@@ -64,8 +64,10 @@ function renderOverview(){
 
   view.innerHTML = `<div class="ov">
     <section class="ov-greet rise">
+      <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
       <p>${sub}</p>
+      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.keys(AI_TOOLS).length + 1 : 1} AI assistants</span></div>
     </section>
 
     ${has ? `<section class="ov-hero rise" aria-label="Current assessment">

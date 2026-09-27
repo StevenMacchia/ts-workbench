@@ -21,6 +21,7 @@ function openSaved(id){
 }
 function newAssessment(){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
+  if(document.body && document.body.dataset) document.body.dataset.route = name;
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";

@@ -62,12 +62,30 @@ function copyText(txt, toastEl){
   catch(e){ done('Copy was blocked in this view'); }
 }
 const view = $('#view');
-const head = (title, desc, crumb, meta='') => `
+// Tool pages open with a hero band. Its icon and key stats come from the current route.
+const HEAD_META = () => {
+  const r = (location.hash || "").slice(1).split("/")[0] || "overview";
+  const ai = ["Runs on your own Claude account", "Nothing stored on a server", "A person makes the final call"];
+  const m = {
+    premortem:["radar", () => [HARMS.length + " abuse risks", Object.keys(SG).length + " safeguards", REGIONS.length + " jurisdictions"]],
+    tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", "8 company types", "The law behind every call"]],
+    metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
+    vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
+    policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => ai],
+    workspace:["user", () => []], about:["info", () => []]
+  }[r];
+  if(!m) return {icon:"logo", stats:[]};
+  let stats = []; try{ stats = m[1](); }catch(e){}
+  return {icon:m[0], stats};
+};
+const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(); return `
   <div class="pagehead">
-    <div>
-      ${crumb?`<div class="crumb"><a href="#overview">Overview</a> / ${esc(crumb)}</div>`:''}
+    <svg class="ph-mark" aria-hidden="true"><use href="#i-${hm.icon}"/></svg>
+    <div class="ph-main">
+      <div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span>${esc(crumb || "T&S Workbench")}</div>
       <h1>${title}</h1>
       <p>${desc}</p>
+      ${hm.stats.length ? `<div class="ph-stats">${hm.stats.map(s => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
     </div>
     ${meta?`<div class="headmeta">${meta}</div>`:''}
-  </div>`;
+  </div>`; };

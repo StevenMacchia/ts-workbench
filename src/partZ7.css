@@ -1,0 +1,78 @@
+
+/* ---------- Visual refresh: hero bands, dark sidebar, overview hero (the look of the share card) ---------- */
+body{--tc:var(--accent);--hero-a:#0D1022;--hero-b:#1B1542;--hero-ink:#F3F4FB;--hero-muted:#C3C6E6;--hero-line:rgba(255,255,255,.14)}
+body[data-route="premortem"]{--tc:var(--t-pm)}
+body[data-route="tabletop"]{--tc:var(--t-tt)}
+body[data-route="metrics"]{--tc:var(--t-mx)}
+body[data-route="vendors"]{--tc:var(--t-vd)}
+body[data-route="policy"]{--tc:var(--t-pol)}
+body[data-route="notice"],body[data-route="appeal"],body[data-route="transparency"]{--tc:var(--t-ai)}
+
+/* Tool hero band */
+.pagehead{position:relative;overflow:hidden;isolation:isolate;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 28px;
+  margin:0 0 28px;padding:34px 38px 32px;border:0;border-radius:22px;color:var(--hero-ink);
+  background:
+    radial-gradient(560px 300px at 92% -20%, color-mix(in oklab, var(--tc) 60%, transparent), transparent 70%),
+    radial-gradient(420px 260px at -5% 120%, rgba(91,91,214,.28), transparent 70%),
+    linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 100%);
+  box-shadow:0 28px 60px -34px rgba(13,16,34,.75), inset 0 0 0 1px rgba(255,255,255,.06)}
+.pagehead::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle, rgba(255,255,255,.07) 1.1px, transparent 1.25px) 0 0/26px 26px;mask-image:linear-gradient(90deg, transparent, #000 35%)}
+.ph-mark{position:absolute;right:-26px;top:-30px;width:230px;height:230px;z-index:-1;color:var(--tc);opacity:.13;transform:rotate(-8deg)}
+.ph-main{min-width:0;max-width:760px}
+.ph-eb{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:500;color:var(--hero-muted);margin-bottom:12px}
+.ph-glyph{background:var(--tc);width:22px;height:22px;border-radius:7px;box-shadow:0 0 0 4px color-mix(in oklab, var(--tc) 22%, transparent)}
+.ph-glyph svg{width:13px!important;height:13px!important}
+.pagehead h1{font-size:clamp(30px,4vw,44px);font-weight:600;letter-spacing:-.038em;line-height:1.05;color:#fff;margin:0}
+.pagehead p{color:var(--hero-muted);font-size:16.5px;line-height:1.55;max-width:64ch;margin:12px 0 0}
+.ph-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.ph-stats span{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:99px;font-size:13px;font-weight:500;color:#E8E9F7;background:rgba(255,255,255,.07);border:1px solid var(--hero-line)}
+.ph-stats span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--tc);box-shadow:0 0 10px color-mix(in oklab, var(--tc) 80%, transparent)}
+.pagehead .headmeta{position:relative;align-items:center}
+.pagehead .headmeta .btn{background:rgba(255,255,255,.08);border-color:var(--hero-line);color:#fff;box-shadow:none}
+.pagehead .headmeta .btn:hover{background:rgba(255,255,255,.15)}
+.pagehead .headmeta .btn.primary{background:#fff;border-color:#fff;color:#14163A}
+.pagehead .headmeta .btn.primary:hover{background:#E9EAFF}
+.pagehead .headmeta .btn svg{color:currentColor}
+.pagehead .toast{color:var(--hero-muted)}
+.pagehead .pill,.pagehead .ai-pill{background:rgba(255,255,255,.1);color:#fff;border:1px solid var(--hero-line)}
+.pagehead .savedtag{color:#9BE3BF}
+
+/* Compact dark bar while reading a metric */
+.mxc{padding:14px 20px;border:0;border-radius:16px;color:var(--hero-ink);margin-bottom:6px;
+  background:radial-gradient(360px 160px at 95% -40%, color-mix(in oklab, var(--tc) 55%, transparent), transparent 70%), linear-gradient(135deg, var(--hero-a), var(--hero-b))}
+.mxc-t{color:#fff}
+.mxc-l:hover .mxc-t{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.mxc-ctx{color:var(--hero-muted)}
+.mxc .btn{background:rgba(255,255,255,.08);border-color:var(--hero-line);color:#fff}
+.mxc .btn.primary{background:#fff;border-color:#fff;color:#14163A}
+
+/* Overview welcome becomes a hero */
+.ov-greet{position:relative;overflow:hidden;isolation:isolate;padding:40px 40px 38px;border-radius:24px;color:var(--hero-ink);gap:10px;
+  background:radial-gradient(600px 320px at 90% -10%, rgba(124,108,255,.42), transparent 70%), linear-gradient(135deg, var(--hero-a), var(--hero-b));
+  box-shadow:0 28px 60px -34px rgba(13,16,34,.75), inset 0 0 0 1px rgba(255,255,255,.06)}
+.ov-greet::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle, rgba(255,255,255,.07) 1.1px, transparent 1.25px) 0 0/26px 26px;mask-image:linear-gradient(90deg, transparent, #000 40%)}
+.ov-greet h1{font-size:clamp(34px,5vw,54px);color:#fff;letter-spacing:-.04em;line-height:1.02}
+.ov-greet p{color:var(--hero-muted);font-size:17px;max-width:62ch}
+
+/* Dark sidebar in both themes: local tokens so only the sidebar changes */
+.side{--ink:#EEF0FA;--side-ink:#C4C8E6;--side-muted:#7F84AA;--muted:#A9ADD0;--faint:#8A8FB5;--hover:rgba(255,255,255,.06);--bg:rgba(255,255,255,.09);
+  --line:rgba(255,255,255,.1);--line-strong:rgba(255,255,255,.2);--sunk:rgba(255,255,255,.05);--side-line:rgba(255,255,255,.08);
+  background:radial-gradient(420px 300px at 0% 0%, rgba(91,91,214,.28), transparent 70%), linear-gradient(180deg,#0E1124 0%,#131236 100%);color:var(--side-ink);border-right:0}
+.side .navlink[aria-current="page"]{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.side .sb-search{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:#9AA0C8}
+.side .sb-search:hover{border-color:rgba(255,255,255,.2);color:#C4C8E6}
+.side .kbd{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#AEB2D2}
+.side .sb-new{background:rgba(255,255,255,.1)}
+.side .themeseg button[aria-pressed="true"]{background:rgba(255,255,255,.12);color:#fff;box-shadow:none}
+
+/* Slightly richer surfaces */
+.card{box-shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px -18px rgba(16,24,40,.18)}
+
+@media (max-width:760px){
+  .pagehead{padding:26px 22px 24px;border-radius:18px;margin-bottom:22px}
+  .pagehead p{font-size:15.5px}
+  .ph-mark{width:160px;height:160px;right:-30px;top:-24px}
+  .ov-greet{padding:28px 22px 26px;border-radius:18px}
+}
+.ov-greet .ph-mark{color:#8B8CFF;opacity:.12;width:260px;height:260px;right:-20px;top:-40px}
+.ov-greet .ph-stats{margin-top:10px}
