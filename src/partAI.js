@@ -278,7 +278,27 @@ function aiScoreFill(){
   return lines.join("\n");
 }
 
+// Tools still being rebuilt show a placeholder page instead of the form
+AI_TOOLS.transparency.wip = true;
+const AI_WIP = {transparency:{
+  plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
+  meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
+function renderAIWip(key){
+  const T = AI_TOOLS[key], w = AI_WIP[key] || {plan:[], meanwhile:[]};
+  view.innerHTML = head(T.n, "This assistant is being rebuilt so it produces reports that hold up in front of regulators. It will be back soon.", "AI assistants", `<span class="pill ai-pill">Under construction</span>`) + `
+    <div class="card wip">
+      <div class="wip-art" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="8" y="30" width="104" height="18" rx="4" fill="var(--sunk)" stroke="var(--line-strong)"/>
+        <path d="M18 30l-10 18M38 30l-12 18M58 30l-12 18M78 30l-12 18M98 30l-12 18M112 36l-8 12" stroke="var(--high)" stroke-width="7" stroke-linecap="square" opacity=".85"/>
+        <rect x="18" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/><rect x="96" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/>
+        <circle cx="21" cy="22" r="6" fill="var(--high)"/><circle cx="99" cy="22" r="6" fill="var(--high)"/><rect x="19" y="24" width="4" height="7" fill="var(--line-strong)"/><rect x="97" y="24" width="4" height="7" fill="var(--line-strong)"/></svg></div>
+      <div class="wip-b"><span class="wip-tag">Under construction</span><h2>${esc(T.n)} is being rebuilt</h2>
+        <p>Transparency reports are read closely by regulators, journalists and researchers, so this tool needs to get the details right. It's offline while that work happens.</p>
+        ${w.plan.length ? `<h4>What it will do</h4><ul>${w.plan.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>
+    </div>
+    ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
+}
 function renderAI(key){
+  if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());

@@ -13,10 +13,11 @@ function renderAbout(){
     ["t-tt","siren","Incident tabletop",`${SCENARIOS.length} crisis scenarios across eight sectors, tailored to the company type you choose. Every weaker answer becomes a lesson: what happened, the stronger call, the principle and the law.`],
     ["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation, with the trap behind every metric."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors with wellness and security minimums and ready-to-use RFP questions."],
+    ["t-ma","steps","Program maturity","Rates a trust and safety program in eight areas, from policy to reviewer wellbeing, against targets for its stage. A radar shows where it stands, and a phased roadmap links each gap to the tool that helps close it."],
     ["t-pol","doc","Policy stress-tester","Paste a platform rule to get an instant clarity check, then an AI review with vague terms, missing exceptions, eight edge cases, relevant laws and a clearer rewrite."],
     ["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to a user who was actioned, with a short version and a check against what an EU statement of reasons must include."],
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal: each element of the rule tested against the facts, the user's arguments weighed, and a suggested reply. A person makes the final call."],
-    ["t-ai","chart","Transparency report drafter","Turns enforcement numbers, including your Metrics scorecard, into report sections, and lists what the EU Digital Services Act would expect that is still missing."]
+    ["t-ai","chart","Transparency report drafter (under construction)","Being rebuilt. It will turn enforcement numbers, including your Metrics scorecard, into report sections, and list what the EU Digital Services Act would expect that is still missing."]
   ];
   const decisions = [
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. AI features run only on a click, on the visitor's own Claude account, which keeps them free to offer. Export and import move work between devices."],

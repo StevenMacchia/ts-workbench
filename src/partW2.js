@@ -6,7 +6,8 @@ const KINDS = {
   tabletop:{n:"Incident tabletop", plural:"Tabletops", icon:"i-siren", route:"tabletop", prefix:"TT"},
   metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
-  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"}
+  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
+  maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
 function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }
@@ -61,6 +62,11 @@ function itemSummary(it){
     const top = vendorResult(d);
     return {html: top ? `<span class="pill accent">Recommended: ${esc(top.v.name)}</span><span class="note">Score ${top.score.toFixed(2)} / 5 · ${d.vendors.length} vendors</span>`
                       : `<span class="pill crit">No vendor meets the minimums</span>`};
+  }
+  if(it.kind==="maturity" && typeof maScore === "function"){
+    const sc = maScore(d), g = maGaps(d).length, n = MA_AREAS.filter(a => d.lv && d.lv[a.k]).length;
+    if(sc === null) return {html:`<span class="note">Not rated yet</span>`};
+    return {html:`<span class="pill ${g ? "high" : "good"}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`};
   }
   if(it.kind==="policy"){
     const s = d.result ? d.result.score : d.heur ? d.heur.score : null;
@@ -191,6 +197,7 @@ function bindWorkspace(){
       if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
       if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
       if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
+      if(it.kind==="maturity"){ ma = JSON.parse(JSON.stringify(it.data)); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
       return goRoute(KINDS[it.kind].route); }
     if(d.wsNew){ const k = d.wsNew;
       if(k==="premortem"){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); }
@@ -198,6 +205,7 @@ function bindWorkspace(){
       if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
       if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
+      if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = {stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}; store.set("ma", ma); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
       copy.id = it.kind==="premortem" ? newId() : wsNewId(KINDS[it.kind].prefix); copy.title = (it.title||"Untitled") + " (copy)"; copy.created = null; copy.updated = null;
@@ -206,7 +214,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();

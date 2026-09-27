@@ -71,7 +71,8 @@ const HEAD_META = () => {
     tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", "8 company types", "The law behind every call"]],
     metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
     vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
-    policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => ai],
+    maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
+    policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
     workspace:["user", () => []], about:["info", () => []]
   }[r];
   if(!m) return {icon:"logo", stats:[]};

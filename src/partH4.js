@@ -29,12 +29,23 @@ OV_ART.pol = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" ari
     <rect x="46" y="68" width="50" height="4" rx="2" fill="var(--faint)" opacity=".5"/><rect x="46" y="78" width="40" height="4" rx="2" fill="var(--faint)" opacity=".35"/><rect x="46" y="88" width="46" height="4" rx="2" fill="var(--faint)" opacity=".35"/>
     <circle cx="116" cy="84" r="20" fill="var(--surface)" stroke="var(--t-pol)" stroke-width="3"/><path d="M130 98l10 10" stroke="var(--t-pol)" stroke-width="4" stroke-linecap="round"/>
     <path d="M108.5 84l5 5 9-10" stroke="var(--t-pol)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+{
+  const oct = (r, vals) => [0,1,2,3,4,5,6,7].map(i => { const a = -Math.PI/2 + i*Math.PI/4, rr = vals ? vals[i]/4*r : r; return (80 + Math.cos(a)*rr).toFixed(1) + "," + (62 + Math.sin(a)*rr).toFixed(1); }).join(" ");
+  const cur = [3.4,2,3,2.2,1.4,2.6,3,3.2], low = -Math.PI/2 + 4*Math.PI/4;
+  OV_ART.ma = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    ${[46, 34, 22].map(r => `<polygon points="${oct(r)}" fill="none" stroke="var(--line-strong)"/>`).join("")}
+    <polygon points="${oct(46, cur)}" fill="var(--t-ma)" fill-opacity=".22" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
+    <circle cx="${(80 + Math.cos(low)*1.4/4*46).toFixed(1)}" cy="${(62 + Math.sin(low)*1.4/4*46).toFixed(1)}" r="4" fill="var(--crit)"/></svg>`;
+}
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
   if(it.kind==="tabletop"){ const sc = SCENARIOS[d.s]; if(!sc) return ""; const picks = (d.first && d.first.length) ? d.first : (d.picks||[]); const b = picks.filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
     return `<span class="ov-chip"><span class="sdot" style="background:${b>=3?"var(--good)":b>=2?"var(--high)":"var(--crit)"}"></span>${b}/${sc.steps.length} first try</span>`; }
   if(it.kind==="metrics"){ const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length; return `<span class="ov-chip">${n} metrics</span>`; }
+  if(it.kind==="maturity" && typeof maScore === "function"){ const sc = maScore(d); if(sc===null) return ""; const g = maGaps(d).length;
+    return `<span class="ov-chip"><span class="sdot" style="background:${g ? "var(--high)" : "var(--good)"}"></span>Level ${sc.toFixed(1)}</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
@@ -67,7 +78,7 @@ function renderOverview(){
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
       <p>${sub}</p>
-      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.keys(AI_TOOLS).length + 1 : 1} AI assistants</span></div>
+      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
     </section>
 
     ${has ? `<section class="ov-hero rise" aria-label="Current assessment">
@@ -106,12 +117,13 @@ function renderOverview(){
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
       </div>
     </section>
 
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic" href="#${k}"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
 
     <section class="ov-cols rise">

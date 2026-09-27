@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>T&amp;S Workbench: free Trust &amp; Safety tools</title>
-<meta name="description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring and AI assistants. Built by Steven Macchia.">
+<meta name="description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, a program maturity assessment and AI assistants. Built by Steven Macchia.">
 <meta name="author" content="Steven Macchia">
 <meta name="theme-color" content="#5B5BD6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%235B5BD6%22%2F%3E%3Cpath%20d%3D%22M16%206l8%203.4v5.8c0%205-3.4%208.8-8%2010.8-4.6-2-8-5.8-8-10.8V9.4z%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M12.5%2016l2.4%202.4%204.6-4.8%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="T&amp;S Workbench: free Trust &amp; Safety tools">
-<meta property="og:description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring and AI assistants. Built by Steven Macchia.">
+<meta property="og:description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, a program maturity assessment and AI assistants. Built by Steven Macchia.">
 <meta property="og:url" content="https://stevenmacchia.github.io/ts-workbench/">
 <meta property="og:image" content="https://stevenmacchia.github.io/ts-workbench/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -1937,6 +1937,208 @@ body[data-route="notice"],body[data-route="appeal"],body[data-route="transparenc
 }
 .ov-greet .ph-mark{color:#8B8CFF;opacity:.12;width:260px;height:260px;right:-20px;top:-40px}
 .ov-greet .ph-stats{margin-top:10px}
+
+/* ---------- Program maturity ---------- */
+:root{--t-ma:#D6409F}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-ma:#F07CC4} }
+:root[data-theme="dark"],:root[data-mode="dark"]{--t-ma:#F07CC4}
+:root[data-mode="light"]{--t-ma:#D6409F}
+body[data-route="maturity"]{--tc:var(--t-ma)}
+.ma-q{margin:18px 0 0;border-left-color:var(--t-ma)}
+.ma-exb{margin-top:18px}
+.ma-grid .vd-bar i{background:var(--t-ma)}
+
+/* stage cards */
+.ma-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ma-stage{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:8px;align-content:start;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface);transition:border-color .15s, box-shadow .15s}
+.ma-stage:hover{border-color:var(--line-strong)}
+.ma-stage:focus-visible{outline:2px solid var(--t-ma);outline-offset:2px}
+.ma-stage.on{border-color:var(--t-ma);box-shadow:inset 0 0 0 1px var(--t-ma);background:color-mix(in oklab, var(--t-ma) 5%, var(--surface))}
+.ma-stage-h{display:flex;align-items:center;gap:10px;font-size:15.5px}
+.ma-radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-strong);flex:none;display:grid;place-items:center}
+.ma-stage.on .ma-radio{border-color:var(--t-ma)}
+.ma-stage.on .ma-radio::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--t-ma)}
+.ma-stage-d{font-size:13.5px;line-height:1.5;color:var(--muted)}
+.ma-stage-t{font-size:12.5px;font-weight:500;color:var(--ink);padding-top:8px;border-top:1px solid var(--line)}
+.ma-why-t{margin:-8px 0 0}
+
+/* area accordion */
+.ma-areas{display:grid;gap:10px}
+.ma-area{padding:0;overflow:hidden;scroll-margin-top:80px;transition:box-shadow .2s, border-color .2s}
+.ma-area.open{border-color:color-mix(in oklab, var(--t-ma) 45%, var(--line));box-shadow:0 14px 40px -26px color-mix(in oklab, var(--t-ma) 60%, transparent)}
+.ma-row{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:30px minmax(0,1fr) auto 18px;gap:14px;align-items:center;padding:14px 18px}
+.ma-row:hover{background:var(--hover)}
+.ma-row:focus-visible{outline:2px solid var(--t-ma);outline-offset:-2px}
+.ma-num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 13px var(--body);background:var(--sunk);color:var(--muted)}
+.ma-num svg{width:15px;height:15px}
+.ma-num.ok{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
+.ma-num.gap{background:var(--high-soft);color:var(--high)}
+.ma-area.open .ma-num:not(.ok):not(.gap){background:var(--t-ma);color:#fff}
+.ma-rt{display:grid;gap:2px;min-width:0}
+.ma-rt b{font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+.ma-rt small{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ma-area.open .ma-rt small{white-space:normal;color:var(--ink);font-size:15px;line-height:1.45}
+.ma-chip{font-size:12px;font-weight:500;padding:3px 10px;border-radius:99px;white-space:nowrap;background:var(--sunk);color:var(--muted)}
+.ma-chip.ok{background:color-mix(in oklab, var(--good) 13%, transparent);color:var(--good)}
+.ma-chip.gap{background:var(--high-soft);color:var(--high)}
+.ma-chev{width:16px;height:16px;color:var(--faint);transition:transform .2s}
+.ma-row[aria-expanded="true"] .ma-chev{transform:rotate(90deg)}
+.ma-body{padding:2px 18px 18px 62px;display:grid;gap:12px}
+.ma-whyline{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+.ma-hint{margin:0;font-size:13px;font-weight:500;color:var(--t-ma)}
+.ma-opts{display:grid;gap:6px}
+.ma-opt{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);transition:border-color .15s, background .15s}
+.ma-opt:hover{border-color:var(--line-strong);background:var(--hover)}
+.ma-opt:focus-visible{outline:2px solid var(--t-ma);outline-offset:1px}
+.ma-opt.on{border-color:var(--t-ma);background:color-mix(in oklab, var(--t-ma) 8%, var(--surface));box-shadow:inset 0 0 0 1px var(--t-ma)}
+.ma-on{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font:600 13px var(--body);background:var(--sunk);color:var(--muted)}
+.ma-opt.on .ma-on{background:var(--t-ma);color:#fff}
+.ma-ot{display:grid;gap:3px;font-size:14px;line-height:1.5;color:var(--muted)}
+.ma-oh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ma-oh b{font-size:14.5px;color:var(--ink);font-weight:600}
+.ma-opt.on .ma-ot{color:var(--ink)}
+.ma-tg{font-size:11px;font-weight:600;letter-spacing:.02em;padding:1px 8px;border-radius:99px;border:1px dashed var(--ink);color:var(--ink);opacity:.75}
+.ma-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
+.ma-tool{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--t-ma);text-decoration:none}
+.ma-tool:hover{text-decoration:underline;text-underline-offset:3px}
+.ma-tool svg{width:14px;height:14px}
+
+/* rail and radar */
+.ma-score{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.ma-score .mono{font-size:30px;font-weight:600;letter-spacing:-.02em}
+.ma-pill{margin-left:auto;background:color-mix(in oklab, var(--t-ma) 14%, transparent);color:var(--t-ma);border:0}
+.ma-radar{width:100%;height:auto;display:block;overflow:visible}
+.ma-rl{font:500 12px var(--body);fill:var(--muted)}
+.ma-radar.big .ma-rl{font-size:12.5px;fill:var(--ink)}
+.ma-rv{font:600 12px var(--mono);fill:var(--t-ma)}
+.ma-rv.gap{fill:var(--crit)}
+.ma-cur{transition:all .3s ease}
+.ma-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.ma-legend span{display:inline-flex;align-items:center;gap:6px}
+.ma-legend i{display:inline-block;width:14px;height:10px;border-radius:3px}
+.ma-lg-cur{background:color-mix(in oklab, var(--t-ma) 25%, transparent);border:2px solid var(--t-ma)}
+.ma-lg-tgt{border:1.5px dashed var(--ink);opacity:.6;border-radius:2px!important}
+.ma-lg-gap{width:10px!important;height:10px!important;border-radius:50%!important;background:var(--crit)}
+.ma-prog{display:grid;gap:6px;padding-top:10px;border-top:1px solid var(--line)}
+.ma-prog-t{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted)}
+
+/* result */
+.ma-res{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+.ma-sum{padding:18px 20px;display:grid;gap:12px}
+.ma-sum-t{font-size:15.5px;line-height:1.65}
+.ma-sum-t p{margin:0}
+.ma-sum-t p + p{margin-top:8px}
+.ma-stand{padding:18px 20px;display:grid;gap:10px}
+.ma-stand h4{margin:0 0 4px;font-size:15.5px}
+.ma-sr{display:grid;grid-template-columns:minmax(0,1fr) auto 72px;gap:12px;align-items:center;font-size:13.5px}
+.ma-sn{line-height:1.35}
+.ma-cells{display:flex;gap:3px}
+.ma-cells i{width:18px;height:12px;border-radius:3px;background:var(--sunk)}
+.ma-cells i.f{background:var(--t-ma)}
+.ma-cells i.f.gap{background:var(--high)}
+.ma-cells i.t{outline:1.5px dashed var(--ink);outline-offset:1px}
+.ma-sv{font:500 12.5px var(--mono);text-align:right;color:var(--muted)}
+.ma-sv.gap{color:var(--high)}
+.ma-sv.ok{color:var(--good)}
+.ma-stand .note{margin:4px 0 0;font-size:12px}
+.ma-rh{font-size:18px;margin:30px 0 14px;letter-spacing:-.015em}
+.ma-more{margin:0}
+.ma-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.ma-phase{display:grid;gap:10px;align-content:start;min-width:0}
+.ma-ph{display:flex;align-items:baseline;gap:8px;padding:0 2px 8px;border-bottom:2px solid var(--line)}
+.ma-now .ma-ph{border-bottom-color:var(--t-ma)}
+.ma-ph b{font-size:15px}
+.ma-ph span{font-size:12.5px;color:var(--muted)}
+.ma-ph .ma-phn{margin-left:auto;font-size:12px}
+.ma-step{padding:14px 16px;display:grid;gap:8px;transition:opacity .2s}
+.ma-step.done{opacity:.6}
+.ma-step-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.ma-step-h b{font-size:14.5px}
+.ma-lvl{font:500 12px var(--mono);color:var(--t-ma)}
+.ma-step-to{font-size:12.5px;color:var(--muted)}
+.ma-check{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.ma-check label{display:grid;grid-template-columns:16px minmax(0,1fr);gap:9px;align-items:start;font-size:13.5px;line-height:1.5;cursor:pointer}
+.ma-check input{margin:3px 0 0;accent-color:var(--t-ma)}
+.ma-check input:checked + span{text-decoration:line-through;color:var(--muted)}
+.ma-none{padding:16px 18px;display:grid;gap:6px}
+.ma-acts{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.ma-order{margin:4px 0 0}
+@media (max-width:1100px){.ma-res{grid-template-columns:1fr}}
+@media (max-width:900px){.ma-road{grid-template-columns:1fr}.ma-stages{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .ma-row{grid-template-columns:28px minmax(0,1fr) 16px;gap:10px;padding:12px 14px}
+  .ma-row .ma-chip{grid-column:2;grid-row:2;justify-self:start}
+  .ma-row .ma-chev{grid-column:3;grid-row:1}
+  .ma-body{padding:0 14px 16px}
+  .ma-opt{grid-template-columns:26px minmax(0,1fr);gap:10px;padding:10px 12px}
+  .ma-on{width:26px;height:26px}
+  .ma-sr{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}
+  .ma-sr .ma-sv{grid-column:1/-1;text-align:left;margin-top:-4px}
+}
+
+/* ---------- Overview: six tools in two rows ---------- */
+.ov-tools > .ov-tool,.ov-tools > .ov-tool:nth-child(n+4){grid-column:span 2}
+.ov-tools > .ov-tool:nth-child(n+4) .ov-art{height:122px}
+@media (max-width:1100px){.ov-tools > .ov-tool,.ov-tools > .ov-tool:nth-child(n+4),.ov-tools > .ov-tool:last-child{grid-column:auto}}
+
+/* ---------- Under construction ---------- */
+.side .sb-soon,.sb-soon{color:var(--faint);background:rgba(127,132,170,.16)}
+.wip{display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:center;padding:26px 28px;border-style:dashed;border-color:var(--line-strong)}
+.wip-art{background:repeating-linear-gradient(-45deg, var(--sunk) 0 10px, transparent 10px 20px);border-radius:14px;padding:18px}
+.wip-art svg{width:100%;height:auto;display:block}
+.wip-b{display:grid;gap:10px;justify-items:start}
+.wip-b h2{margin:0;font-size:24px;letter-spacing:-.02em}
+.wip-b p{margin:0;font-size:15.5px;line-height:1.6;color:var(--muted);max-width:62ch}
+.wip-b h4{margin:6px 0 0;font-size:14px}
+.wip-b ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14.5px;line-height:1.5}
+.wip-tag,.wip-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--high-soft);color:var(--high)}
+.wip-chip{font-size:11px;padding:1px 8px;vertical-align:2px;margin-left:4px}
+.wip-h{font-size:17px;margin:28px 0 12px}
+.wip-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.wip-l{display:grid;grid-template-columns:auto minmax(0,1fr) 16px;gap:12px;align-items:start;padding:16px 18px;text-decoration:none;color:inherit;transition:border-color .15s, transform .15s}
+.wip-l:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.wip-l > span:nth-child(2){display:grid;gap:4px}
+.wip-l b{font-size:14.5px}
+.wip-l .ov-go{width:16px;height:16px;color:var(--faint)}
+.ov-aic.wip{opacity:.72}
+@media (max-width:900px){.wip{grid-template-columns:1fr;gap:16px}.wip-art{max-width:220px}.wip-links{grid-template-columns:1fr}}
+
+/* ---------- Policy stress-tester: no empty right column, no panel over the form ---------- */
+.pol-run{position:static}
+.pol-out.is-empty{position:sticky;top:80px;max-height:calc(100vh - 96px);overflow:auto;scrollbar-width:thin;padding-bottom:2px}
+.pol-out.is-empty .pol-empty{grid-template-columns:96px minmax(0,1fr);align-items:center;column-gap:18px;row-gap:8px;padding:20px 22px}
+.pol-out.is-empty .pol-empty-art{width:96px;height:76px;grid-row:span 2}
+.pol-out.is-empty .pol-empty h3{font-size:17.5px;margin:0;align-self:end}
+.pol-out.is-empty .pol-empty p{margin:0;align-self:start;font-size:14px}
+.pol-out.is-empty .pol-get{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px;padding-top:12px;border-top:1px solid var(--line)}
+.pol-out.is-empty .pol-run{border-color:color-mix(in oklab, var(--t-pol) 45%, var(--line));box-shadow:0 14px 40px -28px color-mix(in oklab, var(--t-pol) 70%, transparent)}
+@media (max-width:1100px){.pol-out.is-empty{position:static;max-height:none;overflow:visible}}
+@media (max-width:560px){.pol-out.is-empty .pol-get{grid-template-columns:1fr}.pol-out.is-empty .pol-empty{grid-template-columns:72px minmax(0,1fr)}.pol-out.is-empty .pol-empty-art{width:72px;height:58px}}
+
+/* maturity results: summary and bars side by side at equal height */
+.ma-res{align-items:stretch}
+.ma-sum{align-content:space-between}
+.ma-sum-cta{display:flex;flex-wrap:wrap;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
+.ma-sr{grid-template-columns:minmax(0,1fr) auto 64px}
+.ma-sn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ma-start{display:grid;gap:5px;padding:12px 14px;border-radius:12px;background:color-mix(in oklab, var(--t-ma) 7%, var(--surface));border:1px solid color-mix(in oklab, var(--t-ma) 25%, var(--line));font-size:13.5px;line-height:1.45}
+.ma-start-k{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t-ma)}
+.ma-start b{font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.ma-start > span:not(.ma-start-k){color:var(--muted)}
+.ma-start-go{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--t-ma);margin-top:2px}
+.ma-start-go:hover{text-decoration:underline;text-underline-offset:3px}
+.ma-start-go svg{width:14px;height:14px}
+.ma-start-go:focus-visible{outline:2px solid var(--t-ma);outline-offset:2px;border-radius:4px}
+.ma-scale{display:grid;gap:8px;padding:30px 0 4px}
+.ma-scale-bar{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.ma-scale-bar i{height:10px;border-radius:99px;background:var(--sunk)}
+.ma-scale-bar i.on{background:color-mix(in oklab, var(--t-ma) 55%, transparent)}
+.ma-scale-tg{position:absolute;top:-6px;bottom:-6px;width:0;border-left:2px dashed var(--ink);opacity:.55}
+.ma-scale-you{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--t-ma);box-shadow:0 0 0 3px var(--surface), 0 4px 12px color-mix(in oklab, var(--t-ma) 50%, transparent)}
+.ma-scale-you b{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font:600 12px var(--mono);color:var(--t-ma);white-space:nowrap}
+.ma-scale-l{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;font-size:11.5px;color:var(--muted);text-align:center}
+.ma-scale-l .cur{color:var(--ink);font-weight:600}
+.ma-scale .note{margin:2px 0 0;font-size:12px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2006,6 +2208,7 @@ body[data-route="notice"],body[data-route="appeal"],body[data-route="transparenc
   <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></g></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></g></symbol><symbol id="i-appeal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a1 1 0 011 1v9a1 1 0 01-1 1h-8l-4 4v-4H5a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M9 10.5l2 2 4-4"/></g></symbol><symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></g></symbol><symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></g></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16V4.5h-4.5v4h-4v4h-4v4H4z"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 <div class="app" id="app">
@@ -2023,10 +2226,11 @@ body[data-route="notice"],body[data-route="appeal"],body[data-route="transparenc
       <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
       <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
+      <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer<span class="sb-new sb-ai">AI</span></a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer<span class="sb-new sb-ai">AI</span></a>
-      <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report<span class="sb-new sb-ai">AI</span></a>
+      <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report<span class="sb-new sb-soon" title="Under construction">Soon</span></a>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
@@ -2088,7 +2292,8 @@ const HEAD_META = () => {
     tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", "8 company types", "The law behind every call"]],
     metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
     vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
-    policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => ai],
+    maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
+    policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
     workspace:["user", () => []], about:["info", () => []]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
@@ -6839,7 +7044,8 @@ const KINDS = {
   tabletop:{n:"Incident tabletop", plural:"Tabletops", icon:"i-siren", route:"tabletop", prefix:"TT"},
   metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
-  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"}
+  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
+  maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
 function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }
@@ -6894,6 +7100,11 @@ function itemSummary(it){
     const top = vendorResult(d);
     return {html: top ? `<span class="pill accent">Recommended: ${esc(top.v.name)}</span><span class="note">Score ${top.score.toFixed(2)} / 5 · ${d.vendors.length} vendors</span>`
                       : `<span class="pill crit">No vendor meets the minimums</span>`};
+  }
+  if(it.kind==="maturity" && typeof maScore === "function"){
+    const sc = maScore(d), g = maGaps(d).length, n = MA_AREAS.filter(a => d.lv && d.lv[a.k]).length;
+    if(sc === null) return {html:`<span class="note">Not rated yet</span>`};
+    return {html:`<span class="pill ${g ? "high" : "good"}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`};
   }
   if(it.kind==="policy"){
     const s = d.result ? d.result.score : d.heur ? d.heur.score : null;
@@ -7024,6 +7235,7 @@ function bindWorkspace(){
       if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
       if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
       if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
+      if(it.kind==="maturity"){ ma = JSON.parse(JSON.stringify(it.data)); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
       return goRoute(KINDS[it.kind].route); }
     if(d.wsNew){ const k = d.wsNew;
       if(k==="premortem"){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); }
@@ -7031,6 +7243,7 @@ function bindWorkspace(){
       if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
       if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
+      if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = {stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}; store.set("ma", ma); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
       copy.id = it.kind==="premortem" ? newId() : wsNewId(KINDS[it.kind].prefix); copy.title = (it.title||"Untitled") + " (copy)"; copy.created = null; copy.updated = null;
@@ -7039,7 +7252,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();
@@ -7100,8 +7313,8 @@ function pmProjectSelect(){
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)"};
-const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report drafter", about:"About this project"};
+const TOOL_COLOR = {premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)"};
+const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report drafter", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -7116,6 +7329,7 @@ function openSaved(id){
   if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
   if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
   if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
+  if(it.kind==="maturity"){ ma = JSON.parse(JSON.stringify(it.data)); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
   goRoute(KINDS[it.kind].route);
 }
 function newAssessment(){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); goRoute("premortem"); }
@@ -7144,9 +7358,9 @@ function cmdkItems(){
   const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, icon:iconId, run:()=>goRoute(route)});
   go("Overview","overview","var(--faint)","home"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
-  go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale");
+  go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
-  go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report drafter","transparency","var(--t-ai)","chart");
+  go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); out.push({g:"Go to", label:"Transparency report drafter", sub:"Under construction", color:"var(--faint)", icon:"chart", run:()=>goRoute("transparency")});
   go("About this project","about","var(--faint)","info");
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","system"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
@@ -7221,12 +7435,23 @@ OV_ART.pol = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" ari
     <rect x="46" y="68" width="50" height="4" rx="2" fill="var(--faint)" opacity=".5"/><rect x="46" y="78" width="40" height="4" rx="2" fill="var(--faint)" opacity=".35"/><rect x="46" y="88" width="46" height="4" rx="2" fill="var(--faint)" opacity=".35"/>
     <circle cx="116" cy="84" r="20" fill="var(--surface)" stroke="var(--t-pol)" stroke-width="3"/><path d="M130 98l10 10" stroke="var(--t-pol)" stroke-width="4" stroke-linecap="round"/>
     <path d="M108.5 84l5 5 9-10" stroke="var(--t-pol)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+{
+  const oct = (r, vals) => [0,1,2,3,4,5,6,7].map(i => { const a = -Math.PI/2 + i*Math.PI/4, rr = vals ? vals[i]/4*r : r; return (80 + Math.cos(a)*rr).toFixed(1) + "," + (62 + Math.sin(a)*rr).toFixed(1); }).join(" ");
+  const cur = [3.4,2,3,2.2,1.4,2.6,3,3.2], low = -Math.PI/2 + 4*Math.PI/4;
+  OV_ART.ma = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    ${[46, 34, 22].map(r => `<polygon points="${oct(r)}" fill="none" stroke="var(--line-strong)"/>`).join("")}
+    <polygon points="${oct(46, cur)}" fill="var(--t-ma)" fill-opacity=".22" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
+    <circle cx="${(80 + Math.cos(low)*1.4/4*46).toFixed(1)}" cy="${(62 + Math.sin(low)*1.4/4*46).toFixed(1)}" r="4" fill="var(--crit)"/></svg>`;
+}
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
   if(it.kind==="tabletop"){ const sc = SCENARIOS[d.s]; if(!sc) return ""; const picks = (d.first && d.first.length) ? d.first : (d.picks||[]); const b = picks.filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
     return `<span class="ov-chip"><span class="sdot" style="background:${b>=3?"var(--good)":b>=2?"var(--high)":"var(--crit)"}"></span>${b}/${sc.steps.length} first try</span>`; }
   if(it.kind==="metrics"){ const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length; return `<span class="ov-chip">${n} metrics</span>`; }
+  if(it.kind==="maturity" && typeof maScore === "function"){ const sc = maScore(d); if(sc===null) return ""; const g = maGaps(d).length;
+    return `<span class="ov-chip"><span class="sdot" style="background:${g ? "var(--high)" : "var(--good)"}"></span>Level ${sc.toFixed(1)}</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
@@ -7259,7 +7484,7 @@ function renderOverview(){
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
       <p>${sub}</p>
-      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.keys(AI_TOOLS).length + 1 : 1} AI assistants</span></div>
+      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
     </section>
 
     ${has ? `<section class="ov-hero rise" aria-label="Current assessment">
@@ -7298,12 +7523,13 @@ function renderOverview(){
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
       </div>
     </section>
 
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic" href="#${k}"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
 
     <section class="ov-cols rise">
@@ -7430,10 +7656,11 @@ function renderAbout(){
     ["t-tt","siren","Incident tabletop",`${SCENARIOS.length} crisis scenarios across eight sectors, tailored to the company type you choose. Every weaker answer becomes a lesson: what happened, the stronger call, the principle and the law.`],
     ["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation, with the trap behind every metric."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors with wellness and security minimums and ready-to-use RFP questions."],
+    ["t-ma","steps","Program maturity","Rates a trust and safety program in eight areas, from policy to reviewer wellbeing, against targets for its stage. A radar shows where it stands, and a phased roadmap links each gap to the tool that helps close it."],
     ["t-pol","doc","Policy stress-tester","Paste a platform rule to get an instant clarity check, then an AI review with vague terms, missing exceptions, eight edge cases, relevant laws and a clearer rewrite."],
     ["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to a user who was actioned, with a short version and a check against what an EU statement of reasons must include."],
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal: each element of the rule tested against the facts, the user's arguments weighed, and a suggested reply. A person makes the final call."],
-    ["t-ai","chart","Transparency report drafter","Turns enforcement numbers, including your Metrics scorecard, into report sections, and lists what the EU Digital Services Act would expect that is still missing."]
+    ["t-ai","chart","Transparency report drafter (under construction)","Being rebuilt. It will turn enforcement numbers, including your Metrics scorecard, into report sections, and list what the EU Digital Services Act would expect that is still missing."]
   ];
   const decisions = [
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. AI features run only on a click, on the visitor's own Claude account, which keeps them free to offer. Export and import move work between devices."],
@@ -7732,6 +7959,17 @@ function renderPolicy(){
   const counts = r ? {all:r.edge_cases.length, allow:0, remove:0, escalate:0} : null;
   if(r) r.edge_cases.forEach(c=>counts[c.decision]++);
   const cases = r ? r.edge_cases.filter(c => pol.filter==="all" || c.decision===pol.filter) : [];
+  const runPanel = `
+      <section class="card pol-run">
+        <div id="pol-strength">${polStrengthHTML()}</div>
+        ${ai ? `<div class="field"><span class="lbl">Depth</span><div class="segs" role="group" aria-label="Analysis depth"><button type="button" data-depth="default" aria-pressed="${pol.depth!=="deep"}">Standard</button><button type="button" data-depth="deep" aria-pressed="${pol.depth==="deep"}">Deep, slower</button></div></div>` : ""}
+        <div class="pol-actions">
+          ${polRun.busy ? `<button type="button" class="btn" id="pol-stop">Stop</button>` : `<button type="button" class="btn primary" id="pol-run">${ai?"Stress-test with Claude":"Run instant checks"} ${icon("arrow")}</button>`}
+          <button type="button" class="btn sm" id="pol-full">Load a complete example</button>
+        </div>
+        <p class="note">${ai?"Runs on your own Claude account. Claude asks your permission the first time. Tip: Ctrl+Enter runs the test.":"Instant checks run in your browser and nothing is sent anywhere. Open this page in Claude while signed in to add Claude's review."}</p>
+        ${polRun.err ? `<p class="pol-err" role="alert">${esc(polRun.err)}</p>` : ""}
+      </section>`;
   view.innerHTML = head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
     `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>`) + `
   ${polInfoHTML()}
@@ -7768,25 +8006,16 @@ function renderPolicy(){
         <p class="pol-tip">Claude turns these into edge cases, so describe real situations rather than categories.</p>
       </section>
 
-      <section class="card pol-run">
-        <div id="pol-strength">${polStrengthHTML()}</div>
-        ${ai ? `<div class="field"><span class="lbl">Depth</span><div class="segs" role="group" aria-label="Analysis depth"><button type="button" data-depth="default" aria-pressed="${pol.depth!=="deep"}">Standard</button><button type="button" data-depth="deep" aria-pressed="${pol.depth==="deep"}">Deep, slower</button></div></div>` : ""}
-        <div class="pol-actions">
-          ${polRun.busy ? `<button type="button" class="btn" id="pol-stop">Stop</button>` : `<button type="button" class="btn primary" id="pol-run">${ai?"Stress-test with Claude":"Run instant checks"} ${icon("arrow")}</button>`}
-          <button type="button" class="btn sm" id="pol-full">Load a complete example</button>
-        </div>
-        <p class="note">${ai?"Runs on your own Claude account. Claude asks your permission the first time. Tip: Ctrl+Enter runs the test.":"Instant checks run in your browser and nothing is sent anywhere. Open this page in Claude while signed in to add Claude's review."}</p>
-        ${polRun.err ? `<p class="pol-err" role="alert">${esc(polRun.err)}</p>` : ""}
-      </section>
+${h ? runPanel : ""}
     </div>
 
-    <div class="pol-out" aria-live="polite">
+    <div class="pol-out ${!h ? "is-empty" : ""}" aria-live="polite">
       ${!h ? `<div class="card pol-empty">
           <div class="pol-empty-art">${OV_ART.pol}</div>
           <h3>Stress-test a rule before it goes live</h3>
           <p class="muted">Fill in the four parts on the left, or load a complete example to see a full report.</p>
           <ul class="pol-get"><li>A clarity score and instant checklist</li>${ai?`<li>Words reviewers will read differently, with fixes</li><li>Eight edge cases for your platform, with decisions</li><li>Relevant laws, open questions and a reviewer checklist</li><li>A clearer rewrite, side by side with yours</li>`:`<li>Claude's full review when opened in Claude while signed in</li>`}</ul>
-          <button type="button" class="btn" id="pol-full2">Load a complete example</button></div>` : `
+</div>${runPanel}` : `
       <div class="card pol-sum">
         ${polRing(r ? r.score : h.score, 96)}
         <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
@@ -8134,7 +8363,27 @@ function aiScoreFill(){
   return lines.join("\n");
 }
 
+// Tools still being rebuilt show a placeholder page instead of the form
+AI_TOOLS.transparency.wip = true;
+const AI_WIP = {transparency:{
+  plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
+  meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
+function renderAIWip(key){
+  const T = AI_TOOLS[key], w = AI_WIP[key] || {plan:[], meanwhile:[]};
+  view.innerHTML = head(T.n, "This assistant is being rebuilt so it produces reports that hold up in front of regulators. It will be back soon.", "AI assistants", `<span class="pill ai-pill">Under construction</span>`) + `
+    <div class="card wip">
+      <div class="wip-art" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="8" y="30" width="104" height="18" rx="4" fill="var(--sunk)" stroke="var(--line-strong)"/>
+        <path d="M18 30l-10 18M38 30l-12 18M58 30l-12 18M78 30l-12 18M98 30l-12 18M112 36l-8 12" stroke="var(--high)" stroke-width="7" stroke-linecap="square" opacity=".85"/>
+        <rect x="18" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/><rect x="96" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/>
+        <circle cx="21" cy="22" r="6" fill="var(--high)"/><circle cx="99" cy="22" r="6" fill="var(--high)"/><rect x="19" y="24" width="4" height="7" fill="var(--line-strong)"/><rect x="97" y="24" width="4" height="7" fill="var(--line-strong)"/></svg></div>
+      <div class="wip-b"><span class="wip-tag">Under construction</span><h2>${esc(T.n)} is being rebuilt</h2>
+        <p>Transparency reports are read closely by regulators, journalists and researchers, so this tool needs to get the details right. It's offline while that work happens.</p>
+        ${w.plan.length ? `<h4>What it will do</h4><ul>${w.plan.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>
+    </div>
+    ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
+}
 function renderAI(key){
+  if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
@@ -8209,8 +8458,381 @@ async function aiRun(key){
 if(window.claude && window.claude.use){
   window.claude.use("sample").then(ns => { if(!SAMPLER) SAMPLER = ns; const h = (location.hash || "").slice(1); if(AI_TOOLS[h]) renderAI(h); }).catch(() => {});
 }
+/* =========================================================
+   PROGRAM MATURITY: content (areas, levels, stages, next steps)
+   ========================================================= */
+const MA_LEVELS = [
+  {n:"Reactive", d:"Handled case by case, by whoever is around"},
+  {n:"Developing", d:"Some basics in place, with gaps and inconsistency"},
+  {n:"Defined", d:"Written down, owned and repeatable"},
+  {n:"Managed", d:"Measured, reviewed and improving"},
+  {n:"Leading", d:"Built in, proactive and shaping the field"}
+];
+// Each area: the question it answers, why it matters, what levels 1 to 5 look like, and the steps from each level to the next
+const MA_AREAS = [
+  {k:"policy", n:"Policy and standards", s:"Policy", tool:["policy", "Stress-test a policy"],
+    q:"Are your rules clear, written down and applied the same way every time?",
+    why:"Unclear rules lead to inconsistent decisions, frustrated users and weak answers when regulators ask how you decide.",
+    lv:["Beyond a short terms of service there are no written rules. Decisions depend on who handles the case.",
+      "Public community guidelines exist, but reviewers have little internal guidance and edge cases get settled in chat threads.",
+      "Every public policy has internal enforcement guidelines with examples, a named owner and a change log.",
+      "Policies are reviewed on a schedule and tested against edge cases before launch. Reviewer agreement is tracked for each policy to find unclear rules.",
+      "Policy work draws on research, outside experts and affected communities. The reasoning behind major changes is published, and appeal outcomes shape revisions."],
+    next:[["Write community guidelines that cover your most serious harms", "Name one owner for each policy area"],
+      ["Write internal enforcement guidelines with clear examples for every policy", "Keep a change log so reviewers know what changed and when"],
+      ["Stress-test new and changed policies against edge cases before they ship", "Track reviewer agreement for each policy to find rules that are unclear"],
+      ["Consult outside experts and affected communities on major changes", "Publish the reasoning behind significant policy changes"]]},
+  {k:"detection", n:"Detection and prevention", s:"Detection", tool:["premortem", "Run an abuse pre-mortem"],
+    q:"How do you find harm, other than waiting for users to report it?",
+    why:"Most harmful content is never reported. What you don't detect, you can't act on or measure.",
+    lv:["Harm is found only when users report it, or when it reaches the press.",
+      "Users can report content, and simple keyword or link filters catch obvious abuse. Known illegal images may not be matched.",
+      "Hash matching catches known child sexual abuse and terrorist content, classifiers cover the top harms, and a review tool ranks cases by severity.",
+      "Precision and recall are measured for each detection system, models learn from reviewer decisions, and account signals catch networks, not just single posts.",
+      "New features get an abuse risk review before launch, a red team probes for gaps, and signals are shared with industry partners."],
+    next:[["Add reporting to every place where users meet or post", "Start block lists for the words and links behind your top harms"],
+      ["Match uploads against known CSAM hashes, for example with PhotoDNA, and report matches as the law requires", "Rank the review queue by severity instead of arrival time"],
+      ["Measure precision and recall for each classifier on a labeled sample", "Add account and network signals to catch coordinated abuse"],
+      ["Run an abuse pre-mortem on every new feature before launch", "Join an industry signal-sharing program, such as the GIFCT hash database or the Tech Coalition's Lantern"]]},
+  {k:"operations", n:"Review operations", s:"Operations", tool:["vendors", "Score moderation vendors"],
+    q:"Do you have the people, process and coverage to act on what you find, quickly enough?",
+    why:"Detection only matters if someone acts in time. Slow action lets harm spread and backlogs build.",
+    lv:["A few people review reports when they have time. There are no targets for how fast.",
+      "A dedicated team or vendor works the queues during business hours, with basic service levels.",
+      "Written workflows, service levels by severity, round-the-clock cover for the most severe harms, and escalation paths to legal and leadership.",
+      "Capacity is forecast from volume trends, vendors are managed against a scorecard, and time to action is tracked for each harm.",
+      "Routing, automation and staffing are tuned continuously, and the team can add capacity within hours during an incident."],
+    next:[["Make a named team or vendor responsible for the review queue", "Set a target time to act on user reports"],
+      ["Set service levels by severity, with round-the-clock cover for child safety and threats to life", "Write an escalation path to legal, communications and leadership"],
+      ["Forecast review capacity from volume trends every quarter", "Score vendors on quality, wellness and surge capacity"],
+      ["Automate clear-cut decisions and route complex cases to specialists", "Test a surge plan that adds reviewers within hours"]]},
+  {k:"quality", n:"Quality and appeals", s:"Quality", tool:["appeal", "Try the appeal reviewer"],
+    q:"Are your decisions accurate and consistent, and can users get a mistake fixed?",
+    why:"Wrong decisions hurt good users and erode trust. In the EU, the Digital Services Act requires online platforms to offer a way to appeal.",
+    lv:["Nobody checks decisions, and users who disagree have no way to appeal.",
+      "Decisions are spot-checked now and then. Appeals go to a general support inbox.",
+      "A regular quality sample measures accuracy for each policy, and appeals get a second reviewer and a response target.",
+      "Reviewer agreement and appeal overturn rates are tracked by policy and fed back into training and guidelines.",
+      "Quality is calibrated across every team and vendor, users get specific reasons for decisions, and overturn data drives changes to policy and models."],
+    next:[["Let users appeal every action on their account or content", "Spot-check a small sample of decisions every week"],
+      ["Run a weekly quality sample and report accuracy for each policy", "Give appeals their own queue, a different reviewer and a response target"],
+      ["Track appeal overturn rates by policy and use them to update guidelines", "Hold calibration sessions where reviewers decide the same cases"],
+      ["Calibrate every team and vendor against one shared answer key", "Give users specific reasons with every decision, including an EU statement of reasons where required"]]},
+  {k:"crisis", n:"Crisis response", s:"Crisis", tool:["tabletop", "Run a tabletop exercise"],
+    q:"When something goes badly wrong, does everyone know what to do in the first hour?",
+    why:"In a crisis, the first hours decide how much harm is done, what the headlines say and what regulators think of you.",
+    lv:["Crises are handled as they happen, by whoever is around.",
+      "People know who to call, but there's no written playbook or agreed severity scale.",
+      "A written playbook sets severity levels, an on-call rotation, named roles and ready templates for regulators and the press.",
+      "A tabletop exercise runs at least twice a year, and every major incident gets a blameless review with tracked actions.",
+      "Drills include executives, playbooks cover emerging threats such as elections and AI-generated content, and lessons are shared across the industry."],
+    next:[["Agree what counts as a crisis and who declares one", "List who to call in legal, communications, engineering and law enforcement"],
+      ["Write a playbook with severity levels, roles and an on-call rotation", "Prepare holding statements and regulator notification templates"],
+      ["Run a tabletop exercise at least twice a year", "Hold a blameless review after every major incident and track the actions"],
+      ["Include executives in at least one exercise a year", "Add playbooks for elections, AI-generated content and coordinated attacks"]]},
+  {k:"measurement", n:"Metrics and reporting", s:"Metrics", tool:["metrics", "Build your scorecard"],
+    q:"Can you show leadership, with numbers, whether users are safer this quarter than last?",
+    why:"Without measurement you can't prove progress, win investment or spot a problem before it grows.",
+    lv:["Little is measured beyond counts of reports or removals.",
+      "A dashboard tracks volumes and response times, but not how much harm users actually see.",
+      "A defined scorecard covers prevalence, speed, accuracy and appeals, and leadership reviews it every quarter.",
+      "Every metric has a target, an owner and a trend. Prevalence is measured by sampling, and a transparency report is published.",
+      "Safety metrics shape product and business decisions, include how safe users feel, and are independently audited where required."],
+    next:[["Log every report, decision and action with a timestamp", "Build a simple dashboard for volume and response time"],
+      ["Choose a scorecard that covers prevalence, speed, accuracy and appeals", "Review the scorecard with leadership every quarter"],
+      ["Measure prevalence with a properly sized random sample", "Publish a transparency report"],
+      ["Make safety metrics a required input to launch and business reviews", "Survey users on how safe they feel and track it next to enforcement data"]]},
+  {k:"compliance", n:"Regulatory readiness", s:"Compliance", tool:["premortem", "Map the laws that apply"],
+    q:"Do you know which online safety laws apply to you, and could you prove you meet them?",
+    why:"Online safety laws now carry large fines, and regulators expect evidence, not promises.",
+    lv:["Nobody tracks online safety law. Legal questions come up only after a letter arrives.",
+      "Legal knows the major laws exist, but obligations aren't linked to owners or processes.",
+      "Obligations under laws such as the EU Digital Services Act, the UK Online Safety Act and child safety reporting rules are mapped to owners, processes and evidence.",
+      "Risk assessments are documented and repeated when products change, and requests from regulators and law enforcement follow a tracked process.",
+      "Compliance is built into product development, audits pass without major findings, and the team contributes to consultations on new rules."],
+    next:[["List where you operate and the online safety laws that apply there", "Name who owns regulatory questions"],
+      ["Map each legal obligation to an owner, a process and the evidence you keep", "Set up required reporting, such as reporting CSAM to NCMEC in the US"],
+      ["Document risk assessments and repeat them when products change", "Track regulator and law enforcement requests from receipt to response"],
+      ["Add a regulatory check to your product launch process", "Respond to consultations on upcoming rules"]]},
+  {k:"wellbeing", n:"Team wellbeing", s:"Wellbeing", tool:null,
+    q:"Are the people who review harmful content protected, supported and able to stay?",
+    why:"Repeated exposure to harmful content can cause lasting psychological harm. Burnout also drives turnover and mistakes.",
+    lv:["Reviewers see harmful content with no limits, training or specialist support.",
+      "A general employee assistance program exists, but nothing specific to content exposure.",
+      "Every reviewer, in-house or at a vendor, has exposure limits, specialist counseling, wellness tools such as image blurring, and resilience training.",
+      "Wellbeing is measured through surveys and attrition, and vendor contracts require the same standards as in-house teams.",
+      "Wellbeing is designed into tools and workflows, support continues after people leave the role, and a senior leader is accountable for it."],
+    next:[["Give reviewers access to confidential counseling", "Tell every new reviewer what they'll see and how to get support"],
+      ["Set daily exposure limits for the most harmful content", "Turn on blurring and grayscale by default in review tools"],
+      ["Survey reviewer wellbeing and track attrition every quarter", "Write wellness standards into every vendor contract"],
+      ["Offer support after people leave review roles", "Make a senior leader accountable for reviewer wellbeing"]]}
+];
+const MA_ALL = n => Object.fromEntries(MA_AREAS.map(a => [a.k, n]));
+const MA_STAGES = [
+  {k:"early", n:"Early stage", d:"A founder or first safety hire covers trust and safety, usually with under a million users.",
+    t:Object.assign(MA_ALL(2), {crisis:3, compliance:3, wellbeing:3}), td:"Level 2, and level 3 for crisis response, compliance and wellbeing"},
+  {k:"growth", n:"Growing", d:"A dedicated safety team, millions of users, and new markets or features on the way.", t:MA_ALL(3), td:"Level 3 in every area"},
+  {k:"scale", n:"At scale or regulated", d:"Tens of millions of users, a heavily regulated sector, or extra duties as a very large platform under EU or UK law.", t:MA_ALL(4), td:"Level 4 in every area"}
+];
+// When two gaps are the same size, fix the one that can hurt people or the company fastest first
+const MA_ORDER = ["crisis", "compliance", "detection", "policy", "wellbeing", "operations", "quality", "measurement"];
+const MA_PHASES = [["now", "Now", "Next 90 days"], ["next", "Next", "3 to 6 months"], ["later", "Later", "6 to 12 months"]];
+const MA_EXAMPLE = {stage:"growth", lv:{policy:3, detection:2, operations:3, quality:2, crisis:1, measurement:2, compliance:1, wellbeing:3}, done:{}, ex:true, open:null};
+Object.assign(MX_GLOSS, {
+  "PhotoDNA":"Microsoft's widely used tool for hash matching known child sexual abuse images.",
+  "GIFCT":"The Global Internet Forum to Counter Terrorism. It runs a shared database of hashes of terrorist content for its member companies.",
+  "Lantern":"A Tech Coalition program where companies share signals about accounts and activity that break child safety policies.",
+  "blameless review":"A review after an incident that looks for what in the system failed rather than who to blame, so people report problems openly.",
+  "tabletop exercise":"A practice session where a team talks through a realistic crisis, step by step, to test its plan.",
+  "service level":"An agreed target for how quickly work gets done, such as acting on a severe report within an hour.",
+  "Digital Services Act":"The EU law that sets rules for online services, including notice and action, appeals, transparency reports and, for the largest platforms, risk assessments and audits.",
+  "Online Safety Act":"The UK law that requires online services to assess and reduce the risk of illegal content and of harm to children.",
+  "employee assistance program":"A general counseling benefit offered to all staff. It rarely covers the specific effects of reviewing harmful content.",
+  "calibration session":"A session where reviewers decide the same cases and compare answers, so everyone applies the rules the same way.",
+  "on-call rotation":"A schedule that names who responds to urgent problems at any hour, and who backs them up."
+});
+MX_GLOSS_RE = null;
+/* =========================================================
+   PROGRAM MATURITY: rate eight areas, see the profile, get a roadmap
+   ========================================================= */
+let ma = store.get("ma", null) || {stage:"growth", lv:{}, done:{}, ex:false, open:"policy"};
+if(!ma.done) ma.done = {};
+const MA_STEPS = [["Set your stage", "Targets depend on your size and how regulated you are."], ["Rate each area", "Pick the level that matches your program today, one area at a time."], ["Get your roadmap", "Close the gaps in order, with the tool that helps for each one."]];
+const maSave = () => store.set("ma", ma);
+const maStage = d => MA_STAGES.find(s => s.k === (d || ma).stage) || MA_STAGES[1];
+const maArea = k => MA_AREAS.find(a => a.k === k);
+function maScore(d){
+  const r = MA_AREAS.filter(a => d.lv[a.k]);
+  return r.length ? Math.round(r.reduce((s, a) => s + d.lv[a.k], 0) / r.length * 10) / 10 : null;
+}
+const maLevelName = x => MA_LEVELS[Math.max(0, Math.min(4, Math.floor(x + 1e-9) - 1))].n;
+function maGaps(d){
+  const t = maStage(d).t;
+  return MA_AREAS.filter(a => d.lv[a.k] && d.lv[a.k] < t[a.k]).map(a => ({a, cur:d.lv[a.k], tgt:t[a.k], gap:t[a.k] - d.lv[a.k]}))
+    .sort((x, y) => y.gap - x.gap || MA_ORDER.indexOf(x.a.k) - MA_ORDER.indexOf(y.a.k));
+}
+// One level at a time: every gap's first step comes before any second step, then the list is split into phases
+function maRoadmap(d){
+  const gaps = maGaps(d), steps = [];
+  gaps.forEach((g, gi) => { for(let j = 0; j < g.gap; j++) steps.push({a:g.a, from:g.cur + j, to:g.cur + j + 1, j, gi}); });
+  steps.sort((x, y) => x.j - y.j || x.gi - y.gi);
+  steps.forEach((s, i) => { s.phase = i < 3 ? "now" : i < 6 ? "next" : "later"; s.acts = s.a.next[s.from - 1]; });
+  return steps;
+}
+
+function maRadar(d, big){
+  const W = 400, H = big ? 330 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, n = MA_AREAS.length, t = maStage(d).t;
+  const pt = (i, v) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(ang) * R * v / 5, cy + Math.sin(ang) * R * v / 5]; };
+  const poly = vals => vals.map((v, i) => pt(i, v).map(x => x.toFixed(1)).join(",")).join(" ");
+  const rated = MA_AREAS.filter(a => d.lv[a.k]).length;
+  const rings = [1, 2, 3, 4, 5].map(l => `<polygon points="${poly(MA_AREAS.map(() => l))}" fill="${l === 5 ? "var(--sunk)" : "none"}" fill-opacity="${l === 5 ? .5 : 0}" stroke="var(--line${l === 5 ? "-strong" : ""})" stroke-width="1"/>`).join("");
+  const axes = MA_AREAS.map((a, i) => { const [x, y] = pt(i, 5); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`; }).join("");
+  const labels = MA_AREAS.map((a, i) => {
+    const [x, y] = pt(i, 5 + (big ? 1.25 : 1.1)), c = Math.cos(-Math.PI / 2 + i * 2 * Math.PI / n), anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle";
+    const lv = d.lv[a.k], below = lv && lv < t[a.k];
+    return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${anchor}" class="ma-rl">${esc(a.s)}${big && lv ? `<tspan class="ma-rv ${below ? "gap" : ""}" dx="5">${lv}</tspan>` : ""}</text>`;
+  }).join("");
+  const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--ink)" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+  const cur = rated ? `<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => d.lv[a.k] || 0))}" fill="var(--t-ma)" fill-opacity=".2" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>` : "";
+  const dots = MA_AREAS.map((a, i) => { const lv = d.lv[a.k]; if(!lv) return ""; const [x, y] = pt(i, lv);
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4.5 : 4}" fill="${lv < t[a.k] ? "var(--crit)" : "var(--t-ma)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("");
+  const sc = maScore(d);
+  const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${d.lv[a.k]} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";
+  return `<svg class="ma-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${tgt}${cur}${dots}${labels}
+    ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : big && sc !== null ? "" : ""}</svg>`;
+}
+function maLegend(d){
+  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Your level</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span><span><i class="ma-lg-gap"></i>Below target</span></div>`;
+}
+// Where the overall score sits on the five-level scale, with the stage target marked
+function maScaleHTML(){
+  const sc = maScore(ma); if(sc === null) return "";
+  const t = maStage().t, tg = MA_AREAS.reduce((s, a) => s + t[a.k], 0) / MA_AREAS.length, pos = v => ((v - 1) / 4 * 100).toFixed(1);
+  return `<div class="ma-scale" role="img" aria-label="Overall level ${sc.toFixed(1)} of 5, target about ${tg.toFixed(1)}">
+    <div class="ma-scale-bar">${MA_LEVELS.map((l, j) => `<i class="${j + 1 <= Math.floor(sc + 1e-9) ? "on" : ""}"></i>`).join("")}
+      <span class="ma-scale-tg" style="left:${pos(tg)}%" title="Target"></span><span class="ma-scale-you" style="left:${pos(sc)}%"><b>${sc.toFixed(1)}</b></span></div>
+    <div class="ma-scale-l">${MA_LEVELS.map((l, j) => `<span class="${j + 1 === Math.floor(sc + 1e-9) ? "cur" : ""}">${l.n}</span>`).join("")}</div>
+    <p class="note">The dashed line marks the average target for ${esc(maStage().n.toLowerCase())} programs.</p></div>`;
+}
+function maNextHTML(){
+  const s = maRoadmap(ma)[0]; if(!s) return "";
+  return `<div class="ma-start"><span class="ma-start-k">Start here</span><b>${esc(s.a.n)} <span class="ma-lvl">${s.from} → ${s.to}</span></b><span>${esc(s.acts[0])}</span>
+    <button type="button" class="ma-tool ma-start-go" data-goresult="1">See the full roadmap<svg><use href="#i-arrow"/></svg></button></div>`;
+}
+function maRailHTML(){
+  const sc = maScore(ma), rated = MA_AREAS.filter(a => ma.lv[a.k]).length, gaps = maGaps(ma);
+  return `<div class="vd-rail-h"><h4>Your profile</h4><span class="note">Updates as you rate</span></div>
+    <div class="ma-score">${sc !== null ? `<b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span>` : `<span class="note">Rate the first area to see your profile.</span>`}</div>
+    ${maRadar(ma, false)}
+    ${maLegend(ma)}
+    ${maNextHTML()}
+    <div class="ma-prog"><div class="ma-prog-t"><span>${rated} of ${MA_AREAS.length} areas rated</span>${rated ? `<span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span>` : ""}</div><div class="vd-bar"><i style="width:${rated / MA_AREAS.length * 100}%"></i></div></div>`;
+}
+
+function maStagesHTML(){
+  return `<div class="ma-stages" role="radiogroup" aria-label="Your stage">${MA_STAGES.map(s => `<button type="button" role="radio" aria-checked="${ma.stage === s.k}" class="card ma-stage ${ma.stage === s.k ? "on" : ""}" data-stage="${s.k}">
+    <span class="ma-stage-h"><span class="ma-radio"></span><b>${s.n}</b></span><span class="ma-stage-d">${esc(s.d)}</span><span class="ma-stage-t">Target: ${esc(s.td)}</span></button>`).join("")}</div>
+    <p class="note ma-why-t">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>`;
+}
+function maAreasHTML(){
+  const t = maStage().t, seen = new Set();
+  return MA_AREAS.map((a, i) => {
+    const lv = ma.lv[a.k], open = ma.open === a.k, below = lv && lv < t[a.k];
+    const chip = lv ? `<span class="ma-chip ${below ? "gap" : "ok"}">Level ${lv} · ${MA_LEVELS[lv - 1].n}</span>` : `<span class="ma-chip none">Not rated</span>`;
+    const headRow = `<button type="button" class="ma-row" data-open="${a.k}" aria-expanded="${open}" aria-controls="ma-b-${a.k}">
+      <span class="ma-num ${lv ? (below ? "gap" : "ok") : ""}">${lv ? `<svg><use href="#i-check"/></svg>` : i + 1}</span>
+      <span class="ma-rt"><b>${esc(a.n)}</b><small>${esc(a.q)}</small></span>${chip}<svg class="ma-chev"><use href="#i-chev"/></svg></button>`;
+    if(!open) return `<div class="card ma-area">${headRow}</div>`;
+    return `<div class="card ma-area open" id="ma-a-${a.k}">${headRow}
+      <div class="ma-body" id="ma-b-${a.k}">
+        <p class="ma-whyline">${mxGloss(a.why, seen)}</p>
+        <p class="ma-hint">Pick the highest level where every statement is true today.</p>
+        <div class="ma-opts" role="radiogroup" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" role="radio" aria-checked="${lv === j + 1}" class="ma-opt ${lv === j + 1 ? "on" : ""}" data-k="${a.k}" data-n="${j + 1}">
+          <span class="ma-on">${j + 1}</span><span class="ma-ot"><span class="ma-oh"><b>${MA_LEVELS[j].n}</b>${t[a.k] === j + 1 ? `<span class="ma-tg">Target</span>` : ""}</span><span>${mxGloss(txt, seen)}</span></span></button>`).join("")}</div>
+        <div class="ma-foot">${a.tool ? `<a class="ma-tool" href="#${a.tool[0]}">${esc(a.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : `<span></span>`}
+          ${i < MA_AREAS.length - 1 ? `<button type="button" class="btn sm" data-open="${MA_AREAS[i + 1].k}">Next: ${esc(MA_AREAS[i + 1].n)}</button>` : `<button type="button" class="btn sm" data-goresult="1">See your roadmap</button>`}</div>
+      </div></div>`;
+  }).join("");
+}
+function maWhy(){
+  const sc = maScore(ma), rated = MA_AREAS.filter(a => ma.lv[a.k]), gaps = maGaps(ma), t = maStage().t;
+  if(!rated.length) return `<p>Rate at least one area to see where your program stands. It takes about five minutes for all eight.</p>`;
+  const strong = rated.filter(a => ma.lv[a.k] >= t[a.k]).sort((x, y) => ma.lv[y.k] - ma.lv[x.k]).slice(0, 2);
+  const list = xs => xs.map(a => `<b>${esc(a.s.toLowerCase())}</b>`).join(" and ");
+  let h = `<p>Your program is at <b>level ${sc.toFixed(1)}</b> overall, which is <b>${maLevelName(sc).toLowerCase()}</b>${rated.length < MA_AREAS.length ? `, based on ${rated.length} of ${MA_AREAS.length} areas` : ""}.`;
+  h += strong.length ? ` It's strongest in ${list(strong)}.</p>` : `</p>`;
+  if(!gaps.length) h += `<p>Every rated area meets the target for ${esc(maStage().n.toLowerCase())} programs. To keep improving, work toward level 5 where your users face the most risk, or check the targets for the next stage.</p>`;
+  else { const g = gaps[0];
+    h += `<p>${gaps.length === 1 ? "One area is" : `${gaps.length} areas are`} below target. Start with <b>${esc(g.a.n.toLowerCase())}</b>, at level ${g.cur} against a target of ${g.tgt}: ${esc(g.a.next[g.cur - 1][0].charAt(0).toLowerCase() + g.a.next[g.cur - 1][0].slice(1))}.</p>`; }
+  return h;
+}
+function maStandHTML(){
+  const t = maStage().t;
+  return `<div class="card ma-stand"><h4>Where you stand</h4>${MA_AREAS.map(a => { const lv = ma.lv[a.k] || 0, below = lv && lv < t[a.k];
+    return `<div class="ma-sr" title="${esc(a.n)}"><span class="ma-sn">${esc(a.s)}</span>
+      <span class="ma-cells" aria-hidden="true">${[1, 2, 3, 4, 5].map(n => `<i class="${n <= lv ? (below ? "f gap" : "f") : ""} ${n === t[a.k] ? "t" : ""}"></i>`).join("")}</span>
+      <span class="ma-sv ${below ? "gap" : lv ? "ok" : ""}">${!lv ? "Not rated" : below ? `${lv} of ${t[a.k]}` : `${lv} ✓`}</span></div>`; }).join("")}
+    <p class="note">Filled cells show your level. The outlined cell is the target for your stage.</p></div>`;
+}
+function maRoadmapHTML(){
+  const steps = maRoadmap(ma), seen = new Set(), unrated = MA_AREAS.filter(a => !ma.lv[a.k]);
+  const more = unrated.length ? `<div class="banner ma-more"><span>Rate the remaining ${unrated.length === 1 ? "area" : unrated.length + " areas"} (${unrated.map(a => esc(a.s.toLowerCase())).join(", ")}) to complete your roadmap.</span><button type="button" class="btn sm" data-open="${unrated[0].k}" data-scroll="1">Rate ${esc(unrated[0].n.toLowerCase())}</button></div>` : "";
+  if(!steps.length) {
+    const stretch = MA_AREAS.filter(a => ma.lv[a.k] && ma.lv[a.k] < 5).sort((x, y) => ma.lv[x.k] - ma.lv[y.k] || MA_ORDER.indexOf(x.k) - MA_ORDER.indexOf(y.k)).slice(0, 3);
+    return more + (MA_AREAS.some(a => ma.lv[a.k]) ? `<div class="card ma-none"><b>No gaps against your targets.</b><p class="note">${stretch.length ? "Stretch goals, if you want to go further:" : "Every area is at the top level."}</p>
+      ${stretch.length ? `<ul class="ma-acts">${stretch.map(a => `<li>${mxGloss(a.next[ma.lv[a.k] - 1][0], seen)} <span class="note">(${esc(a.n)})</span></li>`).join("")}</ul>` : ""}</div>` : "");
+  }
+  const card = s => { const id = `${s.a.k}${s.from}`, done = s.acts.filter((x, i) => ma.done[id + "-" + i]).length;
+    return `<article class="card ma-step ${done === s.acts.length ? "done" : ""}">
+      <div class="ma-step-h"><b>${esc(s.a.n)}</b><span class="ma-lvl">Level ${s.from} → ${s.to}</span></div>
+      <span class="ma-step-to">Reach <b>${MA_LEVELS[s.to - 1].n.toLowerCase()}</b></span>
+      <ul class="ma-check">${s.acts.map((x, i) => `<li><label><input type="checkbox" data-done="${id}-${i}" ${ma.done[id + "-" + i] ? "checked" : ""}><span>${mxGloss(x, seen)}</span></label></li>`).join("")}</ul>
+      ${s.a.tool ? `<a class="ma-tool" href="#${s.a.tool[0]}">${esc(s.a.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</article>`; };
+  return more + `<div class="ma-road">${MA_PHASES.map(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return "";
+    return `<section class="ma-phase ma-${k}"><div class="ma-ph"><b>${n}</b><span>${when}</span><span class="ma-phn mono">${xs.length}</span></div>${xs.map(card).join("")}</section>`; }).join("")}</div>
+    <p class="note ma-order">Each area moves one level at a time. When two gaps are the same size, the roadmap starts where a gap can hurt people or the company fastest: crisis response, then compliance, then detection.</p>`;
+}
+function maResultHTML(){
+  const any = MA_AREAS.some(a => ma.lv[a.k]);
+  return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
+      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button></div>` : ""}</div>${maStandHTML()}</div>
+    <h4 class="ma-rh">Your roadmap</h4>${maRoadmapHTML()}`;
+}
+function maMarkdown(d){
+  const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d);
+  const L = [`# Trust & Safety program maturity`, ``, `${p && p.org ? p.org + " · " : ""}${maStage(d).n} · ${new Date().toISOString().slice(0, 10)}`, ``];
+  L.push(sc !== null ? `**Overall: level ${sc.toFixed(1)} of 5 (${maLevelName(sc)})**` : `Not rated yet.`, ``);
+  L.push(`| Area | Level | Target | Status |`, `|---|---|---|---|`);
+  MA_AREAS.forEach(a => { const lv = d.lv[a.k]; L.push(`| ${a.n} | ${lv ? lv + " · " + MA_LEVELS[lv - 1].n : "Not rated"} | ${t[a.k]} | ${!lv ? "" : lv < t[a.k] ? "Below target" : "On target"} |`); });
+  L.push(``, `## Roadmap`, ``);
+  if(!steps.length) L.push(`No gaps against the targets for this stage.`, ``);
+  MA_PHASES.forEach(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return;
+    L.push(`### ${n} (${when})`, ``);
+    xs.forEach(s => { L.push(`**${s.a.n}: level ${s.from} → ${s.to} (${MA_LEVELS[s.to - 1].n})**`); s.acts.forEach((x, i) => L.push(`- [${d.done && d.done[s.a.k + s.from + "-" + i] ? "x" : " "}] ${x}`)); L.push(``); }); });
+  L.push(`## What each level means`, ``);
+  MA_AREAS.forEach(a => { L.push(`### ${a.n}`, ``, `_${a.q}_`, ``); a.lv.forEach((x, j) => L.push(`${j + 1}. **${MA_LEVELS[j].n}.** ${x}`)); L.push(``); });
+  L.push(`---`, `Made with T&S Workbench. A self-assessment to guide planning, not an audit.`);
+  return L.join("\n");
+}
+const maTitle = d => `Program maturity: ${maStage(d).n.toLowerCase()}, level ${(maScore(d) || 0).toFixed(1)}`;
+
+function maHeadMeta(){
+  const any = MA_AREAS.some(a => ma.lv[a.k]);
+  return `<span class="toast" id="ma-toast" aria-live="polite"></span>
+      ${ma.ex ? `<button class="btn sm" data-ma="clear">Clear example</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
+      ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
+      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button>` : ""}`;
+}
+function renderMaturity(){
+  const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
+  view.innerHTML = head("Program Maturity",
+    "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and get a roadmap that tackles the biggest gaps first.",
+    "Run the program", maHeadMeta()) + `
+    <p class="mxa-q ma-q">How mature is your trust and safety program, and what should you fix first?</p>
+    <div class="mxm-how"><ol class="mxm-how-s">${MA_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
+    ${ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : ""}
+    <div class="vd-grid ma-grid">
+      <div class="vd-main">
+        <section class="mxa-part">${step(1)}<div id="ma-stages">${maStagesHTML()}</div></section>
+        <section class="mxa-part">${step(2)}<div class="ma-areas" id="ma-areas">${maAreasHTML()}</div></section>
+        <section class="mxa-part" id="ma-p3">${step(3)}<div id="ma-result">${maResultHTML()}</div></section>
+      </div>
+      <aside class="vd-rail"><div class="card vd-railc" id="ma-rail">${maRailHTML()}</div></aside>
+    </div>
+    <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Levels are adapted from common capability maturity models.</p>`;
+  bindMaturity();
+}
+function maRefresh(parts){
+  const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+  if(parts.includes("stages")) set("ma-stages", maStagesHTML());
+  if(parts.includes("areas")) set("ma-areas", maAreasHTML());
+  set("ma-rail", maRailHTML()); set("ma-result", maResultHTML());
+  const hm = view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = maHeadMeta();
+  bindMaturity(true);
+}
+function maScrollTo(el){ if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); }
+function bindMaturity(partial){
+  const root = view;
+  if(!partial){
+    root.onclick = e => {
+      const b = e.target.closest("button"); if(!b || !root.contains(b)) return;
+      const d = b.dataset;
+      if(d.stage){ ma.stage = d.stage; maSave(); return maRefresh(["stages", "areas"]); }
+      if(d.open){ ma.open = ma.open === d.open && !d.scroll ? null : d.open; maSave(); maRefresh(["areas"]);
+        const el = document.getElementById("ma-a-" + d.open); if(el) maScrollTo(el); return; }
+      if(d.goresult){ ma.open = null; maSave(); maRefresh(["areas"]); return maScrollTo(document.getElementById("ma-p3")); }
+      if(d.k && d.n){
+        const first = !ma.lv[d.k]; ma.lv[d.k] = +d.n; ma.ex = false; maSave();
+        b.parentNode.querySelectorAll(".ma-opt").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
+        const hd = document.querySelector(`[data-open="${d.k}"].ma-row`);
+        if(!first){ maRefresh(["areas"]); const nb = document.querySelector(`.ma-opt[data-k="${d.k}"][data-n="${d.n}"]`); if(nb) nb.focus(); return; }
+        // First rating of an area: show the choice for a moment, then move on to the next unrated area
+        const i = MA_AREAS.findIndex(a => a.k === d.k), order = MA_AREAS.slice(i + 1).concat(MA_AREAS.slice(0, i)), nx = order.find(a => !ma.lv[a.k]);
+        maRefresh([]);
+        setTimeout(() => { ma.open = nx ? nx.k : null; maSave(); maRefresh(["areas"]);
+          if(nx){ const el = document.getElementById("ma-a-" + nx.k); maScrollTo(el); const f = el && el.querySelector(".ma-opt"); if(f) f.focus({preventScroll:true}); }
+          else maScrollTo(document.getElementById("ma-p3")); }, 260);
+        return;
+      }
+      switch(d.ma){
+        case "example": ma = JSON.parse(JSON.stringify(MA_EXAMPLE)); store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
+        case "clear": case "reset": ma = {stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}; store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
+        case "download": { const md = maMarkdown(ma); return offerFile(`ts-program-maturity-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#ma-toast")); }
+        case "save": { const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
+      }
+    };
+    root.onchange = e => { const t = e.target; if(t.dataset && t.dataset.done){ ma.done[t.dataset.done] = t.checked; maSave();
+      const card = t.closest(".ma-step"); if(card) card.classList.toggle("done", [...card.querySelectorAll("input[type=checkbox]")].every(x => x.checked)); } };
+    root.onkeydown = e => {
+      const g = e.target.closest && e.target.closest(".ma-opts, .ma-stages"); if(!g || !["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) return;
+      e.preventDefault(); const bs = [...g.querySelectorAll("[role=radio]")], cur = bs.indexOf(e.target), nx = bs[Math.max(0, Math.min(bs.length - 1, cur + (["ArrowDown", "ArrowRight"].includes(e.key) ? 1 : -1)))];
+      if(nx) nx.focus();
+    };
+  }
+  root.querySelectorAll(".gl").forEach(g => g.onclick = () => g.focus());
+}
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   const name = ROUTES[h] ? h : 'overview';

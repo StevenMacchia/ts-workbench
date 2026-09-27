@@ -12,11 +12,12 @@ const body = function(){
     tabletop:{TT_TYPES, scenarios:scen},
     metrics:{LAYERS, TIER, METRICS, VANITY, MX_PLATFORMS, MX_LOGS, MX_UNITS, MX_LAYER_HOW, MX_HOW, MX_PF, MX_PF_ON, MX_Q, MX_SC, MX_GLOSS, MX_SAMPLE, MX_RV, MX_TARGETS, MX_DEMO},
     vendors:{CRITERIA, DEFAULT_V, VD_Q, VD_RUBRIC},
-    ai:{tools:Object.fromEntries(Object.entries(AI_TOOLS).map(([k, T]) => [k, {n:T.n, desc:T.desc, q:T.q, steps:T.steps, fields:T.fields, example:T.example, prompt:T.prompt(T.example), sample:T.sample}])),
+    maturity:{MA_LEVELS, MA_AREAS, MA_STAGES, MA_ORDER, MA_PHASES, MA_EXAMPLE},
+    ai:{tools:Object.fromEntries(Object.entries(AI_TOOLS).map(([k, T]) => [k, {n:T.n, wip:!!T.wip, desc:T.desc, q:T.q, steps:T.steps, fields:T.fields, example:T.example, prompt:T.prompt(T.example), sample:T.sample}])),
         policy:{examples:typeof POL_EXAMPLES !== "undefined" ? POL_EXAMPLES : null, full:typeof POL_FULL_EXAMPLE !== "undefined" ? POL_FULL_EXAMPLE : null, prompt:polP}}
   }, null, 1);
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 const out = new Function(src)();
 fs.writeFileSync(path.join(process.argv[2] || D, "data.json"), out);

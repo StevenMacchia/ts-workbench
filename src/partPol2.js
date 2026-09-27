@@ -36,6 +36,17 @@ function renderPolicy(){
   const counts = r ? {all:r.edge_cases.length, allow:0, remove:0, escalate:0} : null;
   if(r) r.edge_cases.forEach(c=>counts[c.decision]++);
   const cases = r ? r.edge_cases.filter(c => pol.filter==="all" || c.decision===pol.filter) : [];
+  const runPanel = `
+      <section class="card pol-run">
+        <div id="pol-strength">${polStrengthHTML()}</div>
+        ${ai ? `<div class="field"><span class="lbl">Depth</span><div class="segs" role="group" aria-label="Analysis depth"><button type="button" data-depth="default" aria-pressed="${pol.depth!=="deep"}">Standard</button><button type="button" data-depth="deep" aria-pressed="${pol.depth==="deep"}">Deep, slower</button></div></div>` : ""}
+        <div class="pol-actions">
+          ${polRun.busy ? `<button type="button" class="btn" id="pol-stop">Stop</button>` : `<button type="button" class="btn primary" id="pol-run">${ai?"Stress-test with Claude":"Run instant checks"} ${icon("arrow")}</button>`}
+          <button type="button" class="btn sm" id="pol-full">Load a complete example</button>
+        </div>
+        <p class="note">${ai?"Runs on your own Claude account. Claude asks your permission the first time. Tip: Ctrl+Enter runs the test.":"Instant checks run in your browser and nothing is sent anywhere. Open this page in Claude while signed in to add Claude's review."}</p>
+        ${polRun.err ? `<p class="pol-err" role="alert">${esc(polRun.err)}</p>` : ""}
+      </section>`;
   view.innerHTML = head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
     `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>`) + `
   ${polInfoHTML()}
@@ -72,25 +83,16 @@ function renderPolicy(){
         <p class="pol-tip">Claude turns these into edge cases, so describe real situations rather than categories.</p>
       </section>
 
-      <section class="card pol-run">
-        <div id="pol-strength">${polStrengthHTML()}</div>
-        ${ai ? `<div class="field"><span class="lbl">Depth</span><div class="segs" role="group" aria-label="Analysis depth"><button type="button" data-depth="default" aria-pressed="${pol.depth!=="deep"}">Standard</button><button type="button" data-depth="deep" aria-pressed="${pol.depth==="deep"}">Deep, slower</button></div></div>` : ""}
-        <div class="pol-actions">
-          ${polRun.busy ? `<button type="button" class="btn" id="pol-stop">Stop</button>` : `<button type="button" class="btn primary" id="pol-run">${ai?"Stress-test with Claude":"Run instant checks"} ${icon("arrow")}</button>`}
-          <button type="button" class="btn sm" id="pol-full">Load a complete example</button>
-        </div>
-        <p class="note">${ai?"Runs on your own Claude account. Claude asks your permission the first time. Tip: Ctrl+Enter runs the test.":"Instant checks run in your browser and nothing is sent anywhere. Open this page in Claude while signed in to add Claude's review."}</p>
-        ${polRun.err ? `<p class="pol-err" role="alert">${esc(polRun.err)}</p>` : ""}
-      </section>
+${h ? runPanel : ""}
     </div>
 
-    <div class="pol-out" aria-live="polite">
+    <div class="pol-out ${!h ? "is-empty" : ""}" aria-live="polite">
       ${!h ? `<div class="card pol-empty">
           <div class="pol-empty-art">${OV_ART.pol}</div>
           <h3>Stress-test a rule before it goes live</h3>
           <p class="muted">Fill in the four parts on the left, or load a complete example to see a full report.</p>
           <ul class="pol-get"><li>A clarity score and instant checklist</li>${ai?`<li>Words reviewers will read differently, with fixes</li><li>Eight edge cases for your platform, with decisions</li><li>Relevant laws, open questions and a reviewer checklist</li><li>A clearer rewrite, side by side with yours</li>`:`<li>Claude's full review when opened in Claude while signed in</li>`}</ul>
-          <button type="button" class="btn" id="pol-full2">Load a complete example</button></div>` : `
+</div>${runPanel}` : `
       <div class="card pol-sum">
         ${polRing(r ? r.score : h.score, 96)}
         <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>

@@ -8,6 +8,7 @@ const body = async function(){
   for(const k of keys){
     const T = AI_TOOLS[k];
     location.hash = "#" + k; store.set("ai:" + k, null); renderAI(k);
+    if(T.wip){ if(bad(view.innerHTML)) throw new Error(k + " placeholder has bad values"); eq(/is being rebuilt/.test(view.innerHTML) && !/data-fk=/.test(view.innerHTML), true, k + " shows the under-construction page"); out.push(k + ": under construction page"); continue; }
     if(bad(view.innerHTML)) throw new Error(k + " empty page has bad values");
     eq((view.innerHTML.match(/data-fk=/g)||[]).length >= T.fields.length, true, k + " renders every field");
     eq(/Open in Claude to run|Run it in Claude/.test(view.innerHTML), true, k + " explains AI needs Claude when no sampler");
@@ -34,7 +35,7 @@ const body = async function(){
     out.push(k + ": " + T.fields.length + " fields, example validates, stubbed run saves a result, declined / rate-limited / junk / empty inputs handled");
   }
   mx = {platform:"social", stage:"2", reg:true, vals:{"Violating-content prevalence":{v:"0.09", t:"0.1", a:"0.15"}}}; eq(/Violating-content prevalence: 0.09%/.test(aiScoreFill()), true, "scorecard numbers feed the transparency drafter");
-  renderOverview(); eq((view.innerHTML.match(/class="ov-aic"/g)||[]).length, 3, "overview lists the AI assistants");
+  renderOverview(); eq((view.innerHTML.match(/class="ov-aic[ "]/g)||[]).length, 3, "overview lists the AI assistants");
   renderAbout(); eq(/Appeal reviewer/.test(view.innerHTML), true, "about page lists the new tools");
   eq(cmdkItems().filter(x => ["Enforcement notice writer","Appeal reviewer","Transparency report drafter"].includes(x.label)).length, 3, "search reaches the new tools");
   out.push("overview, about page, search and scorecard hand-off all include the new tools");
