@@ -117,7 +117,10 @@ const MA_STAGES = [
 // When two gaps are the same size, fix the one that can hurt people or the company fastest first
 const MA_ORDER = ["crisis", "compliance", "detection", "policy", "wellbeing", "operations", "quality", "measurement"];
 const MA_PHASES = [["now", "Now", "Next 90 days"], ["next", "Next", "3 to 6 months"], ["later", "Later", "6 to 12 months"]];
-const MA_EXAMPLE = {stage:"growth", lv:{policy:3, detection:2, operations:3, quality:2, crisis:1, measurement:2, compliance:1, wellbeing:3}, done:{}, ex:true, open:null};
+const MA_EXAMPLE = {stage:"growth", lv:{policy:3, detection:2, operations:3, quality:2, crisis:1, measurement:2, compliance:1, wellbeing:3}, ex:true, open:null, tab:"roadmap",
+  done:{"crisis1-0":true, "crisis1-1":true, "compliance1-0":true},
+  own:{crisis:"Head of Trust & Safety Operations", compliance:"Online safety counsel", detection:"Safety engineering lead", quality:"Review operations manager", measurement:"T&S data analyst", policy:"Policy lead"},
+  notes:{crisis:"Escalation contacts agreed in the Q2 leadership offsite. Playbook draft is in progress."}};
 Object.assign(MX_GLOSS, {
   "PhotoDNA":"Microsoft's widely used tool for hash matching known child sexual abuse images.",
   "GIFCT":"The Global Internet Forum to Counter Terrorism. It runs a shared database of hashes of terrorist content for its member companies.",

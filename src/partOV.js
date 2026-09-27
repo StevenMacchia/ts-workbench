@@ -122,8 +122,8 @@ function bindOverviewPicture(){
   const sel = document.getElementById("ov-pm-sel");
   if(sel) sel.onchange = () => { store.set("ov:pm", sel.value); renderOverview(); const s = document.getElementById("ov-pm-sel"); if(s) s.focus(); };
   view.querySelectorAll("[data-ov-ma]").forEach(a => a.onclick = () => {
-    if(a.dataset.ovMa === "example"){ ma = JSON.parse(JSON.stringify(MA_EXAMPLE)); store.set("ws:cur:maturity", null); }
-    else if(ma.ex){ ma = {stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}; }
+    if(a.dataset.ovMa === "example"){ ma = maExample(); store.set("ws:cur:maturity", null); }
+    else if(ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); }
     store.set("ma", ma);
   });
 }

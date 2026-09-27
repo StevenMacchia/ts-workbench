@@ -202,7 +202,7 @@ function bindWorkspace(){
       if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
       if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
       if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
-      if(it.kind==="maturity"){ ma = JSON.parse(JSON.stringify(it.data)); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
+      if(it.kind==="maturity"){ ma = maInit(JSON.parse(JSON.stringify(it.data))); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
       if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
       return goRoute(KINDS[it.kind].route); }
     if(d.wsNew){ const k = d.wsNew;
@@ -212,7 +212,7 @@ function bindWorkspace(){
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
       if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
       if(k==="coverage"){ store.set("ws:cur:coverage", null); cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
-      if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = {stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}; store.set("ma", ma); }
+      if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = maInit({stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
       copy.id = it.kind==="premortem" ? newId() : wsNewId(KINDS[it.kind].prefix); copy.title = (it.title||"Untitled") + " (copy)"; copy.created = null; copy.updated = null;
