@@ -3,33 +3,10 @@
    Program maturity · all products combined · one product at a time
    ========================================================= */
 const OV_LAYER = ["var(--t-tt)", "var(--t-mx)", "var(--t-vd)", "var(--t-ma)", "var(--t-pol)", "var(--high)"];
-// Worst risk in each radar group for one assessment
-function pmGroupData(r){
-  return RADAR_GROUPS.map(g => { const rs = r.risks.filter(x => g.cats.includes(x.cat)).sort((a, b) => b.score - a.score), w = rs[0];
-    return {score:w ? w.score : 0, band:w ? w.band : null, worst:w ? w.n : "", n:rs.length}; });
-}
 // Saved pre-mortems with their assessment, newest first
 function ovSavedPMs(){
   return Object.values(wsItems()).filter(it => it.kind === "premortem" && it.data).sort((a, b) => (b.updated || 0) - (a.updated || 0))
     .map(it => { const r = assess(openRecord(it.data)); return {it, r, g:pmGroupData(r), name:it.title || it.data.name || "Untitled assessment"}; });
-}
-// Risk radar with one or more layers: {g, color, fill} (fill marks the main shape)
-function riskRadarSVG(layers, label){
-  const n = RADAR_GROUPS.length, cx = 180, cy = 124, R = 86, f = v => v.toFixed(1);
-  const ang = i => (-90 + i * 360 / n) * Math.PI / 180, pt = (i, rad) => [cx + rad * Math.cos(ang(i)), cy + rad * Math.sin(ang(i))];
-  const zones = [[16, "var(--crit-soft)"], [12, "var(--high-soft)"], [8, "var(--med-soft)"], [4, "var(--surface)"]]
-    .map(([v, c]) => `<circle cx="${cx}" cy="${cy}" r="${f(R * v / 16)}" fill="${c}" fill-opacity=".75" stroke="var(--line)" stroke-width="1"/>`).join("");
-  const spokes = RADAR_GROUPS.map((g, i) => { const [x, y] = pt(i, R); return `<line x1="${cx}" y1="${cy}" x2="${f(x)}" y2="${f(y)}" stroke="var(--line)"/>`; }).join("");
-  const main = layers.find(l => l.fill) || layers[0];
-  const labels = RADAR_GROUPS.map((g, i) => { const [x, y] = pt(i, R + 13), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = g.l.length - 1, d = main ? main.g[i] : null;
-    const anchor = c > .25 ? "start" : c < -.25 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
-    return `<text x="${f(x)}" y="${f(y)}" text-anchor="${anchor}" class="ov-rl ${d && d.band === "crit" ? "crit" : d && d.score ? "" : "none"}">${g.l.map((t, j) => `<tspan x="${f(x)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
-  const shapes = layers.map(l => { const pts = l.g.map((d, i) => pt(i, R * d.score / 16).map(f).join(",")).join(" ");
-    return l.fill ? `<polygon class="ov-rp" points="${pts}" fill="${l.color}" fill-opacity=".18" stroke="${l.color}" stroke-width="2" stroke-linejoin="round"/>`
-                  : `<polygon points="${pts}" fill="none" stroke="${l.color}" stroke-width="1.4" stroke-opacity=".85" stroke-linejoin="round" stroke-dasharray="${l.dash || ""}"/>`; }).join("");
-  const dots = main ? main.g.map((d, i) => { if(!d.score) return ""; const [x, y] = pt(i, R * d.score / 16);
-    return `<circle cx="${f(x)}" cy="${f(y)}" r="3.6" fill="var(--${d.band === "low" ? "muted" : d.band})" stroke="var(--surface)" stroke-width="1.6"/>`; }).join("") : "";
-  return `<svg class="ov-radar" viewBox="0 0 360 250" role="img" aria-label="${esc(label)}">${zones}${spokes}${shapes}${dots}${labels}</svg>`;
 }
 // Small radar for lists: just the shape
 function miniRiskRadar(r){
@@ -64,8 +41,10 @@ function ovPictureHTML(){
     maCard = `<article class="card ov-pc ${m.state === "empty" ? "ov-pc-empty" : ""}" style="--c:var(--t-ma)">
       <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span><div><b>Program maturity</b><small>How strong your program is, in 8 areas</small></div>
         ${sc !== null ? `<span class="ov-pc-k"><b class="mono">${sc.toFixed(1)}</b><small>${maLevelName(sc)}</small></span>` : ""}</header>
-      <div class="ov-pc-r">${ghost}${m.state === "empty" ? ovInvite("steps", "var(--t-ma)", "How mature is your program?", "Rate eight areas, from policy to reviewer wellbeing, in about five minutes. You'll get a roadmap for the biggest gaps.",
-          `<a class="btn sm primary" href="#maturity" data-ov-ma="start">Start the assessment</a><a class="btn sm" href="#maturity" data-ov-ma="example">See an example</a>`) : ""}</div>
+      <div class="ov-pc-r">${ghost}</div>
+      ${m.state === "empty" ? ovInvite("steps", "var(--t-ma)", "How mature is your program?", "Rate eight areas, from policy to reviewer wellbeing, in about five minutes. You'll get a roadmap for the biggest gaps.",
+          `<a class="btn sm primary" href="#maturity" data-ov-ma="start">Start the assessment</a><a class="btn sm" href="#maturity" data-ov-ma="example">See an example</a>`)
+        : `<div class="ov-legend"><span><i class="ov-lg-fill" style="--c:var(--t-ma)"></i>Now</span><span><i class="ov-lg-tgt"></i>Target for ${esc(maStage().n.toLowerCase())}</span><span><i class="ov-lg-dot"></i>Below target</span></div>`}
       ${m.state === "empty" ? "" : `<footer class="ov-pc-f"><span>${m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : gaps.length ? `${gaps.length} area${gaps.length === 1 ? "" : "s"} below target · start with ${esc(gaps[0].a.s.toLowerCase())}` : "Every area meets its target"}</span>
         <a class="btn sm" href="#maturity">${m.state === "partial" ? "Continue rating" : "Open roadmap"}</a></footer>`}
     </article>`;
@@ -78,20 +57,21 @@ function ovPictureHTML(){
   const allCard = `<article class="card ov-pc ${emptyPM ? "ov-pc-empty" : ""}" style="--c:var(--t-pm)">
     <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-layers"/></svg></span><div><b>All products</b><small>${emptyPM ? "Combined abuse risk across your products" : `Combined risk across ${pms.length} pre-mortem${pms.length === 1 ? "" : "s"}`}</small></div>
       ${emptyPM ? "" : `<span class="ov-pc-k"><b class="mono" style="${crit ? "color:var(--crit)" : ""}">${crit}</b><small>critical risk${crit === 1 ? "" : "s"}</small></span>`}</header>
-    <div class="ov-pc-r">${emptyPM ? ghostPM + ovInvite("radar", "var(--t-pm)", "How could your products be misused?", "Run a pre-mortem on each product or feature. Their risks combine here, so you can see where your whole portfolio is exposed.",
+    <div class="ov-pc-r">${emptyPM ? ghostPM : riskRadarSVG([...pms.slice(0, OV_LAYER.length).map((p, i) => ({g:p.g, color:OV_LAYER[i], dash:"3 3"})), {g:comb, color:"var(--t-pm)", fill:true}], `Combined risk radar across ${pms.length} products. Highest: ${top ? top.g.n : "none"}.`)}</div>
+    ${emptyPM ? ovInvite("radar", "var(--t-pm)", "How could your products be misused?", "Run a pre-mortem on each product or feature. Their risks combine here, so you can see where your whole portfolio is exposed.",
         `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button><a class="btn sm" href="#premortem">Explore an example</a>`)
-      : riskRadarSVG([...pms.slice(0, OV_LAYER.length).map((p, i) => ({g:p.g, color:OV_LAYER[i], dash:"3 3"})), {g:comb, color:"var(--t-pm)", fill:true}], `Combined risk radar across ${pms.length} products. Highest: ${top ? top.g.n : "none"}.`)}</div>
-    ${emptyPM ? "" : `<div class="ov-legend">${pms.slice(0, 4).map((p, i) => `<span><i style="border-color:${OV_LAYER[i]}"></i>${esc(p.name)}</span>`).join("")}${pms.length > 4 ? `<span class="note">+${pms.length - 4} more</span>` : ""}</div>
+      : `<div class="ov-legend"><span><i class="ov-lg-fill" style="--c:var(--t-pm)"></i>Combined</span>${pms.length > 1 ? pms.slice(0, 3).map((p, i) => `<span><i class="ov-lg-line" style="border-color:${OV_LAYER[i]}"></i>${esc(p.name)}</span>`).join("") + (pms.length > 3 ? `<span class="note">+${pms.length - 3} more</span>` : "") : ""}</div>
     <footer class="ov-pc-f"><span>${top ? `Highest: ${esc(top.g.n.toLowerCase())}${pms.length > 1 ? `, in ${esc(top.d.from)}` : ""}` : "No risks found"}${pms.length === 1 ? " · add another product to compare" : ""}</span><button type="button" class="btn sm" data-ov="new">Add a product</button></footer>`}
   </article>`;
   // 3. One product at a time
   const selId = store.get("ov:pm", null), sel = pms.find(p => p.it.id === selId) || pms[0];
   const oneCard = `<article class="card ov-pc ${sel ? "" : "ov-pc-empty"}" style="--c:var(--t-pm)" id="ov-one">
-    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><b>By product</b><small>${sel ? "Each pre-mortem on its own" : "Each product gets its own radar"}</small></div>
+    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><b>By product</b>${sel && pms.length > 1 ? `<label class="ov-pick"><span class="visually-hidden">Choose a product</span><select class="select" id="ov-pm-sel">${pms.map(p => `<option value="${esc(p.it.id)}" ${p === sel ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>` : `<small>${sel ? esc(sel.name) : "Each product gets its own radar"}</small>`}</div>
       ${sel ? `<span class="ov-pc-k"><span class="pill ${sel.r.posture[1]}">${sel.r.posture[0]}</span></span>` : ""}</header>
-    ${sel && pms.length > 1 ? `<label class="ov-pick"><span class="visually-hidden">Choose a product</span><select class="select" id="ov-pm-sel">${pms.map(p => `<option value="${esc(p.it.id)}" ${p === sel ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>` : sel ? `<p class="ov-pick-one">${esc(sel.name)}</p>` : ""}
-    <div class="ov-pc-r">${sel ? riskRadarSVG([{g:sel.g, color:"var(--t-pm)", fill:true}], `Risk radar for ${sel.name}`) : ghostPM + ovInvite("radar", "var(--t-pm)", "One radar per product", "Save a pre-mortem for each product or launch, then flip between them here to compare how each could be misused.",
-        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button>`)}</div>
+    <div class="ov-pc-r">${sel ? riskRadarSVG([{g:sel.g, color:"var(--t-pm)", fill:true}], `Risk radar for ${sel.name}`) : ghostPM}</div>
+    ${sel ? `<div class="ov-legend">${["crit", "high", "med"].map(b => `<span><i class="ov-lg-dot" style="background:var(--${b})"></i>${BANDS[b][0]}</span>`).join("")}<span><i class="ov-lg-crit"></i>Critical line</span></div>`
+      : ovInvite("radar", "var(--t-pm)", "One radar per product", "Save a pre-mortem for each product or launch, then flip between them here to compare how each could be misused.",
+        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button>`)}
     ${sel ? `<footer class="ov-pc-f"><span>${sel.r.risks.length} risks · ${sel.r.counts.crit} critical · ${sel.r.obligations.filter(o => o.status === "applies").length} laws likely apply</span><button type="button" class="btn sm" data-open="${esc(sel.it.id)}">Open report</button></footer>` : ""}
   </article>`;
   const total = m.state === "none" ? 2 : 3, done = Math.min(total, st.done);
