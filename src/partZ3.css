@@ -1,0 +1,49 @@
+
+/* ---------- About this project ---------- */
+.ab{max-width:840px;margin:0 auto;display:grid;gap:40px;padding-top:8px}
+.ab-hero{display:grid;gap:16px}
+.ab-kicker{font:500 12px var(--mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.ab-hero h1{font-size:46px;letter-spacing:-.055em;line-height:1.02;font-weight:600;margin:0}
+.ab-lede{font-size:19px;line-height:1.5;color:var(--muted);max-width:58ch;letter-spacing:-.012em}
+.ab-by{display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--muted);line-height:1.35;margin:0}
+.ab-by b{color:var(--ink);font-weight:600}
+.ab-by .sb-av{width:36px;height:36px;font-size:13px}
+.ab-by .btn{margin-left:4px}
+.ab-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ab-meta div{padding:13px 0;display:grid;gap:2px}
+.ab-meta div + div{padding-left:18px;border-left:1px solid var(--line)}
+.ab-meta span{font-size:11.5px;color:var(--faint)}
+.ab-meta b{font-size:13.5px;font-weight:500}
+.ab-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:16px;overflow:hidden;background:radial-gradient(90% 140% at 0% 0%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 60%), var(--surface);box-shadow:var(--shadow)}
+.ab-stats div{padding:20px 22px;display:grid;gap:2px}
+.ab-stats div:nth-child(n+4){border-top:1px solid var(--line)}
+.ab-stats div:not(:nth-child(3n+1)){border-left:1px solid var(--line)}
+.ab-stats b{font:600 32px var(--display);letter-spacing:-.04em}
+.ab-stats span{font-size:12.5px;color:var(--faint)}
+.ab-sec h2{font-size:22px;letter-spacing:-.035em;margin:0 0 12px}
+.ab-sec p{font-size:15.5px;line-height:1.72;max-width:68ch;margin:0 0 12px;color:var(--ink)}
+.ab-sec a{color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.ab-sec a svg{width:14px;height:14px}
+.ab-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ab-tool{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+.ab-tool .sb-glyph{width:30px;height:30px;border-radius:9px}
+.ab-tool .sb-glyph svg{width:15px!important;height:15px!important}
+.ab-tool h3{font-size:15px;margin:2px 0 4px}
+.ab-tool p{font-size:13.5px;line-height:1.55;color:var(--muted);margin:0}
+.ab-formula{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 18px}
+.ab-f{display:grid;justify-items:center;gap:2px;min-width:118px;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+.ab-f small{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.ab-f b{font:600 32px var(--mono);letter-spacing:-.03em}
+.ab-f em{font-style:normal;font-size:12px;color:var(--muted)}
+.ab-out{border-color:color-mix(in oklab, var(--crit) 40%, var(--line));background:var(--crit-soft)}
+.ab-out b,.ab-out em{color:var(--crit)}
+.ab-op{font-size:24px;color:var(--faint)}
+.ab-dec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 32px}
+.ab-dec h3{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.ab-dec h3::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent)}
+.ab-dec p{font-size:14px;line-height:1.6;color:var(--muted);margin:0}
+.ab-note{padding:22px 24px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line)}
+.ab-note p{margin:0;color:var(--muted);font-size:14.5px}
+@media (max-width:760px){.ab-hero h1{font-size:34px}.ab-lede{font-size:17px}.ab-meta{grid-template-columns:1fr}.ab-meta div + div{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .ab-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ab-stats div{border-left:0!important;border-top:0}.ab-stats div:nth-child(even){border-left:1px solid var(--line)!important}.ab-stats div:nth-child(n+3){border-top:1px solid var(--line)}
+  .ab-tools,.ab-dec{grid-template-columns:1fr}}

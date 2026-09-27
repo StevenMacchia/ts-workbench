@@ -1,0 +1,10 @@
+/* ---------- Overview risk radar ---------- */
+.radarwrap{position:relative;width:100%;max-width:360px;margin:0 auto}
+.radar{width:100%;height:auto;display:block;overflow:visible}
+.radar text{font-family:var(--body)}
+.rpt{cursor:pointer;outline:none}
+.rpt:focus-visible circle:last-child{stroke:var(--accent);stroke-width:2.5}
+.rtip{position:absolute;transform:translate(-50%,calc(-100% - 6px));z-index:20;background:var(--ink);color:var(--bg);font-size:12px;line-height:1.4;padding:7px 9px;border-radius:6px;pointer-events:none;display:grid;gap:1px;width:max-content;max-width:230px;box-shadow:0 4px 14px rgb(0 0 0 / .18)}
+.rtip[hidden]{display:none}
+.radarcap{text-align:center;margin-top:2px}
+.rtip .rtip-inc{opacity:.75;font-size:11.5px;margin-top:2px}

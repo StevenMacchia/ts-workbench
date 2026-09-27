@@ -1,0 +1,137 @@
+
+/* =========================================================
+   STUDIO POLISH: pre-mortem and tabletop screens
+   ========================================================= */
+/* shared hero surfaces */
+.hero{border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.hero-main{padding:30px 32px;gap:16px}
+.hero-main h2{font-size:28px;letter-spacing:-.04em;line-height:1.12;font-weight:600}
+.hero-main p{font-size:14.5px}
+.hero-side{background:radial-gradient(70% 60% at 50% 30%, var(--glow), transparent 70%), var(--surface-2);border-left:1px solid var(--line)}
+.getlist li b{font-weight:600;font-size:13.5px}
+.libicon{background:color-mix(in oklab, var(--accent) 12%, transparent);color:var(--accent);border-radius:9px}
+.excard{padding:18px;border-radius:14px}
+.excard b{font-size:15px;letter-spacing:-.015em}
+.liblist,.wslist{border-radius:12px;box-shadow:var(--shadow)}
+.librow,.wsrow{transition:background .12s}
+.librow:hover,.wsrow:hover{background:var(--hover)}
+.section-title{margin-top:30px}
+.section-title h2{font-size:16px;letter-spacing:-.02em}
+
+/* question flow */
+.askcard{padding:30px 34px 26px;border-radius:16px}
+.qprog .eyebrow{color:var(--accent);letter-spacing:.06em}
+.askcard > .bar{height:3px!important;background:var(--sunk)}
+.askcard > .bar i{background:linear-gradient(90deg, var(--accent), color-mix(in oklab, var(--accent) 60%, var(--t-tt)))!important;transition:width .4s cubic-bezier(.2,.7,.2,1)}
+.qtitle{font-size:28px;letter-spacing:-.04em;line-height:1.15;margin-top:26px}
+.qhelp{font-size:14.5px;color:var(--muted)}
+.ogrid{gap:10px}
+.ocard{padding:14px 16px 14px 42px;border-radius:12px}
+.ocard::before{left:15px;top:16px}
+.ocard b{font-size:14.5px;letter-spacing:-.01em}
+.ocard span{font-size:13px}
+.ocard.iconcard{padding-left:52px}
+.ocard .oi{left:16px;top:14px}
+.ocard kbd{border-radius:5px;background:var(--bg);font-size:11px}
+.stepnav{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.keyhint{font-size:12px;color:var(--faint)}
+.live{border-radius:14px;padding:18px 18px 16px;background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 5%, var(--surface)), var(--surface) 55%)}
+.live h3{font-size:14.5px}
+.countrow .bar{height:6px}
+.imp b{font-size:13px}
+
+/* report header */
+.rephead{padding:2px 0 6px}
+.rephead-b{display:grid;gap:14px}
+.rep-kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);font-weight:500;margin-bottom:6px}
+.rep-title{font-size:32px;letter-spacing:-.045em;line-height:1.08;font-weight:600;margin:0 0 4px}
+.achips{gap:8px}
+.achip{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:7px 11px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:border-color .15s, box-shadow .15s, transform .15s}
+.achip:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-1px)}
+.achip span{font-size:10.5px;letter-spacing:.06em;color:var(--faint)}
+.achip b{font-size:13px}
+
+/* start here */
+.starthere{border:1px solid color-mix(in oklab, var(--accent) 28%, var(--line));box-shadow:var(--shadow);border-radius:16px;background:radial-gradient(80% 120% at 0% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 60%), var(--surface)}
+.starthere .card-b{padding:24px 26px}
+.starthere .eyebrow{color:var(--accent)}
+.lead{font-size:19px;line-height:1.45;letter-spacing:-.015em;max-width:62ch}
+.firstlist{list-style:none;padding:0;counter-reset:fl;gap:6px}
+.firstlist li{counter-increment:fl;position:relative;padding:12px 14px 12px 50px;border-radius:12px;border:1px solid var(--line);background:var(--bg);transition:border-color .15s, box-shadow .15s}
+.firstlist li:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+.firstlist li::before{content:counter(fl);position:absolute;left:14px;top:12px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 12px var(--mono);background:var(--accent-soft);color:var(--accent)}
+.firstlist li::marker{content:none}
+.first{grid-template-columns:18px minmax(0,1fr)}
+
+/* detail: KPI strip, charts, tabs */
+.rep-detail{margin-top:34px}
+.kpis{gap:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.kpis .kpi{border:0;border-radius:0;box-shadow:none;background:none;padding:18px 20px}
+.kpis .kpi + .kpi{border-left:1px solid var(--line)}
+.kpi .v{font-size:30px}
+@media (max-width:900px){.kpis .kpi:nth-child(3){border-left:0}.kpis .kpi:nth-child(n+3){border-top:1px solid var(--line)}}
+.viz .card{border-radius:14px}
+.viz .card-h{border-bottom:0;padding-bottom:4px}
+.matrix{gap:5px}
+.mcell{min-height:50px;border-radius:9px;transition:transform .12s, box-shadow .12s}
+.mcell:not(.zero):hover{transform:scale(1.04);box-shadow:var(--shadow)}
+.catrow{padding:5px 6px}
+.stack{height:8px}
+#pm-tabs{border-radius:14px}
+#pm-tabs > .card-h{background:var(--surface-2);border-bottom:1px solid var(--line)}
+#pm-tabs .segs button{font-size:13.5px;padding:6px 12px}
+.area{box-shadow:none}
+.area > summary{padding:14px 44px 14px 16px}
+.area-t b{font-size:14.5px}
+.riskd summary{padding:13px 4px}
+.riskd summary .n{font-weight:500}
+.citem{border-radius:10px;padding:10px 8px}
+.citem .t{font-size:14px}
+.lawbox,.learn-sec.better{border-radius:10px}
+
+/* tabletop: picker */
+.ttbar{border-radius:16px;padding:18px 22px;background:radial-gradient(80% 140% at 100% 0%, color-mix(in oklab, var(--t-tt) 10%, transparent), transparent 60%), var(--surface)}
+.ttprog .bar{height:6px}
+.scen{padding:18px 18px 16px;border-radius:14px;gap:10px}
+.scen h3{font-size:16.5px;letter-spacing:-.02em}
+.scen p{font-size:13.5px}
+.scen .libicon.sm{background:color-mix(in oklab, var(--t-tt) 12%, transparent);color:var(--t-tt)}
+.scen.done{border-color:color-mix(in oklab, var(--good) 40%, var(--line))}
+
+/* tabletop: play */
+.tline{gap:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow)}
+.tline li{border:0;border-radius:0;background:none;padding:12px 14px;gap:10px}
+.tline li + li{border-left:1px solid var(--line)}
+.tline li.now{background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)}
+.tline li.ok .tdot,.tline li.miss .tdot,.tline li.now .tdot{font-size:12px}
+@media (max-width:760px){.tline li:nth-child(3){border-left:0}.tline li:nth-child(n+3){border-top:1px solid var(--line)}}
+.inject{padding:28px 30px;border-radius:16px}
+.inject h3{font-size:23px;letter-spacing:-.035em;line-height:1.2;margin-bottom:10px}
+.inject .sit{font-size:15px;line-height:1.6;color:var(--ink)}
+.clock .t{background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:6px;font-size:12px}
+.opts{gap:10px;margin-top:22px}
+.opt{padding:15px 16px;border-radius:12px;grid-template-columns:28px 1fr;align-items:start;font-size:14.5px;line-height:1.5}
+.opt .k{width:26px;height:26px;border-radius:7px;border:1px solid var(--line-strong);display:grid;place-items:center;padding:0;font-size:12px;background:var(--bg)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:hover:not(:disabled) .k{border-color:var(--accent);color:var(--accent)}
+.opt.picked.good .k{background:var(--good);border-color:var(--good);color:#fff}
+.opt.picked.miss .k{background:var(--high);border-color:var(--high);color:#fff}
+.learn{padding:22px 24px;border-radius:16px;gap:14px}
+.learn-h{font-size:18px;letter-spacing:-.02em}
+.learn .cmp{font-size:13.5px}
+.meters{border-radius:14px;padding:18px}
+.meter .bar{height:6px}
+.firsttry .mono{font-size:15px;font-weight:600}
+.verdict{border-radius:16px;padding:26px 28px;background:radial-gradient(80% 120% at 0% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 60%), var(--surface)}
+.verdict h3{font-size:26px;letter-spacing:-.04em}
+.learnbox{border-radius:14px}
+.dcard{border-radius:14px;padding:18px 20px}
+.dhead{font-size:18px;letter-spacing:-.025em}
+
+/* metrics and vendors */
+.metric{border-radius:14px;padding:18px}
+.metric h4{font-size:15px;letter-spacing:-.01em}
+.vres{border-radius:14px;padding:20px}
+.table-wrap{border-radius:14px}
+thead th{background:var(--surface-2)}
+@media (max-width:600px){.askcard{padding:22px 18px}.qtitle{font-size:23px}.rep-title{font-size:26px}.inject{padding:22px 18px}.inject h3{font-size:20px}}

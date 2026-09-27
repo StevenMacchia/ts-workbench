@@ -1,0 +1,30 @@
+
+/* ---------- Manual theme (sidebar switch). Declared last so it wins over the host theme. ---------- */
+:root[data-mode="light"]{
+  color-scheme:light;
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#F9FAFC; --sunk:#EDF0F5; --ink:#121A2B; --muted:#5A6478; --faint:#8791A5;
+  --line:#E1E6EE; --line-strong:#CBD3DF;
+  --accent:#2B5CE6; --accent-soft:#E8EEFD; --accent-ink:#FFFFFF;
+  --side:#0F1728; --side-ink:#D3DAE8; --side-muted:#7F8AA3; --side-active:#1D2940; --side-line:#1E2A40;
+  --crit:#C0342B; --crit-soft:#FBE9E7; --high:#B85A0A; --high-soft:#FDF0E1; --med:#836700; --med-soft:#F8F1D6; --good:#1F7A4D; --good-soft:#E3F3EA;
+  --shadow:0 1px 2px rgb(16 24 40 / .05), 0 1px 3px rgb(16 24 40 / .06);
+  --display:"Schibsted Grotesk","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+:root[data-mode="dark"]{
+  color-scheme:dark;
+  --bg:#0B111C; --surface:#121A28; --surface-2:#0F1623; --sunk:#1A2333; --ink:#E6EBF3; --muted:#97A3B8; --faint:#6D7890;
+  --line:#223049; --line-strong:#33415C;
+  --accent:#7196FF; --accent-soft:#1B2748; --accent-ink:#0B111C;
+  --side:#080D16; --side-ink:#D3DAE8; --side-muted:#76819A; --side-active:#172036; --side-line:#172136;
+  --crit:#F0776C; --crit-soft:#3A1715; --high:#F2A24E; --high-soft:#3A2410; --med:#E3C652; --med-soft:#332C0E; --good:#5CC98D; --good-soft:#12301F;
+  --shadow:none;
+}
+.themeseg{display:flex;gap:2px;background:var(--side-active);padding:3px;border-radius:8px;margin:auto 6px 0}
+.themeseg + .side-foot{margin-top:0}
+.themeseg button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:5px;border:0;background:transparent;color:var(--side-muted);padding:6px 4px;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:500}
+.themeseg button:hover{color:var(--side-ink)}
+.themeseg button svg{width:14px;height:14px}
+.themeseg button[aria-pressed="true"]{background:var(--side);color:#fff}
+@media (max-width:880px){.themeseg{margin:0;align-self:flex-start}}

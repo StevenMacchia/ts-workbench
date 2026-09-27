@@ -1,0 +1,259 @@
+/* =========================================================
+   MY WORKSPACE
+   ========================================================= */
+const KINDS = {
+  premortem:{n:"Abuse pre-mortem", plural:"Pre-mortems", icon:"i-radar", route:"premortem", prefix:"TSW"},
+  tabletop:{n:"Incident tabletop", plural:"Tabletops", icon:"i-siren", route:"tabletop", prefix:"TT"},
+  metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
+  vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
+  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"}
+};
+let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
+function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }
+function flashIn(el, msg){ if(!el) return; el.textContent = msg; setTimeout(()=>{ el.textContent = ""; }, 3500); }
+const projName = id => { const p = wsProjects()[id]; return p ? p.name : ""; };
+const savedWhere = () => { const a = wsActive(); return a ? `Saved to ${projName(a)}` : "Saved to your workspace"; };
+const initials = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase() || "?";
+
+/* ---------- saving from the tools ---------- */
+function wsSaveTabletop(){
+  wsPut({id:wsNewId("TT"), kind:"tabletop", title:ttScenario(tt.s, tt.v).title, projectId:wsActive(), data:JSON.parse(JSON.stringify(tt))});
+  flashIn($("#tt-toast"), savedWhere());
+}
+function wsSaveLabel(kind){ const cur = store.get("ws:cur:"+kind, null); return cur && wsItems()[cur] ? "Save changes" : "Save to workspace"; }
+function wsSaveTool(kind, data, title){
+  let cur = store.get("ws:cur:"+kind, null);
+  if(cur && wsItems()[cur]){ wsPut({id:cur, kind, data:JSON.parse(JSON.stringify(data))}); return "Changes saved"; }
+  cur = wsNewId(KINDS[kind].prefix);
+  wsPut({id:cur, kind, title, projectId:wsActive(), data:JSON.parse(JSON.stringify(data))});
+  store.set("ws:cur:"+kind, cur);
+  return savedWhere();
+}
+const metricsTitle = d => `Metrics: ${MX_PLATFORMS[d.platform]}, ${["","early","scaling","mature"][+d.stage]} stage`;
+const vendorsTitle = d => "Vendor scorecard: " + d.vendors.map(v=>(v.name||"Vendor").split(" (")[0]).join(", ");
+
+/* ---------- summaries ---------- */
+function vendorResult(d){
+  const tw = CRITERIA.reduce((a,c)=>a+(+d.weights[c.k]||0),0) || 1;
+  const rows = d.vendors.map(v=>({v, score:CRITERIA.reduce((a,c)=>a+(+d.weights[c.k]||0)*v.s[c.k],0)/tw, bad:CRITERIA.some(c=>c.deal && v.s[c.k]<=2)}));
+  return rows.filter(x=>!x.bad).sort((a,b)=>b.score-a.score)[0] || null;
+}
+function itemSummary(it){
+  const d = it.data || {};
+  if(it.kind==="premortem"){
+    const r = assess(openRecord(d)), bl = r.safeguards.filter(s=>s.rank===3), bd = bl.filter(s=>d.done&&d.done[s.id]).length;
+    return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd};
+  }
+  if(it.kind==="tabletop"){
+    const sc = SCENARIOS[d.s]; if(!sc) return {html:""};
+    const best = ((d.first && d.first.length) ? d.first : (d.picks||[])).filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
+    const avg = Math.round(DIMS.reduce((a,x)=>a+(d.scores?d.scores[x.k]:0),0)/DIMS.length);
+    const cls = best===sc.steps.length ? "good" : best>=2 ? "high" : "crit";
+    return {html:`<span class="pill ${cls}">${best} of ${sc.steps.length} strong calls</span><span class="note">Average score ${avg}/100</span>`};
+  }
+  if(it.kind==="metrics"){
+    const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length;
+    const c = typeof mxStatusCounts === "function" ? mxStatusCounts(d) : {on:0, watch:0, off:0};
+    const st = c.on + c.watch + c.off ? `<span class="pill good">${c.on} on track</span>${c.watch ? `<span class="pill med">${c.watch} watch</span>` : ""}${c.off ? `<span class="pill crit">${c.off} off track</span>` : ""}` : "";
+    return {html:`<span class="pill">${n} metrics</span>${st}<span class="note">${esc(MX_PLATFORMS[d.platform]||"")}${d.reg?" · regulated":""}${d.period ? " · " + esc(d.period) : ""}</span>`};
+  }
+  if(it.kind==="vendors"){
+    const top = vendorResult(d);
+    return {html: top ? `<span class="pill accent">Recommended: ${esc(top.v.name)}</span><span class="note">Score ${top.score.toFixed(2)} / 5 · ${d.vendors.length} vendors</span>`
+                      : `<span class="pill crit">No vendor meets the minimums</span>`};
+  }
+  if(it.kind==="policy"){
+    const s = d.result ? d.result.score : d.heur ? d.heur.score : null;
+    if(s===null) return {html:`<span class="note">Not tested yet</span>`};
+    const cls = s>=75 ? "good" : s>=50 ? "high" : "crit";
+    return {html:`<span class="pill ${cls}">Clarity ${s}/100</span><span class="note">${d.result ? d.result.edge_cases.length + " edge cases" : "Instant checks"}</span>`};
+  }
+  return {html:""};
+}
+
+/* ---------- page ---------- */
+function profileCard(){
+  const p = wsProfile();
+  if(wsUI.editProfile || !p){
+    return `<div class="card wsprofile"><div class="card-b" style="display:grid;gap:10px">
+      <div><h3 style="font-size:16px">${p?"Edit your profile":"Set up your profile"}</h3><p class="note">Shown on your workspace and in exported files. Stored only in this browser.</p></div>
+      <div class="field"><label for="ws-name">Name</label><input class="input" id="ws-name" value="${esc(p&&p.name||"")}" placeholder="e.g. Alex Rivera"></div>
+      <div class="field"><label for="ws-role">Role</label><input class="input" id="ws-role" value="${esc(p&&p.role||"")}" placeholder="e.g. Head of Trust & Safety"></div>
+      <div class="field"><label for="ws-org">Company or team</label><input class="input" id="ws-org" value="${esc(p&&p.org||"")}" placeholder="Optional"></div>
+      <div class="row"><button type="button" class="btn primary sm" data-ws="saveprofile">Save profile</button>${p?`<button type="button" class="btn sm" data-ws="cancelprofile">Cancel</button>`:""}</div>
+    </div></div>`;
+  }
+  return `<div class="card wsprofile"><div class="card-b wsprof">
+    <span class="avatar" aria-hidden="true">${esc(initials(p.name))}</span>
+    <div style="min-width:0"><b class="wsname">${esc(p.name||"Your profile")}</b><span class="note">${esc([p.role,p.org].filter(Boolean).join(" · ")||"Add your role and team")}</span></div>
+    <button type="button" class="btn sm" data-ws="editprofile">Edit</button>
+  </div></div>`;
+}
+function projectCards(items){
+  const projects = Object.values(wsProjects()).sort((a,b)=>(b.updated||0)-(a.updated||0)), active = wsActive();
+  const counts = pid => Object.keys(KINDS).map(k=>[k, items.filter(i=>i.kind===k && (pid===undefined || (i.projectId||null)===pid)).length]).filter(x=>x[1]);
+  const kc = cs => cs.map(([k,n])=>`<span class="kc" title="${KINDS[k].plural}"><svg><use href="#${KINDS[k].icon}"/></svg>${n}</span>`).join("") || `<span class="note">Empty</span>`;
+  const all = `<button type="button" class="card projcard ${!active?"on":""}" data-wsproj="">
+      <span class="projname"><svg><use href="#i-layers"/></svg>All results</span><span class="note">Everything you've saved</span><span class="kcs">${kc(counts(undefined))}</span></button>`;
+  const cards = projects.map(p => {
+    if(wsUI.editProject===p.id) return `<div class="card projcard on"><div class="field"><label for="wp-name-${p.id}">Project name</label><input class="input" id="wp-name-${p.id}" value="${esc(p.name)}"></div>
+      <div class="field"><label for="wp-desc-${p.id}">Description</label><input class="input" id="wp-desc-${p.id}" value="${esc(p.desc||"")}"></div>
+      <div class="row"><button type="button" class="btn sm primary" data-ws-projsave="${p.id}">Save</button><button type="button" class="btn sm" data-ws="cancelproj">Cancel</button></div></div>`;
+    const confirming = wsUI.confirm==="proj:"+p.id;
+    return `<div class="card projcard ${active===p.id?"on":""}">
+      <button type="button" class="projhit" data-wsproj="${p.id}" aria-pressed="${active===p.id}"><span class="projname"><svg><use href="#i-folder"/></svg>${esc(p.name)}</span>
+        <span class="note">${esc(p.desc||"No description")}</span><span class="kcs">${kc(counts(p.id))}</span></button>
+      <div class="projact">${confirming
+        ? `<span class="note">Delete project? Its results move to All results.</span><button type="button" class="btn sm danger" data-ws-projdelok="${p.id}">Delete</button><button type="button" class="btn sm" data-ws="cancelconfirm">Cancel</button>`
+        : `<button type="button" class="btn sm" data-ws-projedit="${p.id}">Rename</button><button type="button" class="btn sm icon" data-ws-projdel="${p.id}" aria-label="Delete project" title="Delete project"><svg><use href="#i-trash"/></svg></button>`}</div>
+    </div>`;
+  }).join("");
+  const form = wsUI.newProject ? `<div class="card projcard on"><div class="field"><label for="wp-new-name">Project name</label><input class="input" id="wp-new-name" placeholder="e.g. Marketplace launch Q3"></div>
+      <div class="field"><label for="wp-new-desc">Description</label><input class="input" id="wp-new-desc" placeholder="Optional"></div>
+      <div class="row"><button type="button" class="btn sm primary" data-ws="createproj">Create project</button><button type="button" class="btn sm" data-ws="cancelproj">Cancel</button></div></div>` : "";
+  return `<div class="projgrid">${all}${cards}${form}</div>`;
+}
+function itemRows(items){
+  const projects = Object.values(wsProjects()).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!items.length) return `<div class="card wsempty"><b>Nothing saved here yet</b><p class="note">Run a tool and save the result, or start one now.</p>
+    <div class="row">${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
+  return `<div class="card wslist">${items.map(it => {
+    const s = itemSummary(it), confirming = wsUI.confirm==="item:"+it.id;
+    const title = wsUI.rename===it.id
+      ? `<span class="row" style="gap:6px"><input class="input" id="wr-${it.id}" value="${esc(it.title||"")}" style="max-width:280px;padding:6px 9px"><button type="button" class="btn sm primary" data-ws-renameok="${it.id}">Save</button><button type="button" class="btn sm" data-ws="cancelrename">Cancel</button></span>`
+      : `<b>${esc(it.title||"Untitled")}</b>`;
+    return `<div class="wsrow">
+      <span class="libicon"><svg><use href="#${KINDS[it.kind].icon}"/></svg></span>
+      <div class="libmain">${title}<span class="note">${KINDS[it.kind].n} · Updated ${fmtDate(it.updated)}</span></div>
+      <div class="libstat">${s.html}</div>
+      <label class="wsmove"><span class="visually-hidden">Project for ${esc(it.title||"this result")}</span><select class="select" data-ws-move="${it.id}">
+        <option value="">No project</option>${projects.map(p=>`<option value="${p.id}" ${it.projectId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></label>
+      <div class="libact">${confirming
+        ? `<span class="note">Delete permanently?</span><button type="button" class="btn sm danger" data-ws-delok="${it.id}">Delete</button><button type="button" class="btn sm" data-ws="cancelconfirm">Cancel</button>`
+        : `<button type="button" class="btn sm primary" data-ws-open="${it.id}">Open</button>
+           <button type="button" class="btn sm" data-ws-rename="${it.id}">Rename</button>
+           <button type="button" class="btn sm icon" data-ws-dup="${it.id}" aria-label="Duplicate" title="Duplicate"><svg><use href="#i-copy"/></svg></button>
+           <button type="button" class="btn sm icon" data-ws-del="${it.id}" aria-label="Delete" title="Delete"><svg><use href="#i-trash"/></svg></button>`}</div>
+    </div>`; }).join("")}</div>`;
+}
+function renderWorkspace(){
+  const all = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const active = wsActive(), kind = store.get("ws:kind", "");
+  const inProject = active ? all.filter(i=>(i.projectId||null)===active) : all;
+  const shown = kind ? inProject.filter(i=>i.kind===kind) : inProject;
+  const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
+  const p = wsProfile();
+  view.innerHTML = `<div id="ws-root">` + head("My workspace",
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. Saved in this browser only.`, null,
+    `<button type="button" class="btn sm" data-ws="export"><svg><use href="#i-download"/></svg>Export workspace</button>
+     <label class="btn sm" for="ws-import"><svg><use href="#i-upload"/></svg>Import</label><input type="file" id="ws-import" accept=".json,application/json" class="visually-hidden">`) + `
+    <span class="toast" id="ws-toast" aria-live="polite"></span>
+    <div class="wstop">
+      ${profileCard()}
+      <div class="wsstats">
+        <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${Object.keys(wsProjects()).length}</span></div>
+        <div class="card kpi"><span class="eyebrow">Saved results</span><span class="v">${all.length}</span></div>
+        <div class="card kpi"><span class="eyebrow">Pre-mortems</span><span class="v">${all.filter(i=>i.kind==="premortem").length}</span></div>
+        <div class="card kpi"><span class="eyebrow">Open launch blockers ${tip("Launch blockers not yet ticked off, added up across every saved pre-mortem.","tip-r")}</span><span class="v" style="${openBlockers?"color:var(--crit)":""}">${openBlockers}</span></div>
+      </div>
+    </div>
+    <div class="section-title"><h2>Projects ${tip("Group results by launch, product area or client. Click a project to see its results; anything you save while it's selected goes into it.")}</h2>
+      <button type="button" class="btn sm" data-ws="newproj"><svg><use href="#i-plus"/></svg>New project</button></div>
+    ${projectCards(all)}
+    <div class="section-title"><h2>${active?`Results in ${esc(projName(active))}`:"All saved results"}</h2>
+      <div class="segs" role="group" aria-label="Filter by tool"><button type="button" data-ws-kind="" aria-pressed="${!kind}">All <span class="mono" style="opacity:.6">${inProject.length}</span></button>${Object.entries(KINDS).map(([k,v])=>`<button type="button" data-ws-kind="${k}" aria-pressed="${kind===k}">${v.plural} <span class="mono" style="opacity:.6">${inProject.filter(i=>i.kind===k).length}</span></button>`).join("")}</div></div>
+    ${active?`<div class="banner" style="margin-top:12px"><span>New results you save from any tool go into <strong>${esc(projName(active))}</strong>.</span><button type="button" class="btn sm" data-wsproj="">Show all results</button></div>`:""}
+    ${itemRows(shown)}
+    ${shown.length?`<div class="row wsnew"><span class="note">Start something new:</span>${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div>`:""}
+  </div>`;
+  bindWorkspace();
+}
+function bindWorkspace(){
+  const root = $("#ws-root"), toast = m => flashIn($("#ws-toast"), m);
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  const re = () => renderWorkspace();
+  root.addEventListener("click", e => {
+    const b = e.target.closest("button"); if(!b) return;
+    const d = b.dataset, items = wsItems();
+    if(d.wsproj!==undefined){ store.set("ws:active", d.wsproj||null); wsUI.confirm = null; return re(); }
+    if(d.wsKind!==undefined){ store.set("ws:kind", d.wsKind); return re(); }
+    if(d.wsProjedit){ wsUI.editProject = d.wsProjedit; return re(); }
+    if(d.wsProjsave){ const m = wsProjects(), pr = m[d.wsProjsave]; if(pr){ pr.name = val("wp-name-"+pr.id) || pr.name; pr.desc = val("wp-desc-"+pr.id); pr.updated = Date.now(); wsSaveProjects(m); } wsUI.editProject = null; return re(); }
+    if(d.wsProjdel){ wsUI.confirm = "proj:"+d.wsProjdel; return re(); }
+    if(d.wsProjdelok){ const m = wsProjects(); delete m[d.wsProjdelok]; wsSaveProjects(m);
+      Object.values(items).forEach(it => { if(it.projectId===d.wsProjdelok){ it.projectId = null; if(it.data && it.kind==="premortem") it.data.projectId = null; } }); wsSaveItems(items);
+      if(pm.projectId===d.wsProjdelok){ pm.projectId = null; store.set("pm3", pm); }
+      if(store.get("ws:active",null)===d.wsProjdelok) store.set("ws:active", null);
+      wsUI.confirm = null; re(); return toast("Project deleted"); }
+    if(d.wsOpen){ const it = items[d.wsOpen]; if(!it) return;
+      if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); savePM(); }
+      if(it.kind==="tabletop"){ tt = JSON.parse(JSON.stringify(it.data)); store.set("tt", tt); }
+      if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
+      if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
+      if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
+      return goRoute(KINDS[it.kind].route); }
+    if(d.wsNew){ const k = d.wsNew;
+      if(k==="premortem"){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); }
+      if(k==="tabletop"){ tt = null; store.set("tt", null); }
+      if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
+      if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
+      if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
+      return goRoute(KINDS[k].route); }
+    if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
+      copy.id = it.kind==="premortem" ? newId() : wsNewId(KINDS[it.kind].prefix); copy.title = (it.title||"Untitled") + " (copy)"; copy.created = null; copy.updated = null;
+      if(it.kind==="premortem"){ copy.data.id = copy.id; copy.data.name = copy.title; copy.data.created = Date.now(); copy.data.updated = Date.now(); }
+      wsPut(copy); re(); return toast("Duplicated"); }
+    if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
+    if(d.wsDelok){ wsDel(d.wsDelok);
+      if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
+      ["metrics","vendors"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      wsUI.confirm = null; re(); return toast("Deleted"); }
+    if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
+    if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();
+        if(it.kind==="premortem"){ it.data.name = t; if(pm.id===it.id){ pm.name = t; store.set("pm3", pm); } } wsSaveItems(items); }
+      wsUI.rename = null; return re(); }
+    switch(d.ws){
+      case "editprofile": wsUI.editProfile = true; return re();
+      case "cancelprofile": wsUI.editProfile = false; return re();
+      case "saveprofile": { const name = val("ws-name"); if(!name){ const el = document.getElementById("ws-name"); if(el){ el.focus(); el.setAttribute("aria-invalid","true"); } return toast("Add your name to save your profile"); }
+        const prev = wsProfile(); store.set("ws:profile", {name, role:val("ws-role"), org:val("ws-org"), created:(prev&&prev.created)||Date.now()}); wsUI.editProfile = false; re(); return toast("Profile saved"); }
+      case "newproj": wsUI.newProject = true; re(); { const el = document.getElementById("wp-new-name"); if(el) el.focus(); } return;
+      case "cancelproj": wsUI.newProject = false; wsUI.editProject = null; return re();
+      case "createproj": { const name = val("wp-new-name"); if(!name){ const el = document.getElementById("wp-new-name"); if(el) el.focus(); return toast("Give the project a name"); }
+        const m = wsProjects(), id = wsNewId("PRJ"); m[id] = {id, name, desc:val("wp-new-desc"), created:Date.now(), updated:Date.now()}; wsSaveProjects(m);
+        store.set("ws:active", id); wsUI.newProject = false; re(); return toast("Project created"); }
+      case "cancelconfirm": wsUI.confirm = null; return re();
+      case "cancelrename": wsUI.rename = null; return re();
+      case "export": { const json = JSON.stringify({app:"ts-workbench", version:2, kind:"workspace", exported:new Date().toISOString(), profile:wsProfile(), projects:Object.values(wsProjects()), items:Object.values(wsItems())}, null, 2);
+        return offerFile("ts-workbench-workspace.json", json, json, $("#ws-toast")); }
+    }
+  });
+  root.addEventListener("change", e => {
+    const t = e.target;
+    if(t.dataset.wsMove!==undefined){ const items = wsItems(), it = items[t.dataset.wsMove]; if(!it) return;
+      it.projectId = t.value || null; if(it.kind==="premortem" && it.data) it.data.projectId = it.projectId;
+      if(pm.id===it.id){ pm.projectId = it.projectId; store.set("pm3", pm); }
+      wsSaveItems(items); re(); return toast(it.projectId ? `Moved to ${projName(it.projectId)}` : "Removed from project"); }
+    if(t.id==="ws-import" && t.files && t.files[0]){
+      const reader = new FileReader();
+      reader.onload = () => { try{
+          const data = JSON.parse(reader.result); let n = 0;
+          if(data && data.kind==="workspace"){
+            const pr = wsProjects(); (data.projects||[]).forEach(p => { if(p && p.id && p.name){ pr[p.id] = p; } }); wsSaveProjects(pr);
+            const m = wsItems(); (data.items||[]).forEach(it => { if(it && it.id && KINDS[it.kind] && it.data){ m[it.id] = it; n++; } }); wsSaveItems(m);
+            if(data.profile && !wsProfile()) store.set("ws:profile", data.profile);
+            re(); return toast(`Imported ${n} result${n===1?"":"s"}`);
+          }
+          importLibrary(t.files[0], msg => { re(); toast(msg); });
+        }catch(err){ toast("That file isn't a Workbench export"); } };
+      reader.readAsText(t.files[0]);
+    }
+  });
+  root.addEventListener("keydown", e => {
+    if(e.key!=="Enter" || !e.target.id) return;
+    const id = e.target.id;
+    if(id==="wp-new-name" || id==="wp-new-desc"){ e.preventDefault(); root.querySelector('[data-ws="createproj"]').click(); }
+    else if(id.startsWith("wr-")){ e.preventDefault(); root.querySelector(`[data-ws-renameok="${id.slice(3)}"]`).click(); }
+    else if(id.startsWith("ws-")){ e.preventDefault(); const b = root.querySelector('[data-ws="saveprofile"]'); if(b) b.click(); }
+  });
+}
