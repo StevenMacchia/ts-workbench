@@ -11,7 +11,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const icon = id => '<svg><use href="#i-'+id+'"/></svg>'; const view = {querySelectorAll(){ return []; }}; const copyText = () => {};
 const head = (t,d,c,m) => "<h1>"+t+"</h1><p>"+d+"</p>"+(m||"");
 `;
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partOV.js"), rd("partPol.js"), rd("partPol2.js")].join("\n") + `
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partPol.js"), rd("partPol2.js")].join("\n") + `
 const out = [], bad = h => /undefined|NaN|\\[object/.test(h);
 renderPolicy(); if(bad(view.innerHTML)) throw new Error("empty state bad"); out.push("empty state ok, AI badge: " + (view.innerHTML.includes("Instant checks only") ? "instant only (no sampler)" : "?"));
 POL_EXAMPLES.forEach(([n, rule]) => { const h = polHeuristics(rule); out.push("  " + n.padEnd(15) + "instant score " + h.score + " · vague: " + h.vague.map(v=>v.term).join(", ")); });

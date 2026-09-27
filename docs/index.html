@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>T&amp;S Workbench: free Trust &amp; Safety tools</title>
-<meta name="description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, a program maturity assessment and AI assistants. Built by Steven Macchia.">
+<meta name="description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, program maturity, a coverage radar and AI assistants. Built by Steven Macchia.">
 <meta name="author" content="Steven Macchia">
 <meta name="theme-color" content="#5B5BD6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%235B5BD6%22%2F%3E%3Cpath%20d%3D%22M16%206l8%203.4v5.8c0%205-3.4%208.8-8%2010.8-4.6-2-8-5.8-8-10.8V9.4z%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linejoin%3D%22round%22%2F%3E%3Cpath%20d%3D%22M12.5%2016l2.4%202.4%204.6-4.8%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="T&amp;S Workbench: free Trust &amp; Safety tools">
-<meta property="og:description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, a program maturity assessment and AI assistants. Built by Steven Macchia.">
+<meta property="og:description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, program maturity, a coverage radar and AI assistants. Built by Steven Macchia.">
 <meta property="og:url" content="https://stevenmacchia.github.io/ts-workbench/">
 <meta property="og:image" content="https://stevenmacchia.github.io/ts-workbench/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -2258,6 +2258,101 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .sb-foot > .sb-sync{min-width:0;max-width:100%;box-sizing:border-box}
 .sb-sync-t{flex:1 1 auto}
 .sb-sync button{flex:none}
+
+/* ---------- Coverage radar ---------- */
+:root{--t-cv:#46A758}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-cv:#71D083} }
+:root[data-theme="dark"],:root[data-mode="dark"]{--t-cv:#71D083}
+:root[data-mode="light"]{--t-cv:#46A758}
+body[data-route="coverage"]{--tc:var(--t-cv)}
+.cv-q{margin:18px 0 0;border-left-color:var(--t-cv)}
+.cv-grid .vd-bar i{background:var(--t-cv)}
+.ma-pill-r{margin-left:auto}
+.cv-start{background:color-mix(in oklab, var(--t-cv) 8%, var(--surface));border-color:color-mix(in oklab, var(--t-cv) 30%, var(--line))}
+.cv-start .ma-start-k,.cv-start .ma-lvl,.cv-start .ma-start-go{color:color-mix(in oklab, var(--t-cv) 75%, var(--ink))}
+.cv-radar{width:100%;height:auto;display:block;overflow:visible}
+.cv-rl{font:500 11.5px var(--body);fill:var(--muted)}
+.cv-radar.big .cv-rl{font-size:12px;fill:var(--ink)}
+.cv-rl.exposed{fill:var(--crit);font-weight:700}
+.cv-rl.gap{fill:var(--high);font-weight:600}
+.cv-rl.none{fill:var(--faint)}
+.cv-lg-cov{background:color-mix(in oklab, var(--t-cv) 30%, transparent);border:2px solid var(--t-cv)}
+.cv-lg-risk{border:1.5px dashed var(--crit);background:color-mix(in oklab, var(--crit) 10%, transparent)}
+.cv-big{padding:14px 16px;display:grid;gap:8px;align-content:center}
+.cv-big .cv-radar{max-width:420px;margin:0 auto}
+
+/* source */
+.cv-src{padding:16px 18px;display:grid;gap:10px;justify-items:start}
+.cv-src .field{margin:0;width:min(100%,460px)}
+.cv-src > .note{margin:0}
+.cv-riskbar{display:flex;flex-wrap:wrap;gap:6px}
+.cv-rb{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:12px;background:var(--sunk);color:var(--muted)}
+.cv-rb i{width:7px;height:7px;border-radius:50%;background:var(--line-strong)}
+.cv-rb.crit i{background:var(--crit)}.cv-rb.high i{background:var(--high)}.cv-rb.med i{background:var(--med)}.cv-rb.low i{background:var(--muted)}
+.cv-rb.crit{color:var(--ink)}
+
+/* matrix */
+.cv-mx{padding:6px 0 0;overflow:hidden}
+.cv-mh,.cv-mr{display:grid;grid-template-columns:minmax(150px,1.35fr) repeat(5,minmax(0,1fr)) minmax(92px,.9fr);gap:10px;align-items:center;padding:10px 18px}
+.cv-mh{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em;border-bottom:1px solid var(--line);padding-top:8px;padding-bottom:8px}
+.cv-mh span:not(:first-child){text-align:center}
+.cv-mh span[title]{cursor:help;text-decoration:underline dotted var(--line-strong);text-underline-offset:3px}
+.cv-mr{border-bottom:1px solid var(--line)}
+.cv-mr:hover{background:color-mix(in oklab, var(--hover) 60%, transparent)}
+.cv-mn{display:grid;gap:4px;justify-items:start;min-width:0}
+.cv-mn b{font-size:14px;font-weight:600}
+.cv-mn .pill{font-size:11px;padding:1px 8px}
+.cv-mn .note{font-size:11.5px;margin:0}
+.cv-mc{display:flex;justify-content:center}
+.cv-ml{display:none}
+.cv-seg{display:inline-flex;gap:3px}
+.cv-seg button{all:unset;box-sizing:border-box;cursor:pointer;width:18px;height:22px;border-radius:5px;background:var(--sunk);border:1px solid var(--line);transition:transform .1s, background .15s}
+.cv-seg button:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.cv-seg button:focus-visible{outline:2px solid var(--t-cv);outline-offset:1px}
+.cv-seg:has(.on) button{background:var(--sunk)}
+.cv-seg button.on.l0{background:var(--crit);border-color:var(--crit)}
+.cv-seg button.on.l1{background:var(--high);border-color:var(--high)}
+.cv-seg button.on.l2{background:color-mix(in oklab, var(--t-cv) 70%, var(--surface));border-color:var(--t-cv)}
+.cv-seg button.on.l3{background:var(--t-cv);border-color:var(--t-cv)}
+.cv-seg:has(.on.l1) .l0,.cv-seg:has(.on.l2) :is(.l0,.l1),.cv-seg:has(.on.l3) :is(.l0,.l1,.l2){background:color-mix(in oklab, var(--t-cv) 22%, var(--sunk))}
+.cv-mv{display:grid;gap:4px}
+.cv-mv b{font-size:13.5px;font-weight:600}
+.cv-mv.exposed b{color:var(--crit)}.cv-mv.gap b{color:var(--high)}.cv-mv.covered b{color:var(--good)}
+.cv-mb{position:relative;height:6px;border-radius:99px;background:var(--sunk)}
+.cv-mb i{position:absolute;left:0;top:0;bottom:0;border-radius:inherit;background:var(--t-cv)}
+.cv-mv.exposed .cv-mb i{background:var(--crit)}.cv-mv.gap .cv-mb i{background:var(--high)}
+.cv-mb em{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px dashed var(--crit)}
+.cv-key{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:12px 18px;font-size:12px;color:var(--muted)}
+.cv-kl{display:inline-flex;align-items:center;gap:6px}
+.cv-kl i{width:12px;height:14px;border-radius:4px}
+.cv-kl i.l0{background:var(--crit)}.cv-kl i.l1{background:var(--high)}.cv-kl i.l2{background:color-mix(in oklab, var(--t-cv) 70%, var(--surface))}.cv-kl i.l3{background:var(--t-cv)}
+.cv-key .note{margin:0 0 0 auto;font-size:12px}
+.cv-defs{border-top:1px solid var(--line);padding:12px 18px 16px}
+.cv-defs summary{cursor:pointer;font-size:13.5px;font-weight:500;color:var(--accent)}
+.cv-dt{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px}
+.cv-dt h5{margin:0 0 2px;font-size:14px}
+.cv-dt .note{margin:0 0 6px;font-size:12.5px}
+.cv-dt ol{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13px;line-height:1.5}
+
+/* gaps */
+.cv-gaps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cv-gap{padding:14px 16px;display:grid;gap:6px;align-content:start;border-left:3px solid var(--high)}
+.cv-gap.exposed{border-left-color:var(--crit)}
+.cv-gh{display:flex;align-items:center;gap:8px}
+.cv-gh b{font-size:14.5px;margin-right:auto}
+.cv-gn{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;background:var(--sunk);color:var(--muted)}
+.cv-gl{font-size:12.5px;color:var(--muted)}
+.cv-gap p{margin:0;font-size:14px;line-height:1.5}
+.cv-gap .ma-tool{color:color-mix(in oklab, var(--t-cv) 75%, var(--ink))}
+@media (max-width:1100px){.cv-mh{display:none}.cv-mr{grid-template-columns:1fr;gap:8px;padding:14px 16px}.cv-mc{justify-content:space-between;align-items:center}.cv-ml{display:block;font-size:13px;color:var(--muted)}.cv-seg button{width:30px;height:26px}.cv-mv{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}}
+@media (max-width:760px){.cv-gaps{grid-template-columns:1fr}.cv-key .note{margin-left:0}}
+
+/* overview: seven tools in rows of four and three */
+.ov-tools{grid-template-columns:repeat(12,minmax(0,1fr))}
+.ov-tools > .ov-tool,.ov-tools > .ov-tool:nth-child(n+4){grid-column:span 3}
+.ov-tools > .ov-tool:nth-child(n+5){grid-column:span 4}
+@media (max-width:1100px){.ov-tools{grid-template-columns:repeat(2,minmax(0,1fr))}.ov-tools > .ov-tool,.ov-tools > .ov-tool:nth-child(n+4),.ov-tools > .ov-tool:nth-child(n+5){grid-column:auto}.ov-tools > .ov-tool:last-child{grid-column:1/-1}}
+@media (max-width:560px){.ov-tools{grid-template-columns:1fr}.ov-tools > .ov-tool:last-child{grid-column:auto}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2330,6 +2425,7 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
   <symbol id="i-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16V4.5h-4.5v4h-4v4h-4v4H4z"/></g></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></g></symbol>
+  <symbol id="i-cover" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6l8-3z"/><path d="M8 10h8M9 14h6"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 <div class="app" id="app">
@@ -2348,6 +2444,7 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
       <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
+      <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer<span class="sb-new sb-ai">AI</span></a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer<span class="sb-new sb-ai">AI</span></a>
@@ -2414,6 +2511,7 @@ const HEAD_META = () => {
     tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", "8 company types", "The law behind every call"]],
     metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
     vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
+    coverage:["cover", () => [CV_AREAS.length + " harm areas", CV_LAYERS.length + " layers of defense", "Risk vs coverage radar"]],
     maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
     workspace:["user", () => []], about:["info", () => []]
@@ -7175,7 +7273,8 @@ const KINDS = {
   metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
   policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
-  maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"}
+  maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
+  coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
 function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }
@@ -7235,6 +7334,10 @@ function itemSummary(it){
     const sc = maScore(d), g = maGaps(d).length, n = MA_AREAS.filter(a => d.lv && d.lv[a.k]).length;
     if(sc === null) return {html:`<span class="note">Not rated yet</span>`};
     return {html:`<span class="pill ${g ? "high" : "good"}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`};
+  }
+  if(it.kind==="coverage" && typeof cvSummary === "function"){
+    const s = cvSummary(d); if(!s.rated) return {html:`<span class="note">Not rated yet</span>`};
+    return {html:`<span class="pill ${s.exposed.length ? "crit" : s.gaps.length ? "high" : "good"}">${s.cov}% coverage</span><span class="note">${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "No gaps"} · ${s.rated} of ${s.total} rated</span>`};
   }
   if(it.kind==="policy"){
     const s = d.result ? d.result.score : d.heur ? d.heur.score : null;
@@ -7366,6 +7469,7 @@ function bindWorkspace(){
       if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
       if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
       if(it.kind==="maturity"){ ma = JSON.parse(JSON.stringify(it.data)); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
+      if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
       return goRoute(KINDS[it.kind].route); }
     if(d.wsNew){ const k = d.wsNew;
       if(k==="premortem"){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); }
@@ -7373,6 +7477,7 @@ function bindWorkspace(){
       if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
       if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
+      if(k==="coverage"){ store.set("ws:cur:coverage", null); cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
       if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = {stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}; store.set("ma", ma); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
@@ -7382,7 +7487,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors","policy","maturity"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity","coverage"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();
@@ -7443,8 +7548,8 @@ function pmProjectSelect(){
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)"};
-const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report drafter", about:"About this project"};
+const TOOL_COLOR = {premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
+const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report drafter", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -7460,6 +7565,7 @@ function openSaved(id){
   if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
   if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
   if(it.kind==="maturity"){ ma = JSON.parse(JSON.stringify(it.data)); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
+  if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
   goRoute(KINDS[it.kind].route);
 }
 function newAssessment(){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); goRoute("premortem"); }
@@ -7489,7 +7595,7 @@ function cmdkItems(){
   const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, icon:iconId, run:()=>goRoute(route)});
   go("Overview","overview","var(--faint)","home"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
-  go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps");
+  go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); out.push({g:"Go to", label:"Transparency report drafter", sub:"Under construction", color:"var(--faint)", icon:"chart", run:()=>goRoute("transparency")});
   go("About this project","about","var(--faint)","info");
@@ -7575,6 +7681,11 @@ OV_ART.pol = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" ari
     <polygon points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
     <circle cx="${(80 + Math.cos(low)*1.4/4*46).toFixed(1)}" cy="${(62 + Math.sin(low)*1.4/4*46).toFixed(1)}" r="4" fill="var(--crit)"/></svg>`;
 }
+OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <polygon points="80,16 118,32 126,70 104,104 56,104 34,70 42,32" fill="none" stroke="var(--line-strong)"/><polygon points="80,39 99,47 103,66 92,83 68,83 57,66 61,47" fill="none" stroke="var(--line-strong)"/>
+    <polygon points="80,22 114,35 112,68 96,98 70,90 44,69 50,36" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <polygon points="80,30 108,39 118,70 86,82 66,92 48,68 58,44" fill="var(--t-cv)" fill-opacity=".25" stroke="var(--t-cv)" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="86" cy="82" r="4" fill="var(--crit)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
@@ -7583,6 +7694,8 @@ function ovChip(it){
   if(it.kind==="metrics"){ const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length; return `<span class="ov-chip">${n} metrics</span>`; }
   if(it.kind==="maturity" && typeof maScore === "function"){ const sc = maScore(d); if(sc===null) return ""; const g = maGaps(d).length;
     return `<span class="ov-chip"><span class="sdot" style="background:${g ? "var(--high)" : "var(--good)"}"></span>Level ${sc.toFixed(1)}</span>`; }
+  if(it.kind==="coverage" && typeof cvSummary === "function"){ const s = cvSummary(d); if(!s.rated) return "";
+    return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
@@ -7629,6 +7742,7 @@ function renderOverview(){
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
       </div>
     </section>
@@ -7751,6 +7865,7 @@ function renderAbout(){
     ["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation, with the trap behind every metric."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors with wellness and security minimums and ready-to-use RFP questions."],
     ["t-ma","steps","Program maturity","Rates a trust and safety program in eight areas, from policy to reviewer wellbeing, against targets for its stage. A radar shows where it stands, and a phased roadmap links each gap to the tool that helps close it."],
+    ["t-cv","cover","Coverage radar","Rates five layers of defense (policy, detection, enforcement, appeals and measurement) for each kind of harm, then overlays them on the pre-mortem's risk. Where risk outruns coverage, it names the weakest layer and the next step."],
     ["t-pol","doc","Policy stress-tester","Paste a platform rule to get an instant clarity check, then an AI review with vague terms, missing exceptions, eight edge cases, relevant laws and a clearer rewrite."],
     ["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to a user who was actioned, with a short version and a check against what an EU statement of reasons must include."],
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal: each element of the rule tested against the facts, the user's arguments weighed, and a suggested reply. A person makes the final call."],
@@ -8927,6 +9042,254 @@ function bindMaturity(partial){
   root.querySelectorAll(".gl").forEach(g => g.onclick = () => g.focus());
 }
 /* =========================================================
+   COVERAGE RADAR: how well your defenses cover each kind of harm, against your products' risk
+   ========================================================= */
+// The harm areas match the pre-mortem risk radar, minus operational readiness (not a harm in itself)
+const CV_AREAS = RADAR_GROUPS.filter(g => !g.cats.includes("readiness")).map(g => ({k:g.cats[0], n:g.n, l:g.l, cats:g.cats}));
+const CV_LEVELS = ["None", "Partial", "Solid", "Strong"];
+const CV_LAYERS = [
+  {k:"policy", n:"Policy", q:"Is there a clear rule, with guidance reviewers can apply?", tool:["policy", "Stress-test the rule"],
+    lv:["No rule covers it.", "A public rule exists, but reviewers lack detailed guidance.", "A clear rule with internal guidelines, examples and an owner.", "Tested against edge cases, reviewed on a schedule, and shaped by appeals data."],
+    act:h => `Write a clear rule for ${h}, with internal guidelines, examples and edge cases reviewers can apply.`},
+  {k:"detect", n:"Detection", q:"How do you find it, beyond waiting for user reports?", tool:["premortem", "See safeguards in a pre-mortem"],
+    lv:["Found only when users report it.", "Keyword lists or basic filters catch obvious cases.", "Hash matching, classifiers or behavior signals find most of it proactively.", "Detection quality is measured, models learn from reviewer decisions, and red teams probe for gaps."],
+    act:h => `Add proactive detection for ${h}, such as hash matching, classifiers or behavior signals, so you don't rely on user reports.`},
+  {k:"enforce", n:"Enforcement", q:"Can trained people act on it quickly and consistently?", tool:["vendors", "Score moderation vendors"],
+    lv:["No trained reviewers or defined actions.", "Reviewers handle it without specific training or service levels.", "Trained reviewers, clear actions and service levels by severity.", "Specialist reviewers, round-the-clock cover for the worst cases, and escalation to legal and law enforcement."],
+    act:h => `Train reviewers on ${h}, define the actions they can take, and set service levels by severity.`},
+  {k:"appeal", n:"Appeals", q:"Can users contest decisions, and do mistakes get fixed?", tool:["appeal", "Try the appeal reviewer"],
+    lv:["Users can't contest decisions.", "Appeals go to a general support inbox.", "A formal appeal with a second reviewer and a response target.", "Overturn rates are tracked and feed back into policy and training."],
+    act:h => `Let users appeal ${h} decisions, with a second reviewer and a response target.`},
+  {k:"measure", n:"Measurement", q:"Do you know how much of it users see, and how well you respond?", tool:["metrics", "Build your scorecard"],
+    lv:["Nothing is measured.", "Report and removal counts only.", "Prevalence, speed and accuracy are tracked.", "Metrics have targets and owners, and leadership reviews them."],
+    act:h => `Track prevalence, time to action and accuracy for ${h}, and review them with leadership.`}
+];
+// For a high-risk harm, finding and acting on it matter first: each layer's weight when ranking next steps
+const CV_LAYER_WEIGHT = {detect:5, enforce:4, policy:3, measure:2, appeal:2};
+const CV_STEPS = [["Choose the risk to compare", "Your products' combined risk, one product, or an example."], ["Rate your defenses", "For each kind of harm, how strong each layer of defense is today."], ["Close the biggest gaps", "Where risk outruns coverage, with the next step for each."]];
+const CV_EXAMPLE = {src:"ex:teen_social", ex:true, r:{
+  child:{policy:3, detect:1, enforce:2, appeal:1, measure:0}, sexual:{policy:2, detect:1, enforce:2, appeal:1, measure:0},
+  harass:{policy:3, detect:2, enforce:2, appeal:2, measure:1}, violent:{policy:2, detect:2, enforce:1, appeal:1, measure:0},
+  ai:{policy:1, detect:0, enforce:1, appeal:1, measure:0}, privacy:{policy:2, detect:0, enforce:1, appeal:1, measure:0},
+  integrity:{policy:2, detect:2, enforce:2, appeal:1, measure:1}, fraud:{policy:2, detect:1, enforce:1, appeal:1, measure:0}}};
+let cv = store.get("cv", null) || {src:null, ex:false, r:{}};
+if(!cv.r) cv.r = {};
+const cvSave = () => store.set("cv", cv);
+const cvHarm = a => a.n.toLowerCase().replace(" & ", " and ");
+const cvRiskWords = x => x.band ? `${BANDS[x.band][0].toLowerCase()} risk (${x.score} of 16)` : "no risk found";
+
+/* ---------- risk to compare against ---------- */
+function cvSources(){
+  const pms = typeof ovSavedPMs === "function" ? ovSavedPMs() : [];
+  return {pms, list:[...(pms.length ? [["all", `All products (${pms.length} pre-mortem${pms.length === 1 ? "" : "s"})`]] : []), ...pms.map(p => ["pm:" + p.it.id, p.name])],
+    ex:Object.entries(PRESETS).map(([k, p]) => ["ex:" + k, "Example: " + p.name.replace(" (example)", "")])};
+}
+function cvSrc(d){
+  const s = cvSources(), all = s.list.concat(s.ex).map(x => x[0]);
+  const src = d.src && all.includes(d.src) ? d.src : s.pms.length ? "all" : null;
+  return {src, s};
+}
+// Worst score per harm area (0 to 16), from the chosen source
+function cvRisk(d){
+  const {src, s} = cvSrc(d); if(!src) return null;
+  const worst = rs => { const out = {}; CV_AREAS.forEach(a => { const w = rs.filter(x => a.cats.includes(x.cat)).sort((x, y) => y.score - x.score)[0]; out[a.k] = w ? {score:w.score, band:w.band, worst:w.n} : {score:0, band:null, worst:""}; }); return out; };
+  if(src === "all"){ const per = s.pms.map(p => ({name:p.name, w:worst(p.r.risks)})), out = {};
+    CV_AREAS.forEach(a => { out[a.k] = per.reduce((b, p) => p.w[a.k].score > b.score ? Object.assign({from:p.name}, p.w[a.k]) : b, {score:0, band:null, worst:"", from:""}); }); return out; }
+  if(src.startsWith("pm:")){ const p = s.pms.find(x => "pm:" + x.it.id === src); return p ? worst(p.r.risks) : null; }
+  const k = src.slice(3); return PRESETS[k] ? worst(assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(PRESETS[k])))).risks) : null;
+}
+function cvSrcName(d){ const {src, s} = cvSrc(d); const hit = s.list.concat(s.ex).find(x => x[0] === src); return hit ? hit[1] : ""; }
+
+/* ---------- scoring ---------- */
+function cvRows(d){
+  const risk = cvRisk(d);
+  return CV_AREAS.map(a => {
+    const r = d.r[a.k] || {}, rated = CV_LAYERS.filter(l => r[l.k] !== undefined).length, cov = Math.round(CV_LAYERS.reduce((s, l) => s + (r[l.k] || 0), 0) / (CV_LAYERS.length * 3) * 100);
+    const rk = risk ? risk[a.k] : null, score = rk ? rk.score : null, riskPct = score === null ? null : Math.round(score / 16 * 100);
+    const status = score === null || !rated ? "none" : score >= 12 && cov < 50 ? "exposed" : score >= 8 && cov < riskPct ? "gap" : score >= 8 ? "covered" : "lower";
+    return {a, r, rated, cov, score, riskPct, band:rk ? rk.band : null, from:rk && rk.from, status, gap:riskPct === null ? 0 : riskPct - cov};
+  });
+}
+function cvSummary(d){
+  const rows = cvRows(d), rated = rows.reduce((s, x) => s + x.rated, 0), withRisk = rows.filter(x => x.score !== null && x.score > 0);
+  const weight = withRisk.reduce((s, x) => s + x.score, 0);
+  const cov = weight ? Math.round(withRisk.reduce((s, x) => s + x.cov * x.score, 0) / weight) : rows.length ? Math.round(rows.reduce((s, x) => s + x.cov, 0) / rows.length) : 0;
+  return {rows, rated, total:CV_AREAS.length * CV_LAYERS.length, cov, weighted:!!weight, exposed:rows.filter(x => x.status === "exposed"), gaps:rows.filter(x => x.status === "gap")};
+}
+// The next steps: weakest layers in the areas where risk outruns coverage
+function cvActions(d, n){
+  const rows = cvRows(d).filter(x => x.status === "exposed" || x.status === "gap").sort((a, b) => (b.status === "exposed") - (a.status === "exposed") || b.gap - a.gap);
+  // Within an area: the weakest of the layers that matter most. Across areas: each area's first step, then each area's second, and so on
+  const per = rows.map(x => CV_LAYERS.filter(l => (x.r[l.k] || 0) <= 1)
+    .map(l => ({row:x, layer:l, level:x.r[l.k], text:l.act(cvHarm(x.a)), w:(2 - (x.r[l.k] || 0)) * CV_LAYER_WEIGHT[l.k]}))
+    .sort((a, b) => b.w - a.w));
+  const out = [];
+  for(let i = 0; per.some(list => list[i]); i++) per.forEach(list => { if(list[i]) out.push(list[i]); });
+  return n ? out.slice(0, n) : out;
+}
+
+/* ---------- radar: risk against coverage ---------- */
+function cvRadar(d, big){
+  const rows = cvRows(d), n = rows.length, W = 400, H = big ? 320 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, f = v => v.toFixed(1);
+  const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
+  const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
+  const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(rows.map(() => p))}" fill="${p === 100 ? "var(--sunk)" : "none"}" fill-opacity=".5" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
+  const axes = rows.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
+  const hasRisk = rows.some(x => x.riskPct !== null), anyRated = rows.some(x => x.rated);
+  const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round"/>` : "";
+  const cover = anyRated ? `<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="var(--t-cv)" fill-opacity=".24" stroke="var(--t-cv)" stroke-width="2.2" stroke-linejoin="round"/>` : "";
+  const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);
+    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4.5 : 4}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--t-cv)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("") : "";
+  const labels = rows.map((x, i) => { const [a, b] = pt(i, big ? 124 : 120), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = x.a.l.length - 1;
+    const anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
+    return `<text x="${f(a)}" y="${f(b)}" text-anchor="${anchor}" class="cv-rl ${x.status}">${x.a.l.map((t, j) => `<tspan x="${f(a)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
+  const aria = rows.map(x => `${x.a.n}: coverage ${x.cov}%${x.riskPct !== null ? `, risk ${x.riskPct}%` : ""}`).join(". ");
+  return `<svg class="cv-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc("Risk against coverage. " + aria)}">${rings}${axes}${risk}${cover}${dots}${labels}
+    ${!anyRated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="cv-rl none">Rate a defense to start</text>` : ""}</svg>`;
+}
+const cvLegend = d => `<div class="ma-legend cv-legend"><span><i class="cv-lg-cov"></i>Your coverage</span>${cvRisk(d) ? `<span><i class="cv-lg-risk"></i>Risk</span>` : ""}<span><i class="ma-lg-gap"></i>Risk outruns coverage</span></div>`;
+
+/* ---------- page parts ---------- */
+function cvRailHTML(){
+  const s = cvSummary(cv), a = cvActions(cv, 1)[0];
+  return `<div class="vd-rail-h"><h4>Risk vs coverage</h4><span class="note">Updates as you rate</span></div>
+    <div class="ma-score">${s.rated ? `<b class="mono">${s.cov}%</b><span class="note">${s.weighted ? "risk-weighted coverage" : "coverage"}</span>${s.exposed.length ? `<span class="pill crit ma-pill-r">${s.exposed.length} exposed</span>` : s.gaps.length ? `<span class="pill high ma-pill-r">${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}</span>` : ""}` : `<span class="note">Rate the first defense to see your coverage.</span>`}</div>
+    ${cvRadar(cv, false)}${cvLegend(cv)}
+    ${a ? `<div class="ma-start cv-start"><span class="ma-start-k">Start here</span><b>${esc(a.row.a.n)} <span class="ma-lvl">${esc(a.layer.n)}</span></b><span>${esc(a.text)}</span>
+      <button type="button" class="ma-tool ma-start-go" data-cvgo="1">See all gaps<svg><use href="#i-arrow"/></svg></button></div>` : ""}
+    <div class="ma-prog"><div class="ma-prog-t"><span>${s.rated} of ${s.total} rated</span></div><div class="vd-bar"><i style="width:${s.rated / s.total * 100}%"></i></div></div>`;
+}
+function cvSourceHTML(){
+  const {src, s} = cvSrc(cv), rk = cvRisk(cv);
+  const opt = ([v, n]) => `<option value="${esc(v)}" ${v === src ? "selected" : ""}>${esc(n)}</option>`;
+  return `<div class="card cv-src">
+    <div class="field"><label for="cv-src">Compare coverage against</label>
+      <select class="select" id="cv-src">${src ? "" : `<option value="" selected>No risk yet: coverage only</option>`}${s.list.length ? `<optgroup label="Your products">${s.list.map(opt).join("")}</optgroup>` : ""}<optgroup label="Examples">${s.ex.map(opt).join("")}</optgroup></select></div>
+    <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example to see how the comparison works." :
+      src === "all" ? "The worst risk in each harm area across every saved pre-mortem." : src.startsWith("ex:") ? "An example product's risk. Run a pre-mortem on your own products for a real comparison." : "This product's risk, from its pre-mortem."}</p>
+    ${!s.pms.length ? `<button type="button" class="btn sm" data-ov="new">Start a pre-mortem</button>` : ""}
+    ${rk ? `<div class="cv-riskbar">${CV_AREAS.map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
+  </div>`;
+}
+function cvCellHTML(x, l){
+  const v = x.r[l.k];
+  return `<div class="cv-seg" role="radiogroup" aria-label="${esc(x.a.n + ": " + l.n)}">${CV_LEVELS.map((n, j) => `<button type="button" role="radio" aria-checked="${v === j}" class="${v === j ? "on" : ""} l${j}" data-cva="${x.a.k}" data-cvl="${l.k}" data-cvn="${j}" title="${esc(n + ": " + l.lv[j])}"><span class="visually-hidden">${n}</span></button>`).join("")}</div>`;
+}
+function cvMatrixHTML(){
+  const rows = cvRows(cv), seen = new Set();
+  return `<div class="card cv-mx">
+    <div class="cv-mh"><span>Harm area</span>${CV_LAYERS.map(l => `<span title="${esc(l.q)}">${l.n}</span>`).join("")}<span>Coverage</span></div>
+    ${rows.map(x => `<div class="cv-mr" id="cv-row-${x.a.k}">
+      <div class="cv-mn"><b>${esc(x.a.n)}</b>${x.band ? `<span class="pill ${BANDS[x.band][1]}">${BANDS[x.band][0]} risk</span>` : x.score === 0 ? `<span class="note">No risk found</span>` : ""}</div>
+      ${CV_LAYERS.map(l => `<div class="cv-mc"><span class="cv-ml">${l.n}</span>${cvCellHTML(x, l)}</div>`).join("")}
+      <div class="cv-mv ${x.status}"><b class="mono">${x.rated ? x.cov + "%" : "–"}</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span></div>
+    </div>`).join("")}
+    <div class="cv-key"><span>Levels, weakest to strongest:</span>${CV_LEVELS.map((n, j) => `<span class="cv-kl"><i class="l${j}"></i>${n}</span>`).join("")}<span class="note">Hover a square to see what each level means.</span></div>
+    <details class="cv-defs"><summary>What each level means</summary>
+      <div class="cv-dt">${CV_LAYERS.map(l => `<div><h5>${l.n}</h5><p class="note">${esc(l.q)}</p><ol start="0">${l.lv.map((t, j) => `<li><b>${CV_LEVELS[j]}.</b> ${mxGloss(t, seen)}</li>`).join("")}</ol></div>`).join("")}</div></details>
+  </div>`;
+}
+function cvWhy(){
+  const s = cvSummary(cv), rk = cvRisk(cv);
+  if(!s.rated) return `<p>Rate at least one defense to see your coverage. It takes about five minutes for all ${CV_AREAS.length} harm areas.</p>`;
+  let h = `<p>Your ${s.weighted ? "risk-weighted " : ""}coverage is <b>${s.cov}%</b>${s.rated < s.total ? `, based on ${s.rated} of ${s.total} ratings` : ""}.</p>`;
+  if(!rk) return h + `<p>Choose a product or an example above to see where its risk outruns your coverage.</p>`;
+  const top = s.exposed.concat(s.gaps).sort((a, b) => b.gap - a.gap);
+  if(!top.length) return h + `<p>Your coverage keeps pace with the risk in every harm area you've rated. Keep it current as your products change.</p>`;
+  const a = cvActions(cv, 1)[0];
+  return h + `<p>${s.exposed.length ? `<b>${s.exposed.length} area${s.exposed.length === 1 ? " is" : "s are"} exposed</b>: critical risk with less than half the coverage it needs` : `${top.length} area${top.length === 1 ? "" : "s"} carry more risk than your coverage`}. The biggest gap is <b>${esc(cvHarm(top[0].a))}</b>${top[0].from ? ` (worst in ${esc(top[0].from)})` : ""}, at ${top[0].cov}% coverage against ${esc(cvRiskWords(top[0]))}.${a ? ` Start with ${esc(a.layer.n.toLowerCase())}.` : ""}</p>`;
+}
+function cvGapsHTML(){
+  const acts = cvActions(cv), seen = new Set();
+  if(!acts.length) return `<div class="card ma-none"><b>${cvRisk(cv) ? "No gaps where risk is high." : "Choose a risk to compare against."}</b><p class="note">${cvRisk(cv) ? "Every high-risk area has coverage at or above its risk, or its weakest layers are already solid." : "Gaps appear where a harm area's risk is higher than your coverage."}</p></div>`;
+  return `<div class="cv-gaps">${acts.slice(0, 8).map((x, i) => `<article class="card cv-gap ${x.row.status}">
+      <div class="cv-gh"><span class="cv-gn mono">${i + 1}</span><b>${esc(x.row.a.n)}</b><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div>
+      <span class="cv-gl">${esc(x.layer.n)}: ${x.level === undefined ? "not rated" : CV_LEVELS[x.level].toLowerCase()}. ${esc(cvRiskWords(x.row).replace(/^./, c => c.toUpperCase()))}, ${x.row.cov}% coverage.</span>
+      <p>${mxGloss(x.text, seen)}</p>
+      <a class="ma-tool" href="#${x.layer.tool[0]}">${esc(x.layer.tool[1])}<svg><use href="#i-arrow"/></svg></a></article>`).join("")}</div>
+    ${acts.length > 8 ? `<p class="note">${acts.length - 8} more step${acts.length - 8 === 1 ? "" : "s"} in the download and in Send to tracker.</p>` : ""}`;
+}
+function cvResultHTML(){
+  const any = cvSummary(cv).rated, acts = cvActions(cv).length;
+  return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${cvWhy()}</div>
+      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage")}</button></div>` : ""}</div>
+    <div class="card cv-big">${cvRadar(cv, true)}${cvLegend(cv)}</div></div>
+    <div class="ma-rh"><h4>Biggest gaps</h4></div>${cvGapsHTML()}`;
+}
+function cvHeadMeta(){
+  const any = cvSummary(cv).rated;
+  return `<span class="toast" id="cv-toast" aria-live="polite"></span>
+    ${cv.ex ? `<button class="btn sm" data-cv="clear">Clear example</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
+    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage")}</button>` : ""}`;
+}
+function cvMarkdown(d){
+  const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
+  const L = [`# Trust & Safety coverage radar`, ``, `${new Date().toISOString().slice(0, 10)}${src ? " · risk from " + src : ""}`, ``, `**${s.weighted ? "Risk-weighted coverage" : "Coverage"}: ${s.cov}%**${s.exposed.length ? ` · ${s.exposed.length} exposed` : ""}${s.gaps.length ? ` · ${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : ""}`, ``];
+  L.push(`| Harm area | Risk | ${CV_LAYERS.map(l => l.n).join(" | ")} | Coverage |`, `|---|---|${CV_LAYERS.map(() => "---|").join("")}---|`);
+  s.rows.forEach(x => L.push(`| ${x.a.n} | ${x.band ? BANDS[x.band][0] : x.score === 0 ? "None found" : "–"} | ${CV_LAYERS.map(l => x.r[l.k] === undefined ? "–" : CV_LEVELS[x.r[l.k]]).join(" | ")} | ${x.rated ? x.cov + "%" : "–"} |`));
+  L.push(``, `## Next steps`, ``);
+  if(!acts.length) L.push(`No gaps where risk is high.`);
+  acts.forEach(x => L.push(`- [ ] **${x.row.a.n}, ${x.layer.n.toLowerCase()}** (${x.row.status === "exposed" ? "exposed" : "gap"}): ${x.text}`));
+  L.push(``, `---`, `Made with T&S Workbench. A self-assessment to guide planning, not an audit.`);
+  return L.join("\n");
+}
+const cvTitle = d => { const s = cvSummary(d); return `Coverage radar: ${s.cov}% coverage${s.exposed.length ? `, ${s.exposed.length} exposed` : ""}`; };
+
+function renderCoverage(){
+  const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`;
+  view.innerHTML = head("Coverage Radar",
+    "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
+    "Run the program", cvHeadMeta()) + `
+    <p class="mxa-q cv-q">Where is your risk highest and your coverage thinnest?</p>
+    <div class="mxm-how"><ol class="mxm-how-s">${CV_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
+    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage. Clear it to rate your own.</span><button type="button" class="btn sm" data-cv="clear">Clear example</button></div>` : ""}
+    <div class="vd-grid ma-grid cv-grid">
+      <div class="vd-main">
+        <section class="mxa-part">${step(1)}<div id="cv-src-wrap">${cvSourceHTML()}</div></section>
+        <section class="mxa-part">${step(2)}<div id="cv-matrix">${cvMatrixHTML()}</div></section>
+        <section class="mxa-part" id="cv-p3">${step(3)}<div id="cv-result">${cvResultHTML()}</div></section>
+      </div>
+      <aside class="vd-rail"><div class="card vd-railc" id="cv-rail">${cvRailHTML()}</div></aside>
+    </div>
+    <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>`;
+  bindCoverage();
+}
+function cvRefresh(all){
+  const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+  if(all){ set("cv-src-wrap", cvSourceHTML()); set("cv-matrix", cvMatrixHTML()); }
+  set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML());
+  const hm = view.querySelector && view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = cvHeadMeta();
+}
+function bindCoverage(){
+  view.onclick = e => {
+    const b = e.target.closest("button"); if(!b || !view.contains(b)) return;
+    const d = b.dataset;
+    if(d.cva){
+      const row = cv.r[d.cva] = Object.assign({}, cv.r[d.cva]); row[d.cvl] = +d.cvn; cv.ex = false; cvSave();
+      b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
+      const x = cvRows(cv).find(r => r.a.k === d.cva), cell = document.querySelector(`#cv-row-${d.cva} .cv-mv`);
+      if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
+      return cvRefresh(false);
+    }
+    if(d.cvgo){ const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); return; }
+    if(d.ov === "new") return newAssessment();
+    switch(d.cv){
+      case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
+      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
+      case "download": { const md = cvMarkdown(cv); return offerFile(`ts-coverage-radar-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#cv-toast")); }
+      case "tasks": return tkOpen("coverage");
+      case "save": { const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(); return flashIn($("#cv-toast"), msg); }
+    }
+  };
+  view.onchange = e => { if(e.target.id === "cv-src"){ cv.src = e.target.value || null; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); } };
+  view.onkeydown = e => {
+    const g = e.target.closest && e.target.closest(".cv-seg"); if(!g || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+    e.preventDefault(); const bs = [...g.querySelectorAll("button")], cur = bs.indexOf(e.target), nx = bs[Math.max(0, Math.min(bs.length - 1, cur + (e.key === "ArrowRight" ? 1 : -1)))];
+    if(nx){ nx.click(); nx.focus(); }
+  };
+  view.querySelectorAll(".gl").forEach(g => g.onclick = () => g.focus());
+}
+/* =========================================================
    OVERVIEW: your safety picture in three radars
    Program maturity · all products combined · one product at a time
    ========================================================= */
@@ -9036,6 +9399,7 @@ function ovChecklistHTML(){
   const rows = [
     ["steps", "var(--t-ma)", "Rate your program's maturity", m.state === "done" ? `Level ${maScore(ma).toFixed(1)} · ${maLevelName(maScore(ma))}` : m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : "Not started", m.state === "done", "maturity"],
     ["radar", "var(--t-pm)", "Run a pre-mortem on each product", st.pms ? `${st.pms} saved` : "None saved yet", st.pms > 0, "premortem"],
+    ...(typeof cvSummary === "function" ? [(() => { const s = cvSummary(cv); return ["cover", "var(--t-cv)", "Map your defenses against risk", s.rated ? `${s.cov}% coverage${s.exposed.length ? ` · ${s.exposed.length} exposed` : ""}` : "Not started", s.rated >= s.total && !cv.ex, "coverage"]; })()] : []),
     ["siren", "var(--t-tt)", "Rehearse a crisis", `${ttDone} of ${scen.length} scenarios${type !== "all" ? " for your company type" : ""}`, ttDone > 0, "tabletop"],
     ["gauge", "var(--t-mx)", "Track your safety metrics", mxSet ? `Tracking ${Object.keys(mx.vals).length} metrics` : "Scorecard not set up", !!mxSet, "metrics/scorecard"],
     ["scale", "var(--t-vd)", "Score your moderation vendors", vSaved ? "Scorecard saved" : "Not started", vSaved, "vendors"]
@@ -9262,6 +9626,14 @@ function tkFromPremortem(){
       "", `From the abuse pre-mortem "${name}", made with T&S Workbench.`].filter(x => x !== null).join("\n")
   }));
 }
+function tkFromCoverage(){
+  return cvActions(cv).map((x, i) => ({
+    id:`cv-${x.row.a.k}-${x.layer.k}`, title:x.text, group:x.row.status === "exposed" ? "Exposed: critical risk, thin coverage" : "Gaps: risk outruns coverage", owner:"", area:x.row.a.n, pr:x.row.status === "exposed" ? 4 : 3, done:false, def:i < 12,
+    labels:["trust-and-safety", "coverage", "coverage-" + x.layer.k],
+    desc:[x.text, "", `${x.row.a.n}: ${x.row.status === "exposed" ? "exposed (critical risk, under half the coverage it needs)" : "risk outruns coverage"}. ${cvRiskWords(x.row).replace(/^./, c => c.toUpperCase())}, ${x.row.cov}% coverage.`,
+      `Layer: ${x.layer.n}, currently ${x.level === undefined ? "not rated" : CV_LEVELS[x.level].toLowerCase()}. ${x.layer.q}`, "", "From a coverage radar made with T&S Workbench."].join("\n")
+  }));
+}
 function tkFromMaturity(){
   const out = [];
   maRoadmap(ma).forEach(s => { const ph = MA_PHASES.find(p => p[0] === s.phase);
@@ -9320,7 +9692,7 @@ function tkListHTML(){
       ${T.link && !tkLink(k, tk.tasks[0] || {title:"", desc:"", pr:2}) ? `<span class="note">Fill in the settings above to create issues one at a time.</span>` : ""}</div>
     <div class="tk-rows">${tk.tasks.map(t => { const url = T.link ? tkLink(k, t) : null, head = t.group !== group ? `<div class="tk-g">${esc(group = t.group)}</div>` : "";
       return head + `<div class="tk-row ${t.done ? "done" : ""}"><label><input type="checkbox" data-tksel="${esc(t.id)}" ${tk.sel[t.id] ? "checked" : ""}>
-        <span class="tk-t"><b>${esc(t.title)}</b><small>${[T.pr[t.pr] + " priority", t.owner, t.done ? "Done" : ""].filter(Boolean).map(esc).join(" · ")}</small></span></label>
+        <span class="tk-t"><b>${esc(t.title)}</b><small>${[T.pr[t.pr] + " priority", t.area, t.owner, t.done ? "Done" : ""].filter(Boolean).map(esc).join(" · ")}</small></span></label>
         ${url ? `<a class="btn sm ${tk.opened[t.id] ? "" : "ghost"}" href="${esc(url)}" target="_blank" rel="noopener" data-tkopen="${esc(t.id)}">${tk.opened[t.id] ? "Opened ✓" : "Create in " + esc(T.n.split(" ")[0])}</a>` : ""}</div>`; }).join("")}</div>`;
 }
 function tkDialogHTML(){
@@ -9336,6 +9708,7 @@ function tkDialogHTML(){
 }
 function tkOpen(src){
   if(src === "premortem"){ tk = {src:`the pre-mortem "${pm.name || "Untitled assessment"}"`, tasks:tkFromPremortem(), sel:{}, opened:{}}; }
+  else if(src === "coverage"){ tk = {src:"your coverage gaps", tasks:tkFromCoverage(), sel:{}, opened:{}}; }
   else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
   tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
   const prev = document.activeElement, bg = document.createElement("div");
@@ -9360,7 +9733,7 @@ function tkOpen(src){
   const first = box.querySelector('[aria-pressed="true"]'); if(first) first.focus();
 }
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   const name = ROUTES[h] ? h : 'overview';

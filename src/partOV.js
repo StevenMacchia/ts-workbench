@@ -108,6 +108,7 @@ function ovChecklistHTML(){
   const rows = [
     ["steps", "var(--t-ma)", "Rate your program's maturity", m.state === "done" ? `Level ${maScore(ma).toFixed(1)} · ${maLevelName(maScore(ma))}` : m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : "Not started", m.state === "done", "maturity"],
     ["radar", "var(--t-pm)", "Run a pre-mortem on each product", st.pms ? `${st.pms} saved` : "None saved yet", st.pms > 0, "premortem"],
+    ...(typeof cvSummary === "function" ? [(() => { const s = cvSummary(cv); return ["cover", "var(--t-cv)", "Map your defenses against risk", s.rated ? `${s.cov}% coverage${s.exposed.length ? ` · ${s.exposed.length} exposed` : ""}` : "Not started", s.rated >= s.total && !cv.ex, "coverage"]; })()] : []),
     ["siren", "var(--t-tt)", "Rehearse a crisis", `${ttDone} of ${scen.length} scenarios${type !== "all" ? " for your company type" : ""}`, ttDone > 0, "tabletop"],
     ["gauge", "var(--t-mx)", "Track your safety metrics", mxSet ? `Tracking ${Object.keys(mx.vals).length} metrics` : "Scorecard not set up", !!mxSet, "metrics/scorecard"],
     ["scale", "var(--t-vd)", "Score your moderation vendors", vSaved ? "Scorecard saved" : "Not started", vSaved, "vendors"]

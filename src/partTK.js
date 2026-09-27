@@ -33,6 +33,14 @@ function tkFromPremortem(){
       "", `From the abuse pre-mortem "${name}", made with T&S Workbench.`].filter(x => x !== null).join("\n")
   }));
 }
+function tkFromCoverage(){
+  return cvActions(cv).map((x, i) => ({
+    id:`cv-${x.row.a.k}-${x.layer.k}`, title:x.text, group:x.row.status === "exposed" ? "Exposed: critical risk, thin coverage" : "Gaps: risk outruns coverage", owner:"", area:x.row.a.n, pr:x.row.status === "exposed" ? 4 : 3, done:false, def:i < 12,
+    labels:["trust-and-safety", "coverage", "coverage-" + x.layer.k],
+    desc:[x.text, "", `${x.row.a.n}: ${x.row.status === "exposed" ? "exposed (critical risk, under half the coverage it needs)" : "risk outruns coverage"}. ${cvRiskWords(x.row).replace(/^./, c => c.toUpperCase())}, ${x.row.cov}% coverage.`,
+      `Layer: ${x.layer.n}, currently ${x.level === undefined ? "not rated" : CV_LEVELS[x.level].toLowerCase()}. ${x.layer.q}`, "", "From a coverage radar made with T&S Workbench."].join("\n")
+  }));
+}
 function tkFromMaturity(){
   const out = [];
   maRoadmap(ma).forEach(s => { const ph = MA_PHASES.find(p => p[0] === s.phase);
@@ -91,7 +99,7 @@ function tkListHTML(){
       ${T.link && !tkLink(k, tk.tasks[0] || {title:"", desc:"", pr:2}) ? `<span class="note">Fill in the settings above to create issues one at a time.</span>` : ""}</div>
     <div class="tk-rows">${tk.tasks.map(t => { const url = T.link ? tkLink(k, t) : null, head = t.group !== group ? `<div class="tk-g">${esc(group = t.group)}</div>` : "";
       return head + `<div class="tk-row ${t.done ? "done" : ""}"><label><input type="checkbox" data-tksel="${esc(t.id)}" ${tk.sel[t.id] ? "checked" : ""}>
-        <span class="tk-t"><b>${esc(t.title)}</b><small>${[T.pr[t.pr] + " priority", t.owner, t.done ? "Done" : ""].filter(Boolean).map(esc).join(" · ")}</small></span></label>
+        <span class="tk-t"><b>${esc(t.title)}</b><small>${[T.pr[t.pr] + " priority", t.area, t.owner, t.done ? "Done" : ""].filter(Boolean).map(esc).join(" · ")}</small></span></label>
         ${url ? `<a class="btn sm ${tk.opened[t.id] ? "" : "ghost"}" href="${esc(url)}" target="_blank" rel="noopener" data-tkopen="${esc(t.id)}">${tk.opened[t.id] ? "Opened ✓" : "Create in " + esc(T.n.split(" ")[0])}</a>` : ""}</div>`; }).join("")}</div>`;
 }
 function tkDialogHTML(){
@@ -107,6 +115,7 @@ function tkDialogHTML(){
 }
 function tkOpen(src){
   if(src === "premortem"){ tk = {src:`the pre-mortem "${pm.name || "Untitled assessment"}"`, tasks:tkFromPremortem(), sel:{}, opened:{}}; }
+  else if(src === "coverage"){ tk = {src:"your coverage gaps", tasks:tkFromCoverage(), sel:{}, opened:{}}; }
   else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
   tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
   const prev = document.activeElement, bg = document.createElement("div");

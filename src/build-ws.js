@@ -203,7 +203,7 @@ console.log("v8 assembled");
   const W9 = patch(W2, [[`function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }`,
     `function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }`]], "partW2 goRoute");
   const R9 = patch(R, [[`const h = (location.hash || '').slice(1);`, `const h = (location.hash || '').slice(1).split('/')[0];`], [`  ROUTES[name]();`, `  ROUTES[name]();\n  shellUpdate(name);`],
-    [`const ROUTES = {overview:renderOverview, workspace:renderWorkspace, `, `const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, `], [`policy:renderPolicy, `, `policy:renderPolicy, maturity:renderMaturity, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), `]], "partR shell");
+    [`const ROUTES = {overview:renderOverview, workspace:renderWorkspace, `, `const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, `], [`policy:renderPolicy, `, `policy:renderPolicy, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), `]], "partR shell");
   // Report header becomes a document title; the detail heading gets its own spacing hook
   const F3_9 = patch(F3, [
     [`<div class="card"><div class="card-b" style="display:grid;gap:10px">\n      <div class="row" style="justify-content:space-between"><div><h2 style="font-size:20px">`,
@@ -211,7 +211,7 @@ console.log("v8 assembled");
     [`<div class="section-title" style="margin-top:28px"><h2>The detail</h2>`, `<div class="section-title rep-detail"><h2>The detail</h2>`]
   ], "partF3 report header");
   const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css");
-  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partOV.js"), rd("partPF.js"), rd("partTK.js"), R9].join("");
+  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partPF.js"), rd("partTK.js"), R9].join("");
   fs.writeFileSync(path.join(D, "_F3_9.js"), F3_9);
   const STANDALONE_BUILD = true;
 fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + body9);
@@ -224,7 +224,7 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
   const v9 = fs.readFileSync(path.join(D, "ts-workbench-v9.html"), "utf8");
   const site = fs.existsSync(path.join(D, "site-url.txt")) ? fs.readFileSync(path.join(D, "site-url.txt"), "utf8").trim().replace(/\/$/, "") : "";
   const title = "T&amp;S Workbench: free Trust &amp; Safety tools";
-  const desc = "Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, a program maturity assessment and AI assistants. Built by Steven Macchia.";
+  const desc = "Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, program maturity, a coverage radar and AI assistants. Built by Steven Macchia.";
   const icon = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#5B5BD6"/><path d="M16 6l8 3.4v5.8c0 5-3.4 8.8-8 10.8-4.6-2-8-5.8-8-10.8V9.4z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M12.5 16l2.4 2.4 4.6-4.8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
   const img = site ? site + "/og-image.png" : "og-image.png";
   const headTags = [
