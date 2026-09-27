@@ -2937,18 +2937,9 @@ const pill = (band, txt) => `<span class="pill ${BANDS[band][1]}"><span class="d
 const tip = (text, cls) => `<span class="tipi ${cls||""}" tabindex="0" role="img" aria-label="${esc(text)}" data-tip="${esc(text)}"><svg><use href="#i-info"/></svg></span>`;
 let confirmDel = null;
 
-function withImpact(mutate){
-  const before = assess(pm);
-  mutate(); applySkips();
-  const after = assess(pm);
-  const b = Object.fromEntries(before.risks.map(r=>[r.id,r])), a = Object.fromEntries(after.risks.map(r=>[r.id,r]));
-  pm.impact = {
-    added: after.risks.filter(r=>!b[r.id]).map(r=>[r.n,r.band]),
-    removed: before.risks.filter(r=>!a[r.id]).map(r=>[r.n,r.band]),
-    raised: after.risks.filter(r=>b[r.id] && BANDS[r.band][2] > BANDS[b[r.id].band][2]).map(r=>[r.n,r.band]),
-    lowered: after.risks.filter(r=>b[r.id] && BANDS[r.band][2] < BANDS[b[r.id].band][2]).map(r=>[r.n,r.band])
-  };
-}
+function withImpact(mutate){ mutate(); applySkips(); }
+// Snapshot of the risk picture when a question opens, so the panel can show what this question's answer changed
+function qSnap(k){ const r = assess(pm); return {k, bands:Object.fromEntries(r.risks.map(x=>[x.id, x.band])), laws:r.obligations.filter(o=>o.status==="applies").map(o=>o.id || o.n)}; }
 function setType(v){
   const prev = PLATFORMS.find(x=>x.k===pm.type), t = PLATFORMS.find(x=>x.k===v);
   pm.type = v;
@@ -3028,6 +3019,7 @@ function askScreen(){
   const qs = visibleQs();
   pm.qi = Math.max(0, Math.min(pm.qi, qs.length-1));
   const Q = qs[pm.qi], last = pm.qi === qs.length-1;
+  if(!pm.qbase || pm.qbase.k !== Q.k){ pm.qbase = qSnap(Q.k); store.set("pm3", pm); }
   let body = "";
   if(Q.kind==="single") body = `<div class="ogrid ${Q.k==="type"?"":"two"}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k]===o.k,false)).join("")}</div>`;
   if(Q.kind==="multi"){
@@ -3058,22 +3050,38 @@ function askScreen(){
     <p class="note keyhint">Keyboard: number keys select an answer, Enter continues.</p>
   </div>${livePanel(assess(pm))}</div>`;
 }
-function impactBox(){
-  const im = pm.impact;
-  if(!im) return `<p class="note">Your answers will update this picture as you go.</p>`;
+function impactBox(r){
+  const qs = visibleQs(), Q = qs[Math.max(0, Math.min(pm.qi, qs.length-1))], base = pm.qbase;
+  const box = (h, inner) => `<div class="impact"><div class="eyebrow" style="margin-bottom:6px">${h}</div>${inner}</div>`;
+  if(!pm.type) return box("How this works", `<p class="note">Your first answer gives you a starting list of risks for that kind of product. Each answer after that adds, removes or re-rates them, and you'll see the effect here.</p>`);
+  const top = r.risks.slice().sort((a,b)=>b.score-a.score).slice(0,3);
+  if(!base || !Object.keys(base.bands).length) return box("Your starting point", `<p class="note" style="margin-bottom:8px">${r.risks.length} risks are common for ${esc((labelOf(PLATFORMS,pm.type)||"this kind of product").toLowerCase())}. The next questions narrow them down to your product.</p>
+    <div class="imp"><b>Most serious so far</b>${top.map(x=>`<span>${pill(x.band)} ${esc(x.n)}</span>`).join("")}</div>`);
+  if(Q.kind==="single" || Q.kind==="multi"){ if(!pm.answered[Q.k]) return box("This question", `<p class="note">Pick an answer to see how it changes your risks.</p>`); }
+  const now = Object.fromEntries(r.risks.map(x=>[x.id, x])), rank = b => BANDS[b][2];
+  const im = {
+    added: r.risks.filter(x=>!base.bands[x.id]).map(x=>[x.n,x.band]),
+    removed: HARMS.filter(h=>base.bands[h.id] && !now[h.id]).map(h=>[h.n,base.bands[h.id]]),
+    raised: r.risks.filter(x=>base.bands[x.id] && rank(x.band) > rank(base.bands[x.id])).map(x=>[x.n,x.band]),
+    lowered: r.risks.filter(x=>base.bands[x.id] && rank(x.band) < rank(base.bands[x.id])).map(x=>[x.n,x.band])
+  };
+  const laws = r.obligations.filter(o=>o.status==="applies").map(o=>o.id || o.n), lawsUp = laws.filter(x=>!base.laws.includes(x)).length, lawsDn = base.laws.filter(x=>!laws.includes(x)).length;
   const lines = [];
   if(im.added.length) lines.push(`<div class="imp up"><b>+${im.added.length} risk${im.added.length===1?"":"s"}</b>${im.added.slice().sort((a,b)=>BANDS[b[1]][2]-BANDS[a[1]][2]).slice(0,3).map(x=>`<span>${pill(x[1])} ${esc(x[0])}</span>`).join("")}</div>`);
   if(im.raised.length) lines.push(`<div class="imp up"><b>${im.raised.length} rated higher</b>${im.raised.slice(0,2).map(x=>`<span>${pill(x[1])} ${esc(x[0])}</span>`).join("")}</div>`);
   if(im.removed.length) lines.push(`<div class="imp dn"><b>−${im.removed.length} risk${im.removed.length===1?"":"s"} no longer apply</b>${im.removed.slice(0,2).map(x=>`<span>${esc(x[0])}</span>`).join("")}</div>`);
-  if(im.lowered.length) lines.push(`<div class="imp dn"><b>${im.lowered.length} rated lower</b></div>`);
-  return lines.length ? lines.join("") : `<p class="note">That answer didn't change your risks.</p>`;
+  if(im.lowered.length) lines.push(`<div class="imp dn"><b>${im.lowered.length} rated lower</b>${im.lowered.slice(0,2).map(x=>`<span>${pill(x[1])} ${esc(x[0])}</span>`).join("")}</div>`);
+  if(lawsUp) lines.push(`<div class="imp up"><b>+${lawsUp} law${lawsUp===1?"":"s"} likely appl${lawsUp===1?"ies":"y"}</b></div>`);
+  if(lawsDn) lines.push(`<div class="imp dn"><b>${lawsDn} law${lawsDn===1?" no longer applies":"s no longer apply"}</b></div>`);
+  const none = Q.kind==="name" ? "The name only labels your report." : Q.kind==="features" ? "Add or remove features to see how your risks change." : "This answer didn't add or re-rate any risks.";
+  return box("What this answer changed", lines.length ? lines.join("") : `<p class="note">${none}</p>`);
 }
 function livePanel(r){
   const total = r.risks.length || 1;
   return `<aside class="card live" aria-label="Your risk picture" aria-live="polite">
     <div class="row" style="justify-content:space-between"><h3>Your risk picture ${tip("Updates as you answer. Each risk is scored severity × likelihood; critical means 12 or more out of 16.","tip-r")}</h3><span class="pill ${r.posture[1]}">${r.posture[0]}</span></div>
     ${["crit","high","med","low"].map(b=>`<div class="countrow"><span>${BANDS[b][0]}</span><div class="bar"><i style="width:${r.counts[b]/total*100}%;background:var(--${b==="low"?"line-strong":b})"></i></div><span class="mono">${r.counts[b]}</span></div>`).join("")}
-    <div class="impact"><div class="eyebrow" style="margin-bottom:6px">Your last answer</div>${impactBox()}</div>
+    ${pm.stage==="ask" ? impactBox(r) : ""}
     ${pm.type?`<button type="button" class="btn" data-act="report">See report now</button>`:""}
   </aside>`;
 }
@@ -3116,7 +3124,7 @@ function goNext(){
 }
 function goToQuestion(k){
   const idx = visibleQs().findIndex(q=>q.k===k);
-  pm.stage = "ask"; pm.qi = Math.max(0, idx); pm.impact = null; savePM(); renderPremortem(); window.scrollTo(0,0);
+  pm.stage = "ask"; pm.qi = Math.max(0, idx); savePM(); renderPremortem(); window.scrollTo(0,0);
 }
 function bindPremortem(){
   const root = $("#pm-root");
@@ -3130,7 +3138,7 @@ function bindPremortem(){
     if(d.none){ withImpact(() => { pm[d.none] = []; }); pm.answered[d.none] = true; return rerender(); }
     if(d.all){ const Q = QS.find(q=>q.k===d.all); withImpact(() => { pm[d.all] = pm[d.all].length===Q.opts.length ? [] : Q.opts.map(o=>o.k); }); pm.answered[d.all] = true; return rerender(); }
     if(d.next) return goNext();
-    if(d.back){ pm.qi = Math.max(0, pm.qi-1); pm.impact = null; return rerender(); }
+    if(d.back){ pm.qi = Math.max(0, pm.qi-1); return rerender(); }
     if(d.goq) return goToQuestion(d.goq);
     if(d.preset){ pm = fromPreset(d.preset); return rerender(); }
     if(d.libopen){ const rec = libLoad()[d.libopen]; if(rec){ pm = openRecord(rec, {stage:"report"}); } return rerender(); }
