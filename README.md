@@ -36,6 +36,8 @@ Trust & Safety knowledge mostly lives in people's heads and in slide decks that 
 
 ## Screenshots
 
+![overview-rc](assets/overview-rc.png)
+
 ![metrics-map](assets/metrics-map.png)
 
 ![premortem-report](assets/premortem-report.png)

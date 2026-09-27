@@ -89,6 +89,7 @@ function renderOverview(){
       <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
     </section>
 
+    ${typeof rcHTML === "function" ? rcHTML() : ""}
     ${ovPictureHTML()}
 
     <section class="rise">

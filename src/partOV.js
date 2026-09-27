@@ -99,6 +99,7 @@ function ovChecklistHTML(){
       <span class="ov-ck-t"><b>${t}</b><small>${s}</small></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div></div>`;
 }
 function bindOverviewPicture(){
+  view.querySelectorAll("[data-rc=download]").forEach(b => b.onclick = () => { const md = rcMarkdown(); offerFile(`ts-report-card-${new Date().toISOString().slice(0, 10)}.md`, md, md, null).then(r => { if(r === "saved") gsay("Report card downloaded"); else if(r === "copied") gsay("Report card copied to your clipboard"); }); });
   const sel = document.getElementById("ov-pm-sel");
   if(sel) sel.onchange = () => { store.set("ov:pm", sel.value); renderOverview(); const s = document.getElementById("ov-pm-sel"); if(s) s.focus(); };
   view.querySelectorAll("[data-ov-ma]").forEach(a => a.onclick = () => {
