@@ -142,7 +142,7 @@ function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <h4 class="ma-rh">Your roadmap</h4>${maRoadmapHTML()}`;
+    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d);
@@ -224,6 +224,7 @@ function bindMaturity(partial){
         case "example": ma = JSON.parse(JSON.stringify(MA_EXAMPLE)); store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
         case "clear": case "reset": ma = {stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}; store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
         case "download": { const md = maMarkdown(ma); return offerFile(`ts-program-maturity-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#ma-toast")); }
+        case "tasks": return tkOpen("maturity");
         case "save": { const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
       }
     };

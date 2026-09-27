@@ -37,14 +37,15 @@ try{
 async function offerFile(filename, data, fallbackText, toastEl){
   const say = m => { if(toastEl){ toastEl.textContent = m; setTimeout(()=>{ toastEl.textContent = ""; }, 3500); } };
   if(DL){
-    try{ await DL.save({filename, data}); say("Download started"); return; }
+    try{ await DL.save({filename, data}); say("Download started"); return "saved"; }
     catch(e){
       const code = e && e.code;
-      if(code==="declined") return say("Download cancelled");
-      if(code==="rate_limited") return say("A download prompt is already open");
+      if(code==="declined"){ say("Download cancelled"); return "declined"; }
+      if(code==="rate_limited"){ say("A download prompt is already open"); return "declined"; }
     }
   }
   copyText(fallbackText, toastEl);
+  return "copied";
 }
 function exportLibrary(toastEl){
   const items = Object.values(libLoad());

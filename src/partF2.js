@@ -224,6 +224,7 @@ function renderPremortem(){
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
+    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
     actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
   }
@@ -283,6 +284,7 @@ function bindPremortem(){
     switch(d.act){
       case "new": pm = blankPM(); return rerender();
       case "report": pm.stage = "report"; return rerender();
+      case "tasks": return tkOpen("premortem");
       case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();
       case "canceldel": confirmDel = null; return renderPremortem();

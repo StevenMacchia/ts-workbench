@@ -150,9 +150,9 @@ function renderWorkspace(){
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
   const p = wsProfile();
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
-    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. Saved in this browser only.`, null,
-    `<button type="button" class="btn sm" data-ws="export"><svg><use href="#i-download"/></svg>Export workspace</button>
-     <label class="btn sm" for="ws-import"><svg><use href="#i-upload"/></svg>Import</label><input type="file" id="ws-import" accept=".json,application/json" class="visually-hidden">`) + `
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser: save your profile to a file to keep it, and open that file on any device.`, null,
+    `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open profile</button>
+     <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save profile</button>`) + `
     <span class="toast" id="ws-toast" aria-live="polite"></span>
     <div class="wstop">
       ${profileCard()}

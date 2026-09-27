@@ -2205,6 +2205,59 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .ov-pc-empty .ov-inv{position:static;transform:none;inset:auto;padding:0 6px;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .ov-pic-prog i{background:var(--line-strong)}
 .ov-pic-prog i.on{background:var(--good)}
+
+/* ---------- Send to tracker and profile dialogs ---------- */
+.ma-rh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ma-rh h4{margin:0;font-size:18px;letter-spacing:-.015em}
+.tk-bg{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;background:rgba(10,12,28,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.tk{width:min(760px,100%);max-height:min(88vh,860px);display:grid;grid-template-rows:auto auto auto auto minmax(0,1fr) auto;gap:12px;padding:20px 22px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 30px 80px -30px rgba(0,0,0,.55);overflow:hidden}
+.tk.pf{width:min(520px,100%);grid-template-rows:none;gap:10px}
+.tk.pf h3{margin:0;font-size:19px;letter-spacing:-.015em}
+.tk.pf p{margin:0;font-size:14.5px;line-height:1.55}
+.pf-act{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:8px}
+.tk-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.tk-h h3{margin:0 0 2px;font-size:19px;letter-spacing:-.015em}
+.tk-h .note{margin:0}
+.tk-tr{max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tk-tr button{white-space:nowrap}
+.tk-how{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tk-cfg{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.tk-cfg.three{grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,.8fr);margin-top:10px}
+.tk-cfg .field{margin:0}
+.tk-cfg .input{padding:8px 10px;font-size:14px}
+.tk-more summary{cursor:pointer;font-size:13.5px;font-weight:500;color:var(--accent)}
+.tk-more .note{margin:8px 0 0;font-size:12.5px}
+.tk-list{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tk-lh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;background:var(--sunk);font-size:13px}
+.tk-lh .note{margin:0;font-size:12.5px}
+.tk-all{display:inline-flex;gap:8px;align-items:center;font-weight:500}
+.tk-rows{overflow:auto;max-height:44vh}
+.tk-g{padding:8px 14px 4px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid var(--line)}
+.tk-row label{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;align-items:start;cursor:pointer;min-width:0;flex:1}
+.tk-row input{margin:3px 0 0}
+.tk-t{display:grid;gap:1px;min-width:0}
+.tk-t b{font-size:13.5px;font-weight:500;line-height:1.4}
+.tk-t small{font-size:12px;color:var(--muted)}
+.tk-row.done .tk-t b{color:var(--muted);text-decoration:line-through}
+.tk-row .btn{flex:none;white-space:nowrap}
+.tk-f{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap}
+.tk-f .toast{margin-right:auto}
+@media (max-width:640px){.tk-bg{padding:0;place-items:end stretch}.tk{max-height:92vh;border-radius:18px 18px 0 0;padding:16px}.tk-cfg.three{grid-template-columns:1fr}.tk-row{flex-wrap:wrap}.tk-row .btn{margin-left:26px}}
+
+/* sidebar profile status */
+.sb-sync{display:flex;align-items:center;gap:6px;padding:6px 8px 6px 10px;margin:2px 0 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);font-size:12px;color:#A9ADD0}
+.sb-sync-t{display:inline-flex;align-items:center;gap:7px;margin-right:auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-sync-t i{width:7px;height:7px;border-radius:50%;flex:none;background:#7F84AA}
+.sb-sync.ok .sb-sync-t i{background:#4CC38A}
+.sb-sync.dirty .sb-sync-t i{background:#F5C543;box-shadow:0 0 8px rgba(245,197,67,.6)}
+.sb-sync button{all:unset;cursor:pointer;padding:3px 8px;border-radius:7px;font-size:12px;font-weight:500;color:#EEF0FA;background:rgba(255,255,255,.08)}
+.sb-sync button:hover{background:rgba(255,255,255,.15)}
+.sb-sync button:focus-visible{outline:2px solid #8B8CFF;outline-offset:1px}
+.sb-sync.dirty button[data-pf="save"]{background:#F3F4FB;color:#14163A}
+.sb-foot > .sb-sync{min-width:0;max-width:100%;box-sizing:border-box}
+.sb-sync-t{flex:1 1 auto}
+.sb-sync button{flex:none}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2275,6 +2328,8 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></g></symbol><symbol id="i-appeal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a1 1 0 011 1v9a1 1 0 01-1 1h-8l-4 4v-4H5a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M9 10.5l2 2 4-4"/></g></symbol><symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></g></symbol><symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></g></symbol>
   <symbol id="i-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16V4.5h-4.5v4h-4v4h-4v4H4z"/></g></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 <div class="app" id="app">
@@ -2304,6 +2359,7 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
     </nav>
     <div class="sb-foot">
       <a class="sb-me" href="#workspace" id="sb-me"></a>
+      <div class="sb-sync" id="sb-sync"></div>
       <div class="themeseg" role="group" aria-label="Color theme">
         <button type="button" data-thememode="light" aria-pressed="false" title="Light theme" aria-label="Light theme"><svg><use href="#i-sun"/></svg></button>
         <button type="button" data-thememode="dark" aria-pressed="false" title="Dark theme" aria-label="Dark theme"><svg><use href="#i-moon"/></svg></button>
@@ -3369,6 +3425,7 @@ function renderPremortem(){
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
+    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
     actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
   }
@@ -3428,6 +3485,7 @@ function bindPremortem(){
     switch(d.act){
       case "new": pm = blankPM(); return rerender();
       case "report": pm.stage = "report"; return rerender();
+      case "tasks": return tkOpen("premortem");
       case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();
       case "canceldel": confirmDel = null; return renderPremortem();
@@ -3535,14 +3593,15 @@ try{
 async function offerFile(filename, data, fallbackText, toastEl){
   const say = m => { if(toastEl){ toastEl.textContent = m; setTimeout(()=>{ toastEl.textContent = ""; }, 3500); } };
   if(DL){
-    try{ await DL.save({filename, data}); say("Download started"); return; }
+    try{ await DL.save({filename, data}); say("Download started"); return "saved"; }
     catch(e){
       const code = e && e.code;
-      if(code==="declined") return say("Download cancelled");
-      if(code==="rate_limited") return say("A download prompt is already open");
+      if(code==="declined"){ say("Download cancelled"); return "declined"; }
+      if(code==="rate_limited"){ say("A download prompt is already open"); return "declined"; }
     }
   }
   copyText(fallbackText, toastEl);
+  return "copied";
 }
 function exportLibrary(toastEl){
   const items = Object.values(libLoad());
@@ -3712,7 +3771,8 @@ function tabPlan(r){
     ? Object.keys(OWNERS).map(o=>{ const items = r.safeguards.filter(s=>s.o===o).sort(order); return {key:"own-"+o, title:`<b>${OWNERS[o]}</b>`, sub:`${items.filter(s=>s.rank===3).length} launch blockers`, items, dflt:items.some(s=>s.rank===3)}; })
     : TIERS.map(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r).sort(order); return {key:"tier-"+t.r, title:pill(["low","med","high","crit"][t.r], t.n), sub:t.h, items, dflt:t.r>=2}; });
   return `<div class="row" style="justify-content:space-between;margin-bottom:12px">
-      <div class="segs" role="group" aria-label="Group by"><button type="button" data-group="tier" aria-pressed="${!byOwner}">By priority</button><button type="button" data-group="owner" aria-pressed="${byOwner}">By owner</button></div>
+      <div class="row" style="gap:8px"><div class="segs" role="group" aria-label="Group by"><button type="button" data-group="tier" aria-pressed="${!byOwner}">By priority</button><button type="button" data-group="owner" aria-pressed="${byOwner}">By owner</button></div>
+        <button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button></div>
       <span class="note">Priority comes from the most serious risk each action covers. Legal requirements are always launch blockers.</span></div>` +
     groups.filter(g=>g.items.length).map(g=>{ const d = g.items.filter(s=>pm.done[s.id]).length;
       return `<details class="area" data-open="${g.key}" ${isOpen(g.key, g.dflt)?"open":""}>
@@ -7258,9 +7318,9 @@ function renderWorkspace(){
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
   const p = wsProfile();
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
-    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. Saved in this browser only.`, null,
-    `<button type="button" class="btn sm" data-ws="export"><svg><use href="#i-download"/></svg>Export workspace</button>
-     <label class="btn sm" for="ws-import"><svg><use href="#i-upload"/></svg>Import</label><input type="file" id="ws-import" accept=".json,application/json" class="visually-hidden">`) + `
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser: save your profile to a file to keep it, and open that file on any device.`, null,
+    `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open profile</button>
+     <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save profile</button>`) + `
     <span class="toast" id="ws-toast" aria-live="polite"></span>
     <div class="wstop">
       ${profileCard()}
@@ -7419,6 +7479,7 @@ function shellUpdate(name){
   const p = wsProfile(), me = $("#sb-me");
   if(me) me.innerHTML = `<span class="sb-av">${esc(initials2(p&&p.name) || "+")}</span><span style="min-width:0"><b>${esc(p&&p.name || "Set up your profile")}</b><small>${esc(p ? ([p.role,p.org].filter(Boolean).join(" · ") || "Add your role") : "Name, role and team")}</small></span>`;
   const ws = $("#sb-ws"); if(ws) ws.textContent = (p && p.org) || "Your workspace";
+  if(typeof pfStatusRender === "function") pfStatusRender();
   const app = $("#app"); if(app) app.classList.remove("nav-open");
 }
 
@@ -8769,7 +8830,7 @@ function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <h4 class="ma-rh">Your roadmap</h4>${maRoadmapHTML()}`;
+    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d);
@@ -8851,6 +8912,7 @@ function bindMaturity(partial){
         case "example": ma = JSON.parse(JSON.stringify(MA_EXAMPLE)); store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
         case "clear": case "reset": ma = {stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}; store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
         case "download": { const md = maMarkdown(ma); return offerFile(`ts-program-maturity-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#ma-toast")); }
+        case "tasks": return tkOpen("maturity");
         case "save": { const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
       }
     };
@@ -9019,6 +9081,283 @@ function pmCurrentHero(){
     </div>
     <div class="ov-hr">${radarChart(r)}</div>
   </section>`;
+}
+/* =========================================================
+   PROFILE FILE: everything you've saved, in one file you keep
+   Save it to a synced folder (OneDrive, iCloud Drive, Dropbox) and open it on any device.
+   ========================================================= */
+const PF_FILE = "ts-workbench-profile.json";
+// Chrome and Edge can keep writing to the same file; elsewhere, and inside Claude, the profile downloads instead
+const PF_FS = (() => { try{ return typeof window.showSaveFilePicker === "function" && window.top === window.self; }catch(e){ return false; } })();
+let pfHandleCache = null, pfTimer = null;
+
+const pfRaw = {
+  get(k){ try{ return localStorage.getItem("tswb:" + k); }catch(e){ return null; } },
+  set(k, v){ try{ localStorage.setItem("tswb:" + k, String(v)); }catch(e){} }
+};
+function pfCollect(){
+  const data = {};
+  try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:") && !k.startsWith("tswb:profile:")) data[k.slice(5)] = localStorage.getItem(k); } }catch(e){}
+  return data;
+}
+function pfDoc(){
+  const p = wsProfile();
+  return JSON.stringify({app:"ts-workbench", kind:"profile", version:3, saved:new Date().toISOString(), name:(p && p.name) || "", data:pfCollect()}, null, 1);
+}
+// What a profile file holds, in words, before anyone replaces their browser's copy with it
+function pfSummary(obj){
+  const read = k => { try{ return obj.data[k] ? JSON.parse(obj.data[k]) : null; }catch(e){ return null; } };
+  const items = Object.values(read("ws:items") || {}), projects = Object.keys(read("ws:projects") || {}).length, m = read("ma");
+  const bits = [items.length + " saved result" + (items.length === 1 ? "" : "s")];
+  if(projects) bits.push(projects + " project" + (projects === 1 ? "" : "s"));
+  if(m && m.lv && Object.keys(m.lv).length && !m.ex) bits.push("maturity ratings");
+  return bits.join(", ");
+}
+
+/* ---------- remembering the file between visits (Chrome and Edge) ---------- */
+function pfIDB(){
+  return new Promise((ok, no) => { try{ const r = indexedDB.open("tswb-profile", 1); r.onupgradeneeded = () => r.result.createObjectStore("h"); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }catch(e){ no(e); } });
+}
+async function pfHandle(){
+  if(pfHandleCache || !PF_FS) return pfHandleCache;
+  try{ const db = await pfIDB(); pfHandleCache = await new Promise(ok => { const q = db.transaction("h").objectStore("h").get("file"); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); }); }catch(e){}
+  return pfHandleCache;
+}
+async function pfHandleSet(h){
+  pfHandleCache = h;
+  try{ const db = await pfIDB(); db.transaction("h", "readwrite").objectStore("h").put(h, "file"); }catch(e){}
+}
+async function pfWrite(h){ const w = await h.createWritable(); await w.write(pfDoc()); await w.close(); pfMarkSaved(h.name); }
+
+/* ---------- save, open, and keep in sync ---------- */
+function pfMarkSaved(file){ const t = Date.now(); pfRaw.set("profile:savedAt", t); pfRaw.set("profile:changedAt", t); if(file) pfRaw.set("profile:file", file); pfStatusRender(); }
+async function pfSave(){
+  if(PF_FS){
+    try{
+      let h = await pfHandle();
+      if(h){ const q = await h.queryPermission({mode:"readwrite"}); if(q !== "granted" && (await h.requestPermission({mode:"readwrite"})) !== "granted") h = null; }
+      if(!h){ h = await window.showSaveFilePicker({suggestedName:PF_FILE, types:[{description:"T&S Workbench profile", accept:{"application/json":[".json"]}}]}); await pfHandleSet(h); }
+      await pfWrite(h); return gsay("Profile saved to " + h.name);
+    }catch(e){ if(e && e.name === "AbortError") return; }
+  }
+  const doc = pfDoc(), res = await offerFile(PF_FILE, doc, doc, null);
+  if(res === "saved"){ pfMarkSaved(PF_FILE); gsay("Profile saved. Keep the file somewhere safe, like a synced folder"); }
+  else if(res === "copied") gsay("Downloads are blocked here, so the profile was copied to your clipboard");
+}
+// Edits save themselves once a file is connected and the browser has allowed writing this visit
+function pfTouched(){
+  pfRaw.set("profile:changedAt", Date.now());
+  clearTimeout(pfTimer);
+  pfTimer = setTimeout(async () => {
+    pfStatusRender();
+    if(!PF_FS) return;
+    const h = await pfHandle(); if(!h) return;
+    try{ if((await h.queryPermission({mode:"readwrite"})) === "granted") await pfWrite(h); }catch(e){}
+  }, 1500);
+}
+async function pfOpen(){
+  if(PF_FS && typeof window.showOpenFilePicker === "function"){
+    try{ const [h] = await window.showOpenFilePicker({types:[{description:"T&S Workbench profile", accept:{"application/json":[".json"]}}]}); const f = await h.getFile(); return pfReview(await f.text(), f.name, h); }
+    catch(e){ if(e && e.name === "AbortError") return; }
+  }
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json,application/json"; inp.style.display = "none";
+  inp.onchange = () => { const f = inp.files && inp.files[0]; if(f){ const r = new FileReader(); r.onload = () => pfReview(r.result, f.name, null); r.readAsText(f); } inp.remove(); };
+  document.body.appendChild(inp); inp.click();
+}
+// Show what's in the file, then replace this browser's copy only when the person agrees
+function pfReview(text, fileName, handle){
+  let obj = null; try{ obj = JSON.parse(text); }catch(e){}
+  if(!obj || obj.app !== "ts-workbench" && !obj.assessments && !Array.isArray(obj)) return gsay("That file isn't a T&S Workbench profile");
+  if(obj.kind === "workspace" || obj.assessments || Array.isArray(obj)) return pfMergeOld(obj);
+  if(obj.kind !== "profile" || !obj.data || typeof obj.data !== "object") return gsay("That file isn't a T&S Workbench profile");
+  const dirty = +(pfRaw.get("profile:changedAt") || 0) > +(pfRaw.get("profile:savedAt") || 0) && Object.keys(pfCollect()).length > 1;
+  pfModal(`<h3 id="pf-h">Open ${esc(obj.name ? obj.name + "'s profile" : "this profile")}?</h3>
+    <p>${esc(fileName)}${obj.saved ? `, saved ${esc(new Date(obj.saved).toLocaleString())}` : ""}. It holds ${esc(pfSummary(obj))}.</p>
+    <p class="note">Opening it replaces what's saved in this browser.${dirty ? " <b>This browser has changes you haven't saved to a file.</b>" : ""}</p>
+    <div class="pf-act">${dirty ? `<button type="button" class="btn" data-pfm="savefirst">Save mine first</button>` : ""}<button type="button" class="btn" data-pfm="cancel">Cancel</button><button type="button" class="btn primary" data-pfm="open">Open profile</button></div>`,
+    async act => {
+      if(act === "savefirst"){ await pfSave(); return false; }
+      if(act !== "open") return true;
+      try{
+        const keep = []; for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) keep.push(k); }
+        keep.forEach(k => localStorage.removeItem(k));
+        Object.entries(obj.data).forEach(([k, v]) => { if(typeof v === "string" && /^[\w:.\-]+$/.test(k)) localStorage.setItem("tswb:" + k, v); });
+      }catch(e){ gsay("This browser blocked saving the profile"); return true; }
+      if(handle) await pfHandleSet(handle);
+      pfMarkSaved(handle ? handle.name : fileName);
+      location.reload();
+      return true;
+    });
+}
+// Older exports (workspace or pre-mortem library files) merge in rather than replace
+function pfMergeOld(data){
+  let n = 0;
+  if(data.kind === "workspace"){
+    const pr = wsProjects(); (data.projects || []).forEach(p => { if(p && p.id && p.name) pr[p.id] = p; }); wsSaveProjects(pr);
+    const m = wsItems(); (data.items || []).forEach(it => { if(it && it.id && KINDS[it.kind] && it.data){ m[it.id] = it; n++; } }); wsSaveItems(m);
+    if(data.profile && !wsProfile()) store.set("ws:profile", data.profile);
+  } else {
+    const lib = libLoad(); (Array.isArray(data) ? data : data.assessments).forEach(rec => { if(rec && rec.id && rec.type){ lib[rec.id] = rec; n++; } }); libSave(lib);
+  }
+  gsay(`Added ${n} saved result${n === 1 ? "" : "s"} from an older export`);
+  const r = (location.hash || "").slice(1).split("/")[0] || "overview"; if(ROUTES[r]) ROUTES[r](); shellUpdate(r);
+}
+function pfModal(inner, onAct){
+  const prev = document.activeElement, bg = document.createElement("div");
+  bg.className = "tk-bg"; bg.innerHTML = `<div class="tk pf" role="dialog" aria-modal="true" aria-labelledby="pf-h">${inner}</div>`;
+  const close = () => { bg.remove(); document.removeEventListener("keydown", key); if(prev && prev.focus) prev.focus(); };
+  const key = e => { if(e.key === "Escape") close(); };
+  bg.addEventListener("click", async e => { if(e.target === bg) return close(); const b = e.target.closest("[data-pfm]"); if(b && await onAct(b.dataset.pfm)) close(); });
+  document.addEventListener("keydown", key); document.body.appendChild(bg);
+  const first = bg.querySelector(".btn.primary"); if(first) first.focus();
+}
+
+/* ---------- where people see it: the sidebar and My workspace ---------- */
+function pfStatus(){
+  const saved = +(pfRaw.get("profile:savedAt") || 0), changed = +(pfRaw.get("profile:changedAt") || 0), file = pfRaw.get("profile:file") || PF_FILE;
+  return {saved, dirty:changed > saved, file, never:!saved};
+}
+function pfStatusRender(){
+  const el = document.getElementById("sb-sync"); if(!el) return;
+  const s = pfStatus();
+  const text = s.never ? (s.dirty ? "Not saved yet" : "Keep a copy") : s.dirty ? "Unsaved changes" : "Saved " + (relTime(s.saved) === "now" ? "just now" : relTime(s.saved) + " ago");
+  el.className = "sb-sync " + (s.dirty ? "dirty" : s.never ? "" : "ok");
+  el.innerHTML = `<span class="sb-sync-t" title="${esc(s.never ? "Save your profile to a file, then open it on any device" : "Profile file: " + s.file)}"><i></i>${text}</span>
+    <button type="button" data-pf="open" title="Open a profile file">Open</button><button type="button" data-pf="save" title="Save your profile to a file">Save</button>`;
+}
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-pf]"); if(!b) return; e.preventDefault(); b.dataset.pf === "save" ? pfSave() : pfOpen(); });
+{ const setRaw = store.set; store.set = (k, v) => { setRaw.call(store, k, v); if(!/^(profile:|theme$|ov:pm$)/.test(k)) pfTouched(); }; }
+/* =========================================================
+   SEND TO TRACKER: launch plans and roadmaps as tasks in Jira, Asana, Linear or GitHub
+   A CSV for bulk import, or a button that opens one pre-filled issue at a time. No logins or tokens.
+   ========================================================= */
+const TK_TRACKERS = [
+  {k:"jira", n:"Jira", csv:true, link:true, pr:["", "Low", "Medium", "High", "Highest"]},
+  {k:"asana", n:"Asana", csv:true, link:false, pr:["", "Low", "Medium", "High", "Urgent"]},
+  {k:"linear", n:"Linear", csv:true, link:true, pr:["", "Low", "Medium", "High", "Urgent"]},
+  {k:"github", n:"GitHub Issues", csv:false, link:true, pr:["", "Low", "Medium", "High", "Urgent"]}
+];
+const TK_HOW = {
+  jira:"Import the file with Jira's CSV importer (Import issues from CSV) and match Summary, Description, Priority and Labels. For one-click issues, add your site and the project and issue type IDs below.",
+  asana:"In the Asana project that should hold these tasks, import the file with Asana's CSV importer. Name stays the first column, and Section groups the tasks by priority or phase.",
+  linear:"The file follows Linear's CSV template (Title, Description, Priority, Status, Labels) for its import tools. To add tasks one at a time, use the Create buttons.",
+  github:"GitHub has no CSV import, so create issues one at a time. Each button opens a new issue in your repository with the title and description filled in."
+};
+let tkCfg = Object.assign({tracker:"jira", jiraSite:"", jiraPid:"", jiraType:"", linearTeam:"", ghRepo:""}, store.get("tk:cfg", {}) || {});
+let tk = {src:"", tasks:[], sel:{}, opened:{}};
+const tkSlug = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const tkClip = (s, n) => s.length > n ? s.slice(0, n - 1).trim() + "…" : s;
+
+/* ---------- where tasks come from ---------- */
+function tkFromPremortem(){
+  const r = assess(pm), name = pm.name || "Untitled assessment", tier = rank => TIERS.find(t => t.r === rank) || TIERS[TIERS.length - 1];
+  return r.safeguards.filter(s => s.rank >= 1).map(s => ({
+    id:"pm-" + s.id, title:s.t, group:tier(s.rank).n, owner:OWNERS[s.o] || "", pr:s.rank === 3 ? 4 : s.rank === 2 ? 3 : 2, done:!!pm.done[s.id], def:s.rank >= 2 && !pm.done[s.id],
+    labels:["trust-and-safety", "abuse-premortem", "team-" + tkSlug(OWNERS[s.o])].concat(s.rank === 3 ? ["launch-blocker"] : []),
+    desc:[s.t, "",
+      `Priority: ${tier(s.rank).n}. ${tier(s.rank).h}.`,
+      s.covers.length ? `Why: covers ${s.covers.join("; ")}${s.critCovers ? ` (${s.critCovers} critical)` : ""}.` : null,
+      `Owner: ${OWNERS[s.o] || "Unassigned"}. ${EFFORT[s.e] || ""}.`,
+      s.legal === "applies" ? `Legal: likely required by ${(s.laws || []).join("; ")}. Confirm with counsel.` : s.legal === "may" ? `Legal: may be required by ${(s.laws || []).join("; ")}. Confirm with counsel.` : null,
+      "", `From the abuse pre-mortem "${name}", made with T&S Workbench.`].filter(x => x !== null).join("\n")
+  }));
+}
+function tkFromMaturity(){
+  const out = [];
+  maRoadmap(ma).forEach(s => { const ph = MA_PHASES.find(p => p[0] === s.phase);
+    s.acts.forEach((a, i) => out.push({
+      id:`ma-${s.a.k}${s.from}-${i}`, title:a, group:`${ph[1]} (${ph[2]})`, owner:"", pr:s.phase === "now" ? 3 : s.phase === "next" ? 2 : 1, done:!!ma.done[s.a.k + s.from + "-" + i], def:!ma.done[s.a.k + s.from + "-" + i],
+      labels:["trust-and-safety", "program-maturity", "maturity-" + s.a.k],
+      desc:[a, "", `Program maturity: ${s.a.n}, from level ${s.from} (${MA_LEVELS[s.from - 1].n}) to level ${s.to} (${MA_LEVELS[s.to - 1].n}).`,
+        `Why it matters: ${s.a.why}`, `When: ${ph[1]}, ${ph[2].toLowerCase()}.`, "", "From a program maturity assessment made with T&S Workbench."].join("\n")
+    })); });
+  return out;
+}
+
+/* ---------- formats ---------- */
+function tkCsv(rows){ return rows.map(r => r.map(v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`).join(",")).join("\r\n") + "\r\n"; }
+function tkCsvFor(k, tasks){
+  const T = TK_TRACKERS.find(t => t.k === k);
+  if(k === "jira") return tkCsv([["Summary", "Description", "Issue Type", "Priority", "Labels", "Labels", "Labels", "Labels"]]
+    .concat(tasks.map(t => [tkClip(t.title, 250), t.desc, "Task", T.pr[t.pr], ...[0, 1, 2, 3].map(i => t.labels[i] || "")])));
+  if(k === "asana") return tkCsv([["Name", "Description", "Section", "Assignee", "Due Date", "Priority"]]
+    .concat(tasks.map(t => [t.title, t.desc + (t.owner ? `\n\nTeam: ${t.owner}` : ""), t.group, "", "", T.pr[t.pr]])));
+  if(k === "linear") return tkCsv([["Title", "Description", "Priority", "Status", "Labels"]]
+    .concat(tasks.map(t => [tkClip(t.title, 250), t.desc, T.pr[t.pr], "Todo", t.labels.join(",")])));
+  return "";
+}
+function tkLink(k, t){
+  const q = o => Object.entries(o).filter(([, v]) => v).map(([a, v]) => a + "=" + encodeURIComponent(v)).join("&");
+  const T = TK_TRACKERS.find(x => x.k === k);
+  if(k === "jira"){
+    const site = tkCfg.jiraSite.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+    if(!site || !/^\d+$/.test(tkCfg.jiraPid.trim()) || !/^\d+$/.test(tkCfg.jiraType.trim())) return null;
+    return `https://${site}/secure/CreateIssueDetails!init.jspa?` + q({pid:tkCfg.jiraPid.trim(), issuetype:tkCfg.jiraType.trim(), summary:tkClip(t.title, 250), description:t.desc});
+  }
+  if(k === "linear") return "https://linear.new?" + q({title:tkClip(t.title, 250), description:t.desc, priority:T.pr[t.pr], team:tkCfg.linearTeam.trim()});
+  if(k === "github"){
+    const repo = tkCfg.ghRepo.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/+$/, "");
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
+    return `https://github.com/${repo}/issues/new?` + q({title:tkClip(t.title, 250), body:t.desc});
+  }
+  return null;
+}
+
+/* ---------- the dialog ---------- */
+function tkCfgHTML(k){
+  const f = (id, lab, ph, hint) => `<div class="field"><label for="tk-${id}">${lab}</label><input class="input" id="tk-${id}" data-tkcfg="${id}" value="${esc(tkCfg[id] || "")}" placeholder="${esc(ph)}" autocomplete="off">${hint ? `<span class="note">${hint}</span>` : ""}</div>`;
+  if(k === "jira") return `<details class="tk-more" ${tkCfg.jiraSite ? "open" : ""}><summary>One-click Jira issues (optional)</summary><div class="tk-cfg three">
+    ${f("jiraSite", "Jira site", "yourteam.atlassian.net")}${f("jiraPid", "Project ID", "10000")}${f("jiraType", "Issue type ID", "10001")}</div>
+    <p class="note">Both IDs are numbers. Your Jira admin can find them, or look for <span class="mono">pid=</span> in the address bar when creating an issue in the project.</p></details>`;
+  if(k === "linear") return `<div class="tk-cfg">${f("linearTeam", "Team (optional)", "Team key or name, e.g. TNS", "Leave blank to pick the team in Linear.")}</div>`;
+  if(k === "github") return `<div class="tk-cfg">${f("ghRepo", "Repository", "owner/repository", "Issues open in this repository. You need to be signed in to GitHub.")}</div>`;
+  return "";
+}
+function tkListHTML(){
+  const k = tkCfg.tracker, T = TK_TRACKERS.find(t => t.k === k), n = tk.tasks.filter(t => tk.sel[t.id]).length;
+  let group = "";
+  return `<div class="tk-lh"><label class="tk-all"><input type="checkbox" data-tkall="1" ${n === tk.tasks.length ? "checked" : ""}> ${n} of ${tk.tasks.length} selected</label>
+      ${T.link && !tkLink(k, tk.tasks[0] || {title:"", desc:"", pr:2}) ? `<span class="note">Fill in the settings above to create issues one at a time.</span>` : ""}</div>
+    <div class="tk-rows">${tk.tasks.map(t => { const url = T.link ? tkLink(k, t) : null, head = t.group !== group ? `<div class="tk-g">${esc(group = t.group)}</div>` : "";
+      return head + `<div class="tk-row ${t.done ? "done" : ""}"><label><input type="checkbox" data-tksel="${esc(t.id)}" ${tk.sel[t.id] ? "checked" : ""}>
+        <span class="tk-t"><b>${esc(t.title)}</b><small>${[T.pr[t.pr] + " priority", t.owner, t.done ? "Done" : ""].filter(Boolean).map(esc).join(" · ")}</small></span></label>
+        ${url ? `<a class="btn sm ${tk.opened[t.id] ? "" : "ghost"}" href="${esc(url)}" target="_blank" rel="noopener" data-tkopen="${esc(t.id)}">${tk.opened[t.id] ? "Opened ✓" : "Create in " + esc(T.n.split(" ")[0])}</a>` : ""}</div>`; }).join("")}</div>`;
+}
+function tkDialogHTML(){
+  const k = tkCfg.tracker, T = TK_TRACKERS.find(t => t.k === k), n = tk.tasks.filter(t => tk.sel[t.id]).length;
+  return `<header class="tk-h"><div><h3 id="tk-h">Send to your tracker</h3><p class="note">${tk.tasks.length} task${tk.tasks.length === 1 ? "" : "s"} from ${esc(tk.src)}</p></div>
+      <button type="button" class="btn sm icon" data-tkclose="1" aria-label="Close"><svg><use href="#i-x"/></svg></button></header>
+    <div class="segs tk-tr" role="group" aria-label="Tracker">${TK_TRACKERS.map(t => `<button type="button" data-tktr="${t.k}" aria-pressed="${t.k === k}">${t.n}</button>`).join("")}</div>
+    <p class="tk-how">${esc(TK_HOW[k])}</p>
+    ${tkCfgHTML(k)}
+    <div class="tk-list" id="tk-list">${tkListHTML()}</div>
+    <footer class="tk-f"><span class="toast" id="tk-toast" aria-live="polite"></span>
+      ${T.csv ? `<button type="button" class="btn primary" data-tkcsv="1" ${n ? "" : "disabled"}><svg><use href="#i-download"/></svg>Download CSV for ${esc(T.n)} (${n})</button>` : `<span class="note">Use the Create buttons to open each issue.</span>`}</footer>`;
+}
+function tkOpen(src){
+  if(src === "premortem"){ tk = {src:`the pre-mortem "${pm.name || "Untitled assessment"}"`, tasks:tkFromPremortem(), sel:{}, opened:{}}; }
+  else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
+  tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
+  const prev = document.activeElement, bg = document.createElement("div");
+  bg.className = "tk-bg"; bg.innerHTML = `<div class="tk" role="dialog" aria-modal="true" aria-labelledby="tk-h" id="tk">${tkDialogHTML()}</div>`;
+  const box = bg.querySelector("#tk"), redraw = () => { box.innerHTML = tkDialogHTML(); }, list = () => { box.querySelector("#tk-list").innerHTML = tkListHTML(); const c = box.querySelector("[data-tkcsv]"); const n = tk.tasks.filter(t => tk.sel[t.id]).length; if(c){ c.disabled = !n; c.lastChild.textContent = `Download CSV for ${TK_TRACKERS.find(t => t.k === tkCfg.tracker).n} (${n})`; } };
+  const close = () => { bg.remove(); document.removeEventListener("keydown", key); if(prev && prev.focus) prev.focus(); };
+  const key = e => { if(e.key === "Escape") close(); };
+  bg.addEventListener("click", e => {
+    if(e.target === bg || e.target.closest("[data-tkclose]")) return close();
+    const b = e.target.closest("[data-tktr],[data-tkcsv],[data-tkopen]"); if(!b) return;
+    if(b.dataset.tktr){ tkCfg.tracker = b.dataset.tktr; store.set("tk:cfg", tkCfg); redraw(); const s = box.querySelector(`[data-tktr="${tkCfg.tracker}"]`); if(s) s.focus(); }
+    if(b.dataset.tkcsv){ const k = tkCfg.tracker, rows = tk.tasks.filter(t => tk.sel[t.id]), csv = tkCsvFor(k, rows);
+      offerFile(`ts-workbench-${tkSlug(tk.src.replace(/^the /, "")).slice(0, 40)}-${k}.csv`, csv, csv, box.querySelector("#tk-toast")); }
+    if(b.dataset.tkopen){ tk.opened[b.dataset.tkopen] = true; setTimeout(list, 50); }
+  });
+  bg.addEventListener("change", e => { const t = e.target;
+    if(t.dataset.tksel){ tk.sel[t.dataset.tksel] = t.checked; list(); }
+    if(t.dataset.tkall){ tk.tasks.forEach(x => { tk.sel[x.id] = t.checked; }); list(); }
+  });
+  bg.addEventListener("input", e => { const t = e.target; if(t.dataset.tkcfg){ tkCfg[t.dataset.tkcfg] = t.value; store.set("tk:cfg", tkCfg); list(); } });
+  document.addEventListener("keydown", key); document.body.appendChild(bg);
+  const first = box.querySelector('[aria-pressed="true"]'); if(first) first.focus();
 }
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};

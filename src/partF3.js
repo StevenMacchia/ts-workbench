@@ -145,7 +145,8 @@ function tabPlan(r){
     ? Object.keys(OWNERS).map(o=>{ const items = r.safeguards.filter(s=>s.o===o).sort(order); return {key:"own-"+o, title:`<b>${OWNERS[o]}</b>`, sub:`${items.filter(s=>s.rank===3).length} launch blockers`, items, dflt:items.some(s=>s.rank===3)}; })
     : TIERS.map(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r).sort(order); return {key:"tier-"+t.r, title:pill(["low","med","high","crit"][t.r], t.n), sub:t.h, items, dflt:t.r>=2}; });
   return `<div class="row" style="justify-content:space-between;margin-bottom:12px">
-      <div class="segs" role="group" aria-label="Group by"><button type="button" data-group="tier" aria-pressed="${!byOwner}">By priority</button><button type="button" data-group="owner" aria-pressed="${byOwner}">By owner</button></div>
+      <div class="row" style="gap:8px"><div class="segs" role="group" aria-label="Group by"><button type="button" data-group="tier" aria-pressed="${!byOwner}">By priority</button><button type="button" data-group="owner" aria-pressed="${byOwner}">By owner</button></div>
+        <button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button></div>
       <span class="note">Priority comes from the most serious risk each action covers. Legal requirements are always launch blockers.</span></div>` +
     groups.filter(g=>g.items.length).map(g=>{ const d = g.items.filter(s=>pm.done[s.id]).length;
       return `<details class="area" data-open="${g.key}" ${isOpen(g.key, g.dflt)?"open":""}>

@@ -266,3 +266,56 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .ov-pc-empty .ov-inv{position:static;transform:none;inset:auto;padding:0 6px;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .ov-pic-prog i{background:var(--line-strong)}
 .ov-pic-prog i.on{background:var(--good)}
+
+/* ---------- Send to tracker and profile dialogs ---------- */
+.ma-rh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ma-rh h4{margin:0;font-size:18px;letter-spacing:-.015em}
+.tk-bg{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px;background:rgba(10,12,28,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.tk{width:min(760px,100%);max-height:min(88vh,860px);display:grid;grid-template-rows:auto auto auto auto minmax(0,1fr) auto;gap:12px;padding:20px 22px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 30px 80px -30px rgba(0,0,0,.55);overflow:hidden}
+.tk.pf{width:min(520px,100%);grid-template-rows:none;gap:10px}
+.tk.pf h3{margin:0;font-size:19px;letter-spacing:-.015em}
+.tk.pf p{margin:0;font-size:14.5px;line-height:1.55}
+.pf-act{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:8px}
+.tk-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.tk-h h3{margin:0 0 2px;font-size:19px;letter-spacing:-.015em}
+.tk-h .note{margin:0}
+.tk-tr{max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tk-tr button{white-space:nowrap}
+.tk-how{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tk-cfg{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.tk-cfg.three{grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,.8fr);margin-top:10px}
+.tk-cfg .field{margin:0}
+.tk-cfg .input{padding:8px 10px;font-size:14px}
+.tk-more summary{cursor:pointer;font-size:13.5px;font-weight:500;color:var(--accent)}
+.tk-more .note{margin:8px 0 0;font-size:12.5px}
+.tk-list{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.tk-lh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 14px;background:var(--sunk);font-size:13px}
+.tk-lh .note{margin:0;font-size:12.5px}
+.tk-all{display:inline-flex;gap:8px;align-items:center;font-weight:500}
+.tk-rows{overflow:auto;max-height:44vh}
+.tk-g{padding:8px 14px 4px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid var(--line)}
+.tk-row label{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;align-items:start;cursor:pointer;min-width:0;flex:1}
+.tk-row input{margin:3px 0 0}
+.tk-t{display:grid;gap:1px;min-width:0}
+.tk-t b{font-size:13.5px;font-weight:500;line-height:1.4}
+.tk-t small{font-size:12px;color:var(--muted)}
+.tk-row.done .tk-t b{color:var(--muted);text-decoration:line-through}
+.tk-row .btn{flex:none;white-space:nowrap}
+.tk-f{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap}
+.tk-f .toast{margin-right:auto}
+@media (max-width:640px){.tk-bg{padding:0;place-items:end stretch}.tk{max-height:92vh;border-radius:18px 18px 0 0;padding:16px}.tk-cfg.three{grid-template-columns:1fr}.tk-row{flex-wrap:wrap}.tk-row .btn{margin-left:26px}}
+
+/* sidebar profile status */
+.sb-sync{display:flex;align-items:center;gap:6px;padding:6px 8px 6px 10px;margin:2px 0 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);font-size:12px;color:#A9ADD0}
+.sb-sync-t{display:inline-flex;align-items:center;gap:7px;margin-right:auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-sync-t i{width:7px;height:7px;border-radius:50%;flex:none;background:#7F84AA}
+.sb-sync.ok .sb-sync-t i{background:#4CC38A}
+.sb-sync.dirty .sb-sync-t i{background:#F5C543;box-shadow:0 0 8px rgba(245,197,67,.6)}
+.sb-sync button{all:unset;cursor:pointer;padding:3px 8px;border-radius:7px;font-size:12px;font-weight:500;color:#EEF0FA;background:rgba(255,255,255,.08)}
+.sb-sync button:hover{background:rgba(255,255,255,.15)}
+.sb-sync button:focus-visible{outline:2px solid #8B8CFF;outline-offset:1px}
+.sb-sync.dirty button[data-pf="save"]{background:#F3F4FB;color:#14163A}
+.sb-foot > .sb-sync{min-width:0;max-width:100%;box-sizing:border-box}
+.sb-sync-t{flex:1 1 auto}
+.sb-sync button{flex:none}

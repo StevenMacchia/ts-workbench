@@ -37,6 +37,7 @@ function shellUpdate(name){
   const p = wsProfile(), me = $("#sb-me");
   if(me) me.innerHTML = `<span class="sb-av">${esc(initials2(p&&p.name) || "+")}</span><span style="min-width:0"><b>${esc(p&&p.name || "Set up your profile")}</b><small>${esc(p ? ([p.role,p.org].filter(Boolean).join(" · ") || "Add your role") : "Name, role and team")}</small></span>`;
   const ws = $("#sb-ws"); if(ws) ws.textContent = (p && p.org) || "Your workspace";
+  if(typeof pfStatusRender === "function") pfStatusRender();
   const app = $("#app"); if(app) app.classList.remove("nav-open");
 }
 
