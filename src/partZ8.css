@@ -161,7 +161,7 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .wip-l > span:nth-child(2){display:grid;gap:4px}
 .wip-l b{font-size:14.5px}
 .wip-l .ov-go{width:16px;height:16px;color:var(--faint)}
-.ov-aic.wip{opacity:.72}
+.ov-aic.ov-wip{opacity:.72;border-style:dashed}
 @media (max-width:900px){.wip{grid-template-columns:1fr;gap:16px}.wip-art{max-width:220px}.wip-links{grid-template-columns:1fr}}
 
 /* ---------- Policy stress-tester: no empty right column, no panel over the form ---------- */
@@ -200,3 +200,69 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .ma-scale-l{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;font-size:11.5px;color:var(--muted);text-align:center}
 .ma-scale-l .cur{color:var(--ink);font-weight:600}
 .ma-scale .note{margin:2px 0 0;font-size:12px}
+
+/* ---------- Overview: your safety picture ---------- */
+.ov-pic-prog{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted)}
+.ov-pic-prog i{width:18px;height:6px;border-radius:99px;background:var(--sunk)}
+.ov-pic-prog i.on{background:var(--good)}
+.ov-pic-prog i:last-of-type{margin-right:6px}
+.ov-pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.ov-pc{display:grid;grid-template-rows:auto auto 1fr auto auto;padding:16px 18px;gap:8px;border-radius:18px;min-width:0;
+  background:radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--c) 7%, var(--surface)), var(--surface) 60%)}
+.ov-pc-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.ov-pc-h > div{display:grid;gap:1px;min-width:0}
+.ov-pc-h b{font-size:15px;letter-spacing:-.01em}
+.ov-pc-h small{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-pc-k{display:grid;justify-items:end;gap:0;line-height:1.1}
+.ov-pc-k .mono{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.ov-pc-k small{font-size:11.5px;color:var(--muted)}
+.ov-pc-r{position:relative;display:grid;place-items:center;min-height:250px}
+.ov-pc-r > svg{width:100%;max-width:400px;height:auto}
+.ov-pc .ma-radar{max-width:360px}
+.ov-pc-empty .ov-pc-r > svg{opacity:.45;filter:grayscale(1);max-width:250px}
+.ov-radar{overflow:visible}
+.ov-rl{font:500 9.5px var(--body);fill:var(--ink)}
+.ov-rl.crit{font-weight:700;fill:var(--crit)}
+.ov-rl.none{fill:var(--faint)}
+.ov-rp{animation:ovdraw 1.2s cubic-bezier(.2,.7,.2,1) both;stroke-dasharray:1400}
+.ov-inv{position:absolute;inset:auto 6% auto 6%;top:50%;transform:translateY(-50%);display:grid;justify-items:center;text-align:center;gap:8px;padding:18px 18px 16px;border-radius:16px;
+  background:color-mix(in oklab, var(--surface) 88%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);box-shadow:0 18px 40px -28px rgba(16,24,40,.45)}
+.ov-inv .sb-glyph{width:30px;height:30px;border-radius:9px}
+.ov-inv .sb-glyph svg{width:16px!important;height:16px!important}
+.ov-inv b{font-size:16px;letter-spacing:-.015em}
+.ov-inv p{margin:0;font-size:13px;line-height:1.5;color:var(--muted);max-width:34ch}
+.ov-inv-a{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
+.ov-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
+.ov-legend span{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.ov-legend i{width:14px;height:0;border-top:2px dashed;flex:none}
+.ov-pc-f{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.ov-pc-f > span{min-width:0;flex:1 1 180px}
+.ov-pick .select{padding:6px 10px;font-size:13.5px}
+.ov-pick-one{margin:0;font-size:13.5px;font-weight:500}
+@media (max-width:1180px){.ov-pics{grid-template-columns:1fr 1fr}.ov-pics > :first-child{grid-column:1/-1}}
+@media (max-width:760px){.ov-pics{grid-template-columns:1fr}.ov-pc-r{min-height:220px}}
+
+/* complete the picture */
+.ov-check{padding:6px;display:grid}
+.ov-ck{display:grid;grid-template-columns:30px minmax(0,1fr) 16px;gap:12px;align-items:center;padding:9px 10px;border-radius:10px;text-decoration:none;color:inherit}
+.ov-ck:hover{background:var(--hover)}
+.ov-ck-i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sunk)}
+.ov-ck-i svg{width:15px;height:15px}
+.ov-ck.ok .ov-ck-i{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
+.ov-ck-t{display:grid;gap:1px;min-width:0}
+.ov-ck-t b{font-size:13.5px;font-weight:500}
+.ov-ck-t small{font-size:12px;color:var(--muted)}
+.ov-ck .ov-go{width:14px;height:14px;color:var(--faint)}
+
+/* pre-mortem landing: current assessment first, a radar on every saved one */
+.pm-cur{margin-bottom:22px}
+.pm-cur .ov-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pm-new{margin-top:22px}
+.librow{grid-template-columns:56px minmax(0,1fr) auto auto}
+.libradar{width:56px;height:56px;display:block}
+.mini-radar{width:56px;height:56px;display:block}
+@media (max-width:900px){.librow{grid-template-columns:56px minmax(0,1fr)}}
+.ov-pc-empty .ov-pc-r{align-content:start;gap:4px;min-height:0}
+.ov-pc-empty .ov-inv{position:static;transform:none;inset:auto;padding:0 6px;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.ov-pic-prog i{background:var(--line-strong)}
+.ov-pic-prog i.on{background:var(--good)}

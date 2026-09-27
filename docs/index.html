@@ -2100,7 +2100,7 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .wip-l > span:nth-child(2){display:grid;gap:4px}
 .wip-l b{font-size:14.5px}
 .wip-l .ov-go{width:16px;height:16px;color:var(--faint)}
-.ov-aic.wip{opacity:.72}
+.ov-aic.ov-wip{opacity:.72;border-style:dashed}
 @media (max-width:900px){.wip{grid-template-columns:1fr;gap:16px}.wip-art{max-width:220px}.wip-links{grid-template-columns:1fr}}
 
 /* ---------- Policy stress-tester: no empty right column, no panel over the form ---------- */
@@ -2139,6 +2139,72 @@ body[data-route="maturity"]{--tc:var(--t-ma)}
 .ma-scale-l{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;font-size:11.5px;color:var(--muted);text-align:center}
 .ma-scale-l .cur{color:var(--ink);font-weight:600}
 .ma-scale .note{margin:2px 0 0;font-size:12px}
+
+/* ---------- Overview: your safety picture ---------- */
+.ov-pic-prog{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted)}
+.ov-pic-prog i{width:18px;height:6px;border-radius:99px;background:var(--sunk)}
+.ov-pic-prog i.on{background:var(--good)}
+.ov-pic-prog i:last-of-type{margin-right:6px}
+.ov-pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.ov-pc{display:grid;grid-template-rows:auto auto 1fr auto auto;padding:16px 18px;gap:8px;border-radius:18px;min-width:0;
+  background:radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--c) 7%, var(--surface)), var(--surface) 60%)}
+.ov-pc-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.ov-pc-h > div{display:grid;gap:1px;min-width:0}
+.ov-pc-h b{font-size:15px;letter-spacing:-.01em}
+.ov-pc-h small{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-pc-k{display:grid;justify-items:end;gap:0;line-height:1.1}
+.ov-pc-k .mono{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.ov-pc-k small{font-size:11.5px;color:var(--muted)}
+.ov-pc-r{position:relative;display:grid;place-items:center;min-height:250px}
+.ov-pc-r > svg{width:100%;max-width:400px;height:auto}
+.ov-pc .ma-radar{max-width:360px}
+.ov-pc-empty .ov-pc-r > svg{opacity:.45;filter:grayscale(1);max-width:250px}
+.ov-radar{overflow:visible}
+.ov-rl{font:500 9.5px var(--body);fill:var(--ink)}
+.ov-rl.crit{font-weight:700;fill:var(--crit)}
+.ov-rl.none{fill:var(--faint)}
+.ov-rp{animation:ovdraw 1.2s cubic-bezier(.2,.7,.2,1) both;stroke-dasharray:1400}
+.ov-inv{position:absolute;inset:auto 6% auto 6%;top:50%;transform:translateY(-50%);display:grid;justify-items:center;text-align:center;gap:8px;padding:18px 18px 16px;border-radius:16px;
+  background:color-mix(in oklab, var(--surface) 88%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);box-shadow:0 18px 40px -28px rgba(16,24,40,.45)}
+.ov-inv .sb-glyph{width:30px;height:30px;border-radius:9px}
+.ov-inv .sb-glyph svg{width:16px!important;height:16px!important}
+.ov-inv b{font-size:16px;letter-spacing:-.015em}
+.ov-inv p{margin:0;font-size:13px;line-height:1.5;color:var(--muted);max-width:34ch}
+.ov-inv-a{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:4px}
+.ov-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
+.ov-legend span{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.ov-legend i{width:14px;height:0;border-top:2px dashed;flex:none}
+.ov-pc-f{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.ov-pc-f > span{min-width:0;flex:1 1 180px}
+.ov-pick .select{padding:6px 10px;font-size:13.5px}
+.ov-pick-one{margin:0;font-size:13.5px;font-weight:500}
+@media (max-width:1180px){.ov-pics{grid-template-columns:1fr 1fr}.ov-pics > :first-child{grid-column:1/-1}}
+@media (max-width:760px){.ov-pics{grid-template-columns:1fr}.ov-pc-r{min-height:220px}}
+
+/* complete the picture */
+.ov-check{padding:6px;display:grid}
+.ov-ck{display:grid;grid-template-columns:30px minmax(0,1fr) 16px;gap:12px;align-items:center;padding:9px 10px;border-radius:10px;text-decoration:none;color:inherit}
+.ov-ck:hover{background:var(--hover)}
+.ov-ck-i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--sunk)}
+.ov-ck-i svg{width:15px;height:15px}
+.ov-ck.ok .ov-ck-i{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
+.ov-ck-t{display:grid;gap:1px;min-width:0}
+.ov-ck-t b{font-size:13.5px;font-weight:500}
+.ov-ck-t small{font-size:12px;color:var(--muted)}
+.ov-ck .ov-go{width:14px;height:14px;color:var(--faint)}
+
+/* pre-mortem landing: current assessment first, a radar on every saved one */
+.pm-cur{margin-bottom:22px}
+.pm-cur .ov-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pm-new{margin-top:22px}
+.librow{grid-template-columns:56px minmax(0,1fr) auto auto}
+.libradar{width:56px;height:56px;display:block}
+.mini-radar{width:56px;height:56px;display:block}
+@media (max-width:900px){.librow{grid-template-columns:56px minmax(0,1fr)}}
+.ov-pc-empty .ov-pc-r{align-content:start;gap:4px;min-height:0}
+.ov-pc-empty .ov-inv{position:static;transform:none;inset:auto;padding:0 6px;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.ov-pic-prog i{background:var(--line-strong)}
+.ov-pic-prog i.on{background:var(--good)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -3177,7 +3243,7 @@ function libraryBlock(){
   return head + `<div class="card liblist">${items.map(rec=>{
     const r = assess(openRecord(rec)); const bl = r.safeguards.filter(s=>s.rank===3); const bd = bl.filter(s=>rec.done&&rec.done[s.id]).length;
     return `<div class="librow">
-      <span class="libicon"><svg><use href="#p-${esc(rec.type)}"/></svg></span>
+      <span class="libradar" title="Risk radar">${miniRiskRadar(r)}</span>
       <div class="libmain"><b>${esc(rec.name||"Untitled assessment")}</b><span class="note">${esc(labelOf(PLATFORMS,rec.type))} · <span class="mono">${esc(rec.id)}</span> · Updated ${fmtDate(rec.updated)}</span></div>
       <div class="libstat"><span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span></div>
       <div class="libact">${confirmDel===rec.id
@@ -3189,11 +3255,13 @@ function libraryBlock(){
     </div>`;}).join("")}</div>`;
 }
 function startScreen(){
-  return `
-    <div class="card hero">
+  const cur = pmCurrentHero();
+  return `${cur}
+    ${cur ? libraryBlock() : ""}
+    <div class="card hero ${cur ? "pm-new" : ""}">
       <div class="hero-main">
         <span class="pill accent" style="justify-self:start">About 3 minutes · ${QS.length} questions</span>
-        <h2>See how your product could be misused, and what to do about it</h2>
+        <h2>${cur ? "Assess another product or feature" : "See how your product could be misused, and what to do about it"}</h2>
         <p>Answer a few plain-language questions about what you're building and who uses it. No trust &amp; safety background needed.</p>
         <div class="row"><button type="button" class="btn primary" data-act="new">Start a new assessment ${icon("arrow")}</button></div>
       </div>
@@ -3206,7 +3274,7 @@ function startScreen(){
         </ul>
       </div>
     </div>
-    ${libraryBlock()}
+    ${cur ? "" : libraryBlock()}
     <div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
     <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
       return `<button type="button" class="card excard" data-preset="${k}">
@@ -3312,6 +3380,7 @@ function renderPremortem(){
       ${pm.stage==="start" ? startScreen() : pm.stage==="ask" ? askScreen() : renderReport(assess(pm))}
     </div>`;
   bindPremortem();
+  if(pm.stage==="start" && typeof bindRadar === "function") bindRadar();
   if(pm.flash){ const t = $("#pm-toast"); if(t){ t.textContent = pm.flash; setTimeout(()=>{ t.textContent=""; }, 3500); } pm.flash = null; }
   if(refocus){ const el = $(refocus); if(el) el.focus(); }
   else if(activeId && document.getElementById(activeId)){ const el = document.getElementById(activeId); el.focus(); if(caret!==null && el.setSelectionRange) try{ el.setSelectionRange(caret, caret); }catch(e){} }
@@ -3359,6 +3428,7 @@ function bindPremortem(){
     switch(d.act){
       case "new": pm = blankPM(); return rerender();
       case "report": pm.stage = "report"; return rerender();
+      case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();
       case "canceldel": confirmDel = null; return renderPremortem();
       case "save": { const wasExample = pm.example; if(wasExample){ pm = openRecord(recordOf(pm), {id:null, saved:false, created:null, name:(pm.name||"").replace(" (example)","")+" (my copy)", stage:"report"}); } saveToLib(); pm.flash = "Saved to My assessments"; return rerender(); }
@@ -7467,9 +7537,10 @@ function renderOverview(){
     return {t, total:idx.length, done:idx.filter(i=>prog[ttKey(i, t.k)]).length}; })
     .sort((a,b) => (b.t.k===myType) - (a.t.k===myType) || b.done - a.done).slice(0,4);
   const mine = types.find(x=>x.t.k===myType);
-  const sub = has
-    ? `${esc(pm.name || "Your assessment")} has ${open} open launch blocker${open===1?"":"s"}${mine ? `, and you've completed ${mine.done} of ${mine.total} ${esc(mine.t.s)} tabletop scenarios` : ""}.`
-    : "Profile what you're building to see how it could be misused, or rehearse a crisis in the tabletop library.";
+  const pic = ovPicStatus();
+  const sub = pic.done >= 3 ? `Your safety picture is complete. Keep it current as your products and program change.`
+    : pic.done || pic.m.state === "partial" ? `Your safety picture is ${Math.min(pic.done, 3)} of 3 complete. Next, ${pic.next}.`
+    : "See your whole trust and safety program in one place: rate its maturity, run a pre-mortem on each product, and compare them side by side.";
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,5);
   const laws = r.obligations.filter(o=>o.status==="applies").length;
   const nextUp = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
@@ -7487,33 +7558,7 @@ function renderOverview(){
       <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
     </section>
 
-    ${has ? `<section class="ov-hero rise" aria-label="Current assessment">
-      <div class="ov-hl">
-        <div class="ov-eb"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem${pm.updated ? " · updated " + relTime(pm.updated) + " ago" : pm.example ? " · example" : ""}</div>
-        <h2>${esc(pm.name || "Untitled assessment")}</h2>
-        <div class="ov-chips">
-          <span class="ov-status" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"};border-color:color-mix(in oklab, ${r.posture[1]?`var(--${r.posture[1]})`:"var(--line-strong)"} 35%, transparent)"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]} exposure</span>
-          ${pm.regions.length ? `<span class="ov-status">${pm.regions.map(k=>k.toUpperCase()).join(" · ")}</span>` : ""}
-          ${pm.youth ? `<span class="ov-status">${esc(labelOf(YOUTH, pm.youth))}</span>` : ""}
-        </div>
-        <div class="ov-stats">
-          <div><b class="mono">${r.risks.length}</b><span>Risks identified</span></div>
-          <div><b class="mono" style="${r.counts.crit?"color:var(--crit)":""}">${r.counts.crit}</b><span>Critical</span></div>
-          <div><b class="mono">${laws}</b><span>Laws likely apply</span></div>
-        </div>
-        <div>${r.risks.slice(0,3).map(x=>`<div class="ov-risk"><span class="sdot" style="background:var(--${x.band==="low"?"faint":x.band})"></span>${esc(x.n)}<span class="mono">${x.score}/16</span></div>`).join("")}</div>
-        <div class="row" style="gap:8px"><button type="button" class="btn primary" data-ov="report">Open report ${icon("arrow")}</button><button type="button" class="btn" data-ov="plan">Launch plan</button></div>
-      </div>
-      <div class="ov-hr">${radarChart(r)}</div>
-    </section>` : `<section class="ov-hero rise" aria-label="Get started">
-      <div class="ov-hl">
-        <div class="ov-eb"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</div>
-        <h2>Find out how your product could be misused, before it launches</h2>
-        <p class="muted">A few plain-language questions produce a scored risk register, a launch plan with owners, and the laws that likely apply where you operate.</p>
-        <div class="row" style="gap:8px"><button type="button" class="btn primary" data-ov="new">Start a pre-mortem ${icon("arrow")}</button><a class="btn" href="#premortem">Explore an example</a></div>
-      </div>
-      <div class="ov-hr">${heroArt()}</div>
-    </section>`}
+    ${ovPictureHTML()}
 
     <section class="rise">
       <div class="ov-sec-h"><h3>Tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
@@ -7529,7 +7574,7 @@ function renderOverview(){
 
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
 
     <section class="ov-cols rise">
@@ -7542,19 +7587,7 @@ function renderOverview(){
           : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span><button type="button" class="btn sm" data-ov="new">${icon("plus")}Start a pre-mortem</button></div>`}</div>
       </div>
       <div style="display:grid;gap:16px;align-content:start">
-        ${has ? `<div>
-          <div class="ov-sec-h"><h3>Launch readiness</h3><a href="#premortem" data-ov-link="plan">Launch plan</a></div>
-          <div class="ov-card">
-            <div class="ov-ready">
-              <svg width="84" height="84" viewBox="0 0 84 84" role="img" aria-label="${bDone} of ${blockers.length} launch blockers done">
-                <circle cx="42" cy="42" r="34" fill="none" stroke="var(--sunk)" stroke-width="8"/>
-                <circle cx="42" cy="42" r="34" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct/100)).toFixed(1)}" transform="rotate(-90 42 42)"/>
-                <text x="42" y="47" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)" font-family="var(--mono)">${pct}%</text>
-              </svg>
-              <div><h4>${bDone} of ${blockers.length} blockers done</h4><p>${esc(pm.name || "Current assessment")}</p></div>
-            </div>
-            ${nextUp.length ? `<div class="ov-next">${nextUp.map(s=>`<label><input type="checkbox" id="ovn-${s.id}" data-ovsg="${s.id}"><span>${esc(s.t)}<small>${OWNERS[s.o]} · ${EFFORT[s.e].replace(" effort","")}</small></span></label>`).join("")}</div>` : ""}
-          </div></div>` : ""}
+        ${ovChecklistHTML()}
         <div>
           <div class="ov-sec-h"><h3>Tabletop progress</h3><a href="#tabletop">Practice</a></div>
           <div class="ov-card ov-learn">${types.map(x=>`<div class="ov-lrow"><span>${esc(x.t.n.split(" &")[0].split(",")[0])}</span><div class="bar"><i style="width:${x.total?x.done/x.total*100:0}%"></i></div><span class="mono">${x.done}/${x.total}</span></div>`).join("")}</div>
@@ -7565,7 +7598,7 @@ function renderOverview(){
     <footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>Not legal advice. Use the outputs to start conversations with your Legal and Policy partners.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>
   </div>`;
 
-  bindRadar();
+  bindOverviewPicture();
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
   view.querySelectorAll('[data-ov="new"]').forEach(b => b.onclick = newAssessment);
   view.querySelectorAll('[data-ov="report"],[data-ov="plan"],[data-ov-link="plan"]').forEach(b => b.onclick = e => {
@@ -8830,6 +8863,162 @@ function bindMaturity(partial){
     };
   }
   root.querySelectorAll(".gl").forEach(g => g.onclick = () => g.focus());
+}
+/* =========================================================
+   OVERVIEW: your safety picture in three radars
+   Program maturity · all products combined · one product at a time
+   ========================================================= */
+const OV_LAYER = ["var(--t-tt)", "var(--t-mx)", "var(--t-vd)", "var(--t-ma)", "var(--t-pol)", "var(--high)"];
+// Worst risk in each radar group for one assessment
+function pmGroupData(r){
+  return RADAR_GROUPS.map(g => { const rs = r.risks.filter(x => g.cats.includes(x.cat)).sort((a, b) => b.score - a.score), w = rs[0];
+    return {score:w ? w.score : 0, band:w ? w.band : null, worst:w ? w.n : "", n:rs.length}; });
+}
+// Saved pre-mortems with their assessment, newest first
+function ovSavedPMs(){
+  return Object.values(wsItems()).filter(it => it.kind === "premortem" && it.data).sort((a, b) => (b.updated || 0) - (a.updated || 0))
+    .map(it => { const r = assess(openRecord(it.data)); return {it, r, g:pmGroupData(r), name:it.title || it.data.name || "Untitled assessment"}; });
+}
+// Risk radar with one or more layers: {g, color, fill} (fill marks the main shape)
+function riskRadarSVG(layers, label){
+  const n = RADAR_GROUPS.length, cx = 180, cy = 124, R = 86, f = v => v.toFixed(1);
+  const ang = i => (-90 + i * 360 / n) * Math.PI / 180, pt = (i, rad) => [cx + rad * Math.cos(ang(i)), cy + rad * Math.sin(ang(i))];
+  const zones = [[16, "var(--crit-soft)"], [12, "var(--high-soft)"], [8, "var(--med-soft)"], [4, "var(--surface)"]]
+    .map(([v, c]) => `<circle cx="${cx}" cy="${cy}" r="${f(R * v / 16)}" fill="${c}" fill-opacity=".75" stroke="var(--line)" stroke-width="1"/>`).join("");
+  const spokes = RADAR_GROUPS.map((g, i) => { const [x, y] = pt(i, R); return `<line x1="${cx}" y1="${cy}" x2="${f(x)}" y2="${f(y)}" stroke="var(--line)"/>`; }).join("");
+  const main = layers.find(l => l.fill) || layers[0];
+  const labels = RADAR_GROUPS.map((g, i) => { const [x, y] = pt(i, R + 13), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = g.l.length - 1, d = main ? main.g[i] : null;
+    const anchor = c > .25 ? "start" : c < -.25 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
+    return `<text x="${f(x)}" y="${f(y)}" text-anchor="${anchor}" class="ov-rl ${d && d.band === "crit" ? "crit" : d && d.score ? "" : "none"}">${g.l.map((t, j) => `<tspan x="${f(x)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
+  const shapes = layers.map(l => { const pts = l.g.map((d, i) => pt(i, R * d.score / 16).map(f).join(",")).join(" ");
+    return l.fill ? `<polygon class="ov-rp" points="${pts}" fill="${l.color}" fill-opacity=".18" stroke="${l.color}" stroke-width="2" stroke-linejoin="round"/>`
+                  : `<polygon points="${pts}" fill="none" stroke="${l.color}" stroke-width="1.4" stroke-opacity=".85" stroke-linejoin="round" stroke-dasharray="${l.dash || ""}"/>`; }).join("");
+  const dots = main ? main.g.map((d, i) => { if(!d.score) return ""; const [x, y] = pt(i, R * d.score / 16);
+    return `<circle cx="${f(x)}" cy="${f(y)}" r="3.6" fill="var(--${d.band === "low" ? "muted" : d.band})" stroke="var(--surface)" stroke-width="1.6"/>`; }).join("") : "";
+  return `<svg class="ov-radar" viewBox="0 0 360 250" role="img" aria-label="${esc(label)}">${zones}${spokes}${shapes}${dots}${labels}</svg>`;
+}
+// Small radar for lists: just the shape
+function miniRiskRadar(r){
+  const g = pmGroupData(r), n = g.length, c = 28, R = 24, f = v => v.toFixed(1), pt = (i, v) => { const a = (-90 + i * 360 / n) * Math.PI / 180; return [c + Math.cos(a) * R * v, c + Math.sin(a) * R * v]; };
+  const ring = v => g.map((d, i) => pt(i, v).map(f).join(",")).join(" "), worst = g.reduce((m, d) => d.score > m.score ? d : m, {score:0, band:null});
+  const col = worst.band ? `var(--${worst.band === "low" ? "muted" : worst.band})` : "var(--faint)";
+  return `<svg class="mini-radar" viewBox="0 0 56 56" aria-hidden="true"><polygon points="${ring(1)}" fill="var(--sunk)" stroke="var(--line-strong)"/><polygon points="${ring(.5)}" fill="none" stroke="var(--line)"/>
+    <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+function ovMaturityState(){
+  if(typeof MA_AREAS === "undefined") return {state:"none"};
+  const rated = MA_AREAS.filter(a => ma.lv[a.k]).length;
+  return {state:!rated || ma.ex ? "empty" : rated < MA_AREAS.length ? "partial" : "done", rated};
+}
+function ovPicStatus(){
+  const m = ovMaturityState(), pms = Object.values(wsItems()).filter(it => it.kind === "premortem").length;
+  const done = (m.state === "done" ? 1 : 0) + (pms ? 2 : 0);
+  const next = m.state !== "done" ? (m.state === "partial" ? "finish rating your program's maturity" : "rate your program's maturity") : !pms ? "run a pre-mortem on your first product" : "";
+  return {done, next, pms, m};
+}
+function ovInvite(icon, color, title, text, actions){
+  return `<div class="ov-inv"><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${icon}"/></svg></span><b>${title}</b><p>${text}</p><div class="ov-inv-a">${actions}</div></div>`;
+}
+function ovPictureHTML(){
+  const st = ovPicStatus(), pms = ovSavedPMs(), m = st.m;
+  // 1. Program maturity
+  let maCard = "";
+  if(m.state !== "none"){
+    const sc = m.state === "empty" ? null : maScore(ma), gaps = m.state === "empty" ? [] : maGaps(ma);
+    const ghost = m.state === "empty" ? maRadar({stage:ma.stage, lv:{}}, false).replace('<text x="200" y="154" text-anchor="middle" class="ma-rl">Rate an area to start</text>', "") : maRadar(ma, false);
+    maCard = `<article class="card ov-pc ${m.state === "empty" ? "ov-pc-empty" : ""}" style="--c:var(--t-ma)">
+      <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span><div><b>Program maturity</b><small>How strong your program is, in 8 areas</small></div>
+        ${sc !== null ? `<span class="ov-pc-k"><b class="mono">${sc.toFixed(1)}</b><small>${maLevelName(sc)}</small></span>` : ""}</header>
+      <div class="ov-pc-r">${ghost}${m.state === "empty" ? ovInvite("steps", "var(--t-ma)", "How mature is your program?", "Rate eight areas, from policy to reviewer wellbeing, in about five minutes. You'll get a roadmap for the biggest gaps.",
+          `<a class="btn sm primary" href="#maturity" data-ov-ma="start">Start the assessment</a><a class="btn sm" href="#maturity" data-ov-ma="example">See an example</a>`) : ""}</div>
+      ${m.state === "empty" ? "" : `<footer class="ov-pc-f"><span>${m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : gaps.length ? `${gaps.length} area${gaps.length === 1 ? "" : "s"} below target · start with ${esc(gaps[0].a.s.toLowerCase())}` : "Every area meets its target"}</span>
+        <a class="btn sm" href="#maturity">${m.state === "partial" ? "Continue rating" : "Open roadmap"}</a></footer>`}
+    </article>`;
+  }
+  // 2. All products combined: the worst score in each group across every saved pre-mortem
+  const comb = RADAR_GROUPS.map((g, i) => pms.reduce((b, p) => p.g[i].score > b.score ? Object.assign({from:p.name}, p.g[i]) : b, {score:0, band:null, worst:"", n:0, from:""}));
+  const crit = pms.reduce((s, p) => s + p.r.counts.crit, 0), top = comb.map((d, i) => ({d, g:RADAR_GROUPS[i]})).filter(x => x.d.score).sort((a, b) => b.d.score - a.d.score)[0];
+  const emptyPM = !pms.length;
+  const ghostPM = riskRadarSVG([{g:RADAR_GROUPS.map(() => ({score:0, band:null})), color:"var(--faint)", fill:true}], "Empty risk radar");
+  const allCard = `<article class="card ov-pc ${emptyPM ? "ov-pc-empty" : ""}" style="--c:var(--t-pm)">
+    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-layers"/></svg></span><div><b>All products</b><small>${emptyPM ? "Combined abuse risk across your products" : `Combined risk across ${pms.length} pre-mortem${pms.length === 1 ? "" : "s"}`}</small></div>
+      ${emptyPM ? "" : `<span class="ov-pc-k"><b class="mono" style="${crit ? "color:var(--crit)" : ""}">${crit}</b><small>critical risk${crit === 1 ? "" : "s"}</small></span>`}</header>
+    <div class="ov-pc-r">${emptyPM ? ghostPM + ovInvite("radar", "var(--t-pm)", "How could your products be misused?", "Run a pre-mortem on each product or feature. Their risks combine here, so you can see where your whole portfolio is exposed.",
+        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button><a class="btn sm" href="#premortem">Explore an example</a>`)
+      : riskRadarSVG([...pms.slice(0, OV_LAYER.length).map((p, i) => ({g:p.g, color:OV_LAYER[i], dash:"3 3"})), {g:comb, color:"var(--t-pm)", fill:true}], `Combined risk radar across ${pms.length} products. Highest: ${top ? top.g.n : "none"}.`)}</div>
+    ${emptyPM ? "" : `<div class="ov-legend">${pms.slice(0, 4).map((p, i) => `<span><i style="border-color:${OV_LAYER[i]}"></i>${esc(p.name)}</span>`).join("")}${pms.length > 4 ? `<span class="note">+${pms.length - 4} more</span>` : ""}</div>
+    <footer class="ov-pc-f"><span>${top ? `Highest: ${esc(top.g.n.toLowerCase())}${pms.length > 1 ? `, in ${esc(top.d.from)}` : ""}` : "No risks found"}${pms.length === 1 ? " · add another product to compare" : ""}</span><button type="button" class="btn sm" data-ov="new">Add a product</button></footer>`}
+  </article>`;
+  // 3. One product at a time
+  const selId = store.get("ov:pm", null), sel = pms.find(p => p.it.id === selId) || pms[0];
+  const oneCard = `<article class="card ov-pc ${sel ? "" : "ov-pc-empty"}" style="--c:var(--t-pm)" id="ov-one">
+    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><b>By product</b><small>${sel ? "Each pre-mortem on its own" : "Each product gets its own radar"}</small></div>
+      ${sel ? `<span class="ov-pc-k"><span class="pill ${sel.r.posture[1]}">${sel.r.posture[0]}</span></span>` : ""}</header>
+    ${sel && pms.length > 1 ? `<label class="ov-pick"><span class="visually-hidden">Choose a product</span><select class="select" id="ov-pm-sel">${pms.map(p => `<option value="${esc(p.it.id)}" ${p === sel ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>` : sel ? `<p class="ov-pick-one">${esc(sel.name)}</p>` : ""}
+    <div class="ov-pc-r">${sel ? riskRadarSVG([{g:sel.g, color:"var(--t-pm)", fill:true}], `Risk radar for ${sel.name}`) : ghostPM + ovInvite("radar", "var(--t-pm)", "One radar per product", "Save a pre-mortem for each product or launch, then flip between them here to compare how each could be misused.",
+        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button>`)}</div>
+    ${sel ? `<footer class="ov-pc-f"><span>${sel.r.risks.length} risks · ${sel.r.counts.crit} critical · ${sel.r.obligations.filter(o => o.status === "applies").length} laws likely apply</span><button type="button" class="btn sm" data-open="${esc(sel.it.id)}">Open report</button></footer>` : ""}
+  </article>`;
+  const total = m.state === "none" ? 2 : 3, done = Math.min(total, st.done);
+  return `<section class="rise ov-pic" aria-label="Your safety picture">
+    <div class="ov-sec-h"><h3>Your safety picture</h3><span class="ov-pic-prog" aria-label="${done} of ${total} complete">${Array.from({length:total}, (x, i) => `<i class="${i < done ? "on" : ""}"></i>`).join("")}${done} of ${total} complete</span></div>
+    <div class="ov-pics">${maCard}${allCard}${oneCard}</div>
+  </section>`;
+}
+// Everything that adds to the picture, with where you are on each
+function ovChecklistHTML(){
+  const st = ovPicStatus(), m = st.m, prog = ttProgress(), type = ttCompanyType();
+  const scen = SCENARIOS.map((s, i) => i).filter(i => type === "all" || (SCENARIOS[i].types || []).includes(type)), ttDone = scen.filter(i => prog[ttKey(i, type)]).length;
+  const mxSet = typeof mx !== "undefined" && mx && mx.vals && Object.keys(mx.vals).length, vSaved = Object.values(wsItems()).some(it => it.kind === "vendors");
+  const rows = [
+    ["steps", "var(--t-ma)", "Rate your program's maturity", m.state === "done" ? `Level ${maScore(ma).toFixed(1)} · ${maLevelName(maScore(ma))}` : m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : "Not started", m.state === "done", "maturity"],
+    ["radar", "var(--t-pm)", "Run a pre-mortem on each product", st.pms ? `${st.pms} saved` : "None saved yet", st.pms > 0, "premortem"],
+    ["siren", "var(--t-tt)", "Rehearse a crisis", `${ttDone} of ${scen.length} scenarios${type !== "all" ? " for your company type" : ""}`, ttDone > 0, "tabletop"],
+    ["gauge", "var(--t-mx)", "Track your safety metrics", mxSet ? `Tracking ${Object.keys(mx.vals).length} metrics` : "Scorecard not set up", !!mxSet, "metrics/scorecard"],
+    ["scale", "var(--t-vd)", "Score your moderation vendors", vSaved ? "Scorecard saved" : "Not started", vSaved, "vendors"]
+  ].filter(r => r[5] !== "maturity" || m.state !== "none");
+  const done = rows.filter(r => r[4]).length;
+  return `<div><div class="ov-sec-h"><h3>Complete the picture</h3><span class="note">${done} of ${rows.length} done</span></div>
+    <div class="ov-card ov-check">${rows.map(([ic, c, t, s, ok, h]) => `<a class="ov-ck ${ok ? "ok" : ""}" href="#${h}"><span class="ov-ck-i">${ok ? `<svg><use href="#i-check"/></svg>` : `<svg style="color:${c}"><use href="#i-${ic}"/></svg>`}</span>
+      <span class="ov-ck-t"><b>${t}</b><small>${s}</small></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div></div>`;
+}
+function bindOverviewPicture(){
+  const sel = document.getElementById("ov-pm-sel");
+  if(sel) sel.onchange = () => { store.set("ov:pm", sel.value); renderOverview(); const s = document.getElementById("ov-pm-sel"); if(s) s.focus(); };
+  view.querySelectorAll("[data-ov-ma]").forEach(a => a.onclick = () => {
+    if(a.dataset.ovMa === "example"){ ma = JSON.parse(JSON.stringify(MA_EXAMPLE)); store.set("ws:cur:maturity", null); }
+    else if(ma.ex){ ma = {stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}; }
+    store.set("ma", ma);
+  });
+}
+
+/* ---------- Pre-mortem landing: the current assessment up front ---------- */
+function pmCurrentHero(){
+  if(!pm.type) return "";
+  const r = assess(pm); if(!r.risks.length) return "";
+  const laws = r.obligations.filter(o => o.status === "applies").length, bl = r.safeguards.filter(s => s.rank === 3), bd = bl.filter(s => pm.done[s.id]).length;
+  const tone = r.posture[1] ? `var(--${r.posture[1]})` : "var(--faint)";
+  return `<section class="ov-hero pm-cur" aria-label="Current assessment">
+    <div class="ov-hl">
+      <div class="ov-eb"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>${pm.example ? "Example assessment" : "Pick up where you left off"}${pm.updated ? (relTime(pm.updated) === "now" ? " · updated just now" : " · updated " + relTime(pm.updated) + " ago") : ""}</div>
+      <h2>${esc(pm.name || "Untitled assessment")}</h2>
+      <div class="ov-chips">
+        <span class="ov-status" style="color:${tone};border-color:color-mix(in oklab, ${tone} 35%, transparent)"><span class="sdot" style="background:${tone}"></span>${r.posture[0]} exposure</span>
+        ${pm.regions.length ? `<span class="ov-status">${pm.regions.map(k => k.toUpperCase()).join(" · ")}</span>` : ""}
+        ${pm.youth ? `<span class="ov-status">${esc(labelOf(YOUTH, pm.youth))}</span>` : ""}
+      </div>
+      <div class="ov-stats">
+        <div><b class="mono">${r.risks.length}</b><span>Risks identified</span></div>
+        <div><b class="mono" style="${r.counts.crit ? "color:var(--crit)" : ""}">${r.counts.crit}</b><span>Critical</span></div>
+        <div><b class="mono">${bd}/${bl.length}</b><span>Blockers done</span></div>
+        <div><b class="mono">${laws}</b><span>Laws likely apply</span></div>
+      </div>
+      <div>${r.risks.slice(0, 3).map(x => `<div class="ov-risk"><span class="sdot" style="background:var(--${x.band === "low" ? "faint" : x.band})"></span>${esc(x.n)}<span class="mono">${x.score}/16</span></div>`).join("")}</div>
+      <div class="row" style="gap:8px"><button type="button" class="btn primary" data-act="report">Open report ${icon("arrow")}</button><button type="button" class="btn" data-act="plan">Launch plan</button><button type="button" class="btn ghost" data-act="new">Start a new one</button></div>
+    </div>
+    <div class="ov-hr">${radarChart(r)}</div>
+  </section>`;
 }
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};

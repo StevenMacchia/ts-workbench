@@ -98,7 +98,7 @@ function libraryBlock(){
   return head + `<div class="card liblist">${items.map(rec=>{
     const r = assess(openRecord(rec)); const bl = r.safeguards.filter(s=>s.rank===3); const bd = bl.filter(s=>rec.done&&rec.done[s.id]).length;
     return `<div class="librow">
-      <span class="libicon"><svg><use href="#p-${esc(rec.type)}"/></svg></span>
+      <span class="libradar" title="Risk radar">${miniRiskRadar(r)}</span>
       <div class="libmain"><b>${esc(rec.name||"Untitled assessment")}</b><span class="note">${esc(labelOf(PLATFORMS,rec.type))} · <span class="mono">${esc(rec.id)}</span> · Updated ${fmtDate(rec.updated)}</span></div>
       <div class="libstat"><span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span></div>
       <div class="libact">${confirmDel===rec.id
@@ -110,11 +110,13 @@ function libraryBlock(){
     </div>`;}).join("")}</div>`;
 }
 function startScreen(){
-  return `
-    <div class="card hero">
+  const cur = pmCurrentHero();
+  return `${cur}
+    ${cur ? libraryBlock() : ""}
+    <div class="card hero ${cur ? "pm-new" : ""}">
       <div class="hero-main">
         <span class="pill accent" style="justify-self:start">About 3 minutes · ${QS.length} questions</span>
-        <h2>See how your product could be misused, and what to do about it</h2>
+        <h2>${cur ? "Assess another product or feature" : "See how your product could be misused, and what to do about it"}</h2>
         <p>Answer a few plain-language questions about what you're building and who uses it. No trust &amp; safety background needed.</p>
         <div class="row"><button type="button" class="btn primary" data-act="new">Start a new assessment ${icon("arrow")}</button></div>
       </div>
@@ -127,7 +129,7 @@ function startScreen(){
         </ul>
       </div>
     </div>
-    ${libraryBlock()}
+    ${cur ? "" : libraryBlock()}
     <div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
     <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
       return `<button type="button" class="card excard" data-preset="${k}">
@@ -233,6 +235,7 @@ function renderPremortem(){
       ${pm.stage==="start" ? startScreen() : pm.stage==="ask" ? askScreen() : renderReport(assess(pm))}
     </div>`;
   bindPremortem();
+  if(pm.stage==="start" && typeof bindRadar === "function") bindRadar();
   if(pm.flash){ const t = $("#pm-toast"); if(t){ t.textContent = pm.flash; setTimeout(()=>{ t.textContent=""; }, 3500); } pm.flash = null; }
   if(refocus){ const el = $(refocus); if(el) el.focus(); }
   else if(activeId && document.getElementById(activeId)){ const el = document.getElementById(activeId); el.focus(); if(caret!==null && el.setSelectionRange) try{ el.setSelectionRange(caret, caret); }catch(e){} }
@@ -280,6 +283,7 @@ function bindPremortem(){
     switch(d.act){
       case "new": pm = blankPM(); return rerender();
       case "report": pm.stage = "report"; return rerender();
+      case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();
       case "canceldel": confirmDel = null; return renderPremortem();
       case "save": { const wasExample = pm.example; if(wasExample){ pm = openRecord(recordOf(pm), {id:null, saved:false, created:null, name:(pm.name||"").replace(" (example)","")+" (my copy)", stage:"report"}); } saveToLib(); pm.flash = "Saved to My assessments"; return rerender(); }

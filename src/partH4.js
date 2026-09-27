@@ -61,9 +61,10 @@ function renderOverview(){
     return {t, total:idx.length, done:idx.filter(i=>prog[ttKey(i, t.k)]).length}; })
     .sort((a,b) => (b.t.k===myType) - (a.t.k===myType) || b.done - a.done).slice(0,4);
   const mine = types.find(x=>x.t.k===myType);
-  const sub = has
-    ? `${esc(pm.name || "Your assessment")} has ${open} open launch blocker${open===1?"":"s"}${mine ? `, and you've completed ${mine.done} of ${mine.total} ${esc(mine.t.s)} tabletop scenarios` : ""}.`
-    : "Profile what you're building to see how it could be misused, or rehearse a crisis in the tabletop library.";
+  const pic = ovPicStatus();
+  const sub = pic.done >= 3 ? `Your safety picture is complete. Keep it current as your products and program change.`
+    : pic.done || pic.m.state === "partial" ? `Your safety picture is ${Math.min(pic.done, 3)} of 3 complete. Next, ${pic.next}.`
+    : "See your whole trust and safety program in one place: rate its maturity, run a pre-mortem on each product, and compare them side by side.";
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,5);
   const laws = r.obligations.filter(o=>o.status==="applies").length;
   const nextUp = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
@@ -81,33 +82,7 @@ function renderOverview(){
       <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
     </section>
 
-    ${has ? `<section class="ov-hero rise" aria-label="Current assessment">
-      <div class="ov-hl">
-        <div class="ov-eb"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem${pm.updated ? " · updated " + relTime(pm.updated) + " ago" : pm.example ? " · example" : ""}</div>
-        <h2>${esc(pm.name || "Untitled assessment")}</h2>
-        <div class="ov-chips">
-          <span class="ov-status" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"};border-color:color-mix(in oklab, ${r.posture[1]?`var(--${r.posture[1]})`:"var(--line-strong)"} 35%, transparent)"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]} exposure</span>
-          ${pm.regions.length ? `<span class="ov-status">${pm.regions.map(k=>k.toUpperCase()).join(" · ")}</span>` : ""}
-          ${pm.youth ? `<span class="ov-status">${esc(labelOf(YOUTH, pm.youth))}</span>` : ""}
-        </div>
-        <div class="ov-stats">
-          <div><b class="mono">${r.risks.length}</b><span>Risks identified</span></div>
-          <div><b class="mono" style="${r.counts.crit?"color:var(--crit)":""}">${r.counts.crit}</b><span>Critical</span></div>
-          <div><b class="mono">${laws}</b><span>Laws likely apply</span></div>
-        </div>
-        <div>${r.risks.slice(0,3).map(x=>`<div class="ov-risk"><span class="sdot" style="background:var(--${x.band==="low"?"faint":x.band})"></span>${esc(x.n)}<span class="mono">${x.score}/16</span></div>`).join("")}</div>
-        <div class="row" style="gap:8px"><button type="button" class="btn primary" data-ov="report">Open report ${icon("arrow")}</button><button type="button" class="btn" data-ov="plan">Launch plan</button></div>
-      </div>
-      <div class="ov-hr">${radarChart(r)}</div>
-    </section>` : `<section class="ov-hero rise" aria-label="Get started">
-      <div class="ov-hl">
-        <div class="ov-eb"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</div>
-        <h2>Find out how your product could be misused, before it launches</h2>
-        <p class="muted">A few plain-language questions produce a scored risk register, a launch plan with owners, and the laws that likely apply where you operate.</p>
-        <div class="row" style="gap:8px"><button type="button" class="btn primary" data-ov="new">Start a pre-mortem ${icon("arrow")}</button><a class="btn" href="#premortem">Explore an example</a></div>
-      </div>
-      <div class="ov-hr">${heroArt()}</div>
-    </section>`}
+    ${ovPictureHTML()}
 
     <section class="rise">
       <div class="ov-sec-h"><h3>Tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
@@ -123,7 +98,7 @@ function renderOverview(){
 
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
 
     <section class="ov-cols rise">
@@ -136,19 +111,7 @@ function renderOverview(){
           : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span><button type="button" class="btn sm" data-ov="new">${icon("plus")}Start a pre-mortem</button></div>`}</div>
       </div>
       <div style="display:grid;gap:16px;align-content:start">
-        ${has ? `<div>
-          <div class="ov-sec-h"><h3>Launch readiness</h3><a href="#premortem" data-ov-link="plan">Launch plan</a></div>
-          <div class="ov-card">
-            <div class="ov-ready">
-              <svg width="84" height="84" viewBox="0 0 84 84" role="img" aria-label="${bDone} of ${blockers.length} launch blockers done">
-                <circle cx="42" cy="42" r="34" fill="none" stroke="var(--sunk)" stroke-width="8"/>
-                <circle cx="42" cy="42" r="34" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct/100)).toFixed(1)}" transform="rotate(-90 42 42)"/>
-                <text x="42" y="47" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)" font-family="var(--mono)">${pct}%</text>
-              </svg>
-              <div><h4>${bDone} of ${blockers.length} blockers done</h4><p>${esc(pm.name || "Current assessment")}</p></div>
-            </div>
-            ${nextUp.length ? `<div class="ov-next">${nextUp.map(s=>`<label><input type="checkbox" id="ovn-${s.id}" data-ovsg="${s.id}"><span>${esc(s.t)}<small>${OWNERS[s.o]} · ${EFFORT[s.e].replace(" effort","")}</small></span></label>`).join("")}</div>` : ""}
-          </div></div>` : ""}
+        ${ovChecklistHTML()}
         <div>
           <div class="ov-sec-h"><h3>Tabletop progress</h3><a href="#tabletop">Practice</a></div>
           <div class="ov-card ov-learn">${types.map(x=>`<div class="ov-lrow"><span>${esc(x.t.n.split(" &")[0].split(",")[0])}</span><div class="bar"><i style="width:${x.total?x.done/x.total*100:0}%"></i></div><span class="mono">${x.done}/${x.total}</span></div>`).join("")}</div>
@@ -159,7 +122,7 @@ function renderOverview(){
     <footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>Not legal advice. Use the outputs to start conversations with your Legal and Policy partners.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>
   </div>`;
 
-  bindRadar();
+  bindOverviewPicture();
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
   view.querySelectorAll('[data-ov="new"]').forEach(b => b.onclick = newAssessment);
   view.querySelectorAll('[data-ov="report"],[data-ov="plan"],[data-ov-link="plan"]').forEach(b => b.onclick = e => {
