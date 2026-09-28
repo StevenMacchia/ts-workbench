@@ -30,6 +30,18 @@ return {out, run: async () => {
   out.push("AI path: result validated, decisions normalized, full report renders");
   SAMPLER = { json: async () => { throw {code:"rate_limited"}; } }; await polAnalyze(); out.push("rate limit message: " + polRun.err.slice(0,50) + "…");
   SAMPLER = { json: async () => { throw {code:"not_granted"}; } }; await polAnalyze(); out.push("declined consent → instant only: " + polRun.aiOff);
+  // company lookup: Claude fills the platform details from its own knowledge, validated, with undo
+  polRun.aiOff = false; pol.company = $("#pol-company").value = "Twitch"; pol.product = $("#pol-product").value = "Our esports league's channel."; pol.type = "social"; pol.youth = ""; pol.regions = ["us"];
+  SAMPLER = { json: async () => ({known:true, name:"Twitch", platform_type:"video", audience:"teens", regions:["us","eu","uk","xx"], description:"A live-streaming platform where creators broadcast and viewers chat in real time.", uncertain:"Features change often."}) };
+  await polLookup(); if(pol.type !== "video" || pol.youth !== "teens" || pol.regions.join() !== "us,eu,uk") throw new Error("lookup not applied: " + pol.type + pol.youth + pol.regions);
+  if(!/^A live-streaming platform/.test(pol.product) || !/esports league/.test(pol.product)) throw new Error("lookup should keep the person's description");
+  renderPolicy(); if(!view.innerHTML.includes("Filled in from Claude") || bad(view.innerHTML)) throw new Error("lookup banner missing");
+  if(!polPrompt().includes("Company or product: Twitch")) throw new Error("analysis prompt should name the company");
+  polLookUndo(); if(pol.type !== "social" || pol.product !== "Our esports league's channel." || pol.regions.join() !== "us") throw new Error("undo failed");
+  SAMPLER = { json: async () => ({known:false}) }; pol.company = $("#pol-company").value = "Zzqx"; await polLookup(); if(pol.type !== "social" || !pol.look || pol.look.known) throw new Error("unknown company should change nothing");
+  renderPolicy(); if(!view.innerHTML.includes("doesn't recognize")) throw new Error("unknown message missing");
+  if(!polMarkdown().includes("**Company:** Zzqx")) throw new Error("report should name the company");
+  out.push("company lookup: fills type, audience, regions and description; keeps the person's text; undo; unknown names change nothing");
   const msg = wsSaveTool("policy", pol, "Policy: test"); const it = Object.values(wsItems()).find(i=>i.kind==="policy");
   out.push("saved to workspace: " + msg + " · summary " + (!bad(itemSummary(it).html)) + " · overview chip " + (!bad(ovChip(it))));
   renderOverview(); if(bad(view.innerHTML) || !view.innerHTML.includes("Policy stress-tester")) throw new Error("overview missing tool"); out.push("overview shows five tools");

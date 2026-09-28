@@ -9,9 +9,9 @@ try{
     window.claude.use("sample").then(ns => { SAMPLER = ns; if((location.hash||"").slice(1)==="policy") renderPolicy(); }).catch(()=>{});
   }
 }catch(e){}
-const POL_BLANK = () => ({rule:"", type:"social", product:"", youth:"", regions:["us","eu","uk"], enforce:[], actions:[], concerns:"", depth:"default", heur:null, result:null, ts:null, filter:"all"});
+const POL_BLANK = () => ({rule:"", company:"", look:null, type:"social", product:"", youth:"", regions:["us","eu","uk"], enforce:[], actions:[], concerns:"", depth:"default", heur:null, result:null, ts:null, filter:"all"});
 let pol = Object.assign(POL_BLANK(), store.get("pol", null) || {});
-let polRun = {busy:false, ctl:null, stage:0, timer:null, err:"", aiOff:false};
+let polRun = {busy:false, ctl:null, stage:0, timer:null, err:"", aiOff:false, looking:false};
 const savePol = () => store.set("pol", pol);
 const POL_ENF = [["reports","User reports"],["humans","Human reviewers"],["auto","Automated detection"],["vendor","Outsourced moderation vendor"],["community","Community moderators"]];
 const POL_ACT = [["remove","Remove content"],["label","Warning label or blur"],["limit","Reduce reach"],["warn","Warn the user"],["suspend","Temporary suspension"],["ban","Permanent ban"]];
@@ -83,6 +83,7 @@ function polStrength(){
 function polPrompt(){
   const lab = (list, keys) => keys.map(k => (list.find(x=>x[0]===k)||[k,k])[1]).join(", ");
   const ctx = [
+    ["Company or product", (pol.company || "").trim().slice(0, 80) || "Not provided"],
     ["Platform type", labelOf(PLATFORMS, pol.type) || "Not provided"],
     ["Product description", pol.product.trim() || "Not provided"],
     ["Audience", pol.youth ? labelOf(YOUTH, pol.youth) : "Not provided"],
@@ -103,6 +104,7 @@ ${pol.rule.slice(0, 6000)}
 
 INSTRUCTIONS
 - Base every finding on the rule text and the context. Where context is "Not provided", make a sensible assumption and list it under "assumptions".
+- If you recognize the company or product named in the context, use what you know about how that platform works and how people use it to make the hard cases realistic. Don't invent specifics you aren't sure of.
 - Edge cases must be realistic for this platform and audience. Turn the team's concerns into edge cases where relevant. Across the set, include at least one case each of news or documentary use, satire or humour, counter-speech, and, if under-18s may be present, a case involving a minor.
 - Use "escalate" for cases a reviewer could not decide from the rule text alone.
 - Tie enforcement risks to the enforcement methods and actions listed.
@@ -139,7 +141,69 @@ function polValid(r){
 }
 function polReadForm(){
   const v = id => { const el = $("#"+id); return el ? el.value : undefined; };
-  ["rule","product","concerns"].forEach(k => { const x = v("pol-"+k); if(x !== undefined) pol[k] = x; });
+  ["rule","company","product","concerns"].forEach(k => { const x = v("pol-"+k); if(x !== undefined) pol[k] = x; });
+}
+/* ---------- company lookup: Claude describes a named platform from its own knowledge (it can't browse) ---------- */
+function polLookupPrompt(name){
+  return `You help a trust and safety team describe their platform before they stress-test a content policy. Using only your own general knowledge (you cannot browse the web), describe the company or product named below: what kind of platform it is and how people use it.
+
+NAME
+"""
+${name}
+"""
+
+Return JSON only, with this shape:
+{"known": true or false, "name": "the name as it is usually written", "platform_type": one of ${PLATFORMS.map(p => `"${p.k}" (${p.n})`).join(", ")}, "audience": one of ${YOUTH.map(y => `"${y.k}" (${y.n})`).join(", ")}, or "" if unsure, "regions": the subset of ${REGIONS.map(r => `"${r.k}" (${r.n})`).join(", ")} where it has many users, "description": "two or three plain sentences: what people do on it, who uses it, and the features that matter for safety, such as live video, direct messages, payments, groups or recommendations", "uncertain": "one short sentence on anything you are unsure of or that may have changed recently, or an empty string"}
+
+RULES
+- If you don't recognize the name, or it could refer to more than one company, set "known" to false and leave every other field empty. Do not guess.
+- Don't state user numbers, dates or other figures unless you are confident of them.
+- Plain, neutral language. No marketing tone.`;
+}
+function polLookupValid(raw){
+  if(!raw || typeof raw !== "object") return null;
+  const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
+  const res = {known:raw.known === true, name:str(raw.name, 80),
+    platform_type:PLATFORMS.some(p => p.k === raw.platform_type) ? raw.platform_type : "",
+    audience:YOUTH.some(y => y.k === raw.audience) ? raw.audience : "",
+    regions:Array.isArray(raw.regions) ? REGIONS.map(r => r.k).filter(k => raw.regions.includes(k)) : [],
+    description:str(raw.description, 700), uncertain:str(raw.uncertain, 240)};
+  if(res.known && !res.description && !res.platform_type) res.known = false;
+  return res;
+}
+async function polLookup(){
+  polReadForm(); const name = (pol.company || "").trim().slice(0, 80);
+  if(!name){ pol.look = {err:"Type a company or product name first."}; return renderPolicy(); }
+  if(!SAMPLER || polRun.aiOff || polRun.looking) return;
+  polRun.looking = true; renderPolicy();
+  try{
+    const res = polLookupValid(await SAMPLER.json(polLookupPrompt(name), {modelTier:"default"}));
+    if(!res) throw {code:"invalid_json"};
+    if(!res.known) pol.look = {name, known:false};
+    else {
+      // Keep what was there so Undo puts it back exactly; a description the person wrote stays, after Claude's
+      pol.look = {name:res.name || name, known:true, uncertain:res.uncertain, prev:{type:pol.type, youth:pol.youth, regions:pol.regions.slice(), product:pol.product}};
+      if(res.platform_type) pol.type = res.platform_type;
+      if(res.audience) pol.youth = res.audience;
+      if(res.regions.length) pol.regions = res.regions;
+      const mine = pol.product.trim();
+      if(res.description) pol.product = res.description + (mine && mine !== res.description ? "\n\n" + mine : "");
+    }
+    savePol();
+  }catch(e){
+    const code = e && e.code;
+    if(POL_OFF.includes(code)){ polRun.aiOff = true; pol.look = null; }
+    else if(code !== "cancelled") pol.look = {err:POL_ERR[code] || POL_ERR.upstream_error};
+  }finally{
+    polRun.looking = false; renderPolicy(); if(typeof focusQuiet === "function" && typeof document !== "undefined" && document.getElementById) focusQuiet(document.getElementById("pol-look"));
+  }
+}
+function polLookUndo(){ const p = pol.look && pol.look.prev; if(!p) return; Object.assign(pol, {type:p.type, youth:p.youth, regions:p.regions, product:p.product}); pol.look = null; savePol(); renderPolicy(); }
+function polLookHTML(){
+  const l = pol.look; if(!l) return "";
+  if(l.err) return `<p class="pol-look err" role="alert">${esc(l.err)}</p>`;
+  if(!l.known) return `<div class="banner pol-look"><span>Claude doesn't recognize “${esc(l.name)}”, or it could mean more than one company, so nothing was filled in. Describe your product below instead.</span></div>`;
+  return `<div class="banner pol-look ok"><span><strong>Filled in from Claude's knowledge of ${esc(l.name)}.</strong> Check the platform type, audience, regions and description below, and add anything recent.${l.uncertain ? " " + esc(l.uncertain) : ""}</span>${l.prev ? `<button type="button" class="btn sm" id="pol-lookundo">Undo</button>` : ""}</div>`;
 }
 async function polAnalyze(){
   polReadForm(); pol.rule = pol.rule.trim();
@@ -164,6 +228,7 @@ async function polAnalyze(){
 function polMarkdown(){
   const r = pol.result, h = pol.heur, L = [];
   L.push("# Policy stress test", "", "## Rule", "", "> " + pol.rule.replace(/\n/g, "\n> "), "");
+  if(pol.company) L.push("**Company:** " + pol.company.trim());
   if(pol.product) L.push("**Product:** " + pol.product);
   L.push(`**Platform:** ${labelOf(PLATFORMS, pol.type)} · **Regions:** ${pol.regions.map(k=>k.toUpperCase()).join(", ") || "not set"}`, "");
   if(h) L.push(`## Instant checks: ${h.score}/100`, ...h.findings.map(([lv,t]) => `- ${lv==="ok"?"✓":"!"} ${t}`), "");

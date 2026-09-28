@@ -61,12 +61,19 @@ function renderPolicy(){
 
       <section class="card pol-card">
         <div class="pol-h"><span class="pol-num">2</span><div><label for="pol-product">Your platform</label><span class="note">Recommended</span></div></div>
+        <div class="pol-co">
+          <div class="field"><label for="pol-company">Company or product name</label>
+            <div class="pol-co-row"><input class="input" id="pol-company" value="${esc(pol.company || "")}" placeholder="For example: Twitch, Depop or Discord" autocomplete="off" maxlength="80">
+              ${SAMPLER && !polRun.aiOff ? `<button type="button" class="btn" id="pol-lookup" ${polRun.looking ? "disabled" : ""}>${polRun.looking ? "Looking it up…" : `${icon("search")}Look it up with Claude`}</button>` : ""}</div>
+            <span class="note">${SAMPLER && !polRun.aiOff ? "Claude fills in the details below from what it already knows about the company. It can't browse the web, so check them." : "Optional. It's named in your report."}</span></div>
+          <div id="pol-look" tabindex="-1">${polLookHTML()}</div>
+        </div>
         <div class="pol-ctx">
           <div class="field"><label for="pol-type">Platform type</label><select class="select" id="pol-type">${PLATFORMS.map(p=>`<option value="${p.k}" ${p.k===pol.type?"selected":""}>${esc(p.n)}</option>`).join("")}</select></div>
           <div class="field"><label for="pol-youth">Can under-18s use it?</label><select class="select" id="pol-youth"><option value="">Not sure</option>${YOUTH.map(y=>`<option value="${y.k}" ${y.k===pol.youth?"selected":""}>${esc(y.n)}</option>`).join("")}</select></div>
         </div>
         <div class="field"><label for="pol-product">Describe your product</label>
-          <textarea id="pol-product" rows="3" placeholder="What people do on it, who uses it and anything unusual. For example: “A live-streaming app for gamers. Viewers chat in real time and many streamers are teenagers.”">${esc(pol.product)}</textarea></div>
+          <textarea id="pol-product" rows="${(pol.product || "").length > 160 ? 6 : 3}" placeholder="What people do on it, who uses it and anything unusual. For example: “A live-streaming app for gamers. Viewers chat in real time and many streamers are teenagers.”">${esc(pol.product)}</textarea></div>
         <div class="field"><span class="lbl">Regions you operate in</span><div class="pol-regions" id="pol-regions">${chips(REGIONS.map(g=>[g.k,g.k.toUpperCase()]), "regions")}</div></div>
         <div class="pol-compare"><div><span class="eyebrow">Thin</span><p>“A social app.”</p></div><div><span class="eyebrow">Strong</span><p>“A photo app for 18 to 25-year-olds with public profiles, DMs and group chats. Mostly US and UK users. Dating-style ‘rate me’ posts are popular.”</p></div></div>
       </section>
@@ -131,6 +138,11 @@ ${h ? runPanel : ""}
 }
 function polBind(){
   const refreshMeter = () => { const m = $("#pol-strength"); if(m){ m.innerHTML = polStrengthHTML(); polBindMeter(); } const pp = $("#pol-prompt-pre"); if(pp) pp.textContent = polPrompt(); };
+  const co = $("#pol-company");
+  if(co){ co.addEventListener("input", () => { pol.company = co.value; savePol(); });
+    co.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); polLookup(); } }); }
+  const lk = $("#pol-lookup"); if(lk) lk.onclick = polLookup;
+  const lu = $("#pol-lookundo"); if(lu) lu.onclick = polLookUndo;
   ["rule","product","concerns"].forEach(k => { const el = $("#pol-"+k); if(!el) return;
     el.addEventListener("input", () => { pol[k] = el.value; savePol(); if(k==="rule"){ const wc = $("#pol-wc"); if(wc) wc.textContent = polWords(pol.rule) + " words"; } refreshMeter(); });
     el.addEventListener("keydown", e => { if((e.metaKey||e.ctrlKey) && e.key==="Enter"){ e.preventDefault(); if(!polRun.busy) polAnalyze(); } }); });

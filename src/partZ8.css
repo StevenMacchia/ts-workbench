@@ -696,3 +696,16 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .jn-bar-t{flex:1;min-width:220px;font-size:14px;color:var(--muted)}
 .jn-bar-t b{color:var(--ink);font-weight:600}
 @media (max-width:640px){.nx-i{grid-template-columns:24px minmax(0,1fr);}.nx-i > .btn,.nx-i > .nx-open{grid-column:2;justify-self:start}}
+
+/* ---------- Policy stress-tester: company lookup ---------- */
+.pol-co{margin-bottom:14px}
+.pol-co-row{display:flex;gap:8px;flex-wrap:wrap}
+.pol-co-row .input{flex:1;min-width:200px}
+.pol-co-row .btn{flex:none}
+.pol-co-row .btn svg{width:15px;height:15px}
+.pol-look{margin-top:10px}
+.pol-look.err{color:var(--crit);font-size:13px}
+.pol-look.ok{border-color:color-mix(in oklab, var(--good) 35%, var(--line))}
+#pol-look:focus{outline:none}
+.pol-look.banner{margin-bottom:0}
+#pol-look:empty{display:none}
