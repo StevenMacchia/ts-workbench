@@ -10,6 +10,7 @@ const location = {hash:"#policy"}; const window = {scrollTo(){}};
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const icon = id => '<svg><use href="#i-'+id+'"/></svg>'; const view = {querySelectorAll(){ return []; }}; const copyText = () => {};
 const head = (t,d,c,m) => "<h1>"+t+"</h1><p>"+d+"</p>"+(m||"");
+const headCompact = (t,c,m) => "<h1>"+t+"</h1><p>"+c+"</p>"+(m||"");
 `;
 const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partPol.js"), rd("partPol2.js")].join("\n") + `
 const out = [], bad = h => /undefined|NaN|\\[object/.test(h);
@@ -31,7 +32,7 @@ return {out, run: async () => {
   SAMPLER = { json: async () => { throw {code:"rate_limited"}; } }; await polAnalyze(); out.push("rate limit message: " + polRun.err.slice(0,50) + "…");
   SAMPLER = { json: async () => { throw {code:"not_granted"}; } }; await polAnalyze(); out.push("declined consent → instant only: " + polRun.aiOff);
   // company lookup: Claude fills the platform details from its own knowledge, validated, with undo
-  polRun.aiOff = false; pol.company = $("#pol-company").value = "Twitch"; pol.product = $("#pol-product").value = "Our esports league's channel."; pol.type = "social"; pol.youth = ""; pol.regions = ["us"];
+  polRun.aiOff = false; pol.view = "setup"; pol.company = $("#pol-company").value = "Twitch"; pol.product = $("#pol-product").value = "Our esports league's channel."; pol.type = "social"; pol.youth = ""; pol.regions = ["us"];
   SAMPLER = { json: async () => ({known:true, name:"Twitch", platform_type:"video", audience:"teens", regions:["us","eu","uk","xx"], description:"A live-streaming platform where creators broadcast and viewers chat in real time.", uncertain:"Features change often."}) };
   await polLookup(); if(pol.type !== "video" || pol.youth !== "teens" || pol.regions.join() !== "us,eu,uk") throw new Error("lookup not applied: " + pol.type + pol.youth + pol.regions);
   if(!/^A live-streaming platform/.test(pol.product) || !/esports league/.test(pol.product)) throw new Error("lookup should keep the person's description");

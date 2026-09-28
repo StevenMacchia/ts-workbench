@@ -208,9 +208,12 @@ function polLookHTML(){
 async function polAnalyze(){
   polReadForm(); pol.rule = pol.rule.trim();
   if(!pol.rule){ polRun.err = "Paste or write a rule first."; return renderPolicy(); }
-  pol.heur = polHeuristics(pol.rule); pol.result = null; pol.ts = Date.now(); pol.filter = "all"; polRun.err = ""; savePol();
-  if(!SAMPLER || polRun.aiOff){ renderPolicy(); return; }
-  polRun.busy = true; polRun.stage = 0; polRun.ctl = new AbortController(); renderPolicy();
+  pol.heur = polHeuristics(pol.rule); pol.result = null; pol.ts = Date.now(); pol.filter = "all"; polRun.err = "";
+  // Running always moves on to the report, which shows the instant checks straight away while Claude works
+  pol.view = "report"; pol.rtab = "cases"; savePol();
+  const polTop = () => { if(typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0); if(typeof focusQuiet === "function" && typeof document !== "undefined" && document.querySelector) focusQuiet(document.querySelector("#view h1")); };
+  if(!SAMPLER || polRun.aiOff){ renderPolicy(); polTop(); return; }
+  polRun.busy = true; polRun.stage = 0; polRun.ctl = new AbortController(); renderPolicy(); polTop();
   clearInterval(polRun.timer); polRun.timer = setInterval(() => { polRun.stage = Math.min(POL_STAGES.length-1, polRun.stage+1); const s = $("#pol-stage"); if(s) s.textContent = POL_STAGES[polRun.stage] + "…"; }, 5000);
   try{
     const raw = await SAMPLER.json(polPrompt(), {signal: polRun.ctl.signal, modelTier: pol.depth==="deep" ? "complex" : "default"});
