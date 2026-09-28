@@ -9721,7 +9721,7 @@ function pmCurrentHero(){
    ========================================================= */
 const RC_GRADES = [[85, "A", "good"], [70, "B", "good"], [55, "C", "med"], [40, "D", "high"], [0, "F", "crit"]];
 const rcGrade = s => RC_GRADES.find(g => s >= g[0]);
-const RC_WEIGHTS = {maturity:30, coverage:25, launch:20, crisis:15, metrics:10, policy:10};
+const RC_WEIGHTS = {maturity:30, coverage:25, launch:20, crisis:15, policy:10};
 // Each part: {k, n, icon, color, route, score (0 to 100, or null when not graded), detail, todo}
 function rcParts(){
   const out = [], items = Object.values(wsItems());
@@ -9753,12 +9753,6 @@ function rcParts(){
     const perf = runs.length ? runs.reduce((s, x) => s + x, 0) / runs.length : 0;
     out.push({k:"crisis", n:"Crisis readiness", icon:"siren", color:"var(--t-tt)", route:"tabletop", score:runs.length ? Math.round(perf * (0.7 + 0.3 * Math.min(1, runs.length / 4)) * 100) : null,
       detail:runs.length ? `${Math.round(perf * 100)}% strong first calls · ${runs.length} scenario${runs.length === 1 ? "" : "s"} practiced${runs.length < 4 ? " (4 for full credit)" : ""}` : "", todo:"Rehearse a crisis in the tabletop"}); }
-  // Measurement: share of tracked metrics on track, watch counts half
-  if(typeof mxStatusCounts === "function"){
-    const c = mxStatusCounts(mx), n = c.on + c.watch + c.off;
-    out.push({k:"metrics", n:"Measurement", icon:"gauge", color:"var(--t-mx)", route:"metrics/scorecard", score:n >= 3 ? Math.round((c.on + c.watch / 2) / n * 100) : null,
-      detail:n ? `${c.on} on track · ${c.watch} to watch · ${c.off} off track` : "", todo:n ? "Track at least three metrics against targets" : "Set targets in your metrics scorecard"});
-  }
   // Policy clarity: average clarity score of saved policy tests
   { const pol = items.filter(it => it.kind === "policy" && it.data).map(it => it.data.result ? it.data.result.score : it.data.heur ? it.data.heur.score : null).filter(x => x !== null);
     out.push({k:"policy", n:"Policy clarity", icon:"doc", color:"var(--t-pol)", route:"policy", score:pol.length ? Math.round(pol.reduce((s, x) => s + x, 0) / pol.length) : null,
@@ -9787,7 +9781,7 @@ function rcHTML(){
     <div class="card rc-card">
       <div class="rc-main">${rcRing(o.score, 148)}
         <div class="rc-sum"><b>${gr ? `Overall grade ${gr[1]}` : "No grade yet"}</b><p>${esc(line)}</p>
-          <p class="note rc-how">Each part is scored out of 100. The overall grade weighs maturity 30%, coverage 25%, launch readiness 20%, crisis readiness 15%, measurement 10% and policy clarity 10%, across the parts you've completed.</p></div></div>
+          <p class="note rc-how">Each part is scored out of 100. The overall grade weighs maturity 30%, coverage 25%, launch readiness 20%, crisis readiness 15% and policy clarity 10%, across the parts you've completed.</p></div></div>
       <div class="rc-parts">${parts.map(p => { const g = p.score === null ? null : rcGrade(p.score);
         return `<a class="rc-p ${g ? "" : "open"}" href="#${p.route}"><span class="sb-glyph" style="background:${g ? p.color : "var(--faint)"}"><svg><use href="#i-${p.icon}"/></svg></span>
           <span class="rc-pt"><b>${p.n}</b><small>${esc(g ? p.detail : (p.detail ? p.detail + " · " : "") + p.todo)}</small></span>

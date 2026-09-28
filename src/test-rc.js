@@ -7,12 +7,12 @@ const body = function(){
   const part = k => rcParts().find(p => p.k === k);
   // nothing done: no grade, every part invites
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false}); cv = {src:null, ex:false, r:{}}; mx = {platform:"social", stage:"2", reg:true, vals:{}};
-  let o = rcOverall(rcParts()); eq(o.score, null, "no grade yet"); eq(o.total, 6, "six parts");
+  let o = rcOverall(rcParts()); eq(o.score, null, "no grade yet"); eq(o.total, 5, "five parts"); eq(rcParts().some(p => p.k === "metrics"), false, "measurement is left out for now");
   renderOverview(); let h = view.innerHTML; if(bad(h)) throw new Error("blank report card has bad values");
-  eq(/No grade yet/.test(h) && (h.match(/class="rc-ng"/g) || []).length, 6, "every part shows not graded");
+  eq(/No grade yet/.test(h) && (h.match(/class="rc-ng"/g) || []).length, 5, "every part shows not graded");
   // examples never count as your own
   ma = maExample(); cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); eq(part("maturity").score, null, "maturity example is not graded"); eq(part("coverage").score, null, "coverage example is not graded");
-  out.push("blank and examples: no grade, six parts to complete");
+  out.push("blank and examples: no grade, five parts to complete");
   // maturity: closeness to target, capped at the target
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false}); MA_AREAS.forEach(a => ma.lv[a.k] = 3); eq(part("maturity").score, 100, "every area at target");
   ma.lv.crisis = 1; eq(part("maturity").score, Math.round((7 + 1 / 3) / 8 * 100), "one area short of target");
@@ -31,17 +31,17 @@ const body = function(){
   store.set("tt:progress", {[ttKey(0, "social")]:{best:4, runs:1}}); eq(part("crisis").score, Math.round(1 * (0.7 + 0.3 * 0.25) * 100), "one perfect scenario, partial credit for breadth");
   const prog = {}; [0, 1, 2, 3].forEach(i => prog[ttKey(i, "social")] = {best:2, runs:1}); store.set("tt:progress", prog); eq(part("crisis").score, 50, "four scenarios at half strong calls");
   // measurement and policy
-  eq(part("metrics").score, null, "needs three tracked metrics");
   wsPut({id:"PT-1", kind:"policy", title:"Harassment", data:{heur:{score:60}}}); wsPut({id:"PT-2", kind:"policy", title:"Scams", data:{result:{score:80}, heur:{score:40}}});
   eq(part("policy").score, 70, "average clarity, Claude's score first");
   out.push("parts: maturity capped at target, coverage needs every rating, blockers count double, crisis rewards breadth, policy averages");
+  eq(Object.values(RC_WEIGHTS).reduce((x, y) => x + y, 0), 100, "weights add up to 100");
   // overall: weighted across graded parts only
   const ps = rcParts(); o = rcOverall(ps); const g = ps.filter(p => p.score !== null), w = g.reduce((s, p) => s + RC_WEIGHTS[p.k], 0);
-  eq(o.score, Math.round(g.reduce((s, p) => s + p.score * RC_WEIGHTS[p.k], 0) / w), "weighted average"); eq(o.graded, 5, "five parts graded");
+  eq(o.score, Math.round(g.reduce((s, p) => s + p.score * RC_WEIGHTS[p.k], 0) / w), "weighted average"); eq(o.graded, 5, "all five parts graded");
   eq(rcGrade(85)[1], "A", "A from 85"); eq(rcGrade(84)[1], "B", "B below 85"); eq(rcGrade(39)[1], "F", "F below 40");
   renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("report card has bad values: " + (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0]);
   eq(new RegExp(`Overall grade ${rcGrade(o.score)[1]}`).test(h) && new RegExp(`${o.score} / 100`).test(h), true, "overview shows the grade");
-  const md = rcMarkdown(); eq(/\*\*Overall: \d+ \/ 100, grade [A-F]\*\*/.test(md) && /\| Measurement \| Not graded \|/.test(md), true, "markdown report card");
+  const md = rcMarkdown(); eq(/\*\*Overall: \d+ \/ 100, grade [A-F]\*\*/.test(md) && !/Measurement/.test(md), true, "markdown report card");
   out.push(`overall: ${o.score} / 100, grade ${rcGrade(o.score)[1]}, ${o.graded} of ${o.total} parts graded; markdown export`);
   return out.join("\n");
 };
