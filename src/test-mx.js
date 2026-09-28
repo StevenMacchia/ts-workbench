@@ -88,6 +88,11 @@ const body = function(){
   const op = mxOnePagerInner(l2); eq(/Needs attention/.test(op) && /op-tiles/.test(op) && !bad(op), true, "one-pager renders");
   eq(/<html/.test(mxOnePagerDoc(l2)) && mxOnePagerDoc(l2).includes("MX_OP") === false, true, "one-pager downloads as a standalone page");
   const csvH = mxScoreCsv(l2).split("\n")[0]; eq(csvH.includes('"Q4 2025"') && csvH.includes('"Value (Q3 2026)"'), true, "CSV includes saved periods");
+  // reading the numbers together: the example program shows a warning and a good sign
+  const sigT = mxSignals().map(s => s.t);
+  eq(sigT.includes("Bad actors are coming back") && sigT.includes("Real progress"), true, "signals from example numbers: " + sigT.join(" | "));
+  eq(mxSignals()[0].tone, "watch", "warnings come before good signs");
+  eq(mxSigHTML(l2).includes("What your numbers are telling you") && mxOnePagerInner(l2).includes("Reading the numbers together"), true, "signals on the scorecard and the one-pager");
   mxClearDemo(); eq(mx.vals["Fraud loss rate"].v + "|" + mx.period + "|" + !!mx.demo, "50|Mine|false", "clearing example numbers restores your own");
   eq(mxFmt(METRICS.find(m => m.n === "Graphic-exposure hours per reviewer"), 1), "1 person", "singular units");
   eq(mxOnePagerInner([]).includes("Nothing to show yet"), true, "empty one-pager explains itself");

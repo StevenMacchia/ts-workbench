@@ -295,6 +295,7 @@ function mxTabMine(list){
     <span class="mxs-hist" id="mx-hist">${mxHistHTML()}</span>
     <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">See example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
   </div>
+  <div class="card mx-sig" id="mx-sig">${mxSigHTML(list)}</div>
   <div class="card mx-sc">
     <div class="mx-sc-row h"><span>Metric</span><span>Your value</span><span>Target</span><span>Off track at</span><span>Trend</span><span>Status</span></div>
     ${MX_TORD.map(t => { const ms = list.filter(m => m.t === t); if(!ms.length) return "";
@@ -404,6 +405,7 @@ function mxOnePagerInner(list){
     </section>
     ${att.length ? `<section class="op-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
       return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b>: ${esc(MX_SC[m.n][0].charAt(0).toLowerCase() + MX_SC[m.n][0].slice(1))} is <b>${esc(val(m))}</b>, against a target of ${esc((mxTargetText(m) || "not set").replace(/^≤ 0 /, "0 "))}. Read it with ${esc(H.pair)}.</span></li>`; }).join("")}</ul></section>` : ""}
+    ${mxSigHTML(list, true)}
     ${MX_TORD.map(t => { const ms = measured.filter(m => m.t === t); if(!ms.length) return "";
       return `<section class="op-sec"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
     <footer class="op-f">Status compares each value with the program's own target and off-track line. ${(mx.hist || []).length ? `Trends cover ${esc((mx.hist || []).map(h => h.p).concat(mx.period ? [mx.period] : []).filter((p, j, a) => a.indexOf(p) === j).join(", "))}. ` : ""}Made with T&amp;S Workbench.</footer>`;
@@ -477,6 +479,7 @@ function mxSetVal(m, inp, list){
   view.querySelectorAll(`[data-trend="${i}"]`).forEach(el => el.innerHTML = mxTrendHTML(m));
   view.querySelectorAll(`[data-spark="${i}"]`).forEach(el => el.innerHTML = mxSpark(m));
   const sum = $("#mx-sc-sum"); if(sum) sum.innerHTML = mxSumHTML(list);
+  const sig = $("#mx-sig"); if(sig){ sig.innerHTML = mxSigHTML(list); sig.querySelectorAll("[data-go]").forEach(b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.go]))); }
 }
 
 // Glossary tooltips: open on tap, and flip left when a term sits near the right edge

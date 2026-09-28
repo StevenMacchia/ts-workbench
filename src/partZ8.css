@@ -954,3 +954,23 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .gt:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
 #gt-tip{position:fixed;z-index:70;padding:9px 12px;border-radius:10px;background:var(--ink);color:var(--bg);font-size:13px;line-height:1.5;box-shadow:var(--shadow-lift);pointer-events:none}
 @media (max-width:640px){.wb{flex-wrap:wrap}.wb-t{flex-basis:calc(100% - 90px)}.wb .btn{order:3;width:100%;justify-content:center}.ph-help{margin-left:0}}
+
+/* ---------- Metrics: reading the numbers together ---------- */
+.mx-sig{padding:18px 20px;margin:0 0 16px}
+.mx-sig-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px 16px;flex-wrap:wrap;margin-bottom:12px}
+.mx-sig-h h3{margin:0;font-size:17px;letter-spacing:-.01em}
+.mx-sig .note{margin:0}
+.mx-sig-l{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.mx-sig-i{padding:14px 16px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--med)}
+.mx-sig-i.good{border-left-color:var(--good)}
+.mx-sig-tone{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--med)}
+.mx-sig-i.good .mx-sig-tone{color:var(--good)}
+.mx-sig-i h4{margin:4px 0 6px;font-size:15.5px;letter-spacing:-.01em}
+.mx-sig-i p{margin:0 0 6px;font-size:14px;line-height:1.55;color:var(--muted)}
+.mx-sig-i p:last-child{margin:0}
+.mx-sig-why{font-size:13px!important}
+.mx-sig-why .mx-link,.mx-sig-why b{color:var(--ink);font-weight:600}
+.mx-sig-and{color:var(--faint)}
+.mx-sig-d{font-size:12.5px;white-space:nowrap}
+.mx-sig-d.good{color:var(--good)}.mx-sig-d.crit{color:var(--high)}
+.mx-sig-c b{color:var(--ink)}
