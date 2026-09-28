@@ -2787,6 +2787,96 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .vd-x:hover{background:var(--sunk);color:var(--crit)}
 .vd-x svg{width:14px;height:14px}
 .vd-cell.none{background:var(--sunk);color:var(--faint)}
+
+/* ---------- Maturity: framework mapping ---------- */
+.ma-fw{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.ma-fw > summary{cursor:pointer;display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:14px 16px;list-style:none}
+.ma-fw > summary::-webkit-details-marker{display:none}
+.ma-fw > summary::before{content:"▸";color:var(--faint);transition:transform .15s}
+.ma-fw[open] > summary::before{transform:rotate(90deg)}
+.ma-fw > summary b{font-size:14.5px}
+.ma-fw-b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 24px;padding:0 16px}
+@media (max-width:760px){.ma-fw-b{grid-template-columns:1fr}}
+.ma-fw-col ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.ma-fw-col li b{display:block;font-size:13.5px;font-weight:600}
+.ma-fw-col li small{display:block;font-size:12.5px;color:var(--muted);line-height:1.45}
+.ma-fw-note{margin:14px 16px 0;font-size:13.5px;line-height:1.55}
+.ma-fw-src{margin:10px 16px 14px;font-size:12px;line-height:1.5}
+.ma-fw-src a{color:var(--muted)}
+
+/* ---------- Transparency report builder ---------- */
+.tr-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px 16px}
+@media (max-width:560px){.tr-row{grid-template-columns:1fr}}
+.tr-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.tr-tiers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.tr-tiers{grid-template-columns:1fr}}
+.tr-tier{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;align-content:start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tr-tier b{font-size:14px}
+.tr-tier span{font-size:12.5px;line-height:1.45;color:var(--muted)}
+.tr-tier:hover{border-color:var(--line-strong)}
+.tr-tier:focus-visible{outline:2px solid var(--t-ai);outline-offset:2px}
+.tr-tier.on{border-color:var(--t-ai);box-shadow:inset 0 0 0 1px var(--t-ai);background:color-mix(in oklab, var(--t-ai) 6%, var(--surface))}
+.tr-chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer}
+.tr-chk input{margin-top:3px;accent-color:var(--t-ai);width:16px;height:16px;flex:none}
+.tr-note{margin:0}
+.tr-due{margin:0}
+.tr-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+@media (max-width:640px){.tr-fields{grid-template-columns:1fr}}
+.tr-fields .tr-txt,.tr-fields .tr-chk{grid-column:1 / -1}
+.tr-num label{font-size:13.5px}
+.tr-in{display:flex;align-items:center;gap:8px}
+.tr-in .input{max-width:220px}
+.tr-in em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.tr-prev{margin-top:6px}
+.tr-prev .input{max-width:180px;font-size:13px;background:var(--surface-2)}
+.tr-num .input.bad,.tr-cats .input.bad{border-color:var(--crit)}
+.tr-cats{border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.tr-cats > summary{cursor:pointer;display:flex;gap:6px 12px;flex-wrap:wrap;align-items:baseline;padding:12px 14px}
+.tr-cats table{width:calc(100% - 28px);margin:0 14px;border-collapse:collapse;font-size:13.5px}
+.tr-cats th{text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);padding:6px 8px 6px 0}
+.tr-cats td{padding:4px 8px 4px 0}
+.tr-cats td .input{max-width:140px;padding:6px 8px}
+.tr-cats p{margin:10px 14px 12px}
+.tr-sum{grid-template-columns:auto minmax(0,1fr)}
+.tr-ring{width:96px;height:96px;border-radius:50%;display:grid;place-content:center;text-align:center;border:7px solid color-mix(in oklab, var(--t-ai) 30%, var(--sunk))}
+.tr-ring b{font-family:var(--mono);font-size:22px;line-height:1}
+.tr-ring span{font-size:11.5px;color:var(--muted)}
+.tr-doc section{padding:0 0 18px;margin:0 0 18px;border-bottom:1px solid var(--line)}
+.tr-doc section:last-of-type{border-bottom:0}
+.tr-doc h3{font-size:16px;margin:0 0 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.tr-doc p{margin:8px 0 0;line-height:1.6;font-size:14.5px}
+.tr-dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 18px;margin:0}
+.tr-dl div{display:grid;gap:2px}
+.tr-dl dt{font-size:12.5px;color:var(--muted)}
+.tr-dl dd{margin:0;font-size:17px;font-weight:600;font-family:var(--mono)}
+.tr-dl dd small{display:block;font-family:var(--body);font-weight:500;font-size:12px}
+.tr-dl dd small.up{color:var(--good)} .tr-dl dd small.dn{color:var(--high)}
+.tr-doc .miss,.tr-dl dd.miss{color:var(--faint);font-weight:400;font-family:var(--body);font-size:14px}
+.tr-docs{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:4px;font-size:14px}
+.tr-docs li.ok{color:var(--good)}
+.tr-ct{border-collapse:collapse;margin-top:12px;font-size:13.5px;min-width:min(520px,100%)}
+.tr-ct th,.tr-ct td{text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--line)}
+.tr-ct th{font-size:12.5px;color:var(--muted);font-weight:600}
+.tr-check{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.tr-check li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}
+.tr-check li p{margin:4px 0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tr-check li small{font-size:12.5px;color:var(--faint)}
+.tr-st{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--sunk);font-size:13px;font-weight:700}
+.tr-check li.ok .tr-st{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
+.tr-check li.part .tr-st{background:color-mix(in oklab, var(--high) 16%, transparent);color:var(--high)}
+.tr-check li.na{opacity:.6}
+.tr-ai h4{margin:14px 0 6px;font-size:14px}
+.tr-ai h4:first-child{margin-top:0}
+.tr-ai p,.tr-ai li{line-height:1.6;font-size:14.5px}
+.tr-uk{margin:0}
+
+/* ---------- Tier 3: calendar and what changed ---------- */
+.ma-rh-a{display:flex;gap:8px;flex-wrap:wrap}
+.pm-changes{margin-top:16px;padding:14px 18px;border-left:3px solid var(--accent)}
+.pm-changes ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px;font-size:14px;line-height:1.5}
+.ma-tabrow{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.ma-tabrow .ma-tabnote{margin:0}
+.ma-tabrow{margin-bottom:6px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2885,7 +2975,7 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
       <div class="sb-h">AI assistants</div>
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
-      <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report<span class="sb-new sb-soon" title="Under construction">Soon</span></a>
+      <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
@@ -4056,7 +4146,7 @@ function bindPremortem(){
     if(d.back){ pm.qi = Math.max(0, pm.qi-1); return rerender(); }
     if(d.goq) return goToQuestion(d.goq);
     if(d.preset){ pm = fromPreset(d.preset); return rerender(); }
-    if(d.libopen){ const rec = libLoad()[d.libopen]; if(rec){ pm = openRecord(rec, {stage:"report"}); } return rerender(); }
+    if(d.libopen){ const rec = libLoad()[d.libopen]; if(rec){ pm = openRecord(rec, {stage:"report"}); pm.base = pmSnap(pm); } return rerender(); }
     if(d.libdup){ const rec = libLoad()[d.libdup]; if(rec){ pm = openRecord(rec, {id:null, saved:false, created:null, name:(rec.name||"Untitled")+" (copy)", stage:"report"}); saveToLib(); pm.flash = "Duplicated"; } return rerender(); }
     if(d.libfrom){ const rec = libLoad()[d.libfrom]; if(rec){ const base = blankPM(); PROFILE_KEYS.forEach(k=>{ if(rec[k]!==undefined) base[k]=JSON.parse(JSON.stringify(rec[k])); }); QS.forEach(q=>base.answered[q.k]=true); pm = Object.assign(base, {stage:"ask", fromProfile:true}); pm.qi = visibleQs().findIndex(q=>q.k==="features"); } return rerender(); }
     if(d.libdel){ confirmDel = d.libdel; return renderPremortem(); }
@@ -4139,7 +4229,7 @@ function wsDel(id){ const m = wsItems(); delete m[id]; wsSaveItems(m); }
    SAVED ASSESSMENTS AND DOWNLOADS
    Saved in the viewer's browser so it works for anyone the page is shared with.
    ========================================================= */
-const TRANSIENT = ["stage","qi","impact","tab","group","filter","open","search","rview","flash","fromProfile"];
+const TRANSIENT = ["stage","qi","impact","tab","group","filter","open","search","rview","flash","fromProfile","base"];
 const PROFILE_KEYS = ["type","youth","aud","adult","identity","contact","money","regions","scale","team","features"];
 const newId = () => "TSW-" + Date.now().toString(36).toUpperCase().slice(-4) + Math.random().toString(36).slice(2,4).toUpperCase();
 const libLoad = () => { const out = {}; Object.values(wsItems()).forEach(it => { if(it.kind==="premortem" && it.data) out[it.id] = Object.assign({}, it.data, {id:it.id}); }); return out; };
@@ -4166,7 +4256,7 @@ let DL = null;
 const STANDALONE = !(window.claude && typeof window.claude.use === "function");
 if(STANDALONE && typeof Blob !== "undefined" && typeof URL !== "undefined" && URL.createObjectURL){
   DL = {save: async ({filename, data}) => {
-    const type = /\.html?$/.test(filename) ? "text/html" : /\.csv$/.test(filename) ? "text/csv" : /\.json$/.test(filename) ? "application/json" : "text/markdown";
+    const type = /\.html?$/.test(filename) ? "text/html" : /\.ics$/.test(filename) ? "text/calendar" : /\.csv$/.test(filename) ? "text/csv" : /\.json$/.test(filename) ? "application/json" : "text/markdown";
     const url = URL.createObjectURL(new Blob([data], {type: type + ";charset=utf-8"}));
     const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
@@ -4288,6 +4378,25 @@ function startHere(r){
       <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.</span></div>
     </div></div>`;
 }
+/* ---------- what changed since the assessment was last saved ---------- */
+const BAND_ORDER = {low:0, med:1, high:2, crit:3};
+function pmSnap(p){ const r = assess(p), bl = r.safeguards.filter(s => s.rank === 3);
+  return {t:p.updated || Date.now(), risks:Object.fromEntries(r.risks.map(x => [x.id, x.band])), bl:bl.length, blDone:bl.filter(s => p.done && p.done[s.id]).length}; }
+function pmChanges(r){
+  const b = pm.base; if(!b || pm.example) return null;
+  const now = Object.fromEntries(r.risks.map(x => [x.id, x.band])), name = id => (r.risks.find(x => x.id === id) || HARMS.find(h => h.id === id) || {n:id}).n;
+  const added = Object.keys(now).filter(id => !(id in b.risks)), gone = Object.keys(b.risks).filter(id => !(id in now));
+  const up = Object.keys(now).filter(id => id in b.risks && BAND_ORDER[now[id]] > BAND_ORDER[b.risks[id]]), down = Object.keys(now).filter(id => id in b.risks && BAND_ORDER[now[id]] < BAND_ORDER[b.risks[id]]);
+  const bl = r.safeguards.filter(s => s.rank === 3), blDone = bl.filter(s => pm.done[s.id]).length;
+  if(!added.length && !gone.length && !up.length && !down.length && blDone === b.blDone && bl.length === b.bl) return null;
+  const lines = [];
+  if(added.length) lines.push(`<b>${added.length} new risk${added.length === 1 ? "" : "s"}:</b> ${added.slice(0, 3).map(id => esc(name(id))).join(", ")}${added.length > 3 ? " and more" : ""}`);
+  up.slice(0, 3).forEach(id => lines.push(`<b>${esc(name(id))}</b> rose from ${BANDS[b.risks[id]][0].toLowerCase()} to ${BANDS[now[id]][0].toLowerCase()}`));
+  down.slice(0, 2).forEach(id => lines.push(`<b>${esc(name(id))}</b> fell from ${BANDS[b.risks[id]][0].toLowerCase()} to ${BANDS[now[id]][0].toLowerCase()}`));
+  if(gone.length) lines.push(`${gone.length} risk${gone.length === 1 ? " no longer applies" : "s no longer apply"}: ${gone.slice(0, 3).map(id => esc(name(id))).join(", ")}`);
+  if(blDone !== b.blDone || bl.length !== b.bl) lines.push(`Launch blockers: <b>${blDone} of ${bl.length} done</b>, from ${b.blDone} of ${b.bl}`);
+  return lines;
+}
 function renderReport(r){
   if(!r.risks.length) return `<div class="card"><div class="empty"><strong style="color:var(--ink)">Nothing to assess yet</strong><span>Tell us what people can do in your product to see its risks.</span><button type="button" class="btn primary" data-goq="features">Choose capabilities</button></div></div>`;
   const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length;
@@ -4316,6 +4425,7 @@ function renderReport(r){
       <div class="row" style="justify-content:space-between;align-items:flex-end"><div><span class="rep-kicker"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem report</span><h2 class="rep-title">${esc(pm.name||"Untitled assessment")}</h2><span class="note">${pm.id?`<span class="mono">${esc(pm.id)}</span> · `:""}${pm.created?`Created ${fmtDate(pm.created)} · Updated ${fmtDate(pm.updated)}`:(pm.example?"Example":"Not saved yet")}</span></div><span class="row" style="gap:12px">${pmProjectSelect()}<span class="note">Click any answer to change it</span></span></div>
       ${answerChips()}
     </div></div>
+    ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
     <div class="section-title rep-detail"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">
@@ -7812,7 +7922,8 @@ const KINDS = {
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
   policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
   maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
-  coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"}
+  coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
+  transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
 function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }
@@ -7847,6 +7958,10 @@ function vendorResult(d){
 }
 function itemSummary(it){
   const d = it.data || {};
+  if(it.kind==="transparency" && typeof trProgress === "function"){
+    const keep = tr, dd = Object.assign(TR_BLANK(), d); tr = dd; const p = trProgress(); tr = keep;
+    return {html:`<span class="pill ${p.pct >= 90 ? "good" : "high"}">${p.pct}% complete</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`};
+  }
   if(it.kind==="premortem"){
     const r = assess(openRecord(d)), bl = r.safeguards.filter(s=>s.rank===3), bd = bl.filter(s=>d.done&&d.done[s.id]).length;
     return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd};
@@ -8088,8 +8203,8 @@ function pmProjectSelect(){
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report drafter", about:"About this project"};
+const TOOL_COLOR = {transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
+const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -8099,13 +8214,14 @@ function relTime(t){
 }
 function openSaved(id){
   const it = wsItems()[id]; if(!it) return;
-  if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); savePM(); }
+  if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); pm.base = typeof pmSnap === "function" ? pmSnap(pm) : null; savePM(); }
   if(it.kind==="tabletop"){ tt = JSON.parse(JSON.stringify(it.data)); store.set("tt", tt); }
   if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
   if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
   if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
   if(it.kind==="maturity"){ ma = maInit(JSON.parse(JSON.stringify(it.data))); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
   if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
+  if(it.kind==="transparency"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); store.set("tr", tr); store.set("ws:cur:transparency", it.id); }
   goRoute(KINDS[it.kind].route);
 }
 // Move keyboard and screen-reader focus to new content without jumping the page
@@ -8140,7 +8256,7 @@ function cmdkItems(){
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
-  go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); out.push({g:"Go to", label:"Transparency report drafter", sub:"Under construction", color:"var(--faint)", icon:"chart", run:()=>goRoute("transparency")});
+  go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("About this project","about","var(--faint)","info");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
@@ -8416,7 +8532,7 @@ const AB_GROUPS = [
   ["Measure", [["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation."]]],
   ["AI assistants", [["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to an actioned user, checked against what an EU statement of reasons must include."],
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal, with a suggested reply. A person makes the final call."],
-    ["t-ai","chart","Transparency report drafter","Under construction."]]]
+    ["t-ai","chart","Transparency report","Build the report the EU Digital Services Act asks for, with a completeness check and a summary by Claude."]]]
 ];
 const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Rate maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Pre-mortem products","Risk for each product or launch"],
   ["cover","var(--t-cv)","Map coverage","Your defenses against that risk"], ["siren","var(--t-tt)","Rehearse a crisis","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
@@ -9231,7 +9347,10 @@ function aiScoreFill(){
 }
 
 // Tools still being rebuilt show a placeholder page instead of the form
-AI_TOOLS.transparency.wip = true;
+// The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
+AI_TOOLS.transparency.builder = true;
+AI_TOOLS.transparency.n = "Transparency report";
+AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
 const AI_WIP = {transparency:{
   plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
   meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
@@ -9250,6 +9369,7 @@ function renderAIWip(key){
     ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
 }
 function renderAI(key){
+  if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
   if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), st.f);
@@ -9462,6 +9582,43 @@ Object.assign(MX_GLOSS, {
   "on-call rotation":"A schedule that names who responds to urgent problems at any hour, and who backs them up."
 });
 MX_GLOSS_RE = null;
+
+/* ---------- How each area maps to recognized frameworks ----------
+   DTSP: the Safe Framework Specification (June 2025), its 35 best practices under five commitments.
+   Ofcom: the Illegal content Codes of Practice for user-to-user services (in force 17 March 2025) and the
+   Protection of Children Code of Practice for user-to-user services (in force 25 July 2025).
+   Checked against the published documents in September 2026. Draft amendments are flagged as drafts. */
+const MA_FW_SRC = {
+  dtsp:["DTSP Safe Framework Specification, June 2025", "https://dtspartnership.org/wp-content/uploads/2025/07/DTSP_Safe_Framework_Specification_2025.pdf"],
+  illegal:["Ofcom Illegal content Codes of Practice for user-to-user services, in force 17 March 2025", "https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/information-for-industry/illegal-harms/illegal-content-codes-of-practice-for-user-to-user-services-24-feb.pdf"],
+  children:["Ofcom Protection of Children Code of Practice for user-to-user services, in force 25 July 2025", "https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf"]
+};
+const MA_FW_REVIEWED = "September 2026";
+const MA_FW = {
+  policy:{dtsp:[["Product Governance", "PG1: Policies & Standards"], ["Product Governance", "PG3: Community Guidelines/Rules"], ["Product Governance", "PG6: Document Interpretation"]],
+    ofcom:[["ICU C3", "Setting internal content policies"], ["ICU G1", "Terms of service: substance (all services)"], ["ICU G3", "Terms of service: clarity and accessibility"]],
+    note:"A strong fit in both. The children's code has matching measures (PCU C3, PCU G1 and PCU G3)."},
+  detection:{dtsp:[["Product Enforcement", "PE4: Advanced Detection"], ["Product Development", "PD1: Abuse Pattern Analysis"], ["Product Enforcement", "PE9: Industry Partners"]],
+    ofcom:[["ICU C9", "Using hash matching to detect and remove CSAM"], ["ICU C10", "Detecting and removing content matching listed CSAM URLs"], ["ICU A5", "Tracking evidence of new and increasing illegal harm"]],
+    note:"A partial fit. Ofcom's proactive detection measures in force are narrow: CSAM hashes and URLs. Draft amendments would add hash matching for intimate image abuse, so check whether they are now in force."},
+  operations:{dtsp:[["Product Enforcement", "PE1.1: Roles & Teams"], ["Product Enforcement", "PE1.2: Operational Infrastructure"], ["Product Enforcement", "PE6.1: Enforcement Prioritization"], ["Product Enforcement", "PE2: Training & Awareness"]],
+    ofcom:[["ICU C2", "Having a content moderation function that allows for the swift take down of illegal content"], ["ICU C5", "Prioritisation"], ["ICU C6", "Resourcing"], ["ICU C7", "Provision of training and materials to individuals working in content moderation (non-volunteers)"]],
+    note:"A strong fit in both: people, triage, capacity and training."},
+  quality:{dtsp:[["Product Improvement", "PI1: Effectiveness Testing"], ["Product Enforcement", "PE6.2: Appeals"], ["Product Improvement", "PI5: Remedy Mechanisms"]],
+    ofcom:[["ICU C4", "Performance targets"], ["ICU D8", "Appropriate action for relevant complaints which are appeals – determination (large or multi-risk services)"], ["ICU D9", "Appropriate action for relevant complaints which are appeals – determination (services that are neither large nor multi-risk)"], ["ICU D10", "Appropriate action for relevant complaints which are appeals – action following determination"]],
+    note:"A good fit. Ofcom's performance targets explicitly cover the accuracy of decision making, and the children's code adds appeals against age assessments (PCU D11 and PCU D12)."},
+  crisis:{dtsp:[["Product Enforcement", "PE1.2: Operational Infrastructure"], ["Product Enforcement", "PE6.1: Enforcement Prioritization"], ["Product Enforcement", "PE6.3: External Reporting"], ["Product Development", "PD7: Post-Launch Evaluation"]],
+    ofcom:[["ICU C6", "Resourcing"], ["ICU A5", "Tracking evidence of new and increasing illegal harm"]],
+    note:"A weak fit today. DTSP has no crisis practice of its own, and Ofcom's in-force measures only touch it indirectly (resourcing covers surges caused by external events). Ofcom has drafted dedicated crisis-response measures, so check whether they are now in force."},
+  measurement:{dtsp:[["Product Improvement", "PI1: Effectiveness Testing"], ["Product Transparency", "PT1: Transparency Reports"], ["Product Transparency", "PT3: Complaint Intakes"]],
+    ofcom:[["ICU A1", "Annual review of risk management activities"], ["ICU A5", "Tracking evidence of new and increasing illegal harm"], ["ICU C4", "Performance targets"]],
+    note:"A good fit for reporting to senior leadership. Public transparency reports under the Act (section 77) apply only to certain services and sit outside the codes."},
+  compliance:{dtsp:[["Product Development", "PD5: Risk Assessment"], ["Product Improvement", "PI2: Process Alignment"]],
+    ofcom:[["ICU A2", "Individual accountable for illegal content safety duties and reporting and complaints duties"], ["ICU A3", "Written statements of responsibilities"], ["ICU A4", "Internal monitoring and assurance"], ["ICU A7", "Compliance training"]],
+    note:"DTSP is voluntary and sits alongside legal compliance, so only risk assessment and alignment map. Under the Act, the risk assessment (section 9) and record-keeping (section 23) are duties in the Act itself, not code measures."},
+  wellbeing:{dtsp:[["Product Enforcement", "PE3: Wellness & Resilience"]], ofcom:[],
+    note:"DTSP's wellness practice is a direct match. Neither Ofcom code has a measure on moderator wellbeing or exposure."}
+};
 /* =========================================================
    PROGRAM MATURITY: rate eight areas, then work the plan
    Rating sets a baseline. Ticking off the steps for the next level moves an area up,
@@ -9644,6 +9801,32 @@ function maRoadmapHTML(){
     return `<section class="ma-phase ma-${k}"><div class="ma-ph"><b>${n}</b><span>${when}</span><span class="ma-phn mono">${xs.filter(s => s.done).length}/${xs.length}</span></div>${xs.map(card).join("")}</section>`; }).join("")}</div>
     <p class="note ma-order">Each area moves one level at a time. When two gaps are the same size, the roadmap starts where a gap can hurt people or the company fastest: crisis response, then compliance, then detection.</p>`;
 }
+// How an area lines up with the DTSP Safe Framework and Ofcom's codes, with the sources
+function maFrameworkHTML(k){
+  const f = MA_FW[k];
+  return `<details class="ma-fw" ${store.get("ma:fw", false) ? "open" : ""}><summary><b>How this maps to recognized frameworks</b><span class="note">DTSP Safe Framework · Ofcom codes</span></summary>
+    <div class="ma-fw-b">
+      <div class="ma-fw-col"><span class="eyebrow">DTSP Safe Framework</span>${f.dtsp.length ? `<ul>${f.dtsp.map(([c, p]) => `<li><b>${esc(p)}</b><small>${esc(c)}</small></li>`).join("")}</ul>` : `<p class="note">No direct equivalent.</p>`}</div>
+      <div class="ma-fw-col"><span class="eyebrow">Ofcom illegal content codes</span>${f.ofcom.length ? `<ul>${f.ofcom.map(([id, n]) => `<li><b>${esc(id)}</b><small>${esc(n)}</small></li>`).join("")}</ul>` : `<p class="note">No direct equivalent.</p>`}</div>
+    </div>
+    <p class="ma-fw-note">${esc(f.note)}</p>
+    <p class="note ma-fw-src">Sources: <a href="${MA_FW_SRC.dtsp[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.dtsp[0])}</a>; <a href="${MA_FW_SRC.illegal[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.illegal[0])}</a>; <a href="${MA_FW_SRC.children[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.children[0])}</a>. Mapping last reviewed ${MA_FW_REVIEWED}. A guide to where to look, not legal advice.</p>
+  </details>`;
+}
+// Roadmap due dates as all-day calendar events (iCalendar), so they reach people outside the workbench
+const maDueSteps = () => maRoadmap(ma).filter(s => !s.done && ma.due && ma.due[s.id]);
+function maIcs(){
+  const txt = s => String(s).replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\r?\n/g, "\\n");
+  const fold = line => { const out = []; let s = line; while(s.length > 73){ out.push(s.slice(0, 73)); s = " " + s.slice(73); } out.push(s); return out.join("\r\n"); };
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const day = iso => iso.replace(/-/g, "");
+  const after = iso => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10).replace(/-/g, ""); };
+  const events = maDueSteps().map(s => { const due = ma.due[s.id], open = s.acts.filter((a, i) => !ma.done[`${s.id}-${i}`]);
+    const desc = [`Program maturity roadmap. ${s.a.n}: from level ${s.from} to level ${s.to}.`].concat(ma.own && ma.own[s.a.k] ? ["Owner: " + ma.own[s.a.k]] : [], ["Still to do:"], open.map(a => "- " + a), ["", "From T&S Workbench."]).join("\n");
+    return ["BEGIN:VEVENT", `UID:${s.id}-${day(due)}@ts-workbench`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${day(due)}`, `DTEND;VALUE=DATE:${after(due)}`,
+      "SUMMARY:" + txt(`${s.a.n}: reach level ${s.to} (${MA_LEVELS[s.to - 1].n})`), "DESCRIPTION:" + txt(desc), "END:VEVENT"].map(fold).join("\r\n"); });
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//T&S Workbench//Program maturity//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"].concat(events, ["END:VCALENDAR"]).join("\r\n") + "\r\n";
+}
 function maAreaTabHTML(){
   const t = maStage().t, sel = maArea(ma.sel) || (maGaps(ma)[0] || {a:MA_AREAS[0]}).a, seen = new Set(), base = ma.lv[sel.k] || 1, now = maLevelOf(ma, sel.k);
   const list = MA_AREAS.map(a => { const v = maLevelOf(ma, a.k), below = v < t[a.k];
@@ -9664,6 +9847,7 @@ function maAreaTabHTML(){
       <div class="ma-ad-meta"><label class="field"><span>Owner</span><input class="input" data-maown="${sel.k}" value="${esc(ma.own[sel.k] || "")}" placeholder="Who is accountable, e.g. Head of Trust & Safety Operations"></label>
         ${sel.tool ? `<a class="ma-tool" href="#${sel.tool[0]}">${esc(sel.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</div>
       <ol class="ma-ladder">${ladder}</ol>
+      ${typeof MA_FW !== "undefined" && MA_FW[sel.k] ? maFrameworkHTML(sel.k) : ""}
       <label class="field ma-notes"><span>Evidence and notes</span><textarea class="input" rows="3" data-manote="${sel.k}" placeholder="What makes you say this level? Links to playbooks, dashboards or audits.">${esc(ma.notes[sel.k] || "")}</textarea></label>
     </div></div>`;
 }
@@ -9704,14 +9888,14 @@ function maPlanHTML(){
       <div class="ma-band-r">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     </section>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
-    <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
+    <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<div class="ma-tabrow"><p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maDueSteps().length ? `<button type="button" class="btn sm" data-ma="ics"><svg><use href="#i-download"/></svg>Add ${maDueSteps().length} due date${maDueSteps().length === 1 ? "" : "s"} to your calendar</button>` : ""}</div>${maRoadmapHTML()}`}</div>
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
+    <div class="ma-rh"><h4>Your roadmap</h4><span class="ma-rh-a">${maDueSteps().length ? `<button type="button" class="btn sm" data-ma="ics"><svg><use href="#i-download"/></svg>Add ${maDueSteps().length} due date${maDueSteps().length === 1 ? "" : "s"} to your calendar</button>` : ""}${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</span></div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d), pr = maProgress(d);
@@ -9779,6 +9963,7 @@ function maScrollTo(el){ if(el && el.scrollIntoView) el.scrollIntoView({behavior
 function maOpenPlan(){ ma.edit = false; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }
 function bindMaturity(){
   const root = view;
+  root.querySelectorAll(".ma-fw").forEach(d => d.addEventListener("toggle", () => store.set("ma:fw", d.open)));
   root.onclick = e => {
     const b = e.target.closest("button"); if(!b || !root.contains(b)) return;
     const d = b.dataset;
@@ -9812,6 +9997,7 @@ function bindMaturity(){
         return gsay(`Snapshot saved: level ${maScore(ma).toFixed(1)} on ${maDate(Date.now())}`); }
       case "download": { const md = maMarkdown(ma); return offerFile(`ts-program-maturity-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#ma-toast")); }
       case "tasks": return tkOpen("maturity");
+      case "ics": { const n = maDueSteps().length, ics = maIcs(); offerFile("program-maturity-due-dates.ics", ics, ics); return gsay(`${n} due date${n === 1 ? "" : "s"} exported. Open the file to add them to your calendar`); }
       case "save": { const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
     }
   };
@@ -10943,125 +11129,6 @@ document.addEventListener("click", e => {
   renderOverview(); gsay(`Snapshot saved: level ${maScore(ma).toFixed(1)}`); focusQuiet(document.getElementById("nx-h"));
 });
 /* =========================================================
-   DEMO COMPANY: one click fills every tool with Pixelry, a fictional photo and short-video app,
-   so a visitor sees the whole program in a few minutes. The visitor's own work is set aside
-   in this browser and comes back, untouched, when they exit the demo.
-   ========================================================= */
-const DEMO_BACKUP = "tswbdemo:backup";
-// Browser preferences stay put; everything else in the workspace is swapped out
-const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
-const demoOn = () => !!store.get("demo", false);
-function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
-function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
-function demoStart(){
-  if(demoOn()){ goRoute("overview"); return tourStart(); }
-  try{
-    const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
-    localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
-    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
-    store.set("demo", true); store.set("demo:pending", true); store.set("demo:tour", true);
-  }catch(e){ return gsay("This browser blocked the demo"); }
-  demoReload();
-}
-function demoExit(){
-  try{
-    const raw = localStorage.getItem(DEMO_BACKUP), backup = raw ? JSON.parse(raw) : {};
-    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
-    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !DEMO_KEEP.includes(k) && typeof v === "string") localStorage.setItem(k, v); });
-    localStorage.removeItem(DEMO_BACKUP);
-  }catch(e){ return gsay("This browser blocked restoring your work"); }
-  demoReload();
-}
-// Pixelry's program: a quarter into its maturity plan, three products partway through launch, coverage mapped, crises rehearsed
-function demoFill(){
-  const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
-  orgSet({type:"social", stage:"growth", regions:["us", "eu", "uk"], confirmed:true});
-  store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
-  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; ma.due.compliance1 = iso(-2); ma.due.crisis2 = iso(5); maSave();
-  wsSaveTool("maturity", ma, "Pixelry program maturity");
-  [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
-    pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
-    assess(pm).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) pm.done[s.id] = true; });
-    saveToLib();
-    const lib = libLoad(); if(lib[pm.id]){ lib[pm.id].updated = Date.now() - (3 - n) * 6 * day; libSave(lib); }
-  });
-  pm.stage = "start"; savePM();
-  cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); Object.assign(cv, {ex:false, est:false, src:"all"}); cvSave();
-  wsSaveTool("coverage", cv, "Pixelry coverage");
-  mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[]}; mxLoadDemo(mxList());
-  mx.read = {"Violating-content prevalence":true, "Unsafe-contact rate for minors":true, "Harmful reach before action":true}; store.set("mx", mx);
-  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, 4);
-  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:[4, 3, 3, 2][j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
-  store.set("tt:progress", prog);
-  pol = Object.assign(POL_BLANK(), {company:"Pixelry", type:"social", youth:"teens", regions:["us", "eu", "uk"], enforce:["reports", "auto", "humans"], actions:["remove", "warn", "suspend", "ban"],
-    rule:"Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.",
-    product:"Pixelry is a photo and short-video app for 13 to 25-year-olds, with public profiles, comments, DMs and live streams. Creators sell subscriptions and items through Pixelry Market.",
-    concerns:"Pile-ons in the comments when a creator's post goes viral. 'Rate me' posts that invite insults about appearance. Whether repeated one-word insults count as harassment."});
-  pol.heur = polHeuristics(pol.rule); pol.ts = Date.now(); pol.view = "report"; savePol();
-  wsSaveTool("policy", pol, "Policy: Harassment");
-  store.set("rc:hist", [{d:iso(-90), s:44}, {d:iso(-60), s:50}, {d:iso(-30), s:56}]);
-}
-if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
-
-/* ---------- the bar that says you're in the demo, on every page ---------- */
-function demoBar(){
-  let bar = document.getElementById("demo-bar");
-  if(!demoOn()){ if(bar) bar.remove(); return; }
-  const v = document.getElementById("view"); if(!v || !v.parentNode) return;
-  if(!bar){ bar = document.createElement("div"); bar.id = "demo-bar"; bar.className = "demo-bar"; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Demo company"); v.parentNode.insertBefore(bar, v); }
-  bar.innerHTML = `<span class="demo-dot" aria-hidden="true"></span><span class="demo-t"><b>You're exploring Pixelry, a demo company.</b> Everything here is sample data.<span class="demo-more"> Your own work is set aside until you exit.</span></span>
-    <span class="demo-a"><button type="button" class="btn sm" data-demo="tour">Take the tour</button><button type="button" class="btn sm primary" data-demo="exit">Exit demo</button></span>`;
-}
-demoBar();
-
-/* ---------- a short guided tour of the overview ---------- */
-const TOUR = [
-  [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
-  [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
-  [".nx", "Your next moves", "What to do this week, pulled from every tool: overdue roadmap items first, then each product's next launch blocker. You can tick them off right here."],
-  [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
-  [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
-  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
-];
-let tourAt = -1;
-function tourEnd(){
-  tourAt = -1;
-  document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
-  const p = document.getElementById("tour-pop"); if(p) p.remove();
-}
-function tourStep(i){
-  const steps = TOUR.filter(([s]) => document.querySelector(s));
-  if(i < 0 || i >= steps.length) return tourEnd();
-  document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
-  tourAt = i;
-  const [sel, title, text] = steps[i], el = document.querySelector(sel);
-  el.classList.add("tour-on");
-  window.scrollTo(0, i === 0 ? 0 : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 96));
-  let p = document.getElementById("tour-pop");
-  if(!p){ p = document.createElement("div"); p.id = "tour-pop"; p.className = "tour-pop"; p.setAttribute("role", "dialog"); p.setAttribute("aria-labelledby", "tour-h"); p.tabIndex = -1; document.body.appendChild(p); }
-  const last = i === steps.length - 1;
-  p.innerHTML = `<div class="tour-top"><span class="tour-n">${i + 1} of ${steps.length}</span><button type="button" class="tour-x" data-tour="end" aria-label="Close the tour">${icon("x")}</button></div>
-    <h3 id="tour-h">${title}</h3><p>${text}</p>
-    <div class="tour-a">${i ? `<button type="button" class="btn sm" data-tour="back">Back</button>` : `<span></span>`}
-      ${last ? `<span class="tour-last"><a class="btn sm" href="#maturity" data-tour="end">Open Program maturity</a><button type="button" class="btn sm primary" data-tour="end">Done</button></span>` : `<button type="button" class="btn sm primary" data-tour="next">Next ${icon("arrow")}</button>`}</div>`;
-  p.focus({preventScroll:true});
-}
-function tourStart(){
-  if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
-  tourStep(0);
-}
-document.addEventListener("click", e => {
-  const d = e.target.closest && e.target.closest("[data-demo]");
-  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : tourStart(); }
-  const t = e.target.closest && e.target.closest("[data-tour]"); if(!t) return;
-  const a = t.dataset.tour; if(a === "next") return tourStep(tourAt + 1); if(a === "back") return tourStep(tourAt - 1);
-  tourEnd();
-});
-document.addEventListener("keydown", e => { if(e.key === "Escape" && tourAt >= 0) tourEnd(); });
-if(window.addEventListener) window.addEventListener("hashchange", () => { if(tourAt >= 0) tourEnd(); demoBar(); });
-// The tour opens by itself once, straight after the demo loads
-if(demoOn() && store.get("demo:tour", false)){ store.set("demo:tour", false); setTimeout(tourStart, 500); }
-/* =========================================================
    TABLETOP, TEAM MODE: run a scenario live with your team on a shared screen.
    Roles, a timer per decision, discussion prompts, the team's call, notes and action items,
    then an after-action report you can download or send to your tracker.
@@ -11264,6 +11331,407 @@ document.addEventListener("keydown", e => {
 });
 document.addEventListener("fullscreenchange", () => { if(!document.fullscreenElement && ttf && document.body.classList.contains("tt-present")){ document.body.classList.remove("tt-present"); ttfRender(); } });
 if(window.addEventListener) window.addEventListener("hashchange", () => { if((location.hash || "").slice(1) !== "tabletop"){ ttfStop(); document.body.classList.remove("tt-present"); } });
+/* =========================================================
+   TRANSPARENCY REPORT BUILDER: the numbers the EU Digital Services Act asks for, by type of service,
+   with a completeness check, a readable report and, on request, a summary written by Claude.
+   Requirements checked against Regulation (EU) 2022/2065 (Articles 15, 19, 24 and 42) and
+   Commission Implementing Regulation (EU) 2024/2835 in September 2026. Not legal advice.
+   ========================================================= */
+const TR_REVIEWED = "September 2026";
+const TR_SRC = {
+  dsa:["Regulation (EU) 2022/2065, the Digital Services Act", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2065"],
+  templates:["Implementing Regulation (EU) 2024/2835 on transparency report templates", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2835"],
+  download:["The Commission's CSV and XLSX templates", "https://digital-strategy.ec.europa.eu/en/library/implementing-regulation-laying-down-templates-concerning-transparency-reporting-obligations"],
+  uk:["Online Safety Act 2023, section 77", "https://www.legislation.gov.uk/ukpga/2023/50/section/77"]
+};
+// Each tier includes the duties of the ones before it
+const TR_TIERS = [
+  ["intermediary", "Mere conduit or caching", "You transmit or cache information, but don't store it for users."],
+  ["hosting", "Hosting service", "You store information that users provide, such as files or posts."],
+  ["platform", "Online platform", "You store user content and share it with the public, such as a social app or marketplace."],
+  ["vlop", "Very large online platform", "Designated by the Commission: 45 million or more average monthly active recipients in the EU."]
+];
+const trRank = k => TR_TIERS.findIndex(t => t[0] === k);
+// n: a count · h: a median time in hours · pct: a share · txt: a description · chk: published or not
+const TR_SECTIONS = [
+  {k:"orders", ref:"Art. 15(1)(a)", n:"Orders from EU authorities", tier:"intermediary",
+    why:"How many orders you received from Member State authorities, including orders to act (Article 9) and to provide information (Article 10), and how quickly you gave effect to them.",
+    note:"The EU template breaks these down by type of illegal content and by the Member State that issued the order.",
+    f:[["orders_act", "Orders to act against illegal content (Article 9)", "n"], ["orders_info", "Orders to provide information (Article 10)", "n"], ["orders_time", "Median time to give effect to an order", "h"]]},
+  {k:"notices", ref:"Art. 15(1)(b)", n:"Notices of illegal content", tier:"hosting",
+    why:"How many notices people sent you under Article 16, how many came from trusted flaggers, what you did about them and on what basis, how many you processed automatically, and how long action took.",
+    f:[["notices", "Notices received (Article 16)", "n"], ["notices_tf", "Of which from trusted flaggers", "n"], ["notices_law", "Actions taken on the basis of the law", "n"], ["notices_tc", "Actions taken on the basis of your terms and conditions", "n"], ["notices_auto", "Notices processed by automated means", "n"], ["notices_time", "Median time to take action", "h"]]},
+  {k:"own", ref:"Art. 15(1)(c)", n:"Moderation on your own initiative", tier:"intermediary",
+    why:"The measures you took without a notice or order: how many, of what type, for which kind of content, how you detected it, and how you train and support the people who moderate.",
+    note:"The EU template breaks these down by category, by how the content was detected and by type of restriction.",
+    f:[["own_total", "Measures taken on your own initiative", "n"], ["own_auto", "Of which detected by automated means", "n"], ["own_training", "Training and support for your content moderators", "txt"]]},
+  {k:"complaints", ref:"Art. 15(1)(d)", n:"Complaints about your decisions", tier:"intermediary",
+    why:"How many complaints came through your internal complaint system (and, for online platforms, under Article 20), what they were about, what you decided, how long it took and how often you reversed a decision.",
+    f:[["complaints", "Complaints received", "n"], ["complaints_reversed", "Decisions reversed after a complaint", "n"], ["complaints_time", "Median time to decide", "h"]]},
+  {k:"auto", ref:"Art. 15(1)(e)", n:"Automated moderation", tier:"intermediary",
+    why:"Any automated tools you use for moderation: what they do and why, how accurate they are and their possible error rate, and the safeguards around them.",
+    f:[["auto_purpose", "What your automated tools do, and why", "txt"], ["auto_accuracy", "Indicators of accuracy and the possible error rate", "txt"], ["auto_safeguards", "Safeguards, such as human review of automated decisions", "txt"]]},
+  {k:"disputes", ref:"Art. 24(1)(a)", n:"Out-of-court disputes", tier:"platform",
+    why:"How many disputes went to certified out-of-court settlement bodies (Article 21), how they ended, how long they took, and how often you implemented the body's decision.",
+    f:[["disputes", "Disputes submitted to out-of-court settlement bodies", "n"], ["disputes_time", "Median time to complete a dispute", "h"], ["disputes_impl", "Share of decisions you implemented", "pct"]]},
+  {k:"suspensions", ref:"Art. 24(1)(b)", n:"Suspensions for misuse", tier:"platform",
+    why:"How many suspensions you imposed under Article 23, split by the reason: manifestly illegal content, manifestly unfounded notices, or manifestly unfounded complaints.",
+    f:[["susp_illegal", "For providing manifestly illegal content", "n"], ["susp_notices", "For submitting manifestly unfounded notices", "n"], ["susp_complaints", "For submitting manifestly unfounded complaints", "n"]]},
+  {k:"recipients", ref:"Art. 24(2)", n:"Average monthly active recipients", tier:"platform",
+    why:"Your average monthly active recipients in the EU over the past six months. This is published separately, in a public part of your service, at least every six months.",
+    f:[["amar", "Average monthly active recipients in the EU", "n"]]},
+  {k:"vlop_people", ref:"Art. 42(2)(a)–(b)", n:"Moderation staff and languages", tier:"vlop",
+    why:"The people you dedicate to content moderation, by each official EU language, with their qualifications, language expertise, training and support.",
+    f:[["hr_lang", "Content moderation staff by official EU language", "txt"], ["quals", "Qualifications, language expertise, training and support", "txt"]]},
+  {k:"vlop_acc", ref:"Art. 42(2)(c), 42(3)", n:"Accuracy by language, users by country", tier:"vlop",
+    why:"Your accuracy indicators broken down by official EU language, and your average monthly recipients in each Member State.",
+    f:[["acc_lang", "Accuracy indicators by official EU language", "txt"], ["amar_ms", "Average monthly recipients per Member State", "txt"]]},
+  {k:"vlop_docs", ref:"Art. 42(4)", n:"Risk and audit documents", tier:"vlop",
+    why:"Published within three months of receiving each independent audit report: the risk assessment results, the mitigation measures, the audit report and the audit implementation report, and any consultations behind them.",
+    f:[["doc_risk", "Risk assessment results (Article 34)", "chk"], ["doc_mitigation", "Mitigation measures (Article 35)", "chk"], ["doc_audit", "Independent audit report (Article 37(4))", "chk"], ["doc_impl", "Audit implementation report (Article 37(6))", "chk"], ["doc_consult", "Consultations behind the risk assessment, where applicable", "chk"]]}
+];
+// The 15 high-level categories in the EU templates that apply to notices and own-initiative moderation (the list is exhaustive)
+const TR_CATS = ["Animal welfare", "Consumer information infringements", "Cyber violence", "Cyber violence against women", "Data protection and privacy violations", "Illegal or harmful speech", "Intellectual property infringements", "Negative effects on civic discourse or elections", "Protection of minors", "Risk for public security", "Scams and/or fraud", "Self-harm", "Unsafe, non-compliant or prohibited products", "Violence", "Other violation of provider’s terms and conditions"];
+const TR_BLANK = () => ({org:"", year:new Date().getFullYear() - 1, tier:"platform", sme:false, uk:false, v:{}, prev:{}, cat:{}, cmp:false, view:"setup", tab:"report", ai:null});
+const TR_EXAMPLE = {org:"Pixelry", year:2025, tier:"platform", sme:false, uk:false, cmp:true,
+  v:{orders_act:14, orders_info:62, orders_time:9, notices:31400, notices_tf:820, notices_law:4100, notices_tc:18900, notices_auto:12600, notices_time:21,
+    own_total:1240000, own_auto:1080000, own_training:"Moderators complete a two-week onboarding course on our policies and EU law, with monthly calibration sessions. Everyone reviewing graphic content has exposure limits, rotation and access to counselling.",
+    complaints:21500, complaints_reversed:4300, complaints_time:38,
+    auto_purpose:"Hash matching for known child sexual abuse material, classifiers for spam, nudity and hate speech, and filters for known scam links. Classifiers flag content for human review, except spam and exact hash matches, which are removed automatically.",
+    auto_accuracy:"Precision of automated removals, measured weekly on a random sample reviewed by experts: spam 98%, nudity 94%, hate speech 87%. Overturn rate of automated removals on appeal: 3.1%.",
+    auto_safeguards:"Every automated removal can be appealed and is reviewed by a person. Borderline classifier scores always go to human review. New models run in shadow mode before they act.",
+    disputes:112, disputes_time:1100, disputes_impl:0.92, susp_illegal:2900, susp_notices:41, susp_complaints:17, amar:8200000},
+  prev:{notices:26800, own_total:980000, complaints:18000, complaints_reversed:3100, amar:7400000},
+  cat:{"Illegal or harmful speech":{n:6200, o:60000}, "Scams and/or fraud":{n:9800, o:870000}, "Protection of minors":{n:3100, o:41000}, "Other violation of provider’s terms and conditions":{n:5600, o:190000}, "Cyber violence":{n:4200, o:70000}}, view:"setup", tab:"report", ai:null};
+let tr = Object.assign(TR_BLANK(), store.get("tr", null) || {});
+const trSave = () => store.set("tr", tr);
+const trSections = () => TR_SECTIONS.filter(s => trRank(s.tier) <= trRank(tr.tier));
+const trHas = f => { const v = tr.v[f[0]]; return f[2] === "chk" ? !!v : f[2] === "txt" ? !!(v && String(v).trim()) : v !== undefined && v !== null && v !== "" && !isNaN(+v); };
+function trProgress(){ const fs = trSections().flatMap(s => s.f); const got = fs.filter(trHas).length; return {got, total:fs.length, pct:fs.length ? Math.round(got / fs.length * 100) : 0, missing:trSections().filter(s => s.f.some(f => !trHas(f)))}; }
+const trExempt = () => tr.sme && tr.tier !== "vlop";
+const trFmt = (f, v) => v === undefined || v === "" || v === null ? "" : f[2] === "pct" ? Math.round(+v * 100) + "%" : f[2] === "h" ? (+v >= 48 ? `${+(+v / 24).toFixed(1)} days` : `${+v} hours`) : f[2] === "n" ? Number(v).toLocaleString("en-US") : String(v);
+function trDue(){
+  const y = +tr.year || new Date().getFullYear() - 1;
+  return tr.tier === "vlop" ? `Every six months: 1 January to 30 June ${y}, published within two months (by the end of August ${y}), and 1 July to 31 December ${y}, published by the end of February ${y + 1}.`
+    : `Once a year: 1 January to 31 December ${y}, published within two months of the period ending, so by the end of February ${y + 1}.`;
+}
+
+/* ---------- the report, as Markdown ---------- */
+function trMarkdown(){
+  const L = [], tierName = TR_TIERS[trRank(tr.tier)][1];
+  L.push(`# ${tr.org || "Our service"}: transparency report, ${tr.year}`, "", `_EU Digital Services Act · ${tierName} · reporting period 1 January to 31 December ${tr.year}_`, "");
+  if(tr.ai && tr.ai.summary) L.push("## Summary", "", tr.ai.summary, "");
+  trSections().forEach(s => {
+    L.push(`## ${s.n} (${s.ref})`, "");
+    s.f.forEach(f => { const v = tr.v[f[0]];
+      if(f[2] === "chk") L.push(`- ${f[1]}: ${v ? "published" : "not yet published"}`);
+      else if(f[2] === "txt") L.push(`**${f[1]}.** ${v && String(v).trim() ? String(v).trim() : "_Not provided._"}`, "");
+      else { const p = tr.cmp ? tr.prev[f[0]] : undefined, ch = p !== undefined && p !== "" && +p && trHas(f) ? ` (${+v >= +p ? "+" : ""}${Math.round((+v - +p) / +p * 100)}% on the previous period)` : "";
+        L.push(`- ${f[1]}: ${trHas(f) ? trFmt(f, v) + ch : "_not provided_"}`); } });
+    if((s.k === "notices" || s.k === "own") && TR_CATS.some(c => tr.cat[c] && tr.cat[c][s.k === "notices" ? "n" : "o"])){
+      const key = s.k === "notices" ? "n" : "o"; L.push("", "| Category | Count |", "|---|---|", ...TR_CATS.filter(c => tr.cat[c] && tr.cat[c][key]).map(c => `| ${c} | ${Number(tr.cat[c][key]).toLocaleString("en-US")} |`)); }
+    L.push("");
+  });
+  L.push("---", "", `_Built with T&S Workbench from the requirements in ${TR_SRC.dsa[0]} and ${TR_SRC.templates[0]}, as reviewed in ${TR_REVIEWED}. File your report using the Commission's own CSV or XLSX templates. Not legal advice._`);
+  return L.join("\n");
+}
+
+/* ---------- a summary written by Claude, on request ---------- */
+function trPrompt(){
+  const data = trSections().map(s => `${s.n} (${s.ref}):\n` + s.f.map(f => `- ${f[1]}: ${trHas(f) ? (f[2] === "chk" ? "published" : trFmt(f, tr.v[f[0]])) : "not provided"}${tr.cmp && tr.prev[f[0]] ? ` (previous period: ${trFmt(f, tr.prev[f[0]])})` : ""}`).join("\n")).join("\n\n");
+  return `You are a trust and safety communications lead writing the opening of a public transparency report under the EU Digital Services Act. Write for users, journalists and regulators: plain, factual, no marketing tone.
+
+SERVICE: ${(tr.org || "The service").slice(0, 80)} · ${TR_TIERS[trRank(tr.tier)][1]} · reporting year ${tr.year}
+
+NUMBERS
+${data.slice(0, 6000)}
+
+Return JSON only:
+{"summary": "a 120 to 180 word opening summary that states the most important numbers accurately and explains what they mean for users; mention changes on the previous period only where given",
+ "highlights": ["three short factual highlights, each built on a number above"],
+ "questions": ["three questions a regulator or journalist would likely ask about these numbers, especially where data is missing or a figure looks unusual"]}
+
+RULES
+- Use only the numbers above. Never invent or estimate a figure. If something is not provided, don't mention a number for it.
+- Don't claim compliance with the law; describe what was done.`;
+}
+function trValid(r){
+  if(!r || typeof r !== "object" || typeof r.summary !== "string" || !r.summary.trim()) return null;
+  const list = x => Array.isArray(x) ? x.filter(s => typeof s === "string" && s.trim()).slice(0, 5).map(s => s.trim().slice(0, 300)) : [];
+  return {summary:r.summary.trim().slice(0, 1600), highlights:list(r.highlights), questions:list(r.questions)};
+}
+let trRun = {busy:false, err:""};
+async function trWrite(){
+  if(typeof SAMPLER === "undefined" || !SAMPLER || trRun.busy) return;
+  trRun = {busy:true, err:""}; renderTransparency();
+  try{ const res = trValid(await SAMPLER.json(trPrompt(), {modelTier:"default"})); if(!res) throw {code:"invalid_json"}; tr.ai = res; trSave(); }
+  catch(e){ const code = e && e.code; trRun.err = code === "cancelled" ? "" : (typeof POL_ERR !== "undefined" && (POL_ERR[code] || POL_ERR.upstream_error)) || "Claude couldn't write the summary. Try again."; }
+  finally{ trRun.busy = false; renderTransparency(); }
+}
+
+/* ---------- page ---------- */
+function renderTransparency(){
+  const report = tr.view === "report";
+  const ai = typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff);
+  view.innerHTML = (report
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit numbers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button><button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
+    : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `<button type="button" class="btn sm" data-tr="example">See an example</button>`))
+    + (report ? trReportHTML(ai) : trSetupHTML());
+}
+function trField(f){
+  const v = tr.v[f[0]], id = "tr-" + f[0];
+  if(f[2] === "chk") return `<label class="tr-chk"><input type="checkbox" data-trv="${f[0]}" ${v ? "checked" : ""}><span>${esc(f[1])}</span></label>`;
+  if(f[2] === "txt") return `<div class="field tr-txt"><label for="${id}">${esc(f[1])}</label><textarea id="${id}" rows="3" data-trv="${f[0]}">${esc(v || "")}</textarea></div>`;
+  const unit = f[2] === "h" ? "hours" : f[2] === "pct" ? "%" : "";
+  const shown = f[2] === "pct" && v !== undefined && v !== "" ? Math.round(+v * 100) : v === undefined ? "" : v;
+  const pv = tr.prev[f[0]], pshown = f[2] === "pct" && pv !== undefined && pv !== "" ? Math.round(+pv * 100) : pv === undefined ? "" : pv;
+  return `<div class="field tr-num"><label for="${id}">${esc(f[1])}</label><span class="tr-in"><input class="input mono" id="${id}" inputmode="decimal" data-trv="${f[0]}" data-trt="${f[2]}" value="${esc(String(shown))}" placeholder="0">${unit ? `<em>${unit}</em>` : ""}</span>
+    ${tr.cmp ? `<span class="tr-in tr-prev"><input class="input mono" aria-label="${esc(f[1])}, previous period" data-trp="${f[0]}" data-trt="${f[2]}" value="${esc(String(pshown))}" placeholder="Previous">${unit ? `<em>${unit}</em>` : ""}</span>` : ""}</div>`;
+}
+function trSetupHTML(){
+  const p = trProgress();
+  return `<div class="pol-setup tr-setup">
+    <section class="card pol-card">
+      <div class="pol-h"><span class="pol-num">1</span><div><span class="pol-lbl">Your service</span></div></div>
+      <div class="tr-row"><div class="field"><label for="tr-org">Company or service</label><input class="input" id="tr-org" value="${esc(tr.org)}" placeholder="For example: Pixelry" maxlength="80"></div>
+        <div class="field"><label for="tr-year">Reporting year</label><input class="input mono" id="tr-year" inputmode="numeric" value="${esc(String(tr.year))}" maxlength="4"></div></div>
+      <div class="field"><span class="lbl">Type of service under the DSA</span><div class="tr-tiers" role="radiogroup" aria-label="Type of service">${TR_TIERS.map(([k, n, d]) => `<button type="button" role="radio" aria-checked="${tr.tier === k}" class="card tr-tier ${tr.tier === k ? "on" : ""}" data-trtier="${k}"><b>${n}</b><span>${d}</span></button>`).join("")}</div></div>
+      <label class="tr-chk"><input type="checkbox" id="tr-sme" ${tr.sme ? "checked" : ""}><span>We are a micro or small enterprise (fewer than 50 staff, and annual turnover or balance sheet of €10 million or less)</span></label>
+      ${trExempt() ? `<div class="banner tr-note"><span><strong>You may be exempt.</strong> Micro and small enterprises don't have to publish these reports (Article 15(2)), and small online platforms are also exempt from Article 24, except giving user numbers to regulators on request (Articles 19(1) and 24(3)). A voluntary report still builds trust.</span></div>` : ""}
+      <p class="note tr-due"><b>When it's due.</b> ${trDue()}</p>
+      <label class="tr-chk"><input type="checkbox" id="tr-cmp" ${tr.cmp ? "checked" : ""}><span>Compare with the previous period</span></label>
+    </section>
+    ${trSections().map((s, i) => `<section class="card pol-card" id="tr-s-${s.k}">
+      <div class="pol-h"><span class="pol-num">${i + 2}</span><div><span class="pol-lbl">${esc(s.n)}</span><span class="note mono">${esc(s.ref)}</span></div></div>
+      <p class="pol-tip">${esc(s.why)}${s.note ? " " + esc(s.note) : ""}</p>
+      <div class="tr-fields">${s.f.map(trField).join("")}</div>
+      ${s.k === "own" ? trCatsHTML() : ""}
+    </section>`).join("")}
+    <div class="card pol-runbar">
+      <div class="pol-rb-meter"><div class="pol-rb-top"><span class="eyebrow">Report completeness</span><span class="pill ${p.pct >= 90 ? "good" : p.pct >= 50 ? "high" : "crit"}">${p.got} of ${p.total}</span></div>
+        <div class="pol-meter" role="meter" aria-valuemin="0" aria-valuemax="${p.total}" aria-valuenow="${p.got}" aria-label="Report completeness"><i style="width:${p.pct}%;background:var(--${p.pct >= 90 ? "good" : p.pct >= 50 ? "high" : "crit"})"></i></div>
+        ${p.missing.length ? `<button type="button" class="pol-add" data-trgo="${p.missing[0].k}">+ Still missing: ${esc(p.missing[0].n.toLowerCase())}</button>` : `<span class="note">Everything the DSA asks for at your tier is filled in.</span>`}</div>
+      <div class="pol-rb-act"><button type="button" class="btn primary" data-tr="build">Build the report ${icon("arrow")}</button></div>
+    </div>
+    <p class="note pol-rb-note">Everything stays in your browser. Requirements checked against the <a href="${TR_SRC.dsa[1]}" target="_blank" rel="noopener">DSA</a> and the <a href="${TR_SRC.templates[1]}" target="_blank" rel="noopener">EU templates regulation</a> in ${TR_REVIEWED}. Not legal advice.</p>
+  </div>`;
+}
+function trCatsHTML(){
+  return `<details class="tr-cats" ${store.get("tr:cats", false) ? "open" : ""}><summary><b>By category</b><span class="note">The EU templates' ${TR_CATS.length} categories for notices and own-initiative measures</span></summary>
+    <table><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.map(c => { const r = tr.cat[c] || {};
+      return `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td><input class="input mono" data-trc="${esc(c)}" data-trk="n" value="${esc(String(r.n || ""))}" inputmode="numeric" aria-label="${esc(c)}: notices"></td>` : ""}<td><input class="input mono" data-trc="${esc(c)}" data-trk="o" value="${esc(String(r.o || ""))}" inputmode="numeric" aria-label="${esc(c)}: own-initiative measures"></td></tr>`; }).join("")}</tbody></table>
+    <p class="note">The category list is exhaustive: you can't add new top-level categories, only sub-categories within them.</p></details>`;
+}
+function trReportHTML(ai){
+  const p = trProgress(), secs = trSections(), tab = ["report", "checklist", "summary"].includes(tr.tab) ? tr.tab : "report";
+  const catOver = ["n", "o"].map(k => { const sum = TR_CATS.reduce((a, c) => a + (+((tr.cat[c] || {})[k]) || 0), 0), tot = +tr.v[k === "n" ? "notices" : "own_total"] || 0; return sum > tot && tot ? (k === "n" ? "notices" : "own-initiative measures") : null; }).filter(Boolean);
+  return `<div class="pol-report tr-report">
+    <div class="card pol-sum tr-sum">
+      <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
+      <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
+        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}</h2>
+        <p class="note">${trDue()}</p>
+        ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
+        ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
+        <span class="toast" id="tr-toast" aria-live="polite"></span></div>
+    </div>
+    <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
+      ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>
+      <div class="card-b">${tab === "checklist" ? trChecklistHTML() : tab === "summary" ? trSummaryHTML(ai) : trPreviewHTML()}</div></div>
+    ${tr.uk ? "" : `<p class="note tr-uk"><b>In the UK,</b> categorised services publish transparency reports when Ofcom sends them a notice, with the content Ofcom specifies (<a href="${TR_SRC.uk[1]}" target="_blank" rel="noopener">${TR_SRC.uk[0]}</a>).</p>`}
+  </div>`;
+}
+function trPreviewHTML(){
+  return `<article class="tr-doc">${tr.ai && tr.ai.summary ? `<section><h3>Summary</h3><p>${esc(tr.ai.summary)}</p></section>` : ""}
+    ${trSections().map(s => `<section><h3>${esc(s.n)} <span class="note mono">${esc(s.ref)}</span></h3>
+      ${s.f.filter(f => f[2] === "n" || f[2] === "h" || f[2] === "pct").length ? `<dl class="tr-dl">${s.f.filter(f => f[2] === "n" || f[2] === "h" || f[2] === "pct").map(f => { const has = trHas(f), pv = tr.cmp ? tr.prev[f[0]] : undefined, ch = has && pv !== undefined && pv !== "" && +pv ? Math.round((+tr.v[f[0]] - +pv) / +pv * 100) : null;
+        return `<div><dt>${esc(f[1])}</dt><dd class="${has ? "" : "miss"}">${has ? esc(trFmt(f, tr.v[f[0]])) : "Not provided"}${ch !== null ? `<small class="${ch >= 0 ? "up" : "dn"}">${ch >= 0 ? "+" : ""}${ch}% on the previous period</small>` : ""}</dd></div>`; }).join("")}</dl>` : ""}
+      ${s.f.filter(f => f[2] === "txt").map(f => `<p><b>${esc(f[1])}.</b> ${trHas(f) ? esc(String(tr.v[f[0]]).trim()) : `<span class="miss">Not provided.</span>`}</p>`).join("")}
+      ${s.f.filter(f => f[2] === "chk").length ? `<ul class="tr-docs">${s.f.filter(f => f[2] === "chk").map(f => `<li class="${tr.v[f[0]] ? "ok" : "miss"}">${tr.v[f[0]] ? "✓" : "○"} ${esc(f[1])}</li>`).join("")}</ul>` : ""}
+      ${s.k === "own" && TR_CATS.some(c => tr.cat[c] && (tr.cat[c].n || tr.cat[c].o)) ? `<table class="tr-ct"><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.filter(c => tr.cat[c] && (tr.cat[c].n || tr.cat[c].o)).map(c => `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td class="mono">${tr.cat[c].n ? Number(tr.cat[c].n).toLocaleString("en-US") : "–"}</td>` : ""}<td class="mono">${tr.cat[c].o ? Number(tr.cat[c].o).toLocaleString("en-US") : "–"}</td></tr>`).join("")}</tbody></table>` : ""}
+    </section>`).join("")}
+    <p class="note">When you file, use the Commission's own <a href="${TR_SRC.download[1]}" target="_blank" rel="noopener">CSV and XLSX templates</a>: counts as whole numbers, shares between 0 and 1, and median times in hours. This page helps you gather and explain the numbers; it isn't the official template.</p></article>`;
+}
+function trChecklistHTML(){
+  return `<ul class="tr-check">${TR_SECTIONS.map(s => { const applies = trRank(s.tier) <= trRank(tr.tier), done = applies && s.f.every(trHas), some = applies && s.f.some(trHas);
+    return `<li class="${!applies ? "na" : done ? "ok" : some ? "part" : "miss"}"><span class="tr-st">${!applies ? "–" : done ? "✓" : some ? "◐" : "○"}</span><div><b>${esc(s.n)}</b> <span class="note mono">${esc(s.ref)}</span><p>${esc(s.why)}</p>
+      ${!applies ? `<small>Applies to ${esc(TR_TIERS[trRank(s.tier)][1].toLowerCase())}s${s.tier === "vlop" ? "" : " and above"}.</small>` : !done ? `<button type="button" class="pol-add" data-trgo="${s.k}">Add the missing numbers</button>` : ""}</div></li>`; }).join("")}</ul>
+    <p class="note">Sources: <a href="${TR_SRC.dsa[1]}" target="_blank" rel="noopener">${TR_SRC.dsa[0]}</a>, Articles 15, 19, 24 and 42; <a href="${TR_SRC.templates[1]}" target="_blank" rel="noopener">${TR_SRC.templates[0]}</a>. Last reviewed ${TR_REVIEWED}. Not legal advice.</p>`;
+}
+function trSummaryHTML(ai){
+  if(trRun.busy) return `<div class="pol-busy"><div class="pol-spin" aria-hidden="true"></div><div><b>Claude is writing your summary…</b><p class="note">Usually 15 to 40 seconds.</p></div></div>`;
+  const s = tr.ai;
+  return `${trRun.err ? `<p class="pol-err" role="alert">${esc(trRun.err)}</p>` : ""}
+    ${s ? `<div class="tr-ai"><h4>Opening summary</h4><p>${esc(s.summary)}</p>
+      ${s.highlights.length ? `<h4>Highlights</h4><ul>${s.highlights.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      ${s.questions.length ? `<h4>What a regulator or journalist might ask</h4><ul>${s.questions.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+      <p class="note">Written by Claude from your numbers only. Check every figure before you publish.</p></div>` : ""}
+    ${ai ? `<div class="row" style="gap:10px;margin-top:12px"><button type="button" class="btn ${s ? "" : "primary"}" data-tr="write">${s ? "Write it again" : "Write the summary with Claude"} ${icon("arrow")}</button><span class="note">Uses your own Claude account. Claude sees only the numbers on this page.</span></div>`
+      : `<p class="note">Open this page in Claude while signed in to have Claude write an opening summary, highlights and the questions a regulator might ask.</p>`}`;
+}
+
+/* ---------- events ---------- */
+function trNum(el){ const raw = String(el.value).replace(/[, ]/g, "").trim(); if(raw === "") return ""; const n = +raw; if(isNaN(n) || n < 0) return undefined; return el.dataset.trt === "pct" ? Math.min(1, n / 100) : n; }
+function trAct(a, arg){
+  switch(a){
+    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
+    case "build": tr.view = "report"; tr.tab = "report"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": tr.view = "setup"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "tab": tr.tab = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtab="${arg}"]`); if(b) b.focus(); } return;
+    case "tier": tr.tier = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtier="${arg}"]`); if(b) b.focus(); } return;
+    case "go": tr.view = "setup"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
+    case "write": return trWrite();
+    case "copy": return copyText(trMarkdown(), $("#tr-toast"));
+    case "download": { const md = trMarkdown(); return offerFile(`transparency-report-${slug(tr.org || "service")}-${tr.year}.md`, md, md, $("#tr-toast")); }
+    case "save": { const msg = wsSaveTool("transparency", tr, `Transparency report: ${tr.org || "Service"} ${tr.year}`); renderTransparency(); return flashIn($("#tr-toast"), msg); }
+  }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-tr],[data-trtab],[data-trtier],[data-trgo]"); if(!b || !view.contains(b)) return;
+  const d = b.dataset; if(d.trtab) return trAct("tab", d.trtab); if(d.trtier) return trAct("tier", d.trtier); if(d.trgo) return trAct("go", d.trgo); trAct(d.tr);
+});
+document.addEventListener("input", e => {
+  const t = e.target; if(!t || !view.contains(t) || !t.closest(".tr-setup")) return;
+  if(t.id === "tr-org"){ tr.org = t.value.slice(0, 80); return trSave(); }
+  if(t.id === "tr-year"){ const y = parseInt(t.value, 10); if(y >= 2023 && y <= 2100){ tr.year = y; trSave(); const due = document.querySelector(".tr-due"); if(due) due.innerHTML = `<b>When it's due.</b> ${trDue()}`; } return; }
+  if(t.dataset.trv && t.tagName === "TEXTAREA"){ tr.v[t.dataset.trv] = t.value.slice(0, 3000); trSave(); return trMeter(); }
+  if(t.dataset.trv && t.type !== "checkbox"){ const n = trNum(t); t.classList.toggle("bad", n === undefined); if(n !== undefined){ if(n === "") delete tr.v[t.dataset.trv]; else tr.v[t.dataset.trv] = n; trSave(); trMeter(); } return; }
+  if(t.dataset.trp){ const n = trNum(t); t.classList.toggle("bad", n === undefined); if(n !== undefined){ if(n === "") delete tr.prev[t.dataset.trp]; else tr.prev[t.dataset.trp] = n; trSave(); } return; }
+  if(t.dataset.trc){ const n = trNum(t); if(n !== undefined){ const r = tr.cat[t.dataset.trc] = Object.assign({}, tr.cat[t.dataset.trc]); if(n === "") delete r[t.dataset.trk]; else r[t.dataset.trk] = n; trSave(); } }
+});
+document.addEventListener("change", e => {
+  const t = e.target; if(!t || !view.contains(t) || !t.closest(".tr-setup")) return;
+  if(t.id === "tr-sme"){ tr.sme = t.checked; trSave(); renderTransparency(); const f = document.getElementById("tr-sme"); if(f) f.focus(); return; }
+  if(t.id === "tr-cmp"){ tr.cmp = t.checked; trSave(); renderTransparency(); const f = document.getElementById("tr-cmp"); if(f) f.focus(); return; }
+  if(t.dataset.trv && t.type === "checkbox"){ tr.v[t.dataset.trv] = t.checked; trSave(); trMeter(); }
+});
+document.addEventListener("toggle", e => { if(e.target && e.target.classList && e.target.classList.contains("tr-cats")) store.set("tr:cats", e.target.open); }, true);
+// Update the completeness bar without re-rendering the form under the cursor
+function trMeter(){ const bar = document.querySelector(".tr-setup .pol-runbar"); if(!bar) return; const p = trProgress(), c = p.pct >= 90 ? "good" : p.pct >= 50 ? "high" : "crit";
+  const pill = bar.querySelector(".pill"), i = bar.querySelector(".pol-meter i"), m = bar.querySelector(".pol-meter"), add = bar.querySelector(".pol-add");
+  if(pill){ pill.className = "pill " + c; pill.textContent = `${p.got} of ${p.total}`; } if(i){ i.style.width = p.pct + "%"; i.style.background = `var(--${c})`; } if(m) m.setAttribute("aria-valuenow", p.got);
+  if(add){ if(p.missing.length){ add.dataset.trgo = p.missing[0].k; add.textContent = "+ Still missing: " + p.missing[0].n.toLowerCase(); } else add.outerHTML = `<span class="note">Everything the DSA asks for at your tier is filled in.</span>`; } }
+/* =========================================================
+   DEMO COMPANY: one click fills every tool with Pixelry, a fictional photo and short-video app,
+   so a visitor sees the whole program in a few minutes. The visitor's own work is set aside
+   in this browser and comes back, untouched, when they exit the demo.
+   ========================================================= */
+const DEMO_BACKUP = "tswbdemo:backup";
+// Browser preferences stay put; everything else in the workspace is swapped out
+const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
+const demoOn = () => !!store.get("demo", false);
+function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
+function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
+function demoStart(){
+  if(demoOn()){ goRoute("overview"); return tourStart(); }
+  try{
+    const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
+    localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
+    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
+    store.set("demo", true); store.set("demo:pending", true); store.set("demo:tour", true);
+  }catch(e){ return gsay("This browser blocked the demo"); }
+  demoReload();
+}
+function demoExit(){
+  try{
+    const raw = localStorage.getItem(DEMO_BACKUP), backup = raw ? JSON.parse(raw) : {};
+    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
+    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !DEMO_KEEP.includes(k) && typeof v === "string") localStorage.setItem(k, v); });
+    localStorage.removeItem(DEMO_BACKUP);
+  }catch(e){ return gsay("This browser blocked restoring your work"); }
+  demoReload();
+}
+// Pixelry's program: a quarter into its maturity plan, three products partway through launch, coverage mapped, crises rehearsed
+function demoFill(){
+  const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
+  orgSet({type:"social", stage:"growth", regions:["us", "eu", "uk"], confirmed:true});
+  store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
+  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; ma.due.compliance1 = iso(-2); ma.due.crisis2 = iso(5); maSave();
+  wsSaveTool("maturity", ma, "Pixelry program maturity");
+  [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
+    pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
+    assess(pm).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) pm.done[s.id] = true; });
+    saveToLib();
+    const lib = libLoad(); if(lib[pm.id]){ lib[pm.id].updated = Date.now() - (3 - n) * 6 * day; libSave(lib); }
+  });
+  pm.stage = "start"; savePM();
+  cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); Object.assign(cv, {ex:false, est:false, src:"all"}); cvSave();
+  wsSaveTool("coverage", cv, "Pixelry coverage");
+  mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[]}; mxLoadDemo(mxList());
+  mx.read = {"Violating-content prevalence":true, "Unsafe-contact rate for minors":true, "Harmful reach before action":true}; store.set("mx", mx);
+  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, 4);
+  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:[4, 3, 3, 2][j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
+  store.set("tt:progress", prog);
+  pol = Object.assign(POL_BLANK(), {company:"Pixelry", type:"social", youth:"teens", regions:["us", "eu", "uk"], enforce:["reports", "auto", "humans"], actions:["remove", "warn", "suspend", "ban"],
+    rule:"Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.",
+    product:"Pixelry is a photo and short-video app for 13 to 25-year-olds, with public profiles, comments, DMs and live streams. Creators sell subscriptions and items through Pixelry Market.",
+    concerns:"Pile-ons in the comments when a creator's post goes viral. 'Rate me' posts that invite insults about appearance. Whether repeated one-word insults count as harassment."});
+  pol.heur = polHeuristics(pol.rule); pol.ts = Date.now(); pol.view = "report"; savePol();
+  wsSaveTool("policy", pol, "Policy: Harassment");
+  store.set("rc:hist", [{d:iso(-90), s:44}, {d:iso(-60), s:50}, {d:iso(-30), s:56}]);
+  // Last year's DSA transparency report, ready to review
+  if(typeof TR_EXAMPLE !== "undefined"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)), {view:"report"}); trSave(); wsSaveTool("transparency", tr, "Transparency report: Pixelry 2025"); }
+}
+if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
+
+/* ---------- the bar that says you're in the demo, on every page ---------- */
+function demoBar(){
+  let bar = document.getElementById("demo-bar");
+  if(!demoOn()){ if(bar) bar.remove(); return; }
+  const v = document.getElementById("view"); if(!v || !v.parentNode) return;
+  if(!bar){ bar = document.createElement("div"); bar.id = "demo-bar"; bar.className = "demo-bar"; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Demo company"); v.parentNode.insertBefore(bar, v); }
+  bar.innerHTML = `<span class="demo-dot" aria-hidden="true"></span><span class="demo-t"><b>You're exploring Pixelry, a demo company.</b> Everything here is sample data.<span class="demo-more"> Your own work is set aside until you exit.</span></span>
+    <span class="demo-a"><button type="button" class="btn sm" data-demo="tour">Take the tour</button><button type="button" class="btn sm primary" data-demo="exit">Exit demo</button></span>`;
+}
+demoBar();
+
+/* ---------- a short guided tour of the overview ---------- */
+const TOUR = [
+  [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
+  [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
+  [".nx", "Your next moves", "What to do this week, pulled from every tool: overdue roadmap items first, then each product's next launch blocker. You can tick them off right here."],
+  [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
+  [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
+  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
+];
+let tourAt = -1;
+function tourEnd(){
+  tourAt = -1;
+  document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
+  const p = document.getElementById("tour-pop"); if(p) p.remove();
+}
+function tourStep(i){
+  const steps = TOUR.filter(([s]) => document.querySelector(s));
+  if(i < 0 || i >= steps.length) return tourEnd();
+  document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
+  tourAt = i;
+  const [sel, title, text] = steps[i], el = document.querySelector(sel);
+  el.classList.add("tour-on");
+  window.scrollTo(0, i === 0 ? 0 : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 96));
+  let p = document.getElementById("tour-pop");
+  if(!p){ p = document.createElement("div"); p.id = "tour-pop"; p.className = "tour-pop"; p.setAttribute("role", "dialog"); p.setAttribute("aria-labelledby", "tour-h"); p.tabIndex = -1; document.body.appendChild(p); }
+  const last = i === steps.length - 1;
+  p.innerHTML = `<div class="tour-top"><span class="tour-n">${i + 1} of ${steps.length}</span><button type="button" class="tour-x" data-tour="end" aria-label="Close the tour">${icon("x")}</button></div>
+    <h3 id="tour-h">${title}</h3><p>${text}</p>
+    <div class="tour-a">${i ? `<button type="button" class="btn sm" data-tour="back">Back</button>` : `<span></span>`}
+      ${last ? `<span class="tour-last"><a class="btn sm" href="#maturity" data-tour="end">Open Program maturity</a><button type="button" class="btn sm primary" data-tour="end">Done</button></span>` : `<button type="button" class="btn sm primary" data-tour="next">Next ${icon("arrow")}</button>`}</div>`;
+  p.focus({preventScroll:true});
+}
+function tourStart(){
+  if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
+  tourStep(0);
+}
+document.addEventListener("click", e => {
+  const d = e.target.closest && e.target.closest("[data-demo]");
+  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : tourStart(); }
+  const t = e.target.closest && e.target.closest("[data-tour]"); if(!t) return;
+  const a = t.dataset.tour; if(a === "next") return tourStep(tourAt + 1); if(a === "back") return tourStep(tourAt - 1);
+  tourEnd();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape" && tourAt >= 0) tourEnd(); });
+if(window.addEventListener) window.addEventListener("hashchange", () => { if(tourAt >= 0) tourEnd(); demoBar(); });
+// The tour opens by itself once, straight after the demo loads
+if(demoOn() && store.get("demo:tour", false)){ store.set("demo:tour", false); setTimeout(tourStart, 500); }
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){

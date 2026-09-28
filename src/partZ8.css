@@ -848,3 +848,93 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .vd-x:hover{background:var(--sunk);color:var(--crit)}
 .vd-x svg{width:14px;height:14px}
 .vd-cell.none{background:var(--sunk);color:var(--faint)}
+
+/* ---------- Maturity: framework mapping ---------- */
+.ma-fw{margin-top:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.ma-fw > summary{cursor:pointer;display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:14px 16px;list-style:none}
+.ma-fw > summary::-webkit-details-marker{display:none}
+.ma-fw > summary::before{content:"▸";color:var(--faint);transition:transform .15s}
+.ma-fw[open] > summary::before{transform:rotate(90deg)}
+.ma-fw > summary b{font-size:14.5px}
+.ma-fw-b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 24px;padding:0 16px}
+@media (max-width:760px){.ma-fw-b{grid-template-columns:1fr}}
+.ma-fw-col ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.ma-fw-col li b{display:block;font-size:13.5px;font-weight:600}
+.ma-fw-col li small{display:block;font-size:12.5px;color:var(--muted);line-height:1.45}
+.ma-fw-note{margin:14px 16px 0;font-size:13.5px;line-height:1.55}
+.ma-fw-src{margin:10px 16px 14px;font-size:12px;line-height:1.5}
+.ma-fw-src a{color:var(--muted)}
+
+/* ---------- Transparency report builder ---------- */
+.tr-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px 16px}
+@media (max-width:560px){.tr-row{grid-template-columns:1fr}}
+.tr-tiers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.tr-tiers{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.tr-tiers{grid-template-columns:1fr}}
+.tr-tier{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;align-content:start;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tr-tier b{font-size:14px}
+.tr-tier span{font-size:12.5px;line-height:1.45;color:var(--muted)}
+.tr-tier:hover{border-color:var(--line-strong)}
+.tr-tier:focus-visible{outline:2px solid var(--t-ai);outline-offset:2px}
+.tr-tier.on{border-color:var(--t-ai);box-shadow:inset 0 0 0 1px var(--t-ai);background:color-mix(in oklab, var(--t-ai) 6%, var(--surface))}
+.tr-chk{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer}
+.tr-chk input{margin-top:3px;accent-color:var(--t-ai);width:16px;height:16px;flex:none}
+.tr-note{margin:0}
+.tr-due{margin:0}
+.tr-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px}
+@media (max-width:640px){.tr-fields{grid-template-columns:1fr}}
+.tr-fields .tr-txt,.tr-fields .tr-chk{grid-column:1 / -1}
+.tr-num label{font-size:13.5px}
+.tr-in{display:flex;align-items:center;gap:8px}
+.tr-in .input{max-width:220px}
+.tr-in em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.tr-prev{margin-top:6px}
+.tr-prev .input{max-width:180px;font-size:13px;background:var(--surface-2)}
+.tr-num .input.bad,.tr-cats .input.bad{border-color:var(--crit)}
+.tr-cats{border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.tr-cats > summary{cursor:pointer;display:flex;gap:6px 12px;flex-wrap:wrap;align-items:baseline;padding:12px 14px}
+.tr-cats table{width:calc(100% - 28px);margin:0 14px;border-collapse:collapse;font-size:13.5px}
+.tr-cats th{text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);padding:6px 8px 6px 0}
+.tr-cats td{padding:4px 8px 4px 0}
+.tr-cats td .input{max-width:140px;padding:6px 8px}
+.tr-cats p{margin:10px 14px 12px}
+.tr-sum{grid-template-columns:auto minmax(0,1fr)}
+.tr-ring{width:96px;height:96px;border-radius:50%;display:grid;place-content:center;text-align:center;border:7px solid color-mix(in oklab, var(--t-ai) 30%, var(--sunk))}
+.tr-ring b{font-family:var(--mono);font-size:22px;line-height:1}
+.tr-ring span{font-size:11.5px;color:var(--muted)}
+.tr-doc section{padding:0 0 18px;margin:0 0 18px;border-bottom:1px solid var(--line)}
+.tr-doc section:last-of-type{border-bottom:0}
+.tr-doc h3{font-size:16px;margin:0 0 10px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.tr-doc p{margin:8px 0 0;line-height:1.6;font-size:14.5px}
+.tr-dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px 18px;margin:0}
+.tr-dl div{display:grid;gap:2px}
+.tr-dl dt{font-size:12.5px;color:var(--muted)}
+.tr-dl dd{margin:0;font-size:17px;font-weight:600;font-family:var(--mono)}
+.tr-dl dd small{display:block;font-family:var(--body);font-weight:500;font-size:12px}
+.tr-dl dd small.up{color:var(--good)} .tr-dl dd small.dn{color:var(--high)}
+.tr-doc .miss,.tr-dl dd.miss{color:var(--faint);font-weight:400;font-family:var(--body);font-size:14px}
+.tr-docs{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:4px;font-size:14px}
+.tr-docs li.ok{color:var(--good)}
+.tr-ct{border-collapse:collapse;margin-top:12px;font-size:13.5px;min-width:min(520px,100%)}
+.tr-ct th,.tr-ct td{text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--line)}
+.tr-ct th{font-size:12.5px;color:var(--muted);font-weight:600}
+.tr-check{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.tr-check li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px}
+.tr-check li p{margin:4px 0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.tr-check li small{font-size:12.5px;color:var(--faint)}
+.tr-st{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--sunk);font-size:13px;font-weight:700}
+.tr-check li.ok .tr-st{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
+.tr-check li.part .tr-st{background:color-mix(in oklab, var(--high) 16%, transparent);color:var(--high)}
+.tr-check li.na{opacity:.6}
+.tr-ai h4{margin:14px 0 6px;font-size:14px}
+.tr-ai h4:first-child{margin-top:0}
+.tr-ai p,.tr-ai li{line-height:1.6;font-size:14.5px}
+.tr-uk{margin:0}
+
+/* ---------- Tier 3: calendar and what changed ---------- */
+.ma-rh-a{display:flex;gap:8px;flex-wrap:wrap}
+.pm-changes{margin-top:16px;padding:14px 18px;border-left:3px solid var(--accent)}
+.pm-changes ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px;font-size:14px;line-height:1.5}
+.ma-tabrow{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.ma-tabrow .ma-tabnote{margin:0}
+.ma-tabrow{margin-bottom:6px}

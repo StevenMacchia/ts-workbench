@@ -279,7 +279,10 @@ function aiScoreFill(){
 }
 
 // Tools still being rebuilt show a placeholder page instead of the form
-AI_TOOLS.transparency.wip = true;
+// The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
+AI_TOOLS.transparency.builder = true;
+AI_TOOLS.transparency.n = "Transparency report";
+AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
 const AI_WIP = {transparency:{
   plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
   meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
@@ -298,6 +301,7 @@ function renderAIWip(key){
     ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
 }
 function renderAI(key){
+  if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
   if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), st.f);

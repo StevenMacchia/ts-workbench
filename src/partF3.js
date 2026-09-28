@@ -75,6 +75,25 @@ function startHere(r){
       <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.</span></div>
     </div></div>`;
 }
+/* ---------- what changed since the assessment was last saved ---------- */
+const BAND_ORDER = {low:0, med:1, high:2, crit:3};
+function pmSnap(p){ const r = assess(p), bl = r.safeguards.filter(s => s.rank === 3);
+  return {t:p.updated || Date.now(), risks:Object.fromEntries(r.risks.map(x => [x.id, x.band])), bl:bl.length, blDone:bl.filter(s => p.done && p.done[s.id]).length}; }
+function pmChanges(r){
+  const b = pm.base; if(!b || pm.example) return null;
+  const now = Object.fromEntries(r.risks.map(x => [x.id, x.band])), name = id => (r.risks.find(x => x.id === id) || HARMS.find(h => h.id === id) || {n:id}).n;
+  const added = Object.keys(now).filter(id => !(id in b.risks)), gone = Object.keys(b.risks).filter(id => !(id in now));
+  const up = Object.keys(now).filter(id => id in b.risks && BAND_ORDER[now[id]] > BAND_ORDER[b.risks[id]]), down = Object.keys(now).filter(id => id in b.risks && BAND_ORDER[now[id]] < BAND_ORDER[b.risks[id]]);
+  const bl = r.safeguards.filter(s => s.rank === 3), blDone = bl.filter(s => pm.done[s.id]).length;
+  if(!added.length && !gone.length && !up.length && !down.length && blDone === b.blDone && bl.length === b.bl) return null;
+  const lines = [];
+  if(added.length) lines.push(`<b>${added.length} new risk${added.length === 1 ? "" : "s"}:</b> ${added.slice(0, 3).map(id => esc(name(id))).join(", ")}${added.length > 3 ? " and more" : ""}`);
+  up.slice(0, 3).forEach(id => lines.push(`<b>${esc(name(id))}</b> rose from ${BANDS[b.risks[id]][0].toLowerCase()} to ${BANDS[now[id]][0].toLowerCase()}`));
+  down.slice(0, 2).forEach(id => lines.push(`<b>${esc(name(id))}</b> fell from ${BANDS[b.risks[id]][0].toLowerCase()} to ${BANDS[now[id]][0].toLowerCase()}`));
+  if(gone.length) lines.push(`${gone.length} risk${gone.length === 1 ? " no longer applies" : "s no longer apply"}: ${gone.slice(0, 3).map(id => esc(name(id))).join(", ")}`);
+  if(blDone !== b.blDone || bl.length !== b.bl) lines.push(`Launch blockers: <b>${blDone} of ${bl.length} done</b>, from ${b.blDone} of ${b.bl}`);
+  return lines;
+}
 function renderReport(r){
   if(!r.risks.length) return `<div class="card"><div class="empty"><strong style="color:var(--ink)">Nothing to assess yet</strong><span>Tell us what people can do in your product to see its risks.</span><button type="button" class="btn primary" data-goq="features">Choose capabilities</button></div></div>`;
   const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length;
@@ -103,6 +122,7 @@ function renderReport(r){
       <div class="row" style="justify-content:space-between"><div><h2 style="font-size:20px">${esc(pm.name||"Untitled assessment")}</h2><span class="note">${pm.id?`<span class="mono">${esc(pm.id)}</span> · `:""}${pm.created?`Created ${fmtDate(pm.created)} · Updated ${fmtDate(pm.updated)}`:(pm.example?"Example":"Not saved yet")}</span></div><span class="note">Click any answer to change it</span></div>
       ${answerChips()}
     </div></div>
+    ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">

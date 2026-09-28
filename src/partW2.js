@@ -8,7 +8,8 @@ const KINDS = {
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
   policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
   maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
-  coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"}
+  coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
+  transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
 function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }
@@ -43,6 +44,10 @@ function vendorResult(d){
 }
 function itemSummary(it){
   const d = it.data || {};
+  if(it.kind==="transparency" && typeof trProgress === "function"){
+    const keep = tr, dd = Object.assign(TR_BLANK(), d); tr = dd; const p = trProgress(); tr = keep;
+    return {html:`<span class="pill ${p.pct >= 90 ? "good" : "high"}">${p.pct}% complete</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`};
+  }
   if(it.kind==="premortem"){
     const r = assess(openRecord(d)), bl = r.safeguards.filter(s=>s.rank===3), bd = bl.filter(s=>d.done&&d.done[s.id]).length;
     return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd};

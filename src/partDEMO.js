@@ -56,6 +56,8 @@ function demoFill(){
   pol.heur = polHeuristics(pol.rule); pol.ts = Date.now(); pol.view = "report"; savePol();
   wsSaveTool("policy", pol, "Policy: Harassment");
   store.set("rc:hist", [{d:iso(-90), s:44}, {d:iso(-60), s:50}, {d:iso(-30), s:56}]);
+  // Last year's DSA transparency report, ready to review
+  if(typeof TR_EXAMPLE !== "undefined"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)), {view:"report"}); trSave(); wsSaveTool("transparency", tr, "Transparency report: Pixelry 2025"); }
 }
 if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
 

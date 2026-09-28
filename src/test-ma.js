@@ -66,6 +66,10 @@ const body = function(){
   eq(cmdkItems().some(x => x.label === "Program maturity"), true, "search reaches the tool");
   renderOverview(); eq(/href="#maturity"/.test(view.innerHTML) && /Level 2\.3/.test(view.innerHTML), true, "overview card and saved chip");
   out.push("markdown export, workspace save (" + msg + "), search and overview all include maturity");
+  // framework mapping: every area has an entry, each renders, sources are linked
+  eq(MA_AREAS.every(a => MA_FW[a.k] && MA_FW[a.k].note), true, "every area maps to the frameworks");
+  const fwh = maFrameworkHTML("wellbeing"); eq(/PE3: Wellness &amp; Resilience/.test(fwh) && /No direct equivalent/.test(fwh) && /dtspartnership\.org/.test(fwh), true, "wellbeing maps to DTSP only, with sources");
+  out.push("frameworks: " + MA_AREAS.length + " areas mapped to DTSP and Ofcom, with sources");
   return out.join("\n");
 };
 const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js")].join("\n")

@@ -14,7 +14,7 @@ const body = function(){
     vendors:{CRITERIA, DEFAULT_V, VD_Q, VD_RUBRIC},
     maturity:{MA_LEVELS, MA_AREAS, MA_STAGES, MA_ORDER, MA_PHASES, MA_EXAMPLE},
     coverage:{CV_AREAS:CV_AREAS.map(a => ({k:a.k, n:a.n, cats:a.cats.map(c => CATS[c])})), CV_LEVELS, CV_LAYER_WEIGHT, CV_EXAMPLE, CV_LAYERS:CV_LAYERS.map(l => ({k:l.k, n:l.n, q:l.q, lv:l.lv, act:l.act("{harm area}"), tool:l.tool}))},
-    ai:{tools:Object.fromEntries(Object.entries(AI_TOOLS).map(([k, T]) => [k, {n:T.n, wip:!!T.wip, desc:T.desc, q:T.q, steps:T.steps, fields:T.fields, example:T.example, prompt:T.prompt(T.example), sample:T.sample}])),
+    ai:{tools:Object.fromEntries(Object.entries(AI_TOOLS).map(([k, T]) => [k, {n:T.n, wip:!!T.wip, builder:!!T.builder, desc:T.desc, q:T.q, steps:T.steps, fields:T.fields, example:T.example, prompt:T.prompt(T.example), sample:T.sample}])),
         policy:{examples:typeof POL_EXAMPLES !== "undefined" ? POL_EXAMPLES : null, full:typeof POL_FULL_EXAMPLE !== "undefined" ? POL_FULL_EXAMPLE : null, prompt:polP}}
   }, null, 1);
 };

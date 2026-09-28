@@ -135,3 +135,40 @@ Object.assign(MX_GLOSS, {
   "on-call rotation":"A schedule that names who responds to urgent problems at any hour, and who backs them up."
 });
 MX_GLOSS_RE = null;
+
+/* ---------- How each area maps to recognized frameworks ----------
+   DTSP: the Safe Framework Specification (June 2025), its 35 best practices under five commitments.
+   Ofcom: the Illegal content Codes of Practice for user-to-user services (in force 17 March 2025) and the
+   Protection of Children Code of Practice for user-to-user services (in force 25 July 2025).
+   Checked against the published documents in September 2026. Draft amendments are flagged as drafts. */
+const MA_FW_SRC = {
+  dtsp:["DTSP Safe Framework Specification, June 2025", "https://dtspartnership.org/wp-content/uploads/2025/07/DTSP_Safe_Framework_Specification_2025.pdf"],
+  illegal:["Ofcom Illegal content Codes of Practice for user-to-user services, in force 17 March 2025", "https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/information-for-industry/illegal-harms/illegal-content-codes-of-practice-for-user-to-user-services-24-feb.pdf"],
+  children:["Ofcom Protection of Children Code of Practice for user-to-user services, in force 25 July 2025", "https://www.ofcom.org.uk/siteassets/resources/documents/consultations/category-1-10-weeks/statement-protecting-children-from-harms-online/main-document/protection-of-children-code-of-practice-for-user-to-user-services.pdf"]
+};
+const MA_FW_REVIEWED = "September 2026";
+const MA_FW = {
+  policy:{dtsp:[["Product Governance", "PG1: Policies & Standards"], ["Product Governance", "PG3: Community Guidelines/Rules"], ["Product Governance", "PG6: Document Interpretation"]],
+    ofcom:[["ICU C3", "Setting internal content policies"], ["ICU G1", "Terms of service: substance (all services)"], ["ICU G3", "Terms of service: clarity and accessibility"]],
+    note:"A strong fit in both. The children's code has matching measures (PCU C3, PCU G1 and PCU G3)."},
+  detection:{dtsp:[["Product Enforcement", "PE4: Advanced Detection"], ["Product Development", "PD1: Abuse Pattern Analysis"], ["Product Enforcement", "PE9: Industry Partners"]],
+    ofcom:[["ICU C9", "Using hash matching to detect and remove CSAM"], ["ICU C10", "Detecting and removing content matching listed CSAM URLs"], ["ICU A5", "Tracking evidence of new and increasing illegal harm"]],
+    note:"A partial fit. Ofcom's proactive detection measures in force are narrow: CSAM hashes and URLs. Draft amendments would add hash matching for intimate image abuse, so check whether they are now in force."},
+  operations:{dtsp:[["Product Enforcement", "PE1.1: Roles & Teams"], ["Product Enforcement", "PE1.2: Operational Infrastructure"], ["Product Enforcement", "PE6.1: Enforcement Prioritization"], ["Product Enforcement", "PE2: Training & Awareness"]],
+    ofcom:[["ICU C2", "Having a content moderation function that allows for the swift take down of illegal content"], ["ICU C5", "Prioritisation"], ["ICU C6", "Resourcing"], ["ICU C7", "Provision of training and materials to individuals working in content moderation (non-volunteers)"]],
+    note:"A strong fit in both: people, triage, capacity and training."},
+  quality:{dtsp:[["Product Improvement", "PI1: Effectiveness Testing"], ["Product Enforcement", "PE6.2: Appeals"], ["Product Improvement", "PI5: Remedy Mechanisms"]],
+    ofcom:[["ICU C4", "Performance targets"], ["ICU D8", "Appropriate action for relevant complaints which are appeals – determination (large or multi-risk services)"], ["ICU D9", "Appropriate action for relevant complaints which are appeals – determination (services that are neither large nor multi-risk)"], ["ICU D10", "Appropriate action for relevant complaints which are appeals – action following determination"]],
+    note:"A good fit. Ofcom's performance targets explicitly cover the accuracy of decision making, and the children's code adds appeals against age assessments (PCU D11 and PCU D12)."},
+  crisis:{dtsp:[["Product Enforcement", "PE1.2: Operational Infrastructure"], ["Product Enforcement", "PE6.1: Enforcement Prioritization"], ["Product Enforcement", "PE6.3: External Reporting"], ["Product Development", "PD7: Post-Launch Evaluation"]],
+    ofcom:[["ICU C6", "Resourcing"], ["ICU A5", "Tracking evidence of new and increasing illegal harm"]],
+    note:"A weak fit today. DTSP has no crisis practice of its own, and Ofcom's in-force measures only touch it indirectly (resourcing covers surges caused by external events). Ofcom has drafted dedicated crisis-response measures, so check whether they are now in force."},
+  measurement:{dtsp:[["Product Improvement", "PI1: Effectiveness Testing"], ["Product Transparency", "PT1: Transparency Reports"], ["Product Transparency", "PT3: Complaint Intakes"]],
+    ofcom:[["ICU A1", "Annual review of risk management activities"], ["ICU A5", "Tracking evidence of new and increasing illegal harm"], ["ICU C4", "Performance targets"]],
+    note:"A good fit for reporting to senior leadership. Public transparency reports under the Act (section 77) apply only to certain services and sit outside the codes."},
+  compliance:{dtsp:[["Product Development", "PD5: Risk Assessment"], ["Product Improvement", "PI2: Process Alignment"]],
+    ofcom:[["ICU A2", "Individual accountable for illegal content safety duties and reporting and complaints duties"], ["ICU A3", "Written statements of responsibilities"], ["ICU A4", "Internal monitoring and assurance"], ["ICU A7", "Compliance training"]],
+    note:"DTSP is voluntary and sits alongside legal compliance, so only risk assessment and alignment map. Under the Act, the risk assessment (section 9) and record-keeping (section 23) are duties in the Act itself, not code measures."},
+  wellbeing:{dtsp:[["Product Enforcement", "PE3: Wellness & Resilience"]], ofcom:[],
+    note:"DTSP's wellness practice is a direct match. Neither Ofcom code has a measure on moderator wellbeing or exposure."}
+};

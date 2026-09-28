@@ -274,7 +274,7 @@ function bindPremortem(){
     if(d.back){ pm.qi = Math.max(0, pm.qi-1); return rerender(); }
     if(d.goq) return goToQuestion(d.goq);
     if(d.preset){ pm = fromPreset(d.preset); return rerender(); }
-    if(d.libopen){ const rec = libLoad()[d.libopen]; if(rec){ pm = openRecord(rec, {stage:"report"}); } return rerender(); }
+    if(d.libopen){ const rec = libLoad()[d.libopen]; if(rec){ pm = openRecord(rec, {stage:"report"}); pm.base = pmSnap(pm); } return rerender(); }
     if(d.libdup){ const rec = libLoad()[d.libdup]; if(rec){ pm = openRecord(rec, {id:null, saved:false, created:null, name:(rec.name||"Untitled")+" (copy)", stage:"report"}); saveToLib(); pm.flash = "Duplicated"; } return rerender(); }
     if(d.libfrom){ const rec = libLoad()[d.libfrom]; if(rec){ const base = blankPM(); PROFILE_KEYS.forEach(k=>{ if(rec[k]!==undefined) base[k]=JSON.parse(JSON.stringify(rec[k])); }); QS.forEach(q=>base.answered[q.k]=true); pm = Object.assign(base, {stage:"ask", fromProfile:true}); pm.qi = visibleQs().findIndex(q=>q.k==="features"); } return rerender(); }
     if(d.libdel){ confirmDel = d.libdel; return renderPremortem(); }

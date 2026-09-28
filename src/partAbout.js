@@ -13,7 +13,7 @@ const AB_GROUPS = [
   ["Measure", [["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation."]]],
   ["AI assistants", [["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to an actioned user, checked against what an EU statement of reasons must include."],
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal, with a suggested reply. A person makes the final call."],
-    ["t-ai","chart","Transparency report drafter","Under construction."]]]
+    ["t-ai","chart","Transparency report","Build the report the EU Digital Services Act asks for, with a completeness check and a summary by Claude."]]]
 ];
 const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Rate maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Pre-mortem products","Risk for each product or launch"],
   ["cover","var(--t-cv)","Map coverage","Your defenses against that risk"], ["siren","var(--t-tt)","Rehearse a crisis","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];

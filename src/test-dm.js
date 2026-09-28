@@ -19,12 +19,13 @@ const body = function(){
   eq(/Explore a demo company/.test(h), false, "no demo offer while in the demo");
   TOUR.forEach(([sel]) => { eq(h.includes('class="' + sel.slice(1)) || new RegExp('class="[^"]*\\b' + sel.slice(1) + '\\b').test(h), true, "tour target on the overview: " + sel); });
   out.push("tour: all " + TOUR.length + " targets present on the overview");
+  eq(tr.org === "Pixelry" && tr.view === "report" && trProgress().pct, 100, "demo includes a complete transparency report");
   renderMaturity(); if(bad(view.innerHTML)) throw new Error("demo maturity bad: " + where(view.innerHTML));
   renderCoverage(); if(bad(view.innerHTML)) throw new Error("demo coverage bad: " + where(view.innerHTML));
   renderPolicy(); eq(/Instant checks/.test(view.innerHTML) && !bad(view.innerHTML), true, "demo policy report renders");
   out.push("maturity, coverage and policy pages render the demo cleanly");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partDEMO.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partAI.js"), rd("partTR.js"), rd("partDEMO.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

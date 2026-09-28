@@ -1,8 +1,8 @@
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report drafter", about:"About this project"};
+const TOOL_COLOR = {transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
+const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -12,13 +12,14 @@ function relTime(t){
 }
 function openSaved(id){
   const it = wsItems()[id]; if(!it) return;
-  if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); savePM(); }
+  if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); pm.base = typeof pmSnap === "function" ? pmSnap(pm) : null; savePM(); }
   if(it.kind==="tabletop"){ tt = JSON.parse(JSON.stringify(it.data)); store.set("tt", tt); }
   if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
   if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
   if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
   if(it.kind==="maturity"){ ma = maInit(JSON.parse(JSON.stringify(it.data))); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
   if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
+  if(it.kind==="transparency"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); store.set("tr", tr); store.set("ws:cur:transparency", it.id); }
   goRoute(KINDS[it.kind].route);
 }
 // Move keyboard and screen-reader focus to new content without jumping the page
@@ -53,7 +54,7 @@ function cmdkItems(){
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
-  go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); out.push({g:"Go to", label:"Transparency report drafter", sub:"Under construction", color:"var(--faint)", icon:"chart", run:()=>goRoute("transparency")});
+  go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("About this project","about","var(--faint)","info");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
