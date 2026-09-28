@@ -84,9 +84,10 @@ function renderOverview(){
   view.innerHTML = `<div class="ov">
     <section class="ov-greet rise">
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
-      <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
-      <p>${sub}</p>
+      <h1>${typeof demoOn === "function" && demoOn() ? "Pixelry's safety program" : hello + (first ? ", " + esc(first) : "")}</h1>
+      <p>${typeof demoOn === "function" && demoOn() ? "You're seeing it as Alex Rivera, Pixelry's Head of Trust &amp; Safety. " : ""}${sub}</p>
       <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
+      ${typeof demoOn === "function" && !demoOn() && !pic.done && !items.length ? `<div class="ov-demo"><button type="button" class="btn" data-demo="start">Explore a demo company ${icon("arrow")}</button><span>See every tool filled in for a fictional company in about three minutes, then start your own.</span></div>` : ""}
     </section>
 
     ${typeof jnHTML === "function" ? jnHTML() : ""}

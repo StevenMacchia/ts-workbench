@@ -48,6 +48,7 @@ async function pfWrite(h){ const w = await h.createWritable(); await w.write(pfD
 /* ---------- save, open, and keep in sync ---------- */
 function pfMarkSaved(file){ const t = Date.now(); pfRaw.set("profile:savedAt", t); pfRaw.set("profile:changedAt", t); if(file) pfRaw.set("profile:file", file); pfStatusRender(); }
 async function pfSave(){
+  if(store.get("demo", false)) return gsay("You're exploring the demo company. Exit it to save your own workspace");
   if(PF_FS){
     try{
       let h = await pfHandle();
@@ -62,6 +63,8 @@ async function pfSave(){
 }
 // Edits save themselves once a file is connected and the browser has allowed writing this visit
 function pfTouched(){
+  // Demo data never reaches a connected workspace file
+  if(store.get("demo", false)) return;
   pfRaw.set("profile:changedAt", Date.now());
   clearTimeout(pfTimer);
   pfTimer = setTimeout(async () => {
@@ -72,6 +75,7 @@ function pfTouched(){
   }, 1500);
 }
 async function pfOpen(){
+  if(store.get("demo", false)) return gsay("Exit the demo company before opening a workspace file");
   if(PF_FS && typeof window.showOpenFilePicker === "function"){
     try{ const [h] = await window.showOpenFilePicker({types:[{description:"T&S Workbench workspace", accept:{"application/json":[".json"]}}]}); const f = await h.getFile(); return pfReview(await f.text(), f.name, h); }
     catch(e){ if(e && e.name === "AbortError") return; }
@@ -135,6 +139,7 @@ function pfStatus(){
 }
 function pfStatusRender(){
   const el = document.getElementById("sb-sync"); if(!el) return;
+  if(store.get("demo", false)){ el.className = "sb-sync demo"; el.innerHTML = `<span class="sb-sync-t" title="Everything here is sample data"><i></i>Demo: Pixelry</span><button type="button" data-demo="exit">Exit demo</button>`; return; }
   const s = pfStatus();
   const text = s.never ? (s.dirty ? "Not backed up" : "Back up to a file") : s.dirty ? "Changes not backed up" : "Backed up " + (relTime(s.saved) === "now" ? "just now" : relTime(s.saved) + " ago");
   el.className = "sb-sync " + (s.dirty ? "dirty" : s.never ? "" : "ok");

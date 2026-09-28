@@ -31,7 +31,7 @@ function renderAbout(){
     ["Plain language first","Questions are written for product managers and founders, not specialists. Terms like CSAM, KYC or sextortion explain themselves on hover."],
     ["Accessible in both themes","Tuned light and dark themes, visible focus states, labelled controls, reduced-motion support and layouts that work down to phone width."]
   ];
-  const meta = `${AUTHOR.link ? `<a class="btn sm" href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}<a class="btn sm primary" href="#overview">Open the workbench</a>`;
+  const meta = `${AUTHOR.link ? `<a class="btn sm" href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}${typeof demoOn === "function" && !demoOn() ? `<button type="button" class="btn sm" data-demo="start">Explore a demo company</button>` : ""}<a class="btn sm primary" href="#overview">Open the workbench</a>`;
   view.innerHTML = head("T&S Workbench", "A free, private toolkit for running a trust and safety program: assess the program and its products, rehearse crises, and turn the gaps into a plan.", "Case study", meta) + `<article class="ab">
     ${AUTHOR.name ? `<div class="card ab-by2"><span class="sb-av">${esc(AUTHOR.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span class="ab-by2-t"><b>Designed and directed by ${esc(AUTHOR.name)}</b><small>${esc(AUTHOR.title)} · product design, T&amp;S strategy and content</small></span>
       <span class="ab-by2-m"><span><small>Format</small><b>Single-file web app, no backend</b></span><span><small>Status</small><b>Live and free to use</b></span><span><small>Tools</small><b>${tools}</b></span></span></div>` : ""}

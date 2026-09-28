@@ -64,6 +64,7 @@ const MX_OP_CSS = `
 .mxop .op-d.good{color:var(--good)} .mxop .op-d.crit{color:var(--crit)} .mxop .op-d.flat{color:var(--muted)}
 .mxop .op-st{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;background:#eef0f3;color:var(--muted)}
 .mxop .op-st.good{background:#e6f4ec;color:var(--good)} .mxop .op-st.med{background:#fdf0e1;color:var(--med)} .mxop .op-st.crit{background:#fbe7e8;color:var(--crit)}
+.mxop .op-meas{display:block;font-size:11px;font-weight:400;color:#6b7180;margin-top:2px;white-space:normal}
 .mxop .mx-spark .sp-line{fill:none;stroke:#8a909c;stroke-width:1.6}
 .mxop .mx-spark .sp-dot{fill:#8a909c} .mxop .mx-spark .sp-dot.good{fill:var(--good)} .mxop .mx-spark .sp-dot.med{fill:var(--med)} .mxop .mx-spark .sp-dot.crit{fill:var(--crit)}
 .mxop .op-f{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}

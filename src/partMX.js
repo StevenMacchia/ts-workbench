@@ -394,7 +394,7 @@ function mxOnePagerInner(list){
   const val = m => mxFmt(m, mxNum((mx.vals[m.n] || {}).v));
   const delta = m => { const d = mxDelta(m); return d ? `<span class="op-d ${d.good}">${esc(d.text)} vs ${esc(d.prev)}</span>` : ""; };
   const row = m => { const st = mxStatus(m, mx.vals);
-    return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
+    return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}<small class="op-meas">${esc(MX_SC[m.n][0])}</small>${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
   return `<header class="op-h"><div><div class="op-k">Trust &amp; Safety scorecard</div><h1>${esc(mx.period || "Current period")}</h1>
       <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
       <div class="op-date">Prepared ${esc(new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}))}</div></header>
@@ -403,7 +403,7 @@ function mxOnePagerInner(list){
       <div class="op-tile crit"><b>${c.off}</b><span>Off track</span></div><div class="op-tile"><b>${list.length - measured.length}</b><span>Not measured yet</span></div>
     </section>
     ${att.length ? `<section class="op-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
-      return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b> is ${esc(val(m))} against a target of ${esc(mxTargetText(m) || "not set")}. Check ${esc(H.pair)} before acting.</span></li>`; }).join("")}</ul></section>` : ""}
+      return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b>: ${esc(MX_SC[m.n][0].charAt(0).toLowerCase() + MX_SC[m.n][0].slice(1))} is <b>${esc(val(m))}</b>, against a target of ${esc((mxTargetText(m) || "not set").replace(/^≤ 0 /, "0 "))}. Read it with ${esc(H.pair)}.</span></li>`; }).join("")}</ul></section>` : ""}
     ${MX_TORD.map(t => { const ms = measured.filter(m => m.t === t); if(!ms.length) return "";
       return `<section class="op-sec"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
     <footer class="op-f">Status compares each value with the program's own target and off-track line. ${(mx.hist || []).length ? `Trends cover ${esc((mx.hist || []).map(h => h.p).concat(mx.period ? [mx.period] : []).filter((p, j, a) => a.indexOf(p) === j).join(", "))}. ` : ""}Made with T&amp;S Workbench.</footer>`;

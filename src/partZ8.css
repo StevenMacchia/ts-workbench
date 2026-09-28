@@ -749,3 +749,29 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .pol-tabs .pol-sec-h .note{margin:0}
 .pol-report,.pol-setup{grid-template-columns:minmax(0,1fr)}
 @media (max-width:640px){.pol-runbar{padding:12px 14px;gap:10px}.pol-rb-meter .pol-add{display:none}.pol-rb-act{width:100%}.pol-rb-act #pol-run{flex:1;justify-content:center}}
+
+/* ---------- Demo company and tour ---------- */
+.demo-bar{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin:14px clamp(16px,3vw,40px) 0;padding:10px 14px;border-radius:12px;background:color-mix(in oklab, var(--accent) 9%, var(--surface));border:1px solid color-mix(in oklab, var(--accent) 30%, var(--line));font-size:13.5px}
+.demo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);flex:none}
+.demo-t{flex:1;min-width:220px;color:var(--muted)}
+.demo-t b{color:var(--ink);font-weight:600}
+.demo-a{display:flex;gap:8px;flex-wrap:wrap}
+.sb-sync.demo i{background:var(--accent)}
+.ov-demo{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-top:22px}
+.ov-demo .btn{background:#fff;color:#14163A;border-color:transparent;font-weight:600}
+.ov-demo .btn:hover{background:#EEF0FF}
+.ov-demo span{color:var(--hero-muted);font-size:14px;max-width:460px}
+.tour-on{position:relative;z-index:4;box-shadow:0 0 0 3px var(--accent), 0 0 0 10px color-mix(in oklab, var(--accent) 22%, transparent) !important;border-radius:18px;transition:box-shadow .2s}
+.tour-pop{position:fixed;right:24px;bottom:24px;z-index:60;width:min(380px, calc(100vw - 32px));padding:16px 18px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 50px -12px rgba(15,20,40,.35);display:grid;gap:8px}
+.tour-pop:focus{outline:none}
+.tour-top{display:flex;align-items:center;justify-content:space-between}
+.tour-n{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.tour-x{all:unset;cursor:pointer;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--faint)}
+.tour-x:hover{background:var(--sunk);color:var(--ink)}
+.tour-x svg{width:16px;height:16px}
+.tour-pop h3{margin:0;font-size:17px;letter-spacing:-.015em}
+.tour-pop p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+.tour-a{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.tour-last{display:flex;gap:8px}
+@media (max-width:640px){.tour-pop{right:16px;left:16px;bottom:16px;width:auto}.demo-bar{margin:12px 16px 0}}
+@media (max-width:640px){.demo-more{display:none}}

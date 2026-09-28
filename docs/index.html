@@ -2688,6 +2688,32 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .pol-tabs .pol-sec-h .note{margin:0}
 .pol-report,.pol-setup{grid-template-columns:minmax(0,1fr)}
 @media (max-width:640px){.pol-runbar{padding:12px 14px;gap:10px}.pol-rb-meter .pol-add{display:none}.pol-rb-act{width:100%}.pol-rb-act #pol-run{flex:1;justify-content:center}}
+
+/* ---------- Demo company and tour ---------- */
+.demo-bar{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin:14px clamp(16px,3vw,40px) 0;padding:10px 14px;border-radius:12px;background:color-mix(in oklab, var(--accent) 9%, var(--surface));border:1px solid color-mix(in oklab, var(--accent) 30%, var(--line));font-size:13.5px}
+.demo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);flex:none}
+.demo-t{flex:1;min-width:220px;color:var(--muted)}
+.demo-t b{color:var(--ink);font-weight:600}
+.demo-a{display:flex;gap:8px;flex-wrap:wrap}
+.sb-sync.demo i{background:var(--accent)}
+.ov-demo{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-top:22px}
+.ov-demo .btn{background:#fff;color:#14163A;border-color:transparent;font-weight:600}
+.ov-demo .btn:hover{background:#EEF0FF}
+.ov-demo span{color:var(--hero-muted);font-size:14px;max-width:460px}
+.tour-on{position:relative;z-index:4;box-shadow:0 0 0 3px var(--accent), 0 0 0 10px color-mix(in oklab, var(--accent) 22%, transparent) !important;border-radius:18px;transition:box-shadow .2s}
+.tour-pop{position:fixed;right:24px;bottom:24px;z-index:60;width:min(380px, calc(100vw - 32px));padding:16px 18px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 50px -12px rgba(15,20,40,.35);display:grid;gap:8px}
+.tour-pop:focus{outline:none}
+.tour-top{display:flex;align-items:center;justify-content:space-between}
+.tour-n{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.tour-x{all:unset;cursor:pointer;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--faint)}
+.tour-x:hover{background:var(--sunk);color:var(--ink)}
+.tour-x svg{width:16px;height:16px}
+.tour-pop h3{margin:0;font-size:17px;letter-spacing:-.015em}
+.tour-pop p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+.tour-a{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.tour-last{display:flex;gap:8px}
+@media (max-width:640px){.tour-pop{right:16px;left:16px;bottom:16px;width:auto}.demo-bar{margin:12px 16px 0}}
+@media (max-width:640px){.demo-more{display:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -6768,6 +6794,7 @@ const MX_OP_CSS = `
 .mxop .op-d.good{color:var(--good)} .mxop .op-d.crit{color:var(--crit)} .mxop .op-d.flat{color:var(--muted)}
 .mxop .op-st{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;background:#eef0f3;color:var(--muted)}
 .mxop .op-st.good{background:#e6f4ec;color:var(--good)} .mxop .op-st.med{background:#fdf0e1;color:var(--med)} .mxop .op-st.crit{background:#fbe7e8;color:var(--crit)}
+.mxop .op-meas{display:block;font-size:11px;font-weight:400;color:#6b7180;margin-top:2px;white-space:normal}
 .mxop .mx-spark .sp-line{fill:none;stroke:#8a909c;stroke-width:1.6}
 .mxop .mx-spark .sp-dot{fill:#8a909c} .mxop .mx-spark .sp-dot.good{fill:var(--good)} .mxop .mx-spark .sp-dot.med{fill:var(--med)} .mxop .mx-spark .sp-dot.crit{fill:var(--crit)}
 .mxop .op-f{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
@@ -7329,7 +7356,7 @@ function mxOnePagerInner(list){
   const val = m => mxFmt(m, mxNum((mx.vals[m.n] || {}).v));
   const delta = m => { const d = mxDelta(m); return d ? `<span class="op-d ${d.good}">${esc(d.text)} vs ${esc(d.prev)}</span>` : ""; };
   const row = m => { const st = mxStatus(m, mx.vals);
-    return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
+    return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}<small class="op-meas">${esc(MX_SC[m.n][0])}</small>${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
   return `<header class="op-h"><div><div class="op-k">Trust &amp; Safety scorecard</div><h1>${esc(mx.period || "Current period")}</h1>
       <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
       <div class="op-date">Prepared ${esc(new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}))}</div></header>
@@ -7338,7 +7365,7 @@ function mxOnePagerInner(list){
       <div class="op-tile crit"><b>${c.off}</b><span>Off track</span></div><div class="op-tile"><b>${list.length - measured.length}</b><span>Not measured yet</span></div>
     </section>
     ${att.length ? `<section class="op-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
-      return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b> is ${esc(val(m))} against a target of ${esc(mxTargetText(m) || "not set")}. Check ${esc(H.pair)} before acting.</span></li>`; }).join("")}</ul></section>` : ""}
+      return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b>: ${esc(MX_SC[m.n][0].charAt(0).toLowerCase() + MX_SC[m.n][0].slice(1))} is <b>${esc(val(m))}</b>, against a target of ${esc((mxTargetText(m) || "not set").replace(/^≤ 0 /, "0 "))}. Read it with ${esc(H.pair)}.</span></li>`; }).join("")}</ul></section>` : ""}
     ${MX_TORD.map(t => { const ms = measured.filter(m => m.t === t); if(!ms.length) return "";
       return `<section class="op-sec"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
     <footer class="op-f">Status compares each value with the program's own target and off-track line. ${(mx.hist || []).length ? `Trends cover ${esc((mx.hist || []).map(h => h.p).concat(mx.period ? [mx.period] : []).filter((p, j, a) => a.indexOf(p) === j).join(", "))}. ` : ""}Made with T&amp;S Workbench.</footer>`;
@@ -8001,6 +8028,7 @@ function cmdkItems(){
   go("Policy stress-tester","policy","var(--t-pol)","doc");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); out.push({g:"Go to", label:"Transparency report drafter", sub:"Under construction", color:"var(--faint)", icon:"chart", run:()=>goRoute("transparency")});
   go("About this project","about","var(--faint)","info");
+  if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","system"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
   Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(it =>
@@ -8129,9 +8157,10 @@ function renderOverview(){
   view.innerHTML = `<div class="ov">
     <section class="ov-greet rise">
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
-      <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
-      <p>${sub}</p>
+      <h1>${typeof demoOn === "function" && demoOn() ? "Pixelry's safety program" : hello + (first ? ", " + esc(first) : "")}</h1>
+      <p>${typeof demoOn === "function" && demoOn() ? "You're seeing it as Alex Rivera, Pixelry's Head of Trust &amp; Safety. " : ""}${sub}</p>
       <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
+      ${typeof demoOn === "function" && !demoOn() && !pic.done && !items.length ? `<div class="ov-demo"><button type="button" class="btn" data-demo="start">Explore a demo company ${icon("arrow")}</button><span>See every tool filled in for a fictional company in about three minutes, then start your own.</span></div>` : ""}
     </section>
 
     ${typeof jnHTML === "function" ? jnHTML() : ""}
@@ -8291,7 +8320,7 @@ function renderAbout(){
     ["Plain language first","Questions are written for product managers and founders, not specialists. Terms like CSAM, KYC or sextortion explain themselves on hover."],
     ["Accessible in both themes","Tuned light and dark themes, visible focus states, labelled controls, reduced-motion support and layouts that work down to phone width."]
   ];
-  const meta = `${AUTHOR.link ? `<a class="btn sm" href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}<a class="btn sm primary" href="#overview">Open the workbench</a>`;
+  const meta = `${AUTHOR.link ? `<a class="btn sm" href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}${typeof demoOn === "function" && !demoOn() ? `<button type="button" class="btn sm" data-demo="start">Explore a demo company</button>` : ""}<a class="btn sm primary" href="#overview">Open the workbench</a>`;
   view.innerHTML = head("T&S Workbench", "A free, private toolkit for running a trust and safety program: assess the program and its products, rehearse crises, and turn the gaps into a plan.", "Case study", meta) + `<article class="ab">
     ${AUTHOR.name ? `<div class="card ab-by2"><span class="sb-av">${esc(AUTHOR.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span class="ab-by2-t"><b>Designed and directed by ${esc(AUTHOR.name)}</b><small>${esc(AUTHOR.title)} · product design, T&amp;S strategy and content</small></span>
       <span class="ab-by2-m"><span><small>Format</small><b>Single-file web app, no backend</b></span><span><small>Status</small><b>Live and free to use</b></span><span><small>Tools</small><b>${tools}</b></span></span></div>` : ""}
@@ -10241,6 +10270,7 @@ async function pfWrite(h){ const w = await h.createWritable(); await w.write(pfD
 /* ---------- save, open, and keep in sync ---------- */
 function pfMarkSaved(file){ const t = Date.now(); pfRaw.set("profile:savedAt", t); pfRaw.set("profile:changedAt", t); if(file) pfRaw.set("profile:file", file); pfStatusRender(); }
 async function pfSave(){
+  if(store.get("demo", false)) return gsay("You're exploring the demo company. Exit it to save your own workspace");
   if(PF_FS){
     try{
       let h = await pfHandle();
@@ -10255,6 +10285,8 @@ async function pfSave(){
 }
 // Edits save themselves once a file is connected and the browser has allowed writing this visit
 function pfTouched(){
+  // Demo data never reaches a connected workspace file
+  if(store.get("demo", false)) return;
   pfRaw.set("profile:changedAt", Date.now());
   clearTimeout(pfTimer);
   pfTimer = setTimeout(async () => {
@@ -10265,6 +10297,7 @@ function pfTouched(){
   }, 1500);
 }
 async function pfOpen(){
+  if(store.get("demo", false)) return gsay("Exit the demo company before opening a workspace file");
   if(PF_FS && typeof window.showOpenFilePicker === "function"){
     try{ const [h] = await window.showOpenFilePicker({types:[{description:"T&S Workbench workspace", accept:{"application/json":[".json"]}}]}); const f = await h.getFile(); return pfReview(await f.text(), f.name, h); }
     catch(e){ if(e && e.name === "AbortError") return; }
@@ -10328,6 +10361,7 @@ function pfStatus(){
 }
 function pfStatusRender(){
   const el = document.getElementById("sb-sync"); if(!el) return;
+  if(store.get("demo", false)){ el.className = "sb-sync demo"; el.innerHTML = `<span class="sb-sync-t" title="Everything here is sample data"><i></i>Demo: Pixelry</span><button type="button" data-demo="exit">Exit demo</button>`; return; }
   const s = pfStatus();
   const text = s.never ? (s.dirty ? "Not backed up" : "Back up to a file") : s.dirty ? "Changes not backed up" : "Backed up " + (relTime(s.saved) === "now" ? "just now" : relTime(s.saved) + " ago");
   el.className = "sb-sync " + (s.dirty ? "dirty" : s.never ? "" : "ok");
@@ -10793,10 +10827,131 @@ document.addEventListener("click", e => {
   ma.hist = (ma.hist || []).filter(h => new Date(h.t).toDateString() !== today).concat([{t:Date.now(), stage:ma.stage, lv}]); maSave();
   renderOverview(); gsay(`Snapshot saved: level ${maScore(ma).toFixed(1)}`); focusQuiet(document.getElementById("nx-h"));
 });
+/* =========================================================
+   DEMO COMPANY: one click fills every tool with Pixelry, a fictional photo and short-video app,
+   so a visitor sees the whole program in a few minutes. The visitor's own work is set aside
+   in this browser and comes back, untouched, when they exit the demo.
+   ========================================================= */
+const DEMO_BACKUP = "tswbdemo:backup";
+// Browser preferences stay put; everything else in the workspace is swapped out
+const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
+const demoOn = () => !!store.get("demo", false);
+function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
+function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
+function demoStart(){
+  if(demoOn()){ goRoute("overview"); return tourStart(); }
+  try{
+    const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
+    localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
+    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
+    store.set("demo", true); store.set("demo:pending", true); store.set("demo:tour", true);
+  }catch(e){ return gsay("This browser blocked the demo"); }
+  demoReload();
+}
+function demoExit(){
+  try{
+    const raw = localStorage.getItem(DEMO_BACKUP), backup = raw ? JSON.parse(raw) : {};
+    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
+    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !DEMO_KEEP.includes(k) && typeof v === "string") localStorage.setItem(k, v); });
+    localStorage.removeItem(DEMO_BACKUP);
+  }catch(e){ return gsay("This browser blocked restoring your work"); }
+  demoReload();
+}
+// Pixelry's program: a quarter into its maturity plan, three products partway through launch, coverage mapped, crises rehearsed
+function demoFill(){
+  const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
+  orgSet({type:"social", stage:"growth", regions:["us", "eu", "uk"], confirmed:true});
+  store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
+  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; ma.due.compliance1 = iso(-2); ma.due.crisis2 = iso(5); maSave();
+  wsSaveTool("maturity", ma, "Pixelry program maturity");
+  [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
+    pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
+    assess(pm).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) pm.done[s.id] = true; });
+    saveToLib();
+    const lib = libLoad(); if(lib[pm.id]){ lib[pm.id].updated = Date.now() - (3 - n) * 6 * day; libSave(lib); }
+  });
+  pm.stage = "start"; savePM();
+  cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); Object.assign(cv, {ex:false, est:false, src:"all"}); cvSave();
+  wsSaveTool("coverage", cv, "Pixelry coverage");
+  mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[]}; mxLoadDemo(mxList());
+  mx.read = {"Violating-content prevalence":true, "Unsafe-contact rate for minors":true, "Harmful reach before action":true}; store.set("mx", mx);
+  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, 4);
+  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:[4, 3, 3, 2][j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
+  store.set("tt:progress", prog);
+  pol = Object.assign(POL_BLANK(), {company:"Pixelry", type:"social", youth:"teens", regions:["us", "eu", "uk"], enforce:["reports", "auto", "humans"], actions:["remove", "warn", "suspend", "ban"],
+    rule:"Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.",
+    product:"Pixelry is a photo and short-video app for 13 to 25-year-olds, with public profiles, comments, DMs and live streams. Creators sell subscriptions and items through Pixelry Market.",
+    concerns:"Pile-ons in the comments when a creator's post goes viral. 'Rate me' posts that invite insults about appearance. Whether repeated one-word insults count as harassment."});
+  pol.heur = polHeuristics(pol.rule); pol.ts = Date.now(); pol.view = "report"; savePol();
+  wsSaveTool("policy", pol, "Policy: Harassment");
+  store.set("rc:hist", [{d:iso(-90), s:44}, {d:iso(-60), s:50}, {d:iso(-30), s:56}]);
+}
+if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
+
+/* ---------- the bar that says you're in the demo, on every page ---------- */
+function demoBar(){
+  let bar = document.getElementById("demo-bar");
+  if(!demoOn()){ if(bar) bar.remove(); return; }
+  const v = document.getElementById("view"); if(!v || !v.parentNode) return;
+  if(!bar){ bar = document.createElement("div"); bar.id = "demo-bar"; bar.className = "demo-bar"; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Demo company"); v.parentNode.insertBefore(bar, v); }
+  bar.innerHTML = `<span class="demo-dot" aria-hidden="true"></span><span class="demo-t"><b>You're exploring Pixelry, a demo company.</b> Everything here is sample data.<span class="demo-more"> Your own work is set aside until you exit.</span></span>
+    <span class="demo-a"><button type="button" class="btn sm" data-demo="tour">Take the tour</button><button type="button" class="btn sm primary" data-demo="exit">Exit demo</button></span>`;
+}
+demoBar();
+
+/* ---------- a short guided tour of the overview ---------- */
+const TOUR = [
+  [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
+  [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
+  [".nx", "Your next moves", "What to do this week, pulled from every tool: overdue roadmap items first, then each product's next launch blocker. You can tick them off right here."],
+  [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
+  [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
+  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
+];
+let tourAt = -1;
+function tourEnd(){
+  tourAt = -1;
+  document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
+  const p = document.getElementById("tour-pop"); if(p) p.remove();
+}
+function tourStep(i){
+  const steps = TOUR.filter(([s]) => document.querySelector(s));
+  if(i < 0 || i >= steps.length) return tourEnd();
+  document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
+  tourAt = i;
+  const [sel, title, text] = steps[i], el = document.querySelector(sel);
+  el.classList.add("tour-on");
+  window.scrollTo(0, i === 0 ? 0 : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 96));
+  let p = document.getElementById("tour-pop");
+  if(!p){ p = document.createElement("div"); p.id = "tour-pop"; p.className = "tour-pop"; p.setAttribute("role", "dialog"); p.setAttribute("aria-labelledby", "tour-h"); p.tabIndex = -1; document.body.appendChild(p); }
+  const last = i === steps.length - 1;
+  p.innerHTML = `<div class="tour-top"><span class="tour-n">${i + 1} of ${steps.length}</span><button type="button" class="tour-x" data-tour="end" aria-label="Close the tour">${icon("x")}</button></div>
+    <h3 id="tour-h">${title}</h3><p>${text}</p>
+    <div class="tour-a">${i ? `<button type="button" class="btn sm" data-tour="back">Back</button>` : `<span></span>`}
+      ${last ? `<span class="tour-last"><a class="btn sm" href="#maturity" data-tour="end">Open Program maturity</a><button type="button" class="btn sm primary" data-tour="end">Done</button></span>` : `<button type="button" class="btn sm primary" data-tour="next">Next ${icon("arrow")}</button>`}</div>`;
+  p.focus({preventScroll:true});
+}
+function tourStart(){
+  if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
+  tourStep(0);
+}
+document.addEventListener("click", e => {
+  const d = e.target.closest && e.target.closest("[data-demo]");
+  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : tourStart(); }
+  const t = e.target.closest && e.target.closest("[data-tour]"); if(!t) return;
+  const a = t.dataset.tour; if(a === "next") return tourStep(tourAt + 1); if(a === "back") return tourStep(tourAt - 1);
+  tourEnd();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape" && tourAt >= 0) tourEnd(); });
+if(window.addEventListener) window.addEventListener("hashchange", () => { if(tourAt >= 0) tourEnd(); demoBar(); });
+// The tour opens by itself once, straight after the demo loads
+if(demoOn() && store.get("demo:tour", false)){ store.set("demo:tour", false); setTimeout(tourStart, 500); }
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
+  // A shareable link straight into the demo company
+  if(h === "demo" && typeof demoStart === "function"){ demoStart(); return; }
   const name = ROUTES[h] ? h : 'overview';
   $$('.navlink').forEach(a => a.dataset.route === name ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current'));
   ROUTES[name]();

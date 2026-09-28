@@ -4,7 +4,7 @@
 
 Free, private tools that help Trust & Safety and product teams find risks before launch, rehearse incidents, measure what matters, choose vendors and write better policy.
 
-**[Open the live site](https://stevenmacchia.github.io/ts-workbench/)** · no sign-up, and nothing leaves your browser
+**[Open the live site](https://stevenmacchia.github.io/ts-workbench/)** · **[Explore a demo company](https://stevenmacchia.github.io/ts-workbench/#demo)**, with every tool filled in for a fictional app · no sign-up, and nothing leaves your browser
 
 ## The tools
 
@@ -35,6 +35,8 @@ Trust & Safety knowledge mostly lives in people's heads and in slide decks that 
 - **Works everywhere.** Light and dark themes, keyboard navigation and layouts that work at phone width.
 
 ## Screenshots
+
+![overview-demo](assets/overview-demo.png)
 
 ![overview-next](assets/overview-next.png)
 
