@@ -837,3 +837,14 @@ body.tt-present .ttf-stage h2{font-size:clamp(30px,3.4vw,46px)}
 body.tt-present .ttf-sit{font-size:clamp(19px,1.7vw,25px);max-width:none}
 body.tt-present .ttf-timer b{font-size:64px}
 body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
+
+/* ---------- Vendor scorecard: your own shortlist ---------- */
+.vd-presets{display:grid;gap:8px;margin-bottom:14px}
+.vd-pre{display:flex;flex-wrap:wrap;gap:6px}
+.vd-names{flex-wrap:wrap}
+.vd-nm{position:relative;display:inline-flex;align-items:center;flex:1 1 180px}
+.vd-nm .input{width:100%;padding-right:34px}
+.vd-x{all:unset;position:absolute;right:6px;cursor:pointer;display:grid;place-items:center;width:26px;height:26px;border-radius:7px;color:var(--faint)}
+.vd-x:hover{background:var(--sunk);color:var(--crit)}
+.vd-x svg{width:14px;height:14px}
+.vd-cell.none{background:var(--sunk);color:var(--faint)}

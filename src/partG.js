@@ -279,15 +279,15 @@ const CRITERIA = [
 const DEFAULT_V = {
   weights: Object.fromEntries(CRITERIA.map(c=>[c.k,c.w])),
   vendors:[
-    {name:'Vendor A (global BPO)', s:{quality:3,wellness:2,lang:5,surge:5,security:4,cost:4,tooling:3,reporting:3}},
-    {name:'Vendor B (T&S specialist)', s:{quality:5,wellness:4,lang:3,surge:3,security:4,cost:2,tooling:4,reporting:5}},
-    {name:'Vendor C (regional)', s:{quality:4,wellness:4,lang:4,surge:2,security:3,cost:4,tooling:3,reporting:3}}
+    {name:'Vendor A', s:{quality:3,wellness:2,lang:5,surge:5,security:4,cost:4,tooling:3,reporting:3}},
+    {name:'Vendor B', s:{quality:5,wellness:4,lang:3,surge:3,security:4,cost:2,tooling:4,reporting:5}},
+    {name:'Vendor C', s:{quality:4,wellness:4,lang:4,surge:2,security:3,cost:4,tooling:3,reporting:3}}
   ], open:null
 };
 let vx = store.get('vx', null) || JSON.parse(JSON.stringify(DEFAULT_V));
 function vendorScore(v){
   const tw = CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0),0) || 1;
-  return CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0)*v.s[c.k],0)/tw;
+  return CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0)*(v.s[c.k]||0),0)/tw;
 }
 function renderVendors(){
   const tw = CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0),0);
