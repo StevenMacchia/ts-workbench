@@ -1,1 +1,1 @@
-https://stevenmacchia.github.io/ts-workbench
+https://stevenmacchia.com/ts-workbench

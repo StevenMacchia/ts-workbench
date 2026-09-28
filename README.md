@@ -1,22 +1,22 @@
-<p align="center"><a href="https://stevenmacchia.github.io/ts-workbench/"><img src="docs/og-image.png" alt="T&S Workbench" width="100%"></a></p>
+<p align="center"><a href="https://stevenmacchia.com/ts-workbench/"><img src="docs/og-image.png" alt="T&S Workbench" width="100%"></a></p>
 
 # T&S Workbench
 
 Free, private tools that help Trust & Safety and product teams find risks before launch, rehearse incidents, measure what matters, choose vendors and write better policy.
 
-**[Open the live site](https://stevenmacchia.github.io/ts-workbench/)** · **[Explore a demo company](https://stevenmacchia.github.io/ts-workbench/#demo)**, with every tool filled in for a fictional app · no sign-up, and nothing leaves your browser
+**[Open the live site](https://stevenmacchia.com/ts-workbench/)** · **[Explore a demo company](https://stevenmacchia.com/ts-workbench/#demo)**, with every tool filled in for a fictional app · no sign-up, and nothing leaves your browser
 
 ## The tools
 
 | Tool | What it helps you do | Open content |
 |---|---|---|
-| **[Abuse pre-mortem](https://stevenmacchia.github.io/ts-workbench/#premortem)** | Profile a product and see how it will be misused before launch: 58 risks, 104 safeguards, 33 legal obligations in 7 jurisdictions. | [abuse-premortem](https://github.com/stevenmacchia/abuse-premortem) |
-| **[Incident tabletop](https://stevenmacchia.github.io/ts-workbench/#tabletop)** | Rehearse a crisis: 37 scenarios across 8 company types, with a lesson and the law behind every call. | [incident-tabletop](https://github.com/stevenmacchia/incident-tabletop) |
-| **[Metrics framework](https://stevenmacchia.github.io/ts-workbench/#metrics)** | The scorecard a T&S leader brings to an executive review: 36 metrics with formulas, measurement steps and SQL, plus trends and a one-pager. | [ts-metrics-framework](https://github.com/stevenmacchia/ts-metrics-framework) |
-| **[Vendor scorecard](https://stevenmacchia.github.io/ts-workbench/#vendors)** | Choose a moderation vendor on evidence: 8 weighted criteria, rubrics, minimums and RFP questions. | [moderation-vendor-scorecard](https://github.com/stevenmacchia/moderation-vendor-scorecard) |
-| **[Coverage radar](https://stevenmacchia.github.io/ts-workbench/#coverage)** | Rate five layers of defense for 8 kinds of harm and see them against your products' risk. | [harm-coverage-radar](https://github.com/stevenmacchia/harm-coverage-radar) |
-| **[Program maturity](https://stevenmacchia.github.io/ts-workbench/#maturity)** | Rate a T&S program in 8 areas against the targets for its stage, and get a phased roadmap for the biggest gaps. | [ts-maturity-model](https://github.com/stevenmacchia/ts-maturity-model) |
-| **[AI assistants](https://stevenmacchia.github.io/ts-workbench/#policy)** | Stress-test a policy, write an enforcement notice and review an appeal, on the user's own Claude account, and build a DSA transparency report with a completeness check. | [ts-ai-assistants](https://github.com/stevenmacchia/ts-ai-assistants) |
+| **[Abuse pre-mortem](https://stevenmacchia.com/ts-workbench/#premortem)** | Profile a product and see how it will be misused before launch: 58 risks, 104 safeguards, 33 legal obligations in 7 jurisdictions. | [abuse-premortem](https://github.com/stevenmacchia/abuse-premortem) |
+| **[Incident tabletop](https://stevenmacchia.com/ts-workbench/#tabletop)** | Rehearse a crisis: 37 scenarios across 8 company types, with a lesson and the law behind every call. | [incident-tabletop](https://github.com/stevenmacchia/incident-tabletop) |
+| **[Metrics framework](https://stevenmacchia.com/ts-workbench/#metrics)** | The scorecard a T&S leader brings to an executive review: 36 metrics with formulas, measurement steps and SQL, plus trends and a one-pager. | [ts-metrics-framework](https://github.com/stevenmacchia/ts-metrics-framework) |
+| **[Vendor scorecard](https://stevenmacchia.com/ts-workbench/#vendors)** | Choose a moderation vendor on evidence: 8 weighted criteria, rubrics, minimums and RFP questions. | [moderation-vendor-scorecard](https://github.com/stevenmacchia/moderation-vendor-scorecard) |
+| **[Coverage radar](https://stevenmacchia.com/ts-workbench/#coverage)** | Rate five layers of defense for 8 kinds of harm and see them against your products' risk. | [harm-coverage-radar](https://github.com/stevenmacchia/harm-coverage-radar) |
+| **[Program maturity](https://stevenmacchia.com/ts-workbench/#maturity)** | Rate a T&S program in 8 areas against the targets for its stage, and get a phased roadmap for the biggest gaps. | [ts-maturity-model](https://github.com/stevenmacchia/ts-maturity-model) |
+| **[AI assistants](https://stevenmacchia.com/ts-workbench/#policy)** | Stress-test a policy, write an enforcement notice and review an appeal, on the user's own Claude account, and build a DSA transparency report with a completeness check. | [ts-ai-assistants](https://github.com/stevenmacchia/ts-ai-assistants) |
 
 ![Overview](assets/overview.png)
 
