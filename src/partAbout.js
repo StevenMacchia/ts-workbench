@@ -24,7 +24,7 @@ function renderAbout(){
   const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,"tabletop scenario versions"],[lawSteps,"decisions with law notes"],
     [typeof MA_AREAS !== "undefined" ? MA_AREAS.length * 5 : 40,"maturity level descriptions"],[typeof CV_AREAS !== "undefined" ? CV_AREAS.length * CV_LAYERS.length : 40,"coverage checks"]];
   const decisions = [
-    ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account."],
+    ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
     ["One workspace, one vocabulary","Company type, stage and regions are set once and pre-fill every tool. Every saved result lands in the same workspace, grouped by project."],
     ["Every number explains itself","Each risk rating lists the answers that raised or lowered it, and every score on the report card shows what it's made of, so the output can be challenged and defended."],
     ["Plans, not just scores","Maturity and coverage end in steps with owners and due dates. Finishing the steps moves the score, and the steps go to Jira, Asana, Linear or GitHub."],

@@ -211,7 +211,7 @@ console.log("v8 assembled");
     [`<div class="section-title" style="margin-top:28px"><h2>The detail</h2>`, `<div class="section-title rep-detail"><h2>The detail</h2>`]
   ], "partF3 report header");
   const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css");
-  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partTTF.js"), rd("partTR.js"), rd("partDEMO.js"), R9].join("");
+  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partTTF.js"), rd("partTR.js"), rd("partDEMO.js"), rd("partHELP.js"), R9].join("");
   fs.writeFileSync(path.join(D, "_F3_9.js"), F3_9);
   const STANDALONE_BUILD = true;
 fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + body9);
@@ -227,6 +227,8 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
   const desc = "Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, program maturity, a coverage radar and AI assistants. Built by Steven Macchia.";
   const icon = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#5B5BD6"/><path d="M16 6l8 3.4v5.8c0 5-3.4 8.8-8 10.8-4.6-2-8-5.8-8-10.8V9.4z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M12.5 16l2.4 2.4 4.6-4.8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
   const img = site ? site + "/og-image.png" : "og-image.png";
+  // Cookie-free visit counts on the public website only (the Claude version never loads it)
+  const cfa = fs.existsSync(path.join(D, "analytics-token.txt")) ? fs.readFileSync(path.join(D, "analytics-token.txt"), "utf8").trim() : "";
   const headTags = [
     '<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width,initial-scale=1">',
@@ -242,7 +244,8 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
     '<meta property="og:image" content="' + img + '">',
     '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="627">',
     '<meta name="twitter:card" content="summary_large_image">',
-    '<meta name="twitter:image" content="' + img + '">'
+    '<meta name="twitter:image" content="' + img + '">',
+    cfa ? "<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"" + cfa + "\"}'></script>" : ''
   ].filter(Boolean).join("\n");
   const body = v9.replace(/^<title>[^<]*<\/title>\s*/, "");
   const out = headTags + "\n" + body + "\n</html>\n";

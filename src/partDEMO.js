@@ -81,30 +81,34 @@ const TOUR = [
   [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
   [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
 ];
-let tourAt = -1;
+let tourAt = -1, tourSteps = TOUR;
+// Any page's walkthrough uses the same engine
+function tourRun(steps){ tourSteps = steps; tourStep(0); }
 function tourEnd(){
   tourAt = -1;
   document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
   const p = document.getElementById("tour-pop"); if(p) p.remove();
 }
 function tourStep(i){
-  const steps = TOUR.filter(([s]) => document.querySelector(s));
+  const steps = tourSteps.filter(([s]) => document.querySelector(s)), demoTour = tourSteps === TOUR;
   if(i < 0 || i >= steps.length) return tourEnd();
   document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
   tourAt = i;
   const [sel, title, text] = steps[i], el = document.querySelector(sel);
   el.classList.add("tour-on");
-  window.scrollTo(0, i === 0 ? 0 : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 96));
+  window.scrollTo(0, i === 0 && demoTour ? 0 : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 96));
   let p = document.getElementById("tour-pop");
-  if(!p){ p = document.createElement("div"); p.id = "tour-pop"; p.className = "tour-pop"; p.setAttribute("role", "dialog"); p.setAttribute("aria-labelledby", "tour-h"); p.tabIndex = -1; document.body.appendChild(p); }
+  if(!p){ p = document.createElement("div"); p.id = "tour-pop"; p.className = "tour-pop"; document.body.appendChild(p); }
+  p.dataset.kind = "tour"; p.setAttribute("role", "dialog"); p.setAttribute("aria-labelledby", "tour-h"); p.tabIndex = -1;
   const last = i === steps.length - 1;
   p.innerHTML = `<div class="tour-top"><span class="tour-n">${i + 1} of ${steps.length}</span><button type="button" class="tour-x" data-tour="end" aria-label="Close the tour">${icon("x")}</button></div>
     <h3 id="tour-h">${title}</h3><p>${text}</p>
     <div class="tour-a">${i ? `<button type="button" class="btn sm" data-tour="back">Back</button>` : `<span></span>`}
-      ${last ? `<span class="tour-last"><a class="btn sm" href="#maturity" data-tour="end">Open Program maturity</a><button type="button" class="btn sm primary" data-tour="end">Done</button></span>` : `<button type="button" class="btn sm primary" data-tour="next">Next ${icon("arrow")}</button>`}</div>`;
+      ${last ? `<span class="tour-last">${demoTour ? `<a class="btn sm" href="#maturity" data-tour="end">Open Program maturity</a>` : ""}<button type="button" class="btn sm primary" data-tour="end">Done</button></span>` : `<button type="button" class="btn sm primary" data-tour="next">Next ${icon("arrow")}</button>`}</div>`;
   p.focus({preventScroll:true});
 }
 function tourStart(){
+  tourSteps = TOUR;
   if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
   tourStep(0);
 }

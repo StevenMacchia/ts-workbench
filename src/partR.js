@@ -10,6 +10,7 @@ function route(){
   window.scrollTo(0,0);
   // After the first load, a new page takes focus to its heading unless the page placed it somewhere itself
   if(route.done && focusLost()) focusQuiet(document.querySelector("#view h1"));
+  if(typeof helpAfterRoute === "function") helpAfterRoute(name, h);
   route.done = true;
 }
 window.addEventListener('hashchange', route);
