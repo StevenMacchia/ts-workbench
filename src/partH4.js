@@ -89,6 +89,7 @@ function renderOverview(){
       <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
     </section>
 
+    ${typeof jnHTML === "function" ? jnHTML() : ""}
     ${typeof rcHTML === "function" ? rcHTML() : ""}
     ${ovPictureHTML()}
 
@@ -102,7 +103,6 @@ function renderOverview(){
           : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span><button type="button" class="btn sm" data-ov="new">${icon("plus")}Start a pre-mortem</button></div>`}</div>
       </div>
       <div style="display:grid;gap:16px;align-content:start">
-        ${ovChecklistHTML()}
         <div>
           <div class="ov-sec-h"><h3>Tabletop progress</h3><a href="#tabletop">Practice</a></div>
           <div class="ov-card ov-learn">${types.map(x=>`<div class="ov-lrow"><span>${esc(x.t.n.split(" &")[0].split(",")[0])}</span><div class="bar"><i style="width:${x.total?x.done/x.total*100:0}%"></i></div><span class="mono">${x.done}/${x.total}</span></div>`).join("")}</div>

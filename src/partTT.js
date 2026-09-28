@@ -175,6 +175,7 @@ function ttDebrief(H, sc){
           <div class="scen-top"><span class="libicon sm"><svg><use href="#${ttIcon(s, type)}"/></svg></span>${sevPill(s.severity)}</div>
           <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p></button>`).join("")}</div>`:""}
       <div class="row" style="margin-top:16px"><button class="btn primary" id="tt-replay">Replay this scenario</button><button class="btn" id="tt-other">Choose another scenario</button><button class="btn" id="tt-save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="tt-toast" aria-live="polite"></span></div>
+      ${typeof journeyNextHTML === "function" ? journeyNextHTML("crisis") : ""}
     </div>${ttMeters(sc)}</div>`;
   $("#tt-replay").onclick = () => ttStart(tt.s, tt.v);
   $("#tt-other").onclick = $("#tt-quit").onclick = () => { tt = null; store.set("tt", null); renderTabletop(); };

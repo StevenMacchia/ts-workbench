@@ -127,6 +127,7 @@ function tkOpen(src){
     if(e.target === bg || e.target.closest("[data-tkclose]")) return close();
     const b = e.target.closest("[data-tktr],[data-tkcsv],[data-tkopen]"); if(!b) return;
     if(b.dataset.tktr){ tkCfg.tracker = b.dataset.tktr; store.set("tk:cfg", tkCfg); redraw(); const s = box.querySelector(`[data-tktr="${tkCfg.tracker}"]`); if(s) s.focus(); }
+    if(b.dataset.tkcsv || b.dataset.tkopen) store.set("tk:used", true);
     if(b.dataset.tkcsv){ const k = tkCfg.tracker, rows = tk.tasks.filter(t => tk.sel[t.id]), csv = tkCsvFor(k, rows);
       offerFile(`ts-workbench-${tkSlug(tk.src.replace(/^the /, "")).slice(0, 40)}-${k}.csv`, csv, csv, box.querySelector("#tk-toast")); }
     if(b.dataset.tkopen){ tk.opened[b.dataset.tkopen] = true; setTimeout(list, 50); }

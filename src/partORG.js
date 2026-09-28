@@ -40,12 +40,15 @@ function orgCardHTML(){
 }
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion]"); if(!b) return;
+  const wasReady = orgReady();
   if(b.dataset.orgstage) orgSet({stage:b.dataset.orgstage});
   if(b.dataset.orgregion){ const cur = orgGet().regions || [], k = b.dataset.orgregion; orgSet({regions:cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)}); }
+  if(orgReady() !== wasReady && (location.hash || "#overview").slice(1).split("/")[0] === "overview"){ renderOverview(); return gsay("Workspace settings saved"); }
   const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
   gsay("Workspace settings saved");
 });
-document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ orgSet({type:t.value || null}); gsay("Workspace settings saved"); } });
+document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ const wasReady = orgReady(); orgSet({type:t.value || null}); gsay("Workspace settings saved");
+  if(orgReady() !== wasReady && (location.hash || "#overview").slice(1).split("/")[0] === "overview") renderOverview(); } });
 
 /* ---------- New: start any assessment from the top bar ---------- */
 const NEW_ITEMS = [

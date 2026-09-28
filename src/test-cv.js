@@ -46,10 +46,10 @@ const body = function(){
   const msg = wsSaveTool("coverage", cv, cvTitle(cv)), it = Object.values(wsItems()).find(i => i.kind === "coverage");
   eq(!!it && /% coverage/.test(itemSummary(it).html), true, "workspace summary");
   eq(cmdkItems().some(x => x.label === "Coverage radar"), true, "search reaches the tool");
-  renderOverview(); eq(/href="#coverage"/.test(view.innerHTML) && /Map your defenses against risk/.test(view.innerHTML), true, "overview card and checklist");
+  renderOverview(); eq(/href="#coverage"/.test(view.innerHTML) && /Map your coverage/.test(view.innerHTML), true, "overview card and program review step");
   out.push(`exports: markdown, ${tasks.length} tracker tasks, workspace (${msg}), search and overview`);
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partTK.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partTK.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

@@ -123,7 +123,8 @@ function renderReport(r){
     <div class="card" style="margin-top:16px;scroll-margin-top:16px" id="pm-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>
-    </div>`;
+    </div>
+    ${pm.example || typeof journeyNextHTML !== "function" ? "" : journeyNextHTML("premortem")}`;
 }
 function sgItem(s){
   return `<label class="citem ${pm.done[s.id]?"done":""}">

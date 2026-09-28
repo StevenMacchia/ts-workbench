@@ -54,20 +54,46 @@ function rcRing(score, size){
     <text x="50%" y="${size / 2 - 2}" text-anchor="middle" class="rc-grade" style="fill:${gr ? `var(--${gr[2]})` : "var(--faint)"}">${gr ? gr[1] : "–"}</text>
     <text x="50%" y="${size / 2 + 22}" text-anchor="middle" class="rc-num">${score === null ? "not graded" : score + " / 100"}</text></svg>`;
 }
+// One entry a day in the grade's history, so the report card can show which way it's heading
+function rcRecord(o){
+  if(o.score === null) return store.get("rc:hist", []) || [];
+  const hist = (store.get("rc:hist", []) || []).slice(), day = new Date().toISOString().slice(0, 10), last = hist[hist.length - 1];
+  if(last && last.d === day){ if(last.s !== o.score){ last.s = o.score; store.set("rc:hist", hist); } }
+  else { hist.push({d:day, s:o.score}); store.set("rc:hist", hist.slice(-24)); }
+  return store.get("rc:hist", []) || [];
+}
+// The single most useful thing to do next for a part
+function rcTip(p){
+  try{
+    if(p.k === "maturity"){ const nx = maNextItem(ma); return nx ? nx.text : ""; }
+    if(p.k === "coverage"){ const a = cvActions(cv, 1)[0]; return a ? a.text : ""; }
+    if(p.k === "launch"){ for(const it of Object.values(wsItems()).filter(x => x.kind === "premortem" && x.data)){ const s = assess(openRecord(it.data)).safeguards.find(g => g.rank === 3 && !(it.data.done && it.data.done[g.id])); if(s) return s.t + " (" + (it.title || "a product") + ")"; } return ""; }
+    if(p.k === "crisis"){ const n = Object.keys(ttProgress()).length; return n < 4 ? `Practice ${4 - n} more scenario${4 - n === 1 ? "" : "s"} for full credit` : "Replay the scenarios where your first call missed"; }
+    if(p.k === "policy") return "Re-test your lowest-scoring policy with the stress-tester";
+  }catch(e){}
+  return "";
+}
+function rcTrend(hist){
+  if(hist.length < 2) return "";
+  const pts = hist.slice(-8), W = 120, H = 34, x = i => 4 + i * (W - 8) / (pts.length - 1), lo = Math.min(...pts.map(p => p.s)) - 5, hi = Math.max(...pts.map(p => p.s)) + 5, y = v => H - 4 - (v - lo) / Math.max(1, hi - lo) * (H - 8);
+  const first = hist[0], last = hist[hist.length - 1], d = last.s - first.s;
+  return `<span class="rc-trend"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline points="${pts.map((p, i) => x(i).toFixed(1) + "," + y(p.s).toFixed(1)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(last.s).toFixed(1)}" r="3" fill="var(--accent)"/></svg>
+    <small class="${d > 0 ? "up" : d < 0 ? "dn" : ""}">${d > 0 ? "+" : ""}${d} since ${esc(new Date(first.d + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"}))}</small></span>`;
+}
 function rcHTML(){
-  const parts = rcParts(), o = rcOverall(parts), gr = o.score === null ? null : rcGrade(o.score);
+  const parts = rcParts(), o = rcOverall(parts), gr = o.score === null ? null : rcGrade(o.score), hist = rcRecord(o);
   const weakest = parts.filter(p => p.score !== null).sort((a, b) => a.score - b.score)[0], next = parts.find(p => p.score === null);
   const line = o.score === null ? "Complete any assessment to get your first grade. Each one you finish adds to the overall score."
     : `${o.graded} of ${o.total} parts graded.${weakest && weakest.score < 70 ? ` Your weakest is ${weakest.n.toLowerCase()} at ${weakest.score}.` : ""}${next ? ` Add ${next.n.toLowerCase()} for a fuller picture.` : ""}`;
   return `<section class="rise rc" aria-label="Report card">
-    <div class="ov-sec-h"><h3>Report card</h3><span class="rc-act"><button type="button" class="ov-link" data-rc="download">Download</button><span class="note">Self-assessment, not an audit</span></span></div>
+    <div class="ov-sec-h"><h3>Report card</h3><span class="rc-act"><button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button><span class="note">Self-assessment, not an audit</span></span></div>
     <div class="card rc-card">
       <div class="rc-main">${rcRing(o.score, 148)}
-        <div class="rc-sum"><b>${gr ? `Overall grade ${gr[1]}` : "No grade yet"}</b><p>${esc(line)}</p>
+        <div class="rc-sum"><b>${gr ? `Overall grade ${gr[1]}` : "No grade yet"}</b>${rcTrend(hist)}<p>${esc(line)}</p>
           <p class="note rc-how">Each part is scored out of 100. The overall grade weighs maturity 30%, coverage 25%, launch readiness 20%, crisis readiness 15% and policy clarity 10%, across the parts you've completed.</p></div></div>
       <div class="rc-parts">${parts.map(p => { const g = p.score === null ? null : rcGrade(p.score);
         return `<a class="rc-p ${g ? "" : "open"}" href="#${p.route}"><span class="sb-glyph" style="background:${g ? p.color : "var(--faint)"}"><svg><use href="#i-${p.icon}"/></svg></span>
-          <span class="rc-pt"><b>${p.n}</b><small>${esc(g ? p.detail : (p.detail ? p.detail + " · " : "") + p.todo)}</small></span>
+          <span class="rc-pt"><b>${p.n}</b><small>${esc(g ? p.detail : (p.detail ? p.detail + " · " : "") + p.todo)}</small>${g && p.score < 70 && rcTip(p) ? `<em class="rc-tip">To raise it: ${esc(rcTip(p))}</em>` : ""}</span>
           ${g ? `<span class="rc-bar"><i style="width:${p.score}%;background:var(--${g[2]})"></i></span><span class="rc-sc mono">${p.score}</span><span class="rc-lt ${g[2]}">${g[1]}</span>` : `<span class="rc-ng">Not graded</span>`}</a>`; }).join("")}</div>
     </div>
   </section>`;

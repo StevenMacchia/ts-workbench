@@ -10,7 +10,7 @@ const body = function(){
   if(bad(h)) throw new Error("blank overview has bad values: " + (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0]);
   eq(cards(h), 3, "three radar cards"); eq(empties(h), 3, "all three invite when blank"); eq(/0 of 3 complete/.test(h), true, "progress starts at 0");
   eq(/How mature is your program\?/.test(h) && /How could your products be misused\?/.test(h) && /One radar per product/.test(h), true, "each card invites");
-  eq(/Complete the picture/.test(h) && /Not started/.test(h), true, "checklist shows what's left"); eq(/aria-label="Current assessment"/.test(h), false, "pre-mortem hero moved off the overview");
+  eq(/Your program review/.test(h) && /0 of 6 done/.test(h) && /Start here: tell the workbench/.test(h), true, "program review starts with setup"); eq(/aria-label="Current assessment"/.test(h), false, "pre-mortem hero moved off the overview");
   out.push("blank: 3 invitation cards, 0 of 3 complete, checklist");
   // the maturity example doesn't count as your own rating
   ma = JSON.parse(JSON.stringify(MA_EXAMPLE)); renderOverview(); eq(empties(view.innerHTML), 3, "example maturity still invites");
@@ -38,6 +38,6 @@ const body = function(){
   out.push("pre-mortem landing: current assessment hero and a mini radar on each saved assessment");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());
