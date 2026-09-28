@@ -116,6 +116,7 @@ function tkDialogHTML(){
 function tkOpen(src){
   if(src === "premortem"){ tk = {src:`the pre-mortem "${pm.name || "Untitled assessment"}"`, tasks:tkFromPremortem(), sel:{}, opened:{}}; }
   else if(src === "coverage"){ tk = {src:"your coverage gaps", tasks:tkFromCoverage(), sel:{}, opened:{}}; }
+  else if(src === "tabletop"){ tk = {src:`the tabletop "${ttfSc().title}"`, tasks:tkFromTabletop(), sel:{}, opened:{}}; }
   else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
   tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
   const prev = document.activeElement, bg = document.createElement("div");

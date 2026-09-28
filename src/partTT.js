@@ -1,4 +1,5 @@
 function renderTabletop(){
+  if(typeof ttf !== "undefined" && ttf && ttf.phase) return ttfRender();
   if(!tt) return ttPicker(t => head('Incident Tabletop', t, 'Run the program'));
   if(!tt.first) tt.first = []; if(!tt.retried) tt.retried = [];
   const sc = ttScenario(tt.s, tt.v);
@@ -30,6 +31,7 @@ function ttStart(i, v){ tt = freshTT(i); tt.v = v; tt.first = []; tt.retried = [
 
 /* ---------- picker ---------- */
 function ttPicker(H){
+  const ttMode = typeof ttfNew === "function" ? store.get("tt:mode", "solo") : "solo";
   const ttType = ttCompanyType(), tInfo = TT_TYPES.find(t=>t.k===ttType), prog = ttProgress(), filt = store.get("tt:filter", "all");
   const all = SCENARIOS.map((s,i)=>({s:ttScenario(i, ttType), i})).filter(x => ttType==="all" || (x.s.types||[]).includes(ttType))
     .sort((a,b) => (a.s.tailored?1:0) - (b.s.tailored?1:0));
@@ -52,6 +54,8 @@ function ttPicker(H){
         <p class="note">${all.length} scenarios for ${tInfo.s} companies, including ones every company faces, tailored to yours.</p>
       </div>
     </div>
+    <div class="row ttfilters"><div class="segs tt-mode" role="group" aria-label="How to play"><button type="button" data-ttmode="solo" aria-pressed="${ttMode !== "team"}">Play solo</button><button type="button" data-ttmode="team" aria-pressed="${ttMode === "team"}">Run with a team</button></div>
+      ${ttMode === "team" ? `<span class="note tt-mode-n">Run a scenario live on a shared screen: roles, a timer for each decision, notes and action items, then an after-action report.</span>` : ""}</div>
     <div class="row ttfilters"><div class="segs" role="group" aria-label="Show">
       <button type="button" data-ttf="all" aria-pressed="${filt==="all"}">All <span class="mono" style="opacity:.6">${all.length}</span></button>
       <button type="button" data-ttf="todo" aria-pressed="${filt==="todo"}">Not started <span class="mono" style="opacity:.6">${all.length-completed}</span></button>
@@ -65,7 +69,8 @@ function ttPicker(H){
           ${s.tailored?`<span class="tag">Tailored</span>`:""}${laws?`<span class="tag">Law notes</span>`:""}</span>
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
-  $$(".scen").forEach(b => b.onclick = () => ttStart(+b.dataset.i, ttType));
+  $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
+  $$("[data-ttmode]").forEach(b => b.onclick = () => { store.set("tt:mode", b.dataset.ttmode); renderTabletop(); const f = document.querySelector(`[data-ttmode="${b.dataset.ttmode}"]`); if(f) f.focus(); });
   $("#tt-type").onchange = e => { store.set("tt:type", e.target.value); renderTabletop(); };
   $$("[data-ttf]").forEach(b => b.onclick = () => { store.set("tt:filter", b.dataset.ttf); renderTabletop(); });
 }
