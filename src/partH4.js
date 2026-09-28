@@ -90,6 +90,7 @@ function renderOverview(){
     </section>
 
     ${typeof jnHTML === "function" ? jnHTML() : ""}
+    ${typeof nxHTML === "function" ? nxHTML() : ""}
     ${typeof rcHTML === "function" ? rcHTML() : ""}
     ${ovPictureHTML()}
 

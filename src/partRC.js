@@ -19,10 +19,10 @@ function rcParts(){
   }
   // Harm coverage: risk-weighted coverage from the coverage radar
   if(typeof cvSummary === "function"){
-    const s = cvSummary(cv), own = !cv.ex, score = own && s.rated === s.total ? s.cov : null;
+    const s = cvSummary(cv), own = !cv.ex, score = own && !cv.est && s.rated === s.total ? s.cov : null;
     out.push({k:"coverage", n:"Harm coverage", icon:"cover", color:"var(--t-cv)", route:"coverage", score,
-      detail:score !== null ? `${s.weighted ? "Risk-weighted" : "Unweighted"} · ${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "no gaps"}` : own && s.rated ? `${s.rated} of ${s.total} defenses rated` : "",
-      todo:own && s.rated ? "Finish rating your defenses" : "Map your defenses against risk"});
+      detail:score !== null ? `${s.weighted ? "Risk-weighted" : "Unweighted"} · ${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "no gaps"}` : own && cv.est ? "Estimates from maturity, not yet confirmed" : own && s.rated ? `${s.rated} of ${s.total} defenses rated` : "",
+      todo:own && cv.est ? "Confirm your coverage estimates" : own && s.rated ? "Finish rating your defenses" : "Map your defenses against risk"});
   }
   // Launch readiness: safeguards done across saved pre-mortems, launch blockers counted twice
   { const pms = items.filter(it => it.kind === "premortem" && it.data);
@@ -86,7 +86,7 @@ function rcHTML(){
   const line = o.score === null ? "Complete any assessment to get your first grade. Each one you finish adds to the overall score."
     : `${o.graded} of ${o.total} parts graded.${weakest && weakest.score < 70 ? ` Your weakest is ${weakest.n.toLowerCase()} at ${weakest.score}.` : ""}${next ? ` Add ${next.n.toLowerCase()} for a fuller picture.` : ""}`;
   return `<section class="rise rc" aria-label="Report card">
-    <div class="ov-sec-h"><h3>Report card</h3><span class="rc-act"><button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button><span class="note">Self-assessment, not an audit</span></span></div>
+    <div class="ov-sec-h"><h3>Report card</h3><span class="rc-act">${o.score === null ? "" : `<button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button>`}<span class="note">Self-assessment, not an audit</span></span></div>
     <div class="card rc-card">
       <div class="rc-main">${rcRing(o.score, 148)}
         <div class="rc-sum"><b>${gr ? `Overall grade ${gr[1]}` : "No grade yet"}</b>${rcTrend(hist)}<p>${esc(line)}</p>

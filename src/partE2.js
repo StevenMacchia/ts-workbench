@@ -39,7 +39,7 @@ const OBL = [
 {r:"eu", law:"General Data Protection Regulation (GDPR)", st:c=>"applies", bump:false,
  t:"Have a lawful basis for processing, minimize data and run impact assessments for high-risk processing. Children's consent to online services needs parental authorization below an age set by each country (13 to 16).", sg:["data_minimization","access_controls"]},
 {r:"eu", law:"EU AI Act: transparency duties", st:c=>(c.F("ai_gen")||c.F("ai_chat"))?"applies":null,
- t:"From August 2026, tell people when they are interacting with an AI system, and mark AI-generated or manipulated content, including deepfakes, in a machine-readable way. Check for any changes to timelines.", sg:["ai_disclosure","gen_provenance"]},
+ t:"Since 2 August 2026, tell people when they are interacting with an AI system, and mark AI-generated or manipulated content, including deepfakes, in a machine-readable way. Generative AI systems already on the market before that date have until 2 December 2026 to add the marking.", sg:["ai_disclosure","gen_provenance"]},
 {r:"eu", law:"EU anti-money-laundering rules, PSD2 and MiCA", st:c=>(c.T("fintech","crypto")&&c.moneyMoves)?"applies":((c.M("p2p")||c.M("crypto"))?"may":null),
  t:"Payment and crypto businesses need authorization, customer due diligence, transaction monitoring and suspicious-transaction reporting. PSD2 requires strong customer authentication; crypto-asset service providers need authorization under MiCA.", sg:["kyc","aml_monitoring","payment_risk"]},
 
@@ -76,6 +76,45 @@ const OBL = [
 {r:"br", law:"General Data Protection Law (LGPD)", st:c=>"applies", bump:false,
  t:"Process personal data on a legal basis and in the best interests of children and adolescents, with specific parental consent for children's data.", sg:["data_minimization"]}
 ];
+
+// Where each law note comes from: the official text or the regulator's own page. Checked when the notes were last reviewed.
+const LAW_REVIEWED = "September 2026";
+const LAW_SRC = {
+  "Federal CSAM reporting duty (18 U.S.C. § 2258A)":["https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title18-section2258A&num=0&edition=prelim", "US Code, 18 U.S.C. § 2258A"],
+  "Children's Online Privacy Protection Act (COPPA)":["https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa", "FTC, COPPA Rule (16 CFR Part 312)"],
+  "TAKE IT DOWN Act":["https://www.govinfo.gov/app/details/PLAW-119publ12", "GovInfo, Public Law 119-12"],
+  "INFORM Consumers Act":["https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act", "FTC, INFORM Consumers Act guidance"],
+  "FTC rule on consumer reviews and testimonials":["https://www.ftc.gov/legal-library/browse/federal-register-notices/16-cfr-part-465-trade-regulation-rule-use-consumer-reviews-testimonials-final-rule", "FTC, 16 CFR Part 465 final rule"],
+  "Bank Secrecy Act, AML and OFAC sanctions":["https://www.fincen.gov/resources/statutes-and-regulations/bank-secrecy-act", "FinCEN, The Bank Secrecy Act"],
+  "Electronic Fund Transfer Act (Regulation E)":["https://www.consumerfinance.gov/rules-policy/regulations/1005/", "CFPB, Regulation E (12 CFR Part 1005)"],
+  "State AI companion chatbot laws (e.g. California, New York)":["https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB243", "California SB 243 (2025), companion chatbots"],
+  "State age-verification laws for adult content":["https://www.congress.gov/crs-product/LSB11354", "Congressional Research Service overview"],
+  "State children's online safety and design laws":["https://www.congress.gov/crs-product/R49308", "Congressional Research Service, R49308"],
+  "Fair housing, fair lending and equal-employment laws":["https://www.justice.gov/crt/housing-and-civil-enforcement-section", "US DOJ, Housing and Civil Enforcement Section"],
+  "Digital Services Act: core duties":["https://eur-lex.europa.eu/eli/reg/2022/2065/oj/eng", "EUR-Lex, Regulation (EU) 2022/2065"],
+  "Digital Services Act Article 28: protection of minors":["https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-protection-minors", "European Commission, Article 28 guidelines"],
+  "Digital Services Act: trader traceability":["https://eur-lex.europa.eu/eli/reg/2022/2065/oj/eng#art_30", "EUR-Lex, DSA Article 30"],
+  "Digital Services Act: very large platforms":["https://eur-lex.europa.eu/eli/reg/2022/2065/oj/eng#art_33", "EUR-Lex, DSA Articles 33 to 43"],
+  "Terrorist Content Online Regulation":["https://eur-lex.europa.eu/eli/reg/2021/784/oj/eng", "EUR-Lex, Regulation (EU) 2021/784"],
+  "General Data Protection Regulation (GDPR)":["https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng", "EUR-Lex, Regulation (EU) 2016/679"],
+  "EU AI Act: transparency duties":["https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng#art_50", "EUR-Lex, AI Act Article 50"],
+  "EU anti-money-laundering rules, PSD2 and MiCA":["https://finance.ec.europa.eu/financial-crime/anti-money-laundering-and-countering-financing-terrorism-eu-level_en", "European Commission, EU anti-money-laundering rules"],
+  "Online Safety Act: illegal harms duties":["https://www.legislation.gov.uk/ukpga/2023/50/section/10", "legislation.gov.uk, Online Safety Act 2023 s.10"],
+  "Online Safety Act: children's safety duties":["https://www.legislation.gov.uk/ukpga/2023/50/section/12", "legislation.gov.uk, Online Safety Act 2023 s.12"],
+  "Online Safety Act: age checks for pornography":["https://www.legislation.gov.uk/ukpga/2023/50/part/5", "legislation.gov.uk, Online Safety Act 2023 Part 5"],
+  "Age Appropriate Design Code (Children's Code)":["https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/childrens-information/childrens-code-guidance-and-resources/age-appropriate-design-a-code-of-practice-for-online-services/", "ICO, Age appropriate design code"],
+  "APP fraud mandatory reimbursement":["https://www.psr.org.uk/information-for-consumers/app-fraud-reimbursement-protections/", "Payment Systems Regulator, APP fraud reimbursement"],
+  "FCA rules: Consumer Duty, AML and financial promotions":["https://www.fca.org.uk/firms/consumer-duty", "FCA, Consumer Duty"],
+  "Online Safety Act 2021 and industry codes":["https://www.legislation.gov.au/C2021A00076/latest/text", "Federal Register of Legislation, Online Safety Act 2021"],
+  "Social media minimum age (under-16s)":["https://www.esafety.gov.au/about-us/industry-regulation/social-media-age-restrictions", "eSafety Commissioner, social media age restrictions"],
+  "Mandatory reporting of child sexual abuse material":["https://laws-lois.justice.gc.ca/eng/acts/I-20.7/", "Justice Laws Website, S.C. 2011, c. 4"],
+  "Proceeds of Crime (Money Laundering) and Terrorist Financing Act":["https://laws-lois.justice.gc.ca/eng/acts/P-24.501/", "Justice Laws Website, PCMLTFA"],
+  "IT (Intermediary Guidelines and Digital Media Ethics Code) Rules":["https://www.meity.gov.in/documents/act-and-policies/information-technology-intermediary-guidelines-and-digital-media-ethics-code-rules-2021-it-rules-2021-IjM5QjMtQWa", "MeitY, IT Rules 2021"],
+  "Digital Personal Data Protection Act 2023":["https://www.meity.gov.in/static/uploads/2024/06/2bf1f0e9f04e6fb4f8fef35e82c42aa5.pdf", "MeitY, DPDP Act 2023 (PDF)"],
+  "Digital Statute of Children and Adolescents (ECA Digital)":["https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/l15211.htm", "Planalto, Lei nº 15.211/2025"],
+  "General Data Protection Law (LGPD)":["https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm", "Planalto, Lei nº 13.709/2018"]
+};
+const lawSrcLink = law => { const s = LAW_SRC[law]; return s ? `<a class="obl-src" href="${s[0]}" target="_blank" rel="noopener">Source: ${esc(s[1])}<svg><use href="#i-send"/></svg></a>` : ""; };
 
 const DECISIONS = {
   social:["Will you allow adult nudity or sexual content anywhere, even behind a filter?","How will you handle newsworthy but graphic content?","What changes during elections and other high-risk events?","Do public figures get different treatment? If so, how will you keep it transparent?"],

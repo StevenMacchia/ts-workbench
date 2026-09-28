@@ -1,8 +1,9 @@
 function renderTabletop(){
-  const H = t => head('Incident Tabletop', t, 'Run the program');
-  if(!tt) return ttPicker(H);
+  if(!tt) return ttPicker(t => head('Incident Tabletop', t, 'Run the program'));
   if(!tt.first) tt.first = []; if(!tt.retried) tt.retried = [];
   const sc = ttScenario(tt.s, tt.v);
+  // In a scenario the header shrinks to its name and your place in it
+  const H = () => headCompact("Incident Tabletop", esc(sc.title) + (tt.step >= sc.steps.length ? " · debrief" : ` · decision ${tt.step + 1} of ${sc.steps.length}`));
   if(tt.step >= sc.steps.length) return ttDebrief(H, sc);
   return ttPlay(H, sc);
 }
@@ -25,7 +26,7 @@ const dCls = v => v>0 ? "up" : v<0 ? "dn" : "";
 const lawBox = law => law ? `<div class="lawbox"><span class="eyebrow"><svg><use href="#i-scale"/></svg>Law and standards</span><p>${gloss(law)}</p></div>` : "";
 const firstWasBest = (sc, i) => tt.first[i]!==undefined && sc.steps[i].o[tt.first[i]] && sc.steps[i].o[tt.first[i]].best;
 function ttIcon(s, type){ return s.tailored ? (TT_ICON[type] || "i-layers") : (TT_ICON[(s.types||[])[0]] || "i-layers"); }
-function ttStart(i, v){ tt = freshTT(i); tt.v = v; tt.first = []; tt.retried = []; ttSave(); renderTabletop(); window.scrollTo(0,0); }
+function ttStart(i, v){ tt = freshTT(i); tt.v = v; tt.first = []; tt.retried = []; ttSave(); renderTabletop(); window.scrollTo(0,0); focusQuiet(document.querySelector("#view h2") || document.querySelector("#view h1")); }
 
 /* ---------- picker ---------- */
 function ttPicker(H){
@@ -130,10 +131,10 @@ function ttPlay(H, sc){
     tt.before = Object.assign({}, tt.scores);
     DIMS.forEach(x => tt.scores[x.k] = clamp(tt.scores[x.k] + (d[x.k]||0)));
     tt.picks[tt.step] = i; tt.answered = true; ttSave(); renderTabletop();
-    const l = $("#tt-learn"); if(l && l.scrollIntoView) l.scrollIntoView({behavior:"smooth", block:"nearest"}); });
-  const nx = $("#tt-next"); if(nx) nx.onclick = () => { tt.step++; tt.answered = false; tt.before = null; ttSave(); renderTabletop(); window.scrollTo(0,0); };
-  const rt = $("#tt-retry"); if(rt) rt.onclick = () => { if(tt.before) tt.scores = tt.before; tt.before = null; tt.retried[tt.step] = true; tt.picks[tt.step] = undefined; tt.answered = false; ttSave(); renderTabletop(); };
-  $("#tt-quit").onclick = () => { tt = null; store.set("tt", null); renderTabletop(); };
+    const l = $("#tt-learn"); if(l && l.scrollIntoView) l.scrollIntoView({behavior:"smooth", block:"nearest"}); focusQuiet(l); });
+  const nx = $("#tt-next"); if(nx) nx.onclick = () => { tt.step++; tt.answered = false; tt.before = null; ttSave(); renderTabletop(); window.scrollTo(0,0); focusQuiet(document.querySelector("#view h2") || document.querySelector("#view h1")); };
+  const rt = $("#tt-retry"); if(rt) rt.onclick = () => { if(tt.before) tt.scores = tt.before; tt.before = null; tt.retried[tt.step] = true; tt.picks[tt.step] = undefined; tt.answered = false; ttSave(); renderTabletop(); const o = document.querySelector("#view .opt"); if(o) o.focus(); };
+  $("#tt-quit").onclick = () => { tt = null; store.set("tt", null); renderTabletop(); focusQuiet(document.querySelector("#view h1")); };
 }
 
 /* ---------- debrief ---------- */

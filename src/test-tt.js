@@ -5,7 +5,7 @@ const stub = `
 const mem = {}; const store = {get:(k,d)=> k in mem ? JSON.parse(mem[k]) : d, set(k,v){ mem[k] = JSON.stringify(v); }};
 const document = {addEventListener(){}, activeElement:null, getElementById(){ return null; }}; const location = {hash:"#tabletop"}; const window = {};
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const icon = () => ""; const $ = () => ({}), $$ = () => []; const view = {}; const head = (t,d) => "<h1>"+t+"</h1><p>"+d+"</p>"; const copyText = () => {};
+const icon = () => ""; const $ = () => ({}), $$ = () => []; const view = {}; const head = (t,d) => "<h1>"+t+"</h1><p>"+d+"</p>"; const headCompact = (t,c) => "<h1>"+t+"</h1><p>"+c+"</p>"; const copyText = () => {};
 `;
 const src = stub + ["partD.js","partE1.js","partE2.js","partF1.js","_F2.js","partW1.js","_L.js","_F3.js","_G.js","_W2.js"].map(rd).join("\n") + `
 const out = [], bestPos = [0,0,0]; let variants = 0;

@@ -291,7 +291,7 @@
 .mxm-bar{height:6px;border-radius:99px;background:color-mix(in oklab, var(--ink) 10%, transparent);overflow:hidden}
 .mxm-bar i{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .3s ease}
 .mxm-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.mxm-next{font-size:11.5px;font-weight:600;color:#fff;background:var(--accent);padding:2px 9px;border-radius:99px;white-space:nowrap}
+.mxm-next{font-size:11.5px;font-weight:600;color:var(--accent-ink);background:var(--accent);padding:2px 9px;border-radius:99px;white-space:nowrap}
 .mxm-read{font-size:12px;font-weight:500;color:var(--good);white-space:nowrap}
 .mxm-card.is-next{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 14%, transparent)}
 .mxm-q{font-size:15px;color:var(--ink);line-height:1.5}
@@ -306,7 +306,7 @@
 .mxa-main{gap:56px}
 .mxa-part{display:grid;gap:26px;scroll-margin-top:72px}
 .mxa-ph{display:flex;align-items:flex-start;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line)}
-.mxa-pnum{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;font:600 16px var(--body);background:var(--accent);color:#fff}
+.mxa-pnum{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;font:600 16px var(--body);background:var(--accent);color:var(--accent-ink)}
 .mxa-ph h3{font-size:22px;letter-spacing:-.018em;margin:1px 0 2px}
 .mxa-ph p{margin:0;font-size:14.5px;color:var(--muted)}
 .mxa-blk{display:grid;gap:12px}
@@ -327,7 +327,7 @@
 .mxa-tl:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .mxa-tl b{width:24px;height:24px;border-radius:7px;flex:none;display:grid;place-items:center;font:600 12px var(--body);background:var(--sunk);color:var(--muted)}
 .mxa-tl.on{color:var(--ink);background:color-mix(in oklab, var(--accent) 8%, transparent)}
-.mxa-tl.on b{background:var(--accent);color:#fff}
+.mxa-tl.on b{background:var(--accent);color:var(--accent-ink)}
 .mxa-tst{margin-left:auto}
 .mxa-tst .pill{font-size:11px}
 @media (max-width:1100px){
@@ -441,7 +441,7 @@ text.mxt-a{fill:var(--crit)}
 .vd-rk{display:flex;gap:12px;padding:12px;border-radius:12px;border:1px solid var(--line)}
 .vd-rk.top{border-color:var(--accent);background:color-mix(in oklab, var(--accent) 5%, var(--surface))}
 .vd-rk-n{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;font:600 12px var(--body);background:var(--sunk);color:var(--muted)}
-.vd-rk.top .vd-rk-n{background:var(--accent);color:#fff}
+.vd-rk.top .vd-rk-n{background:var(--accent);color:var(--accent-ink)}
 .vd-rk-b{display:grid;gap:6px;flex:1;min-width:0}
 .vd-rk-t{display:flex;justify-content:space-between;gap:6px 8px;align-items:center;flex-wrap:wrap}
 .vd-rk-t b{font-size:14px;font-weight:600}
@@ -478,7 +478,7 @@ text.mxt-a{fill:var(--crit)}
 .vd-cell.high{background:var(--high-soft);color:var(--high)}
 .vd-cell.med{background:var(--med-soft);color:var(--med)}
 .vd-cell.good2{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
-.vd-cell.good{background:var(--good);color:#fff}
+.vd-cell.good{background:var(--good);color:var(--surface)}
 .vd-cell.fail{outline:2px solid var(--crit);outline-offset:1px}
 .vd-sc{display:grid}
 .vd-row{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;padding:9px 0;border-top:1px solid var(--line);flex-wrap:wrap}

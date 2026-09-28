@@ -21,6 +21,9 @@ function openSaved(id){
   if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
   goRoute(KINDS[it.kind].route);
 }
+// Move keyboard and screen-reader focus to new content without jumping the page
+function focusQuiet(el){ if(!el || !el.focus) return; if(!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1"); try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }
+const focusLost = () => !document.activeElement || document.activeElement === document.body;
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;

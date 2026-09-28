@@ -132,6 +132,22 @@ function cvCellHTML(x, l){
   const v = x.r[l.k];
   return `<div class="cv-seg" role="radiogroup" aria-label="${esc(x.a.n + ": " + l.n)}">${CV_LEVELS.map((n, j) => `<button type="button" role="radio" aria-checked="${v === j}" class="${v === j ? "on" : ""} l${j}" data-cva="${x.a.k}" data-cvl="${l.k}" data-cvn="${j}" title="${esc(n + ": " + l.lv[j])}"><span class="visually-hidden">${n}</span></button>`).join("")}</div>`;
 }
+/* ---------- Start from maturity: one program-wide level per layer, then adjust each harm area ---------- */
+const CV_FROM_MA = {policy:"policy", detect:"detection", enforce:"operations", appeal:"quality", measure:"measurement"};
+const cvMaReady = () => typeof ma !== "undefined" && !ma.ex && MA_AREAS.every(a => ma.lv[a.k]);
+const cvFromMaLevel = n => n >= 4 ? 3 : Math.max(0, n - 1);
+function cvFillFromMaturity(){
+  let n = 0;
+  CV_AREAS.forEach(a => { const row = cv.r[a.k] = Object.assign({}, cv.r[a.k]); CV_LAYERS.forEach(l => { if(row[l.k] === undefined){ row[l.k] = cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k])); n++; } }); });
+  cv.ex = false; cv.est = true; cvSave(); return n;
+}
+function cvEstHTML(){
+  if(cv.ex) return "";
+  if(cv.est) return `<div class="banner cv-est"><span><strong>Estimates from your maturity ratings.</strong> Every harm area starts at your program-wide level. Change the ones that are stronger or weaker, then confirm.</span><button type="button" class="btn sm primary" data-cv="confirm">Confirm coverage</button></div>`;
+  const s = cvSummary(cv), left = s.total - s.rated;
+  if(!left || !cvMaReady()) return "";
+  return `<div class="card cv-fill"><div><b>Start from your maturity ratings</b><small>Fill ${left === s.total ? "all " + s.total : "the " + left + " unrated"} cells with your program-wide level for each layer (${CV_LAYERS.map(l => `${l.n.toLowerCase()}: ${CV_LEVELS[cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k]))].toLowerCase()}`).join(", ")}), then adjust the harm areas that differ.</small></div><button type="button" class="btn sm primary" data-cv="fillma">Fill from maturity</button></div>`;
+}
 function cvMatrixHTML(){
   const rows = cvRows(cv), seen = new Set();
   return `<div class="card cv-mx">
@@ -172,7 +188,7 @@ function cvResultHTML(){
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button></div>` : ""}</div>
     <div class="card cv-big">${cvRadar(cv, true)}${cvLegend(cv)}</div></div>
     <div class="ma-rh"><h4>Biggest gaps</h4></div>${cvGapsHTML()}
-    ${cv.ex || cvSummary(cv).rated < CV_AREAS.length * CV_LAYERS.length ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("coverage") : ""}`;
+    ${cv.ex || cv.est || cvSummary(cv).rated < CV_AREAS.length * CV_LAYERS.length ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("coverage") : ""}`;
 }
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
@@ -204,7 +220,7 @@ function renderCoverage(){
     <div class="vd-grid ma-grid cv-grid">
       <div class="vd-main">
         <section class="mxa-part">${step(1)}<div id="cv-src-wrap">${cvSourceHTML()}</div></section>
-        <section class="mxa-part">${step(2)}<div id="cv-matrix">${cvMatrixHTML()}</div></section>
+        <section class="mxa-part">${step(2)}<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div></section>
         <section class="mxa-part" id="cv-p3">${step(3)}<div id="cv-result">${cvResultHTML()}</div></section>
       </div>
       <aside class="vd-rail"><div class="card vd-railc" id="cv-rail">${cvRailHTML()}</div></aside>
@@ -215,7 +231,7 @@ function renderCoverage(){
 function cvRefresh(all){
   const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
   if(all){ set("cv-src-wrap", cvSourceHTML()); set("cv-matrix", cvMatrixHTML()); }
-  set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML());
+  set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML()); set("cv-est", cvEstHTML());
   const hm = view.querySelector && view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = cvHeadMeta();
 }
 function bindCoverage(){
@@ -236,6 +252,8 @@ function bindCoverage(){
       case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
       case "download": { const md = cvMarkdown(cv); return offerFile(`ts-coverage-radar-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#cv-toast")); }
       case "tasks": return tkOpen("coverage");
+      case "fillma": { const n = cvFillFromMaturity(); cvRefresh(true); return flashIn($("#cv-toast"), `Filled ${n} cells from your maturity ratings. Adjust any that differ, then confirm`); }
+      case "confirm": { cv.est = false; cvSave(); cvRefresh(true); const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); focusQuiet(el && el.querySelector("h3")); return flashIn($("#cv-toast"), "Coverage confirmed"); }
       case "save": { const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(); return flashIn($("#cv-toast"), msg); }
     }
   };

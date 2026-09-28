@@ -160,7 +160,7 @@ function askScreen(){
       FGROUPS.map(([g,ks])=>`<div class="fgroup"><h4>${g}</h4><div class="ogrid">${ks.map(k=>`<button type="button" class="ocard multi" data-toggle="features" data-v="${k}" aria-pressed="${pm.features.includes(k)}"><b>${FEATURES[k][0]}</b><span>${FEATURES[k][1]}</span></button>`).join("")}</div></div>`).join("");
   }
   if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
-  const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k];
+  const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k] || qHasValue(Q);
   return `<div class="pm-layout"><div>
     ${pm.fromOrg && pm.qi < 2 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The product type and regions are set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
@@ -228,9 +228,9 @@ function renderPremortem(){
     actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
   }
-  view.innerHTML = head("Abuse Pre-mortem",
+  view.innerHTML = (pm.stage === "start" ? head("Abuse Pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
-    "Build safely", actions) + `
+    "Build safely", actions) : headCompact("Abuse Pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">
       <span class="toast" id="pm-toast" aria-live="polite"></span>
       ${pm.stage==="start" ? startScreen() : pm.stage==="ask" ? askScreen() : renderReport(assess(pm))}
@@ -242,8 +242,11 @@ function renderPremortem(){
   else if(activeId && document.getElementById(activeId)){ const el = document.getElementById(activeId); el.focus(); if(caret!==null && el.setSelectionRange) try{ el.setSelectionRange(caret, caret); }catch(e){} }
   else if(pm.stage==="ask"){ const n = $("#pm-name"); if(n) n.focus(); }
 }
+// A question showing a selection (a default, or a pre-fill from workspace settings) counts as answered once the person moves on
+const qHasValue = Q => Q.kind === "single" ? !!pm[Q.k] : Q.kind === "multi" ? pm[Q.k].length > 0 : false;
 function goNext(){
   const qs = visibleQs(), Q = qs[pm.qi];
+  if(Q && qHasValue(Q)) pm.answered[Q.k] = true;
   if(pm.fromProfile && Q && Q.k==="features"){ pm.qi = qs.findIndex(q=>q.k==="name"); }
   else if(pm.qi >= qs.length-1){
     pm.stage = "report"; pm.fromProfile = false;
@@ -283,7 +286,10 @@ function bindPremortem(){
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
       case "new": pm = orgPrefillPM(blankPM()); return rerender();
-      case "report": pm.stage = "report"; return rerender();
+      case "report": pm.stage = "report";
+        // Leaving the questions early still keeps the work, so a later New never drops it
+        if(!pm.example && !pm.saved){ if(!pm.name) pm.name = (labelOf(PLATFORMS, pm.type) || "Product") + " (draft)"; saveToLib(); pm.flash = "Saved to your workspace. Click any answer to change it"; }
+        return rerender();
       case "tasks": return tkOpen("premortem");
       case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();

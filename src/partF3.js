@@ -191,10 +191,10 @@ function tabRegister(r){
 }
 function tabObligations(r){
   if(!pm.regions.length) return `<div class="empty">Select at least one jurisdiction in step 3 to map obligations.</div>`;
-  return `<p class="disclaimer">A starting map to take to your legal team, not legal advice. It reflects laws as generally understood in mid-2026; thresholds, exemptions and dates vary, and laws change.</p>` +
+  return `<p class="disclaimer">A starting map to take to your legal team, not legal advice. Last reviewed ${LAW_REVIEWED}. Thresholds, exemptions and dates vary, and laws change, so check each source.</p>` +
     REGIONS.filter(g=>pm.regions.includes(g.k)).map(g=>{ const os = r.obligations.filter(o=>o.r===g.k).sort((a,b)=>(a.status==="applies"?0:1)-(b.status==="applies"?0:1));
       return `<div class="region"><h4>${g.n} <span class="note" style="font-family:var(--body);font-weight:400">${os.length} item${os.length===1?"":"s"}</span></h4>
-        ${os.length ? os.map(o=>`<div class="obl"><div class="lh">${o.status==="applies"?`<span class="pill crit hastip" tabindex="0" data-tip="Your answers meet this law&#39;s usual trigger.">Likely applies</span>`:`<span class="pill high hastip" tabindex="0" data-tip="Depends on details we don&#39;t ask about, such as user thresholds, licensing or how regulators classify your service.">May apply</span>`}<b>${esc(o.law)}</b></div><p>${gloss(o.t)}</p>
+        ${os.length ? os.map(o=>`<div class="obl"><div class="lh">${o.status==="applies"?`<span class="pill crit hastip" tabindex="0" data-tip="Your answers meet this law&#39;s usual trigger.">Likely applies</span>`:`<span class="pill high hastip" tabindex="0" data-tip="Depends on details we don&#39;t ask about, such as user thresholds, licensing or how regulators classify your service.">May apply</span>`}<b>${esc(o.law)}</b></div><p>${gloss(o.t)}</p>${lawSrcLink(o.law)}
           ${o.sg.length?`<div class="chipset">${o.sg.map(id=>`<span class="tag">${pm.done[id]?"✓ ":""}${esc(SG[id].t.split(",")[0].split("(")[0].trim())}</span>`).join("")}</div>`:""}</div>`).join("")
         : `<p class="note">Nothing specific flagged for this profile. General consumer-protection and privacy law still applies.</p>`}</div>`;}).join("");
 }
@@ -213,8 +213,8 @@ function reportMarkdown(r){
     L.push(`### ${t.n}`); items.forEach(s=>L.push(`- [${pm.done[s.id]?"x":" "}] ${s.t} (Owner: ${OWNERS[s.o]}; ${EFFORT[s.e].toLowerCase()}${s.legal==="applies"?"; legal requirement":s.legal==="may"?"; may be legally required":""})`)); L.push(""); });
   L.push("## Risk register", "", "| Rating | Risk | Area | Severity | Likelihood | Main drivers |", "|---|---|---|---|---|---|");
   r.risks.forEach(x=>L.push(`| ${BANDS[x.band][0]} | ${x.n} | ${CATS[x.cat]} | ${SEVL[x.sev]} | ${LIKL[x.lik]} | ${x.ups.map(u=>u[1]).concat(x.drivers.map(u=>u[2])).join("; ")||"Baseline"} |`));
-  L.push("", "## Legal and regulatory obligations (not legal advice)");
-  r.obligations.forEach(o=>L.push(`- **${o.law}** (${labelOf(REGIONS,o.r)}, ${o.status==="applies"?"likely applies":"may apply"}): ${o.t}`));
+  L.push("", "## Legal and regulatory obligations (not legal advice)", "", `_Law notes last reviewed ${LAW_REVIEWED}. Check each source; laws change._`, "");
+  r.obligations.forEach(o=>L.push(`- **${o.law}** (${labelOf(REGIONS,o.r)}, ${o.status==="applies"?"likely applies":"may apply"}): ${o.t}${LAW_SRC[o.law] ? ` [Source](${LAW_SRC[o.law][0]})` : ""}`));
   L.push("", "## Decisions to make");
   r.decisions.forEach(d=>{ L.push(`- ${d.q}`); if(pm.notes[d.id]) L.push(`  - Decision: ${pm.notes[d.id]}`); });
   L.push("", "_Generated with T&S Workbench._");

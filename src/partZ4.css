@@ -1,9 +1,9 @@
 
 /* ---------- Policy stress-tester ---------- */
-:root{--t-pol:#0797B9}
+:root{--t-pol:#067C98}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--t-pol:#4CCCE6} }
 :root[data-theme="dark"], :root[data-mode="dark"]{--t-pol:#4CCCE6}
-:root[data-mode="light"]{--t-pol:#0797B9}
+:root[data-mode="light"]{--t-pol:#067C98}
 .sb-new{margin-left:auto;font:600 10px var(--mono);letter-spacing:.04em;color:var(--t-pol);background:color-mix(in oklab, var(--t-pol) 14%, transparent);padding:1px 6px;border-radius:5px}
 /* five tools: three across the top, two wider below */
 .ov-tools{grid-template-columns:repeat(6,minmax(0,1fr))}

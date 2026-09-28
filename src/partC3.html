@@ -91,3 +91,9 @@ const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(); return `
     </div>
     ${meta?`<div class="headmeta">${meta}</div>`:''}
   </div>`; };
+// Working screens (a question, a report, a scenario in progress, a plan) get a slim header so the work sits above the fold
+const headCompact = (title, ctx, meta='') => { const hm = HEAD_META(); return `
+  <div class="pagehead ph-compact">
+    <div class="ph-main"><div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span><h1 class="phc-t">${title}</h1>${ctx ? `<span class="phc-ctx">${ctx}</span>` : ""}</div></div>
+    ${meta?`<div class="headmeta">${meta}</div>`:''}
+  </div>`; };

@@ -84,7 +84,7 @@ function renderAbout(){
 
     <section class="ab-sec ab-note rise">
       <h2>Limits and what's next</h2>
-      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Law notes reflect regulation as generally understood in mid-2026. Next: a transparency report drafter, a rebuilt metrics flow, and sources and review dates for every law note.</p>
+      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}. Next: a transparency report drafter and a rebuilt metrics flow.</p>
     </section>
   </article>`;
 }

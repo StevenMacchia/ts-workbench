@@ -39,6 +39,15 @@ const body = function(){
   eq(/based on 1 of 40 ratings/.test(cvWhy()), true, "notes partial ratings");
   CV_AREAS.forEach(a => { cv.r[a.k] = {}; CV_LAYERS.forEach(l => cv.r[a.k][l.k] = 3); });
   eq(cvSummary(cv).cov, 100, "full coverage"); eq(cvActions(cv).length, 0, "no steps at full coverage"); renderCoverage(); eq(/No gaps where risk is high/.test(view.innerHTML), true, "celebrates no gaps");
+  // start from maturity: estimates fill the matrix but count only once confirmed
+  ma = maInit({stage:"growth", lv:{policy:3, detection:2, operations:4, quality:1, crisis:2, compliance:2, measurement:5, wellbeing:2}, done:{}, ex:false});
+  cv = {src:null, ex:false, r:{child:{policy:3}}}; renderCoverage(); eq(/Fill from maturity/.test(view.innerHTML) && /the 39 unrated/.test(view.innerHTML), true, "offers to fill from maturity");
+  eq(cvFillFromMaturity(), 39, "fills only the unrated cells"); eq(cv.r.child.policy, 3, "keeps what was rated");
+  eq([cv.r.fraud.policy, cv.r.fraud.detect, cv.r.fraud.enforce, cv.r.fraud.appeal, cv.r.fraud.measure].join(","), "2,1,3,0,3", "maps maturity levels onto layers");
+  eq(JOURNEY.find(s => s.k === "coverage").done(), false, "estimates don't complete the step"); eq(rcParts().find(p => p.k === "coverage").score, null, "estimates aren't graded");
+  renderCoverage(); eq(/Confirm coverage/.test(view.innerHTML) && !/Next in your program review/.test(view.innerHTML), true, "asks to confirm before the hand-off");
+  cv.est = false; eq(JOURNEY.find(s => s.k === "coverage").done(), true, "confirmed coverage completes the step"); renderCoverage(); eq(/Next in your program review/.test(view.innerHTML), true, "hand-off after confirming");
+  out.push("start from maturity: fills unrated cells, maps levels onto layers, counts only once confirmed");
   // exports: markdown, tasks, workspace, overview, search
   cv = JSON.parse(JSON.stringify(CV_EXAMPLE));
   const md = cvMarkdown(cv); eq(/\| Child safety \| Critical \| Strong \| Partial \| Solid \| Partial \| None \| 47% \|/.test(md) && /## Next steps/.test(md), true, "markdown table and steps");

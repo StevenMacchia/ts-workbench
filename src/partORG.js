@@ -29,26 +29,28 @@ function orgPrefillPM(p){
   if(o.regions && o.regions.length){ pm.regions = o.regions.slice(); pm.answered.regions = true; }
   pm.fromOrg = true; const out = pm; pm = prev; return out;
 }
-function orgCardHTML(){
+// cta: the first step of the program review, which ends with an explicit "Save and continue" so regions aren't skipped
+function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
-  return `<div class="card org-card"><div class="card-b org-b">
+  return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
     <div><h3>Your organization</h3><p class="note">Used to pre-fill every tool: tabletop scenarios, maturity targets, metrics, policy tests and new pre-mortems. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
     <div class="field"><span class="lbl">Where your users are</span><div class="org-regions">${REGIONS.map(r => `<button type="button" class="pol-chip" aria-pressed="${regions.includes(r.k)}" data-orgregion="${r.k}" title="${esc(r.n)}">${r.k.toUpperCase()}</button>`).join("")}</div></div>
-  </div></div>`;
+  </div>${cta ? `<div class="org-cta"><span class="note">${orgReady() ? (regions.length ? "Saved as you go. Change any of it later in My workspace." : "Add where your users are, so law maps and pre-mortems match your markets.") : "Choose a company type and a stage to continue."}</span><button type="button" class="btn primary" data-orgdone="1" ${orgReady() ? "" : "disabled"}>Save and continue ${icon("arrow")}</button></div>` : ""}</div>`;
 }
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion]"); if(!b) return;
-  const wasReady = orgReady();
   if(b.dataset.orgstage) orgSet({stage:b.dataset.orgstage});
   if(b.dataset.orgregion){ const cur = orgGet().regions || [], k = b.dataset.orgregion; orgSet({regions:cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)}); }
-  if(orgReady() !== wasReady && (location.hash || "#overview").slice(1).split("/")[0] === "overview"){ renderOverview(); return gsay("Workspace settings saved"); }
-  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
+  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
   gsay("Workspace settings saved");
 });
-document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ const wasReady = orgReady(); orgSet({type:t.value || null}); gsay("Workspace settings saved");
-  if(orgReady() !== wasReady && (location.hash || "#overview").slice(1).split("/")[0] === "overview") renderOverview(); } });
+document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ orgSet({type:t.value || null}); gsay("Workspace settings saved");
+  const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById("org-type"); if(again) again.focus(); } } });
+// The first review step is done when the person says so, then they go straight on to the next one
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-orgdone]"); if(!b || !orgReady()) return;
+  orgSet({confirmed:true}); gsay("Workspace set up. Every tool will use it"); const next = typeof jnNext === "function" && jnNext(); if(next) jnGo(next.k); else renderOverview(); });
 
 /* ---------- New: start any assessment from the top bar ---------- */
 const NEW_ITEMS = [

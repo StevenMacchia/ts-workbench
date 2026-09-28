@@ -1,9 +1,9 @@
 
 /* ---------- Program maturity ---------- */
-:root{--t-ma:#D6409F}
+:root{--t-ma:#C0308A}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-ma:#F07CC4} }
 :root[data-theme="dark"],:root[data-mode="dark"]{--t-ma:#F07CC4}
-:root[data-mode="light"]{--t-ma:#D6409F}
+:root[data-mode="light"]{--t-ma:#C0308A}
 body[data-route="maturity"]{--tc:var(--t-ma)}
 .ma-q{margin:18px 0 0;border-left-color:var(--t-ma)}
 .ma-exb{margin-top:18px}
@@ -614,7 +614,7 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .jn-n svg{width:14px;height:14px}
 .jn-s.ok .jn-n{background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
 .jn-s.cur button{border-color:color-mix(in oklab, var(--accent) 45%, var(--line));background:color-mix(in oklab, var(--accent) 6%, var(--surface))}
-.jn-s.cur .jn-n{background:var(--accent);color:#fff}
+.jn-s.cur .jn-n{background:var(--accent);color:var(--accent-ink)}
 .jn-t{display:grid;gap:2px;min-width:0}
 .jn-t b{font-size:13px;font-weight:600;line-height:1.3}
 .jn-t small{font-size:11.5px;color:var(--muted);line-height:1.35}
@@ -640,3 +640,59 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .rc-tip{display:block;font-style:normal;font-size:11.5px;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:1180px){.jn-steps{grid-template-columns:repeat(3,minmax(0,1fr))}.jn-setup .org-b{grid-template-columns:1fr}}
 @media (max-width:640px){.jn-steps{grid-template-columns:1fr}}
+
+/* ---------- Slim header on working screens ---------- */
+.pagehead.ph-compact{padding:14px 20px;border-radius:16px;margin-bottom:18px;align-items:center;gap:10px 20px}
+.ph-compact .ph-mark{display:none}
+.ph-compact .ph-eb{margin:0;gap:10px;flex-wrap:wrap;color:var(--hero-muted)}
+.ph-compact .phc-t{font-size:17px;font-weight:600;letter-spacing:-.015em;color:#fff}
+.ph-compact .phc-ctx{font-size:13.5px;color:var(--hero-muted)}
+.ph-compact .headmeta{margin-left:auto}
+@media (max-width:760px){.pagehead.ph-compact{padding:12px 16px}.ph-compact .headmeta{margin-left:0;width:100%}}
+
+/* ---------- Setup step: explicit save and continue ---------- */
+.org-cta{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--line)}
+.org-cta .btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* ---------- Law note sources ---------- */
+.obl-src{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-size:12.5px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)}
+.obl-src:hover{color:var(--accent);border-color:currentColor}
+.obl-src svg{width:12px;height:12px}
+
+/* ---------- Coverage: start from maturity ---------- */
+.cv-fill{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;padding:14px 18px;margin-bottom:12px;border-color:color-mix(in oklab, var(--t-cv) 35%, var(--line))}
+.cv-fill b{font-size:14.5px}
+.cv-fill small{display:block;margin-top:3px;font-size:13px;line-height:1.5;color:var(--muted)}
+.cv-fill .btn{flex:none}
+.cv-est{margin-bottom:12px}
+@media (max-width:640px){.cv-fill{flex-direction:column;align-items:flex-start}}
+
+.ph-compact h1.phc-t{margin:0;line-height:1.3}
+[tabindex="-1"]:focus{outline:none}
+
+/* ---------- Your next moves ---------- */
+.nx-card{padding:6px}
+.nx-list{list-style:none;margin:0;padding:0}
+.nx-i{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-radius:12px}
+.nx-i + .nx-i{border-top:1px solid var(--line)}
+.nx-i:hover{background:var(--hover)}
+.nx-cb{width:18px;height:18px;margin:0 5px;accent-color:var(--accent);cursor:pointer}
+.nx-g{width:24px;height:24px;border-radius:7px;margin:0 2px}
+.nx-t{min-width:0;display:grid;gap:3px}
+.nx-t b{font-size:14px;font-weight:550;line-height:1.4}
+.nx-t small{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}
+.nx-k{font-weight:500}
+.nx-due{color:var(--muted)}
+.nx-due.late{color:var(--crit);font-weight:600}
+.nx-open{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;color:var(--faint)}
+.nx-open:hover{background:var(--sunk);color:var(--ink)}
+.nx-open svg{width:16px;height:16px}
+.nx-empty{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:14px 16px}
+.nx-empty .btn{margin-left:auto}
+.jn-bar{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding:12px 16px}
+.jn-bar-c{display:flex;gap:4px}
+.jn-bar-c i{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:color-mix(in oklab, var(--good) 16%, transparent);color:var(--good)}
+.jn-bar-c svg{width:11px;height:11px}
+.jn-bar-t{flex:1;min-width:220px;font-size:14px;color:var(--muted)}
+.jn-bar-t b{color:var(--ink);font-weight:600}
+@media (max-width:640px){.nx-i{grid-template-columns:24px minmax(0,1fr);}.nx-i > .btn,.nx-i > .nx-open{grid-column:2;justify-self:start}}
