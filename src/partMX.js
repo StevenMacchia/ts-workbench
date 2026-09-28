@@ -293,7 +293,7 @@ function mxTabMine(list){
   <div class="mxs-bar">
     <button type="button" class="btn sm" id="mx-snap">Save ${mx.period ? esc(mx.period) : "this period"} to history</button>
     <span class="mxs-hist" id="mx-hist">${mxHistHTML()}</span>
-    <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">Try example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
+    <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">See example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
   </div>
   <div class="card mx-sc">
     <div class="mx-sc-row h"><span>Metric</span><span>Your value</span><span>Target</span><span>Off track at</span><span>Trend</span><span>Status</span></div>
@@ -351,7 +351,7 @@ function mxTabRun(list){
 const mxCell = x => String(x == null ? "" : x).replace(/\|/g, "/");
 function mxScoreRows(list){ return list.map(m => { const s = mx.vals[m.n] || {}, st = mxStatus(m, mx.vals); return {m, s, st:st ? MX_STAT[st][0] : "Not measured"}; }); }
 function mxScoreMd(list, h = "#"){
-  return [`${h} T&S scorecard${mx.period ? ": " + mx.period : ""}`, ``, `${MX_PLATFORMS[mx.platform]} · ${MX_STAGE[mx.stage]} stage`, ``,
+  return [`${h} T&S scorecard${mx.period ? ": " + mx.period : ""}`, ``, `${MX_PLATFORMS[mx.platform]} · ${MX_STAGE[mx.stage]}`, ``,
     `| Area | Metric | Measure | Value | Target / from | Off track at / to | Status |`, `|---|---|---|---|---|---|---|`,
     ...mxScoreRows(list).map(r => `| ${LAYERS.find(L => L.k === r.m.l).n} | ${r.m.n} | ${MX_SC[r.m.n][0]}${mxUnit(r.m) ? " (" + mxUnit(r.m) + ")" : ""} | ${mxCell(r.s.v)} | ${mxCell(r.s.t)} | ${mxCell(r.s.a)} | ${r.st} |`)].join("\n");
 }
@@ -396,7 +396,7 @@ function mxOnePagerInner(list){
   const row = m => { const st = mxStatus(m, mx.vals);
     return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
   return `<header class="op-h"><div><div class="op-k">Trust &amp; Safety scorecard</div><h1>${esc(mx.period || "Current period")}</h1>
-      <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]} stage${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
+      <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
       <div class="op-date">Prepared ${esc(new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}))}</div></header>
     <section class="op-tiles">
       <div class="op-tile good"><b>${c.on}</b><span>On track</span></div><div class="op-tile med"><b>${c.watch}</b><span>Watch</span></div>
@@ -490,6 +490,10 @@ function mxBindGloss(){
 function renderMetrics(){
   mx.have = mx.have || {}; mx.vals = mx.vals || {}; mx.read = mx.read || {}; mx.hist = mx.hist || [];
   if(!MX_PLATFORMS[mx.platform]) mx.platform = "social";
+  // A fresh scorecard starts from the workspace settings
+  if(!mx.orgSet && typeof orgGet === "function" && !Object.keys(mx.vals || {}).length && !Object.keys(mx.read || {}).length){ const o = orgGet();
+    if(o.type && ORG_MAP.mx[o.type]) mx.platform = ORG_MAP.mx[o.type]; if(o.stage) mx.stage = ORG_MAP.mxStage[o.stage];
+    if(o.regions && o.regions.length) mx.reg = o.regions.some(r => r === "eu" || r === "uk"); if(o.type || o.stage) mx.orgSet = true; }
   const list = mxList();
   mxFromHash(list);
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
@@ -501,16 +505,15 @@ function renderMetrics(){
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]} stage${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${actions}</div></div>`
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${actions}</div></div>`
     : head("Metrics Framework",
       "The numbers a T&S program should run on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform.",
       "Run the program", actions) + `
     <div class="mxm-filter">
       <span>Showing <b>${list.length} metrics</b> for</span>
       <select class="mxm-sel" id="mx-platform" aria-label="Platform">${Object.entries(MX_PLATFORMS).map(([k, v]) => `<option value="${k}" ${mx.platform === k ? "selected" : ""}>${v}</option>`).join("")}</select>
-      <span>at the</span>
+      <span>·</span>
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
-      <span>stage</span>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>

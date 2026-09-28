@@ -2499,6 +2499,48 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .rc-p.open .rc-pt b{color:var(--muted)}
 @media (max-width:1100px){.rc-card{grid-template-columns:1fr}}
 @media (max-width:560px){.rc-main{flex-direction:column;align-items:flex-start}.rc-p{grid-template-columns:26px minmax(0,1fr) 30px 26px}.rc-bar{display:none}.rc-ng{grid-column:3/-1}}
+
+/* ---------- New menu, workspace settings ---------- */
+.tb-actions{position:relative}
+.tb-newmenu{position:absolute;right:0;top:calc(100% + 8px);z-index:50;width:330px;max-width:calc(100vw - 24px);padding:6px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 24px 60px -24px rgba(16,24,40,.4);display:grid;gap:2px}
+.tb-newmenu[hidden]{display:none}
+.tb-newmenu button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:center;padding:8px 10px;border-radius:10px}
+.tb-newmenu button:hover,.tb-menu button:focus-visible{background:var(--hover);outline:none;box-shadow:inset 0 0 0 1px var(--line-strong)}
+.tb-newmenu b{display:block;font-size:13.5px;font-weight:600}
+.tb-newmenu small{display:block;font-size:12px;color:var(--muted)}
+.tb-newmenu .sb-glyph{width:28px;height:28px;border-radius:8px}
+.wstop{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.wsstats{margin-top:16px}
+.org-b{display:grid;gap:12px}
+.org-b h3{font-size:16px;margin:0 0 2px}
+.org-b .field{margin:0}
+.org-stages{display:flex;flex-wrap:wrap;gap:6px}
+.org-stage{all:unset;box-sizing:border-box;cursor:pointer;padding:7px 12px;border-radius:99px;border:1px solid var(--line-strong);font-size:13px;font-weight:500;color:var(--ink)}
+.org-stage:hover{background:var(--hover)}
+.org-stage:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.org-stage.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.org-regions{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:980px){.wstop{grid-template-columns:1fr}}
+
+/* ---------- About page ---------- */
+.ab{margin-top:4px}
+.ab-by2{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 20px;margin-bottom:22px}
+.ab-by2 .sb-av{width:40px;height:40px;font-size:14px}
+.ab-by2-t{display:grid;gap:2px;margin-right:auto}
+.ab-by2-t b{font-size:15px}
+.ab-by2-t small{font-size:13px;color:var(--muted)}
+.ab-by2-m{display:flex;gap:24px;flex-wrap:wrap}
+.ab-by2-m > span{display:grid;gap:1px}
+.ab-by2-m small{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ab-by2-m b{font-size:13.5px;font-weight:600}
+.ab-journey{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;counter-reset:none}
+.ab-journey li{position:relative;display:grid;gap:6px;align-content:start;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.ab-journey li + li::before{content:"";position:absolute;left:-11px;top:28px;width:10px;border-top:2px dashed var(--line-strong)}
+.ab-journey b{font-size:13.5px}
+.ab-journey small{font-size:12.5px;color:var(--muted);line-height:1.45}
+.ab-gh{font-size:13px!important;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px!important}
+@media (max-width:1100px){.ab-journey{grid-template-columns:repeat(3,minmax(0,1fr))}.ab-journey li:nth-child(4)::before{display:none}}
+@media (max-width:640px){.ab-journey{grid-template-columns:1fr}.ab-journey li::before{display:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2584,16 +2626,19 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
     <nav class="sb-nav" aria-label="Main">
       <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Overview</a>
       <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
-      <div class="sb-h">Tools</div>
-      <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
-      <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
-      <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
-      <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
+      <div class="sb-h">Assess</div>
       <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
       <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
+      <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
+      <div class="sb-h">Prepare</div>
+      <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
+      <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
-      <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer<span class="sb-new sb-ai">AI</span></a>
-      <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer<span class="sb-new sb-ai">AI</span></a>
+      <div class="sb-h">Measure</div>
+      <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
+      <div class="sb-h">AI assistants</div>
+      <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
+      <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report<span class="sb-new sb-soon" title="Under construction">Soon</span></a>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
@@ -2617,7 +2662,8 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
       <div class="tb-crumb"><a href="#overview">Workbench</a><svg><use href="#i-chev"/></svg><b id="tb-here">Overview</b></div>
       <div class="tb-actions">
         <button type="button" class="btn tb-k" data-cmdk="1" aria-label="Search"><svg><use href="#i-search"/></svg><kbd class="kbd">⌘K</kbd></button>
-        <a class="btn brandbtn" href="#premortem" id="tb-new"><svg><use href="#i-plus"/></svg><span>New assessment</span></a>
+        <button type="button" class="btn brandbtn" id="tb-new" aria-haspopup="menu" aria-expanded="false" aria-controls="tb-menu"><svg><use href="#i-plus"/></svg><span>New</span></button>
+        <div class="tb-newmenu" id="tb-menu" role="menu" aria-label="Start something new" hidden></div>
       </div>
     </header>
     <div class="page" id="view"></div>
@@ -2660,7 +2706,7 @@ const HEAD_META = () => {
     coverage:["cover", () => [CV_AREAS.length + " harm areas", CV_LAYERS.length + " layers of defense", "Risk vs coverage radar"]],
     maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
-    workspace:["user", () => []], about:["info", () => []]
+    workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
   let stats = []; try{ stats = m[1](); }catch(e){}
@@ -3495,7 +3541,7 @@ const QS = [
   {k:"team", sec:"Your team", t:"Who deals with safety problems today?", h:"If a child is in danger at 2 a.m., someone needs to respond.", kind:"single",
    tip:"Without a dedicated owner we add readiness risks, such as nobody owning urgent escalations, and suggest simple starting versions of each safeguard.", opts:[
     {k:"none", n:"Nobody yet"}, {k:"parttime", n:"Someone, alongside their main job"}, {k:"dedicated", n:"A dedicated team"}, {k:"mature", n:"A full trust & safety organization"}]},
-  {k:"name", sec:"Last step", t:"What should we call this assessment?", h:"It appears on your report, in My assessments and in the downloaded launch doc.", kind:"name",
+  {k:"name", sec:"Last step", t:"What should we call this assessment?", h:"It appears on your report, in your workspace and in the downloaded launch doc.", kind:"name",
    tip:"Assessments are saved in this browser under this name. Use Export on the start screen to back them up or move them to another device."}
 ];
 
@@ -3536,10 +3582,9 @@ function heroArt(){
 /* ---------- screens ---------- */
 function libraryBlock(){
   const items = Object.values(libLoad()).sort((a,b)=>(b.updated||0)-(a.updated||0));
-  const head = `<div class="section-title"><h2>My assessments ${tip("Saved in this browser only, so nothing leaves your device. Export a backup to keep them safe or to move them to another device or browser.")}</h2>
-    <div class="row">${items.length?`<button type="button" class="btn sm" data-act="export"><svg><use href="#i-download"/></svg>Export</button>`:""}
-      <label class="btn sm" for="lib-import"><svg><use href="#i-upload"/></svg>Import</label><input type="file" id="lib-import" accept=".json,application/json" class="visually-hidden"></div></div>`;
-  if(!items.length) return head + `<div class="card libempty"><svg><use href="#i-folder"/></svg><div><b>No saved assessments yet</b><p class="note">Assessments you finish are saved here automatically. You can reopen them, reuse their answers for a new feature, or export them.</p></div></div>`;
+  const head = `<div class="section-title"><h2>Saved pre-mortems ${tip("Part of your workspace, saved in this browser. Save a workspace file to keep a copy or open it on another device.")}</h2>
+    <a class="btn sm" href="#workspace">All saved work</a></div>`;
+  if(!items.length) return head + `<div class="card libempty"><svg><use href="#i-folder"/></svg><div><b>No saved pre-mortems yet</b><p class="note">Pre-mortems you finish are saved here and in your workspace automatically. Reopen them, or reuse their answers for a new feature.</p></div></div>`;
   return head + `<div class="card liblist">${items.map(rec=>{
     const r = assess(openRecord(rec)); const bl = r.safeguards.filter(s=>s.rank===3); const bd = bl.filter(s=>rec.done&&rec.done[s.id]).length;
     return `<div class="librow">
@@ -3608,6 +3653,7 @@ function askScreen(){
   if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
   const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k];
   return `<div class="pm-layout"><div>
+    ${pm.fromOrg && pm.qi < 2 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The product type and regions are set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
     <div class="card askcard">
       <div class="qprog"><span class="eyebrow">${Q.sec}</span><span class="note mono">${pm.qi+1} / ${qs.length}</span></div>
@@ -3665,7 +3711,7 @@ function renderPremortem(){
   const activeId = active && active.id, caret = active && typeof active.selectionStart==="number" ? active.selectionStart : null;
   const refocus = active && active.dataset && (active.dataset.set||active.dataset.toggle) ? `[data-${active.dataset.set?"set":"toggle"}="${active.dataset.set||active.dataset.toggle}"][data-v="${active.dataset.v}"]` : null;
   let actions = "";
-  if(pm.stage!=="start") actions += `<button type="button" class="btn sm" data-act="home"><svg><use href="#i-folder"/></svg>All assessments</button>`;
+  if(pm.stage!=="start") actions += `<button type="button" class="btn sm" data-act="home"><svg><use href="#i-folder"/></svg>Saved pre-mortems</button>`;
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
@@ -3692,7 +3738,7 @@ function goNext(){
   if(pm.fromProfile && Q && Q.k==="features"){ pm.qi = qs.findIndex(q=>q.k==="name"); }
   else if(pm.qi >= qs.length-1){
     pm.stage = "report"; pm.fromProfile = false;
-    if(!pm.example){ const first = !pm.saved; saveToLib(); if(first) pm.flash = "Saved to My assessments"; }
+    if(!pm.example){ const first = !pm.saved; saveToLib(); if(first) pm.flash = "Saved to your workspace"; }
   }
   else pm.qi++;
   savePM(); renderPremortem(); window.scrollTo(0,0);
@@ -3727,13 +3773,13 @@ function bindPremortem(){
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
-      case "new": pm = blankPM(); return rerender();
+      case "new": pm = orgPrefillPM(blankPM()); return rerender();
       case "report": pm.stage = "report"; return rerender();
       case "tasks": return tkOpen("premortem");
       case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();
       case "canceldel": confirmDel = null; return renderPremortem();
-      case "save": { const wasExample = pm.example; if(wasExample){ pm = openRecord(recordOf(pm), {id:null, saved:false, created:null, name:(pm.name||"").replace(" (example)","")+" (my copy)", stage:"report"}); } saveToLib(); pm.flash = "Saved to My assessments"; return rerender(); }
+      case "save": { const wasExample = pm.example; if(wasExample){ pm = openRecord(recordOf(pm), {id:null, saved:false, created:null, name:(pm.name||"").replace(" (example)","")+" (my copy)", stage:"report"}); } saveToLib(); pm.flash = "Saved to your workspace"; return rerender(); }
       case "typical": { const t = PLATFORMS.find(x=>x.k===pm.type); if(t){ withImpact(() => { pm.features = t.f.slice(); }); } return rerender(); }
       case "clearfilter": pm.filter = {cell:"",cat:"",band:""}; pm.search = ""; return rerender();
       case "fullplan": pm.tab = "plan"; rerender(); { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); } return;
@@ -5321,6 +5367,7 @@ const TT_TYPES = [
 function ttCompanyType(){
   const saved = store.get("tt:type", null);
   if(saved && TT_TYPES.some(t=>t.k===saved)) return saved;
+  const org = typeof orgGet === "function" ? orgGet() : {}; if(org.type && TT_TYPES.some(t=>t.k===org.type)) return org.type;
   const map = {social:"social", video:"social", creator:"social", messaging:"social", marketplace:"marketplace", fintech:"fintech", crypto:"fintech", gaming:"gaming", dating:"dating", genai:"genai", gig:"gig", rentals:"gig", edtech:"kids"};
   return (typeof pm !== "undefined" && pm && map[pm.type]) || "all";
 }
@@ -6980,7 +7027,7 @@ function mxTabMine(list){
   <div class="mxs-bar">
     <button type="button" class="btn sm" id="mx-snap">Save ${mx.period ? esc(mx.period) : "this period"} to history</button>
     <span class="mxs-hist" id="mx-hist">${mxHistHTML()}</span>
-    <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">Try example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
+    <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">See example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
   </div>
   <div class="card mx-sc">
     <div class="mx-sc-row h"><span>Metric</span><span>Your value</span><span>Target</span><span>Off track at</span><span>Trend</span><span>Status</span></div>
@@ -7038,7 +7085,7 @@ function mxTabRun(list){
 const mxCell = x => String(x == null ? "" : x).replace(/\|/g, "/");
 function mxScoreRows(list){ return list.map(m => { const s = mx.vals[m.n] || {}, st = mxStatus(m, mx.vals); return {m, s, st:st ? MX_STAT[st][0] : "Not measured"}; }); }
 function mxScoreMd(list, h = "#"){
-  return [`${h} T&S scorecard${mx.period ? ": " + mx.period : ""}`, ``, `${MX_PLATFORMS[mx.platform]} · ${MX_STAGE[mx.stage]} stage`, ``,
+  return [`${h} T&S scorecard${mx.period ? ": " + mx.period : ""}`, ``, `${MX_PLATFORMS[mx.platform]} · ${MX_STAGE[mx.stage]}`, ``,
     `| Area | Metric | Measure | Value | Target / from | Off track at / to | Status |`, `|---|---|---|---|---|---|---|`,
     ...mxScoreRows(list).map(r => `| ${LAYERS.find(L => L.k === r.m.l).n} | ${r.m.n} | ${MX_SC[r.m.n][0]}${mxUnit(r.m) ? " (" + mxUnit(r.m) + ")" : ""} | ${mxCell(r.s.v)} | ${mxCell(r.s.t)} | ${mxCell(r.s.a)} | ${r.st} |`)].join("\n");
 }
@@ -7083,7 +7130,7 @@ function mxOnePagerInner(list){
   const row = m => { const st = mxStatus(m, mx.vals);
     return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
   return `<header class="op-h"><div><div class="op-k">Trust &amp; Safety scorecard</div><h1>${esc(mx.period || "Current period")}</h1>
-      <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]} stage${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
+      <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
       <div class="op-date">Prepared ${esc(new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}))}</div></header>
     <section class="op-tiles">
       <div class="op-tile good"><b>${c.on}</b><span>On track</span></div><div class="op-tile med"><b>${c.watch}</b><span>Watch</span></div>
@@ -7177,6 +7224,10 @@ function mxBindGloss(){
 function renderMetrics(){
   mx.have = mx.have || {}; mx.vals = mx.vals || {}; mx.read = mx.read || {}; mx.hist = mx.hist || [];
   if(!MX_PLATFORMS[mx.platform]) mx.platform = "social";
+  // A fresh scorecard starts from the workspace settings
+  if(!mx.orgSet && typeof orgGet === "function" && !Object.keys(mx.vals || {}).length && !Object.keys(mx.read || {}).length){ const o = orgGet();
+    if(o.type && ORG_MAP.mx[o.type]) mx.platform = ORG_MAP.mx[o.type]; if(o.stage) mx.stage = ORG_MAP.mxStage[o.stage];
+    if(o.regions && o.regions.length) mx.reg = o.regions.some(r => r === "eu" || r === "uk"); if(o.type || o.stage) mx.orgSet = true; }
   const list = mxList();
   mxFromHash(list);
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
@@ -7188,16 +7239,15 @@ function renderMetrics(){
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]} stage${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${actions}</div></div>`
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${actions}</div></div>`
     : head("Metrics Framework",
       "The numbers a T&S program should run on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform.",
       "Run the program", actions) + `
     <div class="mxm-filter">
       <span>Showing <b>${list.length} metrics</b> for</span>
       <select class="mxm-sel" id="mx-platform" aria-label="Platform">${Object.entries(MX_PLATFORMS).map(([k, v]) => `<option value="${k}" ${mx.platform === k ? "selected" : ""}>${v}</option>`).join("")}</select>
-      <span>at the</span>
+      <span>·</span>
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
-      <span>stage</span>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>
@@ -7357,7 +7407,7 @@ function renderVendors(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor Scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
-    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">Reset to example data</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors")}</button>`) + `
+    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">Reset to example data</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="vd-grid">
@@ -7434,7 +7484,8 @@ function wsSaveTabletop(){
   wsPut({id:wsNewId("TT"), kind:"tabletop", title:ttScenario(tt.s, tt.v).title, projectId:wsActive(), data:JSON.parse(JSON.stringify(tt))});
   flashIn($("#tt-toast"), savedWhere());
 }
-function wsSaveLabel(kind){ const cur = store.get("ws:cur:"+kind, null); return cur && wsItems()[cur] ? "Save changes" : "Save to workspace"; }
+function wsSaveLabel(kind, data){ const cur = store.get("ws:cur:"+kind, null), it = cur && wsItems()[cur]; if(!it) return "Save to workspace";
+  return data !== undefined && JSON.stringify(it.data) === JSON.stringify(data) ? "Saved" : "Save changes"; }
 function wsSaveTool(kind, data, title){
   let cur = store.get("ws:cur:"+kind, null);
   if(cur && wsItems()[cur]){ wsPut({id:cur, kind, data:JSON.parse(JSON.stringify(data))}); return "Changes saved"; }
@@ -7567,18 +7618,19 @@ function renderWorkspace(){
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
   const p = wsProfile();
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
-    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser: save your profile to a file to keep it, and open that file on any device.`, null,
-    `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open profile</button>
-     <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save profile</button>`) + `
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
+    `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
+     <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save workspace file</button>`) + `
     <span class="toast" id="ws-toast" aria-live="polite"></span>
     <div class="wstop">
       ${profileCard()}
-      <div class="wsstats">
+      ${typeof orgCardHTML === "function" ? orgCardHTML() : ""}
+    </div>
+    <div class="wsstats">
         <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${Object.keys(wsProjects()).length}</span></div>
         <div class="card kpi"><span class="eyebrow">Saved results</span><span class="v">${all.length}</span></div>
         <div class="card kpi"><span class="eyebrow">Pre-mortems</span><span class="v">${all.filter(i=>i.kind==="premortem").length}</span></div>
         <div class="card kpi"><span class="eyebrow">Open launch blockers ${tip("Launch blockers not yet ticked off, added up across every saved pre-mortem.","tip-r")}</span><span class="v" style="${openBlockers?"color:var(--crit)":""}">${openBlockers}</span></div>
-      </div>
     </div>
     <div class="section-title"><h2>Projects ${tip("Group results by launch, product area or client. Click a project to see its results; anything you save while it's selected goes into it.")}</h2>
       <button type="button" class="btn sm" data-ws="newproj"><svg><use href="#i-plus"/></svg>New project</button></div>
@@ -7618,7 +7670,7 @@ function bindWorkspace(){
       if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
       return goRoute(KINDS[it.kind].route); }
     if(d.wsNew){ const k = d.wsNew;
-      if(k==="premortem"){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); }
+      if(k==="premortem"){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); }
       if(k==="tabletop"){ tt = null; store.set("tt", null); }
       if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
@@ -7714,7 +7766,7 @@ function openSaved(id){
   if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
   goRoute(KINDS[it.kind].route);
 }
-function newAssessment(){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); goRoute("premortem"); }
+function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
@@ -7786,7 +7838,7 @@ document.addEventListener("keydown", e => {
 /* ---------- mobile nav and new-assessment button ---------- */
 $("#nav-toggle").addEventListener("click", () => $("#app").classList.toggle("nav-open"));
 $("#sb-scrim").addEventListener("click", () => $("#app").classList.remove("nav-open"));
-$("#tb-new").addEventListener("click", e => { e.preventDefault(); newAssessment(); });
+$("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(); });
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
@@ -7875,29 +7927,11 @@ function renderOverview(){
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
       <p>${sub}</p>
-      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
+      <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
     </section>
 
     ${typeof rcHTML === "function" ? rcHTML() : ""}
     ${ovPictureHTML()}
-
-    <section class="rise">
-      <div class="ov-sec-h"><h3>Tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools">
-        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
-        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
-        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
-        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
-      </div>
-    </section>
-
-    ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
-      <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
-    </section>` : ""}
 
     <section class="ov-cols rise">
       <div>
@@ -7916,6 +7950,25 @@ function renderOverview(){
         </div>
       </div>
     </section>
+
+    <section class="rise">
+      <div class="ov-sec-h"><h3>All tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
+      <div class="ov-tools">
+        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
+        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
+        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
+        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
+      </div>
+    </section>
+
+    ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
+      <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+    </section>` : ""}
+
 
     <footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>Not legal advice. Use the outputs to start conversations with your Legal and Policy partners.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>
   </div>`;
@@ -8005,72 +8058,71 @@ function bindRadar(){
    Fill in AUTHOR to put your name on the page.
    ========================================================= */
 const AUTHOR = {name:"Steven Macchia", title:"Trust and Safety Leader", link:"https://www.linkedin.com/in/stevenmacchia"};
+const AB_GROUPS = [
+  ["Assess", [["t-ma","steps","Program maturity","Rates a program in eight areas against targets for its stage. Ticking off the steps for the next level moves an area up, so the plan and the radar stay current."],
+    ["t-cv","cover","Coverage radar","Rates five layers of defense for each kind of harm and overlays them on the pre-mortem's risk, so the gaps that matter most stand out."],
+    ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."]]],
+  ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
+    ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
+    ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
+  ["Measure", [["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation."]]],
+  ["AI assistants", [["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to an actioned user, checked against what an EU statement of reasons must include."],
+    ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal, with a suggested reply. A person makes the final call."],
+    ["t-ai","chart","Transparency report drafter","Under construction."]]]
+];
+const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Rate maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Pre-mortem products","Risk for each product or launch"],
+  ["cover","var(--t-cv)","Map coverage","Your defenses against that risk"], ["siren","var(--t-tt)","Rehearse a crisis","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
   const versions = SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
-  const by = AUTHOR.name ? `Designed and directed by <strong>${esc(AUTHOR.name)}</strong>${AUTHOR.title ? ", " + esc(AUTHOR.title) : ""}.` : "Designed and directed by a trust and safety leader.";
-  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,"tabletop scenario versions"],[lawSteps,"decisions with law notes"],[REGIONS.length,"jurisdictions mapped"],[METRICS.length,"program metrics"]];
-  const tools = [
-    ["t-pm","radar","Abuse pre-mortem","A plain-language profile of any product becomes a scored risk register, a prioritized launch plan with owners, the laws that likely apply, and the policy decisions to make."],
-    ["t-tt","siren","Incident tabletop",`${SCENARIOS.length} crisis scenarios across eight sectors, tailored to the company type you choose. Every weaker answer becomes a lesson: what happened, the stronger call, the principle and the law.`],
-    ["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation, with the trap behind every metric."],
-    ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors with wellness and security minimums and ready-to-use RFP questions."],
-    ["t-ma","steps","Program maturity","Rates a trust and safety program in eight areas, from policy to reviewer wellbeing, against targets for its stage. A radar shows where it stands, and a phased roadmap links each gap to the tool that helps close it."],
-    ["t-cv","cover","Coverage radar","Rates five layers of defense (policy, detection, enforcement, appeals and measurement) for each kind of harm, then overlays them on the pre-mortem's risk. Where risk outruns coverage, it names the weakest layer and the next step."],
-    ["t-pol","doc","Policy stress-tester","Paste a platform rule to get an instant clarity check, then an AI review with vague terms, missing exceptions, eight edge cases, relevant laws and a clearer rewrite."],
-    ["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to a user who was actioned, with a short version and a check against what an EU statement of reasons must include."],
-    ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal: each element of the rule tested against the facts, the user's arguments weighed, and a suggested reply. A person makes the final call."],
-    ["t-ai","chart","Transparency report drafter (under construction)","Being rebuilt. It will turn enforcement numbers, including your Metrics scorecard, into report sections, and list what the EU Digital Services Act would expect that is still missing."]
-  ];
+  const tools = AB_GROUPS.reduce((a, g) => a + g[1].length, 0);
+  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,"tabletop scenario versions"],[lawSteps,"decisions with law notes"],
+    [typeof MA_AREAS !== "undefined" ? MA_AREAS.length * 5 : 40,"maturity level descriptions"],[typeof CV_AREAS !== "undefined" ? CV_AREAS.length * CV_LAYERS.length : 40,"coverage checks"]];
   const decisions = [
-    ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. AI features run only on a click, on the visitor's own Claude account, which keeps them free to offer. Export and import move work between devices."],
+    ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account."],
+    ["One workspace, one vocabulary","Company type, stage and regions are set once and pre-fill every tool. Every saved result lands in the same workspace, grouped by project."],
+    ["Every number explains itself","Each risk rating lists the answers that raised or lowered it, and every score on the report card shows what it's made of, so the output can be challenged and defended."],
+    ["Plans, not just scores","Maturity and coverage end in steps with owners and due dates. Finishing the steps moves the score, and the steps go to Jira, Asana, Linear or GitHub."],
     ["Plain language first","Questions are written for product managers and founders, not specialists. Terms like CSAM, KYC or sextortion explain themselves on hover."],
-    ["Every number explains itself","Each risk rating lists the answers that raised or lowered it. Nothing is a black box, so the output can be challenged and defended."],
-    ["Summary before detail","Reports open with the five actions that matter most. Long lists are grouped, filtered to critical and high by default, and expand on demand."],
-    ["Keyboard and speed","A ⌘K command palette reaches any tool, scenario or saved result. Questions answer with number keys. There's no framework, backend or loading screen."],
     ["Accessible in both themes","Tuned light and dark themes, visible focus states, labelled controls, reduced-motion support and layouts that work down to phone width."]
   ];
-  view.innerHTML = `<article class="ab">
-    <header class="ab-hero rise">
-      <span class="ab-kicker">Case study</span>
-      <h1>T&amp;S Workbench</h1>
-      <p class="ab-lede">A free, private toolkit that helps any product team find abuse risks before launch, rehearse crises, and run a trust and safety program with confidence.</p>
-      ${AUTHOR.name ? `<p class="ab-by"><span class="sb-av">${esc(AUTHOR.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span>By <b>${esc(AUTHOR.name)}</b>${AUTHOR.title ? `<br>${esc(AUTHOR.title)}` : ""}</span>${AUTHOR.link ? `<a class="btn sm" href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">LinkedIn ${icon("arrow")}</a>` : ""}</p>` : ""}
-      <div class="ab-meta">
-        <div><span>Role</span><b>Product design, T&amp;S strategy and content</b></div>
-        <div><span>Format</span><b>Single-file web app, no backend</b></div>
-        <div><span>Status</span><b>Live and free to use</b></div>
-      </div>
-      <div class="row" style="gap:8px"><a class="btn primary" href="#premortem">Try the pre-mortem ${icon("arrow")}</a><a class="btn" href="#tabletop">Take a tabletop</a></div>
-    </header>
+  const meta = `${AUTHOR.link ? `<a class="btn sm" href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}<a class="btn sm primary" href="#overview">Open the workbench</a>`;
+  view.innerHTML = head("T&S Workbench", "A free, private toolkit for running a trust and safety program: assess the program and its products, rehearse crises, and turn the gaps into a plan.", "Case study", meta) + `<article class="ab">
+    ${AUTHOR.name ? `<div class="card ab-by2"><span class="sb-av">${esc(AUTHOR.name.split(" ").map(w=>w[0]).join("").slice(0,2))}</span><span class="ab-by2-t"><b>Designed and directed by ${esc(AUTHOR.name)}</b><small>${esc(AUTHOR.title)} · product design, T&amp;S strategy and content</small></span>
+      <span class="ab-by2-m"><span><small>Format</small><b>Single-file web app, no backend</b></span><span><small>Status</small><b>Live and free to use</b></span><span><small>Tools</small><b>${tools}</b></span></span></div>` : ""}
 
     <section class="ab-stats rise" aria-label="By the numbers">${stats.map(([n,l])=>`<div><b class="mono">${n}</b><span>${l}</span></div>`).join("")}</section>
 
     <section class="ab-sec rise">
       <h2>The problem</h2>
       <p>Most products meet trust and safety after launch, when the first scam, grooming case or regulator letter arrives. Product teams rarely have a structured way to ask “how will this be abused?”, and the specialists who can answer it are stretched thin.</p>
-      <p>Trust and safety leaders face a second gap: the judgment the job needs, in crises, with regulators and under pressure, is mostly learned the hard way. Training material is scarce, generic, or locked inside expensive enterprise platforms.</p>
+      <p>Trust and safety leaders face a second gap: they're asked how mature their program is, where it's exposed and what to fund next, and usually answer with a gut feeling. The judgment the job needs, in crises and with regulators, is mostly learned the hard way.</p>
+    </section>
+
+    <section class="ab-sec rise">
+      <h2>How it fits together</h2>
+      <p>Each tool works on its own, but together they answer the questions a program leader gets asked: how mature are we, where are we exposed, are we ready for a crisis, and what do we do next.</p>
+      <ol class="ab-journey">${AB_JOURNEY.map(([ic, c, n, d], i) => `<li><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><b>${i + 1}. ${n}</b><small>${d}</small></li>`).join("")}</ol>
     </section>
 
     <section class="ab-sec rise">
       <h2>What it does</h2>
-      <div class="ab-tools">${tools.map(([c,i,n,d])=>`<div class="ab-tool"><span class="sb-glyph" style="background:var(--${c})"><svg><use href="#i-${i}"/></svg></span><div><h3>${n}</h3><p>${d}</p></div></div>`).join("")}</div>
+      ${AB_GROUPS.map(([g, list]) => `<h3 class="ab-gh">${g}</h3><div class="ab-tools">${list.map(([c,i,n,d])=>`<div class="ab-tool"><span class="sb-glyph" style="background:var(--${c})"><svg><use href="#i-${i}"/></svg></span><div><h3>${n}</h3><p>${d}</p></div></div>`).join("")}</div>`).join("")}
     </section>
 
     <section class="ab-sec rise">
-      <h2>How the risk engine thinks</h2>
-      <p>Each of the ${HARMS.length} modeled harms has an inherent severity and a baseline likelihood. The platform profile then moves them: stranger contact raises grooming and scam likelihood, verified identity lowers it, a young audience raises severity.</p>
-      <div class="ab-formula" aria-label="Severity times likelihood equals score">
-        <span class="ab-f"><small>Severity</small><b>4</b><em>Critical harm</em></span><span class="ab-op">×</span>
-        <span class="ab-f"><small>Likelihood</small><b>3</b><em>Likely here</em></span><span class="ab-op">=</span>
-        <span class="ab-f ab-out"><small>Score</small><b>12</b><em>Critical</em></span>
+      <h2>How the scores work</h2>
+      <div class="ab-dec">
+        <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical.</p></div>
+        <div><h3>Maturity</h3><p>Each area is rated on five levels. The rating is a baseline; finishing both steps for the next level moves the area up. Targets come from the stage: level 3 for growing programs, with crisis, compliance and wellbeing never below 3.</p></div>
+        <div><h3>Coverage</h3><p>Five layers of defense per harm area, each rated none to strong. Coverage is the share of the maximum, weighted by the pre-mortem's risk. An area is exposed when its risk is critical and its coverage is under half.</p></div>
+        <div><h3>Report card</h3><p>Each finished part is scored out of 100: maturity against target, risk-weighted coverage, launch blockers done, strong first calls in tabletops, and policy clarity. The overall grade weighs them 30, 25, 20, 15 and 10.</p></div>
       </div>
-      <p>Safeguards take the priority of the most serious risk they cover, and anything the law likely requires in a chosen jurisdiction becomes a launch blocker. Every rating shows the exact answers that drove it.</p>
     </section>
 
     <section class="ab-sec rise">
       <h2>Designed for learning</h2>
-      <p>The tabletop turns mistakes into teaching moments. Pick a weaker call and you see what happened, how your choice compares with the strongest one on safety, trust, regulatory standing and team capacity, the principle behind it, and the relevant law. Then you can try again. Debriefs name your blind spot and suggest what to practice next.</p>
+      <p>The tabletop turns mistakes into teaching moments. Pick a weaker call and you see what happened, how your choice compares with the strongest one on safety, trust, regulatory standing and team capacity, the principle behind it, and the relevant law. Then you can try again.</p>
       <p>Universal scenarios, like an account takeover wave or a government takedown order, rewrite themselves for eight company types, so a fintech team and a gaming studio each rehearse their own version of the crisis.</p>
     </section>
 
@@ -8081,13 +8133,13 @@ function renderAbout(){
 
     <section class="ab-sec rise">
       <h2>How it was built</h2>
-      <p>${by} Built as a single HTML file with no frameworks, accounts or servers, using AI-assisted development. Automated checks play every tabletop scenario in every tailored version, render every screen and report, and verify the scoring engine against eight example products before each release.</p>
+      <p>${AUTHOR.name ? `Designed and directed by <strong>${esc(AUTHOR.name)}</strong>. ` : ""}Built as a single HTML file with no frameworks, accounts or servers, using AI-assisted development. Automated checks play every tabletop scenario in every tailored version, render every screen in its empty, partial and complete states, and verify every score before each release.</p>
       ${AUTHOR.link ? `<p><a href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">Connect with ${esc(AUTHOR.name || "the author")} ${icon("arrow")}</a></p>` : ""}
     </section>
 
     <section class="ab-sec ab-note rise">
       <h2>Limits and what's next</h2>
-      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice. Law notes reflect regulation as generally understood in mid-2026. Next on the roadmap: shared team workspaces, more jurisdictions, localized scenarios and exportable board-ready summaries.</p>
+      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Law notes reflect regulation as generally understood in mid-2026. Next: a transparency report drafter, a rebuilt metrics flow, and sources and review dates for every law note.</p>
     </section>
   </article>`;
 }
@@ -8325,7 +8377,7 @@ function renderPolicy(){
         ${ai ? `<div class="field"><span class="lbl">Depth</span><div class="segs" role="group" aria-label="Analysis depth"><button type="button" data-depth="default" aria-pressed="${pol.depth!=="deep"}">Standard</button><button type="button" data-depth="deep" aria-pressed="${pol.depth==="deep"}">Deep, slower</button></div></div>` : ""}
         <div class="pol-actions">
           ${polRun.busy ? `<button type="button" class="btn" id="pol-stop">Stop</button>` : `<button type="button" class="btn primary" id="pol-run">${ai?"Stress-test with Claude":"Run instant checks"} ${icon("arrow")}</button>`}
-          <button type="button" class="btn sm" id="pol-full">Load a complete example</button>
+          <button type="button" class="btn sm" id="pol-full">See an example</button>
         </div>
         <p class="note">${ai?"Runs on your own Claude account. Claude asks your permission the first time. Tip: Ctrl+Enter runs the test.":"Instant checks run in your browser and nothing is sent anywhere. Open this page in Claude while signed in to add Claude's review."}</p>
         ${polRun.err ? `<p class="pol-err" role="alert">${esc(polRun.err)}</p>` : ""}
@@ -8762,7 +8814,7 @@ function renderAI(key){
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}
-          <button type="button" class="btn" id="ai-ex">Load an example</button>
+          <button type="button" class="btn" id="ai-ex">Fill in an example</button>
           <button type="button" class="btn" id="ai-sample">See an example result</button>
           <button type="button" class="btn ghost" id="ai-clear">Clear</button>
         </div>
@@ -9202,7 +9254,7 @@ function maPlanHTML(){
 function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
-      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button></div>` : ""}</div>${maStandHTML()}</div>
+      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
     <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
@@ -9232,10 +9284,11 @@ function maHeadMeta(){
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
       ${ma.ex ? `<button class="btn sm" data-ma="clear">Clear example</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
       ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button>` : ""}`;
+      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>` : ""}`;
 }
 const maPlanMode = () => maAllRated(ma) && !ma.edit;
 function renderMaturity(){
+  if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
   view.innerHTML = head("Program Maturity",
@@ -9276,7 +9329,7 @@ function bindMaturity(){
     if(d.matab){ ma.tab = d.matab; if(d.masel) ma.sel = d.masel; maSave(); return maRefresh([]); }
     if(d.masel){ ma.sel = d.masel; maSave(); maRefresh([]); const n = document.querySelector(`.ma-al[data-masel="${d.masel}"]`); if(n) n.focus(); return; }
     if(d.masnapdel){ ma.hist = ma.hist.filter(h => String(h.t) !== d.masnapdel); maSave(); return maRefresh([]); }
-    if(d.stage){ ma.stage = d.stage; maSave(); return maRefresh(["stages", "areas"]); }
+    if(d.stage){ ma.stage = d.stage; ma.stageSet = true; maSave(); return maRefresh(["stages", "areas"]); }
     if(d.open){ ma.open = ma.open === d.open && !d.scroll ? null : d.open; maSave(); maRefresh(["areas"]);
       const el = document.getElementById("ma-a-" + d.open); if(el) maScrollTo(el); return; }
     if(d.goresult){ if(maAllRated(ma)) return maOpenPlan(); ma.open = null; maSave(); maRefresh(["areas"]); return maScrollTo(document.getElementById("ma-p3")); }
@@ -9500,7 +9553,7 @@ function cvGapsHTML(){
 function cvResultHTML(){
   const any = cvSummary(cv).rated, acts = cvActions(cv).length;
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${cvWhy()}</div>
-      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage")}</button></div>` : ""}</div>
+      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button></div>` : ""}</div>
     <div class="card cv-big">${cvRadar(cv, true)}${cvLegend(cv)}</div></div>
     <div class="ma-rh"><h4>Biggest gaps</h4></div>${cvGapsHTML()}`;
 }
@@ -9508,7 +9561,7 @@ function cvHeadMeta(){
   const any = cvSummary(cv).rated;
   return `<span class="toast" id="cv-toast" aria-live="polite"></span>
     ${cv.ex ? `<button class="btn sm" data-cv="clear">Clear example</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage")}</button>` : ""}`;
+    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button>` : ""}`;
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
@@ -9802,7 +9855,7 @@ function rcMarkdown(){
    PROFILE FILE: everything you've saved, in one file you keep
    Save it to a synced folder (OneDrive, iCloud Drive, Dropbox) and open it on any device.
    ========================================================= */
-const PF_FILE = "ts-workbench-profile.json";
+const PF_FILE = "ts-workbench-workspace.json";
 // Chrome and Edge can keep writing to the same file; elsewhere, and inside Claude, the profile downloads instead
 const PF_FS = (() => { try{ return typeof window.showSaveFilePicker === "function" && window.top === window.self; }catch(e){ return false; } })();
 let pfHandleCache = null, pfTimer = null;
@@ -9852,13 +9905,13 @@ async function pfSave(){
     try{
       let h = await pfHandle();
       if(h){ const q = await h.queryPermission({mode:"readwrite"}); if(q !== "granted" && (await h.requestPermission({mode:"readwrite"})) !== "granted") h = null; }
-      if(!h){ h = await window.showSaveFilePicker({suggestedName:PF_FILE, types:[{description:"T&S Workbench profile", accept:{"application/json":[".json"]}}]}); await pfHandleSet(h); }
-      await pfWrite(h); return gsay("Profile saved to " + h.name);
+      if(!h){ h = await window.showSaveFilePicker({suggestedName:PF_FILE, types:[{description:"T&S Workbench workspace", accept:{"application/json":[".json"]}}]}); await pfHandleSet(h); }
+      await pfWrite(h); return gsay("Workspace saved to " + h.name);
     }catch(e){ if(e && e.name === "AbortError") return; }
   }
   const doc = pfDoc(), res = await offerFile(PF_FILE, doc, doc, null);
-  if(res === "saved"){ pfMarkSaved(PF_FILE); gsay("Profile saved. Keep the file somewhere safe, like a synced folder"); }
-  else if(res === "copied") gsay("Downloads are blocked here, so the profile was copied to your clipboard");
+  if(res === "saved"){ pfMarkSaved(PF_FILE); gsay("Workspace saved. Keep the file somewhere safe, like a synced folder"); }
+  else if(res === "copied") gsay("Downloads are blocked here, so the workspace was copied to your clipboard");
 }
 // Edits save themselves once a file is connected and the browser has allowed writing this visit
 function pfTouched(){
@@ -9873,7 +9926,7 @@ function pfTouched(){
 }
 async function pfOpen(){
   if(PF_FS && typeof window.showOpenFilePicker === "function"){
-    try{ const [h] = await window.showOpenFilePicker({types:[{description:"T&S Workbench profile", accept:{"application/json":[".json"]}}]}); const f = await h.getFile(); return pfReview(await f.text(), f.name, h); }
+    try{ const [h] = await window.showOpenFilePicker({types:[{description:"T&S Workbench workspace", accept:{"application/json":[".json"]}}]}); const f = await h.getFile(); return pfReview(await f.text(), f.name, h); }
     catch(e){ if(e && e.name === "AbortError") return; }
   }
   const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json,application/json"; inp.style.display = "none";
@@ -9883,14 +9936,14 @@ async function pfOpen(){
 // Show what's in the file, then replace this browser's copy only when the person agrees
 function pfReview(text, fileName, handle){
   let obj = null; try{ obj = JSON.parse(text); }catch(e){}
-  if(!obj || obj.app !== "ts-workbench" && !obj.assessments && !Array.isArray(obj)) return gsay("That file isn't a T&S Workbench profile");
+  if(!obj || obj.app !== "ts-workbench" && !obj.assessments && !Array.isArray(obj)) return gsay("That file isn't a T&S Workbench workspace file");
   if(obj.kind === "workspace" || obj.assessments || Array.isArray(obj)) return pfMergeOld(obj);
-  if(obj.kind !== "profile" || !obj.data || typeof obj.data !== "object") return gsay("That file isn't a T&S Workbench profile");
+  if(obj.kind !== "profile" || !obj.data || typeof obj.data !== "object") return gsay("That file isn't a T&S Workbench workspace file");
   const dirty = +(pfRaw.get("profile:changedAt") || 0) > +(pfRaw.get("profile:savedAt") || 0) && Object.keys(pfCollect()).length > 1;
-  pfModal(`<h3 id="pf-h">Open ${esc(obj.name ? obj.name + "'s profile" : "this profile")}?</h3>
+  pfModal(`<h3 id="pf-h">Open ${esc(obj.name ? obj.name + "'s workspace" : "this workspace")}?</h3>
     <p>${esc(fileName)}${obj.saved ? `, saved ${esc(new Date(obj.saved).toLocaleString())}` : ""}. It holds ${esc(pfSummary(obj))}.</p>
     <p class="note">Opening it replaces what's saved in this browser.${dirty ? " <b>This browser has changes you haven't saved to a file.</b>" : ""}</p>
-    <div class="pf-act">${dirty ? `<button type="button" class="btn" data-pfm="savefirst">Save mine first</button>` : ""}<button type="button" class="btn" data-pfm="cancel">Cancel</button><button type="button" class="btn primary" data-pfm="open">Open profile</button></div>`,
+    <div class="pf-act">${dirty ? `<button type="button" class="btn" data-pfm="savefirst">Save mine first</button>` : ""}<button type="button" class="btn" data-pfm="cancel">Cancel</button><button type="button" class="btn primary" data-pfm="open">Open workspace</button></div>`,
     async act => {
       if(act === "savefirst"){ await pfSave(); return false; }
       if(act !== "open") return true;
@@ -9898,7 +9951,7 @@ function pfReview(text, fileName, handle){
         const keep = []; for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) keep.push(k); }
         keep.forEach(k => localStorage.removeItem(k));
         Object.entries(obj.data).forEach(([k, v]) => { if(typeof v === "string" && /^[\w:.\-]+$/.test(k)) localStorage.setItem("tswb:" + k, v); });
-      }catch(e){ gsay("This browser blocked saving the profile"); return true; }
+      }catch(e){ gsay("This browser blocked opening the workspace"); return true; }
       if(handle) await pfHandleSet(handle);
       pfMarkSaved(handle ? handle.name : fileName);
       location.reload();
@@ -9936,10 +9989,10 @@ function pfStatus(){
 function pfStatusRender(){
   const el = document.getElementById("sb-sync"); if(!el) return;
   const s = pfStatus();
-  const text = s.never ? (s.dirty ? "Not saved yet" : "Keep a copy") : s.dirty ? "Unsaved changes" : "Saved " + (relTime(s.saved) === "now" ? "just now" : relTime(s.saved) + " ago");
+  const text = s.never ? (s.dirty ? "Not backed up" : "Back up to a file") : s.dirty ? "Changes not backed up" : "Backed up " + (relTime(s.saved) === "now" ? "just now" : relTime(s.saved) + " ago");
   el.className = "sb-sync " + (s.dirty ? "dirty" : s.never ? "" : "ok");
-  el.innerHTML = `<span class="sb-sync-t" title="${esc(s.never ? "Save your profile to a file, then open it on any device" : "Profile file: " + s.file)}"><i></i>${text}</span>
-    <button type="button" data-pf="open" title="Open a profile file">Open</button><button type="button" data-pf="save" title="Save your profile to a file">Save</button>`;
+  el.innerHTML = `<span class="sb-sync-t" title="${esc(s.never ? "Save your workspace to a file, then open it on any device" : "Workspace file: " + s.file)}"><i></i>${text}</span>
+    <button type="button" data-pf="open" title="Open a workspace file">Open</button><button type="button" data-pf="save" title="Save your workspace to a file">Save</button>`;
 }
 document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-pf]"); if(!b) return; e.preventDefault(); b.dataset.pf === "save" ? pfSave() : pfOpen(); });
 { const setRaw = store.set; store.set = (k, v) => { setRaw.call(store, k, v); if(!/^(profile:|theme$|ov:pm$)/.test(k)) pfTouched(); }; }
@@ -10083,6 +10136,96 @@ function tkOpen(src){
   bg.addEventListener("input", e => { const t = e.target; if(t.dataset.tkcfg){ tkCfg[t.dataset.tkcfg] = t.value; store.set("tk:cfg", tkCfg); list(); } });
   document.addEventListener("keydown", key); document.body.appendChild(bg);
   const first = box.querySelector('[aria-pressed="true"]'); if(first) first.focus();
+}
+/* =========================================================
+   WORKSPACE SETTINGS: company type, stage and regions, set once and used by every tool
+   One vocabulary everywhere: the company types and stages below are the only ones the tools show.
+   ========================================================= */
+const ORG_TYPES = TT_TYPES.filter(t => t.k !== "all");
+const ORG_STAGES = [
+  {k:"early", n:"Early stage", d:"A founder or first safety hire, usually under a million users"},
+  {k:"growth", n:"Growing", d:"A dedicated safety team, millions of users, new markets on the way"},
+  {k:"scale", n:"At scale or regulated", d:"Tens of millions of users, or extra duties under EU or UK law"}
+];
+// How the shared settings map onto each tool's own options
+const ORG_MAP = {
+  mx:{social:"social", marketplace:"market", fintech:"fintech", gaming:"gaming", dating:"dating", genai:"genai", gig:"gig", kids:"kids"},
+  pm:{social:"social", marketplace:"marketplace", fintech:"fintech", gaming:"gaming", dating:"dating", genai:"genai", gig:"gig", kids:"edtech"},
+  mxStage:{early:"1", growth:"2", scale:"3"}
+};
+Object.assign(MX_PLATFORMS, {social:"Social media & video", market:"Marketplace & e-commerce", genai:"Generative AI"});
+Object.assign(MX_STAGE, {"1":"Early stage", "2":"Growing", "3":"At scale or regulated"});
+const orgGet = () => store.get("ws:org", null) || {};
+const orgSet = o => store.set("ws:org", Object.assign({}, orgGet(), o));
+const orgReady = () => { const o = orgGet(); return !!(o.type && o.stage); };
+const orgTypeName = k => (ORG_TYPES.find(t => t.k === k) || {n:""}).n;
+const orgStageName = k => (ORG_STAGES.find(s => s.k === k) || {n:""}).n;
+// A new pre-mortem starts from the workspace's product type and regions; the person can change either
+function orgPrefillPM(p){
+  const o = orgGet(); if(!o.type && !(o.regions && o.regions.length)) return p;
+  const prev = pm; pm = p;
+  if(o.type && ORG_MAP.pm[o.type]){ setType(ORG_MAP.pm[o.type]); pm.answered.type = true; }
+  if(o.regions && o.regions.length){ pm.regions = o.regions.slice(); pm.answered.regions = true; }
+  pm.fromOrg = true; const out = pm; pm = prev; return out;
+}
+function orgCardHTML(){
+  const o = orgGet(), regions = o.regions || [];
+  return `<div class="card org-card"><div class="card-b org-b">
+    <div><h3>Your organization</h3><p class="note">Used to pre-fill every tool: tabletop scenarios, maturity targets, metrics, policy tests and new pre-mortems. Change it any time.</p></div>
+    <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
+    <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
+    <div class="field"><span class="lbl">Where your users are</span><div class="org-regions">${REGIONS.map(r => `<button type="button" class="pol-chip" aria-pressed="${regions.includes(r.k)}" data-orgregion="${r.k}" title="${esc(r.n)}">${r.k.toUpperCase()}</button>`).join("")}</div></div>
+  </div></div>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion]"); if(!b) return;
+  if(b.dataset.orgstage) orgSet({stage:b.dataset.orgstage});
+  if(b.dataset.orgregion){ const cur = orgGet().regions || [], k = b.dataset.orgregion; orgSet({regions:cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)}); }
+  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
+  gsay("Workspace settings saved");
+});
+document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ orgSet({type:t.value || null}); gsay("Workspace settings saved"); } });
+
+/* ---------- New: start any assessment from the top bar ---------- */
+const NEW_ITEMS = [
+  ["premortem", "radar", "var(--t-pm)", "Abuse pre-mortem", "Assess a product or feature before launch", () => newAssessment()],
+  ["maturity", "steps", "var(--t-ma)", "Program maturity", "Rate your program in eight areas", () => goRoute("maturity")],
+  ["coverage", "cover", "var(--t-cv)", "Coverage radar", "Map your defenses against risk", () => goRoute("coverage")],
+  ["tabletop", "siren", "var(--t-tt)", "Tabletop exercise", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
+  ["policy", "doc", "var(--t-pol)", "Policy test", "Find where a rule is unclear", () => goRoute("policy")],
+  ["vendors", "scale", "var(--t-vd)", "Vendor comparison", "Score moderation vendors on evidence", () => goRoute("vendors")]
+];
+function newMenuToggle(open){
+  const m = $("#tb-menu"), b = $("#tb-new"); if(!m || !b) return;
+  const show = open === undefined ? m.hidden : open;
+  m.hidden = !show; b.setAttribute("aria-expanded", show);
+  if(show){ const f = m.querySelector("[role=menuitem]"); if(f) f.focus(); }
+}
+{
+  const m = $("#tb-menu");
+  if(m && m.innerHTML !== undefined){
+    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><small>${d}</small></span></button>`).join("");
+    m.addEventListener("click", e => { const b = e.target.closest("[data-new]"); if(!b) return; newMenuToggle(false); NEW_ITEMS[+b.dataset.new][5](); });
+    m.addEventListener("keydown", e => {
+      const items = [...m.querySelectorAll("[role=menuitem]")], i = items.indexOf(document.activeElement);
+      if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); }
+      if(e.key === "Escape"){ e.preventDefault(); newMenuToggle(false); $("#tb-new").focus(); }
+    });
+    document.addEventListener("click", e => { if(!m.hidden && !e.target.closest("#tb-menu") && !e.target.closest("#tb-new")) newMenuToggle(false); });
+  }
+}
+
+/* ---------- Overview header: your status once you've started, the library's scale before ---------- */
+function ovHeroChips(){
+  const parts = typeof rcParts === "function" ? rcParts() : [], o = parts.length ? rcOverall(parts) : {score:null};
+  const pms = Object.values(wsItems()).filter(it => it.kind === "premortem").length, org = orgGet();
+  if(o.score === null && !pms) return [HARMS.length + " abuse risks", SCENARIOS.length + " crisis scenarios", "8 program areas", (typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1) + " AI assistants"];
+  const out = [];
+  if(o.score !== null) out.push(`Grade ${rcGrade(o.score)[1]} · ${o.score}/100`);
+  if(pms) out.push(`${pms} product${pms === 1 ? "" : "s"} assessed`);
+  const m = parts.find(p => p.k === "maturity"); if(m && m.score !== null) out.push(`Maturity ${maScore(ma).toFixed(1)} of 5`);
+  if(org.type) out.push(orgTypeName(org.type) + (org.stage ? " · " + orgStageName(org.stage) : ""));
+  return out;
 }
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};

@@ -74,7 +74,7 @@ const HEAD_META = () => {
     coverage:["cover", () => [CV_AREAS.length + " harm areas", CV_LAYERS.length + " layers of defense", "Risk vs coverage radar"]],
     maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
-    workspace:["user", () => []], about:["info", () => []]
+    workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
   let stats = []; try{ stats = m[1](); }catch(e){}

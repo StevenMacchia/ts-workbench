@@ -38,7 +38,7 @@ const G = patch(rd("partG.js"), [
   [`    $('#tt-replay').onclick = () => { tt = freshTT(tt.s); store.set('tt',tt); renderTabletop(); };`,
    `    $('#tt-replay').onclick = () => { tt = freshTT(tt.s); store.set('tt',tt); renderTabletop(); };\n    $('#tt-save').onclick = () => wsSaveTabletop();`],
   [`'Run the program', \`<button class="btn sm primary" id="mx-copy">`,
-   `'Run the program', \`<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>\${wsSaveLabel("metrics")}</button><button class="btn sm primary" id="mx-copy">`],
+   `'Run the program', \`<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>\${wsSaveLabel("metrics", mx)}</button><button class="btn sm primary" id="mx-copy">`],
   [`  $('#mx-reg').onchange = e => { mx.reg = e.target.checked; save(); };`,
    `  $('#mx-reg').onchange = e => { mx.reg = e.target.checked; save(); };\n  $('#mx-save').onclick = () => { const msg = wsSaveTool("metrics", mx, metricsTitle(mx)); renderMetrics(); flashIn($('#mx-toast'), msg); };`],
   [`'Run the program', \`<button class="btn sm" id="vx-reset">Reset to example data</button>\`)`,
@@ -211,7 +211,7 @@ console.log("v8 assembled");
     [`<div class="section-title" style="margin-top:28px"><h2>The detail</h2>`, `<div class="section-title rep-detail"><h2>The detail</h2>`]
   ], "partF3 report header");
   const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css");
-  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), R9].join("");
+  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), R9].join("");
   fs.writeFileSync(path.join(D, "_F3_9.js"), F3_9);
   const STANDALONE_BUILD = true;
 fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + body9);

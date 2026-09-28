@@ -86,29 +86,11 @@ function renderOverview(){
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${hello}${first ? ", " + esc(first) : ""}</h1>
       <p>${sub}</p>
-      <div class="ph-stats"><span>${HARMS.length} abuse risks</span><span>${SCENARIOS.length} crisis scenarios</span><span>${METRICS.length} metrics</span><span>${typeof AI_TOOLS !== "undefined" ? Object.values(AI_TOOLS).filter(t => !t.wip).length + 1 : 1} AI assistants</span></div>
+      <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
     </section>
 
     ${typeof rcHTML === "function" ? rcHTML() : ""}
     ${ovPictureHTML()}
-
-    <section class="rise">
-      <div class="ov-sec-h"><h3>Tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools">
-        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
-        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
-        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
-        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
-      </div>
-    </section>
-
-    ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
-      <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
-    </section>` : ""}
 
     <section class="ov-cols rise">
       <div>
@@ -127,6 +109,25 @@ function renderOverview(){
         </div>
       </div>
     </section>
+
+    <section class="rise">
+      <div class="ov-sec-h"><h3>All tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
+      <div class="ov-tools">
+        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
+        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
+        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
+        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
+      </div>
+    </section>
+
+    ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
+      <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+    </section>` : ""}
+
 
     <footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>Not legal advice. Use the outputs to start conversations with your Legal and Policy partners.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>
   </div>`;

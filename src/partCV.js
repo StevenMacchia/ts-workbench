@@ -169,7 +169,7 @@ function cvGapsHTML(){
 function cvResultHTML(){
   const any = cvSummary(cv).rated, acts = cvActions(cv).length;
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${cvWhy()}</div>
-      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage")}</button></div>` : ""}</div>
+      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button></div>` : ""}</div>
     <div class="card cv-big">${cvRadar(cv, true)}${cvLegend(cv)}</div></div>
     <div class="ma-rh"><h4>Biggest gaps</h4></div>${cvGapsHTML()}`;
 }
@@ -177,7 +177,7 @@ function cvHeadMeta(){
   const any = cvSummary(cv).rated;
   return `<span class="toast" id="cv-toast" aria-live="polite"></span>
     ${cv.ex ? `<button class="btn sm" data-cv="clear">Clear example</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage")}</button>` : ""}`;
+    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button>` : ""}`;
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);

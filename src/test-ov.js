@@ -26,7 +26,7 @@ const body = function(){
   MA_AREAS.forEach(a => ma.lv[a.k] = 3); pm = fromPreset("dating"); pm.example = false; pm.name = "Match chat"; pm.id = null; pm.saved = false; saveToLib(); renderOverview(); h = view.innerHTML;
   if(bad(h)) throw new Error("complete overview has bad values");
   eq(/3 of 3 complete/.test(h) && /picture is complete/.test(h), true, "complete");
-  eq(/Combined risk across 2 pre-mortems/.test(h), true, "two products combined"); const picHTML = h.slice(h.indexOf("ov-pics"), h.indexOf("<h3>Tools</h3>")); eq((picHTML.match(/stroke-dasharray="3 3"/g) || []).length, 2, "one outline per product");
+  eq(/Combined risk across 2 pre-mortems/.test(h), true, "two products combined"); const picHTML = h.slice(h.indexOf("ov-pics"), h.indexOf("</section>", h.indexOf("ov-pics"))); eq((picHTML.match(/stroke-dasharray="3 3"/g) || []).length, 2, "one outline per product");
   eq(/id="ov-pm-sel"/.test(h) && (h.match(/<option value=/g) || []).length >= 2, true, "product picker");
   const pms = ovSavedPMs(), comb = RADAR_GROUPS.map((g, i) => Math.max(...pms.map(p => p.g[i].score)));
   eq(comb.every((v, i) => v >= pms[0].g[i].score && v >= pms[1].g[i].score), true, "combined is the worst of each group");

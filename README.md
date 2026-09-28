@@ -26,7 +26,7 @@ Trust & Safety knowledge mostly lives in people's heads and in slide decks that 
 
 ## Design principles
 
-- **Private by default.** Everything is stored in the visitor's own browser, so teams can describe unreleased products freely. A profile file carries it to any device: save it to a synced folder and open it anywhere.
+- **Private by default.** Everything is stored in the visitor's own browser, so teams can describe unreleased products freely. A workspace file carries it to any device: save it to a synced folder and open it anywhere.
 - **Works with your tracker.** Launch plans and maturity roadmaps go to Jira, Asana or Linear as a CSV, or open as pre-filled Jira, Linear or GitHub issues, with no logins or tokens.
 - **Plain language first.** Written for product managers and founders, with jargon explained on hover.
 - **Every number explains itself.** Each risk score lists the answers that drove it; each metric names its guardrail.

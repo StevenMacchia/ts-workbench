@@ -18,16 +18,19 @@
     <nav class="sb-nav" aria-label="Main">
       <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Overview</a>
       <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
-      <div class="sb-h">Tools</div>
-      <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
-      <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
-      <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
-      <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
+      <div class="sb-h">Assess</div>
       <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
       <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
+      <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
+      <div class="sb-h">Prepare</div>
+      <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
+      <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
-      <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer<span class="sb-new sb-ai">AI</span></a>
-      <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer<span class="sb-new sb-ai">AI</span></a>
+      <div class="sb-h">Measure</div>
+      <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
+      <div class="sb-h">AI assistants</div>
+      <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
+      <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report<span class="sb-new sb-soon" title="Under construction">Soon</span></a>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
@@ -51,7 +54,8 @@
       <div class="tb-crumb"><a href="#overview">Workbench</a><svg><use href="#i-chev"/></svg><b id="tb-here">Overview</b></div>
       <div class="tb-actions">
         <button type="button" class="btn tb-k" data-cmdk="1" aria-label="Search"><svg><use href="#i-search"/></svg><kbd class="kbd">⌘K</kbd></button>
-        <a class="btn brandbtn" href="#premortem" id="tb-new"><svg><use href="#i-plus"/></svg><span>New assessment</span></a>
+        <button type="button" class="btn brandbtn" id="tb-new" aria-haspopup="menu" aria-expanded="false" aria-controls="tb-menu"><svg><use href="#i-plus"/></svg><span>New</span></button>
+        <div class="tb-newmenu" id="tb-menu" role="menu" aria-label="Start something new" hidden></div>
       </div>
     </header>
     <div class="page" id="view"></div>

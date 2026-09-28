@@ -217,6 +217,7 @@ const TT_TYPES = [
 function ttCompanyType(){
   const saved = store.get("tt:type", null);
   if(saved && TT_TYPES.some(t=>t.k===saved)) return saved;
+  const org = typeof orgGet === "function" ? orgGet() : {}; if(org.type && TT_TYPES.some(t=>t.k===org.type)) return org.type;
   const map = {social:"social", video:"social", creator:"social", messaging:"social", marketplace:"marketplace", fintech:"fintech", crypto:"fintech", gaming:"gaming", dating:"dating", genai:"genai", gig:"gig", rentals:"gig", edtech:"kids"};
   return (typeof pm !== "undefined" && pm && map[pm.type]) || "all";
 }

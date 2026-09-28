@@ -317,7 +317,7 @@ function renderAI(key){
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}
-          <button type="button" class="btn" id="ai-ex">Load an example</button>
+          <button type="button" class="btn" id="ai-ex">Fill in an example</button>
           <button type="button" class="btn" id="ai-sample">See an example result</button>
           <button type="button" class="btn ghost" id="ai-clear">Clear</button>
         </div>

@@ -245,7 +245,7 @@ function maPlanHTML(){
 function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
-      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button></div>` : ""}</div>${maStandHTML()}</div>
+      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
     <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
@@ -275,10 +275,11 @@ function maHeadMeta(){
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
       ${ma.ex ? `<button class="btn sm" data-ma="clear">Clear example</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
       ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity")}</button>` : ""}`;
+      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>` : ""}`;
 }
 const maPlanMode = () => maAllRated(ma) && !ma.edit;
 function renderMaturity(){
+  if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
   view.innerHTML = head("Program Maturity",
@@ -319,7 +320,7 @@ function bindMaturity(){
     if(d.matab){ ma.tab = d.matab; if(d.masel) ma.sel = d.masel; maSave(); return maRefresh([]); }
     if(d.masel){ ma.sel = d.masel; maSave(); maRefresh([]); const n = document.querySelector(`.ma-al[data-masel="${d.masel}"]`); if(n) n.focus(); return; }
     if(d.masnapdel){ ma.hist = ma.hist.filter(h => String(h.t) !== d.masnapdel); maSave(); return maRefresh([]); }
-    if(d.stage){ ma.stage = d.stage; maSave(); return maRefresh(["stages", "areas"]); }
+    if(d.stage){ ma.stage = d.stage; ma.stageSet = true; maSave(); return maRefresh(["stages", "areas"]); }
     if(d.open){ ma.open = ma.open === d.open && !d.scroll ? null : d.open; maSave(); maRefresh(["areas"]);
       const el = document.getElementById("ma-a-" + d.open); if(el) maScrollTo(el); return; }
     if(d.goresult){ if(maAllRated(ma)) return maOpenPlan(); ma.open = null; maSave(); maRefresh(["areas"]); return maScrollTo(document.getElementById("ma-p3")); }

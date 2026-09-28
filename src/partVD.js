@@ -78,7 +78,7 @@ function renderVendors(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor Scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
-    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">Reset to example data</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors")}</button>`) + `
+    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">Reset to example data</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="vd-grid">

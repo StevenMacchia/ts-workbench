@@ -22,7 +22,8 @@ function wsSaveTabletop(){
   wsPut({id:wsNewId("TT"), kind:"tabletop", title:ttScenario(tt.s, tt.v).title, projectId:wsActive(), data:JSON.parse(JSON.stringify(tt))});
   flashIn($("#tt-toast"), savedWhere());
 }
-function wsSaveLabel(kind){ const cur = store.get("ws:cur:"+kind, null); return cur && wsItems()[cur] ? "Save changes" : "Save to workspace"; }
+function wsSaveLabel(kind, data){ const cur = store.get("ws:cur:"+kind, null), it = cur && wsItems()[cur]; if(!it) return "Save to workspace";
+  return data !== undefined && JSON.stringify(it.data) === JSON.stringify(data) ? "Saved" : "Save changes"; }
 function wsSaveTool(kind, data, title){
   let cur = store.get("ws:cur:"+kind, null);
   if(cur && wsItems()[cur]){ wsPut({id:cur, kind, data:JSON.parse(JSON.stringify(data))}); return "Changes saved"; }
@@ -155,18 +156,19 @@ function renderWorkspace(){
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
   const p = wsProfile();
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
-    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser: save your profile to a file to keep it, and open that file on any device.`, null,
-    `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open profile</button>
-     <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save profile</button>`) + `
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
+    `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
+     <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save workspace file</button>`) + `
     <span class="toast" id="ws-toast" aria-live="polite"></span>
     <div class="wstop">
       ${profileCard()}
-      <div class="wsstats">
+      ${typeof orgCardHTML === "function" ? orgCardHTML() : ""}
+    </div>
+    <div class="wsstats">
         <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${Object.keys(wsProjects()).length}</span></div>
         <div class="card kpi"><span class="eyebrow">Saved results</span><span class="v">${all.length}</span></div>
         <div class="card kpi"><span class="eyebrow">Pre-mortems</span><span class="v">${all.filter(i=>i.kind==="premortem").length}</span></div>
         <div class="card kpi"><span class="eyebrow">Open launch blockers ${tip("Launch blockers not yet ticked off, added up across every saved pre-mortem.","tip-r")}</span><span class="v" style="${openBlockers?"color:var(--crit)":""}">${openBlockers}</span></div>
-      </div>
     </div>
     <div class="section-title"><h2>Projects ${tip("Group results by launch, product area or client. Click a project to see its results; anything you save while it's selected goes into it.")}</h2>
       <button type="button" class="btn sm" data-ws="newproj"><svg><use href="#i-plus"/></svg>New project</button></div>
@@ -206,7 +208,7 @@ function bindWorkspace(){
       if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
       return goRoute(KINDS[it.kind].route); }
     if(d.wsNew){ const k = d.wsNew;
-      if(k==="premortem"){ pm = Object.assign(blankPM(), {projectId:wsActive()}); store.set("pm3", pm); }
+      if(k==="premortem"){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); }
       if(k==="tabletop"){ tt = null; store.set("tt", null); }
       if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }

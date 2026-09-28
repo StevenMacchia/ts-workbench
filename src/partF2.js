@@ -50,7 +50,7 @@ const QS = [
   {k:"team", sec:"Your team", t:"Who deals with safety problems today?", h:"If a child is in danger at 2 a.m., someone needs to respond.", kind:"single",
    tip:"Without a dedicated owner we add readiness risks, such as nobody owning urgent escalations, and suggest simple starting versions of each safeguard.", opts:[
     {k:"none", n:"Nobody yet"}, {k:"parttime", n:"Someone, alongside their main job"}, {k:"dedicated", n:"A dedicated team"}, {k:"mature", n:"A full trust & safety organization"}]},
-  {k:"name", sec:"Last step", t:"What should we call this assessment?", h:"It appears on your report, in My assessments and in the downloaded launch doc.", kind:"name",
+  {k:"name", sec:"Last step", t:"What should we call this assessment?", h:"It appears on your report, in your workspace and in the downloaded launch doc.", kind:"name",
    tip:"Assessments are saved in this browser under this name. Use Export on the start screen to back them up or move them to another device."}
 ];
 
@@ -91,10 +91,9 @@ function heroArt(){
 /* ---------- screens ---------- */
 function libraryBlock(){
   const items = Object.values(libLoad()).sort((a,b)=>(b.updated||0)-(a.updated||0));
-  const head = `<div class="section-title"><h2>My assessments ${tip("Saved in this browser only, so nothing leaves your device. Export a backup to keep them safe or to move them to another device or browser.")}</h2>
-    <div class="row">${items.length?`<button type="button" class="btn sm" data-act="export"><svg><use href="#i-download"/></svg>Export</button>`:""}
-      <label class="btn sm" for="lib-import"><svg><use href="#i-upload"/></svg>Import</label><input type="file" id="lib-import" accept=".json,application/json" class="visually-hidden"></div></div>`;
-  if(!items.length) return head + `<div class="card libempty"><svg><use href="#i-folder"/></svg><div><b>No saved assessments yet</b><p class="note">Assessments you finish are saved here automatically. You can reopen them, reuse their answers for a new feature, or export them.</p></div></div>`;
+  const head = `<div class="section-title"><h2>Saved pre-mortems ${tip("Part of your workspace, saved in this browser. Save a workspace file to keep a copy or open it on another device.")}</h2>
+    <a class="btn sm" href="#workspace">All saved work</a></div>`;
+  if(!items.length) return head + `<div class="card libempty"><svg><use href="#i-folder"/></svg><div><b>No saved pre-mortems yet</b><p class="note">Pre-mortems you finish are saved here and in your workspace automatically. Reopen them, or reuse their answers for a new feature.</p></div></div>`;
   return head + `<div class="card liblist">${items.map(rec=>{
     const r = assess(openRecord(rec)); const bl = r.safeguards.filter(s=>s.rank===3); const bd = bl.filter(s=>rec.done&&rec.done[s.id]).length;
     return `<div class="librow">
@@ -163,6 +162,7 @@ function askScreen(){
   if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
   const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k];
   return `<div class="pm-layout"><div>
+    ${pm.fromOrg && pm.qi < 2 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The product type and regions are set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
     <div class="card askcard">
       <div class="qprog"><span class="eyebrow">${Q.sec}</span><span class="note mono">${pm.qi+1} / ${qs.length}</span></div>
@@ -220,7 +220,7 @@ function renderPremortem(){
   const activeId = active && active.id, caret = active && typeof active.selectionStart==="number" ? active.selectionStart : null;
   const refocus = active && active.dataset && (active.dataset.set||active.dataset.toggle) ? `[data-${active.dataset.set?"set":"toggle"}="${active.dataset.set||active.dataset.toggle}"][data-v="${active.dataset.v}"]` : null;
   let actions = "";
-  if(pm.stage!=="start") actions += `<button type="button" class="btn sm" data-act="home"><svg><use href="#i-folder"/></svg>All assessments</button>`;
+  if(pm.stage!=="start") actions += `<button type="button" class="btn sm" data-act="home"><svg><use href="#i-folder"/></svg>Saved pre-mortems</button>`;
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
@@ -247,7 +247,7 @@ function goNext(){
   if(pm.fromProfile && Q && Q.k==="features"){ pm.qi = qs.findIndex(q=>q.k==="name"); }
   else if(pm.qi >= qs.length-1){
     pm.stage = "report"; pm.fromProfile = false;
-    if(!pm.example){ const first = !pm.saved; saveToLib(); if(first) pm.flash = "Saved to My assessments"; }
+    if(!pm.example){ const first = !pm.saved; saveToLib(); if(first) pm.flash = "Saved to your workspace"; }
   }
   else pm.qi++;
   savePM(); renderPremortem(); window.scrollTo(0,0);
@@ -282,13 +282,13 @@ function bindPremortem(){
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
-      case "new": pm = blankPM(); return rerender();
+      case "new": pm = orgPrefillPM(blankPM()); return rerender();
       case "report": pm.stage = "report"; return rerender();
       case "tasks": return tkOpen("premortem");
       case "plan": pm.stage = "report"; pm.tab = "plan"; rerender(); setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); return;
       case "home": confirmDel = null; pm.stage = "start"; return rerender();
       case "canceldel": confirmDel = null; return renderPremortem();
-      case "save": { const wasExample = pm.example; if(wasExample){ pm = openRecord(recordOf(pm), {id:null, saved:false, created:null, name:(pm.name||"").replace(" (example)","")+" (my copy)", stage:"report"}); } saveToLib(); pm.flash = "Saved to My assessments"; return rerender(); }
+      case "save": { const wasExample = pm.example; if(wasExample){ pm = openRecord(recordOf(pm), {id:null, saved:false, created:null, name:(pm.name||"").replace(" (example)","")+" (my copy)", stage:"report"}); } saveToLib(); pm.flash = "Saved to your workspace"; return rerender(); }
       case "typical": { const t = PLATFORMS.find(x=>x.k===pm.type); if(t){ withImpact(() => { pm.features = t.f.slice(); }); } return rerender(); }
       case "clearfilter": pm.filter = {cell:"",cat:"",band:""}; pm.search = ""; return rerender();
       case "fullplan": pm.tab = "plan"; rerender(); { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); } return;

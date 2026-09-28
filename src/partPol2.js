@@ -42,7 +42,7 @@ function renderPolicy(){
         ${ai ? `<div class="field"><span class="lbl">Depth</span><div class="segs" role="group" aria-label="Analysis depth"><button type="button" data-depth="default" aria-pressed="${pol.depth!=="deep"}">Standard</button><button type="button" data-depth="deep" aria-pressed="${pol.depth==="deep"}">Deep, slower</button></div></div>` : ""}
         <div class="pol-actions">
           ${polRun.busy ? `<button type="button" class="btn" id="pol-stop">Stop</button>` : `<button type="button" class="btn primary" id="pol-run">${ai?"Stress-test with Claude":"Run instant checks"} ${icon("arrow")}</button>`}
-          <button type="button" class="btn sm" id="pol-full">Load a complete example</button>
+          <button type="button" class="btn sm" id="pol-full">See an example</button>
         </div>
         <p class="note">${ai?"Runs on your own Claude account. Claude asks your permission the first time. Tip: Ctrl+Enter runs the test.":"Instant checks run in your browser and nothing is sent anywhere. Open this page in Claude while signed in to add Claude's review."}</p>
         ${polRun.err ? `<p class="pol-err" role="alert">${esc(polRun.err)}</p>` : ""}
