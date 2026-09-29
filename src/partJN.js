@@ -5,13 +5,13 @@
 // Setup counts once confirmed; workspaces set up before the confirm button existed count if any later step is done
 const orgConfirmed = () => orgReady() && (!!orgGet().confirmed || JOURNEY.slice(1).some(s => s.done()));
 const JOURNEY = [
-  {k:"setup", n:"Set up your workspace", d:"Company type, stage and regions, once", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
-  {k:"maturity", n:"Rate your program's maturity", d:"Eight areas, about five minutes", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
-  {k:"premortem", n:"Pre-mortem your main product", d:"How it could be misused, and what to do first", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
+  {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
+  {k:"maturity", n:"Rate your program", d:"Eight areas, about five minutes", min:5, get:"A maturity level for eight areas, and a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
+  {k:"premortem", n:"Pre-mortem a product", d:"How it could be misused, and what to do first", min:8, get:"How it could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
-  {k:"coverage", n:"Map your coverage", d:"Your defenses against that risk", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
-  {k:"crisis", n:"Rehearse a crisis", d:"One tabletop scenario, about eight minutes", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
-  {k:"act", n:"Turn the gaps into work", d:"Send your roadmap or gaps to your tracker", icon:"send", c:"var(--accent)", route:"maturity",
+  {k:"coverage", n:"Map your coverage", d:"Your defenses against that risk", min:5, get:"Whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
+  {k:"crisis", n:"Rehearse a crisis", d:"One tabletop scenario, about eight minutes", min:8, get:"One realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
+  {k:"act", n:"Turn gaps into a plan", d:"Send your roadmap or gaps to your tracker", min:2, get:"Your roadmap and biggest gaps, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"maturity",
     go:() => { const src = MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex && maRoadmap(ma).length ? "maturity" : !cv.ex && cvActions(cv).length ? "coverage" : null; goRoute(src || "maturity"); if(src) setTimeout(() => tkOpen(src), 60); }, done:() => !!store.get("tk:used", false)}
 ];
 const jnNext = skip => JOURNEY.find(s => s.k !== skip && !s.done());
@@ -19,26 +19,6 @@ function jnGo(k){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
   if(k === "maturity" && ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
   if(k === "coverage" && cv.ex){ cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
   if(s.go) s.go(); else goRoute(s.route); }
-// Overview: where you are in the review; the first step holds the setup form so a new visitor starts there
-function jnHTML(){
-  const done = JOURNEY.filter(s => s.done()).length, next = jnNext(), setupOpen = next && next.k === "setup";
-  // Once it's all done, the review steps aside for the week's work
-  if(!next) return `<section class="rise jn jn-done" aria-label="Your program review"><div class="card jn-bar">
-    <span class="jn-bar-c" aria-hidden="true">${JOURNEY.map(() => `<i><svg><use href="#i-check"/></svg></i>`).join("")}</span>
-    <span class="jn-bar-t"><b>Program review complete.</b> Revisit it each quarter as your products and program change.</span>
-    <button type="button" class="btn sm primary" data-pack="1">Leadership pack</button></div></section>`;
-  return `<section class="rise jn" aria-label="Your program review">
-    <div class="ov-sec-h"><h3>Your program review</h3><span class="jn-count">${done} of ${JOURNEY.length} done</span></div>
-    <div class="card jn-card">
-      <ol class="jn-steps">${JOURNEY.map((s, i) => { const ok = s.done(), cur = next === s;
-        return `<li class="jn-s ${ok ? "ok" : cur ? "cur" : ""}"><button type="button" data-jgo="${s.k}" ${cur ? 'aria-current="step"' : ""}>
-          <span class="jn-n">${ok ? `<svg><use href="#i-check"/></svg>` : i + 1}</span><span class="jn-t"><b>${s.n}</b><small>${s.d}</small></span></button></li>`; }).join("")}</ol>
-      ${setupOpen ? `<div class="jn-setup"><div class="jn-setup-h"><b>Start here: tell the workbench about your organization</b><small>It takes 30 seconds, and every tool uses it to pre-fill its questions and targets.</small></div>${orgCardHTML(true)}</div>`
-        : next ? `<div class="jn-cta"><span>Next: <b>${next.n}</b> · ${next.d}</span><button type="button" class="btn primary" data-jgo="${next.k}">Continue ${icon("arrow")}</button></div>`
-        : `<div class="jn-cta done"><span><b>Your program review is complete.</b> Share it with leadership, and come back each quarter to update it.</span><button type="button" class="btn primary" data-pack="1">Leadership pack</button></div>`}
-    </div>
-  </section>`;
-}
 // The hand-off at the end of a tool
 function journeyNextHTML(cur){
   const next = jnNext(cur);

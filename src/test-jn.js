@@ -6,13 +6,15 @@ const body = function(){
   const out = [], bad = h => /undefined|NaN|\[object|null/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0];
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false}); cv = {src:null, ex:false, r:{}};
-  // a new visitor starts with setup, inside the review
+  // a new visitor sees the assessment first, then starts with setup
   eq(jnNext().k, "setup", "setup comes first"); renderOverview(); let h = view.innerHTML;
   if(bad(h)) throw new Error("new-visitor overview has bad values: " + where(h));
-  eq(/Start here: tell the workbench/.test(h) && /class="card org-card"/.test(h), true, "setup form in the review");
+  eq(/data-as="start"/.test(h) && !/class="card org-card"/.test(h), true, "first visit explains before asking");
+  store.set("as:start", true); renderOverview(); h = view.innerHTML;
+  eq(/Up next · about 1 minute/.test(h) && /class="card org-card"/.test(h), true, "setup form is the first step up");
   // each step completes in order
   orgSet({type:"marketplace", stage:"growth"}); eq(jnNext().k, "setup", "setup stays open until confirmed, so regions aren't skipped");
-  eq(/data-orgdone="1" >/.test(jnHTML()) || /data-orgdone="1"\s*>/.test(jnHTML()), true, "save and continue is enabled once type and stage are set");
+  eq(/data-orgdone="1" >/.test(orgCardHTML(true)) || /data-orgdone="1"\s*>/.test(orgCardHTML(true)), true, "save and continue is enabled once type and stage are set");
   orgSet({regions:["us", "eu"], confirmed:true}); eq(jnNext().k, "maturity", "then maturity");
   MA_AREAS.forEach(a => ma.lv[a.k] = 2); eq(jnNext().k, "premortem", "then a pre-mortem");
   pm = orgPrefillPM(blankPM()); eq(pm.type, "marketplace", "pre-mortem pre-filled"); pm.name = "Resale chat"; saveToLib(); eq(jnNext().k, "coverage", "then coverage");
@@ -21,12 +23,12 @@ const body = function(){
   eq(JOURNEY.filter(s => s.done()).length, 5, "five of six done");
   out.push("review: setup, maturity, pre-mortem, coverage, crisis, act, completing in order");
   // hand-offs name the next step, or offer the pack when done
-  eq(/Turn the gaps into work/.test(journeyNextHTML("crisis")), true, "tabletop hands off to the tracker step");
+  eq(/Turn gaps into a plan/.test(journeyNextHTML("crisis")), true, "tabletop hands off to the tracker step");
   renderMaturity(); h = view.innerHTML; eq(/Next in your program review/.test(h), true, "maturity plan hands off");
-  renderCoverage(); eq(/Next in your program review/.test(view.innerHTML), true, "coverage hands off");
+  renderCoverage(); eq(/Back to your assessment/.test(view.innerHTML) && /Step 4 of 6/.test(view.innerHTML), true, "coverage returns to the assessment");
   store.set("tk:used", true); eq(jnNext(), undefined, "all done");
   eq(/Leadership pack/.test(journeyNextHTML("coverage")), true, "complete review offers the pack");
-  renderOverview(); h = view.innerHTML; eq(/Program review complete/.test(h) && !/jn-steps/.test(h), true, "a finished review shrinks to one line");
+  renderOverview(); h = view.innerHTML; eq(/All 6 steps done/.test(h) && /class="card as-complete"/.test(h), true, "a finished assessment offers the pack first");
   out.push("hand-offs: maturity, coverage and tabletop point to the next step; a finished review offers the leadership pack");
   // leadership pack: report card, radars and priorities, as a page and a standalone file
   const inner = packInner(); if(bad(inner)) throw new Error("pack has bad values: " + where(inner));
@@ -34,11 +36,12 @@ const body = function(){
   eq(/Marketplace &amp; e-commerce · Growing · US, EU/.test(inner), true, "pack names the organization");
   const doc = packDoc(); eq(/^<!doctype html>/.test(doc) && /--t-ma:#c0308a/.test(doc), true, "standalone file with its own colors");
   out.push("leadership pack: report card, 3 radars, priorities and blockers, printable and downloadable");
-  // report card trend and tips
+  // the program picture: grade, trend and what each step found
   store.set("rc:hist", [{d:"2026-07-01", s:40}]); renderOverview(); h = view.innerHTML;
   eq(/class="rc-trend"/.test(h) && /since Jul/.test(h), true, "trend since the first grade");
-  const low = rcParts().find(p => p.score !== null && p.score < 70); eq(!!low && /To raise it:/.test(h), true, "tips on weak grades");
-  out.push(`report card: trend line and "to raise it" tips (${low.n} at ${low.score})`);
+  const o = rcOverall(rcParts()); eq(new RegExp(`Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of 5 parts`).test(h), true, "grade in the picture");
+  eq((h.match(/<span class="as-tag"/g) || []).length, 4, "a finding from each step");
+  out.push(`program picture: ${o.score} / 100, grade ${rcGrade(o.score)[1]}, trend line, a finding from each step`);
   // next moves: this quarter's roadmap items, launch blockers, the biggest coverage gap; ticking one works like ticking it in its tool
   const rm = maRoadmap(ma); ma.hist = [{t:Date.now(), stage:ma.stage, lv:{}}];
   let xs = nxItems(); const mxs = xs.filter(x => x.tick && x.tick.startsWith("ma:"));

@@ -102,12 +102,10 @@ function demoWelcomeClose(next){
 
 /* ---------- a short guided tour of the overview ---------- */
 const TOUR = [
-  [".ov-greet", "Pixelry at a glance", "The program's grade, how many products are assessed, overall maturity and the kind of company, in one line. Everything you see is sample data."],
-  [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
-  [".nx", "Your next moves", "What to do this week, pulled from every tool: each product's next launch blocker, this quarter's roadmap items and the biggest coverage gap. You can tick them off right here."],
-  [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
-  [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
-  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it."],
+  [".as-head", "Pixelry's assessment", "A fictional social app, five of six steps in. Everything you see is sample data."],
+  [".as-steps", "Six guided steps", "Each finished step shows what it found. Review opens that tool with Pixelry's answers, and the last step is up next."],
+  [".as-pic", "The program picture", "One score out of 100, each part graded, and three radars: launch risk, maturity and coverage. Click any of them to open that tool."],
+  [".as-know", "What the assessment found", "The most important finding from each step, in plain words."],
   ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
 ];
 let tourAt = -1, tourSteps = TOUR;

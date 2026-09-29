@@ -47,7 +47,7 @@ return {out, run: async () => {
   out.push("company lookup: fills type, audience, regions and description; keeps the person's text; undo; unknown names change nothing");
   const msg = wsSaveTool("policy", pol, "Policy: test"); const it = Object.values(wsItems()).find(i=>i.kind==="policy");
   out.push("saved to workspace: " + msg + " · summary " + (!bad(itemSummary(it).html)) + " · overview chip " + (!bad(ovChip(it))));
-  renderOverview(); if(bad(view.innerHTML) || !view.innerHTML.includes("Policy stress-tester")) throw new Error("overview missing tool"); out.push("overview shows five tools");
+  renderTools(); if(bad(view.innerHTML) || !view.innerHTML.includes("Policy stress-tester")) throw new Error("All tools is missing the policy tool"); out.push("overview shows five tools");
   renderAbout(); if(!view.innerHTML.includes("Policy stress-tester")) throw new Error("about missing tool"); out.push("about page lists the new tool");
   return out.join("\\n");
 }};`;

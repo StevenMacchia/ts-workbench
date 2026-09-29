@@ -3135,6 +3135,250 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 @keyframes offerIn{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
 body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 @media (prefers-reduced-motion: reduce){.tour-pop[data-kind="offer"]{animation:none}}
+
+/* ---------- Your assessment: the home page ---------- */
+.as{gap:26px}
+.as-eb{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.as-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.as-sec-h h2{font-size:16px;margin:0}
+.as-sec-h .note{margin:0;font-size:13px}
+.as-h{font-size:12.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:0 0 2px}
+/* first visit */
+.as-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:56px;align-items:center;padding:24px 0 8px}
+.as-hero-t{display:grid;gap:18px;align-content:center}
+.as-hero-t h1{font-size:clamp(34px,4.2vw,52px);line-height:1.05;letter-spacing:-.035em;margin:0}
+.as-hero-t p{font-size:18px;line-height:1.55;color:var(--muted);margin:0;max-width:560px}
+.as-hero-t > .note{margin:0;font-size:13.5px}
+.as-hero-a{display:flex;flex-wrap:wrap;gap:10px}
+.as-cta{min-height:48px;padding:0 22px;font-size:15px}
+.as-six{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.as-six li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:8px;align-content:start;box-shadow:var(--shadow)}
+.as-six-h{display:flex;justify-content:space-between;align-items:center}
+.as-six-h .note{margin:0;font-size:12.5px}
+.as-six-n{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:650;background:color-mix(in oklab, var(--c) 13%, var(--surface));color:color-mix(in oklab, var(--c) 80%, var(--ink))}
+.as-six b{font-size:15px;line-height:1.3}
+.as-six small{font-size:13px;line-height:1.45;color:var(--muted)}
+/* in progress */
+.as-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px 32px;flex-wrap:wrap}
+.as-ht{display:grid;gap:6px}
+.as-ht h1{font-size:clamp(26px,3vw,34px);letter-spacing:-.02em;margin:0}
+.as-ht .ph-help{justify-self:start}
+.as-prog{display:grid;gap:9px;justify-items:end;font-size:14px;color:var(--muted)}
+.as-prog b{color:var(--ink)}
+.as-segs{display:flex;gap:4px}
+.as-segs i{width:40px;height:6px;border-radius:3px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line)}
+.as-segs i.on{background:var(--accent);box-shadow:none}
+.as-segs i.cur{background:color-mix(in oklab, var(--accent) 32%, var(--surface));box-shadow:none}
+.as-grid{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:28px;align-items:start}
+.as-left,.as-right{display:grid;gap:16px;min-width:0}
+.as-steps{display:grid;gap:10px}
+.as-s{display:flex;align-items:center;gap:12px;padding:11px 14px 11px 16px;border-radius:12px;text-align:left;font:inherit;color:inherit}
+.as-s.ok{background:var(--surface);border:1px solid var(--line)}
+.as-s.todo{background:none;border:1px dashed var(--line-strong);cursor:pointer;width:100%}
+.as-s.todo:hover{border-style:solid;border-color:var(--accent);background:var(--surface)}
+.as-s.todo:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.as-n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:650;color:var(--muted);box-shadow:inset 0 0 0 1.5px var(--line-strong)}
+.as-n svg{width:14px;height:14px}
+.as-n.ok{background:var(--good-soft);color:var(--good);box-shadow:none}
+.as-n.cur{background:var(--c);color:var(--bg);box-shadow:none}
+.as-st{display:grid;gap:2px;min-width:0;flex:1}
+.as-st b{font-size:14.5px;font-weight:600}
+.as-st small{font-size:13px;color:var(--muted);line-height:1.4}
+.as-rv{all:unset;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);padding:8px 4px}
+.as-rv:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.as-rv:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.as-go{font-size:13px;font-weight:600;color:var(--accent);opacity:0;transition:opacity .15s}
+.as-s.todo:hover .as-go,.as-s.todo:focus-visible .as-go{opacity:1}
+.as-s.cur{display:grid;gap:10px;padding:20px;background:var(--surface);border:1.5px solid var(--c);border-radius:16px;box-shadow:var(--shadow-lift)}
+.as-cur-h{display:flex;align-items:center;gap:10px}
+.as-k{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.as-cur-n{font-size:20px;letter-spacing:-.01em}
+.as-s.cur p{margin:0;font-size:14.5px;line-height:1.5;color:var(--muted)}
+.as-s.cur > .btn{justify-self:start;margin-top:4px}
+.as-setup .org-b{grid-template-columns:1fr !important}
+.as-setup .org-card{box-shadow:none}
+.as-complete{padding:18px 20px;display:grid;gap:8px;border-color:color-mix(in oklab, var(--good) 40%, var(--line))}
+.as-complete p{margin:0;font-size:14px;color:var(--muted);line-height:1.5}
+.as-complete .btn{justify-self:start}
+/* the program picture */
+.as-pic{padding:22px 26px;display:grid;gap:18px}
+.as-pic .as-sec-h{margin:0}
+.as-pic-a{display:flex;gap:14px}
+.as-pic-b{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px;align-items:start}
+.as-score{display:grid;gap:6px;align-content:start}
+.as-score .as-k{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500}
+.as-big{display:flex;align-items:baseline;gap:6px}
+.as-big b{font-size:56px;line-height:1;font-weight:650;letter-spacing:-.04em}
+.as-big small{font-size:15px;color:var(--muted)}
+.as-big.none b{color:var(--line-strong)}
+.as-score .note{margin:0;font-size:13px}
+.as-delta{margin-top:6px;font-size:13px;line-height:1.45;padding:9px 11px;border-radius:10px;background:var(--high-soft);color:color-mix(in oklab, var(--high) 75%, var(--ink))}
+.as-delta.up{background:var(--good-soft);color:color-mix(in oklab, var(--good) 80%, var(--ink))}
+.as-parts{display:grid;gap:4px}
+.as-part{display:grid;grid-template-columns:140px minmax(0,1fr) 34px;gap:14px;align-items:center;padding:5px 8px;margin:0 -8px;border-radius:9px;color:inherit;text-decoration:none}
+.as-part:hover{background:var(--hover)}
+.as-pn{font-size:14px;font-weight:550}
+.as-part.open .as-pn{color:var(--muted)}
+.as-pb{display:grid;gap:5px;min-width:0}
+.as-pb small{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.as-bar{display:block;height:8px;border-radius:4px;background:var(--sunk);overflow:hidden}
+.as-bar i{display:block;height:100%;border-radius:4px}
+.as-bar.none{background:none;border:1px dashed var(--line-strong);box-sizing:border-box}
+.as-pv{font-size:14px;text-align:right}
+.as-part.open .as-pv{color:var(--faint)}
+.as-rads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:14px;border-top:1px solid var(--line)}
+.as-rad{display:grid;justify-items:center;gap:2px;text-align:center;color:inherit;text-decoration:none;border-radius:12px;padding:4px 4px 8px}
+.as-rad:hover{background:var(--hover)}
+.as-rad-g{position:relative;display:block;width:100%;max-width:230px}
+.as-rad-g svg{display:block;width:100%;height:auto}
+.as-rad-g svg text,.as-rad-g svg tspan{display:none}
+.as-rad-w{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;font-size:12px;font-weight:500;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px 9px}
+.as-rad b{font-size:13.5px}
+.as-rad small{font-size:12.5px;color:var(--muted)}
+.as-know{padding:18px 26px 20px;display:grid;gap:10px}
+.as-know h2{font-size:16px;margin:0}
+.as-know ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.as-know li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:baseline;font-size:14.5px;line-height:1.5}
+.as-know li.muted{color:var(--muted)}
+.as-tag{font-size:12.5px;font-weight:650}
+.as-first .as-pic{box-shadow:var(--shadow-lift)}
+@media (max-width:1180px){.as-six{grid-template-columns:repeat(3,minmax(0,1fr))}.as-hero{grid-template-columns:1fr;gap:28px}.as-hero .as-pic{max-width:620px}}
+@media (max-width:980px){.as-grid{grid-template-columns:1fr}.as-prog{justify-items:start}}
+@media (max-width:640px){.as-six{grid-template-columns:1fr 1fr}.as-pic{padding:18px}.as-pic-b{grid-template-columns:1fr;gap:16px}.as-part{grid-template-columns:118px minmax(0,1fr) 30px;gap:10px}.as-rads{gap:4px}.as-rad small{display:none}.as-know{padding:16px 18px}.as-know li{grid-template-columns:1fr;gap:2px}.as-segs i{width:28px}.as-cta{width:100%;justify-content:center}}
+.as-first .as-pic-b{grid-template-columns:118px minmax(0,1fr);gap:20px}
+.as-first .as-part{grid-template-columns:128px minmax(0,1fr) 26px;gap:12px}
+/* radars: crop the label margin the small versions don't need */
+.as-rad-g{aspect-ratio:1.4;overflow:hidden}
+.as-rad-g svg{position:absolute;left:50%;top:50%;width:150%;transform:translate(-50%,-50%)}
+.as-setup{margin-top:2px}
+.as-setup .org-card{border:0;background:none;box-shadow:none}
+.as-setup .org-card .card-b{padding:0}
+.as-setup .org-cta{padding:14px 0 0;border-top:1px solid var(--line);margin-top:14px;background:none}
+
+/* ---------- Guided steps: the strip across the top ---------- */
+.asb{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;padding:0 0 18px;margin-bottom:26px;border-bottom:1px solid var(--line)}
+.asb-back{display:inline-flex;align-items:center;gap:8px;min-height:40px;font-size:14px;font-weight:500;color:var(--muted);text-decoration:none;justify-self:start}
+.asb-back svg{width:16px;height:16px}
+.asb-back:hover{color:var(--ink)}
+.asb-mid{display:grid;justify-items:center;gap:7px;font-size:13px;color:var(--muted)}
+.asb-mid b{color:var(--ink);font-weight:600}
+.asb-segs{display:flex;gap:4px}
+.asb-segs i{display:block;width:44px;height:5px;border-radius:3px;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.asb-segs i.solo{width:200px}
+.asb-segs i b{display:block;height:100%;background:var(--accent);transition:width .3s}
+.asb-r{justify-self:end;display:flex;align-items:center;gap:14px}
+.asb-saved{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.asb-saved svg{width:14px;height:14px;color:var(--good)}
+/* shared */
+.cvg-w{max-width:760px;margin:0 auto;display:grid;gap:22px}
+.cvg h1{font-size:clamp(26px,3.2vw,40px);line-height:1.12;letter-spacing:-.025em;margin:0}
+.cvg-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.cvg-foot .note{margin:0;font-size:13.5px}
+.cvg-foot .btn{min-height:44px}
+.cvg-alt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;font-size:13.5px;color:var(--muted)}
+/* intro */
+.cvg-intro{max-width:720px;padding-top:12px}
+.cvg-intro h1{font-size:clamp(32px,4vw,46px);line-height:1.06}
+.cvg-tool{justify-self:start;display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:99px;font-size:13px;font-weight:600;background:color-mix(in oklab, var(--t-cv) 12%, var(--surface));color:color-mix(in oklab, var(--t-cv) 60%, var(--ink))}
+.cvg-lead{font-size:18px;line-height:1.55;color:var(--muted);margin:0}
+.cvg-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cvg-facts div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px 17px;display:grid;gap:4px;align-content:start}
+.cvg-facts b{font-size:15px}
+.cvg-facts span{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.cvg-a{display:flex;flex-wrap:wrap;gap:10px}
+.cvg-cta{min-height:50px;padding:0 24px;font-size:15.5px}
+/* which harms apply */
+.cvg-hd{display:grid;gap:10px}
+.cvg-hd p{margin:0;font-size:16px;line-height:1.5;color:var(--muted)}
+.cvg-list{padding:0;overflow:hidden}
+.cvg-ar{border-bottom:1px solid var(--line)}
+.cvg-ar:last-child{border-bottom:0}
+.cvg-ar label{display:flex;align-items:center;gap:14px;min-height:52px;padding:0 20px;cursor:pointer}
+.cvg-ar input{width:18px;height:18px;margin:0;accent-color:var(--accent);cursor:pointer}
+.cvg-arn{flex:1;font-size:15.5px;font-weight:550}
+.cvg-ar.off .cvg-arn{color:var(--faint);text-decoration:line-through}
+.cvg-warn{margin:0;padding:0 20px 14px 52px;font-size:13.5px;line-height:1.45;color:color-mix(in oklab, var(--high) 80%, var(--ink))}
+/* one question */
+.cvg-q{display:grid;grid-template-columns:minmax(0,720px) minmax(0,340px);justify-content:center;gap:48px;align-items:start}
+.cvg-main{display:grid;gap:20px}
+.cvg-crumb{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.cvg-area{color:color-mix(in oklab, var(--t-cv) 60%, var(--ink))}
+.cvg-crumb span[aria-hidden]{color:var(--line-strong)}
+.cvg-q h1{font-size:clamp(24px,2.8vw,34px);line-height:1.2}
+.cvg-why{margin:-6px 0 2px;font-size:15.5px;line-height:1.5;color:var(--muted)}
+.cvg-opts{display:grid;gap:10px}
+.cvg-opt{display:flex;align-items:flex-start;gap:16px;width:100%;text-align:left;padding:16px 18px 16px 20px;border-radius:14px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;font-size:16px;cursor:pointer;transition:border-color .15s, background .15s}
+.cvg-opt:hover{border-color:var(--accent)}
+.cvg-opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cvg-opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.cvg-radio{flex:none;width:22px;height:22px;margin-top:10px;border-radius:50%;border:2px solid var(--line-strong);box-sizing:border-box;display:grid;place-items:center}
+.cvg-opt.on .cvg-radio{border-color:var(--accent)}
+.cvg-opt.on .cvg-radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.cvg-ot{flex:1;display:grid;gap:3px;line-height:1.45}
+.cvg-opt kbd{flex:none;align-self:center;font:500 12px var(--mono);color:var(--faint);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+.cvg-lv{font-size:12px;font-weight:650;letter-spacing:.05em;text-transform:uppercase}
+.cvg-lv.l0{color:var(--crit)}.cvg-lv.l1{color:var(--high)}.cvg-lv.l2,.cvg-lv.l3{color:var(--good)}.cvg-lv.lx{color:var(--faint)}
+.cvg-aside{display:grid;gap:14px}
+.cvg-rad{padding:16px 18px;display:grid;gap:6px}
+.cvg-rad-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cvg-rad-h b{font-size:14.5px}
+.cvg-rad-h .note{margin:0;font-size:12.5px}
+.cvg-rad .as-rad-g{max-width:none}
+.cvg-rad .ma-legend{font-size:12px}
+.cvg-lays{padding:12px;display:grid;gap:2px}
+.cvg-lays > b{font-size:14.5px;padding:4px 8px 8px}
+.cvg-lay{display:flex;justify-content:space-between;align-items:center;padding:7px 8px;border-radius:8px;font-size:14px}
+.cvg-lay.now{background:var(--accent-soft);font-weight:600}
+.cvg-lay .cvg-lv{font-size:12.5px;letter-spacing:0;text-transform:none}
+.cvg-lay.now .cvg-lv.lx{color:var(--accent)}
+.cvg-chips{display:grid;gap:8px;padding:2px 4px}
+.cvg-chips > div{display:flex;flex-wrap:wrap;gap:6px}
+.cvg-chip{font-size:12.5px;font-weight:550;padding:4px 10px;border-radius:99px;background:var(--sunk);color:var(--muted)}
+.cvg-chip.full{background:var(--good-soft);color:color-mix(in oklab, var(--good) 85%, var(--ink))}
+.cvg-chip.now{background:var(--ink);color:var(--bg)}
+.cvg-aside .cvg-alt{display:grid;gap:8px;justify-items:start;padding:0 4px}
+/* after an area */
+.cvg-done{padding:36px 40px;display:grid;gap:20px;box-shadow:var(--shadow-lift)}
+.cvg-done-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cvg-done h1{font-size:clamp(30px,3.4vw,42px)}
+.cvg-meter{display:grid;gap:8px}
+.cvg-mbar{position:relative;display:block;height:14px;border-radius:7px;background:var(--sunk)}
+.cvg-mbar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:var(--t-cv)}
+.cvg-mbar i.exposed{background:var(--crit)}.cvg-mbar i.gap{background:var(--high)}
+.cvg-mbar em{position:absolute;top:-5px;bottom:-5px;width:0;border-left:2px dashed var(--crit)}
+.cvg-mlab{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted)}
+.cvg-verdict{margin:0;font-size:17px;line-height:1.5}
+.cvg-fix{background:var(--surface-2);border-radius:14px;padding:16px 18px;display:grid;gap:6px}
+.cvg-fix p{margin:0;font-size:15.5px;line-height:1.5}
+/* results */
+.cvr{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:36px;align-items:start}
+.cvr-radar{padding:20px 24px;display:grid;gap:4px}
+.cvr-rh{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.cvr-rh b{font-size:15px}
+.cvr-radar .ma-legend{margin:0}
+.cvr-side{display:grid;gap:14px;align-content:start}
+.cvr-side h1{font-size:clamp(28px,3.2vw,38px)}
+.cvr-sum{margin:0;font-size:16.5px;line-height:1.5;color:var(--muted)}
+.cvr-top{list-style:none;margin:4px 0 0;padding:4px 20px}
+.cvr-top li{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.cvr-top li:last-child{border-bottom:0}
+.cvr-n{flex:none;width:26px;height:26px;border-radius:8px;background:var(--sunk);display:grid;place-items:center;font-size:13px;font-weight:650}
+.cvr-th{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cvr-th b{font-size:15px}
+.cvr-th .note{margin:0;font-size:12.5px;font-weight:600}
+.cvr-top p{margin:5px 0 0;font-size:14.5px;line-height:1.5}
+.cvr-a{display:flex;flex-wrap:wrap;gap:10px;padding-top:4px}
+.cvr-a .btn{min-height:44px}
+.cvr-more{display:flex;flex-wrap:wrap;gap:6px 18px}
+.cvr-tabs{margin:34px 0 16px;justify-self:start}
+.cvr-page{display:grid}
+.cvr-note{margin-top:18px}
+.cvt-b{margin-bottom:16px}
+@media (max-width:1100px){.cvg-q{grid-template-columns:1fr;gap:28px}.cvg-aside{grid-template-columns:repeat(2,minmax(0,1fr))}.cvg-aside .cvg-chips,.cvg-aside .cvg-alt{grid-column:1/-1}.cvr{grid-template-columns:1fr}}
+@media (max-width:720px){.asb{grid-template-columns:1fr auto;row-gap:10px}.asb-mid{grid-column:1/-1;grid-row:2;justify-items:start}.asb-saved{display:none}.asb-segs i{width:36px}.asb-segs i.solo{width:160px}
+  .cvg-facts{grid-template-columns:1fr}.cvg-aside{grid-template-columns:1fr}.cvg-rad{display:none}.cvg-opt{padding:14px 14px 14px 16px;font-size:15px}.cvg-opt kbd{display:none}.cvg-done{padding:24px 20px}.cvg-cta{width:100%;justify-content:center}.cvg-foot .note{display:none}}
+/* on narrow screens the step that's up next comes first */
+@media (max-width:980px){.as-steps .as-h{order:-2}.as-steps .as-s.cur{order:-1}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -3219,7 +3463,8 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
     </a>
     <button type="button" class="sb-search" data-cmdk="1"><svg><use href="#i-search"/></svg>Search or jump to<kbd class="kbd">⌘K</kbd></button>
     <nav class="sb-nav" aria-label="Main">
-      <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Overview</a>
+      <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Your assessment</a>
+      <a class="navlink" href="#tools" data-route="tools"><svg><use href="#i-layers"/></svg>All tools</a>
       <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
       <div class="sb-h">Assess</div>
       <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
@@ -3310,6 +3555,7 @@ const HEAD_META = () => {
     maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
     coppa:["coppa", () => ["The 2025 amended Rule", "4 ready-to-edit drafts", "The rule behind every requirement"]],
+    tools:["layers", () => ["Use any tool on its own", "Free and private", "No sign-up"]],
     workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
@@ -8604,7 +8850,7 @@ function pmProjectSelect(){
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
 const TOOL_COLOR = {coppa:"var(--t-cp)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -8655,7 +8901,7 @@ function shellUpdate(name){
 function cmdkItems(){
   const out = [];
   const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, icon:iconId, run:()=>goRoute(route)});
-  go("Overview","overview","var(--faint)","home"); go("My workspace","workspace","var(--faint)","user");
+  go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
@@ -8777,92 +9023,184 @@ function ovChip(it){
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
   return "";
 }
+/* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
+const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
+  coverage:"Next, you'll see whether your defenses keep up with these risks.", crisis:"Next, you'll see how your team would handle a real incident."};
+const AS_PART_STEP = {maturity:"maturity", coverage:"coverage", launch:"premortem", crisis:"crisis"};
+const asLow = t => /^[A-Z][a-z]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
+const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
+// What a finished step found, in one line
+function asSum(k){
+  try{
+    if(k === "setup"){ const o = orgGet(); return [orgTypeName(o.type), orgStageName(o.stage), (o.regions || []).map(r => r.toUpperCase()).join(", ")].filter(Boolean).join(" · "); }
+    if(k === "maturity"){ const g = maGaps(ma).length; return `Level ${maScore(ma).toFixed(1)} of 5 · ${g ? `${g} of ${MA_AREAS.length} areas below target` : "every area at target"}`; }
+    if(k === "premortem"){ const pms = ovSavedPMs(); let open = 0; pms.forEach(p => { open += p.r.safeguards.filter(s => s.rank === 3 && !(p.it.data.done && p.it.data.done[s.id])).length; });
+      return `${pms.length} product${pms.length === 1 ? "" : "s"} · ${open ? `${open} launch blocker${open === 1 ? "" : "s"} open` : "no open launch blockers"}`; }
+    if(k === "coverage"){ const s = cvSummary(cv); return `${s.cov}% of risk covered · ${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? `${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : "no gaps"}`; }
+    if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} practiced`; }
+    if(k === "act") return "Sent to your tracker";
+  }catch(e){}
+  return "";
+}
+// The most important thing each finished step found, plus a line on what comes next
+function asKnow(){
+  const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [], isDone = k => { const s = J.find(x => x.k === k); return !!(s && s.done()); };
+  try{
+    if(isDone("maturity")){ const g = maGaps(ma)[0];
+      out.push({tag:"Maturity", c:"var(--t-ma)", t:g ? `${g.a.n} is at level ${g.cur}, ${g.gap} level${g.gap === 1 ? "" : "s"} below your target of ${g.tgt}.` : "Every area meets its target for your stage."}); }
+    if(isDone("premortem")){ const hit = ovSavedPMs().map(p => ({p, s:p.r.safeguards.find(g => g.rank === 3 && !(p.it.data.done && p.it.data.done[g.id]))})).find(x => x.s);
+      out.push({tag:"Pre-mortem", c:"var(--t-pm)", t:hit ? `Before launch, ${hit.p.name} still needs ${asLow(hit.s.t.replace(/\.$/, ""))}.` : "Every launch blocker is done across your products."}); }
+    if(isDone("coverage")){ const a = cvActions(cv, 1)[0];
+      out.push({tag:"Coverage", c:"var(--t-cv)", t:a ? `${a.row.a.n} carries ${a.row.band ? BANDS[a.row.band][0].toLowerCase() + " " : ""}risk with ${a.row.cov}% coverage. Start with ${a.layer.n.toLowerCase()}.` : "Your coverage keeps pace with the risk in every harm area."}); }
+    if(isDone("crisis")){ const runs = Object.entries(ttProgress()).map(([key, p]) => { const sc = SCENARIOS.find(s => s.id === key.split(":")[0]); return sc ? (p.best || 0) / sc.steps.length : null; }).filter(x => x !== null);
+      if(runs.length) out.push({tag:"Crisis", c:"var(--t-tt)", t:`Across ${runs.length} rehearsal${runs.length === 1 ? "" : "s"}, ${Math.round(runs.reduce((s, x) => s + x, 0) / runs.length * 100)}% of your first calls were strong.`}); }
+  }catch(e){}
+  const nx = J.find(s => !s.done() && AS_NEXT_LINE[s.k]);
+  if(nx) out.push({tag:"Coming up", c:"var(--faint)", t:AS_NEXT_LINE[nx.k], muted:true});
+  return out;
+}
+// A radar slot: the tool's own radar, labels hidden, or a dashed placeholder until its step is done
+const AS_GHOST = (() => { const n = 8, pt = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return (200 + Math.cos(a) * r).toFixed(1) + "," + (150 + Math.sin(a) * r).toFixed(1); };
+  return `<svg viewBox="0 0 400 300" aria-hidden="true">${[52, 104].map(r => `<polygon points="${Array.from({length:n}, (x, i) => pt(i, r)).join(" ")}" fill="none" stroke="var(--line-strong)" stroke-dasharray="4 5"/>`).join("")}</svg>`; })();
+function asRadarsHTML(){
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], isDone = k => { const s = J.find(x => x.k === k); return !!(s && s.done()); }, slot = [];
+  let pms = []; try{ pms = ovSavedPMs(); }catch(e){}
+  const comb = pms.length ? RADAR_GROUPS.map((g, i) => pms.reduce((b, p) => p.g[i].score > b.score ? p.g[i] : b, {score:0, band:null})) : null;
+  slot.push({n:"Launch risk", sub:pms.length ? `${pms.length} product${pms.length === 1 ? "" : "s"}, by kind of harm` : "", route:"premortem", step:3,
+    svg:comb ? riskRadarSVG([{g:comb, color:"var(--t-pm)", fill:true}], "Combined launch risk across your products") : ""});
+  slot.push({n:"Maturity", sub:"Now against your target", route:"maturity", step:2, svg:isDone("maturity") ? maRadar(ma, false) : ""});
+  slot.push({n:"Coverage", sub:"Your defenses against the risk", route:"coverage", step:4, svg:isDone("coverage") ? cvRadar(cv, false) : ""});
+  return `<div class="as-rads">${slot.map(x => `<a class="as-rad ${x.svg ? "" : "wait"}" href="#${x.route}">
+    <span class="as-rad-g">${x.svg || AS_GHOST}${x.svg ? "" : `<span class="as-rad-w">After step ${x.step}</span>`}</span>
+    <b>${x.n}</b><small>${x.svg ? esc(x.sub) : "&nbsp;"}</small></a>`).join("")}</div>`;
+}
+function asPictureHTML(empty){
+  const parts = typeof rcParts === "function" ? rcParts() : [], o = parts.length ? rcOverall(parts) : {score:null, graded:0, total:5};
+  const graded = parts.filter(p => p.score !== null).map(p => p.k), seen = empty ? null : store.get("as:seen", null);
+  // Say plainly when the score moved since the last visit, and why
+  let delta = "";
+  if(seen && seen.score !== null && o.score !== null && seen.score !== o.score){ const d = o.score - seen.score, added = graded.filter(k => !(seen.graded || []).includes(k)).map(k => parts.find(p => p.k === k).n.toLowerCase());
+    delta = `${d > 0 ? "Up" : "Down"} ${Math.abs(d)} point${Math.abs(d) === 1 ? "" : "s"} since you last looked.${added.length ? ` The score now includes ${added.join(" and ")}${d < 0 ? ", and counts what it found" : ""}.` : ""}`; }
+  if(!empty && (!seen || seen.score !== o.score || (seen.graded || []).join() !== graded.join())) store.set("as:seen", {score:o.score, graded});
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], stepOf = k => J.findIndex(s => s.k === AS_PART_STEP[k]) + 1;
+  const todo = p => p.k === "policy" ? "Optional" : `${p.detail ? p.detail + " · " : ""}Step ${stepOf(p.k)}`;
+  // In step order, with the optional part last
+  const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
+  const rows = parts.slice().sort((a, b) => order(a) - order(b));
+  return `<section class="card as-pic" aria-labelledby="as-pic-h">
+    <div class="as-sec-h"><h2 id="as-pic-h">Your program picture</h2>${!empty && o.score !== null ? `<span class="as-pic-a"><button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button></span>` : `<span class="note">${empty ? "Fills in as you go" : "Updates after every step"}</span>`}</div>
+    <div class="as-pic-b">
+      <div class="as-score"><span class="as-k">Overall</span><span class="as-big ${o.score === null ? "none" : ""}"><b class="mono">${o.score === null ? "–" : o.score}</b><small>/ 100</small></span>
+        <span class="note">${o.score === null ? "Appears after step 2" : `Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of ${o.total} parts${o.graded < o.total ? " so far" : ""}`}</span>
+        ${empty || o.score === null ? "" : rcTrend(rcRecord(o))}
+        ${delta ? `<span class="as-delta ${delta.startsWith("Up") ? "up" : ""}">${esc(delta)}</span>` : ""}</div>
+      <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}"><span class="as-pn">${p.n}</span>
+        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : p.detail)}</small></span>
+        <b class="as-pv mono">${p.score === null ? "–" : p.score}</b></a>`).join("")}</div>
+    </div>
+    ${asRadarsHTML()}
+  </section>`;
+}
+function asKnowHTML(){
+  const xs = asKnow(); if(!xs.length) return "";
+  return `<section class="card as-know" aria-labelledby="as-know-h"><h2 id="as-know-h">What we know so far</h2>
+    <ul>${xs.map(x => `<li class="${x.muted ? "muted" : ""}"><span class="as-tag" style="color:color-mix(in oklab, ${x.c} 78%, var(--ink))">${x.tag}</span><span>${esc(x.t)}</span></li>`).join("")}</ul></section>`;
+}
+function asStepHTML(s, i, next){
+  const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
+  if(ok) return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(asSum(s.k))}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`;
+  if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
+    <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
+    ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
+  return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
+}
+// First visit: what the assessment is, what you get, and a way to see it filled in
+function asWelcomeHTML(J){
+  const total = J.reduce((t, s) => t + (s.min || 0), 0);
+  return `<div class="ov as as-first">
+    <section class="as-hero rise">
+      <div class="as-hero-t">
+        <span class="as-eb">Free · no account · about ${Math.round(total / 5) * 5} minutes</span>
+        <h1>See where your Trust &amp; Safety program stands</h1>
+        <p>Six guided steps. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
+        <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
+        <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
+      </div>
+      ${asPictureHTML(true)}
+    </section>
+    <section class="rise" aria-labelledby="as-six-h">
+      <div class="as-sec-h"><h2 id="as-six-h">The six steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
+      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+    </section>
+    ${asFootHTML()}
+  </div>`;
+}
+const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
 function renderOverview(){
-  const r = assess(pm), has = !!(pm.type && r.risks.length);
-  const p = wsProfile(), first = p && p.name ? p.name.trim().split(/\s+/)[0] : "";
-  const hr = new Date().getHours(), hello = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
-  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, open = blockers.length - bDone;
-  const prog = ttProgress(), myType = ttCompanyType();
-  const types = TT_TYPES.filter(t=>t.k!=="all").map(t => { const idx = SCENARIOS.map((s,i)=>i).filter(i => (SCENARIOS[i].types||[]).includes(t.k));
-    return {t, total:idx.length, done:idx.filter(i=>prog[ttKey(i, t.k)]).length}; })
-    .sort((a,b) => (b.t.k===myType) - (a.t.k===myType) || b.done - a.done).slice(0,4);
-  const mine = types.find(x=>x.t.k===myType);
-  const pic = ovPicStatus();
-  const sub = pic.done >= 3 ? `Your safety picture is complete. Keep it current as your products and program change.`
-    : pic.done || pic.m.state === "partial" ? `Your safety picture is ${Math.min(pic.done, 3)} of 3 complete. Next, ${pic.next}.`
-    : "See your whole trust and safety program in one place: rate its maturity, run a pre-mortem on each product, and compare them side by side.";
-  const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,5);
-  const laws = r.obligations.filter(o=>o.status==="applies").length;
-  const nextUp = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
-  const pct = blockers.length ? Math.round(bDone/blockers.length*100) : 0, C = 2*Math.PI*34;
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();
+  const done = J.filter(s => s.done()), next = J.find(s => !s.done());
+  const fresh = !demo && !done.length && !store.get("as:start", false) && !Object.keys(wsItems()).length;
+  if(fresh || !J.length){ view.innerHTML = asWelcomeHTML(J); return asBind(); }
+  const o = orgGet(), p = wsProfile(), left = J.filter(s => !s.done()).reduce((t, s) => t + (s.min || 0), 0);
+  const who = [demo ? "Pixelry" : p && p.org, o.type && orgTypeName(o.type), o.stage && orgStageName(o.stage)].filter(Boolean).join(" · ");
+  view.innerHTML = `<div class="ov as">
+    <section class="as-head rise">
+      <div class="as-ht"><span class="as-eb">${esc(who || "Your organization")}</span><h1>${demo ? "Pixelry's program assessment" : "Your program assessment"}</h1>${typeof helpBtn === "function" ? helpBtn() : ""}</div>
+      <div class="as-prog"><span>${next ? `<b>${done.length} of ${J.length} steps done</b> · about ${asMin(left)} left` : `<b>All ${J.length} steps done.</b> Revisit it each quarter.`}</span>
+        <span class="as-segs" aria-hidden="true">${J.map(s => `<i class="${s.done() ? "on" : s === next ? "cur" : ""}"></i>`).join("")}</span></div>
+    </section>
+    <div class="as-grid">
+      <div class="as-left">
+        ${next ? "" : `<div class="card as-complete"><b>Your assessment is complete.</b><p>Share it with leadership, then work the plan. Retake any step when your products or program change.</p><button type="button" class="btn primary" data-pack="1">Leadership pack</button></div>${typeof nxHTML === "function" ? nxHTML() : ""}`}
+        <section class="as-steps" aria-labelledby="as-steps-h"><h2 id="as-steps-h" class="as-h">Your steps</h2>${J.map((s, i) => asStepHTML(s, i, next)).join("")}</section>
+      </div>
+      <div class="as-right">${asPictureHTML(false)}${asKnowHTML()}</div>
+    </div>
+    ${asFootHTML()}
+  </div>`;
+  asBind();
+}
+function asBind(){
+  if(typeof bindOverviewPicture === "function") bindOverviewPicture();
+  view.querySelectorAll('[data-as="start"]').forEach(b => b.onclick = () => { store.set("as:start", true); renderOverview(); focusQuiet(document.querySelector("#view h1")); });
+}
+
+/* ---------- All tools: every tool on its own, plus recent work ---------- */
+function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}">
       <div class="ov-art">${OV_ART[key]}</div>
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
-
-  view.innerHTML = `<div class="ov">
-    <section class="ov-greet rise">
-      <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
-      <h1>${typeof demoOn === "function" && demoOn() ? "Pixelry's safety program" : hello + (first ? ", " + esc(first) : "")}</h1>
-      <p>${typeof demoOn === "function" && demoOn() ? "You're seeing it as Alex Rivera, Pixelry's Head of Trust &amp; Safety. " : ""}${sub}</p>
-      ${typeof helpBtn === "function" ? `<div class="ov-help">${helpBtn()}</div>` : ""}
-      <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
-      ${typeof demoOn === "function" && !demoOn() && !pic.done && !items.length ? `<div class="ov-demo"><button type="button" class="btn" data-demo="start">Explore a demo company ${icon("arrow")}</button><span>See every tool filled in for a fictional company in about three minutes, then start your own.</span></div>` : ""}
-    </section>
-
-    ${typeof jnHTML === "function" ? jnHTML() : ""}
-    ${typeof nxHTML === "function" ? nxHTML() : ""}
-    ${typeof rcHTML === "function" ? rcHTML() : ""}
-    ${ovPictureHTML()}
-
-    <section class="ov-cols rise">
-      <div>
-        <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
-        <div class="ov-list">${items.length ? items.map(it=>`<button type="button" class="ov-row" data-open="${esc(it.id)}">
-            <span class="ov-tile" style="background:color-mix(in oklab, ${TOOL_COLOR[it.kind]} 14%, transparent);color:${TOOL_COLOR[it.kind]}"><svg><use href="#${KINDS[it.kind].icon}"/></svg></span>
-            <span style="min-width:0"><b>${esc(it.title||"Untitled")}</b><small>${KINDS[it.kind].n}${it.projectId && projName(it.projectId) ? " · " + esc(projName(it.projectId)) : ""}</small></span>
-            ${ovChip(it)}<span class="when">${relTime(it.updated)}</span></button>`).join("")
-          : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span><button type="button" class="btn sm" data-ov="new">${icon("plus")}Start a pre-mortem</button></div>`}</div>
-      </div>
-      <div style="display:grid;gap:16px;align-content:start">
-        <div>
-          <div class="ov-sec-h"><h3>Tabletop progress</h3><a href="#tabletop">Practice</a></div>
-          <div class="ov-card ov-learn">${types.map(x=>`<div class="ov-lrow"><span>${esc(x.t.n.split(" &")[0].split(",")[0])}</span><div class="bar"><i style="width:${x.total?x.done/x.total*100:0}%"></i></div><span class="mono">${x.done}/${x.total}</span></div>`).join("")}</div>
-        </div>
-      </div>
-    </section>
-
+  const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
+  view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
     <section class="rise">
-      <div class="ov-sec-h"><h3>All tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
+      <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
-        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
-        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
-        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
-        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
+        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
+        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
-
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
       <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
-
-
-    <footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>Not legal advice. Use the outputs to start conversations with your Legal and Policy partners.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>
+    <section class="rise">
+      <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
+      <div class="ov-list">${items.length ? items.map(it => `<button type="button" class="ov-row" data-open="${esc(it.id)}">
+          <span class="ov-tile" style="background:color-mix(in oklab, ${TOOL_COLOR[it.kind]} 14%, transparent);color:${TOOL_COLOR[it.kind]}"><svg><use href="#${KINDS[it.kind].icon}"/></svg></span>
+          <span style="min-width:0"><b>${esc(it.title || "Untitled")}</b><small>${KINDS[it.kind].n}${it.projectId && projName(it.projectId) ? " · " + esc(projName(it.projectId)) : ""}</small></span>
+          ${ovChip(it)}<span class="when">${relTime(it.updated)}</span></button>`).join("")
+        : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span></div>`}</div>
+    </section>
+    ${asFootHTML()}
   </div>`;
-
-  bindOverviewPicture();
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
-  view.querySelectorAll('[data-ov="new"]').forEach(b => b.onclick = newAssessment);
-  view.querySelectorAll('[data-ov="report"],[data-ov="plan"],[data-ov-link="plan"]').forEach(b => b.onclick = e => {
-    e.preventDefault(); pm.stage = "report"; if(b.dataset.ov==="plan" || b.dataset.ovLink==="plan") pm.tab = "plan"; savePM(); goRoute("premortem");
-    if(pm.tab==="plan") setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60);
-  });
-  view.querySelectorAll("[data-ovsg]").forEach(c => c.onchange = () => { pm.done[c.dataset.ovsg] = c.checked; savePM(); gsay(c.checked ? "Marked done" : "Marked not done"); renderOverview(); });
 }
 /* ---------- Overview: risk radar for the current assessment ---------- */
 // The radar groups the 14 harm areas into 9 spokes so it reads at a glance.
@@ -10704,15 +11042,153 @@ function cvOffDo(k, back){
   const f = document.querySelector(back ? `[data-cvoff="${k}"]` : `[data-cvon="${k}"]`); if(f) f.focus({preventScroll:true});
   gsay(`${back ? "Restored" : "Removed"} ${cvHarm(a)}${back ? "" : " from your company profile"}${was.rated && now.rated && was.cov !== now.cov ? `. Coverage ${was.cov}% → ${now.cov}%` : ""}`);
 }
-function renderCoverage(){
-  cvConfirm = null;
-  const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`;
+/* ---------- Guided: one question at a time, a result after each harm area ---------- */
+// Where the guided flow is (intro, which harms apply, a question, an area's result). Null means work it out from the answers.
+// cvView "table" is the one-page version with every question at once, for people who know their program
+let cvG = null, cvView = null, cvTab = "gaps";
+const CV_NOUN = {child:"child safety violations", sexual:"sexual harm", harass:"harassment and hate", violent:"violent and self-harm content", ai:"AI misuse", privacy:"privacy and safety threats", integrity:"platform abuse", fraud:"fraud and scams"};
+const cvNoun = a => CV_NOUN[a.k] || cvHarm(a);
+const CV_Q = {
+  policy:{q:a => `Is there a clear rule on ${cvHarm(a)} that reviewers can apply?`, why:"Reviewers can only be consistent with a rule they can actually apply."},
+  detect:{q:a => `How do you find ${cvNoun(a)} today?`, why:"If you rely on user reports, most people see the harm before you do."},
+  enforce:{q:a => `When you find ${cvNoun(a)}, can trained people act on it quickly?`, why:"Finding it only helps if someone can act, consistently and in time."},
+  appeal:{q:a => `Can users contest your ${cvHarm(a)} decisions?`, why:"Appeals catch your mistakes, and more laws now require them."},
+  measure:{q:a => `Do you measure how often users run into ${cvNoun(a)}?`, why:"Without prevalence, you can't tell whether things are getting better."}
+};
+const cvRatedAll = () => { const s = cvSummary(cv); return s.total > 0 && s.rated === s.total; };
+function cvMode(){
+  if(cv.ex) return "results";
+  if(cvView === "table" || cv.est) return "table";
+  if(cvG) return "guide";
+  return cvRatedAll() ? "results" : "guide";
+}
+// The first question not answered yet
+function cvFirstOpen(){
+  const areas = cvAreas(cv);
+  for(let a = 0; a < areas.length; a++) for(let l = 0; l < CV_LAYERS.length; l++) if((cv.r[areas[a].k] || {})[CV_LAYERS[l].k] === undefined) return {a, l};
+  return null;
+}
+// After an area: the next open question, or the next area when going through the questions again
+function cvNextPos(){
+  const p = cvFirstOpen(); if(p) return p;
+  return cvG && cvG.again && cvG.a + 1 < cvAreas(cv).length ? {a:cvG.a + 1, l:0} : null;
+}
+const cvInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s => s.done()) || !!store.get("as:start", false));
+const CV_BACK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// The strip across the top: where this step sits in the assessment, or just this tool when used on its own
+function cvStepBar(pct){
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === "coverage"), inAs = cvInAssessment() && i >= 0;
+  return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${CV_BACK}${inAs ? "Your assessment" : "All tools"}</a>
+    <div class="asb-mid"><span>${inAs ? `Step ${i + 1} of ${J.length} · ` : ""}<b>Map your coverage</b></span>
+      <span class="asb-segs" aria-hidden="true">${inAs ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span></div>
+    <span class="asb-r"><span class="asb-saved">${icon("check")}Saved as you go</span>${typeof helpBtn === "function" ? helpBtn() : ""}</span></div>`;
+}
+function cvIntroHTML(){
+  const s = cvSummary(cv), n = cvAreas(cv).length, {src, s:srcs} = cvSrc(cv), rk = cvRisk(cv);
+  const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
+    : src.startsWith("pm:") ? `From the ${cvSrcName(cv)} pre-mortem.` : "From an example product. Run a pre-mortem for your own.";
+  return `<div class="cvg-w cvg-intro">
+    <span class="cvg-tool"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</span>
+    <h1>Do your defenses keep up with your risk?</h1>
+    <p class="cvg-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
+    <div class="cvg-facts"><div><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
+    <div class="cvg-a"><button type="button" class="btn primary cvg-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
+      ${!src ? `<button type="button" class="btn cvg-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
+    <div class="cvg-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
+  </div>`;
+}
+function cvApplyHTML(){
+  const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
+  return `<div class="cvg-w">
+    <div class="cvg-hd"><span class="as-eb">Before you start</span><h1>Which of these can happen on ${esc((p && p.org) || "your platform")}?</h1>
+      <p>Untick anything your platform can't have. It won't count toward your grade. It's saved in your company profile, so you can add it back any time.</p></div>
+    <div class="card cvg-list">${CV_AREAS.map(a => { const on = !off.includes(a.k), x = rk && rk[a.k];
+      return `<div class="cvg-ar ${on ? "" : "off"}"><label><input type="checkbox" data-cvapply="${a.k}" ${on ? "checked" : ""}><span class="cvg-arn">${esc(a.n)}</span>${x ? `<span class="pill ${x.band ? BANDS[x.band][1] : ""}">${x.band ? BANDS[x.band][0] + " risk" : "No risk found"}</span>` : ""}</label>
+        ${!on && x && x.score >= 8 ? `<p class="cvg-warn">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Leave it out only if that risk isn't real.</p>` : ""}</div>`; }).join("")}</div>
+    <div class="cvg-foot"><button type="button" class="btn" data-cvg="intro">Back</button><button type="button" class="btn primary" data-cvg="first">Continue with ${n} area${n === 1 ? "" : "s"} ${icon("arrow")}</button></div>
+  </div>`;
+}
+function cvQHTML(){
+  const areas = cvAreas(cv); cvG.a = Math.max(0, Math.min(cvG.a || 0, areas.length - 1)); cvG.l = Math.max(0, Math.min(cvG.l || 0, CV_LAYERS.length - 1));
+  const a = areas[cvG.a], L = CV_LAYERS[cvG.l], r = cv.r[a.k] || {}, Q = CV_Q[L.k];
+  return `<div class="cvg-q">
+    <div class="cvg-main">
+      <div class="cvg-crumb"><span class="cvg-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Question ${cvG.l + 1} of ${CV_LAYERS.length}</span></div>
+      <h1>${esc(Q.q(a))}</h1>
+      <p class="cvg-why">${esc(Q.why)}</p>
+      <div class="cvg-opts" role="group" aria-label="${esc(L.n + " for " + a.n)}">${CV_LEVELS.map((n, j) => `<button type="button" class="cvg-opt ${r[L.k] === j ? "on" : ""}" data-cvpick="${j}" aria-pressed="${r[L.k] === j}">
+        <span class="cvg-radio" aria-hidden="true"></span><span class="cvg-ot"><span class="cvg-lv l${j}">${n}</span><span>${esc(L.lv[j])}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
+      <div class="cvg-foot"><button type="button" class="btn" data-cvg="back">Back</button><span class="note">Pick the closest, or press 1 to 4. You can change it later.</span></div>
+    </div>
+    <aside class="cvg-aside" aria-label="Your progress">
+      <div class="card cvg-rad"><div class="cvg-rad-h"><b>Your radar so far</b><span class="note">Fills in as you answer</span></div><div class="as-rad-g">${cvRadar(cv, false)}</div>${cvLegend(cv)}</div>
+      <div class="card cvg-lays"><b>${esc(a.n)}</b>${CV_LAYERS.map((Ly, i) => { const v = r[Ly.k], now = i === cvG.l;
+        return `<div class="cvg-lay ${now ? "now" : ""}"><span>${Ly.n}</span><span class="cvg-lv l${v === undefined ? "x" : v}">${v === undefined ? (now ? "Now" : "–") : CV_LEVELS[v]}</span></div>`; }).join("")}</div>
+      <div class="cvg-chips"><span class="as-eb">Area ${cvG.a + 1} of ${areas.length}</span><div>${areas.map((z, i) => { const full = CV_LAYERS.every(Ly => (cv.r[z.k] || {})[Ly.k] !== undefined);
+        return `<span class="cvg-chip ${i === cvG.a ? "now" : full ? "full" : ""}">${esc(z.n)}</span>`; }).join("")}</div></div>
+      <div class="cvg-alt"><button type="button" class="ov-link" data-cvg="table">Answer the rest in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Fill the rest from your maturity ratings</button>` : ""}</div>
+    </aside>
+  </div>`;
+}
+function cvAreaDoneHTML(){
+  const areas = cvAreas(cv), a = areas[Math.max(0, Math.min(cvG.a || 0, areas.length - 1))], x = cvRows(cv).find(z => z.a.k === a.k);
+  const lv = k => x.r[k] || 0, weak = CV_LAYERS.filter(L => lv(L.k) <= 1).sort((p, q) => (2 - lv(q.k)) * CV_LAYER_WEIGHT[q.k] - (2 - lv(p.k)) * CV_LAYER_WEIGHT[p.k])[0];
+  const lab = {exposed:["Exposed", "crit"], gap:["Gap", "high"], covered:["Covered", "good"]}[x.status];
+  const verdict = x.status === "exposed" ? `${BANDS[x.band][0]} risk, with less than half the coverage it needs.` : x.status === "gap" ? "Risk outruns your coverage here, though the basics are in place."
+    : x.status === "covered" ? "Your defenses keep pace with the risk here." : x.score === null ? "There's no pre-mortem to compare against yet, so this shows coverage only."
+    : x.score ? "Lower risk, so it counts for less in your grade." : "Your pre-mortem found no risk here, so it counts for little in your grade.";
+  const nx = cvNextPos();
+  return `<div class="cvg-w"><div class="card cvg-done">
+    <div class="cvg-done-h"><span class="as-eb">${esc(a.n)} · done</span>${lab ? `<span class="pill ${lab[1]}">${lab[0]}</span>` : ""}</div>
+    <h1>${x.cov}% covered</h1>
+    <div class="cvg-meter"><span class="cvg-mbar"><i class="${x.status}" style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${Math.min(x.riskPct, 99.6)}%"></em>` : ""}</span>
+      <span class="cvg-mlab"><span>Your coverage</span><span>${x.score !== null ? esc(cvRiskWords(x).replace(/^./, c => c.toUpperCase())) : ""}</span></span></div>
+    <p class="cvg-verdict">${esc(verdict)}</p>
+    ${weak ? `<div class="cvg-fix"><span class="as-eb">Start with ${esc(weak.n.toLowerCase())}</span><p>${esc(weak.act(cvHarm(a)))}</p></div>` : ""}
+    <div class="cvg-foot"><button type="button" class="btn" data-cvg="back">Change answers</button><button type="button" class="btn primary" data-cvg="next">${nx ? `Next: ${esc(areas[nx.a].n)}` : "See your results"} ${icon("arrow")}</button></div>
+  </div></div>`;
+}
+function cvGuideRender(){
+  // With no position yet, the intro shows without claiming one, so a finished set of answers still opens the results
+  const scr = cvG ? cvG.scr : "intro", s = cvSummary(cv), pct = Math.round(s.rated / Math.max(1, s.total) * 100);
+  const body = scr === "apply" ? cvApplyHTML() : scr === "q" ? cvQHTML() : scr === "done" ? cvAreaDoneHTML() : cvIntroHTML();
+  view.innerHTML = `<div class="cvg cvg-s-${scr}">${cvStepBar(pct)}<span class="toast" id="cv-toast" aria-live="polite"></span>${body}</div>`;
+}
+function cvResultsRender(){
+  const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
+  const headline = !rk ? `Your coverage is ${s.cov}%` : `Your defenses cover about ${s.cov}% of your risk`;
+  const sum = !rk ? "Choose a product to compare against, under Compare against, to see where risk outruns your coverage."
+    : s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? " is" : "s are"} exposed: serious risk with less than half the coverage it needs. Close these first.`
+    : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " carries" : "s carry"} more risk than your coverage. Close these first.`
+    : "Your coverage keeps pace with your risk in every harm area. Keep it current as your products change.";
+  const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
+  view.innerHTML = `<div class="cvg cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
+    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    <div class="cvr">
+      <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
+      <div class="cvr-side">
+        <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
+        <h1>${esc(headline)}</h1><p class="cvr-sum">${esc(sum)}</p>
+        ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+        <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+          ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+          <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+          ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
+        ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+      </div>
+    </div>
+    <div class="segs cvr-tabs" role="tablist" aria-label="Coverage detail">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${cvTab === k}" class="${cvTab === k ? "on" : ""}" data-cvtab="${k}">${n}</button>`).join("")}</div>
+    <div class="cvr-tab" role="tabpanel">${cvTab === "answers" ? `<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div>` : cvTab === "source" ? `<div id="cv-src-wrap">${cvSourceHTML()}</div>` : cvGapsHTML()}</div>
+    <p class="note cvr-note">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
+  </div>`;
+}
+// The one-page version: every question at once
+function cvTableRender(){
+  const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`, full = cvRatedAll();
   view.innerHTML = head("Coverage Radar",
     "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
     "Run the program", cvHeadMeta()) + `
-    <p class="mxa-q cv-q">Where is your risk highest and your coverage thinnest?</p>
-    <div class="mxm-how"><ol class="mxm-how-s">${CV_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
-    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage. Clear it to rate your own.</span><button type="button" class="btn sm" data-cv="clear">Clear example</button></div>` : ""}
+    ${cv.est ? "" : `<div class="banner cvt-b"><span>${full ? "<strong>Every defense is rated.</strong> See your radar and the gaps to close first." : "<strong>Prefer one question at a time?</strong> The guided version asks the same questions, with a result after each harm area."}</span><button type="button" class="btn sm ${full ? "primary" : ""}" data-cvg="${full ? "results" : "guide"}">${full ? "See your results" : "Switch to guided"}</button></div>`}
     <div class="vd-grid ma-grid cv-grid">
       <div class="vd-main">
         <section class="mxa-part">${step(1)}<div id="cv-src-wrap">${cvSourceHTML()}</div></section>
@@ -10722,20 +11198,63 @@ function renderCoverage(){
       <aside class="vd-rail"><div class="card vd-railc" id="cv-rail">${cvRailHTML()}</div></aside>
     </div>
     <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>`;
+}
+// keep: a redraw within the page (a confirm row, a tab) rather than arriving at it
+function renderCoverage(keep){
+  if(!keep) cvConfirm = null;
+  const m = cvMode();
+  if(m === "guide") cvGuideRender(); else if(m === "results") cvResultsRender(); else cvTableRender();
   bindCoverage();
 }
 function cvRefresh(all){
+  if(cvMode() !== "table"){ const y = window.scrollY; renderCoverage(true); window.scrollTo(0, y); return; }
   const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
   if(all){ set("cv-src-wrap", cvSourceHTML()); set("cv-matrix", cvMatrixHTML()); }
   set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML()); set("cv-est", cvEstHTML());
   const hm = view.querySelector && view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = cvHeadMeta();
 }
+// Answer the current question, then move on after a beat so the choice registers
+function cvPick(j, now){
+  if(!cvG || cvG.scr !== "q") return;
+  const a = cvAreas(cv)[cvG.a], L = CV_LAYERS[cvG.l]; if(!a || !L) return;
+  cv.r[a.k] = Object.assign({}, cv.r[a.k], {[L.k]:j}); cv.ex = false; cvSave();
+  if(view.querySelectorAll) view.querySelectorAll("[data-cvpick]").forEach(b => { const on = +b.dataset.cvpick === j; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  const go = () => { if(!cvG || cvG.scr !== "q") return; if(cvG.l < CV_LAYERS.length - 1) cvG.l++; else cvG.scr = "done";
+    renderCoverage(true); if(window.scrollY > 120) window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1")); };
+  clearTimeout(cvPick.t); if(now) go(); else cvPick.t = setTimeout(go, 260);
+}
+function cvGo(act){
+  clearTimeout(cvPick.t);
+  const n = CV_LAYERS.length, open = () => { const p = cvFirstOpen(); return p ? {scr:"q", a:p.a, l:p.l} : null; };
+  if(act === "intro"){ cvG = {scr:"intro"}; cvView = null; }
+  else if(act === "start") cvG = {scr:"apply"};
+  else if(act === "first" || act === "resume") { cvG = open(); cvView = null; }
+  else if(act === "back"){ if(!cvG || cvG.scr === "apply") cvG = {scr:"intro"}; else if(cvG.scr === "done") cvG = Object.assign({}, cvG, {scr:"q", l:n - 1});
+    else if(cvG.l > 0) cvG.l--; else if(cvG.a > 0){ cvG.a--; cvG.l = n - 1; } else cvG = {scr:"apply"}; }
+  else if(act === "next"){ const p = cvNextPos(); cvG = p ? {scr:"q", a:p.a, l:p.l, again:cvG && cvG.again} : null; }
+  else if(act === "again"){ cvG = {scr:"q", a:0, l:0, again:true}; cvView = null; }
+  else if(act === "table"){ cvG = null; cvView = "table"; }
+  else if(act === "guide"){ cvView = null; cvG = open() || {scr:"intro"}; }
+  else if(act === "results"){ cvView = null; cvG = null; }
+  renderCoverage(true); window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1"));
+}
+// 1 to 4 answers the current question from anywhere on the page
+document.addEventListener("keydown", e => {
+  if(!cvG || cvG.scr !== "q" || !document.body || document.body.dataset.route !== "coverage") return;
+  if(!/^[1-4]$/.test(e.key) || e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return;
+  if(document.querySelector("#tour-pop:not([hidden]), .tk-bg:not([hidden])")) return;
+  e.preventDefault(); cvPick(+e.key - 1);
+});
 function bindCoverage(){
   view.onclick = e => {
     const b = e.target.closest("button"); if(!b || !view.contains(b)) return;
     const d = b.dataset;
+    if(d.cvpick !== undefined) return cvPick(+d.cvpick);
+    if(d.cvg) return cvGo(d.cvg);
+    if(d.cvtab){ cvTab = d.cvtab; cvRefresh(true); const t = view.querySelector(`[data-cvtab="${d.cvtab}"]`); if(t) t.focus(); return; }
     if(d.cva){
       const row = cv.r[d.cva] = Object.assign({}, cv.r[d.cva]); row[d.cvl] = +d.cvn; cv.ex = false; cvSave();
+      if(cvMode() !== "table"){ cvRefresh(true); const again = view.querySelector(`[data-cva="${d.cva}"][data-cvl="${d.cvl}"][data-cvn="${d.cvn}"]`); if(again) again.focus({preventScroll:true}); return; }
       b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
       const x = cvRows(cv).find(r => r.a.k === d.cva), cell = document.querySelector(`#cv-row-${d.cva} .cv-mv`);
       if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
@@ -10753,16 +11272,22 @@ function bindCoverage(){
     if(d.cvgo){ const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); return; }
     if(d.ov === "new") return newAssessment();
     switch(d.cv){
-      case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
-      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
+      case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
+      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
       case "download": { const md = cvMarkdown(cv); return offerFile(`ts-coverage-radar-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#cv-toast")); }
       case "tasks": return tkOpen("coverage");
-      case "fillma": { const n = cvFillFromMaturity(); cvRefresh(true); return flashIn($("#cv-toast"), `Filled ${n} cells from your maturity ratings. Adjust any that differ, then confirm`); }
-      case "confirm": { cv.est = false; cvSave(); cvRefresh(true); const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); focusQuiet(el && el.querySelector("h3")); return flashIn($("#cv-toast"), "Coverage confirmed"); }
-      case "save": { const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(); return flashIn($("#cv-toast"), msg); }
+      case "fillma": { const n = cvFillFromMaturity(); cvG = null; cvView = "table"; renderCoverage(true); window.scrollTo(0, 0); return flashIn($("#cv-toast"), `Filled ${n} answers from your maturity ratings. Adjust any that differ, then confirm`); }
+      case "confirm": { cv.est = false; cvView = null; cvG = null; cvSave(); renderCoverage(true); window.scrollTo(0, 0); focusQuiet(view.querySelector("h1")); return flashIn($("#cv-toast"), "Coverage confirmed"); }
+      case "save": { const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(true); return flashIn($("#cv-toast"), msg); }
     }
   };
-  view.onchange = e => { if(e.target.id === "cv-src"){ cv.src = e.target.value || null; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); } };
+  view.onchange = e => {
+    const t = e.target;
+    if(t.dataset && t.dataset.cvapply){ const k = t.dataset.cvapply;
+      if(!cvSetOff(k, !t.checked)){ t.checked = true; return gsay("Keep at least three harm areas so the radar can compare them"); }
+      renderCoverage(true); const again = view.querySelector(`[data-cvapply="${k}"]`); if(again) again.focus(); return; }
+    if(t.id === "cv-src"){ cv.src = t.value || null; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); }
+  };
   view.onkeydown = e => {
     const g = e.target.closest && e.target.closest(".cv-seg"); if(!g || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
     e.preventDefault(); const bs = [...g.querySelectorAll("button")], cur = bs.indexOf(e.target), nx = bs[Math.max(0, Math.min(bs.length - 1, cur + (e.key === "ArrowRight" ? 1 : -1)))];
@@ -10789,69 +11314,6 @@ function miniRiskRadar(r){
     <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 }
 
-function ovMaturityState(){
-  if(typeof MA_AREAS === "undefined") return {state:"none"};
-  const rated = MA_AREAS.filter(a => ma.lv[a.k]).length;
-  return {state:!rated || ma.ex ? "empty" : rated < MA_AREAS.length ? "partial" : "done", rated};
-}
-function ovPicStatus(){
-  const m = ovMaturityState(), pms = Object.values(wsItems()).filter(it => it.kind === "premortem").length;
-  const done = (m.state === "done" ? 1 : 0) + (pms ? 2 : 0);
-  const next = m.state !== "done" ? (m.state === "partial" ? "finish rating your program's maturity" : "rate your program's maturity") : !pms ? "run a pre-mortem on your first product" : "";
-  return {done, next, pms, m};
-}
-function ovInvite(icon, color, title, text, actions){
-  return `<div class="ov-inv"><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${icon}"/></svg></span><b>${title}</b><p>${text}</p><div class="ov-inv-a">${actions}</div></div>`;
-}
-function ovPictureHTML(){
-  const st = ovPicStatus(), pms = ovSavedPMs(), m = st.m;
-  // 1. Program maturity
-  let maCard = "";
-  if(m.state !== "none"){
-    const sc = m.state === "empty" ? null : maScore(ma), gaps = m.state === "empty" ? [] : maGaps(ma);
-    const ghost = m.state === "empty" ? maRadar({stage:ma.stage, lv:{}}, false).replace('<text x="200" y="154" text-anchor="middle" class="ma-rl">Rate an area to start</text>', "") : maRadar(ma, false);
-    maCard = `<article class="card ov-pc ${m.state === "empty" ? "ov-pc-empty" : ""}" style="--c:var(--t-ma)">
-      <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span><div><b>Program maturity</b><small>How strong your program is, in 8 areas</small></div>
-        ${sc !== null ? `<span class="ov-pc-k"><b class="mono">${sc.toFixed(1)}</b><small>${maLevelName(sc)}</small></span>` : ""}</header>
-      <div class="ov-pc-r">${ghost}</div>
-      ${m.state === "empty" ? ovInvite("steps", "var(--t-ma)", "How mature is your program?", "Rate eight areas, from policy to reviewer wellbeing, in about five minutes. You'll get a roadmap for the biggest gaps.",
-          `<a class="btn sm primary" href="#maturity" data-ov-ma="start">Start the assessment</a><a class="btn sm" href="#maturity" data-ov-ma="example">See an example</a>`)
-        : `<div class="ov-legend"><span><i class="ov-lg-fill" style="--c:var(--t-ma)"></i>Now</span><span><i class="ov-lg-tgt"></i>Target for ${esc(maStage().n.toLowerCase())}</span><span><i class="ov-lg-dot"></i>Below target</span></div>`}
-      ${m.state === "empty" ? "" : `<footer class="ov-pc-f"><span>${m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : gaps.length ? `${gaps.length} area${gaps.length === 1 ? "" : "s"} below target · start with ${esc(gaps[0].a.s.toLowerCase())}` : "Every area meets its target"}</span>
-        <a class="btn sm" href="#maturity">${m.state === "partial" ? "Continue rating" : "Open roadmap"}</a></footer>`}
-    </article>`;
-  }
-  // 2. All products combined: the worst score in each group across every saved pre-mortem
-  const comb = RADAR_GROUPS.map((g, i) => pms.reduce((b, p) => p.g[i].score > b.score ? Object.assign({from:p.name}, p.g[i]) : b, {score:0, band:null, worst:"", n:0, from:""}));
-  const crit = pms.reduce((s, p) => s + p.r.counts.crit, 0), top = comb.map((d, i) => ({d, g:RADAR_GROUPS[i]})).filter(x => x.d.score).sort((a, b) => b.d.score - a.d.score)[0];
-  const emptyPM = !pms.length;
-  const ghostPM = riskRadarSVG([{g:RADAR_GROUPS.map(() => ({score:0, band:null})), color:"var(--faint)", fill:true}], "Empty risk radar");
-  const allCard = `<article class="card ov-pc ${emptyPM ? "ov-pc-empty" : ""}" style="--c:var(--t-pm)">
-    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-layers"/></svg></span><div><b>All products</b><small>${emptyPM ? "Combined abuse risk across your products" : `Combined risk across ${pms.length} pre-mortem${pms.length === 1 ? "" : "s"}`}</small></div>
-      ${emptyPM ? "" : `<span class="ov-pc-k"><b class="mono" style="${crit ? "color:var(--crit)" : ""}">${crit}</b><small>critical risk${crit === 1 ? "" : "s"}</small></span>`}</header>
-    <div class="ov-pc-r">${emptyPM ? ghostPM : riskRadarSVG([...pms.slice(0, OV_LAYER.length).map((p, i) => ({g:p.g, color:OV_LAYER[i], dash:"3 3"})), {g:comb, color:"var(--t-pm)", fill:true}], `Combined risk radar across ${pms.length} products. Highest: ${top ? top.g.n : "none"}.`)}</div>
-    ${emptyPM ? ovInvite("radar", "var(--t-pm)", "How could your products be misused?", "Run a pre-mortem on each product or feature. Their risks combine here, so you can see where your whole portfolio is exposed.",
-        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button><a class="btn sm" href="#premortem">Explore an example</a>`)
-      : `<div class="ov-legend"><span><i class="ov-lg-fill" style="--c:var(--t-pm)"></i>Combined</span>${pms.length > 1 ? pms.slice(0, 3).map((p, i) => `<span><i class="ov-lg-line" style="border-color:${OV_LAYER[i]}"></i>${esc(p.name)}</span>`).join("") + (pms.length > 3 ? `<span class="note">+${pms.length - 3} more</span>` : "") : ""}</div>
-    <footer class="ov-pc-f"><span>${top ? `Highest: ${esc(top.g.n.toLowerCase())}${pms.length > 1 ? `, in ${esc(top.d.from)}` : ""}` : "No risks found"}${pms.length === 1 ? " · add another product to compare" : ""}</span><button type="button" class="btn sm" data-ov="new">Add a product</button></footer>`}
-  </article>`;
-  // 3. One product at a time
-  const selId = store.get("ov:pm", null), sel = pms.find(p => p.it.id === selId) || pms[0];
-  const oneCard = `<article class="card ov-pc ${sel ? "" : "ov-pc-empty"}" style="--c:var(--t-pm)" id="ov-one">
-    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><b>By product</b>${sel && pms.length > 1 ? `<label class="ov-pick"><span class="visually-hidden">Choose a product</span><select class="select" id="ov-pm-sel">${pms.map(p => `<option value="${esc(p.it.id)}" ${p === sel ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>` : `<small>${sel ? esc(sel.name) : "Each product gets its own radar"}</small>`}</div>
-      ${sel ? `<span class="ov-pc-k"><span class="pill ${sel.r.posture[1]}">${sel.r.posture[0]}</span></span>` : ""}</header>
-    <div class="ov-pc-r">${sel ? riskRadarSVG([{g:sel.g, color:"var(--t-pm)", fill:true}], `Risk radar for ${sel.name}`) : ghostPM}</div>
-    ${sel ? `<div class="ov-legend">${["crit", "high", "med"].map(b => `<span><i class="ov-lg-dot" style="background:var(--${b})"></i>${BANDS[b][0]}</span>`).join("")}<span><i class="ov-lg-crit"></i>Critical line</span></div>`
-      : ovInvite("radar", "var(--t-pm)", "One radar per product", "Save a pre-mortem for each product or launch, then flip between them here to compare how each could be misused.",
-        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button>`)}
-    ${sel ? `<footer class="ov-pc-f"><span>${sel.r.risks.length} risks · ${sel.r.counts.crit} critical · ${sel.r.obligations.filter(o => o.status === "applies").length} laws likely apply</span><button type="button" class="btn sm" data-open="${esc(sel.it.id)}">Open report</button></footer>` : ""}
-  </article>`;
-  const total = m.state === "none" ? 2 : 3, done = Math.min(total, st.done);
-  return `<section class="rise ov-pic" aria-label="Your safety picture">
-    <div class="ov-sec-h"><h3>Your safety picture</h3><span class="ov-pic-prog" aria-label="${done} of ${total} complete">${Array.from({length:total}, (x, i) => `<i class="${i < done ? "on" : ""}"></i>`).join("")}${done} of ${total} complete</span></div>
-    <div class="ov-pics">${maCard}${allCard}${oneCard}</div>
-  </section>`;
-}
 function bindOverviewPicture(){
   view.querySelectorAll("[data-rc=download]").forEach(b => b.onclick = () => { const md = rcMarkdown(); offerFile(`ts-report-card-${new Date().toISOString().slice(0, 10)}.md`, md, md, null).then(r => { if(r === "saved") gsay("Report card downloaded"); else if(r === "copied") gsay("Report card copied to your clipboard"); }); });
   const sel = document.getElementById("ov-pm-sel");
@@ -10938,14 +11400,6 @@ function rcOverall(parts){
   const g = parts.filter(p => p.score !== null), w = g.reduce((s, p) => s + RC_WEIGHTS[p.k], 0);
   return {graded:g.length, total:parts.length, score:w ? Math.round(g.reduce((s, p) => s + p.score * RC_WEIGHTS[p.k], 0) / w) : null};
 }
-function rcRing(score, size){
-  const r = size / 2 - 7, C = 2 * Math.PI * r, gr = score === null ? null : rcGrade(score);
-  return `<svg class="rc-ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${score === null ? "Not graded yet" : `Overall ${score} out of 100, grade ${gr[1]}`}">
-    <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--sunk)" stroke-width="10"/>
-    ${score === null ? "" : `<circle class="rc-arc" cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--${gr[2]})" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - score / 100)).toFixed(1)}" transform="rotate(-90 ${size / 2} ${size / 2})"/>`}
-    <text x="50%" y="${size / 2 - 2}" text-anchor="middle" class="rc-grade" style="fill:${gr ? `var(--${gr[2]})` : "var(--faint)"}">${gr ? gr[1] : "–"}</text>
-    <text x="50%" y="${size / 2 + 22}" text-anchor="middle" class="rc-num">${score === null ? "not graded" : score + " / 100"}</text></svg>`;
-}
 // One entry a day in the grade's history, so the report card can show which way it's heading
 function rcRecord(o){
   if(o.score === null) return store.get("rc:hist", []) || [];
@@ -10954,41 +11408,12 @@ function rcRecord(o){
   else { hist.push({d:day, s:o.score}); store.set("rc:hist", hist.slice(-24)); }
   return store.get("rc:hist", []) || [];
 }
-// The single most useful thing to do next for a part
-function rcTip(p){
-  try{
-    if(p.k === "maturity"){ const nx = maNextItem(ma); return nx ? nx.text : ""; }
-    if(p.k === "coverage"){ const a = cvActions(cv, 1)[0]; return a ? a.text : ""; }
-    if(p.k === "launch"){ for(const it of Object.values(wsItems()).filter(x => x.kind === "premortem" && x.data)){ const s = assess(openRecord(it.data)).safeguards.find(g => g.rank === 3 && !(it.data.done && it.data.done[g.id])); if(s) return s.t + " (" + (it.title || "a product") + ")"; } return ""; }
-    if(p.k === "crisis"){ const n = Object.keys(ttProgress()).length; return n < 4 ? `Practice ${4 - n} more scenario${4 - n === 1 ? "" : "s"} for full credit` : "Replay the scenarios where your first call missed"; }
-    if(p.k === "policy") return "Re-test your lowest-scoring policy with the stress-tester";
-  }catch(e){}
-  return "";
-}
 function rcTrend(hist){
   if(hist.length < 2) return "";
   const pts = hist.slice(-8), W = 120, H = 34, x = i => 4 + i * (W - 8) / (pts.length - 1), lo = Math.min(...pts.map(p => p.s)) - 5, hi = Math.max(...pts.map(p => p.s)) + 5, y = v => H - 4 - (v - lo) / Math.max(1, hi - lo) * (H - 8);
   const first = hist[0], last = hist[hist.length - 1], d = last.s - first.s;
   return `<span class="rc-trend"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline points="${pts.map((p, i) => x(i).toFixed(1) + "," + y(p.s).toFixed(1)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(last.s).toFixed(1)}" r="3" fill="var(--accent)"/></svg>
     <small class="${d > 0 ? "up" : d < 0 ? "dn" : ""}">${d > 0 ? "+" : ""}${d} since ${esc(new Date(first.d + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"}))}</small></span>`;
-}
-function rcHTML(){
-  const parts = rcParts(), o = rcOverall(parts), gr = o.score === null ? null : rcGrade(o.score), hist = rcRecord(o);
-  const weakest = parts.filter(p => p.score !== null).sort((a, b) => a.score - b.score)[0], next = parts.find(p => p.score === null);
-  const line = o.score === null ? "Complete any assessment to get your first grade. Each one you finish adds to the overall score."
-    : `${o.graded} of ${o.total} parts graded.${weakest && weakest.score < 70 ? ` Your weakest is ${weakest.n.toLowerCase()} at ${weakest.score}.` : ""}${next ? ` Add ${next.n.toLowerCase()} for a fuller picture.` : ""}`;
-  return `<section class="rise rc" aria-label="Report card">
-    <div class="ov-sec-h"><h3>Report card</h3><span class="rc-act">${o.score === null ? "" : `<button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button>`}<span class="note">Self-assessment, not an audit</span></span></div>
-    <div class="card rc-card">
-      <div class="rc-main">${rcRing(o.score, 148)}
-        <div class="rc-sum"><b>${gr ? `Overall grade ${gr[1]}` : "No grade yet"}</b>${rcTrend(hist)}<p>${esc(line)}</p>
-          <p class="note rc-how">Each part is scored out of 100. The overall grade weighs maturity 30%, coverage 25%, launch readiness 20%, crisis readiness 15% and policy clarity 10%, across the parts you've completed.</p></div></div>
-      <div class="rc-parts">${parts.map(p => { const g = p.score === null ? null : rcGrade(p.score);
-        return `<a class="rc-p ${g ? "" : "open"}" href="#${p.route}"><span class="sb-glyph" style="background:${g ? p.color : "var(--faint)"}"><svg><use href="#i-${p.icon}"/></svg></span>
-          <span class="rc-pt"><b>${p.n}</b><small>${esc(g ? p.detail : (p.detail ? p.detail + " · " : "") + p.todo)}</small>${g && p.score < 70 && rcTip(p) ? `<em class="rc-tip">To raise it: ${esc(rcTip(p))}</em>` : ""}</span>
-          ${g ? `<span class="rc-bar"><i style="width:${p.score}%;background:var(--${g[2]})"></i></span><span class="rc-sc mono">${p.score}</span><span class="rc-lt ${g[2]}">${g[1]}</span>` : `<span class="rc-ng">Not graded</span>`}</a>`; }).join("")}</div>
-    </div>
-  </section>`;
 }
 function rcMarkdown(){
   const parts = rcParts(), o = rcOverall(parts), p = wsProfile(), gr = o.score === null ? null : rcGrade(o.score);
@@ -11401,13 +11826,13 @@ function ovHeroChips(){
 // Setup counts once confirmed; workspaces set up before the confirm button existed count if any later step is done
 const orgConfirmed = () => orgReady() && (!!orgGet().confirmed || JOURNEY.slice(1).some(s => s.done()));
 const JOURNEY = [
-  {k:"setup", n:"Set up your workspace", d:"Company type, stage and regions, once", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
-  {k:"maturity", n:"Rate your program's maturity", d:"Eight areas, about five minutes", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
-  {k:"premortem", n:"Pre-mortem your main product", d:"How it could be misused, and what to do first", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
+  {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
+  {k:"maturity", n:"Rate your program", d:"Eight areas, about five minutes", min:5, get:"A maturity level for eight areas, and a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
+  {k:"premortem", n:"Pre-mortem a product", d:"How it could be misused, and what to do first", min:8, get:"How it could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
-  {k:"coverage", n:"Map your coverage", d:"Your defenses against that risk", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
-  {k:"crisis", n:"Rehearse a crisis", d:"One tabletop scenario, about eight minutes", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
-  {k:"act", n:"Turn the gaps into work", d:"Send your roadmap or gaps to your tracker", icon:"send", c:"var(--accent)", route:"maturity",
+  {k:"coverage", n:"Map your coverage", d:"Your defenses against that risk", min:5, get:"Whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
+  {k:"crisis", n:"Rehearse a crisis", d:"One tabletop scenario, about eight minutes", min:8, get:"One realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
+  {k:"act", n:"Turn gaps into a plan", d:"Send your roadmap or gaps to your tracker", min:2, get:"Your roadmap and biggest gaps, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"maturity",
     go:() => { const src = MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex && maRoadmap(ma).length ? "maturity" : !cv.ex && cvActions(cv).length ? "coverage" : null; goRoute(src || "maturity"); if(src) setTimeout(() => tkOpen(src), 60); }, done:() => !!store.get("tk:used", false)}
 ];
 const jnNext = skip => JOURNEY.find(s => s.k !== skip && !s.done());
@@ -11415,26 +11840,6 @@ function jnGo(k){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
   if(k === "maturity" && ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
   if(k === "coverage" && cv.ex){ cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
   if(s.go) s.go(); else goRoute(s.route); }
-// Overview: where you are in the review; the first step holds the setup form so a new visitor starts there
-function jnHTML(){
-  const done = JOURNEY.filter(s => s.done()).length, next = jnNext(), setupOpen = next && next.k === "setup";
-  // Once it's all done, the review steps aside for the week's work
-  if(!next) return `<section class="rise jn jn-done" aria-label="Your program review"><div class="card jn-bar">
-    <span class="jn-bar-c" aria-hidden="true">${JOURNEY.map(() => `<i><svg><use href="#i-check"/></svg></i>`).join("")}</span>
-    <span class="jn-bar-t"><b>Program review complete.</b> Revisit it each quarter as your products and program change.</span>
-    <button type="button" class="btn sm primary" data-pack="1">Leadership pack</button></div></section>`;
-  return `<section class="rise jn" aria-label="Your program review">
-    <div class="ov-sec-h"><h3>Your program review</h3><span class="jn-count">${done} of ${JOURNEY.length} done</span></div>
-    <div class="card jn-card">
-      <ol class="jn-steps">${JOURNEY.map((s, i) => { const ok = s.done(), cur = next === s;
-        return `<li class="jn-s ${ok ? "ok" : cur ? "cur" : ""}"><button type="button" data-jgo="${s.k}" ${cur ? 'aria-current="step"' : ""}>
-          <span class="jn-n">${ok ? `<svg><use href="#i-check"/></svg>` : i + 1}</span><span class="jn-t"><b>${s.n}</b><small>${s.d}</small></span></button></li>`; }).join("")}</ol>
-      ${setupOpen ? `<div class="jn-setup"><div class="jn-setup-h"><b>Start here: tell the workbench about your organization</b><small>It takes 30 seconds, and every tool uses it to pre-fill its questions and targets.</small></div>${orgCardHTML(true)}</div>`
-        : next ? `<div class="jn-cta"><span>Next: <b>${next.n}</b> · ${next.d}</span><button type="button" class="btn primary" data-jgo="${next.k}">Continue ${icon("arrow")}</button></div>`
-        : `<div class="jn-cta done"><span><b>Your program review is complete.</b> Share it with leadership, and come back each quarter to update it.</span><button type="button" class="btn primary" data-pack="1">Leadership pack</button></div>`}
-    </div>
-  </section>`;
-}
 // The hand-off at the end of a tool
 function journeyNextHTML(cur){
   const next = jnNext(cur);
@@ -12192,12 +12597,10 @@ function demoWelcomeClose(next){
 
 /* ---------- a short guided tour of the overview ---------- */
 const TOUR = [
-  [".ov-greet", "Pixelry at a glance", "The program's grade, how many products are assessed, overall maturity and the kind of company, in one line. Everything you see is sample data."],
-  [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
-  [".nx", "Your next moves", "What to do this week, pulled from every tool: each product's next launch blocker, this quarter's roadmap items and the biggest coverage gap. You can tick them off right here."],
-  [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
-  [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
-  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it."],
+  [".as-head", "Pixelry's assessment", "A fictional social app, five of six steps in. Everything you see is sample data."],
+  [".as-steps", "Six guided steps", "Each finished step shows what it found. Review opens that tool with Pixelry's answers, and the last step is up next."],
+  [".as-pic", "The program picture", "One score out of 100, each part graded, and three radars: launch risk, maturity and coverage. Click any of them to open that tool."],
+  [".as-know", "What the assessment found", "The most important finding from each step, in plain words."],
   ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
 ];
 let tourAt = -1, tourSteps = TOUR;
@@ -12266,11 +12669,13 @@ if(demoOn() && (store.get("demo:welcome", false) || store.get("demo:tour", false
 // Each step points at a real part of the page; a step whose element isn't on screen is skipped.
 const PAGE_TOURS = {
   overview:[
-    [".ov-greet", "Your home base", "Everything you save in any tool comes together here. Your work stays in this browser."],
-    [".ov-demo", "See it filled in first", "Open a demo company to see every tool with sample data. Your own work is set aside until you exit."],
-    [".jn", "The program review", "The recommended path through the tools, one step at a time. Each tool hands off to the next one."],
-    [".rc", "The report card", "Your program graded out of 100 as you use the tools, with one tip to raise the weakest part."],
-    [".ov-tools", "Every tool", "Open any tool on its own. Each page has a “How this page works” button if you want a tour again."]
+    [".as-hero-t h1", "One assessment, six steps", "Each step asks a few plain questions and adds to one picture of your program. You can stop any time and pick up later."],
+    [".as-first .as-pic", "Your program picture", "It fills in as you go: an overall score, five graded parts and three radars."],
+    [".as-six", "The six steps", "What each one gives you and how long it takes. Every tool is also under All tools, to use on its own."],
+    [".as-head", "Where you are", "How many steps are done, and about how long the rest will take."],
+    [".as-steps", "Your steps", "Finished steps show what they found. The next one is highlighted, and you can start any step early."],
+    [".as-grid .as-pic", "Your program picture", "The overall score, each graded part and three radars. Click any of them to open that tool."],
+    [".as-know", "What we know so far", "The most important finding from each step you've done."]
   ],
   premortem:[
     [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
@@ -12337,6 +12742,15 @@ const PAGE_TOURS = {
     [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
   ],
   coverage:[
+    [".cvg-intro h1", "One question at a time", "Five short questions for each kind of harm, about five minutes in all. At the end you'll see your risk next to your defenses."],
+    [".cvg-intro .cvg-alt", "Other ways in", "Answer everything in one table, start from your maturity ratings, or see a finished example."],
+    [".cvg-list", "Only what applies", "Untick harms your platform can't have. They're left out of the radar and your grade, and saved in your company profile."],
+    [".cvg-opts", "Pick the closest answer", "Click an answer or press 1 to 4. It moves on by itself, and Back lets you change it."],
+    [".cvg-aside", "Watch it fill in", "Your radar fills in as you answer, with your progress through each harm area."],
+    [".cvg-done", "A result after each area", "Coverage for that harm against its risk, and the one thing to fix first."],
+    [".cvr-radar", "Risk against coverage", "Where the dashed risk line sits outside your coverage, risk is outrunning your defenses."],
+    [".cvr-top", "Close these first", "The three weakest defenses where risk is highest."],
+    [".cvr-tabs", "The detail", "Every gap, every answer (change any of them here), and which product's risk you're comparing against."],
     [".vd-main > .mxa-part:first-of-type", "Choose the risk to compare", "Your products' combined risk, one product, or an example. Product risk comes from your pre-mortems."],
     [".vd-main > .mxa-part:nth-of-type(2)", "Rate your defenses", "For each kind of harm, rate how strong each layer of defense is today. If a harm can't happen on your platform, hover it and use the trash can. The radar and your grade leave it out."],
     [".vd-railc", "Risk against coverage", "The radar shows where risk outruns your defenses, and updates as you rate."],
@@ -13253,7 +13667,7 @@ function aiOrgDefaults(T, st){
 /* ---------- Phones: More in the bottom bar opens the full menu ---------- */
 document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); });
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, about:renderAbout, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   // A shareable link straight into the demo company

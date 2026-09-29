@@ -66,90 +66,182 @@ function ovChip(it){
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
   return "";
 }
+/* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
+const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
+  coverage:"Next, you'll see whether your defenses keep up with these risks.", crisis:"Next, you'll see how your team would handle a real incident."};
+const AS_PART_STEP = {maturity:"maturity", coverage:"coverage", launch:"premortem", crisis:"crisis"};
+const asLow = t => /^[A-Z][a-z]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
+const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
+// What a finished step found, in one line
+function asSum(k){
+  try{
+    if(k === "setup"){ const o = orgGet(); return [orgTypeName(o.type), orgStageName(o.stage), (o.regions || []).map(r => r.toUpperCase()).join(", ")].filter(Boolean).join(" · "); }
+    if(k === "maturity"){ const g = maGaps(ma).length; return `Level ${maScore(ma).toFixed(1)} of 5 · ${g ? `${g} of ${MA_AREAS.length} areas below target` : "every area at target"}`; }
+    if(k === "premortem"){ const pms = ovSavedPMs(); let open = 0; pms.forEach(p => { open += p.r.safeguards.filter(s => s.rank === 3 && !(p.it.data.done && p.it.data.done[s.id])).length; });
+      return `${pms.length} product${pms.length === 1 ? "" : "s"} · ${open ? `${open} launch blocker${open === 1 ? "" : "s"} open` : "no open launch blockers"}`; }
+    if(k === "coverage"){ const s = cvSummary(cv); return `${s.cov}% of risk covered · ${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? `${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : "no gaps"}`; }
+    if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} practiced`; }
+    if(k === "act") return "Sent to your tracker";
+  }catch(e){}
+  return "";
+}
+// The most important thing each finished step found, plus a line on what comes next
+function asKnow(){
+  const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [], isDone = k => { const s = J.find(x => x.k === k); return !!(s && s.done()); };
+  try{
+    if(isDone("maturity")){ const g = maGaps(ma)[0];
+      out.push({tag:"Maturity", c:"var(--t-ma)", t:g ? `${g.a.n} is at level ${g.cur}, ${g.gap} level${g.gap === 1 ? "" : "s"} below your target of ${g.tgt}.` : "Every area meets its target for your stage."}); }
+    if(isDone("premortem")){ const hit = ovSavedPMs().map(p => ({p, s:p.r.safeguards.find(g => g.rank === 3 && !(p.it.data.done && p.it.data.done[g.id]))})).find(x => x.s);
+      out.push({tag:"Pre-mortem", c:"var(--t-pm)", t:hit ? `Before launch, ${hit.p.name} still needs ${asLow(hit.s.t.replace(/\.$/, ""))}.` : "Every launch blocker is done across your products."}); }
+    if(isDone("coverage")){ const a = cvActions(cv, 1)[0];
+      out.push({tag:"Coverage", c:"var(--t-cv)", t:a ? `${a.row.a.n} carries ${a.row.band ? BANDS[a.row.band][0].toLowerCase() + " " : ""}risk with ${a.row.cov}% coverage. Start with ${a.layer.n.toLowerCase()}.` : "Your coverage keeps pace with the risk in every harm area."}); }
+    if(isDone("crisis")){ const runs = Object.entries(ttProgress()).map(([key, p]) => { const sc = SCENARIOS.find(s => s.id === key.split(":")[0]); return sc ? (p.best || 0) / sc.steps.length : null; }).filter(x => x !== null);
+      if(runs.length) out.push({tag:"Crisis", c:"var(--t-tt)", t:`Across ${runs.length} rehearsal${runs.length === 1 ? "" : "s"}, ${Math.round(runs.reduce((s, x) => s + x, 0) / runs.length * 100)}% of your first calls were strong.`}); }
+  }catch(e){}
+  const nx = J.find(s => !s.done() && AS_NEXT_LINE[s.k]);
+  if(nx) out.push({tag:"Coming up", c:"var(--faint)", t:AS_NEXT_LINE[nx.k], muted:true});
+  return out;
+}
+// A radar slot: the tool's own radar, labels hidden, or a dashed placeholder until its step is done
+const AS_GHOST = (() => { const n = 8, pt = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return (200 + Math.cos(a) * r).toFixed(1) + "," + (150 + Math.sin(a) * r).toFixed(1); };
+  return `<svg viewBox="0 0 400 300" aria-hidden="true">${[52, 104].map(r => `<polygon points="${Array.from({length:n}, (x, i) => pt(i, r)).join(" ")}" fill="none" stroke="var(--line-strong)" stroke-dasharray="4 5"/>`).join("")}</svg>`; })();
+function asRadarsHTML(){
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], isDone = k => { const s = J.find(x => x.k === k); return !!(s && s.done()); }, slot = [];
+  let pms = []; try{ pms = ovSavedPMs(); }catch(e){}
+  const comb = pms.length ? RADAR_GROUPS.map((g, i) => pms.reduce((b, p) => p.g[i].score > b.score ? p.g[i] : b, {score:0, band:null})) : null;
+  slot.push({n:"Launch risk", sub:pms.length ? `${pms.length} product${pms.length === 1 ? "" : "s"}, by kind of harm` : "", route:"premortem", step:3,
+    svg:comb ? riskRadarSVG([{g:comb, color:"var(--t-pm)", fill:true}], "Combined launch risk across your products") : ""});
+  slot.push({n:"Maturity", sub:"Now against your target", route:"maturity", step:2, svg:isDone("maturity") ? maRadar(ma, false) : ""});
+  slot.push({n:"Coverage", sub:"Your defenses against the risk", route:"coverage", step:4, svg:isDone("coverage") ? cvRadar(cv, false) : ""});
+  return `<div class="as-rads">${slot.map(x => `<a class="as-rad ${x.svg ? "" : "wait"}" href="#${x.route}">
+    <span class="as-rad-g">${x.svg || AS_GHOST}${x.svg ? "" : `<span class="as-rad-w">After step ${x.step}</span>`}</span>
+    <b>${x.n}</b><small>${x.svg ? esc(x.sub) : "&nbsp;"}</small></a>`).join("")}</div>`;
+}
+function asPictureHTML(empty){
+  const parts = typeof rcParts === "function" ? rcParts() : [], o = parts.length ? rcOverall(parts) : {score:null, graded:0, total:5};
+  const graded = parts.filter(p => p.score !== null).map(p => p.k), seen = empty ? null : store.get("as:seen", null);
+  // Say plainly when the score moved since the last visit, and why
+  let delta = "";
+  if(seen && seen.score !== null && o.score !== null && seen.score !== o.score){ const d = o.score - seen.score, added = graded.filter(k => !(seen.graded || []).includes(k)).map(k => parts.find(p => p.k === k).n.toLowerCase());
+    delta = `${d > 0 ? "Up" : "Down"} ${Math.abs(d)} point${Math.abs(d) === 1 ? "" : "s"} since you last looked.${added.length ? ` The score now includes ${added.join(" and ")}${d < 0 ? ", and counts what it found" : ""}.` : ""}`; }
+  if(!empty && (!seen || seen.score !== o.score || (seen.graded || []).join() !== graded.join())) store.set("as:seen", {score:o.score, graded});
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], stepOf = k => J.findIndex(s => s.k === AS_PART_STEP[k]) + 1;
+  const todo = p => p.k === "policy" ? "Optional" : `${p.detail ? p.detail + " · " : ""}Step ${stepOf(p.k)}`;
+  // In step order, with the optional part last
+  const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
+  const rows = parts.slice().sort((a, b) => order(a) - order(b));
+  return `<section class="card as-pic" aria-labelledby="as-pic-h">
+    <div class="as-sec-h"><h2 id="as-pic-h">Your program picture</h2>${!empty && o.score !== null ? `<span class="as-pic-a"><button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button></span>` : `<span class="note">${empty ? "Fills in as you go" : "Updates after every step"}</span>`}</div>
+    <div class="as-pic-b">
+      <div class="as-score"><span class="as-k">Overall</span><span class="as-big ${o.score === null ? "none" : ""}"><b class="mono">${o.score === null ? "–" : o.score}</b><small>/ 100</small></span>
+        <span class="note">${o.score === null ? "Appears after step 2" : `Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of ${o.total} parts${o.graded < o.total ? " so far" : ""}`}</span>
+        ${empty || o.score === null ? "" : rcTrend(rcRecord(o))}
+        ${delta ? `<span class="as-delta ${delta.startsWith("Up") ? "up" : ""}">${esc(delta)}</span>` : ""}</div>
+      <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}"><span class="as-pn">${p.n}</span>
+        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : p.detail)}</small></span>
+        <b class="as-pv mono">${p.score === null ? "–" : p.score}</b></a>`).join("")}</div>
+    </div>
+    ${asRadarsHTML()}
+  </section>`;
+}
+function asKnowHTML(){
+  const xs = asKnow(); if(!xs.length) return "";
+  return `<section class="card as-know" aria-labelledby="as-know-h"><h2 id="as-know-h">What we know so far</h2>
+    <ul>${xs.map(x => `<li class="${x.muted ? "muted" : ""}"><span class="as-tag" style="color:color-mix(in oklab, ${x.c} 78%, var(--ink))">${x.tag}</span><span>${esc(x.t)}</span></li>`).join("")}</ul></section>`;
+}
+function asStepHTML(s, i, next){
+  const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
+  if(ok) return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(asSum(s.k))}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`;
+  if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
+    <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
+    ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
+  return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
+}
+// First visit: what the assessment is, what you get, and a way to see it filled in
+function asWelcomeHTML(J){
+  const total = J.reduce((t, s) => t + (s.min || 0), 0);
+  return `<div class="ov as as-first">
+    <section class="as-hero rise">
+      <div class="as-hero-t">
+        <span class="as-eb">Free · no account · about ${Math.round(total / 5) * 5} minutes</span>
+        <h1>See where your Trust &amp; Safety program stands</h1>
+        <p>Six guided steps. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
+        <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
+        <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
+      </div>
+      ${asPictureHTML(true)}
+    </section>
+    <section class="rise" aria-labelledby="as-six-h">
+      <div class="as-sec-h"><h2 id="as-six-h">The six steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
+      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+    </section>
+    ${asFootHTML()}
+  </div>`;
+}
+const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
 function renderOverview(){
-  const r = assess(pm), has = !!(pm.type && r.risks.length);
-  const p = wsProfile(), first = p && p.name ? p.name.trim().split(/\s+/)[0] : "";
-  const hr = new Date().getHours(), hello = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
-  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, open = blockers.length - bDone;
-  const prog = ttProgress(), myType = ttCompanyType();
-  const types = TT_TYPES.filter(t=>t.k!=="all").map(t => { const idx = SCENARIOS.map((s,i)=>i).filter(i => (SCENARIOS[i].types||[]).includes(t.k));
-    return {t, total:idx.length, done:idx.filter(i=>prog[ttKey(i, t.k)]).length}; })
-    .sort((a,b) => (b.t.k===myType) - (a.t.k===myType) || b.done - a.done).slice(0,4);
-  const mine = types.find(x=>x.t.k===myType);
-  const pic = ovPicStatus();
-  const sub = pic.done >= 3 ? `Your safety picture is complete. Keep it current as your products and program change.`
-    : pic.done || pic.m.state === "partial" ? `Your safety picture is ${Math.min(pic.done, 3)} of 3 complete. Next, ${pic.next}.`
-    : "See your whole trust and safety program in one place: rate its maturity, run a pre-mortem on each product, and compare them side by side.";
-  const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,5);
-  const laws = r.obligations.filter(o=>o.status==="applies").length;
-  const nextUp = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
-  const pct = blockers.length ? Math.round(bDone/blockers.length*100) : 0, C = 2*Math.PI*34;
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();
+  const done = J.filter(s => s.done()), next = J.find(s => !s.done());
+  const fresh = !demo && !done.length && !store.get("as:start", false) && !Object.keys(wsItems()).length;
+  if(fresh || !J.length){ view.innerHTML = asWelcomeHTML(J); return asBind(); }
+  const o = orgGet(), p = wsProfile(), left = J.filter(s => !s.done()).reduce((t, s) => t + (s.min || 0), 0);
+  const who = [demo ? "Pixelry" : p && p.org, o.type && orgTypeName(o.type), o.stage && orgStageName(o.stage)].filter(Boolean).join(" · ");
+  view.innerHTML = `<div class="ov as">
+    <section class="as-head rise">
+      <div class="as-ht"><span class="as-eb">${esc(who || "Your organization")}</span><h1>${demo ? "Pixelry's program assessment" : "Your program assessment"}</h1>${typeof helpBtn === "function" ? helpBtn() : ""}</div>
+      <div class="as-prog"><span>${next ? `<b>${done.length} of ${J.length} steps done</b> · about ${asMin(left)} left` : `<b>All ${J.length} steps done.</b> Revisit it each quarter.`}</span>
+        <span class="as-segs" aria-hidden="true">${J.map(s => `<i class="${s.done() ? "on" : s === next ? "cur" : ""}"></i>`).join("")}</span></div>
+    </section>
+    <div class="as-grid">
+      <div class="as-left">
+        ${next ? "" : `<div class="card as-complete"><b>Your assessment is complete.</b><p>Share it with leadership, then work the plan. Retake any step when your products or program change.</p><button type="button" class="btn primary" data-pack="1">Leadership pack</button></div>${typeof nxHTML === "function" ? nxHTML() : ""}`}
+        <section class="as-steps" aria-labelledby="as-steps-h"><h2 id="as-steps-h" class="as-h">Your steps</h2>${J.map((s, i) => asStepHTML(s, i, next)).join("")}</section>
+      </div>
+      <div class="as-right">${asPictureHTML(false)}${asKnowHTML()}</div>
+    </div>
+    ${asFootHTML()}
+  </div>`;
+  asBind();
+}
+function asBind(){
+  if(typeof bindOverviewPicture === "function") bindOverviewPicture();
+  view.querySelectorAll('[data-as="start"]').forEach(b => b.onclick = () => { store.set("as:start", true); renderOverview(); focusQuiet(document.querySelector("#view h1")); });
+}
+
+/* ---------- All tools: every tool on its own, plus recent work ---------- */
+function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}">
       <div class="ov-art">${OV_ART[key]}</div>
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
-
-  view.innerHTML = `<div class="ov">
-    <section class="ov-greet rise">
-      <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
-      <h1>${typeof demoOn === "function" && demoOn() ? "Pixelry's safety program" : hello + (first ? ", " + esc(first) : "")}</h1>
-      <p>${typeof demoOn === "function" && demoOn() ? "You're seeing it as Alex Rivera, Pixelry's Head of Trust &amp; Safety. " : ""}${sub}</p>
-      ${typeof helpBtn === "function" ? `<div class="ov-help">${helpBtn()}</div>` : ""}
-      <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
-      ${typeof demoOn === "function" && !demoOn() && !pic.done && !items.length ? `<div class="ov-demo"><button type="button" class="btn" data-demo="start">Explore a demo company ${icon("arrow")}</button><span>See every tool filled in for a fictional company in about three minutes, then start your own.</span></div>` : ""}
-    </section>
-
-    ${typeof jnHTML === "function" ? jnHTML() : ""}
-    ${typeof nxHTML === "function" ? nxHTML() : ""}
-    ${typeof rcHTML === "function" ? rcHTML() : ""}
-    ${ovPictureHTML()}
-
-    <section class="ov-cols rise">
-      <div>
-        <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
-        <div class="ov-list">${items.length ? items.map(it=>`<button type="button" class="ov-row" data-open="${esc(it.id)}">
-            <span class="ov-tile" style="background:color-mix(in oklab, ${TOOL_COLOR[it.kind]} 14%, transparent);color:${TOOL_COLOR[it.kind]}"><svg><use href="#${KINDS[it.kind].icon}"/></svg></span>
-            <span style="min-width:0"><b>${esc(it.title||"Untitled")}</b><small>${KINDS[it.kind].n}${it.projectId && projName(it.projectId) ? " · " + esc(projName(it.projectId)) : ""}</small></span>
-            ${ovChip(it)}<span class="when">${relTime(it.updated)}</span></button>`).join("")
-          : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span><button type="button" class="btn sm" data-ov="new">${icon("plus")}Start a pre-mortem</button></div>`}</div>
-      </div>
-      <div style="display:grid;gap:16px;align-content:start">
-        <div>
-          <div class="ov-sec-h"><h3>Tabletop progress</h3><a href="#tabletop">Practice</a></div>
-          <div class="ov-card ov-learn">${types.map(x=>`<div class="ov-lrow"><span>${esc(x.t.n.split(" &")[0].split(",")[0])}</span><div class="bar"><i style="width:${x.total?x.done/x.total*100:0}%"></i></div><span class="mono">${x.done}/${x.total}</span></div>`).join("")}</div>
-        </div>
-      </div>
-    </section>
-
+  const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
+  view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
     <section class="rise">
-      <div class="ov-sec-h"><h3>All tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
+      <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
-        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
-        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
-        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
-        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
+        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
+        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
-
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
       <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
-
-
-    <footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>Not legal advice. Use the outputs to start conversations with your Legal and Policy partners.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>
+    <section class="rise">
+      <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
+      <div class="ov-list">${items.length ? items.map(it => `<button type="button" class="ov-row" data-open="${esc(it.id)}">
+          <span class="ov-tile" style="background:color-mix(in oklab, ${TOOL_COLOR[it.kind]} 14%, transparent);color:${TOOL_COLOR[it.kind]}"><svg><use href="#${KINDS[it.kind].icon}"/></svg></span>
+          <span style="min-width:0"><b>${esc(it.title || "Untitled")}</b><small>${KINDS[it.kind].n}${it.projectId && projName(it.projectId) ? " · " + esc(projName(it.projectId)) : ""}</small></span>
+          ${ovChip(it)}<span class="when">${relTime(it.updated)}</span></button>`).join("")
+        : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span></div>`}</div>
+    </section>
+    ${asFootHTML()}
   </div>`;
-
-  bindOverviewPicture();
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
-  view.querySelectorAll('[data-ov="new"]').forEach(b => b.onclick = newAssessment);
-  view.querySelectorAll('[data-ov="report"],[data-ov="plan"],[data-ov-link="plan"]').forEach(b => b.onclick = e => {
-    e.preventDefault(); pm.stage = "report"; if(b.dataset.ov==="plan" || b.dataset.ovLink==="plan") pm.tab = "plan"; savePM(); goRoute("premortem");
-    if(pm.tab==="plan") setTimeout(() => { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); }, 60);
-  });
-  view.querySelectorAll("[data-ovsg]").forEach(c => c.onchange = () => { pm.done[c.dataset.ovsg] = c.checked; savePM(); gsay(c.checked ? "Marked done" : "Marked not done"); renderOverview(); });
 }

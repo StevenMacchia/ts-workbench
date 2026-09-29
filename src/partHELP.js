@@ -3,11 +3,13 @@
 // Each step points at a real part of the page; a step whose element isn't on screen is skipped.
 const PAGE_TOURS = {
   overview:[
-    [".ov-greet", "Your home base", "Everything you save in any tool comes together here. Your work stays in this browser."],
-    [".ov-demo", "See it filled in first", "Open a demo company to see every tool with sample data. Your own work is set aside until you exit."],
-    [".jn", "The program review", "The recommended path through the tools, one step at a time. Each tool hands off to the next one."],
-    [".rc", "The report card", "Your program graded out of 100 as you use the tools, with one tip to raise the weakest part."],
-    [".ov-tools", "Every tool", "Open any tool on its own. Each page has a “How this page works” button if you want a tour again."]
+    [".as-hero-t h1", "One assessment, six steps", "Each step asks a few plain questions and adds to one picture of your program. You can stop any time and pick up later."],
+    [".as-first .as-pic", "Your program picture", "It fills in as you go: an overall score, five graded parts and three radars."],
+    [".as-six", "The six steps", "What each one gives you and how long it takes. Every tool is also under All tools, to use on its own."],
+    [".as-head", "Where you are", "How many steps are done, and about how long the rest will take."],
+    [".as-steps", "Your steps", "Finished steps show what they found. The next one is highlighted, and you can start any step early."],
+    [".as-grid .as-pic", "Your program picture", "The overall score, each graded part and three radars. Click any of them to open that tool."],
+    [".as-know", "What we know so far", "The most important finding from each step you've done."]
   ],
   premortem:[
     [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
@@ -74,6 +76,15 @@ const PAGE_TOURS = {
     [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
   ],
   coverage:[
+    [".cvg-intro h1", "One question at a time", "Five short questions for each kind of harm, about five minutes in all. At the end you'll see your risk next to your defenses."],
+    [".cvg-intro .cvg-alt", "Other ways in", "Answer everything in one table, start from your maturity ratings, or see a finished example."],
+    [".cvg-list", "Only what applies", "Untick harms your platform can't have. They're left out of the radar and your grade, and saved in your company profile."],
+    [".cvg-opts", "Pick the closest answer", "Click an answer or press 1 to 4. It moves on by itself, and Back lets you change it."],
+    [".cvg-aside", "Watch it fill in", "Your radar fills in as you answer, with your progress through each harm area."],
+    [".cvg-done", "A result after each area", "Coverage for that harm against its risk, and the one thing to fix first."],
+    [".cvr-radar", "Risk against coverage", "Where the dashed risk line sits outside your coverage, risk is outrunning your defenses."],
+    [".cvr-top", "Close these first", "The three weakest defenses where risk is highest."],
+    [".cvr-tabs", "The detail", "Every gap, every answer (change any of them here), and which product's risk you're comparing against."],
     [".vd-main > .mxa-part:first-of-type", "Choose the risk to compare", "Your products' combined risk, one product, or an example. Product risk comes from your pre-mortems."],
     [".vd-main > .mxa-part:nth-of-type(2)", "Rate your defenses", "For each kind of harm, rate how strong each layer of defense is today. If a harm can't happen on your platform, hover it and use the trash can. The radar and your grade leave it out."],
     [".vd-railc", "Risk against coverage", "The radar shows where risk outruns your defenses, and updates as you rate."],

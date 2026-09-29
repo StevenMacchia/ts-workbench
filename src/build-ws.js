@@ -203,7 +203,7 @@ console.log("v8 assembled");
   const W9 = patch(W2, [[`function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }`,
     `function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }`]], "partW2 goRoute");
   const R9 = patch(R, [[`const h = (location.hash || '').slice(1);`, `const h = (location.hash || '').slice(1).split('/')[0];`], [`  ROUTES[name]();`, `  ROUTES[name]();\n  shellUpdate(name);`],
-    [`const ROUTES = {overview:renderOverview, workspace:renderWorkspace, `, `const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, `], [`policy:renderPolicy, `, `policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), `]], "partR shell");
+    [`const ROUTES = {overview:renderOverview, workspace:renderWorkspace, `, `const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, about:renderAbout, policy:renderPolicy, `], [`policy:renderPolicy, `, `policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), `]], "partR shell");
   // Report header becomes a document title; the detail heading gets its own spacing hook
   const F3_9 = patch(F3, [
     [`<div class="card"><div class="card-b" style="display:grid;gap:10px">\n      <div class="row" style="justify-content:space-between"><div><h2 style="font-size:20px">`,

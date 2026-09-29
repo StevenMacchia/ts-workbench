@@ -53,7 +53,7 @@ const body = async function(){
   eq(/tried to steer/.test(view.innerHTML), false, "no steering section when there were none");
   out.push("appeal and notice: user text tagged as evidence, tag break-out stripped, steering attempts shown and exported");
   mx = {platform:"social", stage:"2", reg:true, vals:{"Violating-content prevalence":{v:"0.09", t:"0.1", a:"0.15"}}}; eq(/Violating-content prevalence: 0.09%/.test(aiScoreFill()), true, "scorecard numbers feed the transparency drafter");
-  renderOverview(); eq((view.innerHTML.match(/class="ov-aic[ "]/g)||[]).length, 3, "overview lists the AI assistants");
+  renderTools(); eq((view.innerHTML.match(/class="ov-aic[ "]/g)||[]).length, 3, "All tools lists the AI assistants");
   renderAbout(); eq(/Appeal reviewer/.test(view.innerHTML), true, "about page lists the new tools");
   eq(cmdkItems().filter(x => ["Enforcement notice writer","Appeal reviewer","Transparency report"].includes(x.label)).length, 3, "search reaches the new tools");
   out.push("overview, about page, search and scorecard hand-off all include the new tools");

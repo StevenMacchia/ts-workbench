@@ -254,15 +254,153 @@ function cvOffDo(k, back){
   const f = document.querySelector(back ? `[data-cvoff="${k}"]` : `[data-cvon="${k}"]`); if(f) f.focus({preventScroll:true});
   gsay(`${back ? "Restored" : "Removed"} ${cvHarm(a)}${back ? "" : " from your company profile"}${was.rated && now.rated && was.cov !== now.cov ? `. Coverage ${was.cov}% → ${now.cov}%` : ""}`);
 }
-function renderCoverage(){
-  cvConfirm = null;
-  const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`;
+/* ---------- Guided: one question at a time, a result after each harm area ---------- */
+// Where the guided flow is (intro, which harms apply, a question, an area's result). Null means work it out from the answers.
+// cvView "table" is the one-page version with every question at once, for people who know their program
+let cvG = null, cvView = null, cvTab = "gaps";
+const CV_NOUN = {child:"child safety violations", sexual:"sexual harm", harass:"harassment and hate", violent:"violent and self-harm content", ai:"AI misuse", privacy:"privacy and safety threats", integrity:"platform abuse", fraud:"fraud and scams"};
+const cvNoun = a => CV_NOUN[a.k] || cvHarm(a);
+const CV_Q = {
+  policy:{q:a => `Is there a clear rule on ${cvHarm(a)} that reviewers can apply?`, why:"Reviewers can only be consistent with a rule they can actually apply."},
+  detect:{q:a => `How do you find ${cvNoun(a)} today?`, why:"If you rely on user reports, most people see the harm before you do."},
+  enforce:{q:a => `When you find ${cvNoun(a)}, can trained people act on it quickly?`, why:"Finding it only helps if someone can act, consistently and in time."},
+  appeal:{q:a => `Can users contest your ${cvHarm(a)} decisions?`, why:"Appeals catch your mistakes, and more laws now require them."},
+  measure:{q:a => `Do you measure how often users run into ${cvNoun(a)}?`, why:"Without prevalence, you can't tell whether things are getting better."}
+};
+const cvRatedAll = () => { const s = cvSummary(cv); return s.total > 0 && s.rated === s.total; };
+function cvMode(){
+  if(cv.ex) return "results";
+  if(cvView === "table" || cv.est) return "table";
+  if(cvG) return "guide";
+  return cvRatedAll() ? "results" : "guide";
+}
+// The first question not answered yet
+function cvFirstOpen(){
+  const areas = cvAreas(cv);
+  for(let a = 0; a < areas.length; a++) for(let l = 0; l < CV_LAYERS.length; l++) if((cv.r[areas[a].k] || {})[CV_LAYERS[l].k] === undefined) return {a, l};
+  return null;
+}
+// After an area: the next open question, or the next area when going through the questions again
+function cvNextPos(){
+  const p = cvFirstOpen(); if(p) return p;
+  return cvG && cvG.again && cvG.a + 1 < cvAreas(cv).length ? {a:cvG.a + 1, l:0} : null;
+}
+const cvInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s => s.done()) || !!store.get("as:start", false));
+const CV_BACK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+// The strip across the top: where this step sits in the assessment, or just this tool when used on its own
+function cvStepBar(pct){
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === "coverage"), inAs = cvInAssessment() && i >= 0;
+  return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${CV_BACK}${inAs ? "Your assessment" : "All tools"}</a>
+    <div class="asb-mid"><span>${inAs ? `Step ${i + 1} of ${J.length} · ` : ""}<b>Map your coverage</b></span>
+      <span class="asb-segs" aria-hidden="true">${inAs ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span></div>
+    <span class="asb-r"><span class="asb-saved">${icon("check")}Saved as you go</span>${typeof helpBtn === "function" ? helpBtn() : ""}</span></div>`;
+}
+function cvIntroHTML(){
+  const s = cvSummary(cv), n = cvAreas(cv).length, {src, s:srcs} = cvSrc(cv), rk = cvRisk(cv);
+  const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
+    : src.startsWith("pm:") ? `From the ${cvSrcName(cv)} pre-mortem.` : "From an example product. Run a pre-mortem for your own.";
+  return `<div class="cvg-w cvg-intro">
+    <span class="cvg-tool"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</span>
+    <h1>Do your defenses keep up with your risk?</h1>
+    <p class="cvg-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
+    <div class="cvg-facts"><div><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
+    <div class="cvg-a"><button type="button" class="btn primary cvg-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
+      ${!src ? `<button type="button" class="btn cvg-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
+    <div class="cvg-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
+  </div>`;
+}
+function cvApplyHTML(){
+  const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
+  return `<div class="cvg-w">
+    <div class="cvg-hd"><span class="as-eb">Before you start</span><h1>Which of these can happen on ${esc((p && p.org) || "your platform")}?</h1>
+      <p>Untick anything your platform can't have. It won't count toward your grade. It's saved in your company profile, so you can add it back any time.</p></div>
+    <div class="card cvg-list">${CV_AREAS.map(a => { const on = !off.includes(a.k), x = rk && rk[a.k];
+      return `<div class="cvg-ar ${on ? "" : "off"}"><label><input type="checkbox" data-cvapply="${a.k}" ${on ? "checked" : ""}><span class="cvg-arn">${esc(a.n)}</span>${x ? `<span class="pill ${x.band ? BANDS[x.band][1] : ""}">${x.band ? BANDS[x.band][0] + " risk" : "No risk found"}</span>` : ""}</label>
+        ${!on && x && x.score >= 8 ? `<p class="cvg-warn">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Leave it out only if that risk isn't real.</p>` : ""}</div>`; }).join("")}</div>
+    <div class="cvg-foot"><button type="button" class="btn" data-cvg="intro">Back</button><button type="button" class="btn primary" data-cvg="first">Continue with ${n} area${n === 1 ? "" : "s"} ${icon("arrow")}</button></div>
+  </div>`;
+}
+function cvQHTML(){
+  const areas = cvAreas(cv); cvG.a = Math.max(0, Math.min(cvG.a || 0, areas.length - 1)); cvG.l = Math.max(0, Math.min(cvG.l || 0, CV_LAYERS.length - 1));
+  const a = areas[cvG.a], L = CV_LAYERS[cvG.l], r = cv.r[a.k] || {}, Q = CV_Q[L.k];
+  return `<div class="cvg-q">
+    <div class="cvg-main">
+      <div class="cvg-crumb"><span class="cvg-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Question ${cvG.l + 1} of ${CV_LAYERS.length}</span></div>
+      <h1>${esc(Q.q(a))}</h1>
+      <p class="cvg-why">${esc(Q.why)}</p>
+      <div class="cvg-opts" role="group" aria-label="${esc(L.n + " for " + a.n)}">${CV_LEVELS.map((n, j) => `<button type="button" class="cvg-opt ${r[L.k] === j ? "on" : ""}" data-cvpick="${j}" aria-pressed="${r[L.k] === j}">
+        <span class="cvg-radio" aria-hidden="true"></span><span class="cvg-ot"><span class="cvg-lv l${j}">${n}</span><span>${esc(L.lv[j])}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
+      <div class="cvg-foot"><button type="button" class="btn" data-cvg="back">Back</button><span class="note">Pick the closest, or press 1 to 4. You can change it later.</span></div>
+    </div>
+    <aside class="cvg-aside" aria-label="Your progress">
+      <div class="card cvg-rad"><div class="cvg-rad-h"><b>Your radar so far</b><span class="note">Fills in as you answer</span></div><div class="as-rad-g">${cvRadar(cv, false)}</div>${cvLegend(cv)}</div>
+      <div class="card cvg-lays"><b>${esc(a.n)}</b>${CV_LAYERS.map((Ly, i) => { const v = r[Ly.k], now = i === cvG.l;
+        return `<div class="cvg-lay ${now ? "now" : ""}"><span>${Ly.n}</span><span class="cvg-lv l${v === undefined ? "x" : v}">${v === undefined ? (now ? "Now" : "–") : CV_LEVELS[v]}</span></div>`; }).join("")}</div>
+      <div class="cvg-chips"><span class="as-eb">Area ${cvG.a + 1} of ${areas.length}</span><div>${areas.map((z, i) => { const full = CV_LAYERS.every(Ly => (cv.r[z.k] || {})[Ly.k] !== undefined);
+        return `<span class="cvg-chip ${i === cvG.a ? "now" : full ? "full" : ""}">${esc(z.n)}</span>`; }).join("")}</div></div>
+      <div class="cvg-alt"><button type="button" class="ov-link" data-cvg="table">Answer the rest in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Fill the rest from your maturity ratings</button>` : ""}</div>
+    </aside>
+  </div>`;
+}
+function cvAreaDoneHTML(){
+  const areas = cvAreas(cv), a = areas[Math.max(0, Math.min(cvG.a || 0, areas.length - 1))], x = cvRows(cv).find(z => z.a.k === a.k);
+  const lv = k => x.r[k] || 0, weak = CV_LAYERS.filter(L => lv(L.k) <= 1).sort((p, q) => (2 - lv(q.k)) * CV_LAYER_WEIGHT[q.k] - (2 - lv(p.k)) * CV_LAYER_WEIGHT[p.k])[0];
+  const lab = {exposed:["Exposed", "crit"], gap:["Gap", "high"], covered:["Covered", "good"]}[x.status];
+  const verdict = x.status === "exposed" ? `${BANDS[x.band][0]} risk, with less than half the coverage it needs.` : x.status === "gap" ? "Risk outruns your coverage here, though the basics are in place."
+    : x.status === "covered" ? "Your defenses keep pace with the risk here." : x.score === null ? "There's no pre-mortem to compare against yet, so this shows coverage only."
+    : x.score ? "Lower risk, so it counts for less in your grade." : "Your pre-mortem found no risk here, so it counts for little in your grade.";
+  const nx = cvNextPos();
+  return `<div class="cvg-w"><div class="card cvg-done">
+    <div class="cvg-done-h"><span class="as-eb">${esc(a.n)} · done</span>${lab ? `<span class="pill ${lab[1]}">${lab[0]}</span>` : ""}</div>
+    <h1>${x.cov}% covered</h1>
+    <div class="cvg-meter"><span class="cvg-mbar"><i class="${x.status}" style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${Math.min(x.riskPct, 99.6)}%"></em>` : ""}</span>
+      <span class="cvg-mlab"><span>Your coverage</span><span>${x.score !== null ? esc(cvRiskWords(x).replace(/^./, c => c.toUpperCase())) : ""}</span></span></div>
+    <p class="cvg-verdict">${esc(verdict)}</p>
+    ${weak ? `<div class="cvg-fix"><span class="as-eb">Start with ${esc(weak.n.toLowerCase())}</span><p>${esc(weak.act(cvHarm(a)))}</p></div>` : ""}
+    <div class="cvg-foot"><button type="button" class="btn" data-cvg="back">Change answers</button><button type="button" class="btn primary" data-cvg="next">${nx ? `Next: ${esc(areas[nx.a].n)}` : "See your results"} ${icon("arrow")}</button></div>
+  </div></div>`;
+}
+function cvGuideRender(){
+  // With no position yet, the intro shows without claiming one, so a finished set of answers still opens the results
+  const scr = cvG ? cvG.scr : "intro", s = cvSummary(cv), pct = Math.round(s.rated / Math.max(1, s.total) * 100);
+  const body = scr === "apply" ? cvApplyHTML() : scr === "q" ? cvQHTML() : scr === "done" ? cvAreaDoneHTML() : cvIntroHTML();
+  view.innerHTML = `<div class="cvg cvg-s-${scr}">${cvStepBar(pct)}<span class="toast" id="cv-toast" aria-live="polite"></span>${body}</div>`;
+}
+function cvResultsRender(){
+  const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
+  const headline = !rk ? `Your coverage is ${s.cov}%` : `Your defenses cover about ${s.cov}% of your risk`;
+  const sum = !rk ? "Choose a product to compare against, under Compare against, to see where risk outruns your coverage."
+    : s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? " is" : "s are"} exposed: serious risk with less than half the coverage it needs. Close these first.`
+    : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " carries" : "s carry"} more risk than your coverage. Close these first.`
+    : "Your coverage keeps pace with your risk in every harm area. Keep it current as your products change.";
+  const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
+  view.innerHTML = `<div class="cvg cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
+    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    <div class="cvr">
+      <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
+      <div class="cvr-side">
+        <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
+        <h1>${esc(headline)}</h1><p class="cvr-sum">${esc(sum)}</p>
+        ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+        <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+          ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+          <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+          ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
+        ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+      </div>
+    </div>
+    <div class="segs cvr-tabs" role="tablist" aria-label="Coverage detail">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${cvTab === k}" class="${cvTab === k ? "on" : ""}" data-cvtab="${k}">${n}</button>`).join("")}</div>
+    <div class="cvr-tab" role="tabpanel">${cvTab === "answers" ? `<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div>` : cvTab === "source" ? `<div id="cv-src-wrap">${cvSourceHTML()}</div>` : cvGapsHTML()}</div>
+    <p class="note cvr-note">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
+  </div>`;
+}
+// The one-page version: every question at once
+function cvTableRender(){
+  const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`, full = cvRatedAll();
   view.innerHTML = head("Coverage Radar",
     "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
     "Run the program", cvHeadMeta()) + `
-    <p class="mxa-q cv-q">Where is your risk highest and your coverage thinnest?</p>
-    <div class="mxm-how"><ol class="mxm-how-s">${CV_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
-    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage. Clear it to rate your own.</span><button type="button" class="btn sm" data-cv="clear">Clear example</button></div>` : ""}
+    ${cv.est ? "" : `<div class="banner cvt-b"><span>${full ? "<strong>Every defense is rated.</strong> See your radar and the gaps to close first." : "<strong>Prefer one question at a time?</strong> The guided version asks the same questions, with a result after each harm area."}</span><button type="button" class="btn sm ${full ? "primary" : ""}" data-cvg="${full ? "results" : "guide"}">${full ? "See your results" : "Switch to guided"}</button></div>`}
     <div class="vd-grid ma-grid cv-grid">
       <div class="vd-main">
         <section class="mxa-part">${step(1)}<div id="cv-src-wrap">${cvSourceHTML()}</div></section>
@@ -272,20 +410,63 @@ function renderCoverage(){
       <aside class="vd-rail"><div class="card vd-railc" id="cv-rail">${cvRailHTML()}</div></aside>
     </div>
     <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>`;
+}
+// keep: a redraw within the page (a confirm row, a tab) rather than arriving at it
+function renderCoverage(keep){
+  if(!keep) cvConfirm = null;
+  const m = cvMode();
+  if(m === "guide") cvGuideRender(); else if(m === "results") cvResultsRender(); else cvTableRender();
   bindCoverage();
 }
 function cvRefresh(all){
+  if(cvMode() !== "table"){ const y = window.scrollY; renderCoverage(true); window.scrollTo(0, y); return; }
   const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
   if(all){ set("cv-src-wrap", cvSourceHTML()); set("cv-matrix", cvMatrixHTML()); }
   set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML()); set("cv-est", cvEstHTML());
   const hm = view.querySelector && view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = cvHeadMeta();
 }
+// Answer the current question, then move on after a beat so the choice registers
+function cvPick(j, now){
+  if(!cvG || cvG.scr !== "q") return;
+  const a = cvAreas(cv)[cvG.a], L = CV_LAYERS[cvG.l]; if(!a || !L) return;
+  cv.r[a.k] = Object.assign({}, cv.r[a.k], {[L.k]:j}); cv.ex = false; cvSave();
+  if(view.querySelectorAll) view.querySelectorAll("[data-cvpick]").forEach(b => { const on = +b.dataset.cvpick === j; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  const go = () => { if(!cvG || cvG.scr !== "q") return; if(cvG.l < CV_LAYERS.length - 1) cvG.l++; else cvG.scr = "done";
+    renderCoverage(true); if(window.scrollY > 120) window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1")); };
+  clearTimeout(cvPick.t); if(now) go(); else cvPick.t = setTimeout(go, 260);
+}
+function cvGo(act){
+  clearTimeout(cvPick.t);
+  const n = CV_LAYERS.length, open = () => { const p = cvFirstOpen(); return p ? {scr:"q", a:p.a, l:p.l} : null; };
+  if(act === "intro"){ cvG = {scr:"intro"}; cvView = null; }
+  else if(act === "start") cvG = {scr:"apply"};
+  else if(act === "first" || act === "resume") { cvG = open(); cvView = null; }
+  else if(act === "back"){ if(!cvG || cvG.scr === "apply") cvG = {scr:"intro"}; else if(cvG.scr === "done") cvG = Object.assign({}, cvG, {scr:"q", l:n - 1});
+    else if(cvG.l > 0) cvG.l--; else if(cvG.a > 0){ cvG.a--; cvG.l = n - 1; } else cvG = {scr:"apply"}; }
+  else if(act === "next"){ const p = cvNextPos(); cvG = p ? {scr:"q", a:p.a, l:p.l, again:cvG && cvG.again} : null; }
+  else if(act === "again"){ cvG = {scr:"q", a:0, l:0, again:true}; cvView = null; }
+  else if(act === "table"){ cvG = null; cvView = "table"; }
+  else if(act === "guide"){ cvView = null; cvG = open() || {scr:"intro"}; }
+  else if(act === "results"){ cvView = null; cvG = null; }
+  renderCoverage(true); window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1"));
+}
+// 1 to 4 answers the current question from anywhere on the page
+document.addEventListener("keydown", e => {
+  if(!cvG || cvG.scr !== "q" || !document.body || document.body.dataset.route !== "coverage") return;
+  if(!/^[1-4]$/.test(e.key) || e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return;
+  if(document.querySelector("#tour-pop:not([hidden]), .tk-bg:not([hidden])")) return;
+  e.preventDefault(); cvPick(+e.key - 1);
+});
 function bindCoverage(){
   view.onclick = e => {
     const b = e.target.closest("button"); if(!b || !view.contains(b)) return;
     const d = b.dataset;
+    if(d.cvpick !== undefined) return cvPick(+d.cvpick);
+    if(d.cvg) return cvGo(d.cvg);
+    if(d.cvtab){ cvTab = d.cvtab; cvRefresh(true); const t = view.querySelector(`[data-cvtab="${d.cvtab}"]`); if(t) t.focus(); return; }
     if(d.cva){
       const row = cv.r[d.cva] = Object.assign({}, cv.r[d.cva]); row[d.cvl] = +d.cvn; cv.ex = false; cvSave();
+      if(cvMode() !== "table"){ cvRefresh(true); const again = view.querySelector(`[data-cva="${d.cva}"][data-cvl="${d.cvl}"][data-cvn="${d.cvn}"]`); if(again) again.focus({preventScroll:true}); return; }
       b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
       const x = cvRows(cv).find(r => r.a.k === d.cva), cell = document.querySelector(`#cv-row-${d.cva} .cv-mv`);
       if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
@@ -303,16 +484,22 @@ function bindCoverage(){
     if(d.cvgo){ const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); return; }
     if(d.ov === "new") return newAssessment();
     switch(d.cv){
-      case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
-      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; store.set("ws:cur:coverage", null); cvSave(); return renderCoverage();
+      case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
+      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
       case "download": { const md = cvMarkdown(cv); return offerFile(`ts-coverage-radar-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#cv-toast")); }
       case "tasks": return tkOpen("coverage");
-      case "fillma": { const n = cvFillFromMaturity(); cvRefresh(true); return flashIn($("#cv-toast"), `Filled ${n} cells from your maturity ratings. Adjust any that differ, then confirm`); }
-      case "confirm": { cv.est = false; cvSave(); cvRefresh(true); const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); focusQuiet(el && el.querySelector("h3")); return flashIn($("#cv-toast"), "Coverage confirmed"); }
-      case "save": { const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(); return flashIn($("#cv-toast"), msg); }
+      case "fillma": { const n = cvFillFromMaturity(); cvG = null; cvView = "table"; renderCoverage(true); window.scrollTo(0, 0); return flashIn($("#cv-toast"), `Filled ${n} answers from your maturity ratings. Adjust any that differ, then confirm`); }
+      case "confirm": { cv.est = false; cvView = null; cvG = null; cvSave(); renderCoverage(true); window.scrollTo(0, 0); focusQuiet(view.querySelector("h1")); return flashIn($("#cv-toast"), "Coverage confirmed"); }
+      case "save": { const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(true); return flashIn($("#cv-toast"), msg); }
     }
   };
-  view.onchange = e => { if(e.target.id === "cv-src"){ cv.src = e.target.value || null; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); } };
+  view.onchange = e => {
+    const t = e.target;
+    if(t.dataset && t.dataset.cvapply){ const k = t.dataset.cvapply;
+      if(!cvSetOff(k, !t.checked)){ t.checked = true; return gsay("Keep at least three harm areas so the radar can compare them"); }
+      renderCoverage(true); const again = view.querySelector(`[data-cvapply="${k}"]`); if(again) again.focus(); return; }
+    if(t.id === "cv-src"){ cv.src = t.value || null; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); }
+  };
   view.onkeydown = e => {
     const g = e.target.closest && e.target.closest(".cv-seg"); if(!g || !["ArrowLeft", "ArrowRight"].includes(e.key)) return;
     e.preventDefault(); const bs = [...g.querySelectorAll("button")], cur = bs.indexOf(e.target), nx = bs[Math.max(0, Math.min(bs.length - 1, cur + (e.key === "ArrowRight" ? 1 : -1)))];

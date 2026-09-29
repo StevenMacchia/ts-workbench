@@ -17,69 +17,6 @@ function miniRiskRadar(r){
     <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 }
 
-function ovMaturityState(){
-  if(typeof MA_AREAS === "undefined") return {state:"none"};
-  const rated = MA_AREAS.filter(a => ma.lv[a.k]).length;
-  return {state:!rated || ma.ex ? "empty" : rated < MA_AREAS.length ? "partial" : "done", rated};
-}
-function ovPicStatus(){
-  const m = ovMaturityState(), pms = Object.values(wsItems()).filter(it => it.kind === "premortem").length;
-  const done = (m.state === "done" ? 1 : 0) + (pms ? 2 : 0);
-  const next = m.state !== "done" ? (m.state === "partial" ? "finish rating your program's maturity" : "rate your program's maturity") : !pms ? "run a pre-mortem on your first product" : "";
-  return {done, next, pms, m};
-}
-function ovInvite(icon, color, title, text, actions){
-  return `<div class="ov-inv"><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${icon}"/></svg></span><b>${title}</b><p>${text}</p><div class="ov-inv-a">${actions}</div></div>`;
-}
-function ovPictureHTML(){
-  const st = ovPicStatus(), pms = ovSavedPMs(), m = st.m;
-  // 1. Program maturity
-  let maCard = "";
-  if(m.state !== "none"){
-    const sc = m.state === "empty" ? null : maScore(ma), gaps = m.state === "empty" ? [] : maGaps(ma);
-    const ghost = m.state === "empty" ? maRadar({stage:ma.stage, lv:{}}, false).replace('<text x="200" y="154" text-anchor="middle" class="ma-rl">Rate an area to start</text>', "") : maRadar(ma, false);
-    maCard = `<article class="card ov-pc ${m.state === "empty" ? "ov-pc-empty" : ""}" style="--c:var(--t-ma)">
-      <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span><div><b>Program maturity</b><small>How strong your program is, in 8 areas</small></div>
-        ${sc !== null ? `<span class="ov-pc-k"><b class="mono">${sc.toFixed(1)}</b><small>${maLevelName(sc)}</small></span>` : ""}</header>
-      <div class="ov-pc-r">${ghost}</div>
-      ${m.state === "empty" ? ovInvite("steps", "var(--t-ma)", "How mature is your program?", "Rate eight areas, from policy to reviewer wellbeing, in about five minutes. You'll get a roadmap for the biggest gaps.",
-          `<a class="btn sm primary" href="#maturity" data-ov-ma="start">Start the assessment</a><a class="btn sm" href="#maturity" data-ov-ma="example">See an example</a>`)
-        : `<div class="ov-legend"><span><i class="ov-lg-fill" style="--c:var(--t-ma)"></i>Now</span><span><i class="ov-lg-tgt"></i>Target for ${esc(maStage().n.toLowerCase())}</span><span><i class="ov-lg-dot"></i>Below target</span></div>`}
-      ${m.state === "empty" ? "" : `<footer class="ov-pc-f"><span>${m.state === "partial" ? `${m.rated} of ${MA_AREAS.length} areas rated` : gaps.length ? `${gaps.length} area${gaps.length === 1 ? "" : "s"} below target · start with ${esc(gaps[0].a.s.toLowerCase())}` : "Every area meets its target"}</span>
-        <a class="btn sm" href="#maturity">${m.state === "partial" ? "Continue rating" : "Open roadmap"}</a></footer>`}
-    </article>`;
-  }
-  // 2. All products combined: the worst score in each group across every saved pre-mortem
-  const comb = RADAR_GROUPS.map((g, i) => pms.reduce((b, p) => p.g[i].score > b.score ? Object.assign({from:p.name}, p.g[i]) : b, {score:0, band:null, worst:"", n:0, from:""}));
-  const crit = pms.reduce((s, p) => s + p.r.counts.crit, 0), top = comb.map((d, i) => ({d, g:RADAR_GROUPS[i]})).filter(x => x.d.score).sort((a, b) => b.d.score - a.d.score)[0];
-  const emptyPM = !pms.length;
-  const ghostPM = riskRadarSVG([{g:RADAR_GROUPS.map(() => ({score:0, band:null})), color:"var(--faint)", fill:true}], "Empty risk radar");
-  const allCard = `<article class="card ov-pc ${emptyPM ? "ov-pc-empty" : ""}" style="--c:var(--t-pm)">
-    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-layers"/></svg></span><div><b>All products</b><small>${emptyPM ? "Combined abuse risk across your products" : `Combined risk across ${pms.length} pre-mortem${pms.length === 1 ? "" : "s"}`}</small></div>
-      ${emptyPM ? "" : `<span class="ov-pc-k"><b class="mono" style="${crit ? "color:var(--crit)" : ""}">${crit}</b><small>critical risk${crit === 1 ? "" : "s"}</small></span>`}</header>
-    <div class="ov-pc-r">${emptyPM ? ghostPM : riskRadarSVG([...pms.slice(0, OV_LAYER.length).map((p, i) => ({g:p.g, color:OV_LAYER[i], dash:"3 3"})), {g:comb, color:"var(--t-pm)", fill:true}], `Combined risk radar across ${pms.length} products. Highest: ${top ? top.g.n : "none"}.`)}</div>
-    ${emptyPM ? ovInvite("radar", "var(--t-pm)", "How could your products be misused?", "Run a pre-mortem on each product or feature. Their risks combine here, so you can see where your whole portfolio is exposed.",
-        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button><a class="btn sm" href="#premortem">Explore an example</a>`)
-      : `<div class="ov-legend"><span><i class="ov-lg-fill" style="--c:var(--t-pm)"></i>Combined</span>${pms.length > 1 ? pms.slice(0, 3).map((p, i) => `<span><i class="ov-lg-line" style="border-color:${OV_LAYER[i]}"></i>${esc(p.name)}</span>`).join("") + (pms.length > 3 ? `<span class="note">+${pms.length - 3} more</span>` : "") : ""}</div>
-    <footer class="ov-pc-f"><span>${top ? `Highest: ${esc(top.g.n.toLowerCase())}${pms.length > 1 ? `, in ${esc(top.d.from)}` : ""}` : "No risks found"}${pms.length === 1 ? " · add another product to compare" : ""}</span><button type="button" class="btn sm" data-ov="new">Add a product</button></footer>`}
-  </article>`;
-  // 3. One product at a time
-  const selId = store.get("ov:pm", null), sel = pms.find(p => p.it.id === selId) || pms[0];
-  const oneCard = `<article class="card ov-pc ${sel ? "" : "ov-pc-empty"}" style="--c:var(--t-pm)" id="ov-one">
-    <header class="ov-pc-h"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><b>By product</b>${sel && pms.length > 1 ? `<label class="ov-pick"><span class="visually-hidden">Choose a product</span><select class="select" id="ov-pm-sel">${pms.map(p => `<option value="${esc(p.it.id)}" ${p === sel ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select></label>` : `<small>${sel ? esc(sel.name) : "Each product gets its own radar"}</small>`}</div>
-      ${sel ? `<span class="ov-pc-k"><span class="pill ${sel.r.posture[1]}">${sel.r.posture[0]}</span></span>` : ""}</header>
-    <div class="ov-pc-r">${sel ? riskRadarSVG([{g:sel.g, color:"var(--t-pm)", fill:true}], `Risk radar for ${sel.name}`) : ghostPM}</div>
-    ${sel ? `<div class="ov-legend">${["crit", "high", "med"].map(b => `<span><i class="ov-lg-dot" style="background:var(--${b})"></i>${BANDS[b][0]}</span>`).join("")}<span><i class="ov-lg-crit"></i>Critical line</span></div>`
-      : ovInvite("radar", "var(--t-pm)", "One radar per product", "Save a pre-mortem for each product or launch, then flip between them here to compare how each could be misused.",
-        `<button type="button" class="btn sm primary" data-ov="new">Start a pre-mortem</button>`)}
-    ${sel ? `<footer class="ov-pc-f"><span>${sel.r.risks.length} risks · ${sel.r.counts.crit} critical · ${sel.r.obligations.filter(o => o.status === "applies").length} laws likely apply</span><button type="button" class="btn sm" data-open="${esc(sel.it.id)}">Open report</button></footer>` : ""}
-  </article>`;
-  const total = m.state === "none" ? 2 : 3, done = Math.min(total, st.done);
-  return `<section class="rise ov-pic" aria-label="Your safety picture">
-    <div class="ov-sec-h"><h3>Your safety picture</h3><span class="ov-pic-prog" aria-label="${done} of ${total} complete">${Array.from({length:total}, (x, i) => `<i class="${i < done ? "on" : ""}"></i>`).join("")}${done} of ${total} complete</span></div>
-    <div class="ov-pics">${maCard}${allCard}${oneCard}</div>
-  </section>`;
-}
 function bindOverviewPicture(){
   view.querySelectorAll("[data-rc=download]").forEach(b => b.onclick = () => { const md = rcMarkdown(); offerFile(`ts-report-card-${new Date().toISOString().slice(0, 10)}.md`, md, md, null).then(r => { if(r === "saved") gsay("Report card downloaded"); else if(r === "copied") gsay("Report card copied to your clipboard"); }); });
   const sel = document.getElementById("ov-pm-sel");

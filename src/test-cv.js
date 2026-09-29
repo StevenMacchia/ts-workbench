@@ -9,12 +9,29 @@ const body = function(){
   eq(CV_AREAS.length, 8, "eight harm areas"); eq(CV_AREAS.some(a => a.k === "readiness"), false, "readiness is not a harm area");
   CV_LAYERS.forEach(l => { if(l.lv.length !== 4 || !l.q || !l.tool || !/child safety/.test(l.act("child safety"))) throw new Error("layer incomplete: " + l.k); });
   out.push(`content: ${CV_AREAS.length} harm areas × ${CV_LAYERS.length} layers × ${CV_LEVELS.length} levels`);
-  // blank: no pre-mortems saved, so coverage only
+  // blank: no pre-mortems saved, so coverage only. It opens guided, and the one-table version is a click away
   cv = {src:null, ex:false, r:{}}; renderCoverage(); let h = view.innerHTML;
-  if(bad(h)) throw new Error("blank page has bad values: " + where(h));
+  if(bad(h)) throw new Error("blank intro has bad values: " + where(h));
+  eq(/Do your defenses keep up with your risk\?/.test(h) && /data-cvg="start"/.test(h) && /data-cvg="table"/.test(h), true, "guided intro, with the table as an option");
+  eq(/Coverage only/.test(h) && /Run a pre-mortem first/.test(h) && /href="#tools"/.test(h), true, "coverage only, on its own, back to All tools");
+  cvView = "table"; renderCoverage(); h = view.innerHTML; if(bad(h)) throw new Error("blank table has bad values: " + where(h));
   eq((h.match(/class="cv-mr"/g) || []).length, 8, "one matrix row per harm area"); eq((h.match(/role="radio"/g) || []).length, 8 * 5 * 4, "four levels per cell");
-  eq(cvRisk(cv), null, "no risk without a source"); eq(/No risk yet: coverage only/.test(h) && /Start a pre-mortem/.test(h), true, "invites a pre-mortem");
-  out.push("blank: 8 × 5 matrix, coverage only, invites a pre-mortem");
+  eq(cvRisk(cv), null, "no risk without a source"); eq(/No risk yet: coverage only/.test(h) && /Start a pre-mortem/.test(h) && /Switch to guided/.test(h), true, "invites a pre-mortem");
+  cvView = null;
+  out.push("blank: guided intro, or an 8 × 5 table; coverage only until there's a pre-mortem");
+  // guided: which harms apply, one question at a time, a result after each area, then results
+  cvGo("start"); h = view.innerHTML; eq((h.match(/data-cvapply=/g) || []).length, 8, "asks which harms apply"); eq(/Continue with 8 areas/.test(h), true, "all apply by default");
+  cvGo("first"); h = view.innerHTML; eq(/Is there a clear rule on child safety that reviewers can apply\?/.test(h) && (h.match(/data-cvpick=/g) || []).length, 4, "first question, four answers");
+  [3, 1, 2, 1, 0].forEach(j => cvPick(j, true)); h = view.innerHTML; if(bad(h)) throw new Error("area result has bad values: " + where(h));
+  eq(/47% covered/.test(h) && /Start with detection/.test(h) && /Next: Sexual harm/.test(h), true, "a result after the area, with the first fix");
+  cvGo("back"); eq(cvG.scr + cvG.l, "q4", "back returns to the last question"); cvGo("next"); cvGo("next"); eq(cvG.scr + cvG.a, "q1", "on to the next area");
+  cvPick(2, true); cvGo("back"); cvGo("back"); eq(cvG.a + "/" + cvG.l, "0/4", "back steps across areas");
+  cvGo("table"); eq(cvMode(), "table", "switch to the table any time"); eq(/Switch to guided/.test(view.innerHTML), true, "and back");
+  cvGo("guide"); eq(cvG.scr + cvG.a + cvG.l, "q11", "guided resumes at the first open question");
+  CV_AREAS.forEach(a => { cv.r[a.k] = Object.assign({policy:1, detect:1, enforce:1, appeal:1, measure:1}, cv.r[a.k]); }); cvG = null; cvView = null; renderCoverage(); h = view.innerHTML;
+  eq(cvMode(), "results", "every answer given: results"); eq(/Your coverage is \d+%/.test(h) && /data-cvtab="answers"/.test(h), true, "results with the detail in tabs");
+  cvTab = "answers"; renderCoverage(); eq((view.innerHTML.match(/class="cv-mr"/g) || []).length, 8, "answers editable in the results"); cvTab = "gaps";
+  out.push("guided: harms that apply, one question at a time, a result per area, back and resume, table and results");
   // example: teen social app risk against a typical early program
   cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); renderCoverage(); h = view.innerHTML;
   if(bad(h)) throw new Error("example has bad values: " + where(h));
@@ -41,15 +58,16 @@ const body = function(){
   eq(cvSummary(cv).cov, 100, "full coverage"); eq(cvActions(cv).length, 0, "no steps at full coverage"); renderCoverage(); eq(/No gaps where risk is high/.test(view.innerHTML), true, "celebrates no gaps");
   // start from maturity: estimates fill the matrix but count only once confirmed
   ma = maInit({stage:"growth", lv:{policy:3, detection:2, operations:4, quality:1, crisis:2, compliance:2, measurement:5, wellbeing:2}, done:{}, ex:false});
-  cv = {src:null, ex:false, r:{child:{policy:3}}}; renderCoverage(); eq(/Fill from maturity/.test(view.innerHTML) && /the 39 unrated/.test(view.innerHTML), true, "offers to fill from maturity");
+  cv = {src:null, ex:false, r:{child:{policy:3}}}; cvG = null; renderCoverage(); eq(/data-cv="fillma"/.test(view.innerHTML) && /Pick up where you left off \(1 of 40\)/.test(view.innerHTML), true, "guided offers to start from maturity");
+  cvView = "table"; renderCoverage(); eq(/Fill from maturity/.test(view.innerHTML) && /the 39 unrated/.test(view.innerHTML), true, "the table offers to fill from maturity"); cvView = null;
   eq(cvFillFromMaturity(), 39, "fills only the unrated cells"); eq(cv.r.child.policy, 3, "keeps what was rated");
   eq([cv.r.fraud.policy, cv.r.fraud.detect, cv.r.fraud.enforce, cv.r.fraud.appeal, cv.r.fraud.measure].join(","), "2,1,3,0,3", "maps maturity levels onto layers");
   eq(JOURNEY.find(s => s.k === "coverage").done(), false, "estimates don't complete the step"); eq(rcParts().find(p => p.k === "coverage").score, null, "estimates aren't graded");
   renderCoverage(); eq(/Confirm coverage/.test(view.innerHTML) && !/Next in your program review/.test(view.innerHTML), true, "asks to confirm before the hand-off");
-  cv.est = false; eq(JOURNEY.find(s => s.k === "coverage").done(), true, "confirmed coverage completes the step"); renderCoverage(); eq(/Next in your program review/.test(view.innerHTML), true, "hand-off after confirming");
+  cv.est = false; eq(JOURNEY.find(s => s.k === "coverage").done(), true, "confirmed coverage completes the step"); renderCoverage(); eq(/Back to your assessment/.test(view.innerHTML), true, "back to the assessment after confirming");
   out.push("start from maturity: fills unrated cells, maps levels onto layers, counts only once confirmed");
   // harm areas that don't apply: kept in the company profile, left out of the radar and every grade
-  renderCoverage(); eq((view.innerHTML.match(/data-cvoff="/g) || []).length, 8, "each harm area has a trash can");
+  cvView = "table"; renderCoverage(); eq((view.innerHTML.match(/data-cvoff="/g) || []).length, 8, "each harm area has a trash can");
   eq(cvSetOff("ai", true), true, "remove a harm area"); eq(orgGet().harmsOff.join(","), "ai", "saved in the company profile");
   let s2 = cvSummary(cv); eq(s2.rows.length + "/" + s2.total + "/" + s2.rated, "7/35/35", "the area leaves the rows and the count to rate");
   renderCoverage(); h = view.innerHTML; if(bad(h)) throw new Error("removed area has bad values: " + where(h));
@@ -63,7 +81,7 @@ const body = function(){
   eq(cvSummary(JSON.parse(JSON.stringify(CV_EXAMPLE))).rows.length, 8, "examples show all eight");
   CV_AREAS.forEach(a => cvSetOff(a.k, true)); eq(cvAreas(cv).length, 3, "at least three stay"); eq(/aria-disabled="true"/.test(cvMatrixHTML()), true, "trash disabled at three");
   CV_AREAS.forEach(a => cvSetOff(a.k, false)); eq(cvSummary(cv).rows.length, 8, "all restored");
-  eq(cvHarm(CV_AREAS.find(a => a.k === "ai")), "AI misuse", "acronyms keep their capitals");
+  eq(cvHarm(CV_AREAS.find(a => a.k === "ai")), "AI misuse", "acronyms keep their capitals"); cvView = null;
   out.push(`not relevant: removed from the profile or the radar, grade ${s2.cov}% → ${s3.cov}% without ${risky.a.n.toLowerCase()}, at least three stay, examples unaffected`);
   // exports: markdown, tasks, workspace, overview, search
   cv = JSON.parse(JSON.stringify(CV_EXAMPLE));

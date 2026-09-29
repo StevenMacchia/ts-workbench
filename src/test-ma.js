@@ -64,7 +64,7 @@ const body = function(){
   const msg = wsSaveTool("maturity", ma, maTitle(ma)); const it = Object.values(wsItems()).find(i => i.kind === "maturity");
   eq(!!it && /Level 2\.3 · Developing/.test(itemSummary(it).html), true, "workspace summary"); eq(it.title, "Program maturity: growing, level 2.3", "saved title");
   eq(cmdkItems().some(x => x.label === "Program maturity"), true, "search reaches the tool");
-  renderOverview(); eq(/href="#maturity"/.test(view.innerHTML) && /Level 2\.3/.test(view.innerHTML), true, "overview card and saved chip");
+  renderTools(); eq(/href="#maturity"/.test(view.innerHTML) && /Level 2\.3/.test(view.innerHTML), true, "All tools card and saved chip");
   out.push("markdown export, workspace save (" + msg + "), search and overview all include maturity");
   // framework mapping: every area has an entry, each renders, sources are linked
   eq(MA_AREAS.every(a => MA_FW[a.k] && MA_FW[a.k].note), true, "every area maps to the frameworks");

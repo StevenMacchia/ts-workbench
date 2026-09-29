@@ -6,7 +6,7 @@ const body = function(){
   const out = [], bad = h => /undefined|NaN|\[object|null/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0];
   // a new visitor is offered the demo
-  renderOverview(); eq(/Explore a demo company/.test(view.innerHTML), true, "new visitors are offered the demo");
+  renderOverview(); eq(/data-demo="start"/.test(view.innerHTML), true, "new visitors are offered the demo");
   store.set("demo", true); demoFill();
   eq(orgReady() && !!orgGet().confirmed, true, "workspace set up"); eq(wsProfile().org, "Pixelry", "the company is Pixelry");
   const pms = Object.values(wsItems()).filter(i => i.kind === "premortem").map(i => i.title).sort().join(", ");
@@ -16,7 +16,7 @@ const body = function(){
   const xs = nxItems(); eq(xs.some(x => x.kind === "maturity" && !!x.tick), true, "roadmap items in the next moves"); eq(xs.some(x => x.kind === "premortem"), true, "launch blockers in the next moves");
   out.push("demo data: " + pms + " · grade " + rcOverall(parts).score + "/100 · " + xs.length + " next moves");
   renderOverview(); const h = view.innerHTML; if(bad(h)) throw new Error("demo overview has bad values: " + where(h));
-  eq(/Explore a demo company/.test(h), false, "no demo offer while in the demo");
+  eq(/data-demo="start"/.test(h), false, "no demo offer while in the demo");
   // Class targets live on the overview; the last stop (#tb-demo) is the top-bar pill that demoBar() adds
   TOUR.filter(([sel]) => sel[0] === ".").forEach(([sel]) => { eq(h.includes('class="' + sel.slice(1)) || new RegExp('class="[^"]*\\b' + sel.slice(1) + '\\b').test(h), true, "tour target on the overview: " + sel); });
   eq(TOUR[TOUR.length - 1][0], "#tb-demo", "the tour ends on the exit"); eq(/data-demo="exit"/.test(DEMO_PILL) && /data-demo="about"/.test(DEMO_PILL), true, "the pill exits and reopens the welcome");
