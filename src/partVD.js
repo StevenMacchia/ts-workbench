@@ -114,7 +114,7 @@ function renderVendors(){
       <div class="vd-main">
         <section class="mxa-part">${step(1)}
           <div class="card vd-weights">
-            <div class="vd-presets"><span class="note">Start from your priorities</span><div class="vd-pre" role="group" aria-label="Weight presets">${VD_PRESETS.map(([k, n]) => `<button type="button" class="pol-chip" data-vpre="${k}" aria-pressed="${vdPresetOn() === k}">${n}</button>`).join("")}</div></div>
+            <div class="vd-presets"><span class="note">Start from your priorities</span><div class="vd-pre" role="group" aria-label="Weight presets">${VD_PRESETS.map(([k, n]) => `<button type="button" class="pol-chip" data-vpre="${k}" aria-pressed="${vdPresetOn() === k}">${n}</button>`).join("")}${typeof loopVendorChip === "function" ? loopVendorChip() : ""}</div>${typeof loopVendorNote === "function" ? loopVendorNote() : ""}</div>
             <div class="vd-wbar" id="vd-wbar">${vdWeightsBar()}</div>
             ${CRITERIA.map((c, j) => `<label class="vd-wrow"><span class="vd-wn"><i class="vd-wdot s${j}"></i>${esc(c.n)}${c.deal ? ` <span class="vd-min">min 3</span>` : ""}</span>
               <input type="range" min="0" max="50" step="5" value="${+vx.weights[c.k] || 0}" data-wk="${c.k}" aria-label="${esc(c.n)} weight">

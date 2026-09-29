@@ -12,17 +12,47 @@ const PAGE_TOURS = {
   premortem:[
     [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
     [".pm-cur", "What you'll get", "A report like this one: the risks that apply and how serious each one is, the launch blockers, and the laws likely to apply in your markets."],
-    [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."]
+    [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."],
+    [".askcard", "One question at a time", "Pick the answer that fits, then press Next. Nothing is final: you can change any answer later from the report."],
+    [".live", "Watch your risks change", "Each answer adds, removes or re-rates risks, and this panel shows the effect as you go."],
+    [".starthere", "Start here", "The five actions that cover your most serious risks. Tick them off as you finish them."],
+    [".viz", "Where the risk sits", "How severe and how likely each risk is, before or after the safeguards you've ticked. Click a cell or an area to filter the register."],
+    [".pm-burn", "How far the plan takes you", "Each safeguard you tick lowers the likelihood of the risks it covers. The line is the path through the launch plan; the dot is where you are."],
+    ["#pm-tabs", "The detail", "The launch plan with owners, every risk and why it's rated that way, the laws that likely apply, and the decisions your team has to make."],
+    [".loop", "Put it to work", "Rehearse the crises behind your biggest risks, measure them, and map your defenses against them in the other tools."]
   ],
   tabletop:[
     [".ttbar", "Pick your company type", "Scenarios are tailored to the kind of company you choose. Your progress across all of them shows here."],
     [".tt-mode", "Play solo or with your team", "Solo gives you feedback after every call. Team mode adds roles, a timer for each decision, discussion prompts and a full-screen presenter view."],
-    [".scen-grid", "Choose a scenario", "Each one is four timed decisions as an incident unfolds. A weaker choice shows what happens next and what strong incident command looks like."]
+    [".loop-strip", "Recommended for your risks", "Scenarios picked from the biggest risks in your pre-mortem."],
+    [".ttfilters ~ .scen-grid", "Choose a scenario", "Each one is four timed decisions as an incident unfolds. A weaker choice shows what happens next and what strong incident command looks like."],
+    [".tline", "Four decisions", "The incident unfolds over four updates. The timeline shows where you are and how each call went."],
+    [".inject", "Make the call", "Read the update and pick what you'd do. A weaker choice shows what happened, the stronger call and the law behind it, and you can try it again."],
+    [".tline ~ .play .meters", "Your scorecard", "Each call moves user safety, public trust, regulatory standing and team capacity."],
+    [".play .verdict", "How you did", "Your strong calls on the first try, and the average across the four scores."],
+    [".learnsum", "What to work on", "Your blind spot in this run, and the laws and standards the scenario touched."],
+    [".debrief", "Decision by decision", "Your first choice beside the stronger call, with the lesson for each."],
+    [".ttf-setup .segs", "Time for each decision", "Pick 3, 5 or 10 minutes per decision, or no timer at all."],
+    [".ttf-how", "How it runs", "Share your screen, read each update aloud, talk it through, then choose as a team and capture actions."],
+    [".ttf-roles", "Who's in the room", "Add names to the roles if you like. Each role gets its own discussion prompt, and actions can be assigned to it."],
+    [".ttf-stage", "Read the update aloud", "One update per decision. Talk it through before you show the options."],
+    [".ttf-timer", "Time for each decision", "Start the timer when the discussion starts. Add a minute if the team needs it."],
+    [".ttf-ask", "Prompts for the room", "Questions for everyone, and one for each role, to keep the discussion on what matters."],
+    [".ttf-debrief .verdict", "The after-action report", "How the team did, the actions you captured, and a report to download or send to your tracker."]
   ],
   metrics:[
     [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The list reorders so the metrics that matter most come first."],
     [".mx-tabs", "Four views", "Metrics is the framework. My scorecard holds your own numbers, trends and a one-pager for leadership. Data to log and Running the program cover the practical side."],
-    [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."]
+    [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."],
+    [".mxa-head", "One metric at a time", "The question the metric answers, and what it measures."],
+    [".mxa-toc", "Three parts", "Understand it, measure it and track it. Jump straight to any part."],
+    ["#mxp-3", "Track your number", "Enter this period's value, your target and where it counts as off track, and see where you stand."],
+    [".mxa-pn", "Keep going", "Move to the previous or next metric, or go back to the full list."],
+    [".mxs-top", "Your scorecard", "Name the reporting period, see what's on track, and open a one-pager for leadership."],
+    ["#mx-sig", "Reading the numbers together", "Pairs of metrics that mean more together, like more automation alongside more reversed decisions."],
+    [".mx-sc", "Your numbers", "A value, a target and an off-track line for each metric. Save each period to build trend lines."],
+    [".mx-logs", "Log these first", "The event logs every metric is calculated from, and the fields teams most often forget."],
+    [".mx-rgrid", "Put every metric on a calendar", "Which meeting should look at which metric, and how often."]
   ],
   vendors:[
     [".vd-weights", "Say what matters", "Set how much each criterion counts, or start from a preset. Weights add up to 100."],
@@ -34,7 +64,14 @@ const PAGE_TOURS = {
     [".vd-main > .mxa-part:first-of-type", "Set your stage", "Targets depend on your company's size and how regulated you are, so start here."],
     [".ma-areas", "Rate each area", "Eight areas of a Trust & Safety program. Pick the level that matches your program today, one area at a time."],
     [".vd-railc", "Your profile", "Your radar and score update as you rate."],
-    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, add due dates to your calendar or send the plan to your tracker."]
+    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, add due dates to your calendar or send the plan to your tracker."],
+    [".ma-band-l", "Where you stand", "Your overall level against the target for your stage, the area to fix first, and how far through the plan you are."],
+    [".ma-band-r", "Now against target", "Each area's level today, with the target for your stage as a dashed line. Red dots are below target."],
+    [".ma-tabs", "Three views of the plan", "Roadmap puts the steps in order. By area shows each area's levels, owner and evidence. Progress tracks snapshots over time."],
+    ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar. Add due dates as you go."],
+    [".ma-byarea", "One area at a time", "Pick an area to see every level, the steps to reach the next one, its owner and your evidence."],
+    [".ma-prog-tab", "Show progress", "Save a snapshot each quarter, and the trend shows leadership how the program has grown."],
+    [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
   ],
   coverage:[
     [".vd-main > .mxa-part:first-of-type", "Choose the risk to compare", "Your products' combined risk, one product, or an example. Product risk comes from your pre-mortems."],
@@ -46,7 +83,12 @@ const PAGE_TOURS = {
     [".pol-card", "Your rule", "Paste the policy rule you want to test, or start from one of the examples."],
     [".pol-co", "Your platform", "Add your company or product and what it does, so the test fits how people use it."],
     [".pol-runbar", "Run the test", "Instant checks run in your browser straight away. Claude's review, where available, adds edge cases, gaps, enforcement risks and a rewrite."],
-    [".pol-info", "How it works", "What each check looks for, and how the tool was built."]
+    [".pol-info", "How it works", "What each check looks for, and how the tool was built."],
+    [".pol-report > .pol-sum", "The verdict", "A clarity score for the rule, from the instant checks or Claude's review, with what the rule already does well."],
+    [".pol-tested", "What was tested", "The rule and the context used for the test. Edit either and run it again."],
+    [".pol-report > .pol-sec:not(.pol-busy)", "Instant checks", "A transparent rubric that runs in your browser: vague words, sweeping terms like “any” or “never”, and whether the rule has the six parts of a strong rule."],
+    [".pol-more, .pol-more-n", "Go further with Claude", "Claude's review adds edge cases for your platform, a clearer rewrite and a checklist for reviewers."],
+    ["#pol-tabs", "The findings", "Edge cases and how a team should decide them, words reviewers will read differently, a rewrite, and what your team still needs to decide."]
   ],
   notice:[
     [".ai-form", "Describe the case", "Fill in what happened and what you decided. “Fill in an example” shows the kind of detail that helps."],
@@ -61,7 +103,18 @@ const PAGE_TOURS = {
   transparency:[
     [".pol-card", "Your service", "Name the service and choose what kind it is under the DSA. The sections you need depend on it."],
     [".pol-setup > .pol-card:nth-of-type(2)", "Fill in each section", "Each section maps to an article of the DSA and asks only for the numbers it requires."],
-    [".pol-runbar", "Check and build", "The meter shows what's still missing. Build the report when you're ready, with a checklist and a summary."]
+    [".pol-runbar", "Check and build", "The meter shows what's still missing. Build the report when you're ready, with a checklist and a summary."],
+    [".tr-sum", "How complete it is", "The share of what the DSA asks for at your tier that's filled in, and when the report is due."],
+    [".tr-report .pol-tabs", "Three views", "The report as readers will see it, a checklist of what the DSA asks for, and a summary Claude writes from your numbers only."]
+  ],
+  coppa:[
+    [".cp-aud", "Who it's for", "Start with your audience. It decides whether COPPA applies to every user, to users under 13, or only to the children you know about."],
+    ["#cp-s-data", "Map children's data", "Mark each kind of personal information you collect, including what third-party SDKs collect through you, then why, who gets it and how long you keep it."],
+    ["#cp-s-ctrl", "What you have in place", "Tick what's true today. Only the requirements that apply to your answers are shown."],
+    [".pol-runbar", "Build your plan", "Your gaps in order, with an owner and the rule behind each, plus four drafts: a notice to parents, a retention policy, a security program and a memo for Legal."],
+    [".cp-report .pol-sum", "Where you stand", "Whether COPPA applies to you, how ready you are, and how many critical gaps are left."],
+    [".cp-report .pol-tabs", "Plan, data, drafts and requirements", "Your gaps in order, your data map, four drafts to edit, and every requirement that applies to your answers."],
+    [".cp-gaps", "Close the gaps", "Each gap names the part of the Rule, who usually owns it and what to do. Mark it done once it's fixed."]
   ],
   workspace:[
     [".wsprofile", "Your profile", "Your name and role, shown on your workspace and in exported files."],
@@ -97,7 +150,7 @@ function helpToggle(){ const off = !store.get("help:off", false); store.set("hel
 // Where the visitor was last time, read once before this visit overwrites it
 const WB_PREV = store.get("help:last", null);
 let wbOpen = null;
-const WB_ICON = {premortem:"radar", tabletop:"siren", metrics:"gauge", vendors:"scale", maturity:"steps", coverage:"cover", policy:"doc", notice:"mail", appeal:"appeal", transparency:"chart", workspace:"user"};
+const WB_ICON = {coppa:"coppa", premortem:"radar", tabletop:"siren", metrics:"gauge", vendors:"scale", maturity:"steps", coverage:"cover", policy:"doc", notice:"mail", appeal:"appeal", transparency:"chart", workspace:"user"};
 function wbAgo(t){
   const d = new Date(t), now = new Date(), days = Math.round((new Date(now.toDateString()) - new Date(d.toDateString())) / 864e5);
   return days <= 0 ? "earlier today" : days === 1 ? "yesterday" : days < 7 ? days + " days ago" : "over a week ago";

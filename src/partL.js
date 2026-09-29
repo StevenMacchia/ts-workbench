@@ -2,7 +2,7 @@
    SAVED ASSESSMENTS AND DOWNLOADS
    Saved in the viewer's browser so it works for anyone the page is shared with.
    ========================================================= */
-const TRANSIENT = ["stage","qi","impact","tab","group","filter","open","search","rview","flash","fromProfile","base"];
+const TRANSIENT = ["stage","qi","impact","tab","group","filter","open","search","rview","flash","fromProfile","base","mview"];
 const PROFILE_KEYS = ["type","youth","aud","adult","identity","contact","money","regions","scale","team","features"];
 const newId = () => "TSW-" + Date.now().toString(36).toUpperCase().slice(-4) + Math.random().toString(36).slice(2,4).toUpperCase();
 const libLoad = () => store.get("lib", {}) || {};

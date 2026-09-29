@@ -47,7 +47,7 @@ function ttPicker(H){
     </ol></div>
     <div class="card ttbar">
       <div class="field"><label for="tt-type">Your company type</label>
-        <select class="select" id="tt-type">${TT_TYPES.map(t=>`<option value="${t.k}" ${t.k===ttType?"selected":""}>${t.n}</option>`).join("")}</select></div>
+        <select class="select" id="tt-type">${TT_TYPES.map(t=>`<option value="${t.k}" ${t.k===ttType?"selected":""}>${t.n}</option>`).join("")}</select>${typeof orgFromTag === "function" ? orgFromTag(ttType === orgGet().type) : ""}</div>
       <div class="ttprog">
         <div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="note mono">${completed} of ${all.length} completed</span></div>
         <div class="bar"><i style="width:${all.length?completed/all.length*100:0}%;background:var(--good)"></i></div>
@@ -60,6 +60,7 @@ function ttPicker(H){
       <button type="button" data-ttf="all" aria-pressed="${filt==="all"}">All <span class="mono" style="opacity:.6">${all.length}</span></button>
       <button type="button" data-ttf="todo" aria-pressed="${filt==="todo"}">Not started <span class="mono" style="opacity:.6">${all.length-completed}</span></button>
       <button type="button" data-ttf="done" aria-pressed="${filt==="done"}">Completed <span class="mono" style="opacity:.6">${completed}</span></button></div></div>
+    ${typeof loopTTHTML === "function" && filt !== "done" ? loopTTHTML(ttType) : ""}
     ${list.length ? `<div class="scen-grid">${list.map(({s,i})=>{ const p = pOf({i}); const laws = s.steps.filter(x=>x.law).length;
       return `<button class="card scen ${p?"done":""}" data-i="${i}">
         <div class="scen-top"><span class="libicon sm"><svg><use href="#${ttIcon(s, ttType)}"/></svg></span>${sevPill(s.severity)}
@@ -112,7 +113,7 @@ function ttLearn(st, picked){
       <div class="learn-sec better"><span class="eyebrow">The stronger call · option ${"ABC"[bi]}</span><p><strong>${esc(best.l)}</strong></p><p class="note">${esc(best.r)}</p></div>
       <div class="learn-sec"><span class="eyebrow">The principle</span><p>${esc(st.lesson)}</p></div>
       ${lawBox(st.law)}
-      <div class="row">${retried ? "" : `<button type="button" class="btn" id="tt-retry">Try this decision again</button>`}${nextBtn}</div></div>`;
+      <div class="row">${retried ? "" : `<button type="button" class="btn" id="tt-retry">Try <span class="m-hide">this decision </span>again</button>`}${nextBtn}</div></div>`;
 }
 function ttPlay(H, sc){
   const st = sc.steps[tt.step], picked = tt.answered ? tt.picks[tt.step] : null;

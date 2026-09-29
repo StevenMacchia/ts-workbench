@@ -63,7 +63,7 @@ function startHere(r){
   const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
-    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.`;
+    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
@@ -101,7 +101,8 @@ function renderReport(r){
   const applies = r.obligations.filter(o=>o.status==="applies").length;
   const total = r.risks.length;
   // matrix
-  const cellCount = {}; r.risks.forEach(x=>{ const k=x.sev+"-"+x.lik; cellCount[k]=(cellCount[k]||0)+1; });
+  const resView = pm.mview === "res", likOf = x => resView ? x.rlik : x.lik;
+  const cellCount = {}; r.risks.forEach(x=>{ const k=x.sev+"-"+likOf(x); cellCount[k]=(cellCount[k]||0)+1; });
   let matrix = "";
   for(let s=4;s>=1;s--){
     matrix += `<div class="ylab">${SEVL[s]}</div>`;
@@ -126,7 +127,7 @@ function renderReport(r){
     <div style="margin-top:16px">${startHere(r)}</div>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">
-      <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span></div>
+      <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
       <div class="card kpi"><span class="eyebrow">Risks identified ${tip("Each risk is scored severity (1–4) × likelihood (1–4). 12 or more is critical, 8–11 high, 4–7 medium and below 4 low.")}</span><span class="v">${total}</span>
         <div class="sevstrip">${["crit","high","med","low"].map(b=>`<i style="width:${r.counts[b]/total*100}%;background:var(--${b==="low"?"line-strong":b})"></i>`).join("")}</div>
         <span class="s">${r.counts.crit} critical · ${r.counts.high} high · ${r.counts.med} medium · ${r.counts.low} low</span></div>
@@ -134,17 +135,53 @@ function renderReport(r){
       <div class="card kpi"><span class="eyebrow">Legal obligations ${tip("Laws matched to your answers and jurisdictions. A starting map for your legal team, not legal advice.","tip-r")}</span><span class="v">${applies}<small> apply</small></span><span class="s">${r.obligations.length-applies} more may apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"}</span></div>
     </div>
     <div class="viz">
-      <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent.")}</h3><span class="note">Click a cell to filter</span></div>
-        <div class="card-b"><div class="axis" style="margin-bottom:6px">Severity ↓ · Likelihood →</div><div class="matrix">${matrix}</div></div></div>
+      <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent. After safeguards counts the safeguards you've ticked in the launch plan.")}</h3>
+          <div class="segs" role="group" aria-label="Which ratings to show"><button type="button" data-mview="inh" aria-pressed="${!resView}">Before safeguards</button><button type="button" data-mview="res" aria-pressed="${resView}">After safeguards</button></div></div>
+        <div class="card-b"><div class="axis" style="margin-bottom:6px">Severity ↓ · Likelihood →</div><div class="matrix">${matrix}</div>
+          <p class="note pm-mcap">${!resView ? "Click a cell to filter the register." : !allDone ? "Nothing is ticked yet, so these match the ratings before safeguards. Tick off the launch plan to watch risks move down." : r.counts.crit > r.rcounts.crit ? `With ${allDone} safeguard${allDone === 1 ? "" : "s"} in place, ${r.counts.crit - r.rcounts.crit} of ${r.counts.crit} critical risk${r.counts.crit === 1 ? "" : "s"} ${r.counts.crit - r.rcounts.crit === 1 ? "is" : "are"} no longer critical. Safeguards lower likelihood, not severity.` : "Safeguards lower likelihood, not severity, so the most severe harms stay high even when they're rarer."}</p></div></div>
       <div class="card"><div class="card-h"><h3>Risks by harm area ${tip("Sorted by total risk score. Click an area to see its risks.")}</h3>
         <div class="legend">${["crit","high","med","low"].map(b=>`<span><i style="background:var(--${b==="low"?"line-strong":b})"></i>${BANDS[b][0]}</span>`).join("")}</div></div>
         <div class="card-b catbars">${catbars}</div></div>
     </div>
+    ${pmBurnHTML(r)}
     <div class="card" style="margin-top:16px;scroll-margin-top:16px" id="pm-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>
     </div>
+    ${typeof loopCardHTML === "function" ? loopCardHTML(r) : ""}
     ${pm.example || typeof journeyNextHTML !== "function" ? "" : journeyNextHTML("premortem")}`;
+}
+/* ---------- Risk burn-down: risk before safeguards, what's left now, and the path through the launch plan ---------- */
+// Total risk if the given safeguards were in place, by the same rule as assess()
+function pmResidualTotal(risks, has){
+  return risks.reduce((a, x) => { const n = x.sgs.filter(id => has(id)).length, cut = x.sgs.length ? Math.min(x.lik - 1, Math.floor(2 * n / x.sgs.length + 1e-9)) : 0; return a + x.sev * (x.lik - cut); }, 0);
+}
+function pmBurnHTML(r){
+  if(!r.risks.length || !r.safeguards.length || !r.total) return "";
+  const order = r.safeguards.slice().sort((a, b) => b.rank - a.rank || b.critCovers - a.critCovers || b.covers.length - a.covers.length);
+  const on = new Set(), pts = [r.total];
+  order.forEach(s => { on.add(s.id); pts.push(pmResidualTotal(r.risks, id => on.has(id))); });
+  const N = order.length, done = r.safeguards.filter(s => pm.done[s.id]).length, pct = v => Math.round((r.total - v) / r.total * 100);
+  const bl = order.filter(s => s.rank === 3).length, floor = pts[N];
+  const W = 560, H = 200, L = 40, R = 14, T = 16, B = 34, f = v => v.toFixed(1);
+  const X = i => L + i * (W - L - R) / N, Y = v => T + (1 - v / r.total) * (H - T - B);
+  const line = pts.map((v, i) => `${i ? "L" : "M"}${f(X(i))},${f(Y(v))}`).join("");
+  const grid = [0, .5, 1].map(q => `<line class="bd-grid" x1="${L}" x2="${W - R}" y1="${f(Y(r.total * q))}" y2="${f(Y(r.total * q))}"/><text class="bd-ax" x="${L - 6}" y="${f(Y(r.total * q) + 4)}" text-anchor="end">${Math.round(r.total * q)}</text>`).join("");
+  const blMark = bl && bl < N ? `<line class="bd-bl" x1="${f(X(bl))}" x2="${f(X(bl))}" y1="${T}" y2="${H - B}"/><text class="bd-bll" x="${f(X(bl) + 6)}" y="${T + 10}">Launch blockers done: −${pct(pts[bl])}%</text>` : "";
+  const hits = pts.map((v, i) => `<circle class="bd-hit" cx="${f(X(i))}" cy="${f(Y(v))}" r="7"><title>${esc(i ? `After ${i} safeguard${i === 1 ? "" : "s"} (latest: ${order[i - 1].t.split(",")[0].slice(0, 80)})` : "Before any safeguards")}: risk ${v}, down ${pct(v)}%</title></circle>`).join("");
+  const right = done > N * .65, you = `<circle class="bd-you" cx="${f(X(done))}" cy="${f(Y(r.rtotal))}" r="6"/><text class="bd-youl" x="${f(X(done) + (right ? -11 : 11))}" y="${f(Y(r.rtotal) + (Y(r.rtotal) < T + 24 ? 18 : -10))}" text-anchor="${right ? "end" : "start"}">You are here: ${r.rtotal}</text>`;
+  const strip = c => `<div class="sevstrip">${["crit","high","med","low"].map(b => `<i style="width:${c[b] / r.risks.length * 100}%;background:var(--${b === "low" ? "line-strong" : b})"></i>`).join("")}</div>`;
+  return `<div class="card pm-burn">
+    <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
+      <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
+      <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>
+      <div class="pm-bbars"><div class="pm-bbar"><span>Before</span>${strip(r.counts)}</div><div class="pm-bbar"><span>Now</span>${strip(r.rcounts)}</div></div>
+      <p class="note">With all ${N} safeguards in place, ${floor} of ${r.total} remains. Safeguards make severe harms rarer, not impossible, so detection and response still matter.</p></div>
+    <figure class="pm-bchart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Risk burn-down. Total risk is ${r.total} before safeguards and ${r.rtotal} now, with ${done} of ${N} safeguards done. The ${bl} launch blockers bring it to ${pts[bl]}; all ${N} safeguards bring it to ${floor}.`)}">
+      ${grid}<path class="bd-area" d="${line}L${f(X(N))},${f(Y(0))}L${f(X(0))},${f(Y(0))}Z"/><path class="bd-line" d="${line}"/>${blMark}${hits}${you}
+      <text class="bd-ax" x="${L}" y="${H - 10}">0</text><text class="bd-ax" x="${(L + W - R) / 2}" y="${H - 10}" text-anchor="middle">Safeguards done, in the launch plan's order</text><text class="bd-ax" x="${W - R}" y="${H - 10}" text-anchor="end">${N}</text></svg>
+      <figcaption class="note">The line is the path through your launch plan, most urgent first. The dot is where you are now.</figcaption></figure>
+  </div>`;
 }
 function sgItem(s){
   return `<label class="citem ${pm.done[s.id]?"done":""}">
@@ -179,7 +216,7 @@ function tabRegister(r){
   const mode = pm.rview || "priority";
   const qs = (pm.search||"").trim().toLowerCase();
   let rs = r.risks;
-  if(pm.filter.cell){ const [s,l]=pm.filter.cell.split("-").map(Number); rs = rs.filter(x=>x.sev===s&&x.lik===l); }
+  if(pm.filter.cell){ const [s,l]=pm.filter.cell.split("-").map(Number); rs = rs.filter(x=>x.sev===s&&(pm.mview==="res"?x.rlik:x.lik)===l); }
   if(pm.filter.cat) rs = rs.filter(x=>x.cat===pm.filter.cat);
   if(qs) rs = rs.filter(x=>(x.n+" "+x.d+" "+CATS[x.cat]).toLowerCase().includes(qs));
   const explicit = !!(pm.filter.cell||pm.filter.cat||qs);
@@ -190,18 +227,18 @@ function tabRegister(r){
   const areas = Object.keys(CATS).map(k=>({k, rs:shown.filter(x=>x.cat===k)})).filter(a=>a.rs.length)
     .sort((a,b)=>Math.max(...b.rs.map(x=>x.score))-Math.max(...a.rs.map(x=>x.score)) || b.rs.length-a.rs.length);
   const row = x => { const done = x.sgs.filter(id=>pm.done[id]).length; return `<details class="riskd" data-open="risk-${x.id}" ${isOpen("risk-"+x.id,false)?"open":""}>
-      <summary>${pill(x.band)}<span class="n">${esc(x.n)}</span><span class="sl">${SEVL[x.sev]} × ${LIKL[x.lik]} · <span class="mono">${done}/${x.sgs.length}</span> safeguards</span></summary>
+      <summary>${pill(x.band)}<span class="n">${esc(x.n)}${x.rband !== x.band ? `<span class="pm-rnow" title="After the safeguards you've ticked">now ${esc(BANDS[x.rband][0].toLowerCase())}</span>` : ""}</span><span class="sl">${SEVL[x.sev]} × ${LIKL[x.lik]} · <span class="mono">${done}/${x.sgs.length}</span> safeguards</span></summary>
       <div class="riskbody">
         <p>${gloss(x.d)}</p>
         <div><div class="eyebrow" style="margin-bottom:6px">Why it's rated this way</div>
-          <ul class="why">${x.ups.map(u=>`<li><span class="w up">SEV↑</span><span>${esc(u[1])}</span></li>`).join("")}${x.drivers.map(u=>`<li><span class="w up">+${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${x.reducers.map(u=>`<li><span class="w dn">−${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${!x.ups.length&&!x.drivers.length&&!x.reducers.length?`<li><span class="w">·</span><span>Baseline rating for any product with these capabilities</span></li>`:""}</ul></div>
+          <ul class="why">${x.ups.map(u=>`<li><span class="w up">SEV↑</span><span>${esc(u[1])}</span></li>`).join("")}${x.drivers.map(u=>`<li><span class="w up">+${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${x.reducers.map(u=>`<li><span class="w dn">−${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${x.cut?`<li><span class="w dn">−${x.cut}</span><span>${x.sgDone} of ${x.sgs.length} safeguards in place lower the likelihood to ${LIKL[x.rlik].toLowerCase()}, so it's now rated ${BANDS[x.rband][0].toLowerCase()}</span></li>`:""}${!x.ups.length&&!x.drivers.length&&!x.reducers.length?`<li><span class="w">·</span><span>Baseline rating for any product with these capabilities</span></li>`:""}</ul></div>
         <div><div class="eyebrow" style="margin-bottom:6px">Safeguards</div>
           <ul class="sglist">${x.sgs.map(id=>`<li><span class="${pm.done[id]?"ok":"no"}">${pm.done[id]?"✓":"○"}</span><span>${gloss(SG[id].t)} ${ownerTag(SG[id].o)}</span></li>`).join("")}</ul></div>
       </div></details>`; };
   return `<div class="filters">
       <div class="segs" role="group" aria-label="Which risks"><button type="button" data-rview="priority" aria-pressed="${mode==="priority"}">Critical and high <span class="mono" style="opacity:.6">${pri}</span></button><button type="button" data-rview="all" aria-pressed="${mode==="all"}">All <span class="mono" style="opacity:.6">${r.risks.length}</span></button></div>
       <input class="input search" id="rg-search" type="search" placeholder="Search risks" value="${esc(pm.search||"")}" aria-label="Search risks">
-      ${pm.filter.cat?`<span class="pill accent">${CATS[pm.filter.cat]}</span>`:""}${pm.filter.cell?`<span class="pill accent">${SEVL[+pm.filter.cell[0]]} severity · ${LIKL[+pm.filter.cell[2]]}</span>`:""}
+      ${pm.filter.cat?`<span class="pill accent">${CATS[pm.filter.cat]}</span>`:""}${pm.filter.cell?`<span class="pill accent">${SEVL[+pm.filter.cell[0]]} severity · ${LIKL[+pm.filter.cell[2]]}${pm.mview==="res"?" after safeguards":""}</span>`:""}
       ${explicit?`<button type="button" class="btn sm" data-act="clearfilter">Clear</button>`:""}</div>` +
     (areas.length ? areas.map(a=>`<details class="area" data-open="area-${a.k}" ${isOpen("area-"+a.k, explicit || a.rs.some(x=>x.band==="crit"))?"open":""}>
         <summary><span class="area-t">${catIcon(a.k)}<b>${CATS[a.k]}</b><span class="note">${a.rs.length} risk${a.rs.length===1?"":"s"}</span></span><span class="area-pills">${miniPills(a.rs)}</span></summary>
@@ -214,7 +251,7 @@ function tabObligations(r){
   return `<p class="disclaimer">A starting map to take to your legal team, not legal advice. Last reviewed ${LAW_REVIEWED}. Thresholds, exemptions and dates vary, and laws change, so check each source.</p>` +
     REGIONS.filter(g=>pm.regions.includes(g.k)).map(g=>{ const os = r.obligations.filter(o=>o.r===g.k).sort((a,b)=>(a.status==="applies"?0:1)-(b.status==="applies"?0:1));
       return `<div class="region"><h4>${g.n} <span class="note" style="font-family:var(--body);font-weight:400">${os.length} item${os.length===1?"":"s"}</span></h4>
-        ${os.length ? os.map(o=>`<div class="obl"><div class="lh">${o.status==="applies"?`<span class="pill crit hastip" tabindex="0" data-tip="Your answers meet this law&#39;s usual trigger.">Likely applies</span>`:`<span class="pill high hastip" tabindex="0" data-tip="Depends on details we don&#39;t ask about, such as user thresholds, licensing or how regulators classify your service.">May apply</span>`}<b>${esc(o.law)}</b></div><p>${gloss(o.t)}</p>${lawSrcLink(o.law)}
+        ${os.length ? os.map(o=>`<div class="obl"><div class="lh">${o.status==="applies"?`<span class="pill crit hastip" tabindex="0" data-tip="Your answers meet this law&#39;s usual trigger.">Likely applies</span>`:`<span class="pill high hastip" tabindex="0" data-tip="Depends on details we don&#39;t ask about, such as user thresholds, licensing or how regulators classify your service.">May apply</span>`}<b>${esc(o.law)}</b></div><p>${gloss(o.t)}</p>${lawSrcLink(o.law)}${/COPPA/.test(o.law) ? `<a class="ma-tool" href="#coppa">Check your COPPA readiness<svg><use href="#i-arrow"/></svg></a>` : ""}
           ${o.sg.length?`<div class="chipset">${o.sg.map(id=>`<span class="tag">${pm.done[id]?"✓ ":""}${esc(SG[id].t.split(",")[0].split("(")[0].trim())}</span>`).join("")}</div>`:""}</div>`).join("")
         : `<p class="note">Nothing specific flagged for this profile. General consumer-protection and privacy law still applies.</p>`}</div>`;}).join("");
 }
@@ -227,12 +264,13 @@ function reportMarkdown(r){
   L.push(`# Abuse pre-mortem: ${pm.name||"Untitled assessment"}`, "");
   L.push(`**Profile:** ${labelOf(PLATFORMS,pm.type)}; ${labelOf(YOUTH,pm.youth)}; ${labelOf(IDENTITY,pm.identity)}; ${labelOf(CONTACT,pm.contact)}; adult content: ${labelOf(ADULT,pm.adult).toLowerCase()}; money: ${pm.money.map(k=>labelOf(MONEY,k)).join(", ")||"none"}; regions: ${pm.regions.map(k=>k.toUpperCase()).join(", ")||"none"}; scale: ${labelOf(SCALE,pm.scale)}; T&S: ${labelOf(TEAM,pm.team)}.`);
   L.push(`**Capabilities:** ${pm.features.map(k=>FEATURES[k][0]).join(", ")}`, "");
-  L.push(`**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`, "");
+  L.push(`**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`);
+  L.push(`**After safeguards in place:** ${r.rposture[0]} (${r.rcounts.crit} critical, ${r.rcounts.high} high, ${r.rcounts.med} medium, ${r.rcounts.low} low). Total risk ${r.rtotal} of ${r.total}${r.total && r.rtotal < r.total ? `, down ${Math.round((r.total - r.rtotal) / r.total * 100)}%` : ""}.`, "");
   L.push("## Launch plan");
   TIERS.forEach(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r); if(!items.length) return;
     L.push(`### ${t.n}`); items.forEach(s=>L.push(`- [${pm.done[s.id]?"x":" "}] ${s.t} (Owner: ${OWNERS[s.o]}; ${EFFORT[s.e].toLowerCase()}${s.legal==="applies"?"; legal requirement":s.legal==="may"?"; may be legally required":""})`)); L.push(""); });
-  L.push("## Risk register", "", "| Rating | Risk | Area | Severity | Likelihood | Main drivers |", "|---|---|---|---|---|---|");
-  r.risks.forEach(x=>L.push(`| ${BANDS[x.band][0]} | ${x.n} | ${CATS[x.cat]} | ${SEVL[x.sev]} | ${LIKL[x.lik]} | ${x.ups.map(u=>u[1]).concat(x.drivers.map(u=>u[2])).join("; ")||"Baseline"} |`));
+  L.push("## Risk register", "", "| Rating | After safeguards | Risk | Area | Severity | Likelihood | Main drivers |", "|---|---|---|---|---|---|---|");
+  r.risks.forEach(x=>L.push(`| ${BANDS[x.band][0]} | ${BANDS[x.rband][0]} | ${x.n} | ${CATS[x.cat]} | ${SEVL[x.sev]} | ${LIKL[x.lik]} | ${x.ups.map(u=>u[1]).concat(x.drivers.map(u=>u[2])).join("; ")||"Baseline"} |`));
   L.push("", "## Legal and regulatory obligations (not legal advice)", "", `_Law notes last reviewed ${LAW_REVIEWED}. Check each source; laws change._`, "");
   r.obligations.forEach(o=>L.push(`- **${o.law}** (${labelOf(REGIONS,o.r)}, ${o.status==="applies"?"likely applies":"may apply"}): ${o.t}${LAW_SRC[o.law] ? ` [Source](${LAW_SRC[o.law][0]})` : ""}`));
   L.push("", "## Decisions to make");

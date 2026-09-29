@@ -32,6 +32,11 @@ function polInfoHTML(){
   </details>`;
 }
 function renderPolicy(){
+  // A fresh test starts from the workspace settings: product type, audience, regions and company name
+  if(!pol.orgSet && !pol.rule && !pol.heur && typeof orgGet === "function"){ const o = orgGet(), pr = wsProfile();
+    if(o.type && ORG_MAP.pm[o.type]) pol.type = ORG_MAP.pm[o.type]; if(o.youth) pol.youth = o.youth; if(o.regions && o.regions.length) pol.regions = o.regions.slice();
+    if(pr && pr.org && !pol.company) pol.company = pr.org;
+    if(o.type || o.youth || (o.regions && o.regions.length)){ pol.orgSet = true; savePol(); } }
   const ai = !!SAMPLER && !polRun.aiOff, report = !!pol.heur && pol.view !== "setup";
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
@@ -58,7 +63,7 @@ function polSetupHTML(ai){
     </section>
 
     <section class="card pol-card">
-      <div class="pol-h"><span class="pol-num">2</span><div><label for="pol-company">Your platform</label><span class="note">Recommended</span></div></div>
+      <div class="pol-h"><span class="pol-num">2</span><div><label for="pol-company">Your platform</label><span class="note">Recommended</span></div>${typeof orgFromTag === "function" ? orgFromTag(!!pol.orgSet && ORG_MAP.pm[orgGet().type] === pol.type) : ""}</div>
       <div class="pol-co">
         <div class="field"><label for="pol-company">Company or product name</label>
           <div class="pol-co-row"><input class="input" id="pol-company" value="${esc(pol.company || "")}" placeholder="For example: Twitch, Depop or Discord" autocomplete="off" maxlength="80">

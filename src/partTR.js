@@ -138,6 +138,7 @@ async function trWrite(){
 
 /* ---------- page ---------- */
 function renderTransparency(){
+  if(!tr.org && !tr.orgSet && typeof wsProfile === "function"){ const pr = wsProfile(); if(pr && pr.org){ tr.org = pr.org; tr.orgSet = true; trSave(); } }
   const report = tr.view === "report";
   const ai = typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff);
   view.innerHTML = (report

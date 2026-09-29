@@ -2567,7 +2567,7 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .jn-setup-h small{font-size:13px;color:var(--muted)}
 .jn-setup .org-card{box-shadow:none;border-style:dashed}
 .jn-setup .org-b > div:first-child{display:none}
-.jn-setup .org-b{grid-template-columns:minmax(200px,1fr) auto minmax(0,1.3fr);align-items:end;gap:16px}
+.jn-setup .org-b{grid-template-columns:minmax(170px,1fr) minmax(170px,1fr) auto minmax(0,1.2fr);align-items:end;gap:16px}
 .jn-next{margin-top:24px;padding:18px 20px;display:grid;gap:6px;border-radius:16px;background:radial-gradient(120% 120% at 0% 0%, color-mix(in oklab, var(--accent) 8%, var(--surface)), var(--surface) 60%);border-color:color-mix(in oklab, var(--accent) 30%, var(--line))}
 .jn-k{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
 .jn-next b{display:flex;align-items:center;gap:10px;font-size:17px;letter-spacing:-.01em}
@@ -2914,6 +2914,184 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .mx-sig-d{font-size:12.5px;white-space:nowrap}
 .mx-sig-d.good{color:var(--good)}.mx-sig-d.crit{color:var(--high)}
 .mx-sig-c b{color:var(--ink)}
+
+/* ---------- Residual risk and the risk burn-down ---------- */
+.pm-mcap{margin:10px 0 0}
+.pm-resid{display:block;margin-top:2px}
+.pm-resid b{font-weight:600}
+.pm-rnow{margin-left:8px;font-size:11.5px;font-weight:500;color:var(--good);white-space:nowrap}
+.pm-rnow::before{content:"→ "}
+.viz .card-h .segs button{white-space:nowrap}
+.pm-burn{margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px 28px;padding:20px 22px;border-radius:14px;align-items:start}
+@media (min-width:1280px){.pm-burn{grid-template-columns:minmax(220px,280px) minmax(0,1fr)}}
+.pm-burn h3{margin:0;font-size:16px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+.pm-bl{display:grid;gap:8px;align-content:start}
+.pm-bl .note{margin:0;line-height:1.55}
+.pm-bnums{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px}
+.pm-bnums b{font:700 34px/1 var(--display);letter-spacing:-.03em}
+.pm-bnums s{color:var(--faint);font-size:16px;text-decoration-thickness:1px}
+.pm-bnums .pill{align-self:center}
+.pm-bbars{display:grid;gap:7px;margin:4px 0;max-width:480px}
+.pm-bbar{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.pm-bchart{margin:0;display:grid;gap:6px}
+.pm-bchart svg{width:100%;height:auto;overflow:visible;display:block}
+.pm-bchart figcaption{margin:0}
+.pm-burn .bd-grid{stroke:var(--line);stroke-width:1}
+.pm-burn .bd-ax{font:500 11px var(--body);fill:var(--faint)}
+.pm-burn .bd-area{fill:var(--t-pm);opacity:.1}
+.pm-burn .bd-line{fill:none;stroke:var(--t-pm);stroke-width:2;stroke-linejoin:round}
+.pm-burn .bd-bl{stroke:var(--crit);stroke-width:1.2;stroke-dasharray:3 4;opacity:.7}
+.pm-burn .bd-bll{font:600 11px var(--body);fill:var(--crit)}
+.pm-burn .bd-hit{fill:transparent;stroke:transparent}
+.pm-burn .bd-hit:hover{fill:var(--t-pm);fill-opacity:.25}
+.pm-burn .bd-you{fill:var(--ink);stroke:var(--surface);stroke-width:2.5}
+.pm-burn .bd-youl{font:600 11.5px var(--body);fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+
+/* ---------- Program loop: from a pre-mortem to rehearsal, measurement and resourcing ---------- */
+.loop{margin-top:16px;padding:20px 22px;border-radius:16px;display:grid;gap:16px;background:radial-gradient(120% 140% at 100% 0%, color-mix(in oklab, var(--accent) 7%, var(--surface)), var(--surface) 55%)}
+.loop-h h3{margin:3px 0 4px;font-size:18px;letter-spacing:-.015em}
+.loop-h .note{margin:0}
+.loop-h .note b{color:var(--ink);font-weight:600}
+.loop-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.loop-col{display:grid;gap:8px;align-content:start}
+.loop-k{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:color-mix(in oklab, var(--c) 65%, var(--ink))}
+.loop-k svg{width:15px;height:15px;color:var(--c)}
+.loop-i{display:grid;gap:2px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer;transition:border-color .15s, box-shadow .15s}
+.loop-i:hover{border-color:color-mix(in oklab, var(--ink) 25%, transparent);box-shadow:var(--shadow)}
+.loop-i b{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.loop-i small{font-size:12.5px;color:var(--muted);line-height:1.45}
+@media (max-width:900px){.loop-cols{grid-template-columns:1fr}}
+.loop-strip{margin:0 0 20px}
+.loop-sh{display:flex;align-items:baseline;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;margin-bottom:10px}
+.loop-sh h3{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:16px;letter-spacing:-.01em}
+.loop-sh h3 svg{width:17px;height:17px;color:var(--t-pm)}
+.loop-sh .note{margin:0}
+.loop-scen{border-color:color-mix(in oklab, var(--t-pm) 35%, var(--line))}
+.loop-mx{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}
+.mx-loop{margin-top:22px}
+.loop-chip{display:inline-flex;align-items:center;gap:6px}
+.loop-chip svg{width:14px;height:14px}
+.loop-vnote{margin:2px 0 0;line-height:1.5}
+.loop-vnote b{color:var(--ink);font-weight:600}
+.org-from{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap;justify-self:start}
+.org-from svg{width:14px;height:14px}
+.org-from:hover{color:var(--ink)}
+.pol-h .org-from{margin-left:auto}
+.ma-stages + .org-from{margin-top:10px}
+
+/* ---------- COPPA readiness ---------- */
+:root{--t-cp:#8D6E4B}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-cp:#D4B48C} }
+:root[data-theme="dark"],:root[data-mode="dark"]{--t-cp:#D4B48C}
+:root[data-mode="light"]{--t-cp:#8D6E4B}
+.cp-setup .tr-tier.on{border-color:var(--t-cp);box-shadow:inset 0 0 0 1px var(--t-cp);background:color-mix(in oklab, var(--t-cp) 7%, var(--surface))}
+.cp-setup .tr-tier:focus-visible{outline:2px solid var(--t-cp);outline-offset:2px}
+.cp-setup .tr-tier.off{opacity:.6}
+.cp-setup .tr-tier b{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.cp-setup .tr-chk input{accent-color:var(--t-cp)}
+.cp-setup .tr-chk small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.cp-setup .pol-tip{border-left-color:var(--t-cp)}
+.tr-tiers.cp-aud,.tr-tiers.cp-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){.tr-tiers.cp-aud,.tr-tiers.cp-two{grid-template-columns:1fr}}
+.banner.cp-ap{margin:0}
+.banner.cp-ap.crit{background:color-mix(in oklab, var(--crit) 10%, var(--surface))}
+.banner.cp-ap.high{background:color-mix(in oklab, var(--high) 10%, var(--surface))}
+.banner.cp-ap.good{background:color-mix(in oklab, var(--good) 10%, var(--surface))}
+.cp-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px}
+@media (max-width:640px){.cp-checks{grid-template-columns:1fr}}
+.cp-new{display:inline-block;margin-left:6px;padding:0 5px;border:1px solid color-mix(in oklab, var(--t-cp) 50%, transparent);border-radius:4px;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--t-cp);white-space:nowrap;vertical-align:1px;line-height:1.5}
+.cp-pi{display:grid;gap:8px}
+.cp-row{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surface)}
+.cp-row.on{border-color:color-mix(in oklab, var(--t-cp) 45%, var(--line));background:color-mix(in oklab, var(--t-cp) 4%, var(--surface))}
+.cp-row .tr-chk b{font-weight:600}
+.cp-row-d{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.7fr) minmax(0,1fr);gap:10px 14px;margin-top:10px;padding-left:26px}
+@media (max-width:760px){.cp-row-d{grid-template-columns:1fr;padding-left:0}}
+.cp-row-d .field{margin:0;gap:4px}
+.cp-row-d label,.cp-row-d .lbl{font-size:12px;color:var(--muted)}
+.cp-chips{display:flex;flex-wrap:wrap;gap:5px}
+.cp-chips .pol-chip{font-size:12px;padding:3px 9px}
+.cp-flag{margin:8px 0 0 26px;font-size:12.5px;line-height:1.5}
+.cp-flag.crit{color:var(--crit)} .cp-flag.high{color:var(--high)} .cp-flag.info{color:var(--muted)}
+@media (max-width:760px){.cp-flag{margin-left:0}}
+.cp-grps{display:grid;gap:10px}
+.cp-grp{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.cp-grp h4{margin:0;font-size:14px}
+.cp-grp .note{margin:-4px 0 2px}
+.cp-ring{border-color:color-mix(in oklab, var(--t-cp) 35%, var(--sunk))}
+.cp-ring.crit{border-color:color-mix(in oklab, var(--crit) 35%, var(--sunk))}
+.cp-ring.good{border-color:color-mix(in oklab, var(--good) 40%, var(--sunk))}
+.cp-kpis{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cp-gaps{display:grid}
+.cp-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.cp-gap:first-child{padding-top:2px}
+.cp-gap:last-child{border-bottom:0}
+.cp-gb{display:grid;gap:6px}
+.cp-gap h4{margin:0;font-size:15px;letter-spacing:-.01em;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.cp-gap p{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.cp-gap .cp-fix{color:var(--ink)}
+.cp-gap .cp-case{font-size:12.5px;padding-left:10px;border-left:2px solid var(--line-strong)}
+.cp-gm{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cp-mapw{overflow-x:auto}
+.cp-map{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+.cp-map th,.cp-map td{text-align:left;padding:9px 14px 9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.cp-map th{font-size:12px;color:var(--muted);font-weight:600}
+.cp-map td small{display:block;font-size:12px;line-height:1.45;margin-top:3px}
+.cp-map td small.crit{color:var(--crit)} .cp-map td small.high{color:var(--high)} .cp-map td small.info{color:var(--muted)}
+.cp-dtabs{display:flex;flex-wrap:wrap;margin-bottom:10px}
+.cp-dnote{margin:0 0 10px}
+.cp-draft{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:18px 22px;font-size:14px;line-height:1.6;max-height:560px;overflow:auto}
+.cp-draft h3{font-size:18px;margin:0 0 10px;letter-spacing:-.015em} .cp-draft h4{font-size:15px;margin:18px 0 6px} .cp-draft h5{font-size:14px;margin:14px 0 4px}
+.cp-draft p{margin:0 0 8px} .cp-draft ul,.cp-draft ol{margin:0 0 10px;padding-left:20px} .cp-draft li{margin:3px 0}
+.cp-tw{overflow-x:auto;margin:6px 0 12px}
+.cp-draft table{border-collapse:collapse;font-size:13px;min-width:520px}
+.cp-draft th,.cp-draft td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.cp-draft th{background:var(--surface)}
+.cp-draft .ph{background:color-mix(in oklab, var(--t-cp) 16%, transparent);border-radius:4px;padding:0 3px}
+.cp-dact{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.cp-rq{margin-bottom:18px}
+.cp-rq h4{margin:0 0 10px;font-size:15px;display:flex;gap:8px;align-items:baseline}
+.cp-rq .tr-check li b{font-weight:600}
+@media (max-width:640px){.cp-setup .pol-runbar .pol-rb-meter > .note{display:none}}
+/* Overview: eight tools, four to a row */
+.ov-tools > .ov-tool:nth-child(n+5){grid-column:span 3}
+.ov-tools > .ov-tool .ov-art{height:122px}
+@media (max-width:1100px){.ov-tools > .ov-tool,.ov-tools > .ov-tool:nth-child(n+5),.ov-tools > .ov-tool:last-child{grid-column:auto}}
+
+/* Long titles in Recent shorten with an ellipsis instead of widening the sidebar */
+.side nav.sb-nav,.sb-pins{grid-template-columns:minmax(0,1fr)}
+.sb-pin,.sb-pin span:last-child{min-width:0}
+
+/* ---------- Phones: bottom navigation, bigger tap targets, the next step always in reach ---------- */
+.bnav{display:none}
+@media (max-width:720px){
+  .bnav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:6px 8px calc(6px + env(safe-area-inset-bottom, 0px));background:color-mix(in oklab, var(--bg) 90%, transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-top:1px solid var(--line)}
+  .bnav a,.bnav button{display:grid;justify-items:center;align-content:center;gap:3px;min-height:50px;padding:4px 2px;border:0;border-radius:12px;background:none;color:var(--muted);font:500 11px/1.2 var(--body);text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .bnav svg{width:22px;height:22px}
+  .bnav [aria-current="page"],.bnav .on{color:var(--ink);background:var(--sunk)}
+  .page{padding-bottom:calc(104px + env(safe-area-inset-bottom, 0px))}
+  .gtoast{bottom:calc(86px + env(safe-area-inset-bottom, 0px))}
+  .pol-runbar{bottom:calc(70px + env(safe-area-inset-bottom, 0px))}
+  .tour-pop{bottom:calc(84px + env(safe-area-inset-bottom, 0px))}
+  body.tt-present .bnav{display:none}
+  .btn{height:40px;padding:0 14px;font-size:14px}
+  .btn.sm{height:38px;padding:0 12px;font-size:13.5px}
+  .btn.icon{min-width:38px;justify-content:center}
+  .segs button{min-height:36px}
+  .page input:not([type=checkbox]):not([type=radio]):not([type=range]),.page select,.page textarea,#cmdk-q{font-size:16px!important}
+  .page input[type=checkbox]{width:20px;height:20px}
+  .opt{padding:16px}
+  .mcell{min-height:52px}
+  .keyhint,.m-hide{display:none}
+  .learn > .row:last-child,.askcard .stepnav,.ttf-main > .ttf-go,.ttf-setup > .ttf-go{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom, 0px));z-index:5;margin-inline:-8px;padding:10px 8px;border-radius:14px;background:color-mix(in oklab, var(--surface) 94%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 -10px 24px -16px rgba(15,20,40,.35)}
+  .learn > .row:last-child .btn,.askcard .stepnav .btn,.ttf-main > .ttf-go .btn,.ttf-setup > .ttf-go .btn{flex:1;justify-content:center}
+}
+@media print{.bnav{display:none!important}}
+/* "How this page works" on the metric page bar and the Overview greeting */
+.mxc-r .ph-help{margin-left:0;align-self:center}
+.ov-help{margin-top:14px}
+.ov-help .ph-help{margin-left:0}
+/* Tour highlight: blocks without their own card get breathing room instead of a ring against the text */
+.tour-on:not(.card){outline:3px solid var(--accent);outline-offset:8px;box-shadow:0 0 0 8px color-mix(in oklab, var(--accent) 7%, transparent), 0 0 0 18px color-mix(in oklab, var(--accent) 14%, transparent) !important;border-radius:14px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2988,6 +3166,7 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
   <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></g></symbol>
   <symbol id="i-cover" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6l8-3z"/><path d="M8 10h8M9 14h6"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-coppa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.4-3.1 8.1-7.5 9.5-4.4-1.4-7.5-5.1-7.5-9.5V6L12 3z"/><circle cx="12" cy="10" r="2.1"/><path d="M8.7 16.2c.6-1.9 1.8-3 3.3-3s2.7 1.1 3.3 3"/></g></symbol>
 </svg>
 <div class="app" id="app">
   <aside class="side" id="side" aria-label="Sidebar">
@@ -3003,6 +3182,7 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
       <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
       <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
       <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
+      <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness<span class="sb-new">New</span></a>
       <div class="sb-h">Prepare</div>
       <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
@@ -3042,6 +3222,13 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
     <div class="page" id="view"></div>
   </main>
 </div>
+<nav class="bnav" id="bnav" aria-label="Quick navigation">
+  <a href="#overview" data-bgroup="home"><svg><use href="#i-home"/></svg><span>Home</span></a>
+  <a href="#premortem" data-bgroup="assess"><svg><use href="#i-radar"/></svg><span>Assess</span></a>
+  <a href="#tabletop" data-bgroup="prepare"><svg><use href="#i-siren"/></svg><span>Prepare</span></a>
+  <a href="#workspace" data-bgroup="saved"><svg><use href="#i-user"/></svg><span>Saved</span></a>
+  <button type="button" data-bnav="more" data-bgroup="more" aria-controls="side"><svg><use href="#i-menu"/></svg><span>More</span></button>
+</nav>
 <div class="cmdk-bg" id="cmdk" hidden>
   <div class="cmdk" role="dialog" aria-modal="true" aria-label="Search and jump">
     <input id="cmdk-q" placeholder="Search tools, scenarios and saved work" autocomplete="off" aria-label="Search" aria-controls="cmdk-list">
@@ -3079,6 +3266,7 @@ const HEAD_META = () => {
     coverage:["cover", () => [CV_AREAS.length + " harm areas", CV_LAYERS.length + " layers of defense", "Risk vs coverage radar"]],
     maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
+    coppa:["coppa", () => ["The 2025 amended Rule", "4 ready-to-edit drafts", "The rule behind every requirement"]],
     workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
@@ -3897,10 +4085,19 @@ function assess(p){
   const safeguards = Object.values(map).sort((a,b)=>b.rank-a.rank || b.covers.length-a.covers.length);
 
   const counts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>counts[r.band]++);
-  const posture = counts.crit>=4 ? ["Severe","crit"] : (counts.crit>=1||counts.high>=5) ? ["High","high"] : counts.high>=1 ? ["Moderate","med"] : risks.length ? ["Low","good"] : ["Not assessed",""];
+  const postureOf = n => n.crit>=4 ? ["Severe","crit"] : (n.crit>=1||n.high>=5) ? ["High","high"] : n.high>=1 ? ["Moderate","med"] : risks.length ? ["Low","good"] : ["Not assessed",""];
+  const posture = postureOf(counts);
+  // Residual risk: safeguards in place make harm less likely, not less severe. A risk's likelihood falls
+  // one step once half of its safeguards are done and two steps when all are, never below Rare.
+  const done = p.done || {};
+  risks.forEach(r => { r.sgDone = r.sgs.filter(id => done[id]).length; r.cut = r.sgs.length ? Math.min(r.lik - 1, Math.floor(2 * r.sgDone / r.sgs.length + 1e-9)) : 0;
+    r.rlik = r.lik - r.cut; r.rscore = r.sev * r.rlik; r.rband = bandOf(r.rscore); });
+  const rcounts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>rcounts[r.rband]++);
+  const rposture = postureOf(rcounts);
+  const total = risks.reduce((a,r)=>a+r.score,0), rtotal = risks.reduce((a,r)=>a+r.rscore,0);
   const decisions = (DECISIONS[p.type]||[]).map((q,i)=>({id:p.type+"-"+i, q, src:labelOf(PLATFORMS,p.type)}))
     .concat(derivedDecisions(c).map((q,i)=>({id:"d-"+q.slice(0,24), q, src:"Your profile"})));
-  return {c, risks, obligations, safeguards, counts, posture, decisions};
+  return {c, risks, obligations, safeguards, counts, posture, decisions, rcounts, rposture, total, rtotal};
 }
 
 /* ---------- state ---------- */
@@ -4071,7 +4268,7 @@ function askScreen(){
   if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
   const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k] || qHasValue(Q);
   return `<div class="pm-layout"><div>
-    ${pm.fromOrg && pm.qi < 2 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The product type and regions are set. Change them if this product is different.</span></div>` : ""}
+    ${pm.fromOrg && pm.qi < 3 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The ${typeof orgPrefillWhat === "function" ? orgPrefillWhat() : "product type and regions are"} set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
     <div class="card askcard">
       <div class="qprog"><span class="eyebrow">${Q.sec}</span><span class="note mono">${pm.qi+1} / ${qs.length}</span></div>
@@ -4190,6 +4387,7 @@ function bindPremortem(){
     if(d.libdelok){ const lib = libLoad(); delete lib[d.libdelok]; libSave(lib); if(pm.id===d.libdelok){ pm.saved = false; pm.id = null; } confirmDel = null; pm.flash = "Assessment deleted"; return rerender(); }
     if(d.tab){ pm.tab = d.tab; return rerender(); }
     if(d.rview){ pm.rview = d.rview; return rerender(); }
+    if(d.mview){ pm.mview = d.mview === "res" ? "res" : ""; pm.filter.cell = ""; return rerender(); }
     if(d.group){ pm.group = d.group; return rerender(); }
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
@@ -4266,7 +4464,7 @@ function wsDel(id){ const m = wsItems(); delete m[id]; wsSaveItems(m); }
    SAVED ASSESSMENTS AND DOWNLOADS
    Saved in the viewer's browser so it works for anyone the page is shared with.
    ========================================================= */
-const TRANSIENT = ["stage","qi","impact","tab","group","filter","open","search","rview","flash","fromProfile","base"];
+const TRANSIENT = ["stage","qi","impact","tab","group","filter","open","search","rview","flash","fromProfile","base","mview"];
 const PROFILE_KEYS = ["type","youth","aud","adult","identity","contact","money","regions","scale","team","features"];
 const newId = () => "TSW-" + Date.now().toString(36).toUpperCase().slice(-4) + Math.random().toString(36).slice(2,4).toUpperCase();
 const libLoad = () => { const out = {}; Object.values(wsItems()).forEach(it => { if(it.kind==="premortem" && it.data) out[it.id] = Object.assign({}, it.data, {id:it.id}); }); return out; };
@@ -4403,7 +4601,7 @@ function startHere(r){
   const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
-    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.`;
+    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
@@ -4441,7 +4639,8 @@ function renderReport(r){
   const applies = r.obligations.filter(o=>o.status==="applies").length;
   const total = r.risks.length;
   // matrix
-  const cellCount = {}; r.risks.forEach(x=>{ const k=x.sev+"-"+x.lik; cellCount[k]=(cellCount[k]||0)+1; });
+  const resView = pm.mview === "res", likOf = x => resView ? x.rlik : x.lik;
+  const cellCount = {}; r.risks.forEach(x=>{ const k=x.sev+"-"+likOf(x); cellCount[k]=(cellCount[k]||0)+1; });
   let matrix = "";
   for(let s=4;s>=1;s--){
     matrix += `<div class="ylab">${SEVL[s]}</div>`;
@@ -4466,7 +4665,7 @@ function renderReport(r){
     <div style="margin-top:16px">${startHere(r)}</div>
     <div class="section-title rep-detail"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">
-      <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span></div>
+      <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
       <div class="card kpi"><span class="eyebrow">Risks identified ${tip("Each risk is scored severity (1–4) × likelihood (1–4). 12 or more is critical, 8–11 high, 4–7 medium and below 4 low.")}</span><span class="v">${total}</span>
         <div class="sevstrip">${["crit","high","med","low"].map(b=>`<i style="width:${r.counts[b]/total*100}%;background:var(--${b==="low"?"line-strong":b})"></i>`).join("")}</div>
         <span class="s">${r.counts.crit} critical · ${r.counts.high} high · ${r.counts.med} medium · ${r.counts.low} low</span></div>
@@ -4474,17 +4673,53 @@ function renderReport(r){
       <div class="card kpi"><span class="eyebrow">Legal obligations ${tip("Laws matched to your answers and jurisdictions. A starting map for your legal team, not legal advice.","tip-r")}</span><span class="v">${applies}<small> apply</small></span><span class="s">${r.obligations.length-applies} more may apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"}</span></div>
     </div>
     <div class="viz">
-      <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent.")}</h3><span class="note">Click a cell to filter</span></div>
-        <div class="card-b"><div class="axis" style="margin-bottom:6px">Severity ↓ · Likelihood →</div><div class="matrix">${matrix}</div></div></div>
+      <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent. After safeguards counts the safeguards you've ticked in the launch plan.")}</h3>
+          <div class="segs" role="group" aria-label="Which ratings to show"><button type="button" data-mview="inh" aria-pressed="${!resView}">Before safeguards</button><button type="button" data-mview="res" aria-pressed="${resView}">After safeguards</button></div></div>
+        <div class="card-b"><div class="axis" style="margin-bottom:6px">Severity ↓ · Likelihood →</div><div class="matrix">${matrix}</div>
+          <p class="note pm-mcap">${!resView ? "Click a cell to filter the register." : !allDone ? "Nothing is ticked yet, so these match the ratings before safeguards. Tick off the launch plan to watch risks move down." : r.counts.crit > r.rcounts.crit ? `With ${allDone} safeguard${allDone === 1 ? "" : "s"} in place, ${r.counts.crit - r.rcounts.crit} of ${r.counts.crit} critical risk${r.counts.crit === 1 ? "" : "s"} ${r.counts.crit - r.rcounts.crit === 1 ? "is" : "are"} no longer critical. Safeguards lower likelihood, not severity.` : "Safeguards lower likelihood, not severity, so the most severe harms stay high even when they're rarer."}</p></div></div>
       <div class="card"><div class="card-h"><h3>Risks by harm area ${tip("Sorted by total risk score. Click an area to see its risks.")}</h3>
         <div class="legend">${["crit","high","med","low"].map(b=>`<span><i style="background:var(--${b==="low"?"line-strong":b})"></i>${BANDS[b][0]}</span>`).join("")}</div></div>
         <div class="card-b catbars">${catbars}</div></div>
     </div>
+    ${pmBurnHTML(r)}
     <div class="card" style="margin-top:16px;scroll-margin-top:16px" id="pm-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>
     </div>
+    ${typeof loopCardHTML === "function" ? loopCardHTML(r) : ""}
     ${pm.example || typeof journeyNextHTML !== "function" ? "" : journeyNextHTML("premortem")}`;
+}
+/* ---------- Risk burn-down: risk before safeguards, what's left now, and the path through the launch plan ---------- */
+// Total risk if the given safeguards were in place, by the same rule as assess()
+function pmResidualTotal(risks, has){
+  return risks.reduce((a, x) => { const n = x.sgs.filter(id => has(id)).length, cut = x.sgs.length ? Math.min(x.lik - 1, Math.floor(2 * n / x.sgs.length + 1e-9)) : 0; return a + x.sev * (x.lik - cut); }, 0);
+}
+function pmBurnHTML(r){
+  if(!r.risks.length || !r.safeguards.length || !r.total) return "";
+  const order = r.safeguards.slice().sort((a, b) => b.rank - a.rank || b.critCovers - a.critCovers || b.covers.length - a.covers.length);
+  const on = new Set(), pts = [r.total];
+  order.forEach(s => { on.add(s.id); pts.push(pmResidualTotal(r.risks, id => on.has(id))); });
+  const N = order.length, done = r.safeguards.filter(s => pm.done[s.id]).length, pct = v => Math.round((r.total - v) / r.total * 100);
+  const bl = order.filter(s => s.rank === 3).length, floor = pts[N];
+  const W = 560, H = 200, L = 40, R = 14, T = 16, B = 34, f = v => v.toFixed(1);
+  const X = i => L + i * (W - L - R) / N, Y = v => T + (1 - v / r.total) * (H - T - B);
+  const line = pts.map((v, i) => `${i ? "L" : "M"}${f(X(i))},${f(Y(v))}`).join("");
+  const grid = [0, .5, 1].map(q => `<line class="bd-grid" x1="${L}" x2="${W - R}" y1="${f(Y(r.total * q))}" y2="${f(Y(r.total * q))}"/><text class="bd-ax" x="${L - 6}" y="${f(Y(r.total * q) + 4)}" text-anchor="end">${Math.round(r.total * q)}</text>`).join("");
+  const blMark = bl && bl < N ? `<line class="bd-bl" x1="${f(X(bl))}" x2="${f(X(bl))}" y1="${T}" y2="${H - B}"/><text class="bd-bll" x="${f(X(bl) + 6)}" y="${T + 10}">Launch blockers done: −${pct(pts[bl])}%</text>` : "";
+  const hits = pts.map((v, i) => `<circle class="bd-hit" cx="${f(X(i))}" cy="${f(Y(v))}" r="7"><title>${esc(i ? `After ${i} safeguard${i === 1 ? "" : "s"} (latest: ${order[i - 1].t.split(",")[0].slice(0, 80)})` : "Before any safeguards")}: risk ${v}, down ${pct(v)}%</title></circle>`).join("");
+  const right = done > N * .65, you = `<circle class="bd-you" cx="${f(X(done))}" cy="${f(Y(r.rtotal))}" r="6"/><text class="bd-youl" x="${f(X(done) + (right ? -11 : 11))}" y="${f(Y(r.rtotal) + (Y(r.rtotal) < T + 24 ? 18 : -10))}" text-anchor="${right ? "end" : "start"}">You are here: ${r.rtotal}</text>`;
+  const strip = c => `<div class="sevstrip">${["crit","high","med","low"].map(b => `<i style="width:${c[b] / r.risks.length * 100}%;background:var(--${b === "low" ? "line-strong" : b})"></i>`).join("")}</div>`;
+  return `<div class="card pm-burn">
+    <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
+      <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
+      <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>
+      <div class="pm-bbars"><div class="pm-bbar"><span>Before</span>${strip(r.counts)}</div><div class="pm-bbar"><span>Now</span>${strip(r.rcounts)}</div></div>
+      <p class="note">With all ${N} safeguards in place, ${floor} of ${r.total} remains. Safeguards make severe harms rarer, not impossible, so detection and response still matter.</p></div>
+    <figure class="pm-bchart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(`Risk burn-down. Total risk is ${r.total} before safeguards and ${r.rtotal} now, with ${done} of ${N} safeguards done. The ${bl} launch blockers bring it to ${pts[bl]}; all ${N} safeguards bring it to ${floor}.`)}">
+      ${grid}<path class="bd-area" d="${line}L${f(X(N))},${f(Y(0))}L${f(X(0))},${f(Y(0))}Z"/><path class="bd-line" d="${line}"/>${blMark}${hits}${you}
+      <text class="bd-ax" x="${L}" y="${H - 10}">0</text><text class="bd-ax" x="${(L + W - R) / 2}" y="${H - 10}" text-anchor="middle">Safeguards done, in the launch plan's order</text><text class="bd-ax" x="${W - R}" y="${H - 10}" text-anchor="end">${N}</text></svg>
+      <figcaption class="note">The line is the path through your launch plan, most urgent first. The dot is where you are now.</figcaption></figure>
+  </div>`;
 }
 function sgItem(s){
   return `<label class="citem ${pm.done[s.id]?"done":""}">
@@ -4519,7 +4754,7 @@ function tabRegister(r){
   const mode = pm.rview || "priority";
   const qs = (pm.search||"").trim().toLowerCase();
   let rs = r.risks;
-  if(pm.filter.cell){ const [s,l]=pm.filter.cell.split("-").map(Number); rs = rs.filter(x=>x.sev===s&&x.lik===l); }
+  if(pm.filter.cell){ const [s,l]=pm.filter.cell.split("-").map(Number); rs = rs.filter(x=>x.sev===s&&(pm.mview==="res"?x.rlik:x.lik)===l); }
   if(pm.filter.cat) rs = rs.filter(x=>x.cat===pm.filter.cat);
   if(qs) rs = rs.filter(x=>(x.n+" "+x.d+" "+CATS[x.cat]).toLowerCase().includes(qs));
   const explicit = !!(pm.filter.cell||pm.filter.cat||qs);
@@ -4530,18 +4765,18 @@ function tabRegister(r){
   const areas = Object.keys(CATS).map(k=>({k, rs:shown.filter(x=>x.cat===k)})).filter(a=>a.rs.length)
     .sort((a,b)=>Math.max(...b.rs.map(x=>x.score))-Math.max(...a.rs.map(x=>x.score)) || b.rs.length-a.rs.length);
   const row = x => { const done = x.sgs.filter(id=>pm.done[id]).length; return `<details class="riskd" data-open="risk-${x.id}" ${isOpen("risk-"+x.id,false)?"open":""}>
-      <summary>${pill(x.band)}<span class="n">${esc(x.n)}</span><span class="sl">${SEVL[x.sev]} × ${LIKL[x.lik]} · <span class="mono">${done}/${x.sgs.length}</span> safeguards</span></summary>
+      <summary>${pill(x.band)}<span class="n">${esc(x.n)}${x.rband !== x.band ? `<span class="pm-rnow" title="After the safeguards you've ticked">now ${esc(BANDS[x.rband][0].toLowerCase())}</span>` : ""}</span><span class="sl">${SEVL[x.sev]} × ${LIKL[x.lik]} · <span class="mono">${done}/${x.sgs.length}</span> safeguards</span></summary>
       <div class="riskbody">
         <p>${gloss(x.d)}</p>
         <div><div class="eyebrow" style="margin-bottom:6px">Why it's rated this way</div>
-          <ul class="why">${x.ups.map(u=>`<li><span class="w up">SEV↑</span><span>${esc(u[1])}</span></li>`).join("")}${x.drivers.map(u=>`<li><span class="w up">+${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${x.reducers.map(u=>`<li><span class="w dn">−${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${!x.ups.length&&!x.drivers.length&&!x.reducers.length?`<li><span class="w">·</span><span>Baseline rating for any product with these capabilities</span></li>`:""}</ul></div>
+          <ul class="why">${x.ups.map(u=>`<li><span class="w up">SEV↑</span><span>${esc(u[1])}</span></li>`).join("")}${x.drivers.map(u=>`<li><span class="w up">+${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${x.reducers.map(u=>`<li><span class="w dn">−${u[1]}</span><span>${esc(u[2])}</span></li>`).join("")}${x.cut?`<li><span class="w dn">−${x.cut}</span><span>${x.sgDone} of ${x.sgs.length} safeguards in place lower the likelihood to ${LIKL[x.rlik].toLowerCase()}, so it's now rated ${BANDS[x.rband][0].toLowerCase()}</span></li>`:""}${!x.ups.length&&!x.drivers.length&&!x.reducers.length?`<li><span class="w">·</span><span>Baseline rating for any product with these capabilities</span></li>`:""}</ul></div>
         <div><div class="eyebrow" style="margin-bottom:6px">Safeguards</div>
           <ul class="sglist">${x.sgs.map(id=>`<li><span class="${pm.done[id]?"ok":"no"}">${pm.done[id]?"✓":"○"}</span><span>${gloss(SG[id].t)} ${ownerTag(SG[id].o)}</span></li>`).join("")}</ul></div>
       </div></details>`; };
   return `<div class="filters">
       <div class="segs" role="group" aria-label="Which risks"><button type="button" data-rview="priority" aria-pressed="${mode==="priority"}">Critical and high <span class="mono" style="opacity:.6">${pri}</span></button><button type="button" data-rview="all" aria-pressed="${mode==="all"}">All <span class="mono" style="opacity:.6">${r.risks.length}</span></button></div>
       <input class="input search" id="rg-search" type="search" placeholder="Search risks" value="${esc(pm.search||"")}" aria-label="Search risks">
-      ${pm.filter.cat?`<span class="pill accent">${CATS[pm.filter.cat]}</span>`:""}${pm.filter.cell?`<span class="pill accent">${SEVL[+pm.filter.cell[0]]} severity · ${LIKL[+pm.filter.cell[2]]}</span>`:""}
+      ${pm.filter.cat?`<span class="pill accent">${CATS[pm.filter.cat]}</span>`:""}${pm.filter.cell?`<span class="pill accent">${SEVL[+pm.filter.cell[0]]} severity · ${LIKL[+pm.filter.cell[2]]}${pm.mview==="res"?" after safeguards":""}</span>`:""}
       ${explicit?`<button type="button" class="btn sm" data-act="clearfilter">Clear</button>`:""}</div>` +
     (areas.length ? areas.map(a=>`<details class="area" data-open="area-${a.k}" ${isOpen("area-"+a.k, explicit || a.rs.some(x=>x.band==="crit"))?"open":""}>
         <summary><span class="area-t">${catIcon(a.k)}<b>${CATS[a.k]}</b><span class="note">${a.rs.length} risk${a.rs.length===1?"":"s"}</span></span><span class="area-pills">${miniPills(a.rs)}</span></summary>
@@ -4554,7 +4789,7 @@ function tabObligations(r){
   return `<p class="disclaimer">A starting map to take to your legal team, not legal advice. Last reviewed ${LAW_REVIEWED}. Thresholds, exemptions and dates vary, and laws change, so check each source.</p>` +
     REGIONS.filter(g=>pm.regions.includes(g.k)).map(g=>{ const os = r.obligations.filter(o=>o.r===g.k).sort((a,b)=>(a.status==="applies"?0:1)-(b.status==="applies"?0:1));
       return `<div class="region"><h4>${g.n} <span class="note" style="font-family:var(--body);font-weight:400">${os.length} item${os.length===1?"":"s"}</span></h4>
-        ${os.length ? os.map(o=>`<div class="obl"><div class="lh">${o.status==="applies"?`<span class="pill crit hastip" tabindex="0" data-tip="Your answers meet this law&#39;s usual trigger.">Likely applies</span>`:`<span class="pill high hastip" tabindex="0" data-tip="Depends on details we don&#39;t ask about, such as user thresholds, licensing or how regulators classify your service.">May apply</span>`}<b>${esc(o.law)}</b></div><p>${gloss(o.t)}</p>${lawSrcLink(o.law)}
+        ${os.length ? os.map(o=>`<div class="obl"><div class="lh">${o.status==="applies"?`<span class="pill crit hastip" tabindex="0" data-tip="Your answers meet this law&#39;s usual trigger.">Likely applies</span>`:`<span class="pill high hastip" tabindex="0" data-tip="Depends on details we don&#39;t ask about, such as user thresholds, licensing or how regulators classify your service.">May apply</span>`}<b>${esc(o.law)}</b></div><p>${gloss(o.t)}</p>${lawSrcLink(o.law)}${/COPPA/.test(o.law) ? `<a class="ma-tool" href="#coppa">Check your COPPA readiness<svg><use href="#i-arrow"/></svg></a>` : ""}
           ${o.sg.length?`<div class="chipset">${o.sg.map(id=>`<span class="tag">${pm.done[id]?"✓ ":""}${esc(SG[id].t.split(",")[0].split("(")[0].trim())}</span>`).join("")}</div>`:""}</div>`).join("")
         : `<p class="note">Nothing specific flagged for this profile. General consumer-protection and privacy law still applies.</p>`}</div>`;}).join("");
 }
@@ -4567,12 +4802,13 @@ function reportMarkdown(r){
   L.push(`# Abuse pre-mortem: ${pm.name||"Untitled assessment"}`, "");
   L.push(`**Profile:** ${labelOf(PLATFORMS,pm.type)}; ${labelOf(YOUTH,pm.youth)}; ${labelOf(IDENTITY,pm.identity)}; ${labelOf(CONTACT,pm.contact)}; adult content: ${labelOf(ADULT,pm.adult).toLowerCase()}; money: ${pm.money.map(k=>labelOf(MONEY,k)).join(", ")||"none"}; regions: ${pm.regions.map(k=>k.toUpperCase()).join(", ")||"none"}; scale: ${labelOf(SCALE,pm.scale)}; T&S: ${labelOf(TEAM,pm.team)}.`);
   L.push(`**Capabilities:** ${pm.features.map(k=>FEATURES[k][0]).join(", ")}`, "");
-  L.push(`**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`, "");
+  L.push(`**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`);
+  L.push(`**After safeguards in place:** ${r.rposture[0]} (${r.rcounts.crit} critical, ${r.rcounts.high} high, ${r.rcounts.med} medium, ${r.rcounts.low} low). Total risk ${r.rtotal} of ${r.total}${r.total && r.rtotal < r.total ? `, down ${Math.round((r.total - r.rtotal) / r.total * 100)}%` : ""}.`, "");
   L.push("## Launch plan");
   TIERS.forEach(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r); if(!items.length) return;
     L.push(`### ${t.n}`); items.forEach(s=>L.push(`- [${pm.done[s.id]?"x":" "}] ${s.t} (Owner: ${OWNERS[s.o]}; ${EFFORT[s.e].toLowerCase()}${s.legal==="applies"?"; legal requirement":s.legal==="may"?"; may be legally required":""})`)); L.push(""); });
-  L.push("## Risk register", "", "| Rating | Risk | Area | Severity | Likelihood | Main drivers |", "|---|---|---|---|---|---|");
-  r.risks.forEach(x=>L.push(`| ${BANDS[x.band][0]} | ${x.n} | ${CATS[x.cat]} | ${SEVL[x.sev]} | ${LIKL[x.lik]} | ${x.ups.map(u=>u[1]).concat(x.drivers.map(u=>u[2])).join("; ")||"Baseline"} |`));
+  L.push("## Risk register", "", "| Rating | After safeguards | Risk | Area | Severity | Likelihood | Main drivers |", "|---|---|---|---|---|---|---|");
+  r.risks.forEach(x=>L.push(`| ${BANDS[x.band][0]} | ${BANDS[x.rband][0]} | ${x.n} | ${CATS[x.cat]} | ${SEVL[x.sev]} | ${LIKL[x.lik]} | ${x.ups.map(u=>u[1]).concat(x.drivers.map(u=>u[2])).join("; ")||"Baseline"} |`));
   L.push("", "## Legal and regulatory obligations (not legal advice)", "", `_Law notes last reviewed ${LAW_REVIEWED}. Check each source; laws change._`, "");
   r.obligations.forEach(o=>L.push(`- **${o.law}** (${labelOf(REGIONS,o.r)}, ${o.status==="applies"?"likely applies":"may apply"}): ${o.t}${LAW_SRC[o.law] ? ` [Source](${LAW_SRC[o.law][0]})` : ""}`));
   L.push("", "## Decisions to make");
@@ -5930,7 +6166,7 @@ function ttPicker(H){
     </ol></div>
     <div class="card ttbar">
       <div class="field"><label for="tt-type">Your company type</label>
-        <select class="select" id="tt-type">${TT_TYPES.map(t=>`<option value="${t.k}" ${t.k===ttType?"selected":""}>${t.n}</option>`).join("")}</select></div>
+        <select class="select" id="tt-type">${TT_TYPES.map(t=>`<option value="${t.k}" ${t.k===ttType?"selected":""}>${t.n}</option>`).join("")}</select>${typeof orgFromTag === "function" ? orgFromTag(ttType === orgGet().type) : ""}</div>
       <div class="ttprog">
         <div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="note mono">${completed} of ${all.length} completed</span></div>
         <div class="bar"><i style="width:${all.length?completed/all.length*100:0}%;background:var(--good)"></i></div>
@@ -5943,6 +6179,7 @@ function ttPicker(H){
       <button type="button" data-ttf="all" aria-pressed="${filt==="all"}">All <span class="mono" style="opacity:.6">${all.length}</span></button>
       <button type="button" data-ttf="todo" aria-pressed="${filt==="todo"}">Not started <span class="mono" style="opacity:.6">${all.length-completed}</span></button>
       <button type="button" data-ttf="done" aria-pressed="${filt==="done"}">Completed <span class="mono" style="opacity:.6">${completed}</span></button></div></div>
+    ${typeof loopTTHTML === "function" && filt !== "done" ? loopTTHTML(ttType) : ""}
     ${list.length ? `<div class="scen-grid">${list.map(({s,i})=>{ const p = pOf({i}); const laws = s.steps.filter(x=>x.law).length;
       return `<button class="card scen ${p?"done":""}" data-i="${i}">
         <div class="scen-top"><span class="libicon sm"><svg><use href="#${ttIcon(s, ttType)}"/></svg></span>${sevPill(s.severity)}
@@ -5995,7 +6232,7 @@ function ttLearn(st, picked){
       <div class="learn-sec better"><span class="eyebrow">The stronger call · option ${"ABC"[bi]}</span><p><strong>${esc(best.l)}</strong></p><p class="note">${esc(best.r)}</p></div>
       <div class="learn-sec"><span class="eyebrow">The principle</span><p>${esc(st.lesson)}</p></div>
       ${lawBox(st.law)}
-      <div class="row">${retried ? "" : `<button type="button" class="btn" id="tt-retry">Try this decision again</button>`}${nextBtn}</div></div>`;
+      <div class="row">${retried ? "" : `<button type="button" class="btn" id="tt-retry">Try <span class="m-hide">this decision </span>again</button>`}${nextBtn}</div></div>`;
 }
 function ttPlay(H, sc){
   const st = sc.steps[tt.step], picked = tt.answered ? tt.picks[tt.step] : null;
@@ -7429,7 +7666,7 @@ function mxMap(list){
     </ol>
     <div class="mxm-prog"><span><b>${read}</b> of ${list.length} read</span><div class="mxm-bar"><i style="width:${pct}%"></i></div></div>
   </div>`;
-  return how + MX_TORD.map((t, bi) => {
+  return how + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + MX_TORD.map((t, bi) => {
     const ms = list.filter(m => m.t === t); if(!ms.length) return "";
     const done = ms.filter(m => mx.read[m.n]).length;
     const card = m => { const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
@@ -7777,7 +8014,7 @@ function renderMetrics(){
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${actions}</div></div>`
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
     : head("Metrics Framework",
       "The numbers a T&S program should run on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform.",
       "Run the program", actions) + `
@@ -7787,6 +8024,7 @@ function renderMetrics(){
       <span>·</span>
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
+      ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>`;
@@ -7981,7 +8219,7 @@ function renderVendors(){
       <div class="vd-main">
         <section class="mxa-part">${step(1)}
           <div class="card vd-weights">
-            <div class="vd-presets"><span class="note">Start from your priorities</span><div class="vd-pre" role="group" aria-label="Weight presets">${VD_PRESETS.map(([k, n]) => `<button type="button" class="pol-chip" data-vpre="${k}" aria-pressed="${vdPresetOn() === k}">${n}</button>`).join("")}</div></div>
+            <div class="vd-presets"><span class="note">Start from your priorities</span><div class="vd-pre" role="group" aria-label="Weight presets">${VD_PRESETS.map(([k, n]) => `<button type="button" class="pol-chip" data-vpre="${k}" aria-pressed="${vdPresetOn() === k}">${n}</button>`).join("")}${typeof loopVendorChip === "function" ? loopVendorChip() : ""}</div>${typeof loopVendorNote === "function" ? loopVendorNote() : ""}</div>
             <div class="vd-wbar" id="vd-wbar">${vdWeightsBar()}</div>
             ${CRITERIA.map((c, j) => `<label class="vd-wrow"><span class="vd-wn"><i class="vd-wdot s${j}"></i>${esc(c.n)}${c.deal ? ` <span class="vd-min">min 3</span>` : ""}</span>
               <input type="range" min="0" max="50" step="5" value="${+vx.weights[c.k] || 0}" data-wk="${c.k}" aria-label="${esc(c.n)} weight">
@@ -8045,6 +8283,7 @@ const KINDS = {
   policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
   maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
   coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
+  coppa:{n:"COPPA readiness", plural:"COPPA checks", icon:"i-coppa", route:"coppa", prefix:"CP"},
   transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
@@ -8080,6 +8319,8 @@ function vendorResult(d){
 }
 function itemSummary(it){
   const d = it.data || {};
+  if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
+    return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
   if(it.kind==="transparency" && typeof trProgress === "function"){
     const keep = tr, dd = Object.assign(TR_BLANK(), d); tr = dd; const p = trProgress(); tr = keep;
     return {html:`<span class="pill ${p.pct >= 90 ? "good" : "high"}">${p.pct}% complete</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`};
@@ -8239,15 +8480,7 @@ function bindWorkspace(){
       if(pm.projectId===d.wsProjdelok){ pm.projectId = null; store.set("pm3", pm); }
       if(store.get("ws:active",null)===d.wsProjdelok) store.set("ws:active", null);
       wsUI.confirm = null; re(); return toast("Project deleted"); }
-    if(d.wsOpen){ const it = items[d.wsOpen]; if(!it) return;
-      if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); savePM(); }
-      if(it.kind==="tabletop"){ tt = JSON.parse(JSON.stringify(it.data)); store.set("tt", tt); }
-      if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
-      if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
-      if(it.kind==="policy"){ pol = JSON.parse(JSON.stringify(it.data)); store.set("pol", pol); store.set("ws:cur:policy", it.id); }
-      if(it.kind==="maturity"){ ma = maInit(JSON.parse(JSON.stringify(it.data))); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
-      if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
-      return goRoute(KINDS[it.kind].route); }
+    if(d.wsOpen){ if(items[d.wsOpen]) openSaved(d.wsOpen); return; }
     if(d.wsNew){ const k = d.wsNew;
       if(k==="premortem"){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); }
       if(k==="tabletop"){ tt = null; store.set("tt", null); }
@@ -8256,6 +8489,8 @@ function bindWorkspace(){
       if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
       if(k==="coverage"){ store.set("ws:cur:coverage", null); cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
       if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = maInit({stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
+      if(k==="transparency"){ store.set("ws:cur:transparency", null); tr = TR_BLANK(); store.set("tr", tr); }
+      if(k==="coppa"){ store.set("ws:cur:coppa", null); cp = CP_BLANK(); cpSave(); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
       copy.id = it.kind==="premortem" ? newId() : wsNewId(KINDS[it.kind].prefix); copy.title = (it.title||"Untitled") + " (copy)"; copy.created = null; copy.updated = null;
@@ -8264,7 +8499,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors","policy","maturity","coverage"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity","coverage","transparency","coppa"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();
@@ -8325,8 +8560,8 @@ function pmProjectSelect(){
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
+const TOOL_COLOR = {coppa:"var(--t-cp)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
+const ROUTE_LABEL = {overview:"Overview", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -8344,6 +8579,7 @@ function openSaved(id){
   if(it.kind==="maturity"){ ma = maInit(JSON.parse(JSON.stringify(it.data))); store.set("ma", ma); store.set("ws:cur:maturity", it.id); }
   if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
   if(it.kind==="transparency"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); store.set("tr", tr); store.set("ws:cur:transparency", it.id); }
+  if(it.kind==="coppa"){ cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); cpSave(); store.set("ws:cur:coppa", it.id); }
   goRoute(KINDS[it.kind].route);
 }
 // Move keyboard and screen-reader focus to new content without jumping the page
@@ -8353,6 +8589,8 @@ function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
+  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
+  $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";
   const ct = $("#sb-cnt-tt"); if(ct) ct.textContent = SCENARIOS.length;
@@ -8378,6 +8616,7 @@ function cmdkItems(){
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
+  go("COPPA readiness","coppa","var(--t-cp)","coppa");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("About this project","about","var(--faint)","info");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
@@ -8472,6 +8711,12 @@ OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <polygon points="80,22 114,35 112,68 96,98 70,90 44,69 50,36" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3"/>
     <polygon points="80,30 108,39 118,70 86,82 66,92 48,68 58,44" fill="var(--t-cv)" fill-opacity=".25" stroke="var(--t-cv)" stroke-width="2" stroke-linejoin="round"/>
     <circle cx="86" cy="82" r="4" fill="var(--crit)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
+OV_ART.cp = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="28" y="18" width="72" height="90" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
+    <rect x="40" y="31" width="34" height="6" rx="3" fill="var(--t-cp)" opacity=".85"/>
+    ${[48, 62, 76, 90].map((y, i) => `<rect x="40" y="${y}" width="10" height="10" rx="3" fill="${i < 2 ? "var(--good)" : "var(--sunk)"}" stroke="${i < 2 ? "none" : "var(--line-strong)"}"/><rect x="56" y="${y + 3}" width="${[32, 26, 34, 22][i]}" height="4" rx="2" fill="var(--faint)" opacity=".5"/>`).join("")}
+    <path d="M118 36l20 8v15c0 12-8.5 22-20 26-11.5-4-20-14-20-26V44l20-8z" fill="var(--surface)" stroke="var(--t-cp)" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="118" cy="55" r="5" fill="var(--t-cp)"/><path d="M109 71c1.6-5 4.8-7.6 9-7.6s7.4 2.6 9 7.6" stroke="var(--t-cp)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
@@ -8484,6 +8729,8 @@ function ovChip(it){
     return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
+  if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
+    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
   return "";
 }
@@ -8515,6 +8762,7 @@ function renderOverview(){
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${typeof demoOn === "function" && demoOn() ? "Pixelry's safety program" : hello + (first ? ", " + esc(first) : "")}</h1>
       <p>${typeof demoOn === "function" && demoOn() ? "You're seeing it as Alex Rivera, Pixelry's Head of Trust &amp; Safety. " : ""}${sub}</p>
+      ${typeof helpBtn === "function" ? `<div class="ov-help">${helpBtn()}</div>` : ""}
       <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
       ${typeof demoOn === "function" && !demoOn() && !pic.done && !items.length ? `<div class="ov-demo"><button type="button" class="btn" data-demo="start">Explore a demo company ${icon("arrow")}</button><span>See every tool filled in for a fictional company in about three minutes, then start your own.</span></div>` : ""}
     </section>
@@ -8545,6 +8793,7 @@ function renderOverview(){
       <div class="ov-sec-h"><h3>All tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
@@ -8651,7 +8900,8 @@ const AUTHOR = {name:"Steven Macchia", title:"Trust and Safety Leader", link:"ht
 const AB_GROUPS = [
   ["Assess", [["t-ma","steps","Program maturity","Rates a program in eight areas against targets for its stage. Ticking off the steps for the next level moves an area up, so the plan and the radar stay current."],
     ["t-cv","cover","Coverage radar","Rates five layers of defense for each kind of harm and overlays them on the pre-mortem's risk, so the gaps that matter most stand out."],
-    ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."]]],
+    ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."],
+    ["t-cp","coppa","COPPA readiness","Works out whether the US children's privacy law applies, maps children's data, and turns gaps against the 2025 amended Rule into a plan and four drafts for Legal."]]],
   ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
@@ -8703,7 +8953,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>How the scores work</h2>
       <div class="ab-dec">
-        <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical.</p></div>
+        <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical. Safeguards you tick lower likelihood, so every risk also has a rating after safeguards, and a burn-down shows how far the launch plan takes you.</p></div>
         <div><h3>Maturity</h3><p>Each area is rated on five levels. The rating is a baseline; finishing both steps for the next level moves the area up. Targets come from the stage: level 3 for growing programs, with crisis, compliance and wellbeing never below 3.</p></div>
         <div><h3>Coverage</h3><p>Five layers of defense per harm area, each rated none to strong. Coverage is the share of the maximum, weighted by the pre-mortem's risk. An area is exposed when its risk is critical and its coverage is under half.</p></div>
         <div><h3>Report card</h3><p>Each finished part is scored out of 100: maturity against target, risk-weighted coverage, launch blockers done, strong first calls in tabletops, and policy clarity. The overall grade weighs them 30, 25, 20, 15 and 10.</p></div>
@@ -9025,6 +9275,11 @@ function polInfoHTML(){
   </details>`;
 }
 function renderPolicy(){
+  // A fresh test starts from the workspace settings: product type, audience, regions and company name
+  if(!pol.orgSet && !pol.rule && !pol.heur && typeof orgGet === "function"){ const o = orgGet(), pr = wsProfile();
+    if(o.type && ORG_MAP.pm[o.type]) pol.type = ORG_MAP.pm[o.type]; if(o.youth) pol.youth = o.youth; if(o.regions && o.regions.length) pol.regions = o.regions.slice();
+    if(pr && pr.org && !pol.company) pol.company = pr.org;
+    if(o.type || o.youth || (o.regions && o.regions.length)){ pol.orgSet = true; savePol(); } }
   const ai = !!SAMPLER && !polRun.aiOff, report = !!pol.heur && pol.view !== "setup";
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
@@ -9051,7 +9306,7 @@ function polSetupHTML(ai){
     </section>
 
     <section class="card pol-card">
-      <div class="pol-h"><span class="pol-num">2</span><div><label for="pol-company">Your platform</label><span class="note">Recommended</span></div></div>
+      <div class="pol-h"><span class="pol-num">2</span><div><label for="pol-company">Your platform</label><span class="note">Recommended</span></div>${typeof orgFromTag === "function" ? orgFromTag(!!pol.orgSet && ORG_MAP.pm[orgGet().type] === pol.type) : ""}</div>
       <div class="pol-co">
         <div class="field"><label for="pol-company">Company or product name</label>
           <div class="pol-co-row"><input class="input" id="pol-company" value="${esc(pol.company || "")}" placeholder="For example: Twitch, Depop or Discord" autocomplete="off" maxlength="80">
@@ -9498,7 +9753,7 @@ function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
   if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
-  const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), st.f);
+  const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
   const out = run.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ai-stage">${AI_STAGES[run.stage || 0]}…</b><span class="note">Claude is working on your own account. This usually takes 15 to 40 seconds.</span></div><button type="button" class="btn sm" id="ai-stop">Stop</button></div>`
@@ -9860,6 +10115,7 @@ function maRailHTML(){
 function maStagesHTML(){
   return `<div class="ma-stages" role="radiogroup" aria-label="Your stage">${MA_STAGES.map(s => `<button type="button" role="radio" aria-checked="${ma.stage === s.k}" class="card ma-stage ${ma.stage === s.k ? "on" : ""}" data-stage="${s.k}">
     <span class="ma-stage-h"><span class="ma-radio"></span><b>${s.n}</b></span><span class="ma-stage-d">${esc(s.d)}</span><span class="ma-stage-t">Target: ${esc(s.td)}</span></button>`).join("")}</div>
+    ${typeof orgFromTag === "function" ? orgFromTag(!ma.stageSet && !!orgGet().stage && orgGet().stage === ma.stage) : ""}
     <p class="note ma-why-t">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>`;
 }
 function maAreasHTML(){
@@ -10915,6 +11171,7 @@ function tkOpen(src){
   if(src === "premortem"){ tk = {src:`the pre-mortem "${pm.name || "Untitled assessment"}"`, tasks:tkFromPremortem(), sel:{}, opened:{}}; }
   else if(src === "coverage"){ tk = {src:"your coverage gaps", tasks:tkFromCoverage(), sel:{}, opened:{}}; }
   else if(src === "tabletop"){ tk = {src:`the tabletop "${ttfSc().title}"`, tasks:tkFromTabletop(), sel:{}, opened:{}}; }
+  else if(src === "coppa"){ tk = {src:"your COPPA readiness gaps", tasks:tkFromCoppa(), sel:{}, opened:{}}; }
   else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
   tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
   const prev = document.activeElement, bg = document.createElement("div");
@@ -10964,9 +11221,10 @@ const orgTypeName = k => (ORG_TYPES.find(t => t.k === k) || {n:""}).n;
 const orgStageName = k => (ORG_STAGES.find(s => s.k === k) || {n:""}).n;
 // A new pre-mortem starts from the workspace's product type and regions; the person can change either
 function orgPrefillPM(p){
-  const o = orgGet(); if(!o.type && !(o.regions && o.regions.length)) return p;
+  const o = orgGet(); if(!o.type && !o.youth && !(o.regions && o.regions.length)) return p;
   const prev = pm; pm = p;
   if(o.type && ORG_MAP.pm[o.type]){ setType(ORG_MAP.pm[o.type]); pm.answered.type = true; }
+  if(o.youth && YOUTH.some(y => y.k === o.youth)){ pm.youth = o.youth; pm.answered.youth = true; }
   if(o.regions && o.regions.length){ pm.regions = o.regions.slice(); pm.answered.regions = true; }
   pm.fromOrg = true; const out = pm; pm = prev; return out;
 }
@@ -10974,8 +11232,9 @@ function orgPrefillPM(p){
 function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
   return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
-    <div><h3>Your organization</h3><p class="note">Used to pre-fill every tool: tabletop scenarios, maturity targets, metrics, policy tests and new pre-mortems. Change it any time.</p></div>
+    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, metrics, policy tests and the AI assistants. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
+    <div class="field"><label for="org-youth">Who can use it</label><select class="select" id="org-youth" data-org="youth"><option value="">Choose one</option>${YOUTH.map(y => `<option value="${y.k}" ${o.youth === y.k ? "selected" : ""}>${esc(y.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
     <div class="field"><span class="lbl">Where your users are</span><div class="org-regions">${REGIONS.map(r => `<button type="button" class="pol-chip" aria-pressed="${regions.includes(r.k)}" data-orgregion="${r.k}" title="${esc(r.n)}">${r.k.toUpperCase()}</button>`).join("")}</div></div>
   </div>${cta ? `<div class="org-cta"><span class="note">${orgReady() ? (regions.length ? "Saved as you go. Change any of it later in My workspace." : "Add where your users are, so law maps and pre-mortems match your markets.") : "Choose a company type and a stage to continue."}</span><button type="button" class="btn primary" data-orgdone="1" ${orgReady() ? "" : "disabled"}>Save and continue ${icon("arrow")}</button></div>` : ""}</div>`;
@@ -10987,8 +11246,8 @@ document.addEventListener("click", e => {
   const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
   gsay("Workspace settings saved");
 });
-document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ orgSet({type:t.value || null}); gsay("Workspace settings saved");
-  const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById("org-type"); if(again) again.focus(); } } });
+document.addEventListener("change", e => { const t = e.target; if(t.dataset && (t.dataset.org === "type" || t.dataset.org === "youth")){ orgSet({[t.dataset.org]:t.value || null}); if(t.dataset.org === "type") store.set("tt:type", null); gsay("Workspace settings saved");
+  const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById(t.id); if(again) again.focus(); } } });
 // The first review step is done when the person says so, then they go straight on to the next one
 document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-orgdone]"); if(!b || !orgReady()) return;
   orgSet({confirmed:true}); gsay("Workspace set up. Every tool will use it"); const next = typeof jnNext === "function" && jnNext(); if(next) jnGo(next.k); else renderOverview(); });
@@ -11000,6 +11259,7 @@ const NEW_ITEMS = [
   ["coverage", "cover", "var(--t-cv)", "Coverage radar", "Map your defenses against risk", () => goRoute("coverage")],
   ["tabletop", "siren", "var(--t-tt)", "Tabletop exercise", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
   ["policy", "doc", "var(--t-pol)", "Policy test", "Find where a rule is unclear", () => goRoute("policy")],
+  ["coppa", "coppa", "var(--t-cp)", "COPPA readiness", "Check children's privacy against the amended Rule", () => { if(cp.ex){ cp = CP_BLANK(); cpSave(); store.set("ws:cur:coppa", null); } goRoute("coppa"); }],
   ["vendors", "scale", "var(--t-vd)", "Vendor comparison", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
 function newMenuToggle(open){
@@ -11201,12 +11461,15 @@ function nxItems(){
     if(!last || Date.now() - last > 90 * NX_DAY) out.push({kind:"maturity", snap:1, text:last ? "Take this quarter's maturity snapshot" : "Save a maturity snapshot as your starting point",
       ctx:last ? `Last one ${nxAgo(last)}. Snapshots are how you show progress to leadership` : "Snapshots are how you show progress to leadership", pri:4});
   }
+  // Rehearse the crisis behind your biggest remaining risk, if you haven't yet
+  if(typeof loopSource === "function"){ const src = loopSource(), type = ttCompanyType(), x = src && loopScenarios(src.r, type, 1, LOOP_PM_TT[src.p.type])[0];
+    if(x && !ttProgress()[ttKey(x.i, type)]) out.push({kind:"tabletop", loop:x.i, text:`Rehearse “${x.sc.title}”`, ctx:`Your biggest remaining risk: ${x.cat.n.toLowerCase()} · about 8 minutes`, pri:3.5}); }
   const runs = Object.values(typeof ttProgress === "function" ? ttProgress() : {}), lastRun = Math.max(0, ...runs.map(p => p.last || 0));
-  if(!out.some(x => x.snap) && runs.length && lastRun && Date.now() - lastRun > 30 * NX_DAY)
+  if(!out.some(x => x.snap || x.loop !== undefined) && runs.length && lastRun && Date.now() - lastRun > 30 * NX_DAY)
     out.push({kind:"tabletop", go:"tabletop", text:"Rehearse another crisis", ctx:`Your last tabletop was ${nxAgo(lastRun)}. About eight minutes`, pri:4});
   // Keep the list short and varied: at most three roadmap items and two launch blockers
   // The nudge always keeps its slot, since it is what brings the record up to date
-  const cap = {maturity:3, premortem:2, coverage:1}, seen = {}, nudge = out.find(x => x.pri >= 4);
+  const cap = {maturity:3, premortem:2, coverage:1, tabletop:1}, seen = {}, nudge = out.find(x => x.pri >= 4);
   const main = out.filter(x => x.pri < 4).sort((a, b) => a.pri - b.pri).filter(x => { seen[x.kind] = (seen[x.kind] || 0) + 1; return seen[x.kind] <= cap[x.kind]; });
   return main.slice(0, nudge ? 4 : 5).concat(nudge ? [nudge] : []);
 }
@@ -11220,7 +11483,7 @@ function nxHTML(){
     <div class="card nx-card">${xs.length ? `<ul class="nx-list">${xs.map(x => `<li class="nx-i ${x.late ? "late" : ""}">
         ${x.tick ? `<input type="checkbox" class="nx-cb" data-nxtick="${esc(x.tick)}" aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color(x.kind)}"><svg><use href="#i-${ic[x.kind]}"/></svg></span>`}
         <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span>${x.due ? `<span class="nx-due ${x.late ? "late" : ""}">${nxDueText(x.due)}</span>` : ""}</small></div>
-        ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
+        ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.loop !== undefined ? `<button type="button" class="btn sm" data-loopgo="tt:${x.loop}">Start</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
       </li>`).join("")}</ul>`
       : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing due, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
     </div></section>`;
@@ -11597,6 +11860,7 @@ async function trWrite(){
 
 /* ---------- page ---------- */
 function renderTransparency(){
+  if(!tr.org && !tr.orgSet && typeof wsProfile === "function"){ const pr = wsProfile(); if(pr && pr.org){ tr.org = pr.org; tr.orgSet = true; trSave(); } }
   const report = tr.view === "report";
   const ai = typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff);
   view.innerHTML = (report
@@ -11876,17 +12140,47 @@ const PAGE_TOURS = {
   premortem:[
     [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
     [".pm-cur", "What you'll get", "A report like this one: the risks that apply and how serious each one is, the launch blockers, and the laws likely to apply in your markets."],
-    [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."]
+    [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."],
+    [".askcard", "One question at a time", "Pick the answer that fits, then press Next. Nothing is final: you can change any answer later from the report."],
+    [".live", "Watch your risks change", "Each answer adds, removes or re-rates risks, and this panel shows the effect as you go."],
+    [".starthere", "Start here", "The five actions that cover your most serious risks. Tick them off as you finish them."],
+    [".viz", "Where the risk sits", "How severe and how likely each risk is, before or after the safeguards you've ticked. Click a cell or an area to filter the register."],
+    [".pm-burn", "How far the plan takes you", "Each safeguard you tick lowers the likelihood of the risks it covers. The line is the path through the launch plan; the dot is where you are."],
+    ["#pm-tabs", "The detail", "The launch plan with owners, every risk and why it's rated that way, the laws that likely apply, and the decisions your team has to make."],
+    [".loop", "Put it to work", "Rehearse the crises behind your biggest risks, measure them, and map your defenses against them in the other tools."]
   ],
   tabletop:[
     [".ttbar", "Pick your company type", "Scenarios are tailored to the kind of company you choose. Your progress across all of them shows here."],
     [".tt-mode", "Play solo or with your team", "Solo gives you feedback after every call. Team mode adds roles, a timer for each decision, discussion prompts and a full-screen presenter view."],
-    [".scen-grid", "Choose a scenario", "Each one is four timed decisions as an incident unfolds. A weaker choice shows what happens next and what strong incident command looks like."]
+    [".loop-strip", "Recommended for your risks", "Scenarios picked from the biggest risks in your pre-mortem."],
+    [".ttfilters ~ .scen-grid", "Choose a scenario", "Each one is four timed decisions as an incident unfolds. A weaker choice shows what happens next and what strong incident command looks like."],
+    [".tline", "Four decisions", "The incident unfolds over four updates. The timeline shows where you are and how each call went."],
+    [".inject", "Make the call", "Read the update and pick what you'd do. A weaker choice shows what happened, the stronger call and the law behind it, and you can try it again."],
+    [".tline ~ .play .meters", "Your scorecard", "Each call moves user safety, public trust, regulatory standing and team capacity."],
+    [".play .verdict", "How you did", "Your strong calls on the first try, and the average across the four scores."],
+    [".learnsum", "What to work on", "Your blind spot in this run, and the laws and standards the scenario touched."],
+    [".debrief", "Decision by decision", "Your first choice beside the stronger call, with the lesson for each."],
+    [".ttf-setup .segs", "Time for each decision", "Pick 3, 5 or 10 minutes per decision, or no timer at all."],
+    [".ttf-how", "How it runs", "Share your screen, read each update aloud, talk it through, then choose as a team and capture actions."],
+    [".ttf-roles", "Who's in the room", "Add names to the roles if you like. Each role gets its own discussion prompt, and actions can be assigned to it."],
+    [".ttf-stage", "Read the update aloud", "One update per decision. Talk it through before you show the options."],
+    [".ttf-timer", "Time for each decision", "Start the timer when the discussion starts. Add a minute if the team needs it."],
+    [".ttf-ask", "Prompts for the room", "Questions for everyone, and one for each role, to keep the discussion on what matters."],
+    [".ttf-debrief .verdict", "The after-action report", "How the team did, the actions you captured, and a report to download or send to your tracker."]
   ],
   metrics:[
     [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The list reorders so the metrics that matter most come first."],
     [".mx-tabs", "Four views", "Metrics is the framework. My scorecard holds your own numbers, trends and a one-pager for leadership. Data to log and Running the program cover the practical side."],
-    [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."]
+    [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."],
+    [".mxa-head", "One metric at a time", "The question the metric answers, and what it measures."],
+    [".mxa-toc", "Three parts", "Understand it, measure it and track it. Jump straight to any part."],
+    ["#mxp-3", "Track your number", "Enter this period's value, your target and where it counts as off track, and see where you stand."],
+    [".mxa-pn", "Keep going", "Move to the previous or next metric, or go back to the full list."],
+    [".mxs-top", "Your scorecard", "Name the reporting period, see what's on track, and open a one-pager for leadership."],
+    ["#mx-sig", "Reading the numbers together", "Pairs of metrics that mean more together, like more automation alongside more reversed decisions."],
+    [".mx-sc", "Your numbers", "A value, a target and an off-track line for each metric. Save each period to build trend lines."],
+    [".mx-logs", "Log these first", "The event logs every metric is calculated from, and the fields teams most often forget."],
+    [".mx-rgrid", "Put every metric on a calendar", "Which meeting should look at which metric, and how often."]
   ],
   vendors:[
     [".vd-weights", "Say what matters", "Set how much each criterion counts, or start from a preset. Weights add up to 100."],
@@ -11898,7 +12192,14 @@ const PAGE_TOURS = {
     [".vd-main > .mxa-part:first-of-type", "Set your stage", "Targets depend on your company's size and how regulated you are, so start here."],
     [".ma-areas", "Rate each area", "Eight areas of a Trust & Safety program. Pick the level that matches your program today, one area at a time."],
     [".vd-railc", "Your profile", "Your radar and score update as you rate."],
-    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, add due dates to your calendar or send the plan to your tracker."]
+    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, add due dates to your calendar or send the plan to your tracker."],
+    [".ma-band-l", "Where you stand", "Your overall level against the target for your stage, the area to fix first, and how far through the plan you are."],
+    [".ma-band-r", "Now against target", "Each area's level today, with the target for your stage as a dashed line. Red dots are below target."],
+    [".ma-tabs", "Three views of the plan", "Roadmap puts the steps in order. By area shows each area's levels, owner and evidence. Progress tracks snapshots over time."],
+    ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar. Add due dates as you go."],
+    [".ma-byarea", "One area at a time", "Pick an area to see every level, the steps to reach the next one, its owner and your evidence."],
+    [".ma-prog-tab", "Show progress", "Save a snapshot each quarter, and the trend shows leadership how the program has grown."],
+    [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
   ],
   coverage:[
     [".vd-main > .mxa-part:first-of-type", "Choose the risk to compare", "Your products' combined risk, one product, or an example. Product risk comes from your pre-mortems."],
@@ -11910,7 +12211,12 @@ const PAGE_TOURS = {
     [".pol-card", "Your rule", "Paste the policy rule you want to test, or start from one of the examples."],
     [".pol-co", "Your platform", "Add your company or product and what it does, so the test fits how people use it."],
     [".pol-runbar", "Run the test", "Instant checks run in your browser straight away. Claude's review, where available, adds edge cases, gaps, enforcement risks and a rewrite."],
-    [".pol-info", "How it works", "What each check looks for, and how the tool was built."]
+    [".pol-info", "How it works", "What each check looks for, and how the tool was built."],
+    [".pol-report > .pol-sum", "The verdict", "A clarity score for the rule, from the instant checks or Claude's review, with what the rule already does well."],
+    [".pol-tested", "What was tested", "The rule and the context used for the test. Edit either and run it again."],
+    [".pol-report > .pol-sec:not(.pol-busy)", "Instant checks", "A transparent rubric that runs in your browser: vague words, sweeping terms like “any” or “never”, and whether the rule has the six parts of a strong rule."],
+    [".pol-more, .pol-more-n", "Go further with Claude", "Claude's review adds edge cases for your platform, a clearer rewrite and a checklist for reviewers."],
+    ["#pol-tabs", "The findings", "Edge cases and how a team should decide them, words reviewers will read differently, a rewrite, and what your team still needs to decide."]
   ],
   notice:[
     [".ai-form", "Describe the case", "Fill in what happened and what you decided. “Fill in an example” shows the kind of detail that helps."],
@@ -11925,7 +12231,18 @@ const PAGE_TOURS = {
   transparency:[
     [".pol-card", "Your service", "Name the service and choose what kind it is under the DSA. The sections you need depend on it."],
     [".pol-setup > .pol-card:nth-of-type(2)", "Fill in each section", "Each section maps to an article of the DSA and asks only for the numbers it requires."],
-    [".pol-runbar", "Check and build", "The meter shows what's still missing. Build the report when you're ready, with a checklist and a summary."]
+    [".pol-runbar", "Check and build", "The meter shows what's still missing. Build the report when you're ready, with a checklist and a summary."],
+    [".tr-sum", "How complete it is", "The share of what the DSA asks for at your tier that's filled in, and when the report is due."],
+    [".tr-report .pol-tabs", "Three views", "The report as readers will see it, a checklist of what the DSA asks for, and a summary Claude writes from your numbers only."]
+  ],
+  coppa:[
+    [".cp-aud", "Who it's for", "Start with your audience. It decides whether COPPA applies to every user, to users under 13, or only to the children you know about."],
+    ["#cp-s-data", "Map children's data", "Mark each kind of personal information you collect, including what third-party SDKs collect through you, then why, who gets it and how long you keep it."],
+    ["#cp-s-ctrl", "What you have in place", "Tick what's true today. Only the requirements that apply to your answers are shown."],
+    [".pol-runbar", "Build your plan", "Your gaps in order, with an owner and the rule behind each, plus four drafts: a notice to parents, a retention policy, a security program and a memo for Legal."],
+    [".cp-report .pol-sum", "Where you stand", "Whether COPPA applies to you, how ready you are, and how many critical gaps are left."],
+    [".cp-report .pol-tabs", "Plan, data, drafts and requirements", "Your gaps in order, your data map, four drafts to edit, and every requirement that applies to your answers."],
+    [".cp-gaps", "Close the gaps", "Each gap names the part of the Rule, who usually owns it and what to do. Mark it done once it's fixed."]
   ],
   workspace:[
     [".wsprofile", "Your profile", "Your name and role, shown on your workspace and in exported files."],
@@ -11961,7 +12278,7 @@ function helpToggle(){ const off = !store.get("help:off", false); store.set("hel
 // Where the visitor was last time, read once before this visit overwrites it
 const WB_PREV = store.get("help:last", null);
 let wbOpen = null;
-const WB_ICON = {premortem:"radar", tabletop:"siren", metrics:"gauge", vendors:"scale", maturity:"steps", coverage:"cover", policy:"doc", notice:"mail", appeal:"appeal", transparency:"chart", workspace:"user"};
+const WB_ICON = {coppa:"coppa", premortem:"radar", tabletop:"siren", metrics:"gauge", vendors:"scale", maturity:"steps", coverage:"cover", policy:"doc", notice:"mail", appeal:"appeal", transparency:"chart", workspace:"user"};
 function wbAgo(t){
   const d = new Date(t), now = new Date(), days = Math.round((new Date(now.toDateString()) - new Date(d.toDateString())) / 864e5);
   return days <= 0 ? "earlier today" : days === 1 ? "yesterday" : days < 7 ? days + " days ago" : "over a week ago";
@@ -12082,8 +12399,726 @@ if(typeof document !== "undefined" && document.addEventListener){
     mo.observe(gv, {childList:true, subtree:true});
   }
 }
+/* =========================================================
+   COPPA READINESS: whether the Children's Online Privacy Protection Act applies, the children's data you
+   handle, where you fall short of the amended Rule, and four drafts to close the gaps.
+   Checked against 16 CFR Part 312 as amended by the FTC in 2025 (compliance required from April 22, 2026),
+   in September 2026. A starting point for counsel, not legal advice.
+   ========================================================= */
+const CP_REVIEWED = "September 2026";
+const CP_SRC = [
+  ["The COPPA Rule, 16 CFR Part 312 (current text)", "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312"],
+  ["FTC: the COPPA Rule and its 2025 amendments", "https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa"],
+  ["FTC: Complying with COPPA, frequently asked questions", "https://www.ftc.gov/business-guidance/resources/complying-coppa-frequently-asked-questions"]
+];
+const CP_AUD = [
+  ["primary", "Children are the main audience", "Built for under-13s, like a kids' game, a learning app or a children's video service."],
+  ["mixed", "Children are one of several audiences", "Aimed partly at children, like a family game or a video app with a kids' section."],
+  ["general", "General audience", "Built for teens and adults, but under-13s can sign up or use it."],
+  ["adult", "Adults only", "18+ by design, with nothing that appeals to children."]
+];
+// What the FTC weighs to decide whether a service is directed to children (§312.2). A third value of 1 marks the ones added in 2025
+const CP_FACTORS = [
+  ["subject", "The subject matter appeals to children"],
+  ["visual", "Animated characters, bright visuals, or activities and rewards aimed at children"],
+  ["audio", "Music or other audio aimed at children"],
+  ["models", "Child models, or celebrities who appeal to children"],
+  ["ads", "Ads on or for the service that are aimed at children"],
+  ["language", "Language written for young readers"],
+  ["marketing", "Marketing plans, pitch decks or statements to partners that mention children", 1],
+  ["reviews", "User reviews or app store listings suggest children use it", 1],
+  ["similar", "Similar services have many users under 13", 1],
+  ["data", "Your own audience data shows users under 13"]
+];
+const CP_KNOW = [
+  ["agegate", "Users tell an age question they're under 13"],
+  ["reports", "Users, parents or teachers report that a user is under 13"],
+  ["support", "Support conversations reveal a user's age"],
+  ["content", "Profiles or posts show a user is under 13, like “I'm in 4th grade”"],
+  ["partners", "Schools or partners provide the service to children"]
+];
+const CP_GATE = [
+  ["none", "We don't ask for age", ""],
+  ["neutral", "A neutral age question", "No pre-filled year, no hint about the cut-off age, and no easy way to go back and change the answer."],
+  ["leading", "An age question with a default or a hint", "For example a pre-selected year, or “you must be 13 or older to join”."],
+  ["assured", "Age assurance", "Estimation, an ID check or another method stronger than a typed birthday."]
+];
+// Personal information as COPPA defines it (§312.2). A fourth value of 1 marks the kinds added in 2025
+const CP_PI = [
+  ["name", "First and last name", ""],
+  ["contact", "Email address or other online contact details", ""],
+  ["user", "A username others can use to contact the child", ""],
+  ["phone", "Phone number", ""],
+  ["address", "Home or other physical address", ""],
+  ["govid", "Government ID number", "Social Security, passport, state ID or birth certificate number.", 1],
+  ["persist", "Persistent identifiers", "Cookies, device IDs, advertising IDs or IP addresses that recognize a user over time."],
+  ["media", "Photos, videos or audio of the child", "Anything showing the child's face or recording their voice."],
+  ["geo", "Precise location", "Enough to identify a street and a city or town, like GPS."],
+  ["bio", "Biometric identifiers", "Face or voice prints, fingerprints, iris or retina patterns, gait or DNA.", 1],
+  ["other", "Other details tied to any of the above", "Birthday, school, messages, interests or anything else you link to the child."]
+];
+const CP_USE = [["ops", "Running the service"], ["feature", "A feature the child uses"], ["analytics", "Analytics and improving the service"], ["ads", "Advertising or marketing"], ["safety", "Safety, security or legal duties"]];
+const CP_SHARE = [
+  ["providers", "Service providers", "Vendors that only help run your service, like hosting or support tools."],
+  ["sdk", "Third-party SDKs", "Code from others in your app or site, like analytics, attribution or social SDKs, that may use the data for their own purposes."],
+  ["ads", "Advertising partners", ""],
+  ["public", "Other users or the public", ""],
+  ["sold", "Sold or licensed", ""]
+];
+const CP_KEEP = [["use", "Deleted right after use"], ["30d", "Up to 30 days"], ["1y", "Up to a year"], ["account", "While the account is open"], ["none", "No set limit"]];
+// Verifiable parental consent methods (§312.5(b)): [key, name, detail, allowed when you share children's data, added in 2025]
+const CP_VPC = [
+  ["card", "Card or payment check", "A credit or debit card, or an online payment account that notifies the holder of each transaction.", 1],
+  ["id", "Government ID check", "Checked against databases, then deleted.", 1],
+  ["face", "Photo ID and face match", "A parent's photo ID compared with a live selfie by facial recognition and trained staff, then both images deleted.", 1, 1],
+  ["kba", "Knowledge-based questions", "Questions a child in the household couldn't reasonably answer.", 1, 1],
+  ["call", "Phone or video call", "A toll-free number or a video call with trained staff.", 1],
+  ["form", "Signed consent form", "Returned by post or fax, or as a scan.", 1],
+  ["textplus", "Text plus", "A text message to the parent, then a confirming step later. Only when you never share children's data.", 0, 1],
+  ["emailplus", "Email plus", "An email to the parent, then a confirming step later. Only when you never share children's data.", 0],
+  ["none", "No consent step yet", "", 1]
+];
+const CP_OWNERS = {product:"Product", eng:"Engineering", legal:"Legal & Privacy", ops:"T&S Ops"};
+const CP_SEV = {crit:3, high:2, med:1};
+const CP_SEVN = {crit:["Critical", "crit"], high:["High", "high"], med:["Medium", "med"]};
+const cpList = xs => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+const cpLabel = (list, k) => (list.find(z => z[0] === k) || [])[1] || "";
+// Lowercase for use mid-sentence, keeping acronyms such as SDKs
+const cpLow = s => s.charAt(0).toLowerCase() + s.slice(1);
+// When a requirement applies, given the answers (d), the data map (x) and whether COPPA applies (ap)
+const CP_APPLY = {
+  any:(d, x) => x.rows.length > 0,
+  consent:(d, x) => x.needsConsent,
+  third:(d, x) => x.third,
+  disclose:(d, x) => x.disclose,
+  public:(d, x) => x.public,
+  persistOps:(d, x) => x.persistOps,
+  newpi:(d, x) => x.bio || x.govid,
+  mixed:(d, x, ap) => ap.lvl === "under13",
+  aware:(d, x, ap) => ap.lvl !== "all"
+};
+// What you have in place, grouped as the Rule is. Each item is also a requirement: t text, sev, o owner, cite, a applies, why, fix, kase an enforcement case
+const CP_CTRL = [
+  {k:"consent", n:"Parental consent", h:"Verifiable consent from a parent, before you collect.", items:[
+    {k:"c_before", t:"Nothing is collected from a child before consent, except what an exception allows", sev:"crit", o:"eng", cite:"§312.5(a)", a:"consent",
+      why:"Consent that arrives after collection doesn't count. Sign-up forms, uploads and SDKs that start on launch are the usual culprits.",
+      fix:"Collect only the parent's contact details first, and hold back other fields, uploads and third-party SDKs until consent arrives.",
+      kase:"Microsoft paid $20 million in 2023 after Xbox collected children's details during sign-up before notifying or asking their parents."},
+    {k:"c_sep", t:"A separate consent before sharing with third parties", isNew:1, sev:"crit", o:"product", cite:"§312.5(a)(2)", a:"disclose",
+      why:"Since the 2025 amendments, sharing children's data with third parties, for example for advertising, needs its own consent, separate from consent to collect it, unless the sharing is integral to the service.",
+      fix:"Add a second, optional consent for sharing, and keep ad sharing and third-party SDKs off until a parent agrees.",
+      kase:"Google and YouTube paid $170 million in 2019 over collecting identifiers from viewers of children's channels to serve targeted ads."},
+    {k:"c_nocond", t:"A child can use the service when a parent agrees to collection but declines sharing", sev:"high", o:"product", cite:"§312.5(a)(2)", a:"disclose",
+      why:"Parents must be able to say yes to the service and no to sharing.",
+      fix:"Test the full experience with sharing declined, and remove anything that blocks it."},
+    {k:"c_newpi", t:"Consent, notices, retention and security cover biometric data and government ID numbers", isNew:1, sev:"high", o:"legal", cite:"§312.2", a:"newpi",
+      why:"The 2025 amendments added biometric identifiers and government ID numbers to the definition of personal information.",
+      fix:"Add them to your notices, consent flow, retention policy and security program."}]},
+  {k:"direct", n:"Notice to parents", h:"The notice a parent gets before you collect their child's data.", items:[
+    {k:"d_before", t:"Reaches parents before you collect anything beyond their contact details", sev:"high", o:"product", cite:"§312.4(b)", a:"consent",
+      why:"Consent isn't informed unless the notice comes first.", fix:"Make the notice to parents the first step of the consent flow."},
+    {k:"d_items", t:"Lists what you'll collect, how you'll use it, and who you'll share it with and why", isNew:1, sev:"high", o:"legal", cite:"§312.4(c)", a:"consent",
+      why:"The 2025 amendments added who receives children's data, and why, to what the notice to parents must say.", fix:"Use the draft notice to parents, filled in from your data map."},
+    {k:"d_sep", t:"Tells parents they can agree to collection without agreeing to sharing", sev:"high", o:"legal", cite:"§312.4(c)", a:"disclose",
+      why:"Parents can't use a choice they aren't told about.", fix:"Say so plainly in the notice, next to the list of who receives the data."},
+    {k:"d_delete", t:"Says you'll delete the parent's contact details if they don't respond", sev:"med", o:"legal", cite:"§312.4(c)", a:"consent",
+      why:"You may keep a parent's contact details only to ask for consent.", fix:"State a time limit in the notice, then delete unanswered requests automatically."}]},
+  {k:"notice", n:"Your children's privacy notice", h:"The online notice linked from wherever you collect children's data.", items:[
+    {k:"n_contact", t:"Names every operator, with an address, phone number and email", sev:"med", o:"legal", cite:"§312.4(d)", a:"any",
+      why:"Parents need to know who's responsible for their child's data.", fix:"List each operator's name, address, phone number and email."},
+    {k:"n_what", t:"Says what you collect from children, how you use it, and whether children can make it public", sev:"high", o:"legal", cite:"§312.4(d)", a:"any",
+      why:"The notice is the first thing a regulator reads, and it has to match what the product really does.", fix:"Describe each row of your data map, how you use it, and any feature that lets children share publicly."},
+    {k:"n_third", t:"Names the third parties, or specific categories of them, you share with, and why", isNew:1, sev:"high", o:"legal", cite:"§312.4(d)", a:"disclose",
+      why:"The 2025 amendments require the notice to identify who receives children's data and for what purpose.", fix:"Add each recipient, or a specific category such as “analytics provider”, with the purpose."},
+    {k:"n_ret", t:"Includes your data retention policy", isNew:1, sev:"high", o:"legal", cite:"§312.10", a:"any",
+      why:"The amended Rule requires your written retention policy to be published in the online notice.", fix:"Publish the retention policy, or a clear summary of it, in the notice."},
+    {k:"n_ops", t:"Explains which internal operations use persistent identifiers, and how you stop them being used to contact or profile a child", isNew:1, sev:"med", o:"legal", cite:"§312.4(d)", a:"persistOps",
+      why:"If you rely on the internal-operations exception, the amended Rule requires you to say so and to explain the limits you apply.",
+      fix:"List the internal operations, such as security, understanding how the service works and contextual ads, and the controls that stop profiling or targeted ads."},
+    {k:"n_rights", t:"Explains how parents can review and delete their child's data and stop further collection", sev:"med", o:"legal", cite:"§312.4(d)", a:"any",
+      why:"Parents can only use rights they know about.", fix:"Add the steps, and a contact, for reviewing, deleting and revoking consent."}]},
+  {k:"rights", n:"Parents' rights", h:"What parents can ask you to do, at any time.", items:[
+    {k:"r_review", t:"Parents can see the information you hold about their child", sev:"high", o:"ops", cite:"§312.6", a:"any",
+      why:"Parents have a right to review what you've collected.", fix:"Give parents a way to request, or view, their child's information."},
+    {k:"r_delete", t:"Parents can have it deleted and stop further collection", sev:"high", o:"eng", cite:"§312.6", a:"any",
+      why:"Deletion has to reach every system and vendor, or it isn't deletion.", fix:"Build deletion that covers backups and vendors, and a way to revoke consent.",
+      kase:"Amazon paid $25 million in 2023 over keeping children's Alexa voice recordings indefinitely and undermining parents' deletion requests."},
+    {k:"r_verify", t:"You check that the person asking is really the parent", sev:"med", o:"ops", cite:"§312.6", a:"any",
+      why:"Handing a child's data to the wrong adult is a harm of its own.", fix:"Confirm identity, for example through the original consent method, before releasing anything."}]},
+  {k:"minimize", n:"Collecting only what's needed", h:"Design choices the FTC looks at closely.", items:[
+    {k:"m_cond", t:"Games, prizes and features don't ask for more information than they need", sev:"med", o:"product", cite:"§312.7", a:"any",
+      why:"COPPA bars making a child's participation depend on giving more information than is reasonably necessary.", fix:"Review every sign-up and feature field, and remove what isn't needed."},
+    {k:"m_public", t:"Chat, profiles and other ways to share publicly stay off for children until a parent agrees", sev:"crit", o:"product", cite:"§312.5", a:"public",
+      why:"Letting children publish personal information is a disclosure that needs consent, and it's where many of the worst harms to children start.",
+      fix:"Default chat, profiles and uploads to off or private for children, and turn them on only with consent.",
+      kase:"Epic Games paid $275 million in 2022, partly because Fortnite's voice and text chat were on by default for children."}]},
+  {k:"retention", n:"Data retention", h:"Keeping children's data only as long as you need it.", items:[
+    {k:"t_policy", t:"A written retention policy: what you keep, why, and when you delete it", isNew:1, sev:"high", o:"legal", cite:"§312.10", a:"any",
+      why:"The amended Rule requires a written policy setting out the purposes, the business need and a deletion timeframe for children's data.", fix:"Use the draft retention policy, filled in from your data map."},
+    {k:"t_enforce", t:"Deletion actually runs on schedule, including backups and vendors", sev:"high", o:"eng", cite:"§312.10", a:"any",
+      why:"A policy that isn't carried out is a promise you're breaking.", fix:"Automate deletion, and check every quarter that it ran."},
+    {k:"t_noconsent", t:"Data collected without consent, like unanswered consent requests, is deleted promptly", sev:"med", o:"eng", cite:"§312.5(c)", a:"consent",
+      why:"The exceptions that let you collect before consent come with a duty to delete.", fix:"Set an automatic deletion window for pending consent requests."}]},
+  {k:"security", n:"Security program", h:"Required in writing since the 2025 amendments.", items:[
+    {k:"s_written", t:"A written information security program for children's data", isNew:1, sev:"high", o:"eng", cite:"§312.8", a:"any",
+      why:"The 2025 amendments turned “reasonable security” into a written program with specific parts.", fix:"Use the security program outline."},
+    {k:"s_owner", t:"Named people coordinate it", isNew:1, sev:"med", o:"eng", cite:"§312.8", a:"any",
+      why:"Someone has to own the program for it to happen.", fix:"Name a coordinator and a backup."},
+    {k:"s_assess", t:"Risks are assessed at least once a year", isNew:1, sev:"med", o:"eng", cite:"§312.8", a:"any",
+      why:"The amended Rule requires a risk assessment at least once a year.", fix:"Schedule the assessment and record what it finds."},
+    {k:"s_test", t:"Safeguards are tested and monitored regularly", isNew:1, sev:"med", o:"eng", cite:"§312.8", a:"any",
+      why:"Controls drift. Testing is how you know they still work.", fix:"Set a testing rhythm, such as access reviews and scans, and track the results."},
+    {k:"s_review", t:"The program is reviewed and updated at least once a year", isNew:1, sev:"med", o:"eng", cite:"§312.8", a:"any",
+      why:"The amended Rule requires the program to be evaluated at least once a year.", fix:"Hold a yearly review and record what changed."},
+    {k:"s_vendors", t:"Vendors that receive children's data are checked, and give written assurances they'll protect it", isNew:1, sev:"high", o:"legal", cite:"§312.8", a:"third",
+      why:"Before sharing, the amended Rule requires reasonable steps to confirm a recipient can keep children's data secure, and written assurances that it will.",
+      fix:"Add a vendor review, and contract terms covering confidentiality, security and deletion."}]},
+  {k:"age", n:"Age screening", h:"For services that aren't aimed mainly at children.", items:[
+    {k:"g_before", t:"Nothing is collected before the age question, except what an exception allows", isNew:1, sev:"crit", o:"eng", cite:"§312.2 (mixed audience)", a:"mixed",
+      why:"The amended Rule's definition of a mixed-audience service requires finding out who's a child before collecting personal information.",
+      fix:"Move the age question to the very start, before any identifiers or form fields."},
+    {k:"g_route", t:"Users who say they're under 13 go to parental consent, or to a version that collects no personal information", sev:"high", o:"product", cite:"§312.5", a:"mixed",
+      why:"An age question only helps if what happens next is compliant.", fix:"Build the under-13 path: a parent consent flow, or a limited version with no personal data."},
+    {k:"g_known", t:"When you learn a user is under 13, you get a parent's consent or delete their data", sev:"high", o:"ops", cite:"§312.5", a:"aware",
+      why:"Once you know a user is a child, COPPA applies to them, even on a general-audience service.",
+      fix:"Give reviewers a clear path for underage reports: pause collection, contact the parent or delete the data."}]},
+  {k:"harbor", n:"Safe harbor", h:"Optional.", items:[
+    {k:"h_member", t:"You're in an FTC-approved safe harbor program", opt:1, sev:"med", o:"legal", cite:"§312.11", a:"any",
+      why:"Members that follow an approved program's guidelines are treated as complying with the Rule, and get guidance and audits.",
+      fix:"Compare the approved programs, such as those run by CARU, ESRB, iKeepSafe, kidSAFE and PRIVO."}]}
+];
+// Requirements worked out from the answers rather than ticked
+const CP_SPECIAL = [
+  {k:"vpc", g:"consent", t:"Get a parent's verifiable consent before collecting", sev:"crit", o:"product", cite:"§312.5(a)–(b)", a:"consent", m:d => !!d.vpc && d.vpc !== "none",
+    why:"Collecting a child's personal information without a parent's verifiable consent is the core COPPA violation, and each child can count as a separate violation.",
+    fix:"Add a consent step that uses one of the FTC's approved methods, before you collect anything an exception doesn't cover.",
+    kase:"Musical.ly, now TikTok, paid $5.7 million in 2019 for collecting names, email addresses and photos from children without their parents' consent."},
+  {k:"vpc_ok", g:"consent", t:"Use a consent method that allows sharing", sev:"crit", o:"product", cite:"§312.5(b)", a:(d, x) => x.disclose && (d.vpc === "emailplus" || d.vpc === "textplus"), m:() => false,
+    why:"Email plus and text plus are only allowed when you keep children's data to yourself, and you share it with third parties.",
+    fix:"Switch to a card or payment check, an ID check, a photo ID and face match, knowledge-based questions, a call or a signed form, or stop sharing."},
+  {k:"gate", g:"age", t:"Ask for age in a neutral way", isNew:1, sev:"crit", o:"product", cite:"§312.2 (mixed audience)", a:"mixed", m:d => d.gate === "neutral" || d.gate === "assured",
+    why:d => d.gate === "leading" ? "Your age question has a default or a hint. The amended Rule requires a mixed-audience service to ask without defaulting to an age or encouraging children to lie." : "A mixed-audience service must find out who's a child, neutrally, before collecting personal information.",
+    fix:"Use an open birth-date field with no pre-filled year, don't mention the cut-off age, and stop children going back to change their answer."},
+  {k:"nolimit", g:"retention", t:"Set a deletion timeframe for every kind of children's data", isNew:1, sev:"crit", o:"legal", cite:"§312.10", a:(d, x) => x.noLimit.length > 0, m:() => false,
+    why:(d, x) => `The amended Rule forbids keeping children's personal information indefinitely, and you keep ${cpList(x.noLimit.map(r => cpLow(r.n)))} with no set limit.`,
+    fix:"Tie each kind of data to the purpose you collect it for, and delete it when that purpose is served.",
+    kase:"Amazon paid $25 million in 2023 over keeping children's Alexa voice recordings indefinitely and undermining parents' deletion requests."},
+  {k:"keepset", g:"retention", t:"Decide how long you keep each kind of data", sev:"med", o:"legal", cite:"§312.10", a:(d, x) => x.noKeep.length > 0, m:() => false,
+    why:(d, x) => `You haven't set how long you keep ${cpList(x.noKeep.map(r => cpLow(r.n)))}.`,
+    fix:"Choose how long you keep each row of your data map."}
+];
+const CP_BLANK = () => ({svc:"", aud:"", fac:{}, know:[], gate:"", pi:{}, vpc:"", ctrl:{}, view:"setup", tab:"plan", draft:"notice", ex:false});
+// Brightbeam: a learning app for young children, partway to compliance
+const CP_EXAMPLE = {svc:"Brightbeam", aud:"primary", ex:true, fac:{subject:true, visual:true, audio:true, language:true, marketing:true}, know:[], gate:"",
+  pi:{name:{on:true, use:"feature", share:[], keep:"account"}, contact:{on:true, use:"ops", share:["providers"], keep:"account"},
+    persist:{on:true, use:"analytics", share:["providers", "sdk"], keep:"none"}, media:{on:true, use:"feature", share:["providers"], keep:"1y"},
+    other:{on:true, use:"feature", share:["providers"], keep:"account"}},
+  vpc:"emailplus",
+  ctrl:{n_contact:true, n_what:true, n_rights:true, d_before:true, d_delete:true, c_before:true, r_review:true, r_delete:true, m_cond:true, s_written:true, s_owner:true, t_noconsent:true},
+  view:"report", tab:"plan", draft:"notice"};
+let cp = Object.assign(CP_BLANK(), store.get("cp", null) || {});
+const cpSave = () => store.set("cp", cp);
+const cpTitle = d => "COPPA readiness: " + (d.svc || "Untitled service");
+
+/* ---------- working it out ---------- */
+function cpCtx(d){
+  const rows = CP_PI.filter(p => d.pi[p[0]] && d.pi[p[0]].on).map(p => Object.assign({use:"feature", share:[], keep:""}, d.pi[p[0]], {k:p[0], n:p[1]}));
+  const shares = new Set(rows.flatMap(r => r.share || []));
+  // Identifiers used only to run, secure or understand the service, and shared only with service providers, fall under the internal-operations exception
+  const opsOnly = r => ["ops", "analytics", "safety"].includes(r.use) && (r.share || []).every(s => s === "providers");
+  const persist = rows.find(r => r.k === "persist"), has = k => rows.some(r => r.k === k);
+  return {rows, shares, has, disclose:["ads", "sdk", "sold"].some(k => shares.has(k)), public:shares.has("public"), third:shares.size > 0,
+    persistOps:!!persist && opsOnly(persist), needsConsent:rows.some(r => !(r.k === "persist" && opsOnly(r))),
+    noLimit:rows.filter(r => r.keep === "none"), noKeep:rows.filter(r => !r.keep), bio:has("bio"), govid:has("govid")};
+}
+function cpApplies(d){
+  const fac = CP_FACTORS.filter(f => d.fac[f[0]]).length, know = (d.know || []).length;
+  if(!d.aud) return {lvl:"", h:"Tell us who your service is for", t:"Choose an audience to see whether COPPA applies.", tone:""};
+  if(d.aud === "primary") return {lvl:"all", h:"COPPA applies to every user", t:"Children are your primary audience, so you must treat every user as a child. Asking for age doesn't change that.", tone:"crit"};
+  if(d.aud === "mixed") return {lvl:"under13", h:"COPPA applies to users under 13", t:"Your service is aimed partly at children, which makes it a mixed-audience service. Ask for age neutrally before collecting personal information, then get a parent's consent for users under 13 or give them a version that collects none.", tone:"high"};
+  if(fac >= 3) return {lvl:"under13", h:"The FTC could treat your service as aimed at children", t:`${fac} of the signs the FTC weighs point to children. If it agrees, you're a mixed-audience service: ask for age neutrally and get a parent's consent for users under 13.`, tone:"high"};
+  if(know) return {lvl:"known", h:"COPPA applies to the children you know about", t:"You have ways of learning that a user is under 13. Once you know, you have actual knowledge: get a parent's consent or delete the child's data.", tone:"high"};
+  return {lvl:"watch", h:"COPPA likely doesn't apply today", t:"You don't aim at children and you've no sign of users under 13. Make it easy to report underage users, and act quickly when someone does.", tone:"good"};
+}
+const cpApplyFn = a => typeof a === "function" ? a : CP_APPLY[a];
+const cpItemOn = (it, d, x, ap) => !!ap.lvl && (ap.lvl !== "watch" || it.a === "aware") && cpApplyFn(it.a)(d, x, ap);
+const cpWhy = (r, x) => typeof r.why === "function" ? r.why(cp, x) : r.why;
+function cpReqs(d, x, ap){
+  const out = [];
+  CP_SPECIAL.forEach(r => { if(cpItemOn(r, d, x, ap)) out.push(Object.assign({}, r, {met:!!r.m(d, x, ap)})); });
+  CP_CTRL.forEach(g => g.items.forEach(it => { if(cpItemOn(it, d, x, ap)) out.push(Object.assign({g:g.k}, it, {met:!!d.ctrl[it.k]})); }));
+  return out;
+}
+function cpScore(d, x, ap){
+  const reqs = cpReqs(d, x, ap), counted = reqs.filter(r => !r.opt), met = counted.filter(r => r.met).length;
+  const gaps = counted.filter(r => !r.met).sort((a, b) => CP_SEV[b.sev] - CP_SEV[a.sev]);
+  return {reqs, total:counted.length, met, pct:counted.length ? Math.round(met / counted.length * 100) : 0, gaps, crit:gaps.filter(r => r.sev === "crit").length};
+}
+// Notes on one row of the data map
+function cpRowFlags(r){
+  const f = [], third = (r.share || []).filter(s => ["ads", "sdk", "sold"].includes(s));
+  if(r.keep === "none") f.push(["crit", "No set limit. The amended Rule forbids keeping children's personal information indefinitely."]);
+  if(third.length) f.push(["crit", "Sharing with " + cpList(third.map(s => cpLow(cpLabel(CP_SHARE, s)))) + " needs a parent's separate consent, unless it's integral to the service."]);
+  if((r.share || []).includes("public")) f.push(["high", "Letting children make this public needs a parent's consent first. Keep it off by default."]);
+  if(r.k === "persist") f.push(["info", ["ops", "analytics", "safety"].includes(r.use) && !third.length ? "Can fall under the internal-operations exception if it's never used to contact or profile a child. Your notice must say so." : "Contextual ads and frequency capping can count as internal operations. Targeted ads and profiling need consent."]);
+  if(r.k === "bio" || r.k === "govid") f.push(["info", "Personal information since the 2025 amendments. Make sure consent, notices, retention and security cover it."]);
+  if(r.k === "media" && r.keep === "use") f.push(["info", "If you only use a child's voice to carry out a request and delete it right away, the audio exception may mean you don't need consent for it."]);
+  if(r.k === "geo") f.push(["info", "Street-level location needs consent. Coarser location, like a city or region, isn't personal information on its own."]);
+  if(r.k === "contact") f.push(["info", "Collecting a parent's contact details only to ask for consent is allowed. Delete them if the parent doesn't respond."]);
+  return f;
+}
+// Starting answers from a pre-mortem
+function cpFromPM(src){
+  const p = src.p, F = k => (p.features || []).includes(k), M = k => (p.money || []).includes(k), pi = {};
+  const add = (k, use, share) => { pi[k] = {on:true, use, share:share || [], keep:""}; };
+  add("persist", F("ads") ? "ads" : "ops", F("ads") ? ["ads"] : ["providers"]);
+  if(F("signup") || F("login")) add("contact", "ops", ["providers"]);
+  if(F("profiles")){ add("name", "feature", F("posts") || F("discovery") ? ["public"] : []); add("user", "feature", ["public"]); }
+  if(F("media") || F("live") || F("voice")) add("media", "feature", F("posts") || F("live") || F("groups") ? ["public"] : ["providers"]);
+  if(F("location") || F("meetups")) add("geo", "feature", []);
+  if(F("dm") || F("groups") || F("posts") || F("ai_chat")) add("other", "feature", F("ai_chat") ? ["providers"] : ["public"]);
+  if(M("subs") || M("p2p") || M("payouts")) add("address", "ops", ["providers"]);
+  if(p.identity === "verified") add("govid", "safety", ["providers"]);
+  const aud = p.youth === "kids" ? "primary" : p.youth === "teens" || p.youth === "adult_self" ? "general" : "adult";
+  return {svc:(p.name || "").replace(" (example)", "").replace(" (draft)", ""), aud, pi, know:aud === "general" ? ["reports"] : [], gate:p.youth === "adult_verified" ? "assured" : "",
+    fac:p.youth === "kids" ? {subject:true, visual:true} : {}, view:"setup"};
+}
+
+/* ---------- drafts ---------- */
+const CP_USE_TXT = {ops:"to run the service", feature:"so your child can use the feature it's for", analytics:"to understand and improve how the service works", ads:"for advertising and marketing", safety:"to keep users safe and meet our legal duties"};
+const CP_KEEP_TXT = {use:"We delete it as soon as we've used it.", "30d":"We keep it for up to 30 days.", "1y":"We keep it for up to a year.", account:"We keep it while the account is open, then delete it.", none:"[How long we keep it.]", "":"[How long we keep it.]"};
+const CP_ASK = {
+  card:"Confirm you're an adult with a credit or debit card, or an online payment account, at [link]. The account holder is notified of the check.",
+  id:"Upload a photo of a government-issued ID at [link]. We check it, then delete it once we've confirmed your permission.",
+  face:"At [link], take a photo of your ID and a quick selfie. We compare them, a trained member of our team confirms the match, then we delete both images.",
+  kba:"Answer a few questions at [link] that only an adult in your household should be able to answer.",
+  call:"Call us free on [number], or book a short video call at [link]. A trained member of our team will confirm your permission.",
+  form:"Print and sign the form at [link], then return it by post to [address], by fax to [number] or as a scan to [email].",
+  textplus:"Reply YES to the text message we've sent you. We'll send a second message in [24 hours] to confirm; reply STOP if you didn't give permission.",
+  emailplus:"Click “I agree” below. We'll send a confirmation email in [24 hours]; reply to it if you didn't give permission.",
+  none:"[How parents give permission, using a method the FTC accepts.]"
+};
+function cpNoticeMd(){
+  const d = cp, x = cpCtx(d), svc = d.svc || "[service name]", L = [];
+  const shareTxt = s => ({providers:`Service providers that help us run ${svc}, and may use it only for that`, sdk:"Third-party software in our app or site", ads:"Advertising partners", public:"Other users, when your child chooses to share", sold:"Companies we sell or license it to"})[s];
+  L.push(`# We need your permission: ${svc}`, "", "Hello,", "", `Your child would like to use ${svc}. They gave us your email address so we could ask for your permission. We haven't collected any other information from your child, and we won't unless you agree.`, "", "## What we would collect");
+  if(x.rows.length) x.rows.forEach(r => L.push(`- **${r.n}**, ${CP_USE_TXT[r.use] || "for [purpose]"}. ${CP_KEEP_TXT[r.keep || ""]}`));
+  else L.push("- [Each kind of information we'd collect, why, and how long we keep it.]");
+  L.push("", "## Who we would share it with");
+  const sh = [...x.shares];
+  if(!sh.length) L.push("- No one. We don't share your child's information.");
+  sh.forEach(s => L.push(`- **${shareTxt(s)}**: ${cpList(x.rows.filter(r => (r.share || []).includes(s)).map(r => cpLow(r.n)))}.${["sdk", "ads", "sold"].includes(s) ? " [Name each one, and say why.]" : ""}`));
+  const third = sh.filter(s => ["sdk", "ads", "sold"].includes(s));
+  if(third.length) L.push("", `**You can say yes to ${svc} without saying yes to sharing.** You can agree to us collecting and using your child's information without agreeing to us sharing it with ${cpList(third.map(s => cpLow(shareTxt(s))))}. ${svc} works the same either way.`);
+  if(x.public) L.push("", "Some features let your child share with other users. They stay off until you agree.");
+  L.push("", "## How to give permission", CP_ASK[d.vpc] || CP_ASK.none, "", "If we don't hear from you within [14] days, we'll delete your email address.", "",
+    "## Your choices", "You can see the information we hold about your child, have it deleted, or tell us to stop collecting it, at any time. Contact us at [privacy email], or use [parent dashboard link].", "",
+    "Our full children's privacy notice: [link]", "", `${d.svc || "[Company name]"} · [postal address] · [phone] · [email]`);
+  return L.join("\n");
+}
+function cpRetentionMd(){
+  const d = cp, x = cpCtx(d), svc = d.svc || "[service name]";
+  const L = [`# Children's data retention policy: ${svc}`, "", "**Owner:** [name and role] · **Approved:** [date] · **Next review:** [date, at least once a year]", "",
+    "## Purpose", `This policy sets out how long ${svc} keeps personal information collected from children under 13, why, and how it's deleted, as the COPPA Rule requires (16 CFR 312.10). We keep children's personal information only as long as reasonably necessary for the specific purpose we collected it for, and never indefinitely.`, "",
+    "## Retention schedule", "", "| Information | Why we collect it | Business need | How long we keep it | How we delete it |", "|---|---|---|---|---|"];
+  (x.rows.length ? x.rows : [{n:"[Kind of information]", use:"", keep:""}]).forEach(r => L.push(`| ${r.n} | ${cpLabel(CP_USE, r.use) || "[purpose]"} | [why it's needed for that purpose] | ${r.keep && r.keep !== "none" ? cpLabel(CP_KEEP, r.keep) : "[set a limit]"} | [how it's deleted, including backups and vendors] |`));
+  L.push("", "## How deletion works", "- Deletion covers our systems, backups and every service provider or third party that received the data. [How long backups take to expire.]",
+    "- If a parent doesn't respond to a consent request within [14] days, we delete their contact details.",
+    "- When a parent asks us to delete their child's information, we do it within [number] days and confirm when it's done.",
+    "- We delete in a way that protects against unauthorized access or use.", "",
+    "## Publishing and review", `This policy, or a summary of it, is published in the ${svc} children's privacy notice. [Owner] reviews it at least once a year, and whenever we add a new kind of data or a new purpose.`);
+  return L.join("\n");
+}
+function cpSecurityMd(){
+  const d = cp, x = cpCtx(d), svc = d.svc || "[service name]", recips = [...x.shares].filter(s => s !== "public");
+  return [`# Children's information security program: ${svc}`, "", `A written program, as the COPPA Rule requires (16 CFR 312.8). Scale each part to your size, how sensitive the data is and how complex ${svc} is.`, "",
+    "## 1. Who coordinates it", "- Program coordinator: [name and role]", "- Backup: [name and role]", "- Executive sponsor: [name]", "",
+    "## 2. Risk assessment, at least once a year", `- Children's data covered: ${x.rows.length ? cpList(x.rows.map(r => cpLow(r.n))) : "[kinds of data]"}`, "- Where it's stored and who can reach it: [systems, teams and vendors]", "- Main risks: [for example staff access, account takeover, vendor breaches, misconfiguration]", "- Last assessment: [date] · Next: [date]", "",
+    "## 3. Safeguards", "- Access limited to people who need it, with logging and regular reviews", "- Encryption in transit and at rest", "- Only the data we need, deleted on the schedule in our retention policy", "- A security review for new features that touch children's data", "- [Other safeguards]", "",
+    "## 4. Testing and monitoring", "- [Access reviews, vulnerability scans, penetration tests, alerting] · How often: [ ]", "",
+    "## 5. Yearly review", "- Review the program at least once a year, and after any major change to the service or a security incident. Record what changed and why.", "",
+    "## 6. Service providers and third parties", recips.length ? `- Receive children's data: ${cpList(recips.map(s => cpLow(cpLabel(CP_SHARE, s))))}. [Name each one.]` : "- [Any vendor that receives children's data.]",
+    "- Before sharing, confirm each one can keep the data confidential and secure, and get written assurances that it will.", "- [Contract terms: confidentiality, security, limits on use, deletion, breach notice]", "",
+    "## 7. Incidents", "- [How incidents involving children's data are reported, investigated and, where the law requires, notified]"].join("\n");
+}
+function cpMemoMd(){
+  const d = cp, x = cpCtx(d), ap = cpApplies(d), s = cpScore(d, x, ap), svc = d.svc || "[service name]";
+  const fac = CP_FACTORS.filter(f => d.fac[f[0]]).map(f => f[1]), know = CP_KNOW.filter(k => d.know.includes(k[0])).map(k => k[1]);
+  const L = [`# COPPA readiness: ${svc}`, "", `_Prepared ${new Date().toISOString().slice(0, 10)} with T&S Workbench, for review by counsel. Not legal advice._`, "",
+    "## Summary", `**${ap.h}.** ${ap.t}`, "", s.total ? `${s.met} of ${s.total} requirements are in place (${s.pct}%), with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}.` : "No requirements apply to the answers given.", "",
+    "## Who the service is for", `- Audience: ${cpLabel(CP_AUD, d.aud) || "not answered"}`, `- Signs of a child audience: ${fac.length ? fac.join("; ") : "none identified"}`,
+    `- How we learn a user is under 13: ${know.length ? know.join("; ") : "no process identified"}`, `- Age question: ${d.aud === "primary" ? "not relevant, because every user is treated as a child" : cpLabel(CP_GATE, d.gate) || "not answered"}`, `- Parental consent method: ${cpLabel(CP_VPC, d.vpc) || "not answered"}`, "",
+    "## Children's data", "", "| Information | Used for | Shared with | Kept for |", "|---|---|---|---|"];
+  if(x.rows.length) x.rows.forEach(r => L.push(`| ${r.n} | ${cpLabel(CP_USE, r.use)} | ${(r.share || []).length ? r.share.map(v => cpLabel(CP_SHARE, v)).join(", ") : "No one"} | ${cpLabel(CP_KEEP, r.keep) || "Not set"} |`));
+  else L.push("| None identified | | | |");
+  L.push("", "## Gaps, most urgent first", "");
+  if(!s.gaps.length) L.push("No gaps for the answers given.");
+  s.gaps.forEach((r, i) => L.push(`${i + 1}. **${r.t}** (${CP_SEVN[r.sev][0]}; 16 CFR ${r.cite}${r.isNew ? "; added in 2025" : ""}; owner: ${CP_OWNERS[r.o]}). ${cpWhy(r, x)} To fix: ${r.fix}`));
+  const q = [];
+  const third = [...x.shares].filter(v => ["sdk", "ads", "sold"].includes(v));
+  if(third.length) q.push(`Is any of our sharing with ${cpList(third.map(v => cpLow(cpLabel(CP_SHARE, v))))} integral to the service, so it doesn't need a separate consent?`);
+  if(d.aud === "general" || d.aud === "adult") q.push(fac.length ? `Given ${fac.length} sign${fac.length === 1 ? "" : "s"} of a child audience, could the FTC treat us as a mixed-audience service?` : "Is our process for acting on actual knowledge of users under 13 enough?");
+  if(x.has("persist")) q.push("Does the internal-operations exception cover our use of persistent identifiers, and does our notice describe it as the amended Rule requires?");
+  if(x.has("media")) q.push("Does the audio exception cover any of our voice features?");
+  q.push("Should we join an FTC-approved safe harbor program?");
+  if(d.aud !== "adult") q.push("Do state laws that protect teens, such as New York's Child Data Protection Act or California's rules on selling minors' data, add duties for users aged 13 to 17?");
+  q.push("If we have users outside the US, how do the GDPR's age of digital consent and the UK Children's Code apply?");
+  L.push("", "## Questions for counsel", ...q.map(v => "- " + v));
+  const cases = [...new Set(s.gaps.map(r => r.kase).filter(Boolean))];
+  if(cases.length) L.push("", "## Enforcement to know", ...cases.map(v => "- " + v));
+  L.push("", "## Sources", ...CP_SRC.map(([n, u]) => `- ${n}: ${u}`), "", `Civil penalties can exceed $53,000 per violation, adjusted for inflation each year. Requirements checked in ${CP_REVIEWED}.`);
+  return L.join("\n");
+}
+const CP_DRAFTS = [["notice", "Notice to parents", "notice-to-parents"], ["retention", "Retention policy", "data-retention-policy"], ["security", "Security program", "security-program"], ["memo", "Memo for Legal", "coppa-memo"]];
+const cpDraftMd = k => k === "retention" ? cpRetentionMd() : k === "security" ? cpSecurityMd() : k === "memo" ? cpMemoMd() : cpNoticeMd();
+// Just enough Markdown to show a draft as it would read: headings, lists, tables, bold, italics and [placeholders]
+function cpMd(md){
+  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|\s)_(.+?)_(?=\s|$)/g, "$1<i>$2</i>").replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>');
+  const out = []; let list = null, table = null;
+  const flush = () => {
+    if(list){ out.push(`<${list.t}>${list.items.map(i => `<li>${i}</li>`).join("")}</${list.t}>`); list = null; }
+    if(table){ out.push(`<div class="cp-tw"><table><thead><tr>${table[0].map(c => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${table.slice(1).map(r => `<tr>${r.map(c => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`); table = null; }
+  };
+  md.split("\n").forEach(l => {
+    let m;
+    if(/^\|/.test(l)){ if(/^\|[-| ]+\|$/.test(l)) return; if(list) flush(); (table = table || []).push(l.replace(/^\||\|$/g, "").split("|").map(c => c.trim())); return; }
+    if(table) flush();
+    if((m = l.match(/^(#{1,3}) (.*)$/))){ flush(); out.push(`<h${m[1].length + 2}>${inline(m[2])}</h${m[1].length + 2}>`); return; }
+    if((m = l.match(/^- (.*)$/))){ if(!list || list.t !== "ul"){ flush(); list = {t:"ul", items:[]}; } list.items.push(inline(m[1])); return; }
+    if((m = l.match(/^\d+\. (.*)$/))){ if(!list || list.t !== "ol"){ flush(); list = {t:"ol", items:[]}; } list.items.push(inline(m[1])); return; }
+    flush(); if(l.trim()) out.push(`<p>${inline(l)}</p>`);
+  });
+  flush();
+  return out.join("");
+}
+
+/* ---------- page ---------- */
+function renderCoppa(){
+  const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap), report = cp.view === "report" && !!cp.aud;
+  view.innerHTML = (report
+    ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
+        `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
+    : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
+        `<span class="toast" id="cp-toast" aria-live="polite"></span>${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-cp="example">See an example</button>`))
+    + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
+}
+function cpSetupHTML(x, ap, s){
+  const newTag = `<span class="cp-new" title="Added by the FTC's 2025 amendments">New</span>`;
+  const chk = (grp, k, label, isNew, sub) => `<label class="tr-chk"><input type="checkbox" data-cpset="${grp}" value="${k}" ${(grp === "know" ? cp.know.includes(k) : cp[grp][k]) ? "checked" : ""}><span>${esc(label)}${isNew ? newTag : ""}${sub ? `<small>${esc(sub)}</small>` : ""}</span></label>`;
+  const tile = (attr, cur, k, n, h, extra, note) => `<button type="button" role="radio" aria-checked="${cur === k}" class="card tr-tier ${cur === k ? "on" : ""} ${extra || ""}" data-${attr}="${k}"><b>${esc(n)}${note || ""}</b>${h ? `<span>${esc(h)}</span>` : ""}</button>`;
+  const sec = (n, id, title, tag, body, tip) => `<section class="card pol-card" id="${id}"><div class="pol-h"><span class="pol-num">${n}</span><div><span class="pol-lbl">${title}</span>${tag ? `<span class="note">${tag}</span>` : ""}</div></div>${tip ? `<p class="pol-tip cp-tip">${tip}</p>` : ""}${body}</section>`;
+  const piRow = ([k, n, h, isNew]) => { const r = cp.pi[k] || {}, on = !!r.on;
+    return `<div class="cp-row ${on ? "on" : ""}"><label class="tr-chk"><input type="checkbox" data-cppi="${k}" ${on ? "checked" : ""}><span><b>${esc(n)}</b>${isNew ? newTag : ""}${h ? `<small>${esc(h)}</small>` : ""}</span></label>
+      ${on ? `<div class="cp-row-d">
+        <div class="field"><label for="cp-use-${k}">Mainly used for</label><select class="select" id="cp-use-${k}" data-cpuse="${k}">${CP_USE.map(([v, t]) => `<option value="${v}" ${(r.use || "feature") === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+        <div class="field"><span class="lbl">Shared with</span><div class="cp-chips">${CP_SHARE.map(([v, t, tip]) => `<button type="button" class="pol-chip" data-cpshare="${k}" data-v="${v}" aria-pressed="${(r.share || []).includes(v)}" ${tip ? `title="${esc(tip)}"` : ""}>${t}</button>`).join("")}</div></div>
+        <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+      </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`; };
+  const notPrimary = !!cp.aud && cp.aud !== "primary", live = !!ap.lvl && ap.lvl !== "watch";
+  let n = 1, out = "";
+  out += sec(n++, "cp-s-svc", "Your service", "", `<div class="field"><label for="cp-svc">Service or product name</label><input class="input" id="cp-svc" value="${esc(cp.svc)}" placeholder="For example: Brightbeam" maxlength="80" autocomplete="off"></div>
+    <div class="field"><span class="lbl">Who is it for?</span><div class="tr-tiers cp-aud" role="radiogroup" aria-label="Who it's for">${CP_AUD.map(([k, nm, h]) => tile("cpaud", cp.aud, k, nm, h)).join("")}</div></div>
+    ${cp.aud ? `<div class="banner cp-ap ${ap.tone}"><span><strong>${esc(ap.h)}.</strong> ${esc(ap.t)}</span></div>` : ""}`);
+  if(notPrimary){
+    out += sec(n++, "cp-s-fac", "Signs of a child audience", "The FTC weighs these together", `<div class="cp-checks">${CP_FACTORS.map(([k, t, nw]) => chk("fac", k, t, nw)).join("")}</div>`,
+      "Even a service built for teens and adults can count as aimed at children if enough of these are true. Three or more is a warning sign.");
+    out += sec(n++, "cp-s-know", "Knowing a user's age", "", `<div class="field"><span class="lbl">How could you learn that a user is under 13?</span><div class="cp-checks">${CP_KNOW.map(([k, t]) => chk("know", k, t)).join("")}</div></div>
+      <div class="field"><span class="lbl">How do you ask for age?</span><div class="tr-tiers cp-two" role="radiogroup" aria-label="Age question">${CP_GATE.map(([k, nm, h]) => tile("cpgate", cp.gate, k, nm, h)).join("")}</div></div>`);
+  }
+  if(cp.aud) out += sec(n++, "cp-s-data", "Children's data you collect", `${x.rows.length} selected`, `<div class="cp-pi">${CP_PI.map(piRow).join("")}</div>`,
+    "Include what third-party SDKs collect through your app or site. Under COPPA, what they collect through your service counts as yours.");
+  if(live && x.needsConsent) out += sec(n++, "cp-s-vpc", "How parents give consent", "", `<div class="tr-tiers cp-two" role="radiogroup" aria-label="Consent method">${CP_VPC.map(([k, nm, h, sh, nw]) => { const bad = x.disclose && !sh;
+      return tile("cpvpc", cp.vpc, k, nm, bad ? h + " You share children's data, so this method isn't allowed." : h, bad ? "off" : "", nw ? newTag : ""); }).join("")}</div>`,
+    "The FTC accepts specific methods. Knowledge-based questions, a photo ID with a face match, and text plus were added in 2025.");
+  if(ap.lvl){ const grps = CP_CTRL.map(g => ({g, its:g.items.filter(it => cpItemOn(it, cp, x, ap))})).filter(z => z.its.length);
+    if(grps.length) out += sec(n++, "cp-s-ctrl", "What you have in place", "Tick what's true today", `<div class="cp-grps">${grps.map(({g, its}) => `<div class="cp-grp"><h4>${esc(g.n)}</h4>${g.h ? `<p class="note">${esc(g.h)}</p>` : ""}${its.map(it => chk("ctrl", it.k, it.t, it.isNew, it.opt ? "Optional" : "")).join("")}</div>`).join("")}</div>`); }
+  const tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
+  out += `<div class="card pol-runbar">
+      <div class="pol-rb-meter"><div class="pol-rb-top"><span class="eyebrow">Readiness</span>${s.total ? `<span class="pill ${tone}">${s.met} of ${s.total}</span>` : ""}</div>
+        <div class="pol-meter" role="meter" aria-valuemin="0" aria-valuemax="${s.total || 1}" aria-valuenow="${s.met}" aria-label="Readiness"><i style="width:${s.pct}%;background:var(--${tone})"></i></div>
+        <span class="note">${!cp.aud ? "Choose who your service is for to start." : s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"} so far.` : s.total ? "No critical gaps so far." : "Nothing to check yet."}</span></div>
+      <div class="pol-rb-act"><button type="button" class="btn primary" data-cp="build" ${cp.aud ? "" : "disabled"}>Build my plan ${icon("arrow")}</button></div></div>
+    <p class="note pol-rb-note">Everything stays in your browser. Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Not legal advice.</p>`;
+  return `<div class="pol-setup cp-setup">${out}</div>`;
+}
+function cpReportHTML(x, ap, s){
+  const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
+  return `<div class="pol-report cp-report">
+    ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
+    <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p>
+        <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
+        <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
+    <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
+      <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
+    <p class="note">Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Civil penalties can exceed $53,000 per violation. A starting point for your legal team, not legal advice.</p>
+  </div>`;
+}
+function cpPlanHTML(x, s){
+  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
+  return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the part of the Rule, who usually owns it and what to do.</p></div>
+    <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
+      <span class="eyebrow">${esc((CP_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(CP_SEVN[r.sev][1], CP_SEVN[r.sev][0])}${r.isNew ? `<span class="cp-new">New in 2025</span>` : ""}</h4>
+      <p>${esc(cpWhy(r, x))}</p><p class="cp-fix"><b>What to do.</b> ${esc(r.fix)}</p>
+      ${r.kase ? `<p class="cp-case">${esc(r.kase)}</p>` : ""}
+      <div class="cp-gm"><span class="tag">${esc(CP_OWNERS[r.o])}</span><span class="tag mono">${esc(r.cite)}</span>${CP_CTRL.some(g => g.items.some(it => it.k === r.k)) ? `<button type="button" class="pol-add" data-cpfix="${r.k}">Mark as done</button>` : ""}</div></div></article>`).join("")}</div>`;
+}
+function cpMapHTML(x){
+  if(!x.rows.length) return `<p class="note">You haven't marked any children's data yet. <button type="button" class="pol-add" data-cp="edit">Map your data</button></p>`;
+  return `<div class="cp-mapw"><table class="cp-map"><thead><tr><th>Information</th><th>Used for</th><th>Shared with</th><th>Kept for</th></tr></thead><tbody>${x.rows.map(r => `<tr><td><b>${esc(r.n)}</b>${cpRowFlags(r).map(f => `<small class="${f[0]}">${esc(f[1])}</small>`).join("")}</td><td>${esc(cpLabel(CP_USE, r.use))}</td><td>${(r.share || []).length ? r.share.map(v => esc(cpLabel(CP_SHARE, v))).join(", ") : "No one"}</td><td>${esc(cpLabel(CP_KEEP, r.keep) || "Not set")}</td></tr>`).join("")}</tbody></table></div>`;
+}
+function cpDraftsHTML(){
+  const k = CP_DRAFTS.some(z => z[0] === cp.draft) ? cp.draft : "notice";
+  const intro = {notice:"The notice a parent gets before you collect anything, filled in from your data map and consent method.", retention:"The written policy the amended Rule requires, with a row for each kind of data you collect.", security:"An outline of the written security program the amended Rule requires.", memo:"A summary for counsel: whether COPPA applies, your data, the gaps and the questions to settle."}[k];
+  return `<div class="segs cp-dtabs" role="group" aria-label="Drafts">${CP_DRAFTS.map(([v, nm]) => `<button type="button" data-cpdraft="${v}" aria-pressed="${v === k}">${nm}</button>`).join("")}</div>
+    <p class="note cp-dnote">${intro} Text in brackets is for you to fill in.</p>
+    <div class="cp-draft">${cpMd(cpDraftMd(k))}</div>
+    <div class="cp-dact"><button type="button" class="btn sm" data-cp="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-cp="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="cp-dtoast" aria-live="polite"></span></div>`;
+}
+function cpReqsHTML(x, s){
+  if(!s.reqs.length) return `<p class="note">Choose who your service is for, and mark the children's data you collect, to see which requirements apply.</p>`;
+  return CP_CTRL.map(g => ({g, rs:s.reqs.filter(r => r.g === g.k)})).filter(z => z.rs.length).map(({g, rs}) => `<section class="cp-rq"><h4>${esc(g.n)} <span class="note">${rs.filter(r => r.met).length} of ${rs.length}</span></h4>
+      <ul class="tr-check">${rs.map(r => `<li class="${r.met ? "ok" : r.opt ? "na" : "miss"}"><span class="tr-st">${r.met ? "✓" : "○"}</span><div><b>${esc(r.t)}</b>${r.isNew ? `<span class="cp-new">New in 2025</span>` : ""}${r.opt ? ` <span class="note">Optional</span>` : ""} <span class="note mono">${esc(r.cite)}</span><p>${esc(cpWhy(r, x))}</p></div></li>`).join("")}</ul></section>`).join("")
+    + `<p class="note">Sources: ${CP_SRC.map(([nm, u]) => `<a href="${u}" target="_blank" rel="noopener">${esc(nm)}</a>`).join("; ")}. Checked in ${CP_REVIEWED}. Not legal advice.</p>`;
+}
+
+/* ---------- tracker tasks ---------- */
+function tkFromCoppa(){
+  const x = cpCtx(cp), s = cpScore(cp, x, cpApplies(cp));
+  return s.gaps.map((r, i) => ({id:"cp-" + r.k, title:r.t, group:CP_SEVN[r.sev][0] === "Critical" ? "Critical" : CP_SEVN[r.sev][0] + " priority", owner:CP_OWNERS[r.o], pr:CP_SEV[r.sev] + 1, done:false, def:r.sev !== "med" || i < 12,
+    labels:["trust-and-safety", "coppa", "privacy"].concat(r.isNew ? ["coppa-2025"] : []),
+    desc:[r.t, "", cpWhy(r, x), "", "What to do: " + r.fix, `Rule: 16 CFR ${r.cite}${r.isNew ? ", added by the 2025 amendments" : ""}. Owner: ${CP_OWNERS[r.o]}.`, r.kase ? "Enforcement: " + r.kase : null, "",
+      `From a COPPA readiness check for ${cp.svc || "your service"}, made with T&S Workbench. Not legal advice.`].filter(v => v !== null).join("\n")}));
+}
+
+/* ---------- events ---------- */
+function cpRerender(sel){ cp.ex = false; cpSave(); const y = window.scrollY; renderCoppa(); window.scrollTo(0, y); const el = sel && document.querySelector(sel); if(el) try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }
+function cpAct(a){
+  switch(a){
+    case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
+    case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); return gsay("Filled in from " + src.name + ". Check each answer"); }
+    case "reset": cp = CP_BLANK(); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": cp.view = "setup"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "save": { const msg = wsSaveTool("coppa", cp, cpTitle(cp)); renderCoppa(); return flashIn($("#cp-toast"), msg); }
+    case "tasks": return tkOpen("coppa");
+    case "memo": { const md = cpMemoMd(); return offerFile(`coppa-memo-${slug(cp.svc || "service")}.md`, md, md, $("#cp-toast")); }
+    case "copyd": return copyText(cpDraftMd(cp.draft || "notice"), $("#cp-dtoast"));
+    case "dld": { const d = CP_DRAFTS.find(z => z[0] === (cp.draft || "notice")) || CP_DRAFTS[0], md = cpDraftMd(d[0]); return offerFile(`${d[2]}-${slug(cp.svc || "service")}.md`, md, md, $("#cp-dtoast")); }
+  }
+}
+const cpHere = () => (location.hash || "").slice(1).split("/")[0] === "coppa";
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-cp],[data-cpaud],[data-cpgate],[data-cpvpc],[data-cptab],[data-cpdraft],[data-cpshare],[data-cpfix]");
+  if(!b || !cpHere() || !view.contains(b)) return;
+  const d = b.dataset;
+  if(d.cpaud) { cp.aud = d.cpaud; return cpRerender(`[data-cpaud="${d.cpaud}"]`); }
+  if(d.cpgate) { cp.gate = d.cpgate; return cpRerender(`[data-cpgate="${d.cpgate}"]`); }
+  if(d.cpvpc) { cp.vpc = d.cpvpc; return cpRerender(`[data-cpvpc="${d.cpvpc}"]`); }
+  if(d.cptab) { cp.tab = d.cptab; cpSave(); renderCoppa(); const t = document.querySelector(`[data-cptab="${d.cptab}"]`); if(t) t.focus(); return; }
+  if(d.cpdraft) { cp.draft = d.cpdraft; cpSave(); renderCoppa(); const t = document.querySelector(`[data-cpdraft="${d.cpdraft}"]`); if(t) t.focus(); return; }
+  if(d.cpshare) { const r = cp.pi[d.cpshare] = Object.assign({on:true, use:"feature", share:[], keep:""}, cp.pi[d.cpshare]); r.share = (r.share || []).includes(d.v) ? r.share.filter(v => v !== d.v) : (r.share || []).concat(d.v); return cpRerender(`[data-cpshare="${d.cpshare}"][data-v="${d.v}"]`); }
+  if(d.cpfix) { cp.ctrl = Object.assign({}, cp.ctrl, {[d.cpfix]:true}); cp.ex = false; cpSave(); const y = window.scrollY; renderCoppa(); window.scrollTo(0, y); return gsay("Marked as done"); }
+  if(d.cp) cpAct(d.cp);
+});
+document.addEventListener("change", e => {
+  const t = e.target; if(!t || !cpHere() || !view.contains(t) || !t.closest(".cp-root")) return;
+  const d = t.dataset || {};
+  if(d.cpset){ const g = d.cpset, k = t.value;
+    if(g === "know") cp.know = t.checked ? [...new Set(cp.know.concat(k))] : cp.know.filter(v => v !== k);
+    else { cp[g] = Object.assign({}, cp[g]); if(t.checked) cp[g][k] = true; else delete cp[g][k]; }
+    return cpRerender(`[data-cpset="${g}"][value="${k}"]`); }
+  if(d.cppi){ cp.pi[d.cppi] = Object.assign({use:"feature", share:[], keep:""}, cp.pi[d.cppi], {on:t.checked}); return cpRerender(`[data-cppi="${d.cppi}"]`); }
+  if(d.cpuse){ cp.pi[d.cpuse] = Object.assign({}, cp.pi[d.cpuse], {use:t.value}); return cpRerender("#" + t.id); }
+  if(d.cpkeep){ cp.pi[d.cpkeep] = Object.assign({}, cp.pi[d.cpkeep], {keep:t.value}); return cpRerender("#" + t.id); }
+});
+document.addEventListener("input", e => { const t = e.target; if(t && t.id === "cp-svc" && cpHere()){ cp.svc = t.value.slice(0, 80); cp.ex = false; cpSave(); } });
+// Plain-English terms the check uses, explained on hover
+Object.assign(GT_MORE, {
+  "verifiable parental consent":"Consent from a parent, given through a method the FTC accepts as reasonably sure it's really the parent, such as a card check or an ID check.",
+  "actual knowledge":"Knowing, not just suspecting, that a particular user is under 13, for example because they said so or a parent told you.",
+  "persistent identifier":"An identifier that recognizes a user over time or across services, such as a cookie, a device ID or an advertising ID.",
+  "mixed-audience":"A service aimed partly at children but not mainly at them. It may ask for age and apply COPPA only to users under 13.",
+  "safe harbor":"An FTC-approved industry program. Members that follow its guidelines are treated as complying with the COPPA Rule.",
+  "internal operations":"Running and securing the service, such as keeping it working, authenticating users and serving contextual ads. It never includes profiling or targeted ads."
+});
+
+/* =========================================================
+   PROGRAM LOOP: a pre-mortem's biggest remaining risks point to the crises to rehearse,
+   the metrics to track, the coverage to map and how to weigh a moderation vendor
+   ========================================================= */
+// Tabletop scenarios that rehearse each harm area, best fit first
+const LOOP_TT = {
+  child:["gifting", "classroom", "minor", "comments", "companion"], sexual:["classroom", "minor", "assault"], harass:["swatting", "vip", "bias"],
+  violent:["ugcextremism", "challenge", "jailbreak"], selfharm:["emergency", "challenge", "companion"], privacy:["location", "insider", "camera"],
+  physical:["courier", "partyhouse", "assault", "recall"], integrity:["bots", "reviews", "deepfake"], security:["ato", "insider"],
+  illegal:["counterfeit", "recall", "takedown"], fraud:["offplatform", "romance", "impersonation", "fakelisting"], fincrime:["mules", "sanctions", "coerced"],
+  ai:["jailbreak", "deepfake", "voiceclone", "companion"], readiness:["vendor", "rfi", "newlaw"]
+};
+// Metrics that show whether each harm area is getting better
+const LOOP_MX = {
+  child:["Unsafe-contact rate for minors", "Age-assurance coverage", "Time to report child sexual exploitation"],
+  sexual:["Time to report child sexual exploitation", "Violating-content prevalence", "Proactive detection rate"],
+  harass:["Violating-content prevalence", "Toxicity per 1,000 match-hours", "Repeat-offender rate", "Users who feel safe"],
+  violent:["Harmful reach before action", "Time to detect emerging trends", "Violating-content prevalence"],
+  selfharm:["Time to action by severity (p90)", "Harmful reach before action"],
+  privacy:["Account takeover rate", "Law-enforcement request handling"],
+  physical:["Safety incidents per 10k trips", "Time to action by severity (p90)"],
+  integrity:["Proactive detection rate", "Precision and recall by policy area", "Repeat-offender rate"],
+  security:["Account takeover rate", "Verified-profile share"],
+  illegal:["Prohibited-listing prevalence", "Illegal-content notice handling time"],
+  fraud:["Fraud loss rate", "Romance-scam reports per 10k matches", "Verified-profile share"],
+  fincrime:["Fraud loss rate", "Verified-profile share"],
+  ai:["Violating-generation rate", "Jailbreak success rate", "Over-refusal rate"],
+  readiness:["SLA attainment", "Systemic-risk assessment currency", "Statement-of-reasons coverage"]
+};
+// Pre-mortem product types, as the Metrics framework names them
+const LOOP_PM_MX = {social:"social", messaging:"social", video:"social", creator:"social", marketplace:"market", fintech:"fintech", crypto:"fintech", gaming:"gaming", dating:"dating", genai:"genai", gig:"gig", rentals:"gig", edtech:"kids", health:"social", workplace:"social"};
+const loopList = xs => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+// The pre-mortem to plan from: the saved one open now, else the one saved most recently, else a draft in progress
+function loopSource(){
+  try{
+    const own = pm && pm.type && !pm.example, cur = () => { const r = assess(pm); return r.risks.length ? {name:pm.name || "Untitled assessment", r, p:pm} : null; };
+    if(own && pm.saved){ const s = cur(); if(s) return s; }
+    const it = Object.values(wsItems()).filter(i => i.kind === "premortem" && i.data).sort((a, b) => (b.updated || 0) - (a.updated || 0))[0];
+    if(it){ const p = openRecord(it.data), r = assess(p); if(r.risks.length) return {name:it.title || it.data.name || "Untitled assessment", r, p}; }
+    if(own) return cur();
+  }catch(e){}
+  return null;
+}
+// Harm areas with the most risk left after the safeguards in place
+function loopCats(r, n){
+  const by = {};
+  r.risks.forEach(x => { const c = by[x.cat] = by[x.cat] || {k:x.cat, n:CATS[x.cat], max:0, sum:0, band:"low"}; if(x.rscore > c.max){ c.max = x.rscore; c.band = x.rband; } c.sum += x.rscore; });
+  const all = Object.values(by).sort((a, b) => b.max - a.max || b.sum - a.sum), hot = all.filter(c => c.max >= 8);
+  return (hot.length ? hot : all).slice(0, n || 3);
+}
+// Pre-mortem product types, as the tabletop names company types
+const LOOP_PM_TT = {social:"social", messaging:"social", video:"social", creator:"social", marketplace:"marketplace", fintech:"fintech", crypto:"fintech", gaming:"gaming", dating:"dating", genai:"genai", gig:"gig", rentals:"gig", edtech:"kids", health:"social", workplace:"social"};
+// One scenario per harm area: written for this product's type if there is one, then for your company type, then one that tailors itself
+function loopScenarios(r, type, n, ptype){
+  const out = [], seen = new Set(), has = (j, t) => !!t && t !== "all" && (SCENARIOS[j].types || []).includes(t);
+  const tests = [j => has(j, ptype), j => has(j, type), j => !!SCENARIOS[j].tailored || type === "all"];
+  loopCats(r, 4).forEach(c => { if(out.length >= (n || 3)) return;
+    const xs = (LOOP_TT[c.k] || []).map(id => SCENARIOS.findIndex(s => s.id === id)).filter(i => i >= 0 && !seen.has(i));
+    let pick; tests.forEach(t => { if(pick === undefined) pick = xs.find(t); }); if(pick === undefined) pick = xs[0];
+    if(pick !== undefined){ seen.add(pick); out.push({i:pick, cat:c, sc:ttScenario(pick, type)}); } });
+  return out;
+}
+// Metrics for the top harm areas on this kind of platform, taking turns between areas
+function loopMetrics(r, pk, n){
+  const lists = loopCats(r, 4).map(c => (LOOP_MX[c.k] || []).map(name => ({m:METRICS.find(x => x.n === name), cat:c})).filter(x => x.m && (x.m.p === "all" || x.m.p.includes(pk))));
+  const out = [], seen = new Set();
+  for(let j = 0; j < 4; j++) lists.forEach(l => { const x = l[j]; if(x && !seen.has(x.m.n)){ seen.add(x.m.n); out.push(x); } });
+  return out.slice(0, n || 4);
+}
+// Weights scaled to 100 in steps of 5, keeping their proportions (the vendor scorecard's rule)
+function loopNorm(w){
+  const tw = CRITERIA.reduce((a, c) => a + (w[c.k] || 0), 0) || 1, out = {};
+  CRITERIA.forEach(c => { out[c.k] = Math.round((w[c.k] || 0) / tw * 100 / 5) * 5; });
+  let diff = 100 - CRITERIA.reduce((a, c) => a + out[c.k], 0);
+  const order = CRITERIA.slice().sort((a, b) => out[b.k] - out[a.k]);
+  for(let i = 0; diff !== 0 && i < 40; i++){ const c = order[i % order.length], step = diff > 0 ? 5 : -5; if(out[c.k] + step >= 0){ out[c.k] += step; diff -= step; } }
+  return out;
+}
+// Vendor weights that follow the risks: wellness for graphic and child-safety harms, security for fraud, languages for many markets.
+// Only what actually moved against the balanced weights is reported.
+function loopVendorWeights(src){
+  const base = Object.fromEntries(CRITERIA.map(c => [c.k, c.w])), raw = Object.assign({}, base), why = {};
+  const cats = loopCats(src.r, 4).map(c => c.k), has = ks => ks.some(k => cats.includes(k));
+  const o = typeof orgGet === "function" ? orgGet() : {}, regions = src.p.regions && src.p.regions.length ? src.p.regions : o.regions || [];
+  if(has(["child", "sexual", "violent", "selfharm"])){ raw.wellness += 10; raw.quality += 5; why.wellness = "graphic and child-safety queues"; why.quality = "hard child-safety and violence calls"; }
+  if(has(["fraud", "fincrime", "security", "privacy"])){ raw.security += 10; why.security = "fraud and account data"; }
+  if(regions.length >= 3){ raw.lang += 10; why.lang = regions.length + " regions"; }
+  if(src.p.scale === "large" || src.p.scale === "mid" || o.stage === "scale"){ raw.surge += 5; why.surge = "your scale"; }
+  if(regions.some(k => k === "eu" || k === "uk")){ raw.reporting += 5; why.reporting = "EU and UK transparency duties"; }
+  const w = loopNorm(raw);
+  return {w, up:CRITERIA.filter(c => w[c.k] > base[c.k] && why[c.k]).map(c => `${c.n.toLowerCase()} (${why[c.k]})`), down:CRITERIA.filter(c => w[c.k] < base[c.k]).map(c => c.n.toLowerCase())};
+}
+const loopFitted = () => !!(vx.fitW && CRITERIA.every(c => (+vx.weights[c.k] || 0) === vx.fitW[c.k]));
+function loopVendorChip(){
+  const src = loopSource(); if(!src) return "";
+  return `<button type="button" class="pol-chip loop-chip" data-loopgo="vd" aria-pressed="${loopFitted()}" title="${esc("Weights from the risks in " + src.name)}">${icon("radar")}Fit to your risks</button>`;
+}
+function loopVendorNote(){
+  if(!loopFitted()) return "";
+  const n = esc(vx.fitName || "your pre-mortem"), f = vx.fitWhy && !Array.isArray(vx.fitWhy) ? vx.fitWhy : {}, up = f.up || [], down = f.down || [];
+  return `<p class="note loop-vnote">${up.length ? `Fitted to the risks in <b>${n}</b>: more weight on ${esc(loopList(up))}${down.length ? `, less on ${esc(loopList(down))}` : ""}.` : `The risks in <b>${n}</b> don't call for a different balance, so the weights stay even.`}</p>`;
+}
+// The hand-off at the end of a pre-mortem report
+function loopCardHTML(r){
+  const cats = loopCats(r, 3); if(!cats.length) return "";
+  const ptype = LOOP_PM_TT[pm.type], type = ptype || ttCompanyType(), pk = LOOP_PM_MX[pm.type] || "social", scs = loopScenarios(r, type, 3, ptype), ms = loopMetrics(r, pk, 3), f = loopVendorWeights({r, p:pm});
+  const item = (go, t, s) => `<button type="button" class="loop-i" data-loopgo="${go}"><b>${esc(t)}</b><small>${esc(s)}</small></button>`;
+  return `<section class="card loop" aria-labelledby="loop-h">
+    <div class="loop-h"><span class="eyebrow">Put this assessment to work</span><h3 id="loop-h">Rehearse, measure and resource your biggest risks</h3>
+      <p class="note">After the safeguards you've ticked, most of the risk is in ${loopList(cats.map(c => `<b>${esc(c.n.toLowerCase())}</b>`))}.</p></div>
+    <div class="loop-cols">
+      <div class="loop-col"><span class="loop-k" style="--c:var(--t-tt)">${icon("siren")}Rehearse the crisis</span>${scs.map(x => item("tt:" + x.i + ":" + type, x.sc.title, x.cat.n + " · " + x.sc.steps.length + " decisions, about 8 minutes")).join("")}</div>
+      <div class="loop-col"><span class="loop-k" style="--c:var(--t-mx)">${icon("gauge")}Measure it</span>${ms.map(x => item("mx:" + METRICS.indexOf(x.m) + ":" + pk, x.m.n, MX_Q[x.m.n] || x.cat.n)).join("")}</div>
+      <div class="loop-col"><span class="loop-k" style="--c:var(--t-vd)">${icon("scale")}Resource it</span>${r.obligations.some(o => /COPPA/.test(o.law)) ? item("coppa", "Check your COPPA readiness", "Children under 13 may use this product, so the children's privacy rules likely apply") : ""}${item("cv", "Map your defenses against these risks", "The coverage radar shows where this product's risk outruns what you have in place")}${item("vd", "Weight a vendor comparison to these risks", f.up.length ? "More weight on " + loopList(f.up.map(x => x.split(" (")[0])) : "Your risks call for an even balance")}</div>
+    </div></section>`;
+}
+// Tabletop: the scenarios behind your biggest risks, above the full library
+function loopTTHTML(type){
+  const src = loopSource(); if(!src) return "";
+  const xs = loopScenarios(src.r, type, 3, LOOP_PM_TT[src.p.type]); if(!xs.length) return "";
+  const prog = ttProgress();
+  return `<section class="loop-strip" aria-labelledby="loop-tt-h"><div class="loop-sh"><h3 id="loop-tt-h">${icon("radar")}Recommended for your risks</h3><span class="note">From your pre-mortem, ${esc(src.name)}</span></div>
+    <div class="scen-grid">${xs.map(x => { const p = prog[ttKey(x.i, type)];
+      return `<button class="card scen loop-scen ${p ? "done" : ""}" data-i="${x.i}">
+        <div class="scen-top"><span class="libicon sm"><svg><use href="#${ttIcon(x.sc, type)}"/></svg></span>${sevPill(x.sc.severity)}<span class="pill accent" style="margin-left:auto">${esc(x.cat.n)}</span></div>
+        <h3>${esc(x.sc.title)}</h3><p>${esc(x.sc.blurb)}</p>
+        <span class="scen-foot"><span class="note">${p ? `✓ ${p.best}/4 strong calls on first try` : `Rehearses your ${esc(BANDS[x.cat.band][0].toLowerCase())} risk in ${esc(x.cat.n.toLowerCase())}`}</span></span></button>`; }).join("")}</div></section>`;
+}
+// Metrics: the numbers for your biggest risks, above the priority map
+function loopMxHTML(list){
+  const src = loopSource(); if(!src) return "";
+  const xs = loopMetrics(src.r, mx.platform, 4).filter(x => list.includes(x.m)); if(!xs.length) return "";
+  return `<section class="loop-strip mx-loop" aria-labelledby="loop-mx-h"><div class="loop-sh"><h3 id="loop-mx-h">${icon("radar")}For your biggest risks</h3><span class="note">From your pre-mortem, ${esc(src.name)}</span></div>
+    <div class="loop-mx">${xs.map(x => `<button type="button" class="loop-i" data-open="${METRICS.indexOf(x.m)}"><b>${esc(x.m.n)}</b><small>${esc(x.cat.n)} · ${esc(MX_Q[x.m.n] || "")}</small></button>`).join("")}</div></section>`;
+}
+function loopGo(v){
+  const here = (location.hash || "").slice(1).split("/")[0];
+  const src = here === "premortem" && pm && pm.type ? {r:assess(pm), p:pm, name:pm.name || "this assessment"} : loopSource();
+  if(v.startsWith("tt:")){ const parts = v.split(":"), i = +parts[1], variant = TT_TYPES.some(t => t.k === parts[2]) ? parts[2] : ttCompanyType(); if(!SCENARIOS[i]) return; ttStart(i, variant); return goRoute("tabletop"); }
+  if(v.startsWith("mx:")){ const parts = v.split(":"), m = METRICS[+parts[1]], pk = parts[2]; if(!m) return;
+    if(!mxList().includes(m)){ if(!(m.p === "all" || m.p.includes(mx.platform)) && pk && MX_PLATFORMS[pk]) mx.platform = pk; if(m.st > +mx.stage) mx.stage = String(m.st); if(m.reg) mx.reg = true; }
+    mx.orgSet = true; store.set("mx", mx); location.hash = "metrics/" + mxSlug(m); return; }
+  if(v === "vd"){ if(!src) return goRoute("vendors");
+    const fit = loopVendorWeights(src); vx.weights = Object.assign({}, fit.w); vx.fitW = Object.assign({}, fit.w); vx.fitWhy = {up:fit.up, down:fit.down}; vx.fitName = src.name; store.set("vx", vx);
+    goRoute("vendors"); return gsay("Vendor weights fitted to the risks in " + src.name); }
+  if(v === "coppa"){ if(typeof cpFromPM === "function" && src && (!cp.aud || cp.ex)){ cp = Object.assign(CP_BLANK(), cpFromPM(src)); cpSave(); } return goRoute("coppa"); }
+  if(v === "cv"){ if(cv.ex) cv = {src:null, ex:false, r:{}};
+    const onPM = here === "premortem" && pm, exk = onPM && pm.example ? Object.keys(PRESETS).find(k => PRESETS[k].name === pm.name) : null;
+    cv.src = onPM && pm.saved && pm.id ? "pm:" + pm.id : exk ? "ex:" + exk : "all"; cvSave(); return goRoute("coverage"); }
+}
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-loopgo]"); if(!b) return; e.preventDefault(); loopGo(b.dataset.loopgo); });
+
+/* ---------- Workspace settings, shown where a tool uses them ---------- */
+function orgFromTag(on){
+  return on ? `<a class="org-from" href="#workspace" title="Set in your workspace settings. Change them in My workspace.">${icon("user")}From your workspace</a>` : "";
+}
+function orgPrefillWhat(){
+  const o = orgGet(), xs = [o.type ? "product type" : "", o.youth ? "audience" : "", o.regions && o.regions.length ? "regions" : ""].filter(Boolean);
+  return xs.length ? loopList(xs) + (xs.length === 1 ? " is" : " are") : "workspace settings are";
+}
+// The AI assistants start from your company name and markets until you type your own
+function aiOrgDefaults(T, st){
+  if(st && st.f && Object.keys(st.f).length) return {};
+  const o = typeof orgGet === "function" ? orgGet() : {}, pr = wsProfile(), out = {};
+  T.fields.forEach(fd => {
+    if((fd.k === "product" || fd.k === "org") && pr && pr.org) out[fd.k] = pr.org;
+    if(fd.type === "checks" && fd.k === "regions" && o.regions && o.regions.length){ const ks = fd.opts.map(x => x[0]);
+      out.regions = ks.filter(k => o.regions.includes(k)).concat(ks.includes("other") && o.regions.some(k => !ks.includes(k)) ? ["other"] : []); }
+  });
+  return out;
+}
+
+/* ---------- Phones: More in the bottom bar opens the full menu ---------- */
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); });
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, about:renderAbout, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   // A shareable link straight into the demo company

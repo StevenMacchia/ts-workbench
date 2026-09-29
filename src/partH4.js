@@ -43,6 +43,12 @@ OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <polygon points="80,22 114,35 112,68 96,98 70,90 44,69 50,36" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3"/>
     <polygon points="80,30 108,39 118,70 86,82 66,92 48,68 58,44" fill="var(--t-cv)" fill-opacity=".25" stroke="var(--t-cv)" stroke-width="2" stroke-linejoin="round"/>
     <circle cx="86" cy="82" r="4" fill="var(--crit)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
+OV_ART.cp = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="28" y="18" width="72" height="90" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
+    <rect x="40" y="31" width="34" height="6" rx="3" fill="var(--t-cp)" opacity=".85"/>
+    ${[48, 62, 76, 90].map((y, i) => `<rect x="40" y="${y}" width="10" height="10" rx="3" fill="${i < 2 ? "var(--good)" : "var(--sunk)"}" stroke="${i < 2 ? "none" : "var(--line-strong)"}"/><rect x="56" y="${y + 3}" width="${[32, 26, 34, 22][i]}" height="4" rx="2" fill="var(--faint)" opacity=".5"/>`).join("")}
+    <path d="M118 36l20 8v15c0 12-8.5 22-20 26-11.5-4-20-14-20-26V44l20-8z" fill="var(--surface)" stroke="var(--t-cp)" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="118" cy="55" r="5" fill="var(--t-cp)"/><path d="M109 71c1.6-5 4.8-7.6 9-7.6s7.4 2.6 9 7.6" stroke="var(--t-cp)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
@@ -55,6 +61,8 @@ function ovChip(it){
     return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
+  if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
+    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
   return "";
 }
@@ -86,6 +94,7 @@ function renderOverview(){
       <svg class="ph-mark" aria-hidden="true"><use href="#i-logo"/></svg>
       <h1>${typeof demoOn === "function" && demoOn() ? "Pixelry's safety program" : hello + (first ? ", " + esc(first) : "")}</h1>
       <p>${typeof demoOn === "function" && demoOn() ? "You're seeing it as Alex Rivera, Pixelry's Head of Trust &amp; Safety. " : ""}${sub}</p>
+      ${typeof helpBtn === "function" ? `<div class="ov-help">${helpBtn()}</div>` : ""}
       <div class="ph-stats">${(typeof ovHeroChips === "function" ? ovHeroChips() : []).map(c => `<span>${esc(c)}</span>`).join("")}</div>
       ${typeof demoOn === "function" && !demoOn() && !pic.done && !items.length ? `<div class="ov-demo"><button type="button" class="btn" data-demo="start">Explore a demo company ${icon("arrow")}</button><span>See every tool filled in for a fictional company in about three minutes, then start your own.</span></div>` : ""}
     </section>
@@ -116,6 +125,7 @@ function renderOverview(){
       <div class="ov-sec-h"><h3>All tools</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","Build the scorecard you bring to an executive review.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}

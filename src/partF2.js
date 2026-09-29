@@ -162,7 +162,7 @@ function askScreen(){
   if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
   const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k] || qHasValue(Q);
   return `<div class="pm-layout"><div>
-    ${pm.fromOrg && pm.qi < 2 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The product type and regions are set. Change them if this product is different.</span></div>` : ""}
+    ${pm.fromOrg && pm.qi < 3 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The ${typeof orgPrefillWhat === "function" ? orgPrefillWhat() : "product type and regions are"} set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
     <div class="card askcard">
       <div class="qprog"><span class="eyebrow">${Q.sec}</span><span class="note mono">${pm.qi+1} / ${qs.length}</span></div>
@@ -281,6 +281,7 @@ function bindPremortem(){
     if(d.libdelok){ const lib = libLoad(); delete lib[d.libdelok]; libSave(lib); if(pm.id===d.libdelok){ pm.saved = false; pm.id = null; } confirmDel = null; pm.flash = "Assessment deleted"; return rerender(); }
     if(d.tab){ pm.tab = d.tab; return rerender(); }
     if(d.rview){ pm.rview = d.rview; return rerender(); }
+    if(d.mview){ pm.mview = d.mview === "res" ? "res" : ""; pm.filter.cell = ""; return rerender(); }
     if(d.group){ pm.group = d.group; return rerender(); }
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }

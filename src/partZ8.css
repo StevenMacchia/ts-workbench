@@ -627,7 +627,7 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .jn-setup-h small{font-size:13px;color:var(--muted)}
 .jn-setup .org-card{box-shadow:none;border-style:dashed}
 .jn-setup .org-b > div:first-child{display:none}
-.jn-setup .org-b{grid-template-columns:minmax(200px,1fr) auto minmax(0,1.3fr);align-items:end;gap:16px}
+.jn-setup .org-b{grid-template-columns:minmax(170px,1fr) minmax(170px,1fr) auto minmax(0,1.2fr);align-items:end;gap:16px}
 .jn-next{margin-top:24px;padding:18px 20px;display:grid;gap:6px;border-radius:16px;background:radial-gradient(120% 120% at 0% 0%, color-mix(in oklab, var(--accent) 8%, var(--surface)), var(--surface) 60%);border-color:color-mix(in oklab, var(--accent) 30%, var(--line))}
 .jn-k{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
 .jn-next b{display:flex;align-items:center;gap:10px;font-size:17px;letter-spacing:-.01em}
@@ -974,3 +974,181 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .mx-sig-d{font-size:12.5px;white-space:nowrap}
 .mx-sig-d.good{color:var(--good)}.mx-sig-d.crit{color:var(--high)}
 .mx-sig-c b{color:var(--ink)}
+
+/* ---------- Residual risk and the risk burn-down ---------- */
+.pm-mcap{margin:10px 0 0}
+.pm-resid{display:block;margin-top:2px}
+.pm-resid b{font-weight:600}
+.pm-rnow{margin-left:8px;font-size:11.5px;font-weight:500;color:var(--good);white-space:nowrap}
+.pm-rnow::before{content:"→ "}
+.viz .card-h .segs button{white-space:nowrap}
+.pm-burn{margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px 28px;padding:20px 22px;border-radius:14px;align-items:start}
+@media (min-width:1280px){.pm-burn{grid-template-columns:minmax(220px,280px) minmax(0,1fr)}}
+.pm-burn h3{margin:0;font-size:16px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+.pm-bl{display:grid;gap:8px;align-content:start}
+.pm-bl .note{margin:0;line-height:1.55}
+.pm-bnums{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 10px}
+.pm-bnums b{font:700 34px/1 var(--display);letter-spacing:-.03em}
+.pm-bnums s{color:var(--faint);font-size:16px;text-decoration-thickness:1px}
+.pm-bnums .pill{align-self:center}
+.pm-bbars{display:grid;gap:7px;margin:4px 0;max-width:480px}
+.pm-bbar{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.pm-bchart{margin:0;display:grid;gap:6px}
+.pm-bchart svg{width:100%;height:auto;overflow:visible;display:block}
+.pm-bchart figcaption{margin:0}
+.pm-burn .bd-grid{stroke:var(--line);stroke-width:1}
+.pm-burn .bd-ax{font:500 11px var(--body);fill:var(--faint)}
+.pm-burn .bd-area{fill:var(--t-pm);opacity:.1}
+.pm-burn .bd-line{fill:none;stroke:var(--t-pm);stroke-width:2;stroke-linejoin:round}
+.pm-burn .bd-bl{stroke:var(--crit);stroke-width:1.2;stroke-dasharray:3 4;opacity:.7}
+.pm-burn .bd-bll{font:600 11px var(--body);fill:var(--crit)}
+.pm-burn .bd-hit{fill:transparent;stroke:transparent}
+.pm-burn .bd-hit:hover{fill:var(--t-pm);fill-opacity:.25}
+.pm-burn .bd-you{fill:var(--ink);stroke:var(--surface);stroke-width:2.5}
+.pm-burn .bd-youl{font:600 11.5px var(--body);fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+
+/* ---------- Program loop: from a pre-mortem to rehearsal, measurement and resourcing ---------- */
+.loop{margin-top:16px;padding:20px 22px;border-radius:16px;display:grid;gap:16px;background:radial-gradient(120% 140% at 100% 0%, color-mix(in oklab, var(--accent) 7%, var(--surface)), var(--surface) 55%)}
+.loop-h h3{margin:3px 0 4px;font-size:18px;letter-spacing:-.015em}
+.loop-h .note{margin:0}
+.loop-h .note b{color:var(--ink);font-weight:600}
+.loop-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.loop-col{display:grid;gap:8px;align-content:start}
+.loop-k{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:color-mix(in oklab, var(--c) 65%, var(--ink))}
+.loop-k svg{width:15px;height:15px;color:var(--c)}
+.loop-i{display:grid;gap:2px;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer;transition:border-color .15s, box-shadow .15s}
+.loop-i:hover{border-color:color-mix(in oklab, var(--ink) 25%, transparent);box-shadow:var(--shadow)}
+.loop-i b{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.loop-i small{font-size:12.5px;color:var(--muted);line-height:1.45}
+@media (max-width:900px){.loop-cols{grid-template-columns:1fr}}
+.loop-strip{margin:0 0 20px}
+.loop-sh{display:flex;align-items:baseline;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;margin-bottom:10px}
+.loop-sh h3{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:16px;letter-spacing:-.01em}
+.loop-sh h3 svg{width:17px;height:17px;color:var(--t-pm)}
+.loop-sh .note{margin:0}
+.loop-scen{border-color:color-mix(in oklab, var(--t-pm) 35%, var(--line))}
+.loop-mx{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}
+.mx-loop{margin-top:22px}
+.loop-chip{display:inline-flex;align-items:center;gap:6px}
+.loop-chip svg{width:14px;height:14px}
+.loop-vnote{margin:2px 0 0;line-height:1.5}
+.loop-vnote b{color:var(--ink);font-weight:600}
+.org-from{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap;justify-self:start}
+.org-from svg{width:14px;height:14px}
+.org-from:hover{color:var(--ink)}
+.pol-h .org-from{margin-left:auto}
+.ma-stages + .org-from{margin-top:10px}
+
+/* ---------- COPPA readiness ---------- */
+:root{--t-cp:#8D6E4B}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-cp:#D4B48C} }
+:root[data-theme="dark"],:root[data-mode="dark"]{--t-cp:#D4B48C}
+:root[data-mode="light"]{--t-cp:#8D6E4B}
+.cp-setup .tr-tier.on{border-color:var(--t-cp);box-shadow:inset 0 0 0 1px var(--t-cp);background:color-mix(in oklab, var(--t-cp) 7%, var(--surface))}
+.cp-setup .tr-tier:focus-visible{outline:2px solid var(--t-cp);outline-offset:2px}
+.cp-setup .tr-tier.off{opacity:.6}
+.cp-setup .tr-tier b{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.cp-setup .tr-chk input{accent-color:var(--t-cp)}
+.cp-setup .tr-chk small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.cp-setup .pol-tip{border-left-color:var(--t-cp)}
+.tr-tiers.cp-aud,.tr-tiers.cp-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){.tr-tiers.cp-aud,.tr-tiers.cp-two{grid-template-columns:1fr}}
+.banner.cp-ap{margin:0}
+.banner.cp-ap.crit{background:color-mix(in oklab, var(--crit) 10%, var(--surface))}
+.banner.cp-ap.high{background:color-mix(in oklab, var(--high) 10%, var(--surface))}
+.banner.cp-ap.good{background:color-mix(in oklab, var(--good) 10%, var(--surface))}
+.cp-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px}
+@media (max-width:640px){.cp-checks{grid-template-columns:1fr}}
+.cp-new{display:inline-block;margin-left:6px;padding:0 5px;border:1px solid color-mix(in oklab, var(--t-cp) 50%, transparent);border-radius:4px;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--t-cp);white-space:nowrap;vertical-align:1px;line-height:1.5}
+.cp-pi{display:grid;gap:8px}
+.cp-row{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surface)}
+.cp-row.on{border-color:color-mix(in oklab, var(--t-cp) 45%, var(--line));background:color-mix(in oklab, var(--t-cp) 4%, var(--surface))}
+.cp-row .tr-chk b{font-weight:600}
+.cp-row-d{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.7fr) minmax(0,1fr);gap:10px 14px;margin-top:10px;padding-left:26px}
+@media (max-width:760px){.cp-row-d{grid-template-columns:1fr;padding-left:0}}
+.cp-row-d .field{margin:0;gap:4px}
+.cp-row-d label,.cp-row-d .lbl{font-size:12px;color:var(--muted)}
+.cp-chips{display:flex;flex-wrap:wrap;gap:5px}
+.cp-chips .pol-chip{font-size:12px;padding:3px 9px}
+.cp-flag{margin:8px 0 0 26px;font-size:12.5px;line-height:1.5}
+.cp-flag.crit{color:var(--crit)} .cp-flag.high{color:var(--high)} .cp-flag.info{color:var(--muted)}
+@media (max-width:760px){.cp-flag{margin-left:0}}
+.cp-grps{display:grid;gap:10px}
+.cp-grp{display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.cp-grp h4{margin:0;font-size:14px}
+.cp-grp .note{margin:-4px 0 2px}
+.cp-ring{border-color:color-mix(in oklab, var(--t-cp) 35%, var(--sunk))}
+.cp-ring.crit{border-color:color-mix(in oklab, var(--crit) 35%, var(--sunk))}
+.cp-ring.good{border-color:color-mix(in oklab, var(--good) 40%, var(--sunk))}
+.cp-kpis{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cp-gaps{display:grid}
+.cp-gap{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.cp-gap:first-child{padding-top:2px}
+.cp-gap:last-child{border-bottom:0}
+.cp-gb{display:grid;gap:6px}
+.cp-gap h4{margin:0;font-size:15px;letter-spacing:-.01em;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.cp-gap p{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.cp-gap .cp-fix{color:var(--ink)}
+.cp-gap .cp-case{font-size:12.5px;padding-left:10px;border-left:2px solid var(--line-strong)}
+.cp-gm{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cp-mapw{overflow-x:auto}
+.cp-map{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+.cp-map th,.cp-map td{text-align:left;padding:9px 14px 9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.cp-map th{font-size:12px;color:var(--muted);font-weight:600}
+.cp-map td small{display:block;font-size:12px;line-height:1.45;margin-top:3px}
+.cp-map td small.crit{color:var(--crit)} .cp-map td small.high{color:var(--high)} .cp-map td small.info{color:var(--muted)}
+.cp-dtabs{display:flex;flex-wrap:wrap;margin-bottom:10px}
+.cp-dnote{margin:0 0 10px}
+.cp-draft{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:18px 22px;font-size:14px;line-height:1.6;max-height:560px;overflow:auto}
+.cp-draft h3{font-size:18px;margin:0 0 10px;letter-spacing:-.015em} .cp-draft h4{font-size:15px;margin:18px 0 6px} .cp-draft h5{font-size:14px;margin:14px 0 4px}
+.cp-draft p{margin:0 0 8px} .cp-draft ul,.cp-draft ol{margin:0 0 10px;padding-left:20px} .cp-draft li{margin:3px 0}
+.cp-tw{overflow-x:auto;margin:6px 0 12px}
+.cp-draft table{border-collapse:collapse;font-size:13px;min-width:520px}
+.cp-draft th,.cp-draft td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.cp-draft th{background:var(--surface)}
+.cp-draft .ph{background:color-mix(in oklab, var(--t-cp) 16%, transparent);border-radius:4px;padding:0 3px}
+.cp-dact{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.cp-rq{margin-bottom:18px}
+.cp-rq h4{margin:0 0 10px;font-size:15px;display:flex;gap:8px;align-items:baseline}
+.cp-rq .tr-check li b{font-weight:600}
+@media (max-width:640px){.cp-setup .pol-runbar .pol-rb-meter > .note{display:none}}
+/* Overview: eight tools, four to a row */
+.ov-tools > .ov-tool:nth-child(n+5){grid-column:span 3}
+.ov-tools > .ov-tool .ov-art{height:122px}
+@media (max-width:1100px){.ov-tools > .ov-tool,.ov-tools > .ov-tool:nth-child(n+5),.ov-tools > .ov-tool:last-child{grid-column:auto}}
+
+/* Long titles in Recent shorten with an ellipsis instead of widening the sidebar */
+.side nav.sb-nav,.sb-pins{grid-template-columns:minmax(0,1fr)}
+.sb-pin,.sb-pin span:last-child{min-width:0}
+
+/* ---------- Phones: bottom navigation, bigger tap targets, the next step always in reach ---------- */
+.bnav{display:none}
+@media (max-width:720px){
+  .bnav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:6px 8px calc(6px + env(safe-area-inset-bottom, 0px));background:color-mix(in oklab, var(--bg) 90%, transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-top:1px solid var(--line)}
+  .bnav a,.bnav button{display:grid;justify-items:center;align-content:center;gap:3px;min-height:50px;padding:4px 2px;border:0;border-radius:12px;background:none;color:var(--muted);font:500 11px/1.2 var(--body);text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .bnav svg{width:22px;height:22px}
+  .bnav [aria-current="page"],.bnav .on{color:var(--ink);background:var(--sunk)}
+  .page{padding-bottom:calc(104px + env(safe-area-inset-bottom, 0px))}
+  .gtoast{bottom:calc(86px + env(safe-area-inset-bottom, 0px))}
+  .pol-runbar{bottom:calc(70px + env(safe-area-inset-bottom, 0px))}
+  .tour-pop{bottom:calc(84px + env(safe-area-inset-bottom, 0px))}
+  body.tt-present .bnav{display:none}
+  .btn{height:40px;padding:0 14px;font-size:14px}
+  .btn.sm{height:38px;padding:0 12px;font-size:13.5px}
+  .btn.icon{min-width:38px;justify-content:center}
+  .segs button{min-height:36px}
+  .page input:not([type=checkbox]):not([type=radio]):not([type=range]),.page select,.page textarea,#cmdk-q{font-size:16px!important}
+  .page input[type=checkbox]{width:20px;height:20px}
+  .opt{padding:16px}
+  .mcell{min-height:52px}
+  .keyhint,.m-hide{display:none}
+  .learn > .row:last-child,.askcard .stepnav,.ttf-main > .ttf-go,.ttf-setup > .ttf-go{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom, 0px));z-index:5;margin-inline:-8px;padding:10px 8px;border-radius:14px;background:color-mix(in oklab, var(--surface) 94%, transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 -10px 24px -16px rgba(15,20,40,.35)}
+  .learn > .row:last-child .btn,.askcard .stepnav .btn,.ttf-main > .ttf-go .btn,.ttf-setup > .ttf-go .btn{flex:1;justify-content:center}
+}
+@media print{.bnav{display:none!important}}
+/* "How this page works" on the metric page bar and the Overview greeting */
+.mxc-r .ph-help{margin-left:0;align-self:center}
+.ov-help{margin-top:14px}
+.ov-help .ph-help{margin-left:0}
+/* Tour highlight: blocks without their own card get breathing room instead of a ring against the text */
+.tour-on:not(.card){outline:3px solid var(--accent);outline-offset:8px;box-shadow:0 0 0 8px color-mix(in oklab, var(--accent) 7%, transparent), 0 0 0 18px color-mix(in oklab, var(--accent) 14%, transparent) !important;border-radius:14px}

@@ -6,7 +6,8 @@ const AUTHOR = {name:"Steven Macchia", title:"Trust and Safety Leader", link:"ht
 const AB_GROUPS = [
   ["Assess", [["t-ma","steps","Program maturity","Rates a program in eight areas against targets for its stage. Ticking off the steps for the next level moves an area up, so the plan and the radar stay current."],
     ["t-cv","cover","Coverage radar","Rates five layers of defense for each kind of harm and overlays them on the pre-mortem's risk, so the gaps that matter most stand out."],
-    ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."]]],
+    ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."],
+    ["t-cp","coppa","COPPA readiness","Works out whether the US children's privacy law applies, maps children's data, and turns gaps against the 2025 amended Rule into a plan and four drafts for Legal."]]],
   ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
@@ -58,7 +59,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>How the scores work</h2>
       <div class="ab-dec">
-        <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical.</p></div>
+        <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical. Safeguards you tick lower likelihood, so every risk also has a rating after safeguards, and a burn-down shows how far the launch plan takes you.</p></div>
         <div><h3>Maturity</h3><p>Each area is rated on five levels. The rating is a baseline; finishing both steps for the next level moves the area up. Targets come from the stage: level 3 for growing programs, with crisis, compliance and wellbeing never below 3.</p></div>
         <div><h3>Coverage</h3><p>Five layers of defense per harm area, each rated none to strong. Coverage is the share of the maximum, weighted by the pre-mortem's risk. An area is exposed when its risk is critical and its coverage is under half.</p></div>
         <div><h3>Report card</h3><p>Each finished part is scored out of 100: maturity against target, risk-weighted coverage, launch blockers done, strong first calls in tabletops, and policy clarity. The overall grade weighs them 30, 25, 20, 15 and 10.</p></div>

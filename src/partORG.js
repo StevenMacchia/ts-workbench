@@ -23,9 +23,10 @@ const orgTypeName = k => (ORG_TYPES.find(t => t.k === k) || {n:""}).n;
 const orgStageName = k => (ORG_STAGES.find(s => s.k === k) || {n:""}).n;
 // A new pre-mortem starts from the workspace's product type and regions; the person can change either
 function orgPrefillPM(p){
-  const o = orgGet(); if(!o.type && !(o.regions && o.regions.length)) return p;
+  const o = orgGet(); if(!o.type && !o.youth && !(o.regions && o.regions.length)) return p;
   const prev = pm; pm = p;
   if(o.type && ORG_MAP.pm[o.type]){ setType(ORG_MAP.pm[o.type]); pm.answered.type = true; }
+  if(o.youth && YOUTH.some(y => y.k === o.youth)){ pm.youth = o.youth; pm.answered.youth = true; }
   if(o.regions && o.regions.length){ pm.regions = o.regions.slice(); pm.answered.regions = true; }
   pm.fromOrg = true; const out = pm; pm = prev; return out;
 }
@@ -33,8 +34,9 @@ function orgPrefillPM(p){
 function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
   return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
-    <div><h3>Your organization</h3><p class="note">Used to pre-fill every tool: tabletop scenarios, maturity targets, metrics, policy tests and new pre-mortems. Change it any time.</p></div>
+    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, metrics, policy tests and the AI assistants. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
+    <div class="field"><label for="org-youth">Who can use it</label><select class="select" id="org-youth" data-org="youth"><option value="">Choose one</option>${YOUTH.map(y => `<option value="${y.k}" ${o.youth === y.k ? "selected" : ""}>${esc(y.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
     <div class="field"><span class="lbl">Where your users are</span><div class="org-regions">${REGIONS.map(r => `<button type="button" class="pol-chip" aria-pressed="${regions.includes(r.k)}" data-orgregion="${r.k}" title="${esc(r.n)}">${r.k.toUpperCase()}</button>`).join("")}</div></div>
   </div>${cta ? `<div class="org-cta"><span class="note">${orgReady() ? (regions.length ? "Saved as you go. Change any of it later in My workspace." : "Add where your users are, so law maps and pre-mortems match your markets.") : "Choose a company type and a stage to continue."}</span><button type="button" class="btn primary" data-orgdone="1" ${orgReady() ? "" : "disabled"}>Save and continue ${icon("arrow")}</button></div>` : ""}</div>`;
@@ -46,8 +48,8 @@ document.addEventListener("click", e => {
   const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
   gsay("Workspace settings saved");
 });
-document.addEventListener("change", e => { const t = e.target; if(t.dataset && t.dataset.org === "type"){ orgSet({type:t.value || null}); gsay("Workspace settings saved");
-  const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById("org-type"); if(again) again.focus(); } } });
+document.addEventListener("change", e => { const t = e.target; if(t.dataset && (t.dataset.org === "type" || t.dataset.org === "youth")){ orgSet({[t.dataset.org]:t.value || null}); if(t.dataset.org === "type") store.set("tt:type", null); gsay("Workspace settings saved");
+  const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById(t.id); if(again) again.focus(); } } });
 // The first review step is done when the person says so, then they go straight on to the next one
 document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-orgdone]"); if(!b || !orgReady()) return;
   orgSet({confirmed:true}); gsay("Workspace set up. Every tool will use it"); const next = typeof jnNext === "function" && jnNext(); if(next) jnGo(next.k); else renderOverview(); });
@@ -59,6 +61,7 @@ const NEW_ITEMS = [
   ["coverage", "cover", "var(--t-cv)", "Coverage radar", "Map your defenses against risk", () => goRoute("coverage")],
   ["tabletop", "siren", "var(--t-tt)", "Tabletop exercise", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
   ["policy", "doc", "var(--t-pol)", "Policy test", "Find where a rule is unclear", () => goRoute("policy")],
+  ["coppa", "coppa", "var(--t-cp)", "COPPA readiness", "Check children's privacy against the amended Rule", () => { if(cp.ex){ cp = CP_BLANK(); cpSave(); store.set("ws:cur:coppa", null); } goRoute("coppa"); }],
   ["vendors", "scale", "var(--t-vd)", "Vendor comparison", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
 function newMenuToggle(open){

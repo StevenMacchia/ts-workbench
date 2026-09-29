@@ -48,12 +48,15 @@ function nxItems(){
     if(!last || Date.now() - last > 90 * NX_DAY) out.push({kind:"maturity", snap:1, text:last ? "Take this quarter's maturity snapshot" : "Save a maturity snapshot as your starting point",
       ctx:last ? `Last one ${nxAgo(last)}. Snapshots are how you show progress to leadership` : "Snapshots are how you show progress to leadership", pri:4});
   }
+  // Rehearse the crisis behind your biggest remaining risk, if you haven't yet
+  if(typeof loopSource === "function"){ const src = loopSource(), type = ttCompanyType(), x = src && loopScenarios(src.r, type, 1, LOOP_PM_TT[src.p.type])[0];
+    if(x && !ttProgress()[ttKey(x.i, type)]) out.push({kind:"tabletop", loop:x.i, text:`Rehearse “${x.sc.title}”`, ctx:`Your biggest remaining risk: ${x.cat.n.toLowerCase()} · about 8 minutes`, pri:3.5}); }
   const runs = Object.values(typeof ttProgress === "function" ? ttProgress() : {}), lastRun = Math.max(0, ...runs.map(p => p.last || 0));
-  if(!out.some(x => x.snap) && runs.length && lastRun && Date.now() - lastRun > 30 * NX_DAY)
+  if(!out.some(x => x.snap || x.loop !== undefined) && runs.length && lastRun && Date.now() - lastRun > 30 * NX_DAY)
     out.push({kind:"tabletop", go:"tabletop", text:"Rehearse another crisis", ctx:`Your last tabletop was ${nxAgo(lastRun)}. About eight minutes`, pri:4});
   // Keep the list short and varied: at most three roadmap items and two launch blockers
   // The nudge always keeps its slot, since it is what brings the record up to date
-  const cap = {maturity:3, premortem:2, coverage:1}, seen = {}, nudge = out.find(x => x.pri >= 4);
+  const cap = {maturity:3, premortem:2, coverage:1, tabletop:1}, seen = {}, nudge = out.find(x => x.pri >= 4);
   const main = out.filter(x => x.pri < 4).sort((a, b) => a.pri - b.pri).filter(x => { seen[x.kind] = (seen[x.kind] || 0) + 1; return seen[x.kind] <= cap[x.kind]; });
   return main.slice(0, nudge ? 4 : 5).concat(nudge ? [nudge] : []);
 }
@@ -67,7 +70,7 @@ function nxHTML(){
     <div class="card nx-card">${xs.length ? `<ul class="nx-list">${xs.map(x => `<li class="nx-i ${x.late ? "late" : ""}">
         ${x.tick ? `<input type="checkbox" class="nx-cb" data-nxtick="${esc(x.tick)}" aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color(x.kind)}"><svg><use href="#i-${ic[x.kind]}"/></svg></span>`}
         <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span>${x.due ? `<span class="nx-due ${x.late ? "late" : ""}">${nxDueText(x.due)}</span>` : ""}</small></div>
-        ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
+        ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.loop !== undefined ? `<button type="button" class="btn sm" data-loopgo="tt:${x.loop}">Start</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
       </li>`).join("")}</ul>`
       : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing due, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
     </div></section>`;

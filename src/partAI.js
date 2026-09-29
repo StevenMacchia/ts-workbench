@@ -304,7 +304,7 @@ function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
   if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
-  const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), st.f);
+  const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
   const out = run.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ai-stage">${AI_STAGES[run.stage || 0]}…</b><span class="note">Claude is working on your own account. This usually takes 15 to 40 seconds.</span></div><button type="button" class="btn sm" id="ai-stop">Stop</button></div>`

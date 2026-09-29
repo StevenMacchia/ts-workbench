@@ -33,9 +33,9 @@ SCENARIOS.forEach((sc, si) => {
 { const si = SCENARIOS.findIndex(s=>s.id==="mules"); tt = freshTT(si); tt.first = []; tt.retried = [];
   const wrong = SCENARIOS[si].steps[0].o.findIndex(o=>!o.best), right = SCENARIOS[si].steps[0].o.findIndex(o=>o.best);
   tt.first[0] = wrong; tt.picks[0] = wrong; tt.answered = true; renderTabletop();
-  ["Not the strongest call","Try this decision again","The stronger call","Law and standards","Biggest gap"].forEach(t => { if(!view.innerHTML.includes(t)) throw new Error("learning panel missing: " + t); });
+  ["Not the strongest call",'id="tt-retry"',"The stronger call","Law and standards","Biggest gap"].forEach(t => { if(!view.innerHTML.includes(t)) throw new Error("learning panel missing: " + t); });
   tt.retried[0] = true; tt.picks[0] = right; renderTabletop();
-  if(!view.innerHTML.includes("Strong call, on your second try") || view.innerHTML.includes("Try this decision again")) throw new Error("retry state wrong");
+  if(!view.innerHTML.includes("Strong call, on your second try") || view.innerHTML.includes('id="tt-retry"')) throw new Error("retry state wrong");
   out.push("learning panel, comparison, law note and retry: ok");
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length,0); out.push("steps with law notes: " + lawSteps + " across " + SCENARIOS.filter(s=>s.steps.some(x=>x.law)).length + " scenarios"); }
 out.push("scenarios: " + SCENARIOS.length + " (new: " + (SCENARIOS.length-3) + ")");

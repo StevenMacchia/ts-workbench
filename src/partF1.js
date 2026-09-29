@@ -75,10 +75,19 @@ function assess(p){
   const safeguards = Object.values(map).sort((a,b)=>b.rank-a.rank || b.covers.length-a.covers.length);
 
   const counts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>counts[r.band]++);
-  const posture = counts.crit>=4 ? ["Severe","crit"] : (counts.crit>=1||counts.high>=5) ? ["High","high"] : counts.high>=1 ? ["Moderate","med"] : risks.length ? ["Low","good"] : ["Not assessed",""];
+  const postureOf = n => n.crit>=4 ? ["Severe","crit"] : (n.crit>=1||n.high>=5) ? ["High","high"] : n.high>=1 ? ["Moderate","med"] : risks.length ? ["Low","good"] : ["Not assessed",""];
+  const posture = postureOf(counts);
+  // Residual risk: safeguards in place make harm less likely, not less severe. A risk's likelihood falls
+  // one step once half of its safeguards are done and two steps when all are, never below Rare.
+  const done = p.done || {};
+  risks.forEach(r => { r.sgDone = r.sgs.filter(id => done[id]).length; r.cut = r.sgs.length ? Math.min(r.lik - 1, Math.floor(2 * r.sgDone / r.sgs.length + 1e-9)) : 0;
+    r.rlik = r.lik - r.cut; r.rscore = r.sev * r.rlik; r.rband = bandOf(r.rscore); });
+  const rcounts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>rcounts[r.rband]++);
+  const rposture = postureOf(rcounts);
+  const total = risks.reduce((a,r)=>a+r.score,0), rtotal = risks.reduce((a,r)=>a+r.rscore,0);
   const decisions = (DECISIONS[p.type]||[]).map((q,i)=>({id:p.type+"-"+i, q, src:labelOf(PLATFORMS,p.type)}))
     .concat(derivedDecisions(c).map((q,i)=>({id:"d-"+q.slice(0,24), q, src:"Your profile"})));
-  return {c, risks, obligations, safeguards, counts, posture, decisions};
+  return {c, risks, obligations, safeguards, counts, posture, decisions, rcounts, rposture, total, rtotal};
 }
 
 /* ---------- state ---------- */
