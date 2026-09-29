@@ -245,3 +245,17 @@ function renderTools(){
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
 }
+
+/* ---------- Guided steps: the strip across the top ---------- */
+const AS_BACK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const asInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s => s.done()) || !!store.get("as:start", false));
+// Where this step sits in the assessment, or just this tool when someone uses it on its own.
+// A tool that isn't one of the six steps (the policy test) shows as the optional part
+function asStepBar(k, pct, help){
+  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === k), inAs = asInAssessment() && (i >= 0 || k === "policy");
+  const name = i >= 0 ? J[i].n : (typeof ROUTE_LABEL !== "undefined" && ROUTE_LABEL[k]) || "", seq = inAs && i >= 0;
+  return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${AS_BACK}${inAs ? "Your assessment" : "All tools"}</a>
+    <div class="asb-mid"><span>${seq ? `Step ${i + 1} of ${J.length} · ` : inAs ? "Optional · " : ""}<b>${esc(name)}</b></span>
+      <span class="asb-segs" aria-hidden="true">${seq ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span></div>
+    <span class="asb-r"><span class="asb-saved">${icon("check")}Saved as you go</span>${help && typeof helpBtn === "function" ? helpBtn() : ""}</span></div>`;
+}

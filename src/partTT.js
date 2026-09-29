@@ -1,10 +1,12 @@
 function renderTabletop(){
   if(typeof ttf !== "undefined" && ttf && ttf.phase) return ttfRender();
-  if(!tt) return ttPicker(t => head('Incident Tabletop', t, 'Run the program'));
+  // The assessment strip: done once any scenario has been played
+  const bar = pct => typeof asStepBar === "function" ? asStepBar("crisis", pct, false) : "";
+  if(!tt) return ttPicker(t => bar(Object.keys(ttProgress()).length ? 100 : 0) + head('Incident Tabletop', t, 'Run the program'));
   if(!tt.first) tt.first = []; if(!tt.retried) tt.retried = [];
   const sc = ttScenario(tt.s, tt.v);
   // In a scenario the header shrinks to its name and your place in it
-  const H = () => headCompact("Incident Tabletop", esc(sc.title) + (tt.step >= sc.steps.length ? " · debrief" : ` · decision ${tt.step + 1} of ${sc.steps.length}`));
+  const H = () => bar(Math.round(Math.min(tt.step, sc.steps.length) / sc.steps.length * 100)) + headCompact("Incident Tabletop", esc(sc.title) + (tt.step >= sc.steps.length ? " · debrief" : ` · decision ${tt.step + 1} of ${sc.steps.length}`));
   if(tt.step >= sc.steps.length) return ttDebrief(H, sc);
   return ttPlay(H, sc);
 }

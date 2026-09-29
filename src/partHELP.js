@@ -63,6 +63,11 @@ const PAGE_TOURS = {
     [".vd-railc", "Watch the result", "The ranking updates as you score. The highest weighted score wins, unless a vendor fails a minimum."]
   ],
   maturity:[
+    [".gd-intro h1", "One area at a time", "Eight areas, one question each, about five minutes in all. At the end you get a score and a roadmap for the biggest gaps."],
+    [".gd-intro .gd-alt", "Other ways in", "Rate every area on one page, or see a finished example first."],
+    [".gd-s-stage .gd-opts", "Your size first", "Targets depend on how big and how regulated you are. It starts from your company profile."],
+    [".gd-q .gd-opts", "Pick the highest level that's true", "Choose the highest level where every statement is true today, or press 1 to 5. Your target is marked."],
+    [".gd-q .gd-aside", "Watch it fill in", "Your radar fills in against your target as you answer."],
     [".vd-main > .mxa-part:first-of-type", "Set your stage", "Targets depend on your company's size and how regulated you are, so start here."],
     [".ma-areas", "Rate each area", "Eight areas of a Trust & Safety program. Pick the level that matches your program today, one area at a time."],
     [".vd-railc", "Your profile", "Your radar and score update as you rate."],
@@ -76,12 +81,12 @@ const PAGE_TOURS = {
     [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
   ],
   coverage:[
-    [".cvg-intro h1", "One question at a time", "Five short questions for each kind of harm, about five minutes in all. At the end you'll see your risk next to your defenses."],
-    [".cvg-intro .cvg-alt", "Other ways in", "Answer everything in one table, start from your maturity ratings, or see a finished example."],
-    [".cvg-list", "Only what applies", "Untick harms your platform can't have. They're left out of the radar and your grade, and saved in your company profile."],
-    [".cvg-opts", "Pick the closest answer", "Click an answer or press 1 to 4. It moves on by itself, and Back lets you change it."],
-    [".cvg-aside", "Watch it fill in", "Your radar fills in as you answer, with your progress through each harm area."],
-    [".cvg-done", "A result after each area", "Coverage for that harm against its risk, and the one thing to fix first."],
+    [".gd-intro h1", "One question at a time", "Five short questions for each kind of harm, about five minutes in all. At the end you'll see your risk next to your defenses."],
+    [".gd-intro .gd-alt", "Other ways in", "Answer everything in one table, start from your maturity ratings, or see a finished example."],
+    [".gd-list", "Only what applies", "Untick harms your platform can't have. They're left out of the radar and your grade, and saved in your company profile."],
+    [".gd-opts", "Pick the closest answer", "Click an answer or press 1 to 4. It moves on by itself, and Back lets you change it."],
+    [".gd-aside", "Watch it fill in", "Your radar fills in as you answer, with your progress through each harm area."],
+    [".gd-done", "A result after each area", "Coverage for that harm against its risk, and the one thing to fix first."],
     [".cvr-radar", "Risk against coverage", "Where the dashed risk line sits outside your coverage, risk is outrunning your defenses."],
     [".cvr-top", "Close these first", "The three weakest defenses where risk is highest."],
     [".cvr-tabs", "The detail", "Every gap, every answer (change any of them here), and which product's risk you're comparing against."],

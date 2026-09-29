@@ -228,7 +228,9 @@ function renderPremortem(){
     actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
   }
-  view.innerHTML = (pm.stage === "start" ? head("Abuse Pre-mortem",
+  // The assessment strip: how far through the questions, or done once there is a report
+  const stripPct = pm.stage === "report" ? 100 : pm.stage === "ask" ? Math.round(pm.qi / Math.max(1, visibleQs().length) * 100) : Object.values(wsItems()).some(it => it.kind === "premortem") ? 100 : 0;
+  view.innerHTML = (typeof asStepBar === "function" ? asStepBar("premortem", stripPct, false) : "") + (pm.stage === "start" ? head("Abuse Pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
     "Build safely", actions) : headCompact("Abuse Pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">

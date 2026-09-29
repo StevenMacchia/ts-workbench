@@ -285,60 +285,52 @@ function cvNextPos(){
   const p = cvFirstOpen(); if(p) return p;
   return cvG && cvG.again && cvG.a + 1 < cvAreas(cv).length ? {a:cvG.a + 1, l:0} : null;
 }
-const cvInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s => s.done()) || !!store.get("as:start", false));
-const CV_BACK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-// The strip across the top: where this step sits in the assessment, or just this tool when used on its own
-function cvStepBar(pct){
-  const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === "coverage"), inAs = cvInAssessment() && i >= 0;
-  return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${CV_BACK}${inAs ? "Your assessment" : "All tools"}</a>
-    <div class="asb-mid"><span>${inAs ? `Step ${i + 1} of ${J.length} · ` : ""}<b>Map your coverage</b></span>
-      <span class="asb-segs" aria-hidden="true">${inAs ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span></div>
-    <span class="asb-r"><span class="asb-saved">${icon("check")}Saved as you go</span>${typeof helpBtn === "function" ? helpBtn() : ""}</span></div>`;
-}
+const cvInAssessment = () => asInAssessment();
+const cvStepBar = pct => asStepBar("coverage", pct, true);
 function cvIntroHTML(){
   const s = cvSummary(cv), n = cvAreas(cv).length, {src, s:srcs} = cvSrc(cv), rk = cvRisk(cv);
   const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
     : src.startsWith("pm:") ? `From the ${cvSrcName(cv)} pre-mortem.` : "From an example product. Run a pre-mortem for your own.";
-  return `<div class="cvg-w cvg-intro">
-    <span class="cvg-tool"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</span>
+  return `<div class="gd-w gd-intro">
+    <span class="gd-tool"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</span>
     <h1>Do your defenses keep up with your risk?</h1>
-    <p class="cvg-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
-    <div class="cvg-facts"><div><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
-    <div class="cvg-a"><button type="button" class="btn primary cvg-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
-      ${!src ? `<button type="button" class="btn cvg-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
-    <div class="cvg-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
+    <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
+    <div class="gd-facts"><div><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
+    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
+      ${!src ? `<button type="button" class="btn gd-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
+    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
   </div>`;
 }
 function cvApplyHTML(){
   const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
-  return `<div class="cvg-w">
-    <div class="cvg-hd"><span class="as-eb">Before you start</span><h1>Which of these can happen on ${esc((p && p.org) || "your platform")}?</h1>
+  return `<div class="gd-w">
+    <div class="gd-hd"><span class="as-eb">Before you start</span><h1>Which of these can happen on ${esc((p && p.org) || "your platform")}?</h1>
       <p>Untick anything your platform can't have. It won't count toward your grade. It's saved in your company profile, so you can add it back any time.</p></div>
-    <div class="card cvg-list">${CV_AREAS.map(a => { const on = !off.includes(a.k), x = rk && rk[a.k];
-      return `<div class="cvg-ar ${on ? "" : "off"}"><label><input type="checkbox" data-cvapply="${a.k}" ${on ? "checked" : ""}><span class="cvg-arn">${esc(a.n)}</span>${x ? `<span class="pill ${x.band ? BANDS[x.band][1] : ""}">${x.band ? BANDS[x.band][0] + " risk" : "No risk found"}</span>` : ""}</label>
-        ${!on && x && x.score >= 8 ? `<p class="cvg-warn">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Leave it out only if that risk isn't real.</p>` : ""}</div>`; }).join("")}</div>
-    <div class="cvg-foot"><button type="button" class="btn" data-cvg="intro">Back</button><button type="button" class="btn primary" data-cvg="first">Continue with ${n} area${n === 1 ? "" : "s"} ${icon("arrow")}</button></div>
+    <div class="card gd-list">${CV_AREAS.map(a => { const on = !off.includes(a.k), x = rk && rk[a.k];
+      return `<div class="gd-ar ${on ? "" : "off"}"><label><input type="checkbox" data-cvapply="${a.k}" ${on ? "checked" : ""}><span class="gd-arn">${esc(a.n)}</span>${x ? `<span class="pill ${x.band ? BANDS[x.band][1] : ""}">${x.band ? BANDS[x.band][0] + " risk" : "No risk found"}</span>` : ""}</label>
+        ${!on && x && x.score >= 8 ? `<p class="gd-warn">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Leave it out only if that risk isn't real.</p>` : ""}</div>`; }).join("")}</div>
+    <div class="gd-foot"><button type="button" class="btn" data-cvg="intro">Back</button><button type="button" class="btn primary" data-cvg="first">Continue with ${n} area${n === 1 ? "" : "s"} ${icon("arrow")}</button></div>
   </div>`;
 }
 function cvQHTML(){
   const areas = cvAreas(cv); cvG.a = Math.max(0, Math.min(cvG.a || 0, areas.length - 1)); cvG.l = Math.max(0, Math.min(cvG.l || 0, CV_LAYERS.length - 1));
   const a = areas[cvG.a], L = CV_LAYERS[cvG.l], r = cv.r[a.k] || {}, Q = CV_Q[L.k];
-  return `<div class="cvg-q">
-    <div class="cvg-main">
-      <div class="cvg-crumb"><span class="cvg-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Question ${cvG.l + 1} of ${CV_LAYERS.length}</span></div>
+  return `<div class="gd-q">
+    <div class="gd-main">
+      <div class="gd-crumb"><span class="gd-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Question ${cvG.l + 1} of ${CV_LAYERS.length}</span></div>
       <h1>${esc(Q.q(a))}</h1>
-      <p class="cvg-why">${esc(Q.why)}</p>
-      <div class="cvg-opts" role="group" aria-label="${esc(L.n + " for " + a.n)}">${CV_LEVELS.map((n, j) => `<button type="button" class="cvg-opt ${r[L.k] === j ? "on" : ""}" data-cvpick="${j}" aria-pressed="${r[L.k] === j}">
-        <span class="cvg-radio" aria-hidden="true"></span><span class="cvg-ot"><span class="cvg-lv l${j}">${n}</span><span>${esc(L.lv[j])}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
-      <div class="cvg-foot"><button type="button" class="btn" data-cvg="back">Back</button><span class="note">Pick the closest, or press 1 to 4. You can change it later.</span></div>
+      <p class="gd-why">${esc(Q.why)}</p>
+      <div class="gd-opts" role="group" aria-label="${esc(L.n + " for " + a.n)}">${CV_LEVELS.map((n, j) => `<button type="button" class="gd-opt ${r[L.k] === j ? "on" : ""}" data-cvpick="${j}" aria-pressed="${r[L.k] === j}">
+        <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><span class="gd-lv l${j}">${n}</span><span>${esc(L.lv[j])}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
+      <div class="gd-foot"><button type="button" class="btn" data-cvg="back">Back</button><span class="note">Pick the closest, or press 1 to 4. You can change it later.</span></div>
     </div>
-    <aside class="cvg-aside" aria-label="Your progress">
-      <div class="card cvg-rad"><div class="cvg-rad-h"><b>Your radar so far</b><span class="note">Fills in as you answer</span></div><div class="as-rad-g">${cvRadar(cv, false)}</div>${cvLegend(cv)}</div>
-      <div class="card cvg-lays"><b>${esc(a.n)}</b>${CV_LAYERS.map((Ly, i) => { const v = r[Ly.k], now = i === cvG.l;
-        return `<div class="cvg-lay ${now ? "now" : ""}"><span>${Ly.n}</span><span class="cvg-lv l${v === undefined ? "x" : v}">${v === undefined ? (now ? "Now" : "–") : CV_LEVELS[v]}</span></div>`; }).join("")}</div>
-      <div class="cvg-chips"><span class="as-eb">Area ${cvG.a + 1} of ${areas.length}</span><div>${areas.map((z, i) => { const full = CV_LAYERS.every(Ly => (cv.r[z.k] || {})[Ly.k] !== undefined);
-        return `<span class="cvg-chip ${i === cvG.a ? "now" : full ? "full" : ""}">${esc(z.n)}</span>`; }).join("")}</div></div>
-      <div class="cvg-alt"><button type="button" class="ov-link" data-cvg="table">Answer the rest in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Fill the rest from your maturity ratings</button>` : ""}</div>
+    <aside class="gd-aside" aria-label="Your progress">
+      <div class="card gd-rad"><div class="gd-rad-h"><b>Your radar so far</b><span class="note">Fills in as you answer</span></div><div class="as-rad-g">${cvRadar(cv, false)}</div>${cvLegend(cv)}</div>
+      <div class="card gd-lays"><b>${esc(a.n)}</b>${CV_LAYERS.map((Ly, i) => { const v = r[Ly.k], now = i === cvG.l;
+        return `<div class="gd-lay ${now ? "now" : ""}"><span>${Ly.n}</span><span class="gd-lv l${v === undefined ? "x" : v}">${v === undefined ? (now ? "Now" : "–") : CV_LEVELS[v]}</span></div>`; }).join("")}</div>
+      <div class="gd-chips"><span class="as-eb">Area ${cvG.a + 1} of ${areas.length}</span><div>${areas.map((z, i) => { const full = CV_LAYERS.every(Ly => (cv.r[z.k] || {})[Ly.k] !== undefined);
+        return `<span class="gd-chip ${i === cvG.a ? "now" : full ? "full" : ""}">${esc(z.n)}</span>`; }).join("")}</div></div>
+      <div class="gd-alt"><button type="button" class="ov-link" data-cvg="table">Answer the rest in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Fill the rest from your maturity ratings</button>` : ""}</div>
     </aside>
   </div>`;
 }
@@ -350,21 +342,21 @@ function cvAreaDoneHTML(){
     : x.status === "covered" ? "Your defenses keep pace with the risk here." : x.score === null ? "There's no pre-mortem to compare against yet, so this shows coverage only."
     : x.score ? "Lower risk, so it counts for less in your grade." : "Your pre-mortem found no risk here, so it counts for little in your grade.";
   const nx = cvNextPos();
-  return `<div class="cvg-w"><div class="card cvg-done">
-    <div class="cvg-done-h"><span class="as-eb">${esc(a.n)} · done</span>${lab ? `<span class="pill ${lab[1]}">${lab[0]}</span>` : ""}</div>
+  return `<div class="gd-w"><div class="card gd-done">
+    <div class="gd-done-h"><span class="as-eb">${esc(a.n)} · done</span>${lab ? `<span class="pill ${lab[1]}">${lab[0]}</span>` : ""}</div>
     <h1>${x.cov}% covered</h1>
-    <div class="cvg-meter"><span class="cvg-mbar"><i class="${x.status}" style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${Math.min(x.riskPct, 99.6)}%"></em>` : ""}</span>
-      <span class="cvg-mlab"><span>Your coverage</span><span>${x.score !== null ? esc(cvRiskWords(x).replace(/^./, c => c.toUpperCase())) : ""}</span></span></div>
-    <p class="cvg-verdict">${esc(verdict)}</p>
-    ${weak ? `<div class="cvg-fix"><span class="as-eb">Start with ${esc(weak.n.toLowerCase())}</span><p>${esc(weak.act(cvHarm(a)))}</p></div>` : ""}
-    <div class="cvg-foot"><button type="button" class="btn" data-cvg="back">Change answers</button><button type="button" class="btn primary" data-cvg="next">${nx ? `Next: ${esc(areas[nx.a].n)}` : "See your results"} ${icon("arrow")}</button></div>
+    <div class="gd-meter"><span class="gd-mbar"><i class="${x.status}" style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${Math.min(x.riskPct, 99.6)}%"></em>` : ""}</span>
+      <span class="gd-mlab"><span>Your coverage</span><span>${x.score !== null ? esc(cvRiskWords(x).replace(/^./, c => c.toUpperCase())) : ""}</span></span></div>
+    <p class="gd-verdict">${esc(verdict)}</p>
+    ${weak ? `<div class="gd-fix"><span class="as-eb">Start with ${esc(weak.n.toLowerCase())}</span><p>${esc(weak.act(cvHarm(a)))}</p></div>` : ""}
+    <div class="gd-foot"><button type="button" class="btn" data-cvg="back">Change answers</button><button type="button" class="btn primary" data-cvg="next">${nx ? `Next: ${esc(areas[nx.a].n)}` : "See your results"} ${icon("arrow")}</button></div>
   </div></div>`;
 }
 function cvGuideRender(){
   // With no position yet, the intro shows without claiming one, so a finished set of answers still opens the results
   const scr = cvG ? cvG.scr : "intro", s = cvSummary(cv), pct = Math.round(s.rated / Math.max(1, s.total) * 100);
   const body = scr === "apply" ? cvApplyHTML() : scr === "q" ? cvQHTML() : scr === "done" ? cvAreaDoneHTML() : cvIntroHTML();
-  view.innerHTML = `<div class="cvg cvg-s-${scr}">${cvStepBar(pct)}<span class="toast" id="cv-toast" aria-live="polite"></span>${body}</div>`;
+  view.innerHTML = `<div class="gd gd-s-${scr}">${cvStepBar(pct)}<span class="toast" id="cv-toast" aria-live="polite"></span>${body}</div>`;
 }
 function cvResultsRender(){
   const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
@@ -374,7 +366,7 @@ function cvResultsRender(){
     : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " carries" : "s carry"} more risk than your coverage. Close these first.`
     : "Your coverage keeps pace with your risk in every harm area. Keep it current as your products change.";
   const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
-  view.innerHTML = `<div class="cvg cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
+  view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
     ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>

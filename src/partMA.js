@@ -283,6 +283,108 @@ function maMarkdown(d){
 }
 const maTitle = d => `Program maturity: ${maStage(d).n.toLowerCase()}, level ${(maScore(d) || 0).toFixed(1)}`;
 
+/* ---------- Guided: your size first, then one area at a time ---------- */
+// Where the guided flow is (intro, stage, an area). Null means work it out from the ratings.
+// maView "page" is the one-page version with every area at once, for people who know their program
+let maG = null, maView = null;
+function maMode(){
+  if(ma.ex) return "plan";
+  if(ma.edit || maView === "page") return "page";
+  if(maG) return "guide";
+  return maAllRated(ma) ? "plan" : "guide";
+}
+const maFirstOpen = () => { const i = MA_AREAS.findIndex(a => !ma.lv[a.k]); return i < 0 ? null : i; };
+// After an area: the next one still unrated, or simply the next one when going through them again
+function maNextOpen(i){
+  if(maG && maG.again) return i + 1 < MA_AREAS.length ? i + 1 : null;
+  const order = MA_AREAS.map((a, j) => j).slice(i + 1).concat(MA_AREAS.map((a, j) => j).slice(0, i));
+  const nx = order.find(j => !ma.lv[MA_AREAS[j].k]); return nx === undefined ? null : nx;
+}
+function maIntroHTML(){
+  const rated = MA_AREAS.filter(a => ma.lv[a.k]).length, o = typeof orgGet === "function" ? orgGet() : {};
+  return `<div class="gd-w gd-intro">
+    <span class="gd-tool"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</span>
+    <h1>How strong is your Trust &amp; Safety program?</h1>
+    <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
+    <div class="gd-facts"><div><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
+      <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
+    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
+    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Rate them all on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
+  </div>`;
+}
+function maStageStepHTML(){
+  const o = typeof orgGet === "function" ? orgGet() : {}, fromOrg = !ma.stageSet && o.stage === ma.stage;
+  return `<div class="gd-w">
+    <div class="gd-hd"><span class="as-eb">Before you start</span><h1>How big is your program?</h1>
+      <p>Targets depend on your size and how regulated you are.${fromOrg ? " We've picked the one from your company profile." : ""}</p></div>
+    <div class="gd-opts" role="group" aria-label="Your stage">${MA_STAGES.map((s, j) => `<button type="button" class="gd-opt ${ma.stage === s.k ? "on" : ""}" data-magstage="${s.k}" aria-pressed="${ma.stage === s.k}">
+      <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><b>${esc(s.n)}</b><span>${esc(s.d)}</span><span class="gd-sub">Target: ${esc(s.td)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
+    <p class="note gd-note">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>
+    <div class="gd-foot"><button type="button" class="btn" data-mag="intro">Back</button><button type="button" class="btn primary" data-mag="first">Continue ${icon("arrow")}</button></div>
+  </div>`;
+}
+function maQHTML(){
+  maG.i = Math.max(0, Math.min(maG.i || 0, MA_AREAS.length - 1));
+  const i = maG.i, a = MA_AREAS[i], lv = ma.lv[a.k], t = maStage().t;
+  return `<div class="gd-q">
+    <div class="gd-main">
+      <div class="gd-crumb"><span class="gd-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Area ${i + 1} of ${MA_AREAS.length}</span></div>
+      <h1>${esc(a.q)}</h1>
+      <p class="gd-why">${esc(a.why)} Pick the highest level where every statement is true today.</p>
+      <div class="gd-opts" role="group" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" class="gd-opt ${lv === j + 1 ? "on" : ""}" data-magpick="${j + 1}" aria-pressed="${lv === j + 1}">
+        <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><span class="gd-lvh"><span class="gd-lv lm">${j + 1} · ${MA_LEVELS[j].n}</span>${t[a.k] === j + 1 ? `<span class="ma-tg">Your target</span>` : ""}</span><span>${esc(txt)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
+      <div class="gd-foot"><button type="button" class="btn" data-mag="back">Back</button><span class="note">Pick the closest, or press 1 to 5. You can change it later.</span></div>
+    </div>
+    <aside class="gd-aside" aria-label="Your progress">
+      <div class="card gd-rad"><div class="gd-rad-h"><b>Your radar so far</b><span class="note">Against your target</span></div><div class="as-rad-g">${maRadar(ma, false)}</div>${maLegend(ma)}</div>
+      <div class="gd-chips"><span class="as-eb">Area ${i + 1} of ${MA_AREAS.length}</span><div>${MA_AREAS.map((z, j) => `<span class="gd-chip ${j === i ? "now" : ma.lv[z.k] ? "full" : ""}">${esc(z.s)}</span>`).join("")}</div></div>
+      <div class="gd-alt"><button type="button" class="ov-link" data-mag="page">Rate the rest on one page</button></div>
+    </aside>
+  </div>`;
+}
+function maGuideRender(){
+  const scr = maG ? maG.scr : "intro", rated = MA_AREAS.filter(a => ma.lv[a.k]).length;
+  const body = scr === "stage" ? maStageStepHTML() : scr === "q" ? maQHTML() : maIntroHTML();
+  view.innerHTML = `<div class="gd gd-s-${scr}" style="--tc:var(--t-ma)">${asStepBar("maturity", Math.round(rated / MA_AREAS.length * 100), true)}<span class="toast" id="ma-toast" aria-live="polite"></span>${body}</div>`;
+}
+// Every area rated: straight to the plan
+function maFinish(){ maG = null; ma.tab = "roadmap"; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1")); gsay(`All ${MA_AREAS.length} areas rated. Here's your plan`); }
+function maPick(n, now){
+  if(!maG || maG.scr !== "q") return;
+  const a = MA_AREAS[maG.i]; if(!a) return;
+  ma.lv[a.k] = n; ma.ex = false; maSave();
+  if(view.querySelectorAll) view.querySelectorAll("[data-magpick]").forEach(b => { const on = +b.dataset.magpick === n; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  const go = () => { if(!maG || maG.scr !== "q") return; const nx = maNextOpen(maG.i);
+    if(nx === null) return maFinish();
+    maG.i = nx; renderMaturity(); if(window.scrollY > 120) window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1")); };
+  clearTimeout(maPick.t); if(now) go(); else maPick.t = setTimeout(go, 260);
+}
+function maPickStage(k, now){
+  ma.stage = k; ma.stageSet = true; maSave();
+  if(view.querySelectorAll) view.querySelectorAll("[data-magstage]").forEach(b => { const on = b.dataset.magstage === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  clearTimeout(maPick.t); if(now) maGo("first"); else maPick.t = setTimeout(() => maGo("first"), 260);
+}
+function maGo(act){
+  clearTimeout(maPick.t);
+  const open = () => { const i = maFirstOpen(); return i === null ? null : {scr:"q", i}; };
+  if(act === "intro"){ maG = {scr:"intro"}; maView = null; }
+  else if(act === "start") maG = {scr:"stage"};
+  else if(act === "first" || act === "resume"){ maView = null; maG = open(); if(!maG) return maFinish(); }
+  else if(act === "back"){ if(!maG || maG.scr === "stage") maG = {scr:"intro"}; else if(maG.i > 0) maG.i--; else maG = {scr:"stage"}; }
+  else if(act === "again"){ maG = {scr:"q", i:0, again:true}; maView = null; ma.edit = false; }
+  else if(act === "page"){ maG = null; maView = "page"; }
+  else if(act === "guide"){ maView = null; ma.edit = false; maG = open() || {scr:"intro"}; }
+  maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1"));
+}
+// Number keys answer the current question from anywhere on the page
+document.addEventListener("keydown", e => {
+  if(!maG || !["q", "stage"].includes(maG.scr) || !document.body || document.body.dataset.route !== "maturity") return;
+  const max = maG.scr === "q" ? 5 : MA_STAGES.length;
+  if(!/^[1-9]$/.test(e.key) || +e.key > max || e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return;
+  if(document.querySelector("#tour-pop:not([hidden]), .tk-bg:not([hidden])")) return;
+  e.preventDefault(); if(maG.scr === "q") maPick(+e.key); else maPickStage(MA_STAGES[+e.key - 1].k);
+});
+
 function maHeadMeta(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
@@ -290,17 +392,19 @@ function maHeadMeta(){
       ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
       <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>` : ""}`;
 }
-const maPlanMode = () => maAllRated(ma) && !ma.edit;
+const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
   if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
+  if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
-  view.innerHTML = (maPlanMode() ? headCompact("Program Maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program Maturity",
+  view.innerHTML = (maPlanMode() ? asStepBar("maturity", 100, false) + headCompact("Program Maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program Maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
     <p class="mxa-q ma-q">How mature is your trust and safety program, and what should you fix first?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${MA_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     ${exBanner}
+    ${!ma.edit && !ma.ex && !maAllRated(ma) ? `<div class="banner cvt-b"><span><strong>Prefer one area at a time?</strong> The guided version asks the same questions, with your radar filling in as you go.</span><button type="button" class="btn sm" data-mag="guide">Switch to guided</button></div>` : ""}
     ${ma.edit ? `<div class="banner ma-exb"><span>You're editing your ratings. Your ticked steps, owners and snapshots are kept.</span><button type="button" class="btn sm primary" data-goresult="1">Back to your plan</button></div>` : ""}
     <div class="vd-grid ma-grid">
       <div class="vd-main">
@@ -324,13 +428,16 @@ function maRefresh(parts){
   const hm = view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = maHeadMeta();
 }
 function maScrollTo(el){ if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); }
-function maOpenPlan(){ ma.edit = false; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }
+function maOpenPlan(){ ma.edit = false; maView = null; maG = null; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }
 function bindMaturity(){
   const root = view;
   root.querySelectorAll(".ma-fw").forEach(d => d.addEventListener("toggle", () => store.set("ma:fw", d.open)));
   root.onclick = e => {
     const b = e.target.closest("button"); if(!b || !root.contains(b)) return;
     const d = b.dataset;
+    if(d.mag) return maGo(d.mag);
+    if(d.magpick) return maPick(+d.magpick);
+    if(d.magstage) return maPickStage(d.magstage);
     if(d.matab){ ma.tab = d.matab; if(d.masel) ma.sel = d.masel; maSave(); return maRefresh([]); }
     if(d.masel){ ma.sel = d.masel; maSave(); maRefresh([]); const n = document.querySelector(`.ma-al[data-masel="${d.masel}"]`); if(n) n.focus(); return; }
     if(d.masnapdel){ ma.hist = ma.hist.filter(h => String(h.t) !== d.masnapdel); maSave(); return maRefresh([]); }
@@ -353,8 +460,8 @@ function bindMaturity(){
       return;
     }
     switch(d.ma){
-      case "example": ma = maExample(); store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
-      case "clear": case "reset": ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ws:cur:maturity", null); maSave(); return renderMaturity();
+      case "example": ma = maExample(); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
+      case "clear": case "reset": ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
       case "edit": ma.edit = true; ma.open = null; maSave(); renderMaturity(); return window.scrollTo(0, 0);
       case "snapshot": { const lv = Object.fromEntries(MA_AREAS.map(a => [a.k, maLevelOf(ma, a.k)])), today = new Date().toDateString();
         ma.hist = ma.hist.filter(h => new Date(h.t).toDateString() !== today).concat([{t:Date.now(), stage:ma.stage, lv}]); maSave(); maRefresh([]);

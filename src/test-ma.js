@@ -11,8 +11,22 @@ const body = function(){
     MA_STAGES.forEach(s => { if(!(s.t[a.k] >= 1 && s.t[a.k] <= 5)) throw new Error("stage " + s.k + " has no target for " + a.k); });
     if(!MA_ORDER.includes(a.k)) throw new Error("priority order missing " + a.k); });
   out.push("content: " + MA_AREAS.length + " areas × 5 levels, " + MA_AREAS.length * 4 + " step sets, " + MA_STAGES.length + " stages with targets");
-  // blank: the rating flow
+  // blank: it opens guided, and every area on one page is a click away
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false, open:"policy"}); renderMaturity(); let h = view.innerHTML;
+  if(bad(h)) throw new Error("blank intro has bad values: " + where(h));
+  eq(/How strong is your Trust &amp; Safety program\?/.test(h) && /data-mag="start"/.test(h) && /data-mag="page"/.test(h) && /data-ma="example"/.test(h), true, "guided intro, one page and an example");
+  eq(/href="#tools"/.test(h), true, "on its own, back to All tools");
+  // guided: your size, then one area at a time, then the plan
+  maGo("start"); h = view.innerHTML; eq((h.match(/data-magstage=/g) || []).length, 3, "asks your size first");
+  maPickStage("scale", true); h = view.innerHTML; eq(ma.stage + "/" + ma.stageSet, "scale/true", "size saved");
+  eq(/Are your rules clear, written down and applied the same way every time\?/.test(h) && (h.match(/data-magpick=/g) || []).length, 5, "first area, five levels");
+  eq(/data-magpick="4"[^>]*>[\s\S]{0,260}Your target/.test(h), true, "the target for your size is marked");
+  maPick(2, true); eq(maG.i + "/" + ma.lv.policy, "1/2", "on to the next area"); maGo("back"); eq(maG.i, 0, "back to the first area"); maGo("back"); eq(maG.scr, "stage", "back to your size");
+  maGo("page"); eq(maMode(), "page", "switch to one page any time"); eq(/Switch to guided/.test(view.innerHTML), true, "and back");
+  maGo("guide"); eq(maG.scr + maG.i, "q1", "guided resumes at the first unrated area");
+  MA_AREAS.slice(1).forEach(() => maPick(3, true)); eq(maMode(), "plan", "the last area opens the plan"); eq(/id="ma-plan"/.test(view.innerHTML) && /class="asb"/.test(view.innerHTML), true, "plan with the assessment strip");
+  out.push("guided: size first, one area at a time with the target marked, back and resume, one page, then the plan");
+  ma = maInit({stage:"growth", lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = "page"; renderMaturity(); h = view.innerHTML;
   if(bad(h)) throw new Error("blank page has bad values: " + where(h));
   eq((h.match(/class="card ma-area/g) || []).length, 8, "one card per area"); eq((h.match(/class="card ma-area open"/g) || []).length, 1, "one area open");
   eq((h.match(/class="ma-opt /g) || []).length, 5, "five levels in the open area"); eq((h.match(/data-stage=/g) || []).length, 3, "three stages");
@@ -56,7 +70,7 @@ const body = function(){
   // every area at 5 and nothing to do
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false}); MA_AREAS.forEach(a => ma.lv[a.k] = 5); renderMaturity(); h = view.innerHTML;
   eq(maGaps(ma).length, 0, "no gaps at level 5"); eq(/No gaps against your targets/.test(h) && /every rated area meets the target/i.test(h), true, "celebrates no gaps");
-  ma.edit = true; renderMaturity(); eq(/Back to your plan/.test(view.innerHTML) && /class="card ma-area/.test(view.innerHTML), true, "edit ratings reopens the flow");
+  ma.edit = true; renderMaturity(); eq(/Back to your plan/.test(view.innerHTML) && /class="card ma-area/.test(view.innerHTML), true, "edit ratings reopens the flow"); ma.edit = false; maView = null;
   // exports and workspace
   ma = maExample();
   const md = maMarkdown(ma); eq(/\| Crisis response \| 2 · Developing \| 3 \| Head of Trust & Safety Operations \| Below target \|/.test(md), true, "markdown table with owners");
