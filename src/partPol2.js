@@ -133,7 +133,7 @@ function polReportHTML(ai){
         <button type="button" class="pol-add" data-poledit="1">Edit the rule or context</button></div>
     </div>
 
-    ${polRun.busy ? `<div class="card pol-sec pol-busy"><div class="pol-spin" aria-hidden="true"></div><div><b id="pol-stage">${POL_STAGES[polRun.stage]}…</b><p class="note">${pol.depth==="deep" ? "A deep review usually takes one to two minutes." : "Claude's review usually takes 20 to 60 seconds."} The instant checks are below while you wait.</p></div><button type="button" class="btn sm" id="pol-stop">Stop</button></div>` : ""}
+    ${polRun.busy ? `<div class="card pol-sec pol-busy"><div class="pol-spin" aria-hidden="true"></div><div><b id="pol-stage" aria-live="polite">${POL_PHASE[polRun.phase || "thinking"]}…</b><p class="note">${pol.depth==="deep" ? "A deep review usually takes one to two minutes." : "Claude's review usually takes 20 to 60 seconds."} The instant checks are below while you wait.</p></div><button type="button" class="btn sm" id="pol-stop">Stop</button></div>` : ""}
     ${polRun.err ? `<div class="pol-err" role="alert">${esc(polRun.err)}${ai ? ` <button type="button" class="btn sm" id="pol-run">Try again</button>` : ""}</div>` : ""}
     ${!r && !polRun.busy && !polRun.err ? (ai ? `<div class="banner pol-more"><span><strong>These are the instant checks.</strong> Claude's review adds edge cases for your platform, a clearer rewrite, a reviewer checklist and relevant laws.</span><button type="button" class="btn sm primary" id="pol-run">Stress-test with Claude ${icon("arrow")}</button></div>`
       : `<p class="note pol-more-n">Open this page in Claude while signed in to add Claude's review: edge cases for your platform, a clearer rewrite and a reviewer checklist.</p>`) : ""}

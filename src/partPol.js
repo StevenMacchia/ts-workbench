@@ -125,7 +125,8 @@ Reply with only a JSON object with exactly these keys:
  "reviewer_checklist": ["a short yes/no check a moderator applies, in order"] (3 to 5),
  "rewrite": "an improved version of the rule in plain language with a definition, examples, exceptions, consequences and how to appeal, under 200 words"}`;
 }
-const POL_STAGES = ["Reading your rule and context","Looking for words reviewers will read differently","Checking for missing exceptions and consequences","Writing realistic edge cases for your platform","Checking laws in your regions","Drafting a reviewer checklist","Writing a clearer rewrite"];
+// What Claude is actually doing: thinking until the first text arrives, then writing
+const POL_PHASE = {thinking:"Claude is reviewing your rule", writing:"Claude is writing the report"};
 const POL_ERR = {rate_limited:"You've reached your Claude usage limit for now. Instant checks still work; try the deeper analysis later.", refused:"Claude couldn't analyze this text. Try rephrasing the rule or the context.", invalid_json:"The analysis came back incomplete. Try again, or switch to standard depth.", empty_completion:"The analysis came back empty. Try a shorter rule.", prompt_too_large:"That's too much text to analyze at once. Shorten the rule or the context.", session_expired:"Your Claude session expired. Sign in again to use deeper analysis.", upstream_error:"There was a connection problem. Try again."};
 const POL_OFF = ["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
 function polValid(r){
@@ -213,10 +214,10 @@ async function polAnalyze(){
   pol.view = "report"; pol.rtab = "cases"; savePol();
   const polTop = () => { if(typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0); if(typeof focusQuiet === "function" && typeof document !== "undefined" && document.querySelector) focusQuiet(document.querySelector("#view h1")); };
   if(!SAMPLER || polRun.aiOff){ renderPolicy(); polTop(); return; }
-  polRun.busy = true; polRun.stage = 0; polRun.ctl = new AbortController(); renderPolicy(); polTop();
-  clearInterval(polRun.timer); polRun.timer = setInterval(() => { polRun.stage = Math.min(POL_STAGES.length-1, polRun.stage+1); const s = $("#pol-stage"); if(s) s.textContent = POL_STAGES[polRun.stage] + "…"; }, 5000);
+  polRun.busy = true; polRun.phase = "thinking"; polRun.ctl = new AbortController(); renderPolicy(); polTop();
+  const onText = () => { if(polRun.phase === "writing") return; polRun.phase = "writing"; const s = $("#pol-stage"); if(s) s.textContent = POL_PHASE.writing + "…"; };
   try{
-    const raw = await SAMPLER.json(polPrompt(), {signal: polRun.ctl.signal, modelTier: pol.depth==="deep" ? "complex" : "default"});
+    const raw = await SAMPLER.json(polPrompt(), {signal: polRun.ctl.signal, modelTier: pol.depth==="deep" ? "complex" : "default", onText});
     const res = polValid(raw);
     if(!res || !res.edge_cases.length) throw {code:"invalid_json"};
     pol.result = res; pol.ts = Date.now(); savePol();
@@ -225,7 +226,7 @@ async function polAnalyze(){
     if(POL_OFF.includes(code)){ polRun.aiOff = true; polRun.err = "Deeper analysis isn't available in this view, so here are the instant checks."; }
     else if(code !== "cancelled") polRun.err = POL_ERR[code] || POL_ERR.upstream_error;
   }finally{
-    clearInterval(polRun.timer); polRun.busy = false; polRun.ctl = null; renderPolicy();
+    polRun.busy = false; polRun.ctl = null; renderPolicy();
   }
 }
 function polMarkdown(){

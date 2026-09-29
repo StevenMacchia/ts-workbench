@@ -22,13 +22,15 @@ out.push("well-written rule instant score: " + polHeuristics(strong).score);
 return {out, run: async () => {
   pol.rule = POL_EXAMPLES[0][1]; $("#pol-rule").value = pol.rule;
   // stub sampler returning a plausible answer
-  SAMPLER = { json: async () => ({score:48, summary:"Too vague to enforce consistently.", vague_terms:[{term:"offensive", why:"subjective", suggest:"insults targeting a person"}], gaps:[{gap:"No exceptions", why:"news and satire"}],
+  let phases = "";
+  SAMPLER = { json: async (p, o) => { phases = polRun.phase; o.onText({text:"{", delta:"{"}); phases += " → " + polRun.phase; return {score:48, summary:"Too vague to enforce consistently.", vague_terms:[{term:"offensive", why:"subjective", suggest:"insults targeting a person"}], gaps:[{gap:"No exceptions", why:"news and satire"}],
     edge_cases:[{case:"A user quotes a slur to report it", decision:"allow", reasoning:"counter-speech"},{case:"Repeated DMs after block", decision:"REMOVE", reasoning:"persistent contact"},{case:"Satire of a politician", decision:"maybe", reasoning:"context"}],
-    enforcement_risks:["Over-removal of banter"], legal:[{law:"UK Online Safety Act", note:"illegal harassment"}], rewrite:"Harassment means..."}) };
+    enforcement_risks:["Over-removal of banter"], legal:[{law:"UK Online Safety Act", note:"illegal harassment"}], rewrite:"Harassment means..."}; } };
   await polAnalyze(); if(!pol.result || pol.result.edge_cases.length!==3) throw new Error("AI result not stored");
   if(pol.result.edge_cases[1].decision!=="remove" || pol.result.edge_cases[2].decision!=="escalate") throw new Error("decision normalization failed");
   renderPolicy(); if(bad(view.innerHTML) || !view.innerHTML.includes("Suggested rewrite") || !view.innerHTML.includes("Edge cases")) throw new Error("AI render bad");
-  out.push("AI path: result validated, decisions normalized, full report renders");
+  if(phases !== "thinking → writing") throw new Error("progress should follow streaming, got " + phases);
+  out.push("AI path: result validated, decisions normalized, full report renders, progress " + phases);
   SAMPLER = { json: async () => { throw {code:"rate_limited"}; } }; await polAnalyze(); out.push("rate limit message: " + polRun.err.slice(0,50) + "…");
   SAMPLER = { json: async () => { throw {code:"not_granted"}; } }; await polAnalyze(); out.push("declined consent → instant only: " + polRun.aiOff);
   // company lookup: Claude fills the platform details from its own knowledge, validated, with undo
