@@ -32,7 +32,7 @@ const body = function(){
   // the example opens as a plan a quarter in
   ma = maExample(); renderMaturity(); h = view.innerHTML;
   if(bad(h)) throw new Error("example plan has bad values: " + where(h));
-  eq(/id="ma-plan"/.test(h) && /Your maturity plan/.test(h), true, "example opens the plan"); eq(/This is an example/.test(h), true, "example is labelled");
+  eq(/id="ma-plan"/.test(h) && /Your maturity plan/.test(h), true, "example opens the plan"); eq(/type="date"|data-madue|due date/i.test(h), false, "no due dates on the roadmap"); eq(/This is an example/.test(h), true, "example is labelled");
   eq(maScore(ma), 2.3, "score counts the finished crisis steps"); eq(maLevelOf(ma, "crisis"), 2, "crisis moved up");
   const gaps = maGaps(ma); eq(gaps.map(g => g.a.k).join(","), "compliance,crisis,detection,quality,measurement", "gaps from current levels");
   const road = maRoadmap(ma); eq(road.length, 7, "roadmap planned from the baseline"); eq(road[0].done, true, "finished step shows as reached");

@@ -33,7 +33,7 @@ function demoFill(){
   const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
   orgSet({type:"social", stage:"growth", regions:["us", "eu", "uk"], confirmed:true});
   store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
-  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; ma.due.compliance1 = iso(-2); ma.due.crisis2 = iso(5); maSave();
+  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; maSave();
   wsSaveTool("maturity", ma, "Pixelry program maturity");
   [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
     pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
@@ -76,7 +76,7 @@ demoBar();
 const TOUR = [
   [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
   [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
-  [".nx", "Your next moves", "What to do this week, pulled from every tool: overdue roadmap items first, then each product's next launch blocker. You can tick them off right here."],
+  [".nx", "Your next moves", "What to do this week, pulled from every tool: each product's next launch blocker, this quarter's roadmap items and the biggest coverage gap. You can tick them off right here."],
   [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
   [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
   [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]

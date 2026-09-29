@@ -2380,8 +2380,7 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .ma-reached svg{width:14px;height:14px}
 .ma-step.done{opacity:1;border-color:color-mix(in oklab, var(--good) 45%, var(--line));background:color-mix(in oklab, var(--good) 5%, var(--surface))}
 .ma-step-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
-.ma-own{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
-.ma-due input{font:500 12px var(--body);color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:7px;padding:3px 6px}
+.ma-own{min-width:0;line-height:1.4}
 .ma-link{all:unset;cursor:pointer;color:var(--t-ma);font-weight:500}
 .ma-link:hover{text-decoration:underline;text-underline-offset:3px}
 .ma-link:focus-visible{outline:2px solid var(--t-ma);outline-offset:2px;border-radius:3px}
@@ -2622,8 +2621,6 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .nx-t b{font-size:14px;font-weight:550;line-height:1.4}
 .nx-t small{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}
 .nx-k{font-weight:500}
-.nx-due{color:var(--muted)}
-.nx-due.late{color:var(--crit);font-weight:600}
 .nx-open{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;color:var(--faint)}
 .nx-open:hover{background:var(--sunk);color:var(--ink)}
 .nx-open svg{width:16px;height:16px}
@@ -2871,13 +2868,9 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .tr-ai p,.tr-ai li{line-height:1.6;font-size:14.5px}
 .tr-uk{margin:0}
 
-/* ---------- Tier 3: calendar and what changed ---------- */
-.ma-rh-a{display:flex;gap:8px;flex-wrap:wrap}
+/* ---------- Tier 3: what changed ---------- */
 .pm-changes{margin-top:16px;padding:14px 18px;border-left:3px solid var(--accent)}
 .pm-changes ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px;font-size:14px;line-height:1.5}
-.ma-tabrow{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap}
-.ma-tabrow .ma-tabnote{margin:0}
-.ma-tabrow{margin-bottom:6px}
 
 /* ---------- Page walkthroughs, welcome back and glossary terms ---------- */
 .ph-help{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:6px;margin-left:6px;padding:3px 10px 3px 8px;border-radius:999px;border:1px solid color-mix(in oklab, currentColor 32%, transparent);font-size:12.5px;font-weight:500;line-height:1.4;cursor:pointer;white-space:nowrap}
@@ -4491,7 +4484,7 @@ let DL = null;
 const STANDALONE = !(window.claude && typeof window.claude.use === "function");
 if(STANDALONE && typeof Blob !== "undefined" && typeof URL !== "undefined" && URL.createObjectURL){
   DL = {save: async ({filename, data}) => {
-    const type = /\.html?$/.test(filename) ? "text/html" : /\.ics$/.test(filename) ? "text/calendar" : /\.csv$/.test(filename) ? "text/csv" : /\.json$/.test(filename) ? "application/json" : "text/markdown";
+    const type = /\.html?$/.test(filename) ? "text/html" : /\.csv$/.test(filename) ? "text/csv" : /\.json$/.test(filename) ? "application/json" : "text/markdown";
     const url = URL.createObjectURL(new Blob([data], {type: type + ";charset=utf-8"}));
     const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
@@ -8922,7 +8915,7 @@ function renderAbout(){
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
     ["One workspace, one vocabulary","Company type, stage and regions are set once and pre-fill every tool. Every saved result lands in the same workspace, grouped by project."],
     ["Every number explains itself","Each risk rating lists the answers that raised or lowered it, and every score on the report card shows what it's made of, so the output can be challenged and defended."],
-    ["Plans, not just scores","Maturity and coverage end in steps with owners and due dates. Finishing the steps moves the score, and the steps go to Jira, Asana, Linear or GitHub."],
+    ["Plans, not just scores","Maturity and coverage end in concrete steps. Finishing the steps moves the score, and the steps go to Jira, Asana, Linear or GitHub."],
     ["Plain language first","Questions are written for product managers and founders, not specialists. Terms like CSAM, KYC or sextortion explain themselves on hover."],
     ["Accessible in both themes","Tuned light and dark themes, visible focus states, labelled controls, reduced-motion support and layouts that work down to phone width."]
   ];
@@ -10006,7 +9999,7 @@ const MA_FW = {
    so the radar, score and roadmap always show where the program is now.
    ========================================================= */
 let ma = store.get("ma", null) || {stage:"growth", lv:{}, done:{}, ex:false, open:"policy"};
-const maInit = d => { ["done", "own", "due", "notes"].forEach(k => { if(!d[k] || typeof d[k] !== "object") d[k] = {}; }); if(!Array.isArray(d.hist)) d.hist = []; if(!d.tab) d.tab = "roadmap"; return d; };
+const maInit = d => { ["done", "own", "notes"].forEach(k => { if(!d[k] || typeof d[k] !== "object") d[k] = {}; }); delete d.due; if(!Array.isArray(d.hist)) d.hist = []; if(!d.tab) d.tab = "roadmap"; return d; };
 maInit(ma);
 const MA_STEPS = [["Set your stage", "Targets depend on your size and how regulated you are."], ["Rate each area", "Pick the level that matches your program today, one area at a time."], ["Work the plan", "Tick off steps as you finish them. Areas move up as you do."]];
 const MA_TABS = [["roadmap", "Roadmap"], ["areas", "By area"], ["progress", "Progress"]];
@@ -10014,10 +10007,9 @@ const maSave = () => store.set("ma", ma);
 const maStage = d => MA_STAGES.find(s => s.k === (d || ma).stage) || MA_STAGES[1];
 const maArea = k => MA_AREAS.find(a => a.k === k);
 const maDate = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
-// The example opens as a plan in progress: a few steps done, owners, due dates and last quarter's snapshot
+// The example opens as a plan in progress: a few steps done, owners and last quarter's snapshot
 function maExample(){
-  const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
-  d.due = {crisis2:iso(30), compliance1:iso(21), detection2:iso(45), quality2:iso(75), measurement2:iso(90)};
+  const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5;
   d.hist = [{t:Date.now() - 91 * day, stage:"growth", lv:{policy:2, detection:2, operations:2, quality:1, crisis:1, measurement:1, compliance:1, wellbeing:2}}];
   return d;
 }
@@ -10176,8 +10168,7 @@ function maRoadmapHTML(){
       <div class="ma-step-h"><b>${esc(s.a.n)}</b><span class="ma-lvl">Level ${s.from} → ${s.to}</span></div>
       <span class="ma-step-to">${s.done ? `<span class="ma-reached"><svg><use href="#i-check"/></svg>Level ${s.to} reached</span>` : `Reach <b>${MA_LEVELS[s.to - 1].n.toLowerCase()}</b>`}</span>
       <ul class="ma-check">${s.acts.map((x, i) => maItemHTML(s.id, i, x, seen)).join("")}</ul>
-      ${plan ? `<div class="ma-step-meta"><span class="ma-own" title="Area owner">${ma.own[s.a.k] ? esc(ma.own[s.a.k]) : `<button type="button" class="ma-link" data-matab="areas" data-masel="${s.a.k}">Add an owner</button>`}</span>
-        <label class="ma-due"><span class="visually-hidden">Due date for ${esc(s.a.n)} level ${s.to}</span><input type="date" data-madue="${s.id}" value="${esc(ma.due[s.id] || "")}"></label></div>` : ""}
+      ${plan ? `<div class="ma-step-meta"><span class="ma-own" title="Area owner">${ma.own[s.a.k] ? esc(ma.own[s.a.k]) : `<button type="button" class="ma-link" data-matab="areas" data-masel="${s.a.k}">Add an owner</button>`}</span></div>` : ""}
       ${s.a.tool ? `<a class="ma-tool" href="#${s.a.tool[0]}">${esc(s.a.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</article>`;
   return more + `<div class="ma-road">${MA_PHASES.map(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return "";
     return `<section class="ma-phase ma-${k}"><div class="ma-ph"><b>${n}</b><span>${when}</span><span class="ma-phn mono">${xs.filter(s => s.done).length}/${xs.length}</span></div>${xs.map(card).join("")}</section>`; }).join("")}</div>
@@ -10194,20 +10185,6 @@ function maFrameworkHTML(k){
     <p class="ma-fw-note">${esc(f.note)}</p>
     <p class="note ma-fw-src">Sources: <a href="${MA_FW_SRC.dtsp[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.dtsp[0])}</a>; <a href="${MA_FW_SRC.illegal[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.illegal[0])}</a>; <a href="${MA_FW_SRC.children[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.children[0])}</a>. Mapping last reviewed ${MA_FW_REVIEWED}. A guide to where to look, not legal advice.</p>
   </details>`;
-}
-// Roadmap due dates as all-day calendar events (iCalendar), so they reach people outside the workbench
-const maDueSteps = () => maRoadmap(ma).filter(s => !s.done && ma.due && ma.due[s.id]);
-function maIcs(){
-  const txt = s => String(s).replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\r?\n/g, "\\n");
-  const fold = line => { const out = []; let s = line; while(s.length > 73){ out.push(s.slice(0, 73)); s = " " + s.slice(73); } out.push(s); return out.join("\r\n"); };
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  const day = iso => iso.replace(/-/g, "");
-  const after = iso => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10).replace(/-/g, ""); };
-  const events = maDueSteps().map(s => { const due = ma.due[s.id], open = s.acts.filter((a, i) => !ma.done[`${s.id}-${i}`]);
-    const desc = [`Program maturity roadmap. ${s.a.n}: from level ${s.from} to level ${s.to}.`].concat(ma.own && ma.own[s.a.k] ? ["Owner: " + ma.own[s.a.k]] : [], ["Still to do:"], open.map(a => "- " + a), ["", "From T&S Workbench."]).join("\n");
-    return ["BEGIN:VEVENT", `UID:${s.id}-${day(due)}@ts-workbench`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${day(due)}`, `DTEND;VALUE=DATE:${after(due)}`,
-      "SUMMARY:" + txt(`${s.a.n}: reach level ${s.to} (${MA_LEVELS[s.to - 1].n})`), "DESCRIPTION:" + txt(desc), "END:VEVENT"].map(fold).join("\r\n"); });
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//T&S Workbench//Program maturity//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"].concat(events, ["END:VCALENDAR"]).join("\r\n") + "\r\n";
 }
 function maAreaTabHTML(){
   const t = maStage().t, sel = maArea(ma.sel) || (maGaps(ma)[0] || {a:MA_AREAS[0]}).a, seen = new Set(), base = ma.lv[sel.k] || 1, now = maLevelOf(ma, sel.k);
@@ -10270,14 +10247,14 @@ function maPlanHTML(){
       <div class="ma-band-r">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     </section>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
-    <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<div class="ma-tabrow"><p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maDueSteps().length ? `<button type="button" class="btn sm" data-ma="ics"><svg><use href="#i-download"/></svg>Add ${maDueSteps().length} due date${maDueSteps().length === 1 ? "" : "s"} to your calendar</button>` : ""}</div>${maRoadmapHTML()}`}</div>
+    <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <div class="ma-rh"><h4>Your roadmap</h4><span class="ma-rh-a">${maDueSteps().length ? `<button type="button" class="btn sm" data-ma="ics"><svg><use href="#i-download"/></svg>Add ${maDueSteps().length} due date${maDueSteps().length === 1 ? "" : "s"} to your calendar</button>` : ""}${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</span></div>${maRoadmapHTML()}`;
+    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d), pr = maProgress(d);
@@ -10289,7 +10266,7 @@ function maMarkdown(d){
   if(!steps.length) L.push(`No gaps against the targets for this stage.`, ``);
   MA_PHASES.forEach(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return;
     L.push(`### ${n} (${when})`, ``);
-    xs.forEach(s => { const due = d.due && d.due[s.id]; L.push(`**${s.a.n}: level ${s.from} → ${s.to} (${MA_LEVELS[s.to - 1].n})**${s.done ? " ✓ reached" : ""}${due ? ` · due ${due}` : ""}`);
+    xs.forEach(s => { L.push(`**${s.a.n}: level ${s.from} → ${s.to} (${MA_LEVELS[s.to - 1].n})**${s.done ? " ✓ reached" : ""}`);
       s.acts.forEach((x, i) => L.push(`- [${d.done && d.done[s.id + "-" + i] ? "x" : " "}] ${x}`)); L.push(``); }); });
   const notes = MA_AREAS.filter(a => d.notes && d.notes[a.k]);
   if(notes.length){ L.push(`## Evidence and notes`, ``); notes.forEach(a => L.push(`**${a.n}:** ${d.notes[a.k].replace(/\n+/g, " ")}`, ``)); }
@@ -10379,7 +10356,6 @@ function bindMaturity(){
         return gsay(`Snapshot saved: level ${maScore(ma).toFixed(1)} on ${maDate(Date.now())}`); }
       case "download": { const md = maMarkdown(ma); return offerFile(`ts-program-maturity-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#ma-toast")); }
       case "tasks": return tkOpen("maturity");
-      case "ics": { const n = maDueSteps().length, ics = maIcs(); offerFile("program-maturity-due-dates.ics", ics, ics); return gsay(`${n} due date${n === 1 ? "" : "s"} exported. Open the file to add them to your calendar`); }
       case "save": { const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
     }
   };
@@ -10393,7 +10369,6 @@ function bindMaturity(){
       maRefresh([]); const again = document.querySelector(`[data-done="${d.done}"]`); if(again) again.focus({preventScroll:true});
       return;
     }
-    if(d.madue){ ma.due[d.madue] = t.value; return maSave(); }
     if(d.maown){ ma.own[d.maown] = t.value.trim(); maSave(); const n = document.querySelector(`.ma-al[data-masel="${d.maown}"] small`); if(n) n.textContent = ma.own[d.maown] || "No owner yet"; return; }
     if(d.manote){ ma.notes[d.manote] = t.value; return maSave(); }
   };
@@ -11099,10 +11074,10 @@ function tkFromMaturity(){
   const out = [];
   maRoadmap(ma).forEach(s => { const ph = MA_PHASES.find(p => p[0] === s.phase);
     s.acts.forEach((a, i) => out.push({
-      id:`ma-${s.a.k}${s.from}-${i}`, title:a, group:`${ph[1]} (${ph[2]})`, owner:(ma.own && ma.own[s.a.k]) || "", due:(ma.due && ma.due[s.id]) || "", pr:s.phase === "now" ? 3 : s.phase === "next" ? 2 : 1, done:!!ma.done[s.a.k + s.from + "-" + i], def:!ma.done[s.a.k + s.from + "-" + i],
+      id:`ma-${s.a.k}${s.from}-${i}`, title:a, group:`${ph[1]} (${ph[2]})`, owner:(ma.own && ma.own[s.a.k]) || "", pr:s.phase === "now" ? 3 : s.phase === "next" ? 2 : 1, done:!!ma.done[s.a.k + s.from + "-" + i], def:!ma.done[s.a.k + s.from + "-" + i],
       labels:["trust-and-safety", "program-maturity", "maturity-" + s.a.k],
       desc:[a, "", `Program maturity: ${s.a.n}, from level ${s.from} (${MA_LEVELS[s.from - 1].n}) to level ${s.to} (${MA_LEVELS[s.to - 1].n}).`,
-        `Why it matters: ${s.a.why}`, `When: ${ph[1]}, ${ph[2].toLowerCase()}${ma.due && ma.due[s.id] ? `, due ${ma.due[s.id]}` : ""}.`, ma.own && ma.own[s.a.k] ? `Owner: ${ma.own[s.a.k]}.` : null, "", "From a program maturity assessment made with T&S Workbench."].filter(x => x !== null).join("\n")
+        `Why it matters: ${s.a.why}`, `When: ${ph[1]}, ${ph[2].toLowerCase()}.`, ma.own && ma.own[s.a.k] ? `Owner: ${ma.own[s.a.k]}.` : null, "", "From a program maturity assessment made with T&S Workbench."].filter(x => x !== null).join("\n")
     })); });
   return out;
 }
@@ -11113,8 +11088,8 @@ function tkCsvFor(k, tasks){
   const T = TK_TRACKERS.find(t => t.k === k);
   if(k === "jira") return tkCsv([["Summary", "Description", "Issue Type", "Priority", "Labels", "Labels", "Labels", "Labels"]]
     .concat(tasks.map(t => [tkClip(t.title, 250), t.desc, "Task", T.pr[t.pr], ...[0, 1, 2, 3].map(i => t.labels[i] || "")])));
-  if(k === "asana") return tkCsv([["Name", "Description", "Section", "Assignee", "Due Date", "Priority"]]
-    .concat(tasks.map(t => [t.title, t.desc + (t.owner && !t.desc.includes("Owner: ") ? `\n\nOwner: ${t.owner}` : ""), t.group, "", t.due ? t.due.replace(/^(\d{4})-(\d{2})-(\d{2})$/, "$2/$3/$1") : "", T.pr[t.pr]])));
+  if(k === "asana") return tkCsv([["Name", "Description", "Section", "Assignee", "Priority"]]
+    .concat(tasks.map(t => [t.title, t.desc + (t.owner && !t.desc.includes("Owner: ") ? `\n\nOwner: ${t.owner}` : ""), t.group, "", T.pr[t.pr]])));
   if(k === "linear") return tkCsv([["Title", "Description", "Priority", "Status", "Labels"]]
     .concat(tasks.map(t => [tkClip(t.title, 250), t.desc, T.pr[t.pr], "Todo", t.labels.join(",")])));
   return "";
@@ -11413,33 +11388,20 @@ function packOpen(){
 }
 /* =========================================================
    YOUR NEXT MOVES: the few things worth doing this week, pulled from every tool
-   Roadmap items by due date, each product's next launch blocker, the biggest coverage gap,
-   and a nudge when a snapshot or a rehearsal is overdue. Most can be ticked off right here.
+   This quarter's roadmap items, each product's next launch blocker, the biggest coverage gap,
+   and a nudge when a snapshot or a rehearsal is due. Most can be ticked off right here.
    ========================================================= */
 const NX_DAY = 86400000;
-const nxToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
-const nxDays = iso => Math.round((new Date(iso + "T00:00:00").getTime() - nxToday()) / NX_DAY);
-function nxDueText(iso){
-  if(!iso) return "";
-  const n = nxDays(iso);
-  if(n < 0) return `Overdue by ${-n} day${n === -1 ? "" : "s"}`;
-  if(n === 0) return "Due today";
-  if(n === 1) return "Due tomorrow";
-  if(n < 7) return `Due in ${n} days`;
-  return "Due " + new Date(iso + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"});
-}
 const nxAgo = t => { const d = Math.floor((Date.now() - t) / NX_DAY); return d < 14 ? `${d} days ago` : d < 60 ? `${Math.round(d / 7)} weeks ago` : `${Math.round(d / 30)} months ago`; };
 
 function nxItems(){
   const out = [];
-  // Maturity roadmap: the next unticked item in each open step. Overdue and due-soon first, then the "now" phase
+  // Maturity roadmap: the next unticked item in each open step of the "now" phase
   if(typeof maAllRated === "function" && !ma.ex && maAllRated(ma)){
     maRoadmap(ma).filter(s => !s.done).forEach(s => {
       const i = s.acts.findIndex((a, j) => !ma.done[`${s.id}-${j}`]); if(i < 0) return;
-      const due = ma.due && ma.due[s.id], n = due ? nxDays(due) : null;
-      if(s.phase !== "now" && !(n !== null && n <= 14)) return;
-      out.push({kind:"maturity", tick:"ma:" + s.id + "-" + i, text:s.acts[i], ctx:`${s.a.n} · level ${s.from} → ${s.to}`, due, late:n !== null && n < 0,
-        pri:n !== null && n < 0 ? 0 : n !== null && n <= 7 ? 1 : 2.2 + s.gi * 0.01});
+      if(s.phase !== "now") return;
+      out.push({kind:"maturity", tick:"ma:" + s.id + "-" + i, text:s.acts[i], ctx:`${s.a.n} · level ${s.from} → ${s.to}`, pri:2.2 + s.gi * 0.01});
     });
   }
   // Each saved product's next launch blocker, most recently worked on first; the same blocker is never listed twice
@@ -11480,12 +11442,12 @@ function nxHTML(){
   const xs = nxItems(), color = k => TOOL_COLOR[k] || "var(--accent)", ic = {maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren"};
   return `<section class="rise nx" aria-labelledby="nx-h">
     <div class="ov-sec-h"><h3 id="nx-h">Your next moves</h3><span class="note">From your roadmap, launch plans and coverage</span></div>
-    <div class="card nx-card">${xs.length ? `<ul class="nx-list">${xs.map(x => `<li class="nx-i ${x.late ? "late" : ""}">
+    <div class="card nx-card">${xs.length ? `<ul class="nx-list">${xs.map(x => `<li class="nx-i">
         ${x.tick ? `<input type="checkbox" class="nx-cb" data-nxtick="${esc(x.tick)}" aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color(x.kind)}"><svg><use href="#i-${ic[x.kind]}"/></svg></span>`}
-        <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span>${x.due ? `<span class="nx-due ${x.late ? "late" : ""}">${nxDueText(x.due)}</span>` : ""}</small></div>
+        <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span></small></div>
         ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.loop !== undefined ? `<button type="button" class="btn sm" data-loopgo="tt:${x.loop}">Start</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
       </li>`).join("")}</ul>`
-      : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing due, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
+      : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing urgent on your roadmap, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
     </div></section>`;
 }
 // Ticking an item here does exactly what ticking it in its tool does, then the report card moves
@@ -12036,7 +11998,7 @@ function demoFill(){
   const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
   orgSet({type:"social", stage:"growth", regions:["us", "eu", "uk"], confirmed:true});
   store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
-  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; ma.due.compliance1 = iso(-2); ma.due.crisis2 = iso(5); maSave();
+  ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; maSave();
   wsSaveTool("maturity", ma, "Pixelry program maturity");
   [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
     pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
@@ -12079,7 +12041,7 @@ demoBar();
 const TOUR = [
   [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
   [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
-  [".nx", "Your next moves", "What to do this week, pulled from every tool: overdue roadmap items first, then each product's next launch blocker. You can tick them off right here."],
+  [".nx", "Your next moves", "What to do this week, pulled from every tool: each product's next launch blocker, this quarter's roadmap items and the biggest coverage gap. You can tick them off right here."],
   [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
   [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
   [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
@@ -12192,11 +12154,11 @@ const PAGE_TOURS = {
     [".vd-main > .mxa-part:first-of-type", "Set your stage", "Targets depend on your company's size and how regulated you are, so start here."],
     [".ma-areas", "Rate each area", "Eight areas of a Trust & Safety program. Pick the level that matches your program today, one area at a time."],
     [".vd-railc", "Your profile", "Your radar and score update as you rate."],
-    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, add due dates to your calendar or send the plan to your tracker."],
+    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, or send the plan to your tracker."],
     [".ma-band-l", "Where you stand", "Your overall level against the target for your stage, the area to fix first, and how far through the plan you are."],
     [".ma-band-r", "Now against target", "Each area's level today, with the target for your stage as a dashed line. Red dots are below target."],
     [".ma-tabs", "Three views of the plan", "Roadmap puts the steps in order. By area shows each area's levels, owner and evidence. Progress tracks snapshots over time."],
-    ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar. Add due dates as you go."],
+    ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar."],
     [".ma-byarea", "One area at a time", "Pick an area to see every level, the steps to reach the next one, its owner and your evidence."],
     [".ma-prog-tab", "Show progress", "Save a snapshot each quarter, and the trend shows leadership how the program has grown."],
     [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]

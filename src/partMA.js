@@ -4,7 +4,7 @@
    so the radar, score and roadmap always show where the program is now.
    ========================================================= */
 let ma = store.get("ma", null) || {stage:"growth", lv:{}, done:{}, ex:false, open:"policy"};
-const maInit = d => { ["done", "own", "due", "notes"].forEach(k => { if(!d[k] || typeof d[k] !== "object") d[k] = {}; }); if(!Array.isArray(d.hist)) d.hist = []; if(!d.tab) d.tab = "roadmap"; return d; };
+const maInit = d => { ["done", "own", "notes"].forEach(k => { if(!d[k] || typeof d[k] !== "object") d[k] = {}; }); delete d.due; if(!Array.isArray(d.hist)) d.hist = []; if(!d.tab) d.tab = "roadmap"; return d; };
 maInit(ma);
 const MA_STEPS = [["Set your stage", "Targets depend on your size and how regulated you are."], ["Rate each area", "Pick the level that matches your program today, one area at a time."], ["Work the plan", "Tick off steps as you finish them. Areas move up as you do."]];
 const MA_TABS = [["roadmap", "Roadmap"], ["areas", "By area"], ["progress", "Progress"]];
@@ -12,10 +12,9 @@ const maSave = () => store.set("ma", ma);
 const maStage = d => MA_STAGES.find(s => s.k === (d || ma).stage) || MA_STAGES[1];
 const maArea = k => MA_AREAS.find(a => a.k === k);
 const maDate = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
-// The example opens as a plan in progress: a few steps done, owners, due dates and last quarter's snapshot
+// The example opens as a plan in progress: a few steps done, owners and last quarter's snapshot
 function maExample(){
-  const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
-  d.due = {crisis2:iso(30), compliance1:iso(21), detection2:iso(45), quality2:iso(75), measurement2:iso(90)};
+  const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5;
   d.hist = [{t:Date.now() - 91 * day, stage:"growth", lv:{policy:2, detection:2, operations:2, quality:1, crisis:1, measurement:1, compliance:1, wellbeing:2}}];
   return d;
 }
@@ -174,8 +173,7 @@ function maRoadmapHTML(){
       <div class="ma-step-h"><b>${esc(s.a.n)}</b><span class="ma-lvl">Level ${s.from} → ${s.to}</span></div>
       <span class="ma-step-to">${s.done ? `<span class="ma-reached"><svg><use href="#i-check"/></svg>Level ${s.to} reached</span>` : `Reach <b>${MA_LEVELS[s.to - 1].n.toLowerCase()}</b>`}</span>
       <ul class="ma-check">${s.acts.map((x, i) => maItemHTML(s.id, i, x, seen)).join("")}</ul>
-      ${plan ? `<div class="ma-step-meta"><span class="ma-own" title="Area owner">${ma.own[s.a.k] ? esc(ma.own[s.a.k]) : `<button type="button" class="ma-link" data-matab="areas" data-masel="${s.a.k}">Add an owner</button>`}</span>
-        <label class="ma-due"><span class="visually-hidden">Due date for ${esc(s.a.n)} level ${s.to}</span><input type="date" data-madue="${s.id}" value="${esc(ma.due[s.id] || "")}"></label></div>` : ""}
+      ${plan ? `<div class="ma-step-meta"><span class="ma-own" title="Area owner">${ma.own[s.a.k] ? esc(ma.own[s.a.k]) : `<button type="button" class="ma-link" data-matab="areas" data-masel="${s.a.k}">Add an owner</button>`}</span></div>` : ""}
       ${s.a.tool ? `<a class="ma-tool" href="#${s.a.tool[0]}">${esc(s.a.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</article>`;
   return more + `<div class="ma-road">${MA_PHASES.map(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return "";
     return `<section class="ma-phase ma-${k}"><div class="ma-ph"><b>${n}</b><span>${when}</span><span class="ma-phn mono">${xs.filter(s => s.done).length}/${xs.length}</span></div>${xs.map(card).join("")}</section>`; }).join("")}</div>
@@ -192,20 +190,6 @@ function maFrameworkHTML(k){
     <p class="ma-fw-note">${esc(f.note)}</p>
     <p class="note ma-fw-src">Sources: <a href="${MA_FW_SRC.dtsp[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.dtsp[0])}</a>; <a href="${MA_FW_SRC.illegal[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.illegal[0])}</a>; <a href="${MA_FW_SRC.children[1]}" target="_blank" rel="noopener">${esc(MA_FW_SRC.children[0])}</a>. Mapping last reviewed ${MA_FW_REVIEWED}. A guide to where to look, not legal advice.</p>
   </details>`;
-}
-// Roadmap due dates as all-day calendar events (iCalendar), so they reach people outside the workbench
-const maDueSteps = () => maRoadmap(ma).filter(s => !s.done && ma.due && ma.due[s.id]);
-function maIcs(){
-  const txt = s => String(s).replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\r?\n/g, "\\n");
-  const fold = line => { const out = []; let s = line; while(s.length > 73){ out.push(s.slice(0, 73)); s = " " + s.slice(73); } out.push(s); return out.join("\r\n"); };
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  const day = iso => iso.replace(/-/g, "");
-  const after = iso => { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10).replace(/-/g, ""); };
-  const events = maDueSteps().map(s => { const due = ma.due[s.id], open = s.acts.filter((a, i) => !ma.done[`${s.id}-${i}`]);
-    const desc = [`Program maturity roadmap. ${s.a.n}: from level ${s.from} to level ${s.to}.`].concat(ma.own && ma.own[s.a.k] ? ["Owner: " + ma.own[s.a.k]] : [], ["Still to do:"], open.map(a => "- " + a), ["", "From T&S Workbench."]).join("\n");
-    return ["BEGIN:VEVENT", `UID:${s.id}-${day(due)}@ts-workbench`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${day(due)}`, `DTEND;VALUE=DATE:${after(due)}`,
-      "SUMMARY:" + txt(`${s.a.n}: reach level ${s.to} (${MA_LEVELS[s.to - 1].n})`), "DESCRIPTION:" + txt(desc), "END:VEVENT"].map(fold).join("\r\n"); });
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//T&S Workbench//Program maturity//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"].concat(events, ["END:VCALENDAR"]).join("\r\n") + "\r\n";
 }
 function maAreaTabHTML(){
   const t = maStage().t, sel = maArea(ma.sel) || (maGaps(ma)[0] || {a:MA_AREAS[0]}).a, seen = new Set(), base = ma.lv[sel.k] || 1, now = maLevelOf(ma, sel.k);
@@ -268,14 +252,14 @@ function maPlanHTML(){
       <div class="ma-band-r">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     </section>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
-    <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<div class="ma-tabrow"><p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maDueSteps().length ? `<button type="button" class="btn sm" data-ma="ics"><svg><use href="#i-download"/></svg>Add ${maDueSteps().length} due date${maDueSteps().length === 1 ? "" : "s"} to your calendar</button>` : ""}</div>${maRoadmapHTML()}`}</div>
+    <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <div class="ma-rh"><h4>Your roadmap</h4><span class="ma-rh-a">${maDueSteps().length ? `<button type="button" class="btn sm" data-ma="ics"><svg><use href="#i-download"/></svg>Add ${maDueSteps().length} due date${maDueSteps().length === 1 ? "" : "s"} to your calendar</button>` : ""}${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</span></div>${maRoadmapHTML()}`;
+    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d), pr = maProgress(d);
@@ -287,7 +271,7 @@ function maMarkdown(d){
   if(!steps.length) L.push(`No gaps against the targets for this stage.`, ``);
   MA_PHASES.forEach(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return;
     L.push(`### ${n} (${when})`, ``);
-    xs.forEach(s => { const due = d.due && d.due[s.id]; L.push(`**${s.a.n}: level ${s.from} → ${s.to} (${MA_LEVELS[s.to - 1].n})**${s.done ? " ✓ reached" : ""}${due ? ` · due ${due}` : ""}`);
+    xs.forEach(s => { L.push(`**${s.a.n}: level ${s.from} → ${s.to} (${MA_LEVELS[s.to - 1].n})**${s.done ? " ✓ reached" : ""}`);
       s.acts.forEach((x, i) => L.push(`- [${d.done && d.done[s.id + "-" + i] ? "x" : " "}] ${x}`)); L.push(``); }); });
   const notes = MA_AREAS.filter(a => d.notes && d.notes[a.k]);
   if(notes.length){ L.push(`## Evidence and notes`, ``); notes.forEach(a => L.push(`**${a.n}:** ${d.notes[a.k].replace(/\n+/g, " ")}`, ``)); }
@@ -377,7 +361,6 @@ function bindMaturity(){
         return gsay(`Snapshot saved: level ${maScore(ma).toFixed(1)} on ${maDate(Date.now())}`); }
       case "download": { const md = maMarkdown(ma); return offerFile(`ts-program-maturity-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#ma-toast")); }
       case "tasks": return tkOpen("maturity");
-      case "ics": { const n = maDueSteps().length, ics = maIcs(); offerFile("program-maturity-due-dates.ics", ics, ics); return gsay(`${n} due date${n === 1 ? "" : "s"} exported. Open the file to add them to your calendar`); }
       case "save": { const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
     }
   };
@@ -391,7 +374,6 @@ function bindMaturity(){
       maRefresh([]); const again = document.querySelector(`[data-done="${d.done}"]`); if(again) again.focus({preventScroll:true});
       return;
     }
-    if(d.madue){ ma.due[d.madue] = t.value; return maSave(); }
     if(d.maown){ ma.own[d.maown] = t.value.trim(); maSave(); const n = document.querySelector(`.ma-al[data-masel="${d.maown}"] small`); if(n) n.textContent = ma.own[d.maown] || "No owner yet"; return; }
     if(d.manote){ ma.notes[d.manote] = t.value; return maSave(); }
   };

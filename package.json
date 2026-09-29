@@ -5,7 +5,7 @@
   "description": "Free, private Trust & Safety tools in a single HTML file.",
   "scripts": {
     "build": "node src/build-ws.js",
-    "test": "node src/build-ws.js && node src/test-v9.js && node src/test-mx.js && node src/test-vd.js && node src/test-ai.js && node src/test-pol.js && node src/test-ws.js && node src/test-tt.js && node src/test-ma.js && node src/test-ov.js && node src/test-tk.js && node src/test-cv.js && node src/test-rc.js && node src/test-org.js && node src/test-jn.js && node src/test-cp.js"
+    "test": "node src/build-ws.js && node src/test-v9.js && node src/test-mx.js && node src/test-vd.js && node src/test-ai.js && node src/test-pol.js && node src/test-ws.js && node src/test-tt.js && node src/test-ma.js && node src/test-ov.js && node src/test-tk.js && node src/test-cv.js && node src/test-rc.js && node src/test-org.js && node src/test-jn.js"
   },
   "license": "MIT"
 }

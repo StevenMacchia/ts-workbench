@@ -28,7 +28,7 @@ function renderAbout(){
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
     ["One workspace, one vocabulary","Company type, stage and regions are set once and pre-fill every tool. Every saved result lands in the same workspace, grouped by project."],
     ["Every number explains itself","Each risk rating lists the answers that raised or lowered it, and every score on the report card shows what it's made of, so the output can be challenged and defended."],
-    ["Plans, not just scores","Maturity and coverage end in steps with owners and due dates. Finishing the steps moves the score, and the steps go to Jira, Asana, Linear or GitHub."],
+    ["Plans, not just scores","Maturity and coverage end in concrete steps. Finishing the steps moves the score, and the steps go to Jira, Asana, Linear or GitHub."],
     ["Plain language first","Questions are written for product managers and founders, not specialists. Terms like CSAM, KYC or sextortion explain themselves on hover."],
     ["Accessible in both themes","Tuned light and dark themes, visible focus states, labelled controls, reduced-motion support and layouts that work down to phone width."]
   ];

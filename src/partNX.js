@@ -1,32 +1,19 @@
 /* =========================================================
    YOUR NEXT MOVES: the few things worth doing this week, pulled from every tool
-   Roadmap items by due date, each product's next launch blocker, the biggest coverage gap,
-   and a nudge when a snapshot or a rehearsal is overdue. Most can be ticked off right here.
+   This quarter's roadmap items, each product's next launch blocker, the biggest coverage gap,
+   and a nudge when a snapshot or a rehearsal is due. Most can be ticked off right here.
    ========================================================= */
 const NX_DAY = 86400000;
-const nxToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
-const nxDays = iso => Math.round((new Date(iso + "T00:00:00").getTime() - nxToday()) / NX_DAY);
-function nxDueText(iso){
-  if(!iso) return "";
-  const n = nxDays(iso);
-  if(n < 0) return `Overdue by ${-n} day${n === -1 ? "" : "s"}`;
-  if(n === 0) return "Due today";
-  if(n === 1) return "Due tomorrow";
-  if(n < 7) return `Due in ${n} days`;
-  return "Due " + new Date(iso + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"});
-}
 const nxAgo = t => { const d = Math.floor((Date.now() - t) / NX_DAY); return d < 14 ? `${d} days ago` : d < 60 ? `${Math.round(d / 7)} weeks ago` : `${Math.round(d / 30)} months ago`; };
 
 function nxItems(){
   const out = [];
-  // Maturity roadmap: the next unticked item in each open step. Overdue and due-soon first, then the "now" phase
+  // Maturity roadmap: the next unticked item in each open step of the "now" phase
   if(typeof maAllRated === "function" && !ma.ex && maAllRated(ma)){
     maRoadmap(ma).filter(s => !s.done).forEach(s => {
       const i = s.acts.findIndex((a, j) => !ma.done[`${s.id}-${j}`]); if(i < 0) return;
-      const due = ma.due && ma.due[s.id], n = due ? nxDays(due) : null;
-      if(s.phase !== "now" && !(n !== null && n <= 14)) return;
-      out.push({kind:"maturity", tick:"ma:" + s.id + "-" + i, text:s.acts[i], ctx:`${s.a.n} · level ${s.from} → ${s.to}`, due, late:n !== null && n < 0,
-        pri:n !== null && n < 0 ? 0 : n !== null && n <= 7 ? 1 : 2.2 + s.gi * 0.01});
+      if(s.phase !== "now") return;
+      out.push({kind:"maturity", tick:"ma:" + s.id + "-" + i, text:s.acts[i], ctx:`${s.a.n} · level ${s.from} → ${s.to}`, pri:2.2 + s.gi * 0.01});
     });
   }
   // Each saved product's next launch blocker, most recently worked on first; the same blocker is never listed twice
@@ -67,12 +54,12 @@ function nxHTML(){
   const xs = nxItems(), color = k => TOOL_COLOR[k] || "var(--accent)", ic = {maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren"};
   return `<section class="rise nx" aria-labelledby="nx-h">
     <div class="ov-sec-h"><h3 id="nx-h">Your next moves</h3><span class="note">From your roadmap, launch plans and coverage</span></div>
-    <div class="card nx-card">${xs.length ? `<ul class="nx-list">${xs.map(x => `<li class="nx-i ${x.late ? "late" : ""}">
+    <div class="card nx-card">${xs.length ? `<ul class="nx-list">${xs.map(x => `<li class="nx-i">
         ${x.tick ? `<input type="checkbox" class="nx-cb" data-nxtick="${esc(x.tick)}" aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color(x.kind)}"><svg><use href="#i-${ic[x.kind]}"/></svg></span>`}
-        <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span>${x.due ? `<span class="nx-due ${x.late ? "late" : ""}">${nxDueText(x.due)}</span>` : ""}</small></div>
+        <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span></small></div>
         ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.loop !== undefined ? `<button type="button" class="btn sm" data-loopgo="tt:${x.loop}">Start</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
       </li>`).join("")}</ul>`
-      : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing due, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
+      : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing urgent on your roadmap, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
     </div></section>`;
 }
 // Ticking an item here does exactly what ticking it in its tool does, then the report card moves

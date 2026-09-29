@@ -23,7 +23,7 @@ let DL = null;
 const STANDALONE = !(window.claude && typeof window.claude.use === "function");
 if(STANDALONE && typeof Blob !== "undefined" && typeof URL !== "undefined" && URL.createObjectURL){
   DL = {save: async ({filename, data}) => {
-    const type = /\.html?$/.test(filename) ? "text/html" : /\.ics$/.test(filename) ? "text/calendar" : /\.csv$/.test(filename) ? "text/csv" : /\.json$/.test(filename) ? "application/json" : "text/markdown";
+    const type = /\.html?$/.test(filename) ? "text/html" : /\.csv$/.test(filename) ? "text/csv" : /\.json$/.test(filename) ? "application/json" : "text/markdown";
     const url = URL.createObjectURL(new Blob([data], {type: type + ";charset=utf-8"}));
     const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);

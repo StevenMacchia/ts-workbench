@@ -13,7 +13,7 @@ const body = function(){
   eq(pms, "Pixelry Creator Subscriptions, Pixelry Market, Pixelry app", "three Pixelry products");
   const parts = rcParts(); eq(parts.every(p => p.score !== null), true, "every report card part is graded: " + parts.map(p => p.k + "=" + p.score).join(" "));
   eq(JOURNEY.filter(s => s.done()).length, 5, "five of six review steps done"); eq(jnNext().k, "act", "next step is sending gaps to a tracker");
-  const xs = nxItems(); eq(xs[0].late, true, "an overdue roadmap item leads the next moves"); eq(xs.some(x => x.kind === "premortem"), true, "launch blockers in the next moves");
+  const xs = nxItems(); eq(xs.some(x => x.kind === "maturity" && !!x.tick), true, "roadmap items in the next moves"); eq(xs.some(x => x.kind === "premortem"), true, "launch blockers in the next moves");
   out.push("demo data: " + pms + " · grade " + rcOverall(parts).score + "/100 · " + xs.length + " next moves");
   renderOverview(); const h = view.innerHTML; if(bad(h)) throw new Error("demo overview has bad values: " + where(h));
   eq(/Explore a demo company/.test(h), false, "no demo offer while in the demo");

@@ -45,10 +45,10 @@ function tkFromMaturity(){
   const out = [];
   maRoadmap(ma).forEach(s => { const ph = MA_PHASES.find(p => p[0] === s.phase);
     s.acts.forEach((a, i) => out.push({
-      id:`ma-${s.a.k}${s.from}-${i}`, title:a, group:`${ph[1]} (${ph[2]})`, owner:(ma.own && ma.own[s.a.k]) || "", due:(ma.due && ma.due[s.id]) || "", pr:s.phase === "now" ? 3 : s.phase === "next" ? 2 : 1, done:!!ma.done[s.a.k + s.from + "-" + i], def:!ma.done[s.a.k + s.from + "-" + i],
+      id:`ma-${s.a.k}${s.from}-${i}`, title:a, group:`${ph[1]} (${ph[2]})`, owner:(ma.own && ma.own[s.a.k]) || "", pr:s.phase === "now" ? 3 : s.phase === "next" ? 2 : 1, done:!!ma.done[s.a.k + s.from + "-" + i], def:!ma.done[s.a.k + s.from + "-" + i],
       labels:["trust-and-safety", "program-maturity", "maturity-" + s.a.k],
       desc:[a, "", `Program maturity: ${s.a.n}, from level ${s.from} (${MA_LEVELS[s.from - 1].n}) to level ${s.to} (${MA_LEVELS[s.to - 1].n}).`,
-        `Why it matters: ${s.a.why}`, `When: ${ph[1]}, ${ph[2].toLowerCase()}${ma.due && ma.due[s.id] ? `, due ${ma.due[s.id]}` : ""}.`, ma.own && ma.own[s.a.k] ? `Owner: ${ma.own[s.a.k]}.` : null, "", "From a program maturity assessment made with T&S Workbench."].filter(x => x !== null).join("\n")
+        `Why it matters: ${s.a.why}`, `When: ${ph[1]}, ${ph[2].toLowerCase()}.`, ma.own && ma.own[s.a.k] ? `Owner: ${ma.own[s.a.k]}.` : null, "", "From a program maturity assessment made with T&S Workbench."].filter(x => x !== null).join("\n")
     })); });
   return out;
 }
@@ -59,8 +59,8 @@ function tkCsvFor(k, tasks){
   const T = TK_TRACKERS.find(t => t.k === k);
   if(k === "jira") return tkCsv([["Summary", "Description", "Issue Type", "Priority", "Labels", "Labels", "Labels", "Labels"]]
     .concat(tasks.map(t => [tkClip(t.title, 250), t.desc, "Task", T.pr[t.pr], ...[0, 1, 2, 3].map(i => t.labels[i] || "")])));
-  if(k === "asana") return tkCsv([["Name", "Description", "Section", "Assignee", "Due Date", "Priority"]]
-    .concat(tasks.map(t => [t.title, t.desc + (t.owner && !t.desc.includes("Owner: ") ? `\n\nOwner: ${t.owner}` : ""), t.group, "", t.due ? t.due.replace(/^(\d{4})-(\d{2})-(\d{2})$/, "$2/$3/$1") : "", T.pr[t.pr]])));
+  if(k === "asana") return tkCsv([["Name", "Description", "Section", "Assignee", "Priority"]]
+    .concat(tasks.map(t => [t.title, t.desc + (t.owner && !t.desc.includes("Owner: ") ? `\n\nOwner: ${t.owner}` : ""), t.group, "", T.pr[t.pr]])));
   if(k === "linear") return tkCsv([["Title", "Description", "Priority", "Status", "Labels"]]
     .concat(tasks.map(t => [tkClip(t.title, 250), t.desc, T.pr[t.pr], "Todo", t.labels.join(",")])));
   return "";

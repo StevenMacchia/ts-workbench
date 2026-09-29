@@ -64,11 +64,11 @@ const PAGE_TOURS = {
     [".vd-main > .mxa-part:first-of-type", "Set your stage", "Targets depend on your company's size and how regulated you are, so start here."],
     [".ma-areas", "Rate each area", "Eight areas of a Trust & Safety program. Pick the level that matches your program today, one area at a time."],
     [".vd-railc", "Your profile", "Your radar and score update as you rate."],
-    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, add due dates to your calendar or send the plan to your tracker."],
+    [".vd-main > .mxa-part:last-of-type", "Work the plan", "A phased roadmap for your biggest gaps. Tick off steps as you finish them, or send the plan to your tracker."],
     [".ma-band-l", "Where you stand", "Your overall level against the target for your stage, the area to fix first, and how far through the plan you are."],
     [".ma-band-r", "Now against target", "Each area's level today, with the target for your stage as a dashed line. Red dots are below target."],
     [".ma-tabs", "Three views of the plan", "Roadmap puts the steps in order. By area shows each area's levels, owner and evidence. Progress tracks snapshots over time."],
-    ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar. Add due dates as you go."],
+    ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar."],
     [".ma-byarea", "One area at a time", "Pick an area to see every level, the steps to reach the next one, its owner and your evidence."],
     [".ma-prog-tab", "Show progress", "Save a snapshot each quarter, and the trend shows leadership how the program has grown."],
     [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
