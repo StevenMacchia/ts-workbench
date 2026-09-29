@@ -76,6 +76,7 @@ demoBar();
 function demoWelcome(){
   if(!demoOn() || document.getElementById("dm-welcome")) return;
   if(tourAt >= 0) tourEnd();
+  if(typeof helpOfferClose === "function") helpOfferClose();
   const bg = document.createElement("div"); bg.className = "tk-bg dm-bg"; bg.id = "dm-welcome";
   bg.innerHTML = `<div class="tk dm" role="dialog" aria-modal="true" aria-labelledby="dm-h" aria-describedby="dm-d">
     <span class="eyebrow">Demo company</span>
@@ -91,6 +92,7 @@ function demoWelcome(){
 function demoWelcomeClose(next){
   const bg = document.getElementById("dm-welcome"); if(!bg) return;
   bg.remove();
+  if(typeof helpOfferClose === "function") helpOfferClose();
   if(next === "tour") return tourStart();
   // Point at the exit, so people know where it lives
   const pill = document.getElementById("tb-demo");
@@ -156,8 +158,16 @@ document.addEventListener("keydown", e => {
       if(e.shiftKey && i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } else if(!e.shiftKey && i === f.length - 1){ e.preventDefault(); f[0].focus(); } }
     return;
   }
+  const offer = document.getElementById("tour-pop");
+  if(e.key === "Escape" && offer && offer.dataset.kind === "offer" && typeof helpOfferClose === "function") return helpOfferClose();
   if(e.key === "Escape" && tourAt >= 0) tourEnd();
 });
+// The quick-tour offer sits in the middle of the screen: a click outside it dismisses it and does nothing else
+document.addEventListener("click", e => {
+  const p = document.getElementById("tour-pop");
+  if(!p || p.dataset.kind !== "offer" || p.contains(e.target) || document.getElementById("dm-welcome") || typeof helpOfferClose !== "function") return;
+  e.preventDefault(); e.stopPropagation(); helpOfferClose();
+}, true);
 if(window.addEventListener) window.addEventListener("hashchange", () => { if(tourAt >= 0) tourEnd(); demoBar(); });
 // The welcome opens once, straight after the demo loads (demo:tour is the flag older links set)
 if(demoOn() && (store.get("demo:welcome", false) || store.get("demo:tour", false))){ store.set("demo:welcome", false); store.set("demo:tour", false); setTimeout(demoWelcome, 300); }
