@@ -2688,11 +2688,6 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 @media (max-width:640px){.pol-runbar{padding:12px 14px;gap:10px}.pol-rb-meter .pol-add{display:none}.pol-rb-act{width:100%}.pol-rb-act #pol-run{flex:1;justify-content:center}}
 
 /* ---------- Demo company and tour ---------- */
-.demo-bar{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin:14px clamp(16px,3vw,40px) 0;padding:10px 14px;border-radius:12px;background:color-mix(in oklab, var(--accent) 9%, var(--surface));border:1px solid color-mix(in oklab, var(--accent) 30%, var(--line));font-size:13.5px}
-.demo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);flex:none}
-.demo-t{flex:1;min-width:220px;color:var(--muted)}
-.demo-t b{color:var(--ink);font-weight:600}
-.demo-a{display:flex;gap:8px;flex-wrap:wrap}
 .sb-sync.demo i{background:var(--accent)}
 .ov-demo{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-top:22px}
 .ov-demo .btn{background:#fff;color:#14163A;border-color:transparent;font-weight:600}
@@ -2710,8 +2705,7 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .tour-pop p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
 .tour-a{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
 .tour-last{display:flex;gap:8px}
-@media (max-width:640px){.tour-pop{right:16px;left:16px;bottom:16px;width:auto}.demo-bar{margin:12px 16px 0}}
-@media (max-width:640px){.demo-more{display:none}}
+@media (max-width:640px){.tour-pop{right:16px;left:16px;bottom:16px;width:auto}}
 
 /* ---------- Tabletop team mode ---------- */
 .tt-mode-n{font-size:13px;color:var(--muted);max-width:560px}
@@ -2768,7 +2762,7 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .ttf-meters{border:0;box-shadow:none;padding:0;background:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:10px 0 4px}
 @media (max-width:760px){.ttf-meters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Presenter view: the room sees the incident, not the app */
-body.tt-present .side,body.tt-present .topbar,body.tt-present #demo-bar{display:none}
+body.tt-present .side,body.tt-present .topbar{display:none}
 body.tt-present .app{grid-template-columns:1fr}
 body.tt-present .ttf-stage h2{font-size:clamp(30px,3.4vw,46px)}
 body.tt-present .ttf-sit{font-size:clamp(19px,1.7vw,25px);max-width:none}
@@ -3085,6 +3079,55 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .ov-help .ph-help{margin-left:0}
 /* Tour highlight: blocks without their own card get breathing room instead of a ring against the text */
 .tour-on:not(.card){outline:3px solid var(--accent);outline-offset:8px;box-shadow:0 0 0 8px color-mix(in oklab, var(--accent) 7%, transparent), 0 0 0 18px color-mix(in oklab, var(--accent) 14%, transparent) !important;border-radius:14px}
+
+/* ---------- demo: the top-bar pill and the welcome ---------- */
+.tb-demo{display:inline-flex;align-items:center;gap:2px;height:34px;padding:3px;border-radius:999px;border:1px solid color-mix(in oklab, var(--accent) 38%, var(--line));background:color-mix(in oklab, var(--accent) 10%, var(--surface));flex:none}
+.tb-demo-t{display:inline-flex;align-items:center;gap:7px;height:100%;padding:0 10px 0 9px;border:0;border-radius:999px;background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tb-demo-t i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent)}
+.tb-demo-x{display:inline-flex;align-items:center;height:100%;padding:0 12px;border:0;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tb-demo-x:hover{filter:brightness(1.08)}
+.tb-demo button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tb-demo.hi{animation:tbDemoHi 1s ease-out 3}
+@keyframes tbDemoHi{0%{box-shadow:0 0 0 0 color-mix(in oklab, var(--accent) 55%, transparent)}100%{box-shadow:0 0 0 12px color-mix(in oklab, var(--accent) 0%, transparent)}}
+.tk.dm{width:min(520px,100%);grid-template-rows:none;gap:12px;padding:24px}
+.dm h3{margin:0;font-size:22px;letter-spacing:-.02em}
+.dm p{margin:0;color:var(--muted);line-height:1.55}
+.dm-exit{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;border-radius:14px;background:var(--sunk);border:1px solid var(--line)}
+.dm-exit-t{display:grid;gap:2px;font-size:14px;line-height:1.5;color:var(--muted)}
+.dm-exit-t > b{color:var(--ink)}
+.dm-sample{pointer-events:none}
+.dm-a{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.dm .dm-small{font-size:13px;color:var(--faint)}
+@media (max-width:640px){.tb-demo-co{display:none}.dm-exit{flex-direction:column;align-items:flex-start}.dm-a .btn{flex:1;justify-content:center}.tk.dm{padding:20px}}
+@media (prefers-reduced-motion: reduce){.tb-demo.hi{animation:none;outline:2px solid var(--accent);outline-offset:3px}}
+
+/* ---------- Coverage: harm areas that don't apply ---------- */
+.cv-mnt{display:flex;align-items:center;gap:4px;min-width:0}
+.cv-off{all:unset;box-sizing:border-box;flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--faint);cursor:pointer;opacity:0;transition:opacity .15s, background .15s, color .15s}
+.cv-off svg{width:15px;height:15px}
+.cv-mr:hover .cv-off,.cv-off:focus-visible{opacity:1}
+.cv-off:hover{background:color-mix(in oklab, var(--crit) 10%, transparent);color:var(--crit)}
+.cv-off:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.cv-off[aria-disabled="true"]{cursor:not-allowed}
+.cv-off[aria-disabled="true"]:hover{background:var(--sunk);color:var(--faint)}
+@media (hover:none){.cv-off{opacity:1}}
+.cv-mr.cv-conf,.cv-mr.cv-conf:hover{grid-template-columns:minmax(0,1fr) auto;background:color-mix(in oklab, var(--crit) 6%, var(--surface))}
+.cv-conf-t{display:grid;gap:3px;font-size:13.5px;line-height:1.45}
+.cv-conf-t b{font-size:14px}
+.cv-conf-a{display:flex;gap:8px}
+@media (max-width:560px){.cv-mr.cv-conf{grid-template-columns:1fr}}
+.cv-offs{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:12px 18px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.cv-offs-t{font-weight:600;color:var(--ink)}
+.cv-offs .note{font-size:12px;margin:0}
+.cv-offc{display:inline-flex;align-items:center;gap:5px;border:1px dashed var(--line-strong);background:var(--bg);color:var(--muted);border-radius:99px;padding:3px 8px 3px 11px;font:500 12.5px var(--body);cursor:pointer;text-decoration:line-through;text-decoration-color:color-mix(in oklab, var(--muted) 60%, transparent)}
+.cv-offc svg{width:13px;height:13px}
+.cv-offc:hover{border-style:solid;border-color:var(--t-cv);color:var(--ink);text-decoration:none}
+.cv-offc.warn{border-color:var(--high);color:var(--ink)}
+.cv-offw{flex-basis:100%;margin:2px 0 0;padding-left:10px;border-left:3px solid var(--high);color:var(--ink);font-size:12.5px;line-height:1.45}
+.org-harms .note{display:block;margin-top:6px;font-size:12px}
+/* The page name gives way to the demo pill on phones instead of running under it */
+.tb-crumb b{min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){body:has(.tb-demo) .tb-crumb{display:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -10415,8 +10458,21 @@ const CV_EXAMPLE = {src:"ex:teen_social", ex:true, r:{
 let cv = store.get("cv", null) || {src:null, ex:false, r:{}};
 if(!cv.r) cv.r = {};
 const cvSave = () => store.set("cv", cv);
-const cvHarm = a => a.n.toLowerCase().replace(" & ", " and ");
+const cvHarm = a => a.n.replace(" & ", " and ").split(" ").map(w => /^[A-Z]{2,}$/.test(w) ? w : w.toLowerCase()).join(" ");
 const cvRiskWords = x => x.band ? `${BANDS[x.band][0].toLowerCase()} risk (${x.score} of 16)` : "no risk found";
+
+/* ---------- harm areas that don't apply ---------- */
+// Kept in the company profile, so the radar and every grade leave them out. Examples always show all eight.
+// At least three stay, so the radar keeps its shape
+const CV_MIN = 3;
+let cvConfirm = null;
+const cvOff = () => ((store.get("ws:org", null) || {}).harmsOff || []).filter(k => CV_AREAS.some(a => a.k === k));
+const cvAreas = d => d && d.ex ? CV_AREAS : CV_AREAS.filter(a => !cvOff().includes(a.k));
+function cvSetOff(k, off){
+  const cur = cvOff(), next = off ? cur.filter(x => x !== k).concat([k]) : cur.filter(x => x !== k);
+  if(CV_AREAS.length - next.length < CV_MIN) return false;
+  store.set("ws:org", Object.assign({}, store.get("ws:org", null) || {}, {harmsOff:next})); return true;
+}
 
 /* ---------- risk to compare against ---------- */
 function cvSources(){
@@ -10443,7 +10499,7 @@ function cvSrcName(d){ const {src, s} = cvSrc(d); const hit = s.list.concat(s.ex
 /* ---------- scoring ---------- */
 function cvRows(d){
   const risk = cvRisk(d);
-  return CV_AREAS.map(a => {
+  return cvAreas(d).map(a => {
     const r = d.r[a.k] || {}, rated = CV_LAYERS.filter(l => r[l.k] !== undefined).length, cov = Math.round(CV_LAYERS.reduce((s, l) => s + (r[l.k] || 0), 0) / (CV_LAYERS.length * 3) * 100);
     const rk = risk ? risk[a.k] : null, score = rk ? rk.score : null, riskPct = score === null ? null : Math.round(score / 16 * 100);
     const status = score === null || !rated ? "none" : score >= 12 && cov < 50 ? "exposed" : score >= 8 && cov < riskPct ? "gap" : score >= 8 ? "covered" : "lower";
@@ -10454,7 +10510,7 @@ function cvSummary(d){
   const rows = cvRows(d), rated = rows.reduce((s, x) => s + x.rated, 0), withRisk = rows.filter(x => x.score !== null && x.score > 0);
   const weight = withRisk.reduce((s, x) => s + x.score, 0);
   const cov = weight ? Math.round(withRisk.reduce((s, x) => s + x.cov * x.score, 0) / weight) : rows.length ? Math.round(rows.reduce((s, x) => s + x.cov, 0) / rows.length) : 0;
-  return {rows, rated, total:CV_AREAS.length * CV_LAYERS.length, cov, weighted:!!weight, exposed:rows.filter(x => x.status === "exposed"), gaps:rows.filter(x => x.status === "gap")};
+  return {rows, rated, total:rows.length * CV_LAYERS.length, cov, weighted:!!weight, exposed:rows.filter(x => x.status === "exposed"), gaps:rows.filter(x => x.status === "gap")};
 }
 // The next steps: weakest layers in the areas where risk outruns coverage
 function cvActions(d, n){
@@ -10508,7 +10564,7 @@ function cvSourceHTML(){
     <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example to see how the comparison works." :
       src === "all" ? "The worst risk in each harm area across every saved pre-mortem." : src.startsWith("ex:") ? "An example product's risk. Run a pre-mortem on your own products for a real comparison." : "This product's risk, from its pre-mortem."}</p>
     ${!s.pms.length ? `<button type="button" class="btn sm" data-ov="new">Start a pre-mortem</button>` : ""}
-    ${rk ? `<div class="cv-riskbar">${CV_AREAS.map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
+    ${rk ? `<div class="cv-riskbar">${cvAreas(cv).map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
   </div>`;
 }
 function cvCellHTML(x, l){
@@ -10521,7 +10577,7 @@ const cvMaReady = () => typeof ma !== "undefined" && !ma.ex && MA_AREAS.every(a 
 const cvFromMaLevel = n => n >= 4 ? 3 : Math.max(0, n - 1);
 function cvFillFromMaturity(){
   let n = 0;
-  CV_AREAS.forEach(a => { const row = cv.r[a.k] = Object.assign({}, cv.r[a.k]); CV_LAYERS.forEach(l => { if(row[l.k] === undefined){ row[l.k] = cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k])); n++; } }); });
+  cvAreas(cv).forEach(a => { const row = cv.r[a.k] = Object.assign({}, cv.r[a.k]); CV_LAYERS.forEach(l => { if(row[l.k] === undefined){ row[l.k] = cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k])); n++; } }); });
   cv.ex = false; cv.est = true; cvSave(); return n;
 }
 function cvEstHTML(){
@@ -10531,15 +10587,37 @@ function cvEstHTML(){
   if(!left || !cvMaReady()) return "";
   return `<div class="card cv-fill"><div><b>Start from your maturity ratings</b><small>Fill ${left === s.total ? "all " + s.total : "the " + left + " unrated"} cells with your program-wide level for each layer (${CV_LAYERS.map(l => `${l.n.toLowerCase()}: ${CV_LEVELS[cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k]))].toLowerCase()}`).join(", ")}), then adjust the harm areas that differ.</small></div><button type="button" class="btn sm primary" data-cv="fillma">Fill from maturity</button></div>`;
 }
+// Who found the risk in a harm area: the worst product, the chosen product, or the example
+function cvRiskWho(x){
+  const {src} = cvSrc(cv);
+  return x.from ? `${x.from}'s pre-mortem` : src && src.startsWith("pm:") ? `${cvSrcName(cv)}'s pre-mortem` : "The example product";
+}
+// Removing a harm area with high or critical risk asks first, since it takes that risk out of the grade
+function cvConfirmHTML(x){
+  return `<div class="cv-mr cv-conf" id="cv-row-${x.a.k}" role="group" aria-label="${esc("Remove " + x.a.n + "?")}">
+    <div class="cv-conf-t"><b>Remove ${esc(cvHarm(x.a))}?</b><span>${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Removing it also takes that risk out of your coverage grade.</span></div>
+    <div class="cv-conf-a"><button type="button" class="btn sm danger" data-cvoffok="${x.a.k}">Remove</button><button type="button" class="btn sm" data-cvoffno="${x.a.k}">Keep it</button></div></div>`;
+}
+function cvOffHTML(){
+  const off = cvOff(); if(cv.ex || !off.length) return "";
+  const rk = cvRisk(cv), p = typeof wsProfile === "function" ? wsProfile() : null, risky = off.filter(k => rk && rk[k] && rk[k].score >= 8);
+  const area = k => CV_AREAS.find(a => a.k === k);
+  return `<div class="cv-offs"><span class="cv-offs-t">Doesn't apply to ${esc((p && p.org) || "your platform")}:</span>
+    ${off.map(k => `<button type="button" class="cv-offc ${risky.includes(k) ? "warn" : ""}" data-cvon="${k}" aria-label="${esc("Restore " + area(k).n)}" title="Restore it">${esc(area(k).n)}<svg><use href="#i-plus"/></svg></button>`).join("")}
+    <span class="note">Saved in your company profile.</span>
+    ${risky.map(k => { const x = Object.assign({a:area(k)}, rk[k]); return `<p class="cv-offw">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} in ${esc(cvHarm(x.a))}. Restore it if that risk is real.</p>`; }).join("")}</div>`;
+}
 function cvMatrixHTML(){
-  const rows = cvRows(cv), seen = new Set();
+  const rows = cvRows(cv), seen = new Set(), canOff = rows.length > CV_MIN;
+  const trash = x => cv.ex ? "" : `<button type="button" class="cv-off" data-cvoff="${x.a.k}" ${canOff ? "" : 'aria-disabled="true"'} aria-label="${esc("Remove " + x.a.n + ": it doesn't apply to your platform")}" title="${canOff ? "Doesn't apply to us" : "Keep at least three harm areas"}"><svg><use href="#i-trash"/></svg></button>`;
   return `<div class="card cv-mx">
     <div class="cv-mh"><span>Harm area</span>${CV_LAYERS.map(l => `<span title="${esc(l.q)}">${l.n}</span>`).join("")}<span>Coverage</span></div>
-    ${rows.map(x => `<div class="cv-mr" id="cv-row-${x.a.k}">
-      <div class="cv-mn"><b>${esc(x.a.n)}</b>${x.band ? `<span class="pill ${BANDS[x.band][1]}">${BANDS[x.band][0]} risk</span>` : x.score === 0 ? `<span class="note">No risk found</span>` : ""}</div>
+    ${rows.map(x => cvConfirm === x.a.k ? cvConfirmHTML(x) : `<div class="cv-mr" id="cv-row-${x.a.k}">
+      <div class="cv-mn"><span class="cv-mnt"><b>${esc(x.a.n)}</b>${trash(x)}</span>${x.band ? `<span class="pill ${BANDS[x.band][1]}">${BANDS[x.band][0]} risk</span>` : x.score === 0 ? `<span class="note">No risk found</span>` : ""}</div>
       ${CV_LAYERS.map(l => `<div class="cv-mc"><span class="cv-ml">${l.n}</span>${cvCellHTML(x, l)}</div>`).join("")}
       <div class="cv-mv ${x.status}"><b class="mono">${x.rated ? x.cov + "%" : "–"}</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span></div>
     </div>`).join("")}
+    ${cvOffHTML()}
     <div class="cv-key"><span>Levels, weakest to strongest:</span>${CV_LEVELS.map((n, j) => `<span class="cv-kl"><i class="l${j}"></i>${n}</span>`).join("")}<span class="note">Hover a square to see what each level means.</span></div>
     <details class="cv-defs"><summary>What each level means</summary>
       <div class="cv-dt">${CV_LAYERS.map(l => `<div><h5>${l.n}</h5><p class="note">${esc(l.q)}</p><ol start="0">${l.lv.map((t, j) => `<li><b>${CV_LEVELS[j]}.</b> ${mxGloss(t, seen)}</li>`).join("")}</ol></div>`).join("")}</div></details>
@@ -10547,7 +10625,7 @@ function cvMatrixHTML(){
 }
 function cvWhy(){
   const s = cvSummary(cv), rk = cvRisk(cv);
-  if(!s.rated) return `<p>Rate at least one defense to see your coverage. It takes about five minutes for all ${CV_AREAS.length} harm areas.</p>`;
+  if(!s.rated) return `<p>Rate at least one defense to see your coverage. It takes about five minutes for all ${cvAreas(cv).length} harm areas.</p>`;
   let h = `<p>Your ${s.weighted ? "risk-weighted " : ""}coverage is <b>${s.cov}%</b>${s.rated < s.total ? `, based on ${s.rated} of ${s.total} ratings` : ""}.</p>`;
   if(!rk) return h + `<p>Choose a product or an example above to see where its risk outruns your coverage.</p>`;
   const top = s.exposed.concat(s.gaps).sort((a, b) => b.gap - a.gap);
@@ -10571,7 +10649,7 @@ function cvResultHTML(){
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button></div>` : ""}</div>
     <div class="card cv-big">${cvRadar(cv, true)}${cvLegend(cv)}</div></div>
     <div class="ma-rh"><h4>Biggest gaps</h4></div>${cvGapsHTML()}
-    ${cv.ex || cv.est || cvSummary(cv).rated < CV_AREAS.length * CV_LAYERS.length ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("coverage") : ""}`;
+    ${cv.ex || cv.est || cvSummary(cv).rated < cvSummary(cv).total ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("coverage") : ""}`;
 }
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
@@ -10584,6 +10662,7 @@ function cvMarkdown(d){
   const L = [`# Trust & Safety coverage radar`, ``, `${new Date().toISOString().slice(0, 10)}${src ? " · risk from " + src : ""}`, ``, `**${s.weighted ? "Risk-weighted coverage" : "Coverage"}: ${s.cov}%**${s.exposed.length ? ` · ${s.exposed.length} exposed` : ""}${s.gaps.length ? ` · ${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : ""}`, ``];
   L.push(`| Harm area | Risk | ${CV_LAYERS.map(l => l.n).join(" | ")} | Coverage |`, `|---|---|${CV_LAYERS.map(() => "---|").join("")}---|`);
   s.rows.forEach(x => L.push(`| ${x.a.n} | ${x.band ? BANDS[x.band][0] : x.score === 0 ? "None found" : "–"} | ${CV_LAYERS.map(l => x.r[l.k] === undefined ? "–" : CV_LEVELS[x.r[l.k]]).join(" | ")} | ${x.rated ? x.cov + "%" : "–"} |`));
+  if(!d.ex && cvOff().length) L.push(``, `Left out because they don't apply to this platform: ${cvOff().map(k => CV_AREAS.find(a => a.k === k).n).join(", ")}.`);
   L.push(``, `## Next steps`, ``);
   if(!acts.length) L.push(`No gaps where risk is high.`);
   acts.forEach(x => L.push(`- [ ] **${x.row.a.n}, ${x.layer.n.toLowerCase()}** (${x.row.status === "exposed" ? "exposed" : "gap"}): ${x.text}`));
@@ -10592,7 +10671,17 @@ function cvMarkdown(d){
 }
 const cvTitle = d => { const s = cvSummary(d); return `Coverage radar: ${s.cov}% coverage${s.exposed.length ? `, ${s.exposed.length} exposed` : ""}`; };
 
+// Remove a harm area, or bring it back, then redraw the radar and the grades
+function cvOffDo(k, back){
+  const a = CV_AREAS.find(x => x.k === k), was = cvSummary(cv);
+  cvConfirm = null;
+  if(!cvSetOff(k, !back)) return gsay("Keep at least three harm areas so the radar can compare them");
+  cvRefresh(true); const now = cvSummary(cv);
+  const f = document.querySelector(back ? `[data-cvoff="${k}"]` : `[data-cvon="${k}"]`); if(f) f.focus({preventScroll:true});
+  gsay(`${back ? "Restored" : "Removed"} ${cvHarm(a)}${back ? "" : " from your company profile"}${was.rated && now.rated && was.cov !== now.cov ? `. Coverage ${was.cov}% → ${now.cov}%` : ""}`);
+}
 function renderCoverage(){
+  cvConfirm = null;
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Coverage Radar",
     "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
@@ -10628,6 +10717,15 @@ function bindCoverage(){
       if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
       return cvRefresh(false);
     }
+    if(d.cvoff){
+      if(b.getAttribute("aria-disabled") === "true") return gsay("Keep at least three harm areas so the radar can compare them");
+      const x = cvRows(cv).find(r => r.a.k === d.cvoff);
+      if(x && x.score >= 8){ cvConfirm = d.cvoff; cvRefresh(true); const ok = document.querySelector(`[data-cvoffok="${d.cvoff}"]`); if(ok) ok.focus(); return; }
+      return cvOffDo(d.cvoff);
+    }
+    if(d.cvoffok) return cvOffDo(d.cvoffok);
+    if(d.cvoffno){ cvConfirm = null; cvRefresh(true); const t = document.querySelector(`[data-cvoff="${d.cvoffno}"]`); if(t) t.focus(); return; }
+    if(d.cvon) return cvOffDo(d.cvon, true);
     if(d.cvgo){ const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); return; }
     if(d.ov === "new") return newAssessment();
     switch(d.cv){
@@ -11207,19 +11305,22 @@ function orgPrefillPM(p){
 function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
   return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
-    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, metrics, policy tests and the AI assistants. Change it any time.</p></div>
+    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, coverage areas, metrics, policy tests and the AI assistants. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
     <div class="field"><label for="org-youth">Who can use it</label><select class="select" id="org-youth" data-org="youth"><option value="">Choose one</option>${YOUTH.map(y => `<option value="${y.k}" ${o.youth === y.k ? "selected" : ""}>${esc(y.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
     <div class="field"><span class="lbl">Where your users are</span><div class="org-regions">${REGIONS.map(r => `<button type="button" class="pol-chip" aria-pressed="${regions.includes(r.k)}" data-orgregion="${r.k}" title="${esc(r.n)}">${r.k.toUpperCase()}</button>`).join("")}</div></div>
+    ${!cta && typeof cvOff === "function" ? `<div class="field org-harms"><span class="lbl">Harm areas that apply</span><div class="org-regions">${CV_AREAS.map(a => `<button type="button" class="pol-chip" aria-pressed="${!cvOff().includes(a.k)}" data-orgharm="${a.k}">${esc(a.n)}</button>`).join("")}</div>
+      <small class="note">All apply by default. Turn off any your platform can't have, and Coverage radar and its grade leave them out.</small></div>` : ""}
   </div>${cta ? `<div class="org-cta"><span class="note">${orgReady() ? (regions.length ? "Saved as you go. Change any of it later in My workspace." : "Add where your users are, so law maps and pre-mortems match your markets.") : "Choose a company type and a stage to continue."}</span><button type="button" class="btn primary" data-orgdone="1" ${orgReady() ? "" : "disabled"}>Save and continue ${icon("arrow")}</button></div>` : ""}</div>`;
 }
 document.addEventListener("click", e => {
-  const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion]"); if(!b) return;
+  const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion],[data-orgharm]"); if(!b) return;
   if(b.dataset.orgstage) orgSet({stage:b.dataset.orgstage});
   if(b.dataset.orgregion){ const cur = orgGet().regions || [], k = b.dataset.orgregion; orgSet({regions:cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)}); }
-  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
-  gsay("Workspace settings saved");
+  if(b.dataset.orgharm && !cvSetOff(b.dataset.orgharm, b.getAttribute("aria-pressed") === "true")) return gsay("Keep at least three harm areas so Coverage radar can compare them");
+  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"],[data-orgharm="${b.dataset.orgharm}"]`); if(again) again.focus(); }
+  gsay(b.dataset.orgharm ? `${CV_AREAS.find(a => a.k === b.dataset.orgharm).n} ${cvOff().includes(b.dataset.orgharm) ? "left out of" : "added back to"} Coverage radar` : "Workspace settings saved");
 });
 document.addEventListener("change", e => { const t = e.target; if(t.dataset && (t.dataset.org === "type" || t.dataset.org === "youth")){ orgSet({[t.dataset.org]:t.value || null}); if(t.dataset.org === "type") store.set("tt:type", null); gsay("Workspace settings saved");
   const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById(t.id); if(again) again.focus(); } } });
@@ -11975,12 +12076,12 @@ const demoOn = () => !!store.get("demo", false);
 function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
 function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
 function demoStart(){
-  if(demoOn()){ goRoute("overview"); return tourStart(); }
+  if(demoOn()){ goRoute("overview"); return demoWelcome(); }
   try{
     const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
     localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
     demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
-    store.set("demo", true); store.set("demo:pending", true); store.set("demo:tour", true);
+    store.set("demo", true); store.set("demo:pending", true); store.set("demo:welcome", true);
   }catch(e){ return gsay("This browser blocked the demo"); }
   demoReload();
 }
@@ -12026,25 +12127,52 @@ function demoFill(){
 }
 if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
 
-/* ---------- the bar that says you're in the demo, on every page ---------- */
+/* ---------- "Demo: Pixelry · Exit demo" in the top bar, on every page and screen size ---------- */
+const DEMO_PILL = `<button type="button" class="tb-demo-t" data-demo="about" title="About the demo"><i aria-hidden="true"></i><span>Demo<span class="tb-demo-co">: Pixelry</span></span></button><button type="button" class="tb-demo-x" data-demo="exit">Exit demo</button>`;
 function demoBar(){
-  let bar = document.getElementById("demo-bar");
-  if(!demoOn()){ if(bar) bar.remove(); return; }
-  const v = document.getElementById("view"); if(!v || !v.parentNode) return;
-  if(!bar){ bar = document.createElement("div"); bar.id = "demo-bar"; bar.className = "demo-bar"; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Demo company"); v.parentNode.insertBefore(bar, v); }
-  bar.innerHTML = `<span class="demo-dot" aria-hidden="true"></span><span class="demo-t"><b>You're exploring Pixelry, a demo company.</b> Everything here is sample data.<span class="demo-more"> Your own work is set aside until you exit.</span></span>
-    <span class="demo-a"><button type="button" class="btn sm" data-demo="tour">Take the tour</button><button type="button" class="btn sm primary" data-demo="exit">Exit demo</button></span>`;
+  let pill = document.getElementById("tb-demo");
+  if(!demoOn()){ if(pill) pill.remove(); return; }
+  const acts = document.querySelector(".topbar .tb-actions"); if(!acts || pill) return;
+  pill = document.createElement("div"); pill.id = "tb-demo"; pill.className = "tb-demo"; pill.setAttribute("role", "group"); pill.setAttribute("aria-label", "Demo company");
+  pill.innerHTML = DEMO_PILL; acts.insertBefore(pill, acts.firstChild);
 }
 demoBar();
 
+/* ---------- the welcome that opens the demo: what it is, where to exit, and the tour ---------- */
+function demoWelcome(){
+  if(!demoOn() || document.getElementById("dm-welcome")) return;
+  if(tourAt >= 0) tourEnd();
+  const bg = document.createElement("div"); bg.className = "tk-bg dm-bg"; bg.id = "dm-welcome";
+  bg.innerHTML = `<div class="tk dm" role="dialog" aria-modal="true" aria-labelledby="dm-h" aria-describedby="dm-d">
+    <span class="eyebrow">Demo company</span>
+    <h3 id="dm-h">You're exploring Pixelry</h3>
+    <p id="dm-d">Pixelry is a fictional photo and short-video app with about 8 million users in the US, EU and UK. Every tool is filled in with its sample data, so you can see a whole safety program at once.</p>
+    <div class="dm-exit"><div class="dm-exit-t"><b>Leave any time</b><span>Use <b>Exit demo</b> at the top of the page. Your own work is set aside in this browser and comes back untouched.</span></div><span class="tb-demo dm-sample" aria-hidden="true"><span class="tb-demo-t"><i></i><span>Demo<span class="tb-demo-co">: Pixelry</span></span></span><span class="tb-demo-x">Exit demo</span></span></div>
+    <div class="dm-a"><button type="button" class="btn primary" data-dm="tour">Take the tour ${icon("arrow")}</button><button type="button" class="btn" data-dm="explore">Explore on my own</button></div>
+    <p class="dm-small">The tour takes about a minute and stays on the Overview.</p>
+  </div>`;
+  document.body.appendChild(bg);
+  const b = bg.querySelector('[data-dm="tour"]'); if(b) b.focus();
+}
+function demoWelcomeClose(next){
+  const bg = document.getElementById("dm-welcome"); if(!bg) return;
+  bg.remove();
+  if(next === "tour") return tourStart();
+  // Point at the exit, so people know where it lives
+  const pill = document.getElementById("tb-demo");
+  if(pill){ pill.classList.remove("hi"); void pill.offsetWidth; pill.classList.add("hi"); setTimeout(() => pill.classList.remove("hi"), 3200); }
+  const h = document.querySelector("#view h1"); if(h && typeof focusQuiet === "function") focusQuiet(h);
+}
+
 /* ---------- a short guided tour of the overview ---------- */
 const TOUR = [
-  [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
+  [".ov-greet", "Pixelry at a glance", "The program's grade, how many products are assessed, overall maturity and the kind of company, in one line. Everything you see is sample data."],
   [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
   [".nx", "Your next moves", "What to do this week, pulled from every tool: each product's next launch blocker, this quarter's roadmap items and the biggest coverage gap. You can tick them off right here."],
   [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
   [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
-  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
+  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it."],
+  ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
 ];
 let tourAt = -1, tourSteps = TOUR;
 // Any page's walkthrough uses the same engine
@@ -12079,15 +12207,26 @@ function tourStart(){
 }
 document.addEventListener("click", e => {
   const d = e.target.closest && e.target.closest("[data-demo]");
-  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : tourStart(); }
+  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : a === "about" ? demoWelcome() : tourStart(); }
+  const w = e.target.closest && e.target.closest("[data-dm]");
+  if(w){ e.preventDefault(); return demoWelcomeClose(w.dataset.dm); }
   const t = e.target.closest && e.target.closest("[data-tour]"); if(!t) return;
   const a = t.dataset.tour; if(a === "next") return tourStep(tourAt + 1); if(a === "back") return tourStep(tourAt - 1);
   tourEnd();
 });
-document.addEventListener("keydown", e => { if(e.key === "Escape" && tourAt >= 0) tourEnd(); });
+document.addEventListener("keydown", e => {
+  const dm = document.getElementById("dm-welcome");
+  if(dm){
+    if(e.key === "Escape"){ e.preventDefault(); return demoWelcomeClose("explore"); }
+    if(e.key === "Tab"){ const f = [...dm.querySelectorAll("button")]; const i = f.indexOf(document.activeElement);
+      if(e.shiftKey && i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } else if(!e.shiftKey && i === f.length - 1){ e.preventDefault(); f[0].focus(); } }
+    return;
+  }
+  if(e.key === "Escape" && tourAt >= 0) tourEnd();
+});
 if(window.addEventListener) window.addEventListener("hashchange", () => { if(tourAt >= 0) tourEnd(); demoBar(); });
-// The tour opens by itself once, straight after the demo loads
-if(demoOn() && store.get("demo:tour", false)){ store.set("demo:tour", false); setTimeout(tourStart, 500); }
+// The welcome opens once, straight after the demo loads (demo:tour is the flag older links set)
+if(demoOn() && (store.get("demo:welcome", false) || store.get("demo:tour", false))){ store.set("demo:welcome", false); store.set("demo:tour", false); setTimeout(demoWelcome, 300); }
 /* ---------- Page walkthroughs, "welcome back" and plain-English terms ---------- */
 // A short tour for each page, offered once on the first visit and replayable from "How this page works".
 // Each step points at a real part of the page; a step whose element isn't on screen is skipped.
@@ -12165,7 +12304,7 @@ const PAGE_TOURS = {
   ],
   coverage:[
     [".vd-main > .mxa-part:first-of-type", "Choose the risk to compare", "Your products' combined risk, one product, or an example. Product risk comes from your pre-mortems."],
-    [".vd-main > .mxa-part:nth-of-type(2)", "Rate your defenses", "For each kind of harm, rate how strong each layer of defense is today."],
+    [".vd-main > .mxa-part:nth-of-type(2)", "Rate your defenses", "For each kind of harm, rate how strong each layer of defense is today. If a harm can't happen on your platform, hover it and use the trash can. The radar and your grade leave it out."],
     [".vd-railc", "Risk against coverage", "The radar shows where risk outruns your defenses, and updates as you rate."],
     [".vd-main > .mxa-part:last-of-type", "Close the biggest gaps", "The gaps in order, with the next step for each."]
   ],

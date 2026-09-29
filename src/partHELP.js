@@ -75,7 +75,7 @@ const PAGE_TOURS = {
   ],
   coverage:[
     [".vd-main > .mxa-part:first-of-type", "Choose the risk to compare", "Your products' combined risk, one product, or an example. Product risk comes from your pre-mortems."],
-    [".vd-main > .mxa-part:nth-of-type(2)", "Rate your defenses", "For each kind of harm, rate how strong each layer of defense is today."],
+    [".vd-main > .mxa-part:nth-of-type(2)", "Rate your defenses", "For each kind of harm, rate how strong each layer of defense is today. If a harm can't happen on your platform, hover it and use the trash can. The radar and your grade leave it out."],
     [".vd-railc", "Risk against coverage", "The radar shows where risk outruns your defenses, and updates as you rate."],
     [".vd-main > .mxa-part:last-of-type", "Close the biggest gaps", "The gaps in order, with the next step for each."]
   ],

@@ -32,8 +32,21 @@ const CV_EXAMPLE = {src:"ex:teen_social", ex:true, r:{
 let cv = store.get("cv", null) || {src:null, ex:false, r:{}};
 if(!cv.r) cv.r = {};
 const cvSave = () => store.set("cv", cv);
-const cvHarm = a => a.n.toLowerCase().replace(" & ", " and ");
+const cvHarm = a => a.n.replace(" & ", " and ").split(" ").map(w => /^[A-Z]{2,}$/.test(w) ? w : w.toLowerCase()).join(" ");
 const cvRiskWords = x => x.band ? `${BANDS[x.band][0].toLowerCase()} risk (${x.score} of 16)` : "no risk found";
+
+/* ---------- harm areas that don't apply ---------- */
+// Kept in the company profile, so the radar and every grade leave them out. Examples always show all eight.
+// At least three stay, so the radar keeps its shape
+const CV_MIN = 3;
+let cvConfirm = null;
+const cvOff = () => ((store.get("ws:org", null) || {}).harmsOff || []).filter(k => CV_AREAS.some(a => a.k === k));
+const cvAreas = d => d && d.ex ? CV_AREAS : CV_AREAS.filter(a => !cvOff().includes(a.k));
+function cvSetOff(k, off){
+  const cur = cvOff(), next = off ? cur.filter(x => x !== k).concat([k]) : cur.filter(x => x !== k);
+  if(CV_AREAS.length - next.length < CV_MIN) return false;
+  store.set("ws:org", Object.assign({}, store.get("ws:org", null) || {}, {harmsOff:next})); return true;
+}
 
 /* ---------- risk to compare against ---------- */
 function cvSources(){
@@ -60,7 +73,7 @@ function cvSrcName(d){ const {src, s} = cvSrc(d); const hit = s.list.concat(s.ex
 /* ---------- scoring ---------- */
 function cvRows(d){
   const risk = cvRisk(d);
-  return CV_AREAS.map(a => {
+  return cvAreas(d).map(a => {
     const r = d.r[a.k] || {}, rated = CV_LAYERS.filter(l => r[l.k] !== undefined).length, cov = Math.round(CV_LAYERS.reduce((s, l) => s + (r[l.k] || 0), 0) / (CV_LAYERS.length * 3) * 100);
     const rk = risk ? risk[a.k] : null, score = rk ? rk.score : null, riskPct = score === null ? null : Math.round(score / 16 * 100);
     const status = score === null || !rated ? "none" : score >= 12 && cov < 50 ? "exposed" : score >= 8 && cov < riskPct ? "gap" : score >= 8 ? "covered" : "lower";
@@ -71,7 +84,7 @@ function cvSummary(d){
   const rows = cvRows(d), rated = rows.reduce((s, x) => s + x.rated, 0), withRisk = rows.filter(x => x.score !== null && x.score > 0);
   const weight = withRisk.reduce((s, x) => s + x.score, 0);
   const cov = weight ? Math.round(withRisk.reduce((s, x) => s + x.cov * x.score, 0) / weight) : rows.length ? Math.round(rows.reduce((s, x) => s + x.cov, 0) / rows.length) : 0;
-  return {rows, rated, total:CV_AREAS.length * CV_LAYERS.length, cov, weighted:!!weight, exposed:rows.filter(x => x.status === "exposed"), gaps:rows.filter(x => x.status === "gap")};
+  return {rows, rated, total:rows.length * CV_LAYERS.length, cov, weighted:!!weight, exposed:rows.filter(x => x.status === "exposed"), gaps:rows.filter(x => x.status === "gap")};
 }
 // The next steps: weakest layers in the areas where risk outruns coverage
 function cvActions(d, n){
@@ -125,7 +138,7 @@ function cvSourceHTML(){
     <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example to see how the comparison works." :
       src === "all" ? "The worst risk in each harm area across every saved pre-mortem." : src.startsWith("ex:") ? "An example product's risk. Run a pre-mortem on your own products for a real comparison." : "This product's risk, from its pre-mortem."}</p>
     ${!s.pms.length ? `<button type="button" class="btn sm" data-ov="new">Start a pre-mortem</button>` : ""}
-    ${rk ? `<div class="cv-riskbar">${CV_AREAS.map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
+    ${rk ? `<div class="cv-riskbar">${cvAreas(cv).map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
   </div>`;
 }
 function cvCellHTML(x, l){
@@ -138,7 +151,7 @@ const cvMaReady = () => typeof ma !== "undefined" && !ma.ex && MA_AREAS.every(a 
 const cvFromMaLevel = n => n >= 4 ? 3 : Math.max(0, n - 1);
 function cvFillFromMaturity(){
   let n = 0;
-  CV_AREAS.forEach(a => { const row = cv.r[a.k] = Object.assign({}, cv.r[a.k]); CV_LAYERS.forEach(l => { if(row[l.k] === undefined){ row[l.k] = cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k])); n++; } }); });
+  cvAreas(cv).forEach(a => { const row = cv.r[a.k] = Object.assign({}, cv.r[a.k]); CV_LAYERS.forEach(l => { if(row[l.k] === undefined){ row[l.k] = cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k])); n++; } }); });
   cv.ex = false; cv.est = true; cvSave(); return n;
 }
 function cvEstHTML(){
@@ -148,15 +161,37 @@ function cvEstHTML(){
   if(!left || !cvMaReady()) return "";
   return `<div class="card cv-fill"><div><b>Start from your maturity ratings</b><small>Fill ${left === s.total ? "all " + s.total : "the " + left + " unrated"} cells with your program-wide level for each layer (${CV_LAYERS.map(l => `${l.n.toLowerCase()}: ${CV_LEVELS[cvFromMaLevel(maLevelOf(ma, CV_FROM_MA[l.k]))].toLowerCase()}`).join(", ")}), then adjust the harm areas that differ.</small></div><button type="button" class="btn sm primary" data-cv="fillma">Fill from maturity</button></div>`;
 }
+// Who found the risk in a harm area: the worst product, the chosen product, or the example
+function cvRiskWho(x){
+  const {src} = cvSrc(cv);
+  return x.from ? `${x.from}'s pre-mortem` : src && src.startsWith("pm:") ? `${cvSrcName(cv)}'s pre-mortem` : "The example product";
+}
+// Removing a harm area with high or critical risk asks first, since it takes that risk out of the grade
+function cvConfirmHTML(x){
+  return `<div class="cv-mr cv-conf" id="cv-row-${x.a.k}" role="group" aria-label="${esc("Remove " + x.a.n + "?")}">
+    <div class="cv-conf-t"><b>Remove ${esc(cvHarm(x.a))}?</b><span>${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Removing it also takes that risk out of your coverage grade.</span></div>
+    <div class="cv-conf-a"><button type="button" class="btn sm danger" data-cvoffok="${x.a.k}">Remove</button><button type="button" class="btn sm" data-cvoffno="${x.a.k}">Keep it</button></div></div>`;
+}
+function cvOffHTML(){
+  const off = cvOff(); if(cv.ex || !off.length) return "";
+  const rk = cvRisk(cv), p = typeof wsProfile === "function" ? wsProfile() : null, risky = off.filter(k => rk && rk[k] && rk[k].score >= 8);
+  const area = k => CV_AREAS.find(a => a.k === k);
+  return `<div class="cv-offs"><span class="cv-offs-t">Doesn't apply to ${esc((p && p.org) || "your platform")}:</span>
+    ${off.map(k => `<button type="button" class="cv-offc ${risky.includes(k) ? "warn" : ""}" data-cvon="${k}" aria-label="${esc("Restore " + area(k).n)}" title="Restore it">${esc(area(k).n)}<svg><use href="#i-plus"/></svg></button>`).join("")}
+    <span class="note">Saved in your company profile.</span>
+    ${risky.map(k => { const x = Object.assign({a:area(k)}, rk[k]); return `<p class="cv-offw">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} in ${esc(cvHarm(x.a))}. Restore it if that risk is real.</p>`; }).join("")}</div>`;
+}
 function cvMatrixHTML(){
-  const rows = cvRows(cv), seen = new Set();
+  const rows = cvRows(cv), seen = new Set(), canOff = rows.length > CV_MIN;
+  const trash = x => cv.ex ? "" : `<button type="button" class="cv-off" data-cvoff="${x.a.k}" ${canOff ? "" : 'aria-disabled="true"'} aria-label="${esc("Remove " + x.a.n + ": it doesn't apply to your platform")}" title="${canOff ? "Doesn't apply to us" : "Keep at least three harm areas"}"><svg><use href="#i-trash"/></svg></button>`;
   return `<div class="card cv-mx">
     <div class="cv-mh"><span>Harm area</span>${CV_LAYERS.map(l => `<span title="${esc(l.q)}">${l.n}</span>`).join("")}<span>Coverage</span></div>
-    ${rows.map(x => `<div class="cv-mr" id="cv-row-${x.a.k}">
-      <div class="cv-mn"><b>${esc(x.a.n)}</b>${x.band ? `<span class="pill ${BANDS[x.band][1]}">${BANDS[x.band][0]} risk</span>` : x.score === 0 ? `<span class="note">No risk found</span>` : ""}</div>
+    ${rows.map(x => cvConfirm === x.a.k ? cvConfirmHTML(x) : `<div class="cv-mr" id="cv-row-${x.a.k}">
+      <div class="cv-mn"><span class="cv-mnt"><b>${esc(x.a.n)}</b>${trash(x)}</span>${x.band ? `<span class="pill ${BANDS[x.band][1]}">${BANDS[x.band][0]} risk</span>` : x.score === 0 ? `<span class="note">No risk found</span>` : ""}</div>
       ${CV_LAYERS.map(l => `<div class="cv-mc"><span class="cv-ml">${l.n}</span>${cvCellHTML(x, l)}</div>`).join("")}
       <div class="cv-mv ${x.status}"><b class="mono">${x.rated ? x.cov + "%" : "–"}</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span></div>
     </div>`).join("")}
+    ${cvOffHTML()}
     <div class="cv-key"><span>Levels, weakest to strongest:</span>${CV_LEVELS.map((n, j) => `<span class="cv-kl"><i class="l${j}"></i>${n}</span>`).join("")}<span class="note">Hover a square to see what each level means.</span></div>
     <details class="cv-defs"><summary>What each level means</summary>
       <div class="cv-dt">${CV_LAYERS.map(l => `<div><h5>${l.n}</h5><p class="note">${esc(l.q)}</p><ol start="0">${l.lv.map((t, j) => `<li><b>${CV_LEVELS[j]}.</b> ${mxGloss(t, seen)}</li>`).join("")}</ol></div>`).join("")}</div></details>
@@ -164,7 +199,7 @@ function cvMatrixHTML(){
 }
 function cvWhy(){
   const s = cvSummary(cv), rk = cvRisk(cv);
-  if(!s.rated) return `<p>Rate at least one defense to see your coverage. It takes about five minutes for all ${CV_AREAS.length} harm areas.</p>`;
+  if(!s.rated) return `<p>Rate at least one defense to see your coverage. It takes about five minutes for all ${cvAreas(cv).length} harm areas.</p>`;
   let h = `<p>Your ${s.weighted ? "risk-weighted " : ""}coverage is <b>${s.cov}%</b>${s.rated < s.total ? `, based on ${s.rated} of ${s.total} ratings` : ""}.</p>`;
   if(!rk) return h + `<p>Choose a product or an example above to see where its risk outruns your coverage.</p>`;
   const top = s.exposed.concat(s.gaps).sort((a, b) => b.gap - a.gap);
@@ -188,7 +223,7 @@ function cvResultHTML(){
       ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>${acts ? `<button type="button" class="btn sm" data-cv="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button></div>` : ""}</div>
     <div class="card cv-big">${cvRadar(cv, true)}${cvLegend(cv)}</div></div>
     <div class="ma-rh"><h4>Biggest gaps</h4></div>${cvGapsHTML()}
-    ${cv.ex || cv.est || cvSummary(cv).rated < CV_AREAS.length * CV_LAYERS.length ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("coverage") : ""}`;
+    ${cv.ex || cv.est || cvSummary(cv).rated < cvSummary(cv).total ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("coverage") : ""}`;
 }
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
@@ -201,6 +236,7 @@ function cvMarkdown(d){
   const L = [`# Trust & Safety coverage radar`, ``, `${new Date().toISOString().slice(0, 10)}${src ? " · risk from " + src : ""}`, ``, `**${s.weighted ? "Risk-weighted coverage" : "Coverage"}: ${s.cov}%**${s.exposed.length ? ` · ${s.exposed.length} exposed` : ""}${s.gaps.length ? ` · ${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : ""}`, ``];
   L.push(`| Harm area | Risk | ${CV_LAYERS.map(l => l.n).join(" | ")} | Coverage |`, `|---|---|${CV_LAYERS.map(() => "---|").join("")}---|`);
   s.rows.forEach(x => L.push(`| ${x.a.n} | ${x.band ? BANDS[x.band][0] : x.score === 0 ? "None found" : "–"} | ${CV_LAYERS.map(l => x.r[l.k] === undefined ? "–" : CV_LEVELS[x.r[l.k]]).join(" | ")} | ${x.rated ? x.cov + "%" : "–"} |`));
+  if(!d.ex && cvOff().length) L.push(``, `Left out because they don't apply to this platform: ${cvOff().map(k => CV_AREAS.find(a => a.k === k).n).join(", ")}.`);
   L.push(``, `## Next steps`, ``);
   if(!acts.length) L.push(`No gaps where risk is high.`);
   acts.forEach(x => L.push(`- [ ] **${x.row.a.n}, ${x.layer.n.toLowerCase()}** (${x.row.status === "exposed" ? "exposed" : "gap"}): ${x.text}`));
@@ -209,7 +245,17 @@ function cvMarkdown(d){
 }
 const cvTitle = d => { const s = cvSummary(d); return `Coverage radar: ${s.cov}% coverage${s.exposed.length ? `, ${s.exposed.length} exposed` : ""}`; };
 
+// Remove a harm area, or bring it back, then redraw the radar and the grades
+function cvOffDo(k, back){
+  const a = CV_AREAS.find(x => x.k === k), was = cvSummary(cv);
+  cvConfirm = null;
+  if(!cvSetOff(k, !back)) return gsay("Keep at least three harm areas so the radar can compare them");
+  cvRefresh(true); const now = cvSummary(cv);
+  const f = document.querySelector(back ? `[data-cvoff="${k}"]` : `[data-cvon="${k}"]`); if(f) f.focus({preventScroll:true});
+  gsay(`${back ? "Restored" : "Removed"} ${cvHarm(a)}${back ? "" : " from your company profile"}${was.rated && now.rated && was.cov !== now.cov ? `. Coverage ${was.cov}% → ${now.cov}%` : ""}`);
+}
 function renderCoverage(){
+  cvConfirm = null;
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Coverage Radar",
     "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
@@ -245,6 +291,15 @@ function bindCoverage(){
       if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
       return cvRefresh(false);
     }
+    if(d.cvoff){
+      if(b.getAttribute("aria-disabled") === "true") return gsay("Keep at least three harm areas so the radar can compare them");
+      const x = cvRows(cv).find(r => r.a.k === d.cvoff);
+      if(x && x.score >= 8){ cvConfirm = d.cvoff; cvRefresh(true); const ok = document.querySelector(`[data-cvoffok="${d.cvoff}"]`); if(ok) ok.focus(); return; }
+      return cvOffDo(d.cvoff);
+    }
+    if(d.cvoffok) return cvOffDo(d.cvoffok);
+    if(d.cvoffno){ cvConfirm = null; cvRefresh(true); const t = document.querySelector(`[data-cvoff="${d.cvoffno}"]`); if(t) t.focus(); return; }
+    if(d.cvon) return cvOffDo(d.cvon, true);
     if(d.cvgo){ const el = document.getElementById("cv-p3"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); return; }
     if(d.ov === "new") return newAssessment();
     switch(d.cv){

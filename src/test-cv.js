@@ -48,6 +48,23 @@ const body = function(){
   renderCoverage(); eq(/Confirm coverage/.test(view.innerHTML) && !/Next in your program review/.test(view.innerHTML), true, "asks to confirm before the hand-off");
   cv.est = false; eq(JOURNEY.find(s => s.k === "coverage").done(), true, "confirmed coverage completes the step"); renderCoverage(); eq(/Next in your program review/.test(view.innerHTML), true, "hand-off after confirming");
   out.push("start from maturity: fills unrated cells, maps levels onto layers, counts only once confirmed");
+  // harm areas that don't apply: kept in the company profile, left out of the radar and every grade
+  renderCoverage(); eq((view.innerHTML.match(/data-cvoff="/g) || []).length, 8, "each harm area has a trash can");
+  eq(cvSetOff("ai", true), true, "remove a harm area"); eq(orgGet().harmsOff.join(","), "ai", "saved in the company profile");
+  let s2 = cvSummary(cv); eq(s2.rows.length + "/" + s2.total + "/" + s2.rated, "7/35/35", "the area leaves the rows and the count to rate");
+  renderCoverage(); h = view.innerHTML; if(bad(h)) throw new Error("removed area has bad values: " + where(h));
+  eq((h.match(/class="cv-mr"/g) || []).length, 7, "matrix drops the row"); eq(/data-cvon="ai"/.test(h) && /Doesn't apply to/.test(h), true, "removed areas can be restored");
+  eq((cvRadar(cv, false).match(/<line /g) || []).length, 7, "seven axes on the radar"); eq(JOURNEY.find(s => s.k === "coverage").done(), true, "still complete");
+  eq(/aria-pressed="false" data-orgharm="ai"/.test(orgCardHTML()) && /aria-pressed="true" data-orgharm="child"/.test(orgCardHTML()), true, "company profile shows which apply");
+  const risky = s2.rows.filter(x => x.score >= 8)[0]; CV_LAYERS.forEach(l => cv.r[risky.a.k][l.k] = 0); s2 = cvSummary(cv);
+  cvSetOff(risky.a.k, true); const s3 = cvSummary(cv); eq(s3.cov > s2.cov, true, `grade recalculates without ${risky.a.n} (${s2.cov}% → ${s3.cov}%)`);
+  eq(rcParts().find(p => p.k === "coverage").score, s3.cov, "report card uses the new grade");
+  renderCoverage(); eq(/Restore it if that risk is real/.test(view.innerHTML), true, "warns when a removed area has high risk");
+  eq(cvSummary(JSON.parse(JSON.stringify(CV_EXAMPLE))).rows.length, 8, "examples show all eight");
+  CV_AREAS.forEach(a => cvSetOff(a.k, true)); eq(cvAreas(cv).length, 3, "at least three stay"); eq(/aria-disabled="true"/.test(cvMatrixHTML()), true, "trash disabled at three");
+  CV_AREAS.forEach(a => cvSetOff(a.k, false)); eq(cvSummary(cv).rows.length, 8, "all restored");
+  eq(cvHarm(CV_AREAS.find(a => a.k === "ai")), "AI misuse", "acronyms keep their capitals");
+  out.push(`not relevant: removed from the profile or the radar, grade ${s2.cov}% → ${s3.cov}% without ${risky.a.n.toLowerCase()}, at least three stay, examples unaffected`);
   // exports: markdown, tasks, workspace, overview, search
   cv = JSON.parse(JSON.stringify(CV_EXAMPLE));
   const md = cvMarkdown(cv); eq(/\| Child safety \| Critical \| Strong \| Partial \| Solid \| Partial \| None \| 47% \|/.test(md) && /## Next steps/.test(md), true, "markdown table and steps");

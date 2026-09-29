@@ -10,12 +10,12 @@ const demoOn = () => !!store.get("demo", false);
 function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
 function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
 function demoStart(){
-  if(demoOn()){ goRoute("overview"); return tourStart(); }
+  if(demoOn()){ goRoute("overview"); return demoWelcome(); }
   try{
     const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
     localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
     demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
-    store.set("demo", true); store.set("demo:pending", true); store.set("demo:tour", true);
+    store.set("demo", true); store.set("demo:pending", true); store.set("demo:welcome", true);
   }catch(e){ return gsay("This browser blocked the demo"); }
   demoReload();
 }
@@ -61,25 +61,52 @@ function demoFill(){
 }
 if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
 
-/* ---------- the bar that says you're in the demo, on every page ---------- */
+/* ---------- "Demo: Pixelry · Exit demo" in the top bar, on every page and screen size ---------- */
+const DEMO_PILL = `<button type="button" class="tb-demo-t" data-demo="about" title="About the demo"><i aria-hidden="true"></i><span>Demo<span class="tb-demo-co">: Pixelry</span></span></button><button type="button" class="tb-demo-x" data-demo="exit">Exit demo</button>`;
 function demoBar(){
-  let bar = document.getElementById("demo-bar");
-  if(!demoOn()){ if(bar) bar.remove(); return; }
-  const v = document.getElementById("view"); if(!v || !v.parentNode) return;
-  if(!bar){ bar = document.createElement("div"); bar.id = "demo-bar"; bar.className = "demo-bar"; bar.setAttribute("role", "region"); bar.setAttribute("aria-label", "Demo company"); v.parentNode.insertBefore(bar, v); }
-  bar.innerHTML = `<span class="demo-dot" aria-hidden="true"></span><span class="demo-t"><b>You're exploring Pixelry, a demo company.</b> Everything here is sample data.<span class="demo-more"> Your own work is set aside until you exit.</span></span>
-    <span class="demo-a"><button type="button" class="btn sm" data-demo="tour">Take the tour</button><button type="button" class="btn sm primary" data-demo="exit">Exit demo</button></span>`;
+  let pill = document.getElementById("tb-demo");
+  if(!demoOn()){ if(pill) pill.remove(); return; }
+  const acts = document.querySelector(".topbar .tb-actions"); if(!acts || pill) return;
+  pill = document.createElement("div"); pill.id = "tb-demo"; pill.className = "tb-demo"; pill.setAttribute("role", "group"); pill.setAttribute("aria-label", "Demo company");
+  pill.innerHTML = DEMO_PILL; acts.insertBefore(pill, acts.firstChild);
 }
 demoBar();
 
+/* ---------- the welcome that opens the demo: what it is, where to exit, and the tour ---------- */
+function demoWelcome(){
+  if(!demoOn() || document.getElementById("dm-welcome")) return;
+  if(tourAt >= 0) tourEnd();
+  const bg = document.createElement("div"); bg.className = "tk-bg dm-bg"; bg.id = "dm-welcome";
+  bg.innerHTML = `<div class="tk dm" role="dialog" aria-modal="true" aria-labelledby="dm-h" aria-describedby="dm-d">
+    <span class="eyebrow">Demo company</span>
+    <h3 id="dm-h">You're exploring Pixelry</h3>
+    <p id="dm-d">Pixelry is a fictional photo and short-video app with about 8 million users in the US, EU and UK. Every tool is filled in with its sample data, so you can see a whole safety program at once.</p>
+    <div class="dm-exit"><div class="dm-exit-t"><b>Leave any time</b><span>Use <b>Exit demo</b> at the top of the page. Your own work is set aside in this browser and comes back untouched.</span></div><span class="tb-demo dm-sample" aria-hidden="true"><span class="tb-demo-t"><i></i><span>Demo<span class="tb-demo-co">: Pixelry</span></span></span><span class="tb-demo-x">Exit demo</span></span></div>
+    <div class="dm-a"><button type="button" class="btn primary" data-dm="tour">Take the tour ${icon("arrow")}</button><button type="button" class="btn" data-dm="explore">Explore on my own</button></div>
+    <p class="dm-small">The tour takes about a minute and stays on the Overview.</p>
+  </div>`;
+  document.body.appendChild(bg);
+  const b = bg.querySelector('[data-dm="tour"]'); if(b) b.focus();
+}
+function demoWelcomeClose(next){
+  const bg = document.getElementById("dm-welcome"); if(!bg) return;
+  bg.remove();
+  if(next === "tour") return tourStart();
+  // Point at the exit, so people know where it lives
+  const pill = document.getElementById("tb-demo");
+  if(pill){ pill.classList.remove("hi"); void pill.offsetWidth; pill.classList.add("hi"); setTimeout(() => pill.classList.remove("hi"), 3200); }
+  const h = document.querySelector("#view h1"); if(h && typeof focusQuiet === "function") focusQuiet(h);
+}
+
 /* ---------- a short guided tour of the overview ---------- */
 const TOUR = [
-  [".ov-greet", "Meet Pixelry", "A fictional photo and short-video app with about 8 million users in the US, EU and UK, and a growing safety team. Everything you see is its sample data."],
+  [".ov-greet", "Pixelry at a glance", "The program's grade, how many products are assessed, overall maturity and the kind of company, in one line. Everything you see is sample data."],
   [".jn", "The program review", "The recommended path through the tools. Pixelry has done five of the six steps, and each tool hands off to the next one."],
   [".nx", "Your next moves", "What to do this week, pulled from every tool: each product's next launch blocker, this quarter's roadmap items and the biggest coverage gap. You can tick them off right here."],
   [".rc", "The report card", "Each part of the program graded out of 100, with the trend since the first grade and one tip to raise the weakest part."],
   [".ov-pic", "The safety picture", "Three radars side by side: how mature the program is, the combined risk across every product, and each product on its own."],
-  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it. When you're ready, exit the demo from the bar at the top and start your own."]
+  [".ov-tools", "Every tool, filled in", "Open any tool to see Pixelry's work in it."],
+  ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
 ];
 let tourAt = -1, tourSteps = TOUR;
 // Any page's walkthrough uses the same engine
@@ -114,12 +141,23 @@ function tourStart(){
 }
 document.addEventListener("click", e => {
   const d = e.target.closest && e.target.closest("[data-demo]");
-  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : tourStart(); }
+  if(d){ e.preventDefault(); const a = d.dataset.demo; return a === "start" ? demoStart() : a === "exit" ? demoExit() : a === "about" ? demoWelcome() : tourStart(); }
+  const w = e.target.closest && e.target.closest("[data-dm]");
+  if(w){ e.preventDefault(); return demoWelcomeClose(w.dataset.dm); }
   const t = e.target.closest && e.target.closest("[data-tour]"); if(!t) return;
   const a = t.dataset.tour; if(a === "next") return tourStep(tourAt + 1); if(a === "back") return tourStep(tourAt - 1);
   tourEnd();
 });
-document.addEventListener("keydown", e => { if(e.key === "Escape" && tourAt >= 0) tourEnd(); });
+document.addEventListener("keydown", e => {
+  const dm = document.getElementById("dm-welcome");
+  if(dm){
+    if(e.key === "Escape"){ e.preventDefault(); return demoWelcomeClose("explore"); }
+    if(e.key === "Tab"){ const f = [...dm.querySelectorAll("button")]; const i = f.indexOf(document.activeElement);
+      if(e.shiftKey && i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } else if(!e.shiftKey && i === f.length - 1){ e.preventDefault(); f[0].focus(); } }
+    return;
+  }
+  if(e.key === "Escape" && tourAt >= 0) tourEnd();
+});
 if(window.addEventListener) window.addEventListener("hashchange", () => { if(tourAt >= 0) tourEnd(); demoBar(); });
-// The tour opens by itself once, straight after the demo loads
-if(demoOn() && store.get("demo:tour", false)){ store.set("demo:tour", false); setTimeout(tourStart, 500); }
+// The welcome opens once, straight after the demo loads (demo:tour is the flag older links set)
+if(demoOn() && (store.get("demo:welcome", false) || store.get("demo:tour", false))){ store.set("demo:welcome", false); store.set("demo:tour", false); setTimeout(demoWelcome, 300); }

@@ -1,4 +1,4 @@
-// Checks the demo company: a consistent program across every tool, a clear banner, and a tour that finds its targets, without a browser.
+// Checks the demo company: a consistent program across every tool, the Exit demo pill, and a tour that finds its targets, without a browser.
 const fs = require("fs"), path = require("path");
 const D = path.dirname(__filename), rd = f => fs.readFileSync(path.join(D, f), "utf8");
 const v9 = rd("test-v9.js"), s0 = v9.indexOf("const stub = `") + 14, stub = v9.slice(s0, v9.indexOf("`;", s0));
@@ -17,8 +17,10 @@ const body = function(){
   out.push("demo data: " + pms + " · grade " + rcOverall(parts).score + "/100 · " + xs.length + " next moves");
   renderOverview(); const h = view.innerHTML; if(bad(h)) throw new Error("demo overview has bad values: " + where(h));
   eq(/Explore a demo company/.test(h), false, "no demo offer while in the demo");
-  TOUR.forEach(([sel]) => { eq(h.includes('class="' + sel.slice(1)) || new RegExp('class="[^"]*\\b' + sel.slice(1) + '\\b').test(h), true, "tour target on the overview: " + sel); });
-  out.push("tour: all " + TOUR.length + " targets present on the overview");
+  // Class targets live on the overview; the last stop (#tb-demo) is the top-bar pill that demoBar() adds
+  TOUR.filter(([sel]) => sel[0] === ".").forEach(([sel]) => { eq(h.includes('class="' + sel.slice(1)) || new RegExp('class="[^"]*\\b' + sel.slice(1) + '\\b').test(h), true, "tour target on the overview: " + sel); });
+  eq(TOUR[TOUR.length - 1][0], "#tb-demo", "the tour ends on the exit"); eq(/data-demo="exit"/.test(DEMO_PILL) && /data-demo="about"/.test(DEMO_PILL), true, "the pill exits and reopens the welcome");
+  out.push("tour: all " + TOUR.length + " targets present, ending on the Exit demo pill");
   eq(tr.org === "Pixelry" && tr.view === "report" && trProgress().pct, 100, "demo includes a complete transparency report");
   renderMaturity(); if(bad(view.innerHTML)) throw new Error("demo maturity bad: " + where(view.innerHTML));
   renderCoverage(); if(bad(view.innerHTML)) throw new Error("demo coverage bad: " + where(view.innerHTML));

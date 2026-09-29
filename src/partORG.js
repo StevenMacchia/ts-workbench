@@ -34,19 +34,22 @@ function orgPrefillPM(p){
 function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
   return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
-    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, metrics, policy tests and the AI assistants. Change it any time.</p></div>
+    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, coverage areas, metrics, policy tests and the AI assistants. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
     <div class="field"><label for="org-youth">Who can use it</label><select class="select" id="org-youth" data-org="youth"><option value="">Choose one</option>${YOUTH.map(y => `<option value="${y.k}" ${o.youth === y.k ? "selected" : ""}>${esc(y.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
     <div class="field"><span class="lbl">Where your users are</span><div class="org-regions">${REGIONS.map(r => `<button type="button" class="pol-chip" aria-pressed="${regions.includes(r.k)}" data-orgregion="${r.k}" title="${esc(r.n)}">${r.k.toUpperCase()}</button>`).join("")}</div></div>
+    ${!cta && typeof cvOff === "function" ? `<div class="field org-harms"><span class="lbl">Harm areas that apply</span><div class="org-regions">${CV_AREAS.map(a => `<button type="button" class="pol-chip" aria-pressed="${!cvOff().includes(a.k)}" data-orgharm="${a.k}">${esc(a.n)}</button>`).join("")}</div>
+      <small class="note">All apply by default. Turn off any your platform can't have, and Coverage radar and its grade leave them out.</small></div>` : ""}
   </div>${cta ? `<div class="org-cta"><span class="note">${orgReady() ? (regions.length ? "Saved as you go. Change any of it later in My workspace." : "Add where your users are, so law maps and pre-mortems match your markets.") : "Choose a company type and a stage to continue."}</span><button type="button" class="btn primary" data-orgdone="1" ${orgReady() ? "" : "disabled"}>Save and continue ${icon("arrow")}</button></div>` : ""}</div>`;
 }
 document.addEventListener("click", e => {
-  const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion]"); if(!b) return;
+  const b = e.target.closest && e.target.closest("[data-orgstage],[data-orgregion],[data-orgharm]"); if(!b) return;
   if(b.dataset.orgstage) orgSet({stage:b.dataset.orgstage});
   if(b.dataset.orgregion){ const cur = orgGet().regions || [], k = b.dataset.orgregion; orgSet({regions:cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)}); }
-  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"]`); if(again) again.focus(); }
-  gsay("Workspace settings saved");
+  if(b.dataset.orgharm && !cvSetOff(b.dataset.orgharm, b.getAttribute("aria-pressed") === "true")) return gsay("Keep at least three harm areas so Coverage radar can compare them");
+  const card = b.closest(".org-card"); if(card){ card.outerHTML = orgCardHTML(!!card.dataset.cta); const again = document.querySelector(`[data-orgstage="${b.dataset.orgstage}"],[data-orgregion="${b.dataset.orgregion}"],[data-orgharm="${b.dataset.orgharm}"]`); if(again) again.focus(); }
+  gsay(b.dataset.orgharm ? `${CV_AREAS.find(a => a.k === b.dataset.orgharm).n} ${cvOff().includes(b.dataset.orgharm) ? "left out of" : "added back to"} Coverage radar` : "Workspace settings saved");
 });
 document.addEventListener("change", e => { const t = e.target; if(t.dataset && (t.dataset.org === "type" || t.dataset.org === "youth")){ orgSet({[t.dataset.org]:t.value || null}); if(t.dataset.org === "type") store.set("tt:type", null); gsay("Workspace settings saved");
   const card = t.closest(".org-card"); if(card && card.dataset.cta){ card.outerHTML = orgCardHTML(true); const again = document.getElementById(t.id); if(again) again.focus(); } } });
