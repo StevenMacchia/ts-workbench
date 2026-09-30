@@ -283,7 +283,8 @@ function mxHistHTML(){
 function mxTabMine(list){
   const lab = (f, t) => `<span class="mx-sc-lab">${t}</span>`;
   return `<div class="mx-intro"><h3>Your scorecard</h3>
-    <p>For each metric you track, enter this period's number, your target, and the point where it counts as off track. Save the period when it closes, and each metric builds a trend line you can show leadership.</p></div>
+    <p>For each metric you track, enter this period's number, your target, and the point where it counts as off track. Save the period when it closes, and each metric builds a trend line you can show leadership.</p>
+    ${mx.demo ? "" : `<p><button type="button" class="btn sm" id="mx-guide">Set it up one metric at a time</button></p>`}</div>
   ${mx.demo ? `<div class="mxs-demo">${mxIco("warn")}<span>You're looking at <b>example numbers</b> for a ${esc(MX_PLATFORMS[mx.platform].toLowerCase())} program, so you can see how a full scorecard reads.</span><button type="button" class="btn sm" id="mx-demo-clear">Clear example numbers</button></div>` : ""}
   <div class="mxs-top">
     <label class="mxa-y mxs-period"><span>Reporting period</span><input class="input" id="mx-period" value="${esc(mx.period || "")}" placeholder="For example Q3 2026"></label>
@@ -490,6 +491,39 @@ function mxBindGloss(){
   });
 }
 
+/* ---------- Guided: set up your scorecard, then one metric at a time ---------- */
+let mxView = null;
+// Guided for a fresh scorecard; the framework and the tabs once there are numbers, an example, or a metric opened by link
+function mxMode(){
+  if(mxView === "page" || mx.demo || Object.keys(mx.vals || {}).length || mx.tab !== "card") return "page";
+  if(/^#metrics\/./.test(location.hash || "")) return "page";
+  return "guide";
+}
+function mxSpec(){
+  const list = mxList(), tracked = () => list.filter(m => mx.have[m.n]);
+  const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
+  const steps = [
+    {id:"platform", eb:"Your platform", title:"What kind of platform is it?", why:"The list of metrics changes with it: a marketplace watches fraud loss, a social app watches prevalence and reach.", kind:"single", opts:() => Object.entries(MX_PLATFORMS).map(([k, v]) => ({k, n:v})), get:() => mx.platformSet || mx.orgSet ? mx.platform : "", set:v => { mx.platformSet = true; setV("platform", v); }},
+    {id:"stage", eb:"Your stage", title:"How far along is your program?", why:"Early programs start with a few metrics they can actually measure. Later stages add more.", kind:"single", opts:() => Object.entries(MX_STAGE).map(([k, v]) => ({k, n:v, h:MX_STAGE_HELP[k]})), get:() => mx.stageSet || mx.orgSet ? mx.stage : "", set:v => { mx.stageSet = true; setV("stage", v); }},
+    {id:"reg", eb:"Regulation", title:"Does the EU Digital Services Act or the UK Online Safety Act apply to you?", why:"They add reporting metrics you'll need for transparency reports.", kind:"single", opts:() => [{k:"no", n:"No"}, {k:"yes", n:"Yes"}], get:() => mx.regSet || mx.orgSet ? (mx.reg ? "yes" : "no") : "", set:v => { mx.regSet = true; setV("reg", v === "yes"); }},
+    {id:"pick", eb:"Your metrics", title:"Which metrics will you track?", why:"The north stars are picked for you. Add the health metrics and diagnostics you can measure today. You can change this any time.", kind:"multi", opt:false,
+      opts:() => mxList().map(m => ({k:m.n, n:m.n, h:`${MX_TIER_NAME[m.t].replace(/ metrics$/, "")} · ${MX_SC[m.n] ? MX_SC[m.n][0] : m.d}`})), get:() => Object.keys(mx.have || {}).filter(n => mx.have[n] && mxList().some(m => m.n === n)),
+      toggle:n => { mx.have = Object.assign({}, mx.have); if(mx.have[n]) delete mx.have[n]; else mx.have[n] = true; store.set("mx", mx); }},
+    {id:"period", eb:"Reporting period", title:"Which period are these numbers for?", why:"Save each period when it closes, and every metric builds a trend line.", kind:"text", opt:true, placeholder:"For example Q3 2026", get:() => mx.period || "", set:v => { mx.period = v; store.set("mx", mx); }}
+  ].concat(METRICS.map(m => ({id:"m-" + mxSlug(m), eb:m.n, title:esc(m.n), skip:() => !mx.have[m.n] || !mxList().some(x => x.n === m.n), why:`${esc(m.d)} ${MX_HOW[m.n] ? "Formula: " + esc(MX_HOW[m.n].f) + "." : ""}`, kind:"custom", opt:true, next:"Continue",
+    html:() => `<div class="gd-mx"><label class="mxa-y"><span>This period${mxUnit(m) ? ` (${esc(mxUnit(m))})` : ""}</span>${mxInput(m, "v")}</label><label class="mxa-y"><span>Target</span>${mxInput(m, "t")}</label><label class="mxa-y"><span>Off track at</span>${mxInput(m, "a")}</label></div><p class="note gd-mx-st"><span data-st="${METRICS.indexOf(m)}">${mxPill(mxStatus(m, mx.vals))}</span> <button type="button" class="mx-link" data-open="${METRICS.indexOf(m)}">How to measure it</button></p>`,
+    has:() => !!(mx.vals[m.n] && mx.vals[m.n].v)})));
+  return {k:"metrics", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
+    intro:{title:"Build the scorecard you'd bring to an executive review", lead:"Tell it about your platform and stage, pick the metrics you'll track, and enter this period's numbers one metric at a time. Every metric has a formula, a way to measure it and starter SQL, and the scorecard turns into a one-pager for leadership.",
+      facts:[["About 10 minutes", "Five questions, then one screen per metric you track."], [`${METRICS.length} metrics`, "In the order to adopt them: north stars first."], ["Numbers you may not have yet", "Skip any metric. The framework tells you how to log it."]], start:"Start"},
+    alt:[{n:"Browse the framework instead", run:() => { mxView = "page"; mx.tab = "card"; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}, {n:"See example numbers", run:() => { mxView = "page"; mx.tab = "mine"; store.set("mx", mx); renderMetrics(); const b = $("#mx-demo"); if(b) b.click(); }}],
+    steps, finish:"See my scorecard",
+    bind:() => { view.querySelectorAll("[data-f]").forEach(inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, mxList()));
+      view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { mxView = "page"; mx.tab = "card"; mx.open = METRICS[+b.dataset.open].n; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }); },
+    done:() => { mxView = "page"; mx.tab = "mine"; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
+// North stars come pre-ticked, so the first scorecard isn't empty
+function mxGuideStart(){ const list = mxList(); if(!list.some(m => mx.have[m.n])){ mx.have = Object.assign({}, mx.have); list.filter(m => m.t === "ns").forEach(m => { mx.have[m.n] = true; }); store.set("mx", mx); } }
 function renderMetrics(){
   mx.have = mx.have || {}; mx.vals = mx.vals || {}; mx.read = mx.read || {}; mx.hist = mx.hist || [];
   if(!MX_PLATFORMS[mx.platform]) mx.platform = "social";
@@ -499,6 +533,8 @@ function renderMetrics(){
     if(o.regions && o.regions.length) mx.reg = o.regions.some(r => r === "eu" || r === "uk"); if(o.type || o.stage) mx.orgSet = true; }
   const list = mxList();
   mxFromHash(list);
+  if(typeof gdRender === "function" && mxMode() === "guide"){ mxGuideStart(); return gdRender(mxSpec()); }
+  if(typeof gdCur !== "undefined") gdCur = null;
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
   const open = mx.tab === "card" && list.find(m => m.n === mx.open);
   if(!open) mx.open = null;
@@ -538,6 +574,7 @@ function renderMetrics(){
   bind("[data-step]", b => b.onclick = () => { const n = list[list.indexOf(open) + +b.dataset.step]; if(n) mxGo(mxSlug(n)); });
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
+  bind("#mx-guide", b => b.onclick = () => { mxView = null; mx.tab = "card"; gdReset("metrics"); store.set("mx", mx); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();

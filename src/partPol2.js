@@ -31,6 +31,37 @@ function polInfoHTML(){
     </div>
   </details>`;
 }
+/* ---------- Guided: the rule, then your platform, then what worries you ---------- */
+let polView = null;
+function polSpec(){
+  const ai = !!SAMPLER && !polRun.aiOff, setV = (k, v) => { pol[k] = v; savePol(); };
+  const multi = (k, list) => ({kind:"multi", opt:true, opts:() => list.map(([v, n]) => ({k:v, n})), get:() => pol[k] || [], toggle:v => setV(k, (pol[k] || []).includes(v) ? pol[k].filter(x => x !== v) : (pol[k] || []).concat(v))});
+  const steps = [
+    {id:"rule", eb:"Your rule", title:"What's the rule you want to test?", why:"Paste it exactly as users would see it, with any definitions, examples and exceptions you already have. The more of the real rule you paste, the more precise the review.", kind:"text", rows:8,
+      placeholder:"For example: “Harassment means repeatedly targeting someone with insults, threats or unwanted sexual comments…”", get:() => pol.rule, set:v => setV("rule", v),
+      hint:`Start from an example: ${POL_EXAMPLES.map(([n], i) => `<button type="button" class="pol-chip" data-polex="${i}">${esc(n)}</button>`).join(" ")}`},
+    {id:"company", eb:"Your platform", title:"What's the company or product called?", why:ai ? "Claude can fill in the details that follow from what it already knows about the company. It can't browse the web, so check them." : "It's named in your report.", kind:"text", opt:true, max:80,
+      placeholder:"For example: Twitch, Depop or Discord", get:() => pol.company, set:v => setV("company", v),
+      hint:(ai ? `<span class="pol-co-row"><button type="button" class="btn sm" data-pollookup="1" ${polRun.looking ? "disabled" : ""}>${polRun.looking ? "Looking it up…" : `${icon("search")}Look it up with Claude`}</button></span>` : "") + `<div id="pol-look" tabindex="-1">${polLookHTML()}</div>`},
+    {id:"type", eb:"Platform type", title:"What kind of platform is it?", why:"The edge cases and the law depend on it.", kind:"single", opts:() => PLATFORMS.map(p => ({k:p.k, n:p.n})), get:() => pol.type, set:v => setV("type", v)},
+    {id:"youth", eb:"Who uses it", title:"Can under-18s use it?", kind:"single", opts:() => YOUTH.map(y => ({k:y.k, n:y.n})).concat([{k:"unsure", n:"Not sure"}]), get:() => pol.youth || (pol.youthSet ? "unsure" : ""), set:v => { pol.youthSet = true; setV("youth", v === "unsure" ? "" : v); }},
+    {id:"product", eb:"Your product", title:"Describe your product in a sentence or two", why:"What people do on it, who uses it and anything unusual.", kind:"text", rows:4, opt:true,
+      placeholder:"For example: “A photo app for 18 to 25-year-olds with public profiles, DMs and group chats. ‘Rate me’ posts are popular.”", get:() => pol.product, set:v => setV("product", v)},
+    Object.assign({id:"regions", eb:"Your regions", title:"Where do you operate?", why:"Each region brings its own law to the edge cases."}, multi("regions", REGIONS.map(r => [r.k, r.k.toUpperCase() + " · " + r.n])), {opt:false}),
+    Object.assign({id:"enforce", eb:"Who finds violations", title:"Who finds violations today?", why:"Optional. It shapes the cases: a rule enforced by classifiers fails differently from one enforced by people."}, multi("enforce", POL_ENF)),
+    Object.assign({id:"actions", eb:"Actions", title:"What can reviewers do when they find one?", why:"Optional. The review checks whether the rule tells reviewers which action fits."}, multi("actions", POL_ACT)),
+    {id:"concerns", eb:"What worries you", title:"What worries you about this rule?", why:"Gray areas, recent incidents or cases your team argues about. Claude turns these into edge cases, so describe real situations rather than categories.", kind:"text", rows:4, opt:true,
+      placeholder:"For example: “Rival fans' trash talk keeps getting reported as harassment. We're unsure about jokes about someone's appearance.”", get:() => pol.concerns, set:v => setV("concerns", v)}
+  ];
+  return {k:"policy", tool:{name:"Policy stress-tester", icon:"doc", color:"var(--t-pol)"},
+    intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule, tell the test about your platform and what worries you, and it finds the words reviewers would read differently, the cases the rule forgets, and how it holds up against real edge cases.",
+      facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
+    alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
+    steps, finish:ai ? "Run the test" : "Run the instant checks",
+    bind:() => { $$("[data-polex]").forEach(b => b.onclick = () => { pol.rule = POL_EXAMPLES[+b.dataset.polex][1]; pol.heur = null; pol.result = null; savePol(); renderPolicy(); const t = view.querySelector(".gd-text .input"); if(t) t.focus(); });
+      const lk = view.querySelector && view.querySelector("[data-pollookup]"); if(lk) lk.onclick = polLookup; },
+    done:() => { gdCur = null; polAnalyze(); }};
+}
 function renderPolicy(){
   // A fresh test starts from the workspace settings: product type, audience, regions and company name
   if(!pol.orgSet && !pol.rule && !pol.heur && typeof orgGet === "function"){ const o = orgGet(), pr = wsProfile();
@@ -38,6 +69,8 @@ function renderPolicy(){
     if(pr && pr.org && !pol.company) pol.company = pr.org;
     if(o.type || o.youth || (o.regions && o.regions.length)){ pol.orgSet = true; savePol(); } }
   const ai = !!SAMPLER && !polRun.aiOff, report = !!pol.heur && pol.view !== "setup";
+  if(!report && polView !== "page" && !polRun.busy) return gdRender(polSpec());
+  gdCur = null;
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
         `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
@@ -54,6 +87,7 @@ function renderPolicy(){
 function polSetupHTML(ai){
   const chips = (list, key) => list.map(([k,n])=>`<button type="button" class="pol-chip" data-multi="${key}" data-v="${k}" aria-pressed="${pol[key].includes(k)}">${esc(n)}</button>`).join("");
   return `<div class="pol-setup">
+    <div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" data-polguide="1">Switch to guided</button></div>
     ${polInfoHTML()}
     <section class="card pol-card">
       <div class="pol-h"><span class="pol-num">1</span><div><label for="pol-rule">Your rule</label><span class="note">Required</span></div><span class="note mono pol-wc" id="pol-wc">${polWords(pol.rule)} words</span></div>
@@ -181,7 +215,8 @@ function polBind(){
   $$("[data-depth]").forEach(b => b.onclick = () => { polReadForm(); pol.depth = b.dataset.depth; savePol(); renderPolicy(); });
   $$("[data-filter]").forEach(b => b.onclick = () => { pol.filter = b.dataset.filter; savePol(); renderPolicy(); const t = document.querySelector(`[data-filter="${b.dataset.filter}"]`); if(t) t.focus(); });
   $$("[data-poltab]").forEach(b => b.onclick = () => { pol.rtab = b.dataset.poltab; savePol(); renderPolicy(); const t = document.querySelector(`[data-poltab="${b.dataset.poltab}"]`); if(t) t.focus(); });
-  $$("[data-poledit]").forEach(b => b.onclick = () => { pol.view = "setup"; polRun.err = ""; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
+  $$("[data-polguide]").forEach(b => b.onclick = () => { polReadForm(); polView = null; savePol(); renderPolicy(); window.scrollTo(0, 0); });
+  $$("[data-poledit]").forEach(b => b.onclick = () => { pol.view = "setup"; polView = "page"; polRun.err = ""; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
   $$("[data-polreport]").forEach(b => b.onclick = () => { polReadForm(); pol.view = "report"; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
   const loadFull = () => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); renderPolicy(); gsay("Complete example loaded. Run the test at the bottom to see the full report."); };
   const full = $("#pol-full"); if(full) full.onclick = loadFull;

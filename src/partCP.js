@@ -392,8 +392,57 @@ function cpMd(md){
 }
 
 /* ---------- page ---------- */
+/* ---------- Guided: one question per screen, then the plan ---------- */
+let cpView = null;
+const CP_NEW_TAG = `<span class="cp-new" title="Added by the FTC's 2025 amendments">New</span>`;
+// One kind of personal information: whether you collect it, and if so why, who gets it and how long you keep it
+function cpPiRow([k, n, h, isNew]){
+  const r = cp.pi[k] || {}, on = !!r.on;
+  return `<div class="cp-row ${on ? "on" : ""}"><label class="tr-chk"><input type="checkbox" data-cppi="${k}" ${on ? "checked" : ""}><span><b>${esc(n)}</b>${isNew ? CP_NEW_TAG : ""}${h ? `<small>${esc(h)}</small>` : ""}</span></label>
+    ${on ? `<div class="cp-row-d">
+      <div class="field"><label for="cp-use-${k}">Mainly used for</label><select class="select" id="cp-use-${k}" data-cpuse="${k}">${CP_USE.map(([v, t]) => `<option value="${v}" ${(r.use || "feature") === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+      <div class="field"><span class="lbl">Shared with</span><div class="cp-chips">${CP_SHARE.map(([v, t, tip]) => `<button type="button" class="pol-chip" data-cpshare="${k}" data-v="${v}" aria-pressed="${(r.share || []).includes(v)}" ${tip ? `title="${esc(tip)}"` : ""}>${t}</button>`).join("")}</div></div>
+      <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+    </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`;
+}
+function cpSpec(){
+  const X = () => cpCtx(cp), AP = () => cpApplies(cp);
+  const notPrimary = () => !!cp.aud && cp.aud !== "primary", live = () => { const ap = AP(); return !!ap.lvl && ap.lvl !== "watch"; };
+  const setV = (k, v) => { cp[k] = v; cp.ex = false; cpSave(); };
+  const steps = [
+    {id:"svc", eb:"Your service", title:"What's the service or product called?", why:"It's named in your plan and in the drafts for parents and for Legal.", kind:"text", opt:true, placeholder:"For example: Brightbeam", max:80, get:() => cp.svc, set:v => setV("svc", v.slice(0, 80))},
+    {id:"aud", eb:"Who it's for", title:"Who is the service for?", why:"This decides whether COPPA applies to every user, to users under 13, or only to the children you know about.", kind:"single",
+      opts:() => CP_AUD.map(([k, n, h]) => ({k, n, h})), get:() => cp.aud, set:k => setV("aud", k)},
+    {id:"fac", eb:"Signs of a child audience", title:"Which of these are true of the service?", why:"Even a service built for teens and adults can count as aimed at children if enough of these are true. The FTC weighs them together, and three or more is a warning sign.", kind:"multi", opt:true, none:"None of these", skip:() => !notPrimary(),
+      opts:() => CP_FACTORS.map(([k, t, nw]) => ({k, n:t, tag:nw ? CP_NEW_TAG : ""})), get:() => Object.keys(cp.fac || {}).filter(k => cp.fac[k]),
+      toggle:k => { const f = Object.assign({}, cp.fac); if(f[k]) delete f[k]; else f[k] = true; setV("fac", f); }, clear:() => setV("fac", {})},
+    {id:"know", eb:"Knowing ages", title:"How could you learn that a user is under 13?", why:"Once you know a particular user is a child, COPPA applies to them even on a general-audience service.", kind:"multi", opt:true, none:"No way to know", skip:() => !notPrimary(),
+      opts:() => CP_KNOW.map(([k, t]) => ({k, n:t})), get:() => cp.know, toggle:k => setV("know", cp.know.includes(k) ? cp.know.filter(v => v !== k) : cp.know.concat(k)), clear:() => setV("know", [])},
+    {id:"gate", eb:"Asking for age", title:"How do you ask for age?", why:"A neutral question protects you. One with a default or a hint doesn't.", kind:"single", skip:() => !notPrimary(),
+      opts:() => CP_GATE.map(([k, n, h]) => ({k, n, h})), get:() => cp.gate, set:k => setV("gate", k)},
+    {id:"data", eb:"Children's data", title:"What personal information do you collect from children?", why:"Tick each kind you collect, then say what it's for, who gets it and how long you keep it. Include what third-party SDKs collect through your app or site: under COPPA, that counts as yours.", kind:"custom", opt:true, skip:() => !cp.aud,
+      html:() => `<div class="cp-pi gd-pi">${CP_PI.map(cpPiRow).join("")}</div>`, next:"Continue"},
+    {id:"vpc", eb:"Parental consent", title:"How do parents give consent?", why:"The FTC accepts specific methods. Knowledge-based questions, a photo ID with a face match, and text plus were added in 2025.", kind:"single", skip:() => !(live() && X().needsConsent),
+      opts:() => { const x = X(); return CP_VPC.map(([k, n, h, sh, nw]) => { const bad = x.disclose && !sh; return {k, n, h:bad ? h + " You share children's data, so this method isn't allowed." : h, off:bad, offMsg:"You share children's data, so this method isn't allowed", tag:nw ? CP_NEW_TAG : ""}; }); },
+      get:() => cp.vpc, set:k => setV("vpc", k)}
+  ].concat(CP_CTRL.map(g => ({id:"ctrl-" + g.k, eb:g.n, title:`${esc(g.n)}: what do you have in place today?`, why:g.h ? esc(g.h) + " Tick what's true today." : "Tick what's true today.", kind:"multi", opt:true, none:"None of these yet",
+    skip:() => { const x = X(), ap = AP(); return !ap.lvl || !g.items.some(it => cpItemOn(it, cp, x, ap)); },
+    opts:() => { const x = X(), ap = AP(); return g.items.filter(it => cpItemOn(it, cp, x, ap)).map(it => ({k:it.k, n:it.t, h:it.opt ? "Optional" : "", tag:it.isNew ? CP_NEW_TAG : ""})); },
+    get:() => Object.keys(cp.ctrl || {}).filter(k => cp.ctrl[k]), toggle:k => { const c = Object.assign({}, cp.ctrl); if(c[k]) delete c[k]; else c[k] = true; setV("ctrl", c); },
+    clear:() => { const c = Object.assign({}, cp.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
+  const src = typeof loopSource === "function" ? loopSource() : null;
+  return {k:"coppa", tool:{name:"COPPA readiness", icon:"coppa", color:"var(--t-cp)"},
+    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal.",
+      facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
+    alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
+      .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
+    steps, finish:"Build my plan",
+    done:() => { cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
 function renderCoppa(){
-  const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap), report = cp.view === "report" && !!cp.aud;
+  const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap), report = (cp.view === "report" && !!cp.aud) || cp.ex;
+  if(!report && cpView !== "page") return gdRender(cpSpec());
+  gdCur = null;
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
@@ -406,7 +455,7 @@ function cpSetupHTML(x, ap, s){
   const chk = (grp, k, label, isNew, sub) => `<label class="tr-chk"><input type="checkbox" data-cpset="${grp}" value="${k}" ${(grp === "know" ? cp.know.includes(k) : cp[grp][k]) ? "checked" : ""}><span>${esc(label)}${isNew ? newTag : ""}${sub ? `<small>${esc(sub)}</small>` : ""}</span></label>`;
   const tile = (attr, cur, k, n, h, extra, note) => `<button type="button" role="radio" aria-checked="${cur === k}" class="card tr-tier ${cur === k ? "on" : ""} ${extra || ""}" data-${attr}="${k}"><b>${esc(n)}${note || ""}</b>${h ? `<span>${esc(h)}</span>` : ""}</button>`;
   const sec = (n, id, title, tag, body, tip) => `<section class="card pol-card" id="${id}"><div class="pol-h"><span class="pol-num">${n}</span><div><span class="pol-lbl">${title}</span>${tag ? `<span class="note">${tag}</span>` : ""}</div></div>${tip ? `<p class="pol-tip cp-tip">${tip}</p>` : ""}${body}</section>`;
-  const piRow = ([k, n, h, isNew]) => { const r = cp.pi[k] || {}, on = !!r.on;
+  const piRow = cpPiRow; const _unused = ([k, n, h, isNew]) => { const r = cp.pi[k] || {}, on = !!r.on;
     return `<div class="cp-row ${on ? "on" : ""}"><label class="tr-chk"><input type="checkbox" data-cppi="${k}" ${on ? "checked" : ""}><span><b>${esc(n)}</b>${isNew ? newTag : ""}${h ? `<small>${esc(h)}</small>` : ""}</span></label>
       ${on ? `<div class="cp-row-d">
         <div class="field"><label for="cp-use-${k}">Mainly used for</label><select class="select" id="cp-use-${k}" data-cpuse="${k}">${CP_USE.map(([v, t]) => `<option value="${v}" ${(r.use || "feature") === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
@@ -414,7 +463,7 @@ function cpSetupHTML(x, ap, s){
         <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
       </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`; };
   const notPrimary = !!cp.aud && cp.aud !== "primary", live = !!ap.lvl && ap.lvl !== "watch";
-  let n = 1, out = "";
+  let n = 1, out = `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, and only what applies to your answers.</span><button type="button" class="btn sm" data-cp="guide">Switch to guided</button></div>`;
   out += sec(n++, "cp-s-svc", "Your service", "", `<div class="field"><label for="cp-svc">Service or product name</label><input class="input" id="cp-svc" value="${esc(cp.svc)}" placeholder="For example: Brightbeam" maxlength="80" autocomplete="off"></div>
     <div class="field"><span class="lbl">Who is it for?</span><div class="tr-tiers cp-aud" role="radiogroup" aria-label="Who it's for">${CP_AUD.map(([k, nm, h]) => tile("cpaud", cp.aud, k, nm, h)).join("")}</div></div>
     ${cp.aud ? `<div class="banner cp-ap ${ap.tone}"><span><strong>${esc(ap.h)}.</strong> ${esc(ap.t)}</span></div>` : ""}`);
@@ -494,11 +543,12 @@ function tkFromCoppa(){
 function cpRerender(sel){ cp.ex = false; cpSave(); const y = window.scrollY; renderCoppa(); window.scrollTo(0, y); const el = sel && document.querySelector(sel); if(el) try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }
 function cpAct(a){
   switch(a){
-    case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
-    case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); return gsay("Filled in from " + src.name + ". Check each answer"); }
-    case "reset": cp = CP_BLANK(); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
+    case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); gdReset("coppa"); cpView = "page"; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
+    case "reset": cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
-    case "edit": cp.view = "setup"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "guide": cpView = null; gdReset("coppa"); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": cp.view = "setup"; cpView = "page"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "save": { const msg = wsSaveTool("coppa", cp, cpTitle(cp)); renderCoppa(); return flashIn($("#cp-toast"), msg); }
     case "tasks": return tkOpen("coppa");
     case "memo": { const md = cpMemoMd(); return offerFile(`coppa-memo-${slug(cp.svc || "service")}.md`, md, md, $("#cp-toast")); }

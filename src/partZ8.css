@@ -1473,3 +1473,37 @@ body:has(.asb) .tb-crumb{display:none}
 .sb-more .navlink .sb-glyph svg{width:9px;height:9px}
 .sb-more .navlink[aria-current="page"] .sb-glyph{opacity:1}
 .sb-more .sb-new{font-size:9px}
+/* guided engine: square boxes for multi-choice, an option that isn't available, typed answers */
+.gd-radio.sq{border-radius:6px}
+.gd-opt.on .gd-radio.sq::after{border-radius:2px;width:10px;height:10px}
+.gd-opt.off{opacity:.55;cursor:not-allowed}
+.gd-opt.off:hover{border-color:var(--line-strong)}
+.gd-oh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gd-oh b{font-size:16px}
+.gd-multi-n{margin:-8px 0 0;font-size:13.5px}
+.gd-text{display:grid;gap:8px}
+.gd-text .input{font-size:16px;padding:12px 14px}
+.gd-text textarea.input{min-height:120px;line-height:1.5;resize:vertical}
+.gd-text .note{margin:0;font-size:13.5px}
+.gd-foot-r{display:flex;align-items:center;gap:14px}
+.gd .vd-crit .vd-cq,.gd .vd-crit .vd-ch h4{display:none}
+.gd .vd-crit .vd-ch{justify-content:flex-start}
+/* the pre-mortem's questions in the guided shape */
+.gd-pm{margin-top:4px}
+.gd-pm .gd-q{grid-template-columns:minmax(0,720px) minmax(0,380px)}
+.gd-opts.gd-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gd-opt.gd-icon{padding-left:16px}
+.gd-oi{flex:none;width:24px;height:24px;margin-top:8px;color:var(--tc, var(--accent))}
+.gd-feat-h{justify-content:space-between;margin-bottom:4px}
+.gd-pm .fgroup{margin-top:14px}
+.gd-pm .fgroup h4{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.gd-pm .gd-aside .live{margin:0}
+@media (max-width:1100px){.gd-pm .gd-q{grid-template-columns:1fr}}
+@media (max-width:640px){.gd-opts.gd-grid{grid-template-columns:1fr}}
+/* guided metrics: three numbers per metric */
+.gd-mx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.gd-mx .mxa-y{display:grid;gap:6px}
+.gd-mx .mxa-y > span{font-size:13px;font-weight:600;color:var(--muted)}
+.gd-mx .input{font-size:16px;padding:11px 12px}
+@media (max-width:640px){.gd-mx{grid-template-columns:1fr}}
+.gd-mx-st{display:flex;align-items:center;gap:10px;margin:12px 0 0}

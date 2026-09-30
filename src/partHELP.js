@@ -15,7 +15,7 @@ const PAGE_TOURS = {
     [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
     [".pm-cur", "What you'll get", "A report like this one: the risks that apply and how serious each one is, the launch blockers, and the laws likely to apply in your markets."],
     [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."],
-    [".askcard", "One question at a time", "Pick the answer that fits, then press Next. Nothing is final: you can change any answer later from the report."],
+    [".gd-pm .gd-main", "One question at a time", "Pick the answer that fits, or press its number, then Next. Nothing is final: you can change any answer later from the report."],
     [".live", "Watch your risks change", "Each answer adds, removes or re-rates risks, and this panel shows the effect as you go."],
     [".starthere", "Start here", "The five actions that cover your most serious risks. Tick them off as you finish them."],
     [".viz", "Where the risk sits", "How severe and how likely each risk is, before or after the safeguards you've ticked. Click a cell or an area to filter the register."],

@@ -3413,6 +3413,40 @@ body:has(.asb) .tb-crumb{display:none}
 .sb-more .navlink .sb-glyph svg{width:9px;height:9px}
 .sb-more .navlink[aria-current="page"] .sb-glyph{opacity:1}
 .sb-more .sb-new{font-size:9px}
+/* guided engine: square boxes for multi-choice, an option that isn't available, typed answers */
+.gd-radio.sq{border-radius:6px}
+.gd-opt.on .gd-radio.sq::after{border-radius:2px;width:10px;height:10px}
+.gd-opt.off{opacity:.55;cursor:not-allowed}
+.gd-opt.off:hover{border-color:var(--line-strong)}
+.gd-oh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gd-oh b{font-size:16px}
+.gd-multi-n{margin:-8px 0 0;font-size:13.5px}
+.gd-text{display:grid;gap:8px}
+.gd-text .input{font-size:16px;padding:12px 14px}
+.gd-text textarea.input{min-height:120px;line-height:1.5;resize:vertical}
+.gd-text .note{margin:0;font-size:13.5px}
+.gd-foot-r{display:flex;align-items:center;gap:14px}
+.gd .vd-crit .vd-cq,.gd .vd-crit .vd-ch h4{display:none}
+.gd .vd-crit .vd-ch{justify-content:flex-start}
+/* the pre-mortem's questions in the guided shape */
+.gd-pm{margin-top:4px}
+.gd-pm .gd-q{grid-template-columns:minmax(0,720px) minmax(0,380px)}
+.gd-opts.gd-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gd-opt.gd-icon{padding-left:16px}
+.gd-oi{flex:none;width:24px;height:24px;margin-top:8px;color:var(--tc, var(--accent))}
+.gd-feat-h{justify-content:space-between;margin-bottom:4px}
+.gd-pm .fgroup{margin-top:14px}
+.gd-pm .fgroup h4{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.gd-pm .gd-aside .live{margin:0}
+@media (max-width:1100px){.gd-pm .gd-q{grid-template-columns:1fr}}
+@media (max-width:640px){.gd-opts.gd-grid{grid-template-columns:1fr}}
+/* guided metrics: three numbers per metric */
+.gd-mx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.gd-mx .mxa-y{display:grid;gap:6px}
+.gd-mx .mxa-y > span{font-size:13px;font-weight:600;color:var(--muted)}
+.gd-mx .input{font-size:16px;padding:11px 12px}
+@media (max-width:640px){.gd-mx{grid-template-columns:1fr}}
+.gd-mx-st{display:flex;align-items:center;gap:10px;margin:12px 0 0}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4575,44 +4609,44 @@ function startScreen(){
 }
 function optCard(Q, o, i, pressed, multi){
   const ic = Q.k==="type";
-  return `<button type="button" class="ocard opt-key ${multi?"multi":""} ${ic?"iconcard":""}" ${multi?`data-toggle="${Q.k}"`:`data-set="${Q.k}"`} data-v="${o.k}" aria-pressed="${pressed}">
-    ${ic?`<svg class="oi"><use href="#p-${o.k}"/></svg>`:""}${i<9?`<kbd>${i+1}</kbd>`:""}<b>${esc(o.n)}</b>${o.h?`<span>${esc(o.h)}</span>`:""}</button>`;
+  return `<button type="button" class="gd-opt opt-key ${pressed?"on":""} ${ic?"gd-icon":""}" ${multi?`data-toggle="${Q.k}"`:`data-set="${Q.k}"`} data-v="${o.k}" aria-pressed="${pressed}">
+    <span class="gd-radio ${multi?"sq":""}" aria-hidden="true"></span>${ic?`<svg class="gd-oi" aria-hidden="true"><use href="#p-${o.k}"/></svg>`:""}<span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b></span>${o.h?`<span>${esc(o.h)}</span>`:""}</span>${i<9?`<kbd aria-hidden="true">${i+1}</kbd>`:""}</button>`;
 }
+// One question per screen, in the same shape as every other guided tool; the live panel shows what each answer changes
 function askScreen(){
   const qs = visibleQs();
   pm.qi = Math.max(0, Math.min(pm.qi, qs.length-1));
   const Q = qs[pm.qi], last = pm.qi === qs.length-1;
   if(!pm.qbase || pm.qbase.k !== Q.k){ pm.qbase = qSnap(Q.k); store.set("pm3", pm); }
   let body = "";
-  if(Q.kind==="single") body = `<div class="ogrid ${Q.k==="type"?"":"two"}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k]===o.k,false)).join("")}</div>`;
+  if(Q.kind==="single") body = `<div class="gd-opts ${Q.opts.length > 5 ? "gd-grid" : ""}" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k]===o.k,false)).join("")}</div>`;
   if(Q.kind==="multi"){
-    const extra = Q.none ? `<button type="button" class="ocard opt-key" data-none="${Q.k}" aria-pressed="${!pm[Q.k].length && !!pm.answered[Q.k]}">${Q.opts.length<9?`<kbd>${Q.opts.length+1}</kbd>`:""}<b>${Q.none}</b></button>`
-      : `<button type="button" class="ocard opt-key" data-all="${Q.k}" aria-pressed="${pm[Q.k].length===Q.opts.length}">${Q.opts.length<9?`<kbd>${Q.opts.length+1}</kbd>`:""}<b>${Q.all}</b></button>`;
-    body = `<p class="note" style="margin-bottom:8px">Choose all that apply.</p><div class="ogrid two">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
+    const extra = Q.none ? `<button type="button" class="gd-opt opt-key" data-none="${Q.k}" aria-pressed="${!pm[Q.k].length && !!pm.answered[Q.k]}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.none)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`
+      : `<button type="button" class="gd-opt opt-key" data-all="${Q.k}" aria-pressed="${pm[Q.k].length===Q.opts.length}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.all)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`;
+    body = `<p class="note gd-multi-n">Choose all that apply.</p><div class="gd-opts gd-grid" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
   }
   if(Q.kind==="features"){
     const t = PLATFORMS.find(x=>x.k===pm.type);
-    body = `<div class="row" style="justify-content:space-between;margin-bottom:12px"><span class="note">${pm.features.length} selected${t?` · typical for ${esc(t.n.toLowerCase())}`:""}</span>${t?`<button type="button" class="btn sm" data-act="typical">Reset to typical</button>`:""}</div>` +
+    body = `<div class="row gd-feat-h"><span class="note">${pm.features.length} selected${t?` · typical for ${esc(t.n.toLowerCase())}`:""}</span>${t?`<button type="button" class="btn sm" data-act="typical">Reset to typical</button>`:""}</div>` +
       FGROUPS.map(([g,ks])=>`<div class="fgroup"><h4>${g}</h4><div class="ogrid">${ks.map(k=>`<button type="button" class="ocard multi" data-toggle="features" data-v="${k}" aria-pressed="${pm.features.includes(k)}"><b>${FEATURES[k][0]}</b><span>${FEATURES[k][1]}</span></button>`).join("")}</div></div>`).join("");
   }
-  if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
+  if(Q.kind==="name") body = `<div class="gd-text"><label class="visually-hidden" for="pm-name">${esc(Q.t)}</label><input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" autocomplete="off"></div>`;
   const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k] || qHasValue(Q);
-  return `<div class="pm-layout"><div>
+  return `<div class="gd gd-s-q gd-pm" style="--tc:var(--t-pm)">
     ${pm.fromOrg && pm.qi < 3 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The ${typeof orgPrefillWhat === "function" ? orgPrefillWhat() : "product type and regions are"} set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
-    <div class="card askcard">
-      <div class="qprog"><span class="eyebrow">${Q.sec}</span><span class="note mono">${pm.qi+1} / ${qs.length}</span></div>
-      <div class="bar" style="height:4px"><i style="width:${(pm.qi)/qs.length*100}%;background:var(--accent)"></i></div>
-      <h2 class="qtitle">${Q.t} ${Q.tip?tip(Q.tip):""}</h2>
-      <p class="qhelp" style="margin-bottom:18px">${Q.h}</p>
+    <div class="gd-q"><div class="gd-main">
+      <div class="gd-crumb"><span class="gd-area">${esc(Q.sec)}</span><span aria-hidden="true">/</span><span>Question ${pm.qi+1} of ${qs.length}</span></div>
+      <h1>${Q.t} ${Q.tip?tip(Q.tip):""}</h1>
+      <p class="gd-why">${Q.h}</p>
       ${body}
-      <div class="stepnav">
+      <div class="gd-foot">
         ${pm.qi>0?`<button type="button" class="btn" data-back="1">Back</button>`:`<button type="button" class="btn" data-act="home">Cancel</button>`}
-        <button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button>
+        <span class="gd-foot-r"><span class="note">${Q.kind==="single"||Q.kind==="multi" ? "Number keys pick an answer, " : ""}Enter continues.</span><button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button></span>
       </div>
     </div>
-    <p class="note keyhint">Keyboard: number keys select an answer, Enter continues.</p>
-  </div>${livePanel(assess(pm))}</div>`;
+    <aside class="gd-aside" aria-label="What your answers change">${livePanel(assess(pm))}</aside></div>
+  </div>`;
 }
 function impactBox(r){
   const qs = visibleQs(), Q = qs[Math.max(0, Math.min(pm.qi, qs.length-1))], base = pm.qbase;
@@ -8119,7 +8153,8 @@ function mxHistHTML(){
 function mxTabMine(list){
   const lab = (f, t) => `<span class="mx-sc-lab">${t}</span>`;
   return `<div class="mx-intro"><h3>Your scorecard</h3>
-    <p>For each metric you track, enter this period's number, your target, and the point where it counts as off track. Save the period when it closes, and each metric builds a trend line you can show leadership.</p></div>
+    <p>For each metric you track, enter this period's number, your target, and the point where it counts as off track. Save the period when it closes, and each metric builds a trend line you can show leadership.</p>
+    ${mx.demo ? "" : `<p><button type="button" class="btn sm" id="mx-guide">Set it up one metric at a time</button></p>`}</div>
   ${mx.demo ? `<div class="mxs-demo">${mxIco("warn")}<span>You're looking at <b>example numbers</b> for a ${esc(MX_PLATFORMS[mx.platform].toLowerCase())} program, so you can see how a full scorecard reads.</span><button type="button" class="btn sm" id="mx-demo-clear">Clear example numbers</button></div>` : ""}
   <div class="mxs-top">
     <label class="mxa-y mxs-period"><span>Reporting period</span><input class="input" id="mx-period" value="${esc(mx.period || "")}" placeholder="For example Q3 2026"></label>
@@ -8326,6 +8361,39 @@ function mxBindGloss(){
   });
 }
 
+/* ---------- Guided: set up your scorecard, then one metric at a time ---------- */
+let mxView = null;
+// Guided for a fresh scorecard; the framework and the tabs once there are numbers, an example, or a metric opened by link
+function mxMode(){
+  if(mxView === "page" || mx.demo || Object.keys(mx.vals || {}).length || mx.tab !== "card") return "page";
+  if(/^#metrics\/./.test(location.hash || "")) return "page";
+  return "guide";
+}
+function mxSpec(){
+  const list = mxList(), tracked = () => list.filter(m => mx.have[m.n]);
+  const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
+  const steps = [
+    {id:"platform", eb:"Your platform", title:"What kind of platform is it?", why:"The list of metrics changes with it: a marketplace watches fraud loss, a social app watches prevalence and reach.", kind:"single", opts:() => Object.entries(MX_PLATFORMS).map(([k, v]) => ({k, n:v})), get:() => mx.platformSet || mx.orgSet ? mx.platform : "", set:v => { mx.platformSet = true; setV("platform", v); }},
+    {id:"stage", eb:"Your stage", title:"How far along is your program?", why:"Early programs start with a few metrics they can actually measure. Later stages add more.", kind:"single", opts:() => Object.entries(MX_STAGE).map(([k, v]) => ({k, n:v, h:MX_STAGE_HELP[k]})), get:() => mx.stageSet || mx.orgSet ? mx.stage : "", set:v => { mx.stageSet = true; setV("stage", v); }},
+    {id:"reg", eb:"Regulation", title:"Does the EU Digital Services Act or the UK Online Safety Act apply to you?", why:"They add reporting metrics you'll need for transparency reports.", kind:"single", opts:() => [{k:"no", n:"No"}, {k:"yes", n:"Yes"}], get:() => mx.regSet || mx.orgSet ? (mx.reg ? "yes" : "no") : "", set:v => { mx.regSet = true; setV("reg", v === "yes"); }},
+    {id:"pick", eb:"Your metrics", title:"Which metrics will you track?", why:"The north stars are picked for you. Add the health metrics and diagnostics you can measure today. You can change this any time.", kind:"multi", opt:false,
+      opts:() => mxList().map(m => ({k:m.n, n:m.n, h:`${MX_TIER_NAME[m.t].replace(/ metrics$/, "")} · ${MX_SC[m.n] ? MX_SC[m.n][0] : m.d}`})), get:() => Object.keys(mx.have || {}).filter(n => mx.have[n] && mxList().some(m => m.n === n)),
+      toggle:n => { mx.have = Object.assign({}, mx.have); if(mx.have[n]) delete mx.have[n]; else mx.have[n] = true; store.set("mx", mx); }},
+    {id:"period", eb:"Reporting period", title:"Which period are these numbers for?", why:"Save each period when it closes, and every metric builds a trend line.", kind:"text", opt:true, placeholder:"For example Q3 2026", get:() => mx.period || "", set:v => { mx.period = v; store.set("mx", mx); }}
+  ].concat(METRICS.map(m => ({id:"m-" + mxSlug(m), eb:m.n, title:esc(m.n), skip:() => !mx.have[m.n] || !mxList().some(x => x.n === m.n), why:`${esc(m.d)} ${MX_HOW[m.n] ? "Formula: " + esc(MX_HOW[m.n].f) + "." : ""}`, kind:"custom", opt:true, next:"Continue",
+    html:() => `<div class="gd-mx"><label class="mxa-y"><span>This period${mxUnit(m) ? ` (${esc(mxUnit(m))})` : ""}</span>${mxInput(m, "v")}</label><label class="mxa-y"><span>Target</span>${mxInput(m, "t")}</label><label class="mxa-y"><span>Off track at</span>${mxInput(m, "a")}</label></div><p class="note gd-mx-st"><span data-st="${METRICS.indexOf(m)}">${mxPill(mxStatus(m, mx.vals))}</span> <button type="button" class="mx-link" data-open="${METRICS.indexOf(m)}">How to measure it</button></p>`,
+    has:() => !!(mx.vals[m.n] && mx.vals[m.n].v)})));
+  return {k:"metrics", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
+    intro:{title:"Build the scorecard you'd bring to an executive review", lead:"Tell it about your platform and stage, pick the metrics you'll track, and enter this period's numbers one metric at a time. Every metric has a formula, a way to measure it and starter SQL, and the scorecard turns into a one-pager for leadership.",
+      facts:[["About 10 minutes", "Five questions, then one screen per metric you track."], [`${METRICS.length} metrics`, "In the order to adopt them: north stars first."], ["Numbers you may not have yet", "Skip any metric. The framework tells you how to log it."]], start:"Start"},
+    alt:[{n:"Browse the framework instead", run:() => { mxView = "page"; mx.tab = "card"; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}, {n:"See example numbers", run:() => { mxView = "page"; mx.tab = "mine"; store.set("mx", mx); renderMetrics(); const b = $("#mx-demo"); if(b) b.click(); }}],
+    steps, finish:"See my scorecard",
+    bind:() => { view.querySelectorAll("[data-f]").forEach(inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, mxList()));
+      view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { mxView = "page"; mx.tab = "card"; mx.open = METRICS[+b.dataset.open].n; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }); },
+    done:() => { mxView = "page"; mx.tab = "mine"; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
+// North stars come pre-ticked, so the first scorecard isn't empty
+function mxGuideStart(){ const list = mxList(); if(!list.some(m => mx.have[m.n])){ mx.have = Object.assign({}, mx.have); list.filter(m => m.t === "ns").forEach(m => { mx.have[m.n] = true; }); store.set("mx", mx); } }
 function renderMetrics(){
   mx.have = mx.have || {}; mx.vals = mx.vals || {}; mx.read = mx.read || {}; mx.hist = mx.hist || [];
   if(!MX_PLATFORMS[mx.platform]) mx.platform = "social";
@@ -8335,6 +8403,8 @@ function renderMetrics(){
     if(o.regions && o.regions.length) mx.reg = o.regions.some(r => r === "eu" || r === "uk"); if(o.type || o.stage) mx.orgSet = true; }
   const list = mxList();
   mxFromHash(list);
+  if(typeof gdRender === "function" && mxMode() === "guide"){ mxGuideStart(); return gdRender(mxSpec()); }
+  if(typeof gdCur !== "undefined") gdCur = null;
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
   const open = mx.tab === "card" && list.find(m => m.n === mx.open);
   if(!open) mx.open = null;
@@ -8374,6 +8444,7 @@ function renderMetrics(){
   bind("[data-step]", b => b.onclick = () => { const n = list[list.indexOf(open) + +b.dataset.step]; if(n) mxGo(mxSlug(n)); });
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
+  bind("#mx-guide", b => b.onclick = () => { mxView = null; mx.tab = "card"; gdReset("metrics"); store.set("mx", mx); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();
@@ -8537,12 +8608,96 @@ function vdWeightsBar(){
   return CRITERIA.map((c, j) => `<i class="vd-wseg s${j}" style="width:${(+vx.weights[c.k] || 0) / tw * 100}%" title="${esc(c.n)}: ${vx.weights[c.k]}"></i>`).join("");
 }
 
+
+/* ---------- pieces both the one-page scorecard and the guided flow use ---------- */
+const vdSave = () => store.set("vx", vx);
+function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
+            ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
+function vdCritHTML(c, seen){ return `<article class="card vd-crit">
+            <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
+            <p class="vd-cq">${esc(VD_Q[c.k])}</p>
+            <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
+            <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
+              <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
+            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
+          </article>`; }
+// refresh: what to do after a score or a weight changes
+function vdBindShared(refresh){
+  const save = vdSave;
+  view.querySelectorAll("input.vname").forEach(inp => inp.onchange = e => { vx.vendors[+e.target.dataset.i].name = e.target.value.trim() || "Vendor"; save(); renderVendors(); });
+  view.querySelectorAll(".vd-seg button").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, k = b.dataset.k; vx.vendors[i].s[k] = +b.dataset.n; save();
+    b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
+    refresh();
+  });
+  view.querySelectorAll(".vd-seg").forEach(g => g.onkeydown = e => {
+    if(!["ArrowLeft", "ArrowRight"].includes(e.key)) return; e.preventDefault();
+    const bs = [...g.querySelectorAll("button")], cur = bs.findIndex(x => x.classList.contains("on")), nx = bs[cur < 0 ? (e.key === "ArrowRight" ? 0 : 4) : Math.max(0, Math.min(4, cur + (e.key === "ArrowRight" ? 1 : -1)))];
+    nx.click(); nx.focus();
+  });
+  const add = $("#vx-add"); if(add) add.onclick = () => { vx.vendors.push(vdBlank("Vendor " + "ABCD"[vx.vendors.length])); save(); renderVendors(); const ins = view.querySelectorAll("input.vname"); const f = ins[ins.length - 1]; if(f){ f.focus(); f.select(); } };
+  view.querySelectorAll("[data-vdel]").forEach(b => b.onclick = () => { const i = +b.dataset.vdel, n = vx.vendors[i].name; vx.vendors.splice(i, 1); save(); renderVendors(); gsay(n + " removed"); });
+  view.querySelectorAll("[data-vpre]").forEach(b => b.onclick = () => { const p = VD_PRESETS.find(x => x[0] === b.dataset.vpre); vx.weights = Object.assign({}, p[2]); save(); renderVendors(); const f = view.querySelector(`[data-vpre="${p[0]}"]`); if(f) f.focus(); });
+}
+/* ---------- Guided: what matters, your shortlist, then one criterion at a time ---------- */
+let vdView = null;
+const VD_PRESET_HINT = {balanced:"Every criterion counts about the same.", quality:"Decision quality and reporting first.", cost:"Cost weighs most, but quality still matters.", regulated:"Security and quality, for high-risk or regulated platforms.", scale:"Languages and surge capacity, for big global platforms."};
+const vdMode = () => vdView === "page" ? "page" : vdView === "results" || vx.vendors.some(vdDone) ? "results" : "guide";
+function vdSpec(){
+  const names = () => vx.vendors.length >= VD_MIN && vx.vendors.every(v => v.name && v.name.trim());
+  const steps = [
+    {id:"pre", eb:"What matters", title:"What matters most in this choice?", why:"Each starting point weights the eight criteria differently. You can fine-tune every weight on the one-page scorecard.", kind:"single",
+      opts:() => VD_PRESETS.map(([k, n]) => ({k, n, h:VD_PRESET_HINT[k]})).concat(!vdPresetOn() && vdTotal() ? [{k:"custom", n:"Keep my own weights", h:"Set on the one-page scorecard."}] : []),
+      get:() => vdPresetOn() || (vdTotal() ? "custom" : ""), set:k => { const p = VD_PRESETS.find(x => x[0] === k); if(p){ vx.weights = Object.assign({}, p[2]); vdSave(); } }, has:() => vdTotal() > 0},
+    {id:"names", eb:"Your shortlist", title:"Who are you comparing?", why:`Two to ${VD_MAX} vendors: specialists, outsourcing firms, regional teams or tools. Use the names you'd use in the room.`, kind:"custom", html:() => vdNamesHTML(), answered:names, has:names, next:"Continue"}
+  ].concat(CRITERIA.map(c => ({id:"c-" + c.k, eb:c.n, title:esc(VD_Q[c.k]), why:`Rate each vendor from 1 to 5. The rubric says what 1, 3 and 5 look like${c.deal ? ", and this one has a minimum: a vendor scoring 2 or lower can't win" : ""}. The questions to ask are below.`, kind:"custom",
+    html:() => vdCritHTML(c, new Set()), answered:() => vx.vendors.every(v => v.s[c.k]), has:() => vx.vendors.some(v => v.s[c.k]), next:"Continue"})));
+  return {k:"vendors", tool:{name:"Vendor scorecard", icon:"scale", color:"var(--t-vd)"},
+    intro:{title:"Which moderation vendor should you trust with your users and your reviewers?", lead:"Say what matters, name your shortlist, then score each vendor against a plain rubric, one criterion at a time. The ranking builds as you go, and at the end you'll see who wins and exactly why.",
+      facts:[["About 10 minutes", `${CRITERIA.length} criteria, one per screen, with the questions to ask in an RFP.`], ["Evidence, not pitch", "Each score has a rubric, and wellness and security have minimums."], ["Two to four vendors", "Rename them any time. The math is shown."]], start:"Start"},
+    alt:[{n:"Score everything on one page", run:() => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See a finished example", run:() => vdExample()}],
+    steps, finish:"See who wins",
+    aside:() => `<div class="card vd-railc gd-rail">${vdRailHTML()}</div>`,
+    bind:() => { const p = gdPos("vendors"), st = gdLive(gdCur), s = st[p.i];
+      vdBindShared(() => { const nb = view.querySelector('[data-gd="next"]'); const ok = s && gdAnswered(s); if(nb) nb.disabled = !ok;
+        const rail = view.querySelector(".gd-rail"); if(rail) rail.innerHTML = vdRailHTML();
+        // Every vendor scored on this criterion: move on, like a picked answer
+        if(ok && s && /^c-/.test(s.id)){ clearTimeout(gdGo.t); gdGo.t = setTimeout(() => { if(gdCur && gdCur.k === "vendors") gdGo(gdCur, "next"); }, 320); } });
+      const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); }; },
+    done:() => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
+function vdExample(){ vx = JSON.parse(JSON.stringify(DEFAULT_V)); vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); gsay("Example loaded: three vendors, already scored"); }
+function vdOwn(){ vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); }
+// The result: who wins and why, the heat map, and the ways back in
+function vdResultsRender(){
+  const {sorted, top} = vdRank(), all = sorted.every(x => x.done);
+  const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
+  view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
+    <div class="cvr">
+      <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
+      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><h1>${esc(headline)}</h1><div class="cvr-sum vd-why">${vdWhy()}</div>
+        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button></div>
+        <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
+    </div>
+    <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
+    <p class="note cvr-note">Compare any two to four vendors. Scores are yours; the rubric only says what each number should mean.</p>
+  </div>`;
+  $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
+  $("#vx-own").onclick = vdOwn; $("#vx-reset").onclick = vdExample;
+  const pb = view.querySelector && view.querySelector('[data-vd="page"]'); if(pb) pb.onclick = () => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
+  const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); };
+}
 function renderVendors(){
+  const m = vdMode();
+  if(m === "guide") return gdRender(vdSpec());
+  gdCur = null;
+  if(m === "results") return vdResultsRender();
   const seen = new Set();
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
     "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-own">Start your own</button><button class="btn sm" id="vx-reset">See the example</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
+    ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="vd-grid">
@@ -8557,16 +8712,8 @@ function renderVendors(){
           </div>
         </section>
         <section class="mxa-part">${step(2)}
-          <div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
-            ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>
-          ${CRITERIA.map(c => `<article class="card vd-crit">
-            <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
-            <p class="vd-cq">${esc(VD_Q[c.k])}</p>
-            <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
-            <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
-              <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
-            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
-          </article>`).join("")}
+          ${vdNamesHTML()}
+          ${CRITERIA.map(c => vdCritHTML(c, seen)).join("")}
         </section>
         <section class="mxa-part">${step(3)}<div id="vd-result">${vdResultHTML()}</div></section>
       </div>
@@ -8576,28 +8723,16 @@ function renderVendors(){
 
   const save = () => store.set("vx", vx);
   const refresh = () => { $("#vd-rail").innerHTML = vdRailHTML(); $("#vd-result").innerHTML = vdResultHTML(); const nb = $("#vx-norm"); if(nb) nb.onclick = () => { vdNormalize(); save(); renderVendors(); }; };
-  view.querySelectorAll("input.vname").forEach(inp => inp.onchange = e => { vx.vendors[+e.target.dataset.i].name = e.target.value.trim() || "Vendor"; save(); renderVendors(); });
+  vdBindShared(refresh);
   view.querySelectorAll("[data-wk]").forEach(r => r.oninput = () => {
     vx.weights[r.dataset.wk] = +r.value; save();
     $("#vd-wv-" + r.dataset.wk).textContent = r.value; const cw = $("#vd-cw-" + r.dataset.wk); if(cw) cw.textContent = r.value;
     $("#vd-wbar").innerHTML = vdWeightsBar(); refresh();
   });
-  view.querySelectorAll(".vd-seg button").forEach(b => b.onclick = () => {
-    const i = +b.dataset.i, k = b.dataset.k; vx.vendors[i].s[k] = +b.dataset.n; save();
-    b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
-    refresh();
-  });
-  view.querySelectorAll(".vd-seg").forEach(g => g.onkeydown = e => {
-    if(!["ArrowLeft", "ArrowRight"].includes(e.key)) return; e.preventDefault();
-    const bs = [...g.querySelectorAll("button")], cur = bs.findIndex(x => x.classList.contains("on")), nx = bs[cur < 0 ? (e.key === "ArrowRight" ? 0 : 4) : Math.max(0, Math.min(4, cur + (e.key === "ArrowRight" ? 1 : -1)))];
-    nx.click(); nx.focus();
-  });
   view.querySelectorAll(".gl").forEach(g => g.onclick = () => g.focus());
-  $("#vx-reset").onclick = () => { vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("ws:cur:vendors", null); save(); renderVendors(); gsay("Example loaded: three vendors, already scored"); };
-  $("#vx-own").onclick = () => { vx = {weights:JSON.parse(JSON.stringify(DEFAULT_V.weights)), vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; store.set("ws:cur:vendors", null); save(); renderVendors(); const f = view.querySelector("input.vname"); if(f){ f.focus(); f.select(); } };
-  const add = $("#vx-add"); if(add) add.onclick = () => { vx.vendors.push(vdBlank("Vendor " + "ABCD"[vx.vendors.length])); save(); renderVendors(); const ins = view.querySelectorAll("input.vname"); const f = ins[ins.length - 1]; if(f){ f.focus(); f.select(); } };
-  view.querySelectorAll("[data-vdel]").forEach(b => b.onclick = () => { const i = +b.dataset.vdel, n = vx.vendors[i].name; vx.vendors.splice(i, 1); save(); renderVendors(); gsay(n + " removed"); });
-  view.querySelectorAll("[data-vpre]").forEach(b => b.onclick = () => { const p = VD_PRESETS.find(x => x[0] === b.dataset.vpre); vx.weights = Object.assign({}, p[2]); save(); renderVendors(); const f = view.querySelector(`[data-vpre="${p[0]}"]`); if(f) f.focus(); });
+  $("#vx-reset").onclick = vdExample; $("#vx-own").onclick = vdOwn;
+  const gb = view.querySelector && view.querySelector("[data-vd=guide]"); if(gb) gb.onclick = () => { vdView = null; renderVendors(); window.scrollTo(0, 0); };
+  const rb = view.querySelector && view.querySelector("[data-vd=results]"); if(rb) rb.onclick = () => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); };
   const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); save(); renderVendors(); };
   $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
 }
@@ -9731,6 +9866,37 @@ function polInfoHTML(){
     </div>
   </details>`;
 }
+/* ---------- Guided: the rule, then your platform, then what worries you ---------- */
+let polView = null;
+function polSpec(){
+  const ai = !!SAMPLER && !polRun.aiOff, setV = (k, v) => { pol[k] = v; savePol(); };
+  const multi = (k, list) => ({kind:"multi", opt:true, opts:() => list.map(([v, n]) => ({k:v, n})), get:() => pol[k] || [], toggle:v => setV(k, (pol[k] || []).includes(v) ? pol[k].filter(x => x !== v) : (pol[k] || []).concat(v))});
+  const steps = [
+    {id:"rule", eb:"Your rule", title:"What's the rule you want to test?", why:"Paste it exactly as users would see it, with any definitions, examples and exceptions you already have. The more of the real rule you paste, the more precise the review.", kind:"text", rows:8,
+      placeholder:"For example: “Harassment means repeatedly targeting someone with insults, threats or unwanted sexual comments…”", get:() => pol.rule, set:v => setV("rule", v),
+      hint:`Start from an example: ${POL_EXAMPLES.map(([n], i) => `<button type="button" class="pol-chip" data-polex="${i}">${esc(n)}</button>`).join(" ")}`},
+    {id:"company", eb:"Your platform", title:"What's the company or product called?", why:ai ? "Claude can fill in the details that follow from what it already knows about the company. It can't browse the web, so check them." : "It's named in your report.", kind:"text", opt:true, max:80,
+      placeholder:"For example: Twitch, Depop or Discord", get:() => pol.company, set:v => setV("company", v),
+      hint:(ai ? `<span class="pol-co-row"><button type="button" class="btn sm" data-pollookup="1" ${polRun.looking ? "disabled" : ""}>${polRun.looking ? "Looking it up…" : `${icon("search")}Look it up with Claude`}</button></span>` : "") + `<div id="pol-look" tabindex="-1">${polLookHTML()}</div>`},
+    {id:"type", eb:"Platform type", title:"What kind of platform is it?", why:"The edge cases and the law depend on it.", kind:"single", opts:() => PLATFORMS.map(p => ({k:p.k, n:p.n})), get:() => pol.type, set:v => setV("type", v)},
+    {id:"youth", eb:"Who uses it", title:"Can under-18s use it?", kind:"single", opts:() => YOUTH.map(y => ({k:y.k, n:y.n})).concat([{k:"unsure", n:"Not sure"}]), get:() => pol.youth || (pol.youthSet ? "unsure" : ""), set:v => { pol.youthSet = true; setV("youth", v === "unsure" ? "" : v); }},
+    {id:"product", eb:"Your product", title:"Describe your product in a sentence or two", why:"What people do on it, who uses it and anything unusual.", kind:"text", rows:4, opt:true,
+      placeholder:"For example: “A photo app for 18 to 25-year-olds with public profiles, DMs and group chats. ‘Rate me’ posts are popular.”", get:() => pol.product, set:v => setV("product", v)},
+    Object.assign({id:"regions", eb:"Your regions", title:"Where do you operate?", why:"Each region brings its own law to the edge cases."}, multi("regions", REGIONS.map(r => [r.k, r.k.toUpperCase() + " · " + r.n])), {opt:false}),
+    Object.assign({id:"enforce", eb:"Who finds violations", title:"Who finds violations today?", why:"Optional. It shapes the cases: a rule enforced by classifiers fails differently from one enforced by people."}, multi("enforce", POL_ENF)),
+    Object.assign({id:"actions", eb:"Actions", title:"What can reviewers do when they find one?", why:"Optional. The review checks whether the rule tells reviewers which action fits."}, multi("actions", POL_ACT)),
+    {id:"concerns", eb:"What worries you", title:"What worries you about this rule?", why:"Gray areas, recent incidents or cases your team argues about. Claude turns these into edge cases, so describe real situations rather than categories.", kind:"text", rows:4, opt:true,
+      placeholder:"For example: “Rival fans' trash talk keeps getting reported as harassment. We're unsure about jokes about someone's appearance.”", get:() => pol.concerns, set:v => setV("concerns", v)}
+  ];
+  return {k:"policy", tool:{name:"Policy stress-tester", icon:"doc", color:"var(--t-pol)"},
+    intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule, tell the test about your platform and what worries you, and it finds the words reviewers would read differently, the cases the rule forgets, and how it holds up against real edge cases.",
+      facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
+    alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
+    steps, finish:ai ? "Run the test" : "Run the instant checks",
+    bind:() => { $$("[data-polex]").forEach(b => b.onclick = () => { pol.rule = POL_EXAMPLES[+b.dataset.polex][1]; pol.heur = null; pol.result = null; savePol(); renderPolicy(); const t = view.querySelector(".gd-text .input"); if(t) t.focus(); });
+      const lk = view.querySelector && view.querySelector("[data-pollookup]"); if(lk) lk.onclick = polLookup; },
+    done:() => { gdCur = null; polAnalyze(); }};
+}
 function renderPolicy(){
   // A fresh test starts from the workspace settings: product type, audience, regions and company name
   if(!pol.orgSet && !pol.rule && !pol.heur && typeof orgGet === "function"){ const o = orgGet(), pr = wsProfile();
@@ -9738,6 +9904,8 @@ function renderPolicy(){
     if(pr && pr.org && !pol.company) pol.company = pr.org;
     if(o.type || o.youth || (o.regions && o.regions.length)){ pol.orgSet = true; savePol(); } }
   const ai = !!SAMPLER && !polRun.aiOff, report = !!pol.heur && pol.view !== "setup";
+  if(!report && polView !== "page" && !polRun.busy) return gdRender(polSpec());
+  gdCur = null;
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
         `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
@@ -9754,6 +9922,7 @@ function renderPolicy(){
 function polSetupHTML(ai){
   const chips = (list, key) => list.map(([k,n])=>`<button type="button" class="pol-chip" data-multi="${key}" data-v="${k}" aria-pressed="${pol[key].includes(k)}">${esc(n)}</button>`).join("");
   return `<div class="pol-setup">
+    <div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" data-polguide="1">Switch to guided</button></div>
     ${polInfoHTML()}
     <section class="card pol-card">
       <div class="pol-h"><span class="pol-num">1</span><div><label for="pol-rule">Your rule</label><span class="note">Required</span></div><span class="note mono pol-wc" id="pol-wc">${polWords(pol.rule)} words</span></div>
@@ -9881,7 +10050,8 @@ function polBind(){
   $$("[data-depth]").forEach(b => b.onclick = () => { polReadForm(); pol.depth = b.dataset.depth; savePol(); renderPolicy(); });
   $$("[data-filter]").forEach(b => b.onclick = () => { pol.filter = b.dataset.filter; savePol(); renderPolicy(); const t = document.querySelector(`[data-filter="${b.dataset.filter}"]`); if(t) t.focus(); });
   $$("[data-poltab]").forEach(b => b.onclick = () => { pol.rtab = b.dataset.poltab; savePol(); renderPolicy(); const t = document.querySelector(`[data-poltab="${b.dataset.poltab}"]`); if(t) t.focus(); });
-  $$("[data-poledit]").forEach(b => b.onclick = () => { pol.view = "setup"; polRun.err = ""; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
+  $$("[data-polguide]").forEach(b => b.onclick = () => { polReadForm(); polView = null; savePol(); renderPolicy(); window.scrollTo(0, 0); });
+  $$("[data-poledit]").forEach(b => b.onclick = () => { pol.view = "setup"; polView = "page"; polRun.err = ""; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
   $$("[data-polreport]").forEach(b => b.onclick = () => { polReadForm(); pol.view = "report"; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
   const loadFull = () => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); renderPolicy(); gsay("Complete example loaded. Run the test at the bottom to see the full report."); };
   const full = $("#pol-full"); if(full) full.onclick = loadFull;
@@ -10220,10 +10390,34 @@ function renderAIWip(key){
     </div>
     ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
 }
+/* ---------- Guided: each field on its own screen, then the run ---------- */
+const aiView = {};
+function aiSpec(key){
+  const T = AI_TOOLS[key], run = AIRUN[key] = AIRUN[key] || {}, ai = !!SAMPLER && !run.off;
+  const F = () => { const st = aiGet(key); return Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f); };
+  const setV = (k, v) => { const st = aiGet(key); st.f = Object.assign(F(), st.f, {[k]:v}); st.sample = false; aiPut(key, st); };
+  const q = fd => fd.q || (fd.type === "select" || fd.type === "checks" ? fd.lab : fd.lab + "?").replace(/\?\?$/, "?");
+  const steps = T.fields.map(fd => {
+    const base = {id:fd.k, eb:fd.lab, title:esc(q(fd)), why:fd.help ? esc(fd.help) : "", opt:!fd.req};
+    if(fd.type === "select") return Object.assign(base, {kind:"single", opts:() => fd.opts.map(o => ({k:o, n:o})), get:() => F()[fd.k], set:v => setV(fd.k, v), has:() => !!(aiGet(key).f || {})[fd.k], opt:false});
+    if(fd.type === "checks") return Object.assign(base, {kind:"multi", opts:() => fd.opts.map(([k, n]) => ({k, n})), get:() => F()[fd.k] || [], toggle:k => { const cur = F()[fd.k] || []; setV(fd.k, cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)); }});
+    return Object.assign(base, {kind:"text", rows:fd.type === "area" ? (fd.rows || 4) + 1 : 1, placeholder:fd.ph || "", get:() => F()[fd.k] || "", set:v => setV(fd.k, v)});
+  });
+  return {k:key, tool:{name:T.n, icon:T.icon.replace(/^i-/, ""), color:"var(--t-ai)"},
+    intro:{title:esc(T.q), lead:esc(T.desc), facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
+    alt:[{n:"Fill everything in on one page", run:() => { aiView[key] = "page"; renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }},
+      {n:"Fill in an example", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; gdReset(key); renderAI(key); window.scrollTo(0, 0); }},
+      {n:"See an example result", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; aiView[key] = "page"; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); }}],
+    steps, finish:ai ? "Run with Claude" : "Review and run",
+    done:() => { aiView[key] = "page"; if(ai) return aiRun(key); renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
 function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
   if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
+  // Guided until there is a result or the one-page form was asked for
+  if(!st.r && !run.busy && aiView[key] !== "page" && typeof gdRender === "function") return gdRender(aiSpec(key));
+  if(typeof gdCur !== "undefined") gdCur = null;
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
@@ -10236,6 +10430,7 @@ function renderAI(key){
     <div class="mxm-how ai-how"><ol class="mxm-how-s">${T.steps.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="ai-grid">
       <form class="card ai-form" id="ai-form" onsubmit="return false">
+        ${st.r || run.busy ? "" : `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" id="ai-guide">Switch to guided</button></div>`}
         <div class="ai-fields">${T.fields.map(fd => aiField(T, fd, f[fd.k])).join("")}</div>
         ${fill ? `<button type="button" class="mx-link ai-fill" id="ai-fill">Use the numbers from my Metrics scorecard</button>` : ""}
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
@@ -10261,7 +10456,8 @@ function renderAI(key){
   view.querySelectorAll("[data-fk]").forEach(el => { el.oninput = persist; el.onchange = persist; });
   $("#ai-ex").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; renderAI(key); };
   $("#ai-sample").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 30); };
-  $("#ai-clear").onclick = () => { aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; renderAI(key); };
+  $("#ai-clear").onclick = () => { aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; aiView[key] = null; gdReset(key); renderAI(key); window.scrollTo(0, 0); };
+  const gb = $("#ai-guide"); if(gb) gb.onclick = () => { persist(); aiView[key] = null; renderAI(key); window.scrollTo(0, 0); };
   view.querySelectorAll("[data-aidepth]").forEach(b => b.onclick = () => { const s = aiGet(key); s.f = aiRead(T); s.depth = b.dataset.aidepth; aiPut(key, s); renderAI(key); });
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
   const stop = $("#ai-stop"); if(stop) stop.onclick = () => { if(run.ctl) run.ctl.abort(); };
@@ -12525,10 +12721,33 @@ async function trWrite(){
 }
 
 /* ---------- page ---------- */
+/* ---------- Guided: your service, then one section of the report per screen ---------- */
+let trView = null;
+function trSpec(){
+  const yn = (k, title, why, on, set) => ({id:k, eb:title.replace(/\?$/, ""), title, why, kind:"single", opts:() => [{k:"no", n:"No"}, {k:"yes", n:"Yes"}], get:() => tr[k + "Set"] ? (on() ? "yes" : "no") : "", set:v => { set(v === "yes"); tr[k + "Set"] = true; trSave(); }});
+  const steps = [
+    {id:"org", eb:"Your service", title:"What's the company or service called?", why:"It's named in the report.", kind:"text", max:80, placeholder:"For example: Pixelry", get:() => tr.org, set:v => { tr.org = v.slice(0, 80); tr.orgSet = true; trSave(); }},
+    {id:"year", eb:"Reporting year", title:"Which year is the report for?", why:"Reports cover a calendar year. This decides when it's due.", kind:"single", opts:() => [0, 1, 2].map(i => { const y = new Date().getFullYear() - i; return {k:String(y), n:String(y), h:i === 0 ? "The current year, for a report in progress" : i === 1 ? "Last year, the usual case" : ""}; }),
+      get:() => String(tr.year || ""), set:v => { tr.year = parseInt(v, 10); trSave(); }},
+    {id:"tier", eb:"Type of service", title:"What kind of service are you under the DSA?", why:"It decides which sections the law asks for.", kind:"single", opts:() => TR_TIERS.map(([k, n, d]) => ({k, n, h:d})), get:() => tr.tierSet ? tr.tier : "", set:v => { tr.tier = v; tr.tierSet = true; trSave(); }},
+    yn("sme", "Are you a micro or small enterprise?", "Fewer than 50 staff, and annual turnover or balance sheet of €10 million or less. Micro and small enterprises are exempt from most of these reports.", () => tr.sme, v => { tr.sme = v; }),
+    yn("cmp", "Compare with the previous period?", "Optional. Adds a column for last period's numbers, so the report shows the trend.", () => tr.cmp, v => { tr.cmp = v; })
+  ].concat(trSections().map(s => ({id:"s-" + s.k, eb:s.n, title:esc(s.n), why:`${esc(s.ref)} · ${esc(s.why)}${s.note ? " " + esc(s.note) : ""}`, kind:"custom", opt:true, next:"Continue",
+    html:() => `<div class="tr-setup gd-tr"><div class="tr-fields">${s.f.map(trField).join("")}</div>${s.k === "own" ? trCatsHTML() : ""}</div>`, has:() => s.f.some(trHas)})));
+  const p = trProgress();
+  return {k:"transparency", tool:{name:"Transparency report", icon:"chart", color:"var(--t-ai)"},
+    intro:{title:"Build the transparency report the DSA asks for", lead:"Say what kind of service you are, then fill in one section at a time: only the sections the law asks for at your tier. At the end you get a readable report, a check of what's missing, and the numbers by category.",
+      facts:[["About 15 minutes", "Numbers you can look up as you go. Come back any time."], ["Only your sections", "Hosting services, platforms and very large platforms have different duties."], ["Checked against the DSA", `Articles 15, 24 and 42 and the EU templates, reviewed ${TR_REVIEWED}.`]], start:p.got ? "Continue" : "Start"},
+    alt:[{n:"Fill everything in on one page", run:() => { trView = "page"; renderTransparency(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See an example", run:() => trAct("example")}],
+    steps, finish:"Build the report",
+    done:() => { trView = null; trAct("build"); }};
+}
 function renderTransparency(){
   if(!tr.org && !tr.orgSet && typeof wsProfile === "function"){ const pr = wsProfile(); if(pr && pr.org){ tr.org = pr.org; tr.orgSet = true; trSave(); } }
   const report = tr.view === "report";
   const ai = typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff);
+  if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
+  if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
     ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit numbers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button><button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `<button type="button" class="btn sm" data-tr="example">See an example</button>`))
@@ -12547,6 +12766,7 @@ function trField(f){
 function trSetupHTML(){
   const p = trProgress();
   return `<div class="pol-setup tr-setup">
+    <div class="banner cvt-b"><span><strong>Prefer one section at a time?</strong> The guided version asks for the same numbers, one section per screen.</span><button type="button" class="btn sm" data-tr="guide">Switch to guided</button></div>
     <section class="card pol-card">
       <div class="pol-h"><span class="pol-num">1</span><div><span class="pol-lbl">Your service</span></div></div>
       <div class="tr-row"><div class="field"><label for="tr-org">Company or service</label><input class="input" id="tr-org" value="${esc(tr.org)}" placeholder="For example: Pixelry" maxlength="80"></div>
@@ -12630,12 +12850,13 @@ function trSummaryHTML(ai){
 function trNum(el){ const raw = String(el.value).replace(/[, ]/g, "").trim(); if(raw === "") return ""; const n = +raw; if(isNaN(n) || n < 0) return undefined; return el.dataset.trt === "pct" ? Math.min(1, n / 100) : n; }
 function trAct(a, arg){
   switch(a){
-    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
+    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
     case "build": tr.view = "report"; tr.tab = "report"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
-    case "edit": tr.view = "setup"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "guide": trView = null; gdReset("transparency"); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "tab": tr.tab = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtab="${arg}"]`); if(b) b.focus(); } return;
     case "tier": tr.tier = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtier="${arg}"]`); if(b) b.focus(); } return;
-    case "go": tr.view = "setup"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
+    case "go": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
     case "write": return trWrite();
     case "copy": return copyText(trMarkdown(), $("#tr-toast"));
     case "download": { const md = trMarkdown(); return offerFile(`transparency-report-${slug(tr.org || "service")}-${tr.year}.md`, md, md, $("#tr-toast")); }
@@ -12855,7 +13076,7 @@ const PAGE_TOURS = {
     [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
     [".pm-cur", "What you'll get", "A report like this one: the risks that apply and how serious each one is, the launch blockers, and the laws likely to apply in your markets."],
     [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."],
-    [".askcard", "One question at a time", "Pick the answer that fits, then press Next. Nothing is final: you can change any answer later from the report."],
+    [".gd-pm .gd-main", "One question at a time", "Pick the answer that fits, or press its number, then Next. Nothing is final: you can change any answer later from the report."],
     [".live", "Watch your risks change", "Each answer adds, removes or re-rates risks, and this panel shows the effect as you go."],
     [".starthere", "Start here", "The five actions that cover your most serious risks. Tick them off as you finish them."],
     [".viz", "Where the risk sits", "How severe and how likely each risk is, before or after the safeguards you've ticked. Click a cell or an area to filter the register."],
@@ -13095,6 +13316,119 @@ if(typeof document !== "undefined" && document.addEventListener){
     mo.observe(gv, {childList:true, subtree:true});
   }
 }
+/* =========================================================
+   GUIDED FLOWS: one engine for every tool that asks its questions one screen at a time
+   A tool hands over a spec (its intro, its steps and what to do at the end); the engine draws the
+   strip, the intro, each question, the progress aside, and handles clicks and number keys.
+   A step: {id, eb, title, why, kind:"single"|"multi"|"text"|"custom", opts, get, set, toggle, html, answered, skip, opt, rows, placeholder, next}
+   ========================================================= */
+let gdCur = null;
+const gdS = {};
+const gdPos = k => gdS[k] || (gdS[k] = {scr:"intro", i:0});
+const gdReset = k => { delete gdS[k]; if(gdCur && gdCur.k === k) gdCur = null; };
+const gdLive = spec => spec.steps.filter(s => !s.skip || !s.skip());
+function gdAnswered(s){
+  try{ if(s.answered) return !!s.answered(); if(s.opt) return true; const v = s.get ? s.get() : null;
+    return s.kind === "multi" ? Array.isArray(v) && v.length > 0 : s.kind === "custom" ? true : !!(v && String(v).trim()); }catch(e){ return false; }
+}
+// A real answer, as opposed to an optional step that may simply be passed
+function gdHas(s){
+  try{ if(s.has) return !!s.has(); const v = s.get ? s.get() : null;
+    return s.kind === "multi" ? Array.isArray(v) && v.length > 0 : s.kind === "custom" ? false : !!(v && String(v).trim()); }catch(e){ return false; }
+}
+const gdFirstOpen = spec => { const i = gdLive(spec).findIndex(s => !gdHas(s) && !s.opt || !gdAnswered(s)); return i < 0 ? null : i; };
+const gdPct = spec => { const st = gdLive(spec), n = st.filter(gdHas).length; return st.length ? Math.round(n / st.length * 100) : 0; };
+function gdIntroHTML(spec){
+  const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
+  const resume = n > 0 && n < st.length && gdHas(st[0]);
+  return `<div class="gd-w gd-intro">
+    <span class="gd-tool"><span class="sb-glyph" style="background:${T.color}"><svg><use href="#i-${T.icon}"/></svg></span>${esc(T.name)}</span>
+    <h1>${I.title}</h1>
+    <p class="gd-lead">${I.lead}</p>
+    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
+    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
+    ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
+  </div>`;
+}
+function gdOptHTML(s, o, j, on){
+  return `<button type="button" class="gd-opt ${on ? "on" : ""} ${o.off ? "off" : ""}" data-gdpick="${esc(o.k)}" aria-pressed="${on}" ${o.off ? 'aria-disabled="true"' : ""}>
+    <span class="gd-radio ${s.kind === "multi" ? "sq" : ""}" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b>${o.tag || ""}</span>${o.h ? `<span>${esc(o.h)}</span>` : ""}</span>${j < 9 ? `<kbd aria-hidden="true">${j + 1}</kbd>` : ""}</button>`;
+}
+function gdBodyHTML(s){
+  if(s.kind === "single"){ const v = s.get(); return `<div class="gd-opts" role="group" aria-label="${esc(s.title)}">${s.opts().map((o, j) => gdOptHTML(s, o, j, v === o.k)).join("")}</div>`; }
+  if(s.kind === "multi"){ const v = s.get() || [], os = s.opts();
+    return `<p class="note gd-multi-n">Choose all that apply${s.none ? ", or none" : ""}.</p><div class="gd-opts" role="group" aria-label="${esc(s.title)}">${os.map((o, j) => gdOptHTML(s, o, j, v.includes(o.k))).join("")}${s.none ? gdOptHTML(s, {k:"__none", n:s.none}, os.length, !v.length && !!s.noneOn && s.noneOn()) : ""}</div>`; }
+  if(s.kind === "text"){ const v = s.get() || "", id = "gd-t-" + s.id;
+    return `<div class="gd-text"><label class="visually-hidden" for="${id}">${esc(s.title)}</label>${(s.rows || 1) > 1 ? `<textarea id="${id}" class="input" rows="${s.rows}" data-gdtext="1" placeholder="${esc(s.placeholder || "")}" ${s.max ? `maxlength="${s.max}"` : ""}>${esc(v)}</textarea>` : `<input id="${id}" class="input" data-gdtext="1" value="${esc(v)}" placeholder="${esc(s.placeholder || "")}" ${s.max ? `maxlength="${s.max}"` : ""} autocomplete="off">`}${s.hint ? `<p class="note">${s.hint}</p>` : ""}</div>`; }
+  return s.html ? s.html() : "";
+}
+function gdQHTML(spec){
+  const p = gdPos(spec.k), st = gdLive(spec); p.i = Math.max(0, Math.min(p.i, st.length - 1));
+  const s = st[p.i], last = p.i === st.length - 1, single = s.kind === "single" && s.auto !== false;
+  const next = s.next || (last ? (spec.finish || "See your results") : "Continue");
+  return `<div class="gd-q">
+    <div class="gd-main">
+      <div class="gd-crumb"><span class="gd-area">${esc(s.eb || spec.tool.name)}</span><span aria-hidden="true">/</span><span>Question ${p.i + 1} of ${st.length}</span></div>
+      <h1>${s.title}</h1>
+      ${s.why ? `<p class="gd-why">${s.why}</p>` : ""}
+      ${gdBodyHTML(s)}
+      <div class="gd-foot"><button type="button" class="btn" data-gd="back">Back</button>
+        ${single ? `<span class="note">Pick the closest${s.opts().length <= 9 ? ", or press a number" : ""}. You can change it later.</span>` : `<span class="gd-foot-r">${s.opt ? `<span class="note">Optional</span>` : ""}<button type="button" class="btn primary" data-gd="next" ${!s.opt && !gdAnswered(s) ? "disabled" : ""}>${esc(next)} ${icon("arrow")}</button></span>`}</div>
+    </div>
+    <aside class="gd-aside" aria-label="Your progress">
+      ${spec.aside ? spec.aside(s) : ""}
+      <div class="gd-chips"><span class="as-eb">Question ${p.i + 1} of ${st.length}</span><div>${st.map((z, j) => `<span class="gd-chip ${j === p.i ? "now" : gdHas(z) ? "full" : ""}">${esc(z.eb || z.id)}</span>`).join("")}</div></div>
+      ${spec.alt && spec.alt.length ? `<div class="gd-alt">${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
+    </aside>
+  </div>`;
+}
+function gdRender(spec){
+  gdCur = spec; const p = gdPos(spec.k);
+  if(p.scr === "q" && !gdLive(spec).length) p.scr = "intro";
+  view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
+  if(spec.bind) spec.bind();
+}
+const gdFocus = () => { const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };
+function gdShow(spec){ gdRender(spec); if(window.scrollY > 120) window.scrollTo(0, 0); gdFocus(); }
+function gdGo(spec, act){
+  clearTimeout(gdGo.t); const p = gdPos(spec.k), st = gdLive(spec);
+  if(/^alt\d+$/.test(act)){ const a = spec.alt[+act.slice(3)]; if(a) a.run(); return; }
+  if(act === "intro") p.scr = "intro";
+  else if(act === "start"){ p.scr = "q"; p.i = 0; }
+  else if(act === "resume"){ const i = gdFirstOpen(spec); p.scr = "q"; p.i = i === null ? 0 : i; }
+  else if(act === "back"){ if(p.scr !== "q" || p.i === 0) p.scr = "intro"; else p.i--; }
+  else if(act === "next"){ const s = st[p.i]; if(s && !s.opt && !gdAnswered(s)) return; if(p.i >= st.length - 1){ gdReset(spec.k); return spec.done(); } p.i++; }
+  gdShow(spec);
+}
+function gdPick(spec, k){
+  const p = gdPos(spec.k), s = gdLive(spec)[p.i]; if(!s || p.scr !== "q") return;
+  const opt = s.kind === "single" || s.kind === "multi" ? s.opts().find(o => String(o.k) === k) : null;
+  if(opt && opt.off) return gsay(opt.offMsg || "That option isn't available for your answers");
+  if(s.kind === "single"){ s.set(k);
+    if(view.querySelectorAll) view.querySelectorAll("[data-gdpick]").forEach(b => { const on = b.dataset.gdpick === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+    clearTimeout(gdGo.t); if(s.auto === false) return gdShow(spec); gdGo.t = setTimeout(() => gdGo(spec, "next"), 260); return; }
+  if(s.kind === "multi"){ if(k === "__none"){ if(s.clear) s.clear(); return gdGo(spec, "next"); } s.toggle(k); gdShow(spec); const again = view.querySelectorAll && [...view.querySelectorAll("[data-gdpick]")].find(x => x.dataset.gdpick === k); if(again) again.focus({preventScroll:true}); }
+}
+document.addEventListener("click", e => {
+  if(!gdCur) return; const b = e.target.closest && e.target.closest("[data-gd],[data-gdpick]"); if(!b || !view.contains(b)) return;
+  e.preventDefault(); if(b.dataset.gdpick !== undefined) return gdPick(gdCur, b.dataset.gdpick); gdGo(gdCur, b.dataset.gd);
+});
+document.addEventListener("input", e => {
+  if(!gdCur) return; const t = e.target; if(!t || !t.dataset || !t.dataset.gdtext || !view.contains(t)) return;
+  const p = gdPos(gdCur.k), s = gdLive(gdCur)[p.i]; if(!s || s.kind !== "text") return;
+  s.set(t.value); const nb = view.querySelector('[data-gd="next"]'); if(nb) nb.disabled = !s.opt && !gdAnswered(s);
+});
+// Number keys answer the question on screen; Enter continues a typed answer
+document.addEventListener("keydown", e => {
+  if(!gdCur || !view.querySelector || !view.querySelector(".gd-s-q")) return;
+  if(document.querySelector("#tour-pop:not([hidden]), .tk-bg:not([hidden])")) return;
+  const p = gdPos(gdCur.k), s = gdLive(gdCur)[p.i]; if(!s) return;
+  const typing = /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "");
+  if(e.key === "Enter" && !e.shiftKey && s.kind === "text" && typing && e.target.tagName !== "TEXTAREA"){ e.preventDefault(); return gdGo(gdCur, "next"); }
+  if(typing || e.metaKey || e.ctrlKey || e.altKey || !/^[1-9]$/.test(e.key) || !["single", "multi"].includes(s.kind)) return;
+  const os = s.opts(), j = +e.key - 1, o = os[j] || (s.kind === "multi" && s.none && j === os.length ? {k:"__none"} : null); if(!o) return;
+  e.preventDefault(); gdPick(gdCur, String(o.k));
+});
 /* =========================================================
    COPPA READINESS: whether the Children's Online Privacy Protection Act applies, the children's data you
    handle, where you fall short of the amended Rule, and four drafts to close the gaps.
@@ -13489,8 +13823,57 @@ function cpMd(md){
 }
 
 /* ---------- page ---------- */
+/* ---------- Guided: one question per screen, then the plan ---------- */
+let cpView = null;
+const CP_NEW_TAG = `<span class="cp-new" title="Added by the FTC's 2025 amendments">New</span>`;
+// One kind of personal information: whether you collect it, and if so why, who gets it and how long you keep it
+function cpPiRow([k, n, h, isNew]){
+  const r = cp.pi[k] || {}, on = !!r.on;
+  return `<div class="cp-row ${on ? "on" : ""}"><label class="tr-chk"><input type="checkbox" data-cppi="${k}" ${on ? "checked" : ""}><span><b>${esc(n)}</b>${isNew ? CP_NEW_TAG : ""}${h ? `<small>${esc(h)}</small>` : ""}</span></label>
+    ${on ? `<div class="cp-row-d">
+      <div class="field"><label for="cp-use-${k}">Mainly used for</label><select class="select" id="cp-use-${k}" data-cpuse="${k}">${CP_USE.map(([v, t]) => `<option value="${v}" ${(r.use || "feature") === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+      <div class="field"><span class="lbl">Shared with</span><div class="cp-chips">${CP_SHARE.map(([v, t, tip]) => `<button type="button" class="pol-chip" data-cpshare="${k}" data-v="${v}" aria-pressed="${(r.share || []).includes(v)}" ${tip ? `title="${esc(tip)}"` : ""}>${t}</button>`).join("")}</div></div>
+      <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+    </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`;
+}
+function cpSpec(){
+  const X = () => cpCtx(cp), AP = () => cpApplies(cp);
+  const notPrimary = () => !!cp.aud && cp.aud !== "primary", live = () => { const ap = AP(); return !!ap.lvl && ap.lvl !== "watch"; };
+  const setV = (k, v) => { cp[k] = v; cp.ex = false; cpSave(); };
+  const steps = [
+    {id:"svc", eb:"Your service", title:"What's the service or product called?", why:"It's named in your plan and in the drafts for parents and for Legal.", kind:"text", opt:true, placeholder:"For example: Brightbeam", max:80, get:() => cp.svc, set:v => setV("svc", v.slice(0, 80))},
+    {id:"aud", eb:"Who it's for", title:"Who is the service for?", why:"This decides whether COPPA applies to every user, to users under 13, or only to the children you know about.", kind:"single",
+      opts:() => CP_AUD.map(([k, n, h]) => ({k, n, h})), get:() => cp.aud, set:k => setV("aud", k)},
+    {id:"fac", eb:"Signs of a child audience", title:"Which of these are true of the service?", why:"Even a service built for teens and adults can count as aimed at children if enough of these are true. The FTC weighs them together, and three or more is a warning sign.", kind:"multi", opt:true, none:"None of these", skip:() => !notPrimary(),
+      opts:() => CP_FACTORS.map(([k, t, nw]) => ({k, n:t, tag:nw ? CP_NEW_TAG : ""})), get:() => Object.keys(cp.fac || {}).filter(k => cp.fac[k]),
+      toggle:k => { const f = Object.assign({}, cp.fac); if(f[k]) delete f[k]; else f[k] = true; setV("fac", f); }, clear:() => setV("fac", {})},
+    {id:"know", eb:"Knowing ages", title:"How could you learn that a user is under 13?", why:"Once you know a particular user is a child, COPPA applies to them even on a general-audience service.", kind:"multi", opt:true, none:"No way to know", skip:() => !notPrimary(),
+      opts:() => CP_KNOW.map(([k, t]) => ({k, n:t})), get:() => cp.know, toggle:k => setV("know", cp.know.includes(k) ? cp.know.filter(v => v !== k) : cp.know.concat(k)), clear:() => setV("know", [])},
+    {id:"gate", eb:"Asking for age", title:"How do you ask for age?", why:"A neutral question protects you. One with a default or a hint doesn't.", kind:"single", skip:() => !notPrimary(),
+      opts:() => CP_GATE.map(([k, n, h]) => ({k, n, h})), get:() => cp.gate, set:k => setV("gate", k)},
+    {id:"data", eb:"Children's data", title:"What personal information do you collect from children?", why:"Tick each kind you collect, then say what it's for, who gets it and how long you keep it. Include what third-party SDKs collect through your app or site: under COPPA, that counts as yours.", kind:"custom", opt:true, skip:() => !cp.aud,
+      html:() => `<div class="cp-pi gd-pi">${CP_PI.map(cpPiRow).join("")}</div>`, next:"Continue"},
+    {id:"vpc", eb:"Parental consent", title:"How do parents give consent?", why:"The FTC accepts specific methods. Knowledge-based questions, a photo ID with a face match, and text plus were added in 2025.", kind:"single", skip:() => !(live() && X().needsConsent),
+      opts:() => { const x = X(); return CP_VPC.map(([k, n, h, sh, nw]) => { const bad = x.disclose && !sh; return {k, n, h:bad ? h + " You share children's data, so this method isn't allowed." : h, off:bad, offMsg:"You share children's data, so this method isn't allowed", tag:nw ? CP_NEW_TAG : ""}; }); },
+      get:() => cp.vpc, set:k => setV("vpc", k)}
+  ].concat(CP_CTRL.map(g => ({id:"ctrl-" + g.k, eb:g.n, title:`${esc(g.n)}: what do you have in place today?`, why:g.h ? esc(g.h) + " Tick what's true today." : "Tick what's true today.", kind:"multi", opt:true, none:"None of these yet",
+    skip:() => { const x = X(), ap = AP(); return !ap.lvl || !g.items.some(it => cpItemOn(it, cp, x, ap)); },
+    opts:() => { const x = X(), ap = AP(); return g.items.filter(it => cpItemOn(it, cp, x, ap)).map(it => ({k:it.k, n:it.t, h:it.opt ? "Optional" : "", tag:it.isNew ? CP_NEW_TAG : ""})); },
+    get:() => Object.keys(cp.ctrl || {}).filter(k => cp.ctrl[k]), toggle:k => { const c = Object.assign({}, cp.ctrl); if(c[k]) delete c[k]; else c[k] = true; setV("ctrl", c); },
+    clear:() => { const c = Object.assign({}, cp.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
+  const src = typeof loopSource === "function" ? loopSource() : null;
+  return {k:"coppa", tool:{name:"COPPA readiness", icon:"coppa", color:"var(--t-cp)"},
+    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal.",
+      facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
+    alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
+      .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
+    steps, finish:"Build my plan",
+    done:() => { cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
 function renderCoppa(){
-  const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap), report = cp.view === "report" && !!cp.aud;
+  const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap), report = (cp.view === "report" && !!cp.aud) || cp.ex;
+  if(!report && cpView !== "page") return gdRender(cpSpec());
+  gdCur = null;
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
@@ -13503,7 +13886,7 @@ function cpSetupHTML(x, ap, s){
   const chk = (grp, k, label, isNew, sub) => `<label class="tr-chk"><input type="checkbox" data-cpset="${grp}" value="${k}" ${(grp === "know" ? cp.know.includes(k) : cp[grp][k]) ? "checked" : ""}><span>${esc(label)}${isNew ? newTag : ""}${sub ? `<small>${esc(sub)}</small>` : ""}</span></label>`;
   const tile = (attr, cur, k, n, h, extra, note) => `<button type="button" role="radio" aria-checked="${cur === k}" class="card tr-tier ${cur === k ? "on" : ""} ${extra || ""}" data-${attr}="${k}"><b>${esc(n)}${note || ""}</b>${h ? `<span>${esc(h)}</span>` : ""}</button>`;
   const sec = (n, id, title, tag, body, tip) => `<section class="card pol-card" id="${id}"><div class="pol-h"><span class="pol-num">${n}</span><div><span class="pol-lbl">${title}</span>${tag ? `<span class="note">${tag}</span>` : ""}</div></div>${tip ? `<p class="pol-tip cp-tip">${tip}</p>` : ""}${body}</section>`;
-  const piRow = ([k, n, h, isNew]) => { const r = cp.pi[k] || {}, on = !!r.on;
+  const piRow = cpPiRow; const _unused = ([k, n, h, isNew]) => { const r = cp.pi[k] || {}, on = !!r.on;
     return `<div class="cp-row ${on ? "on" : ""}"><label class="tr-chk"><input type="checkbox" data-cppi="${k}" ${on ? "checked" : ""}><span><b>${esc(n)}</b>${isNew ? newTag : ""}${h ? `<small>${esc(h)}</small>` : ""}</span></label>
       ${on ? `<div class="cp-row-d">
         <div class="field"><label for="cp-use-${k}">Mainly used for</label><select class="select" id="cp-use-${k}" data-cpuse="${k}">${CP_USE.map(([v, t]) => `<option value="${v}" ${(r.use || "feature") === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
@@ -13511,7 +13894,7 @@ function cpSetupHTML(x, ap, s){
         <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
       </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`; };
   const notPrimary = !!cp.aud && cp.aud !== "primary", live = !!ap.lvl && ap.lvl !== "watch";
-  let n = 1, out = "";
+  let n = 1, out = `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, and only what applies to your answers.</span><button type="button" class="btn sm" data-cp="guide">Switch to guided</button></div>`;
   out += sec(n++, "cp-s-svc", "Your service", "", `<div class="field"><label for="cp-svc">Service or product name</label><input class="input" id="cp-svc" value="${esc(cp.svc)}" placeholder="For example: Brightbeam" maxlength="80" autocomplete="off"></div>
     <div class="field"><span class="lbl">Who is it for?</span><div class="tr-tiers cp-aud" role="radiogroup" aria-label="Who it's for">${CP_AUD.map(([k, nm, h]) => tile("cpaud", cp.aud, k, nm, h)).join("")}</div></div>
     ${cp.aud ? `<div class="banner cp-ap ${ap.tone}"><span><strong>${esc(ap.h)}.</strong> ${esc(ap.t)}</span></div>` : ""}`);
@@ -13591,11 +13974,12 @@ function tkFromCoppa(){
 function cpRerender(sel){ cp.ex = false; cpSave(); const y = window.scrollY; renderCoppa(); window.scrollTo(0, y); const el = sel && document.querySelector(sel); if(el) try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }
 function cpAct(a){
   switch(a){
-    case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
-    case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); return gsay("Filled in from " + src.name + ". Check each answer"); }
-    case "reset": cp = CP_BLANK(); store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
+    case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); gdReset("coppa"); cpView = "page"; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
+    case "reset": cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
-    case "edit": cp.view = "setup"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "guide": cpView = null; gdReset("coppa"); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": cp.view = "setup"; cpView = "page"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "save": { const msg = wsSaveTool("coppa", cp, cpTitle(cp)); renderCoppa(); return flashIn($("#cp-toast"), msg); }
     case "tasks": return tkOpen("coppa");
     case "memo": { const md = cpMemoMd(); return offerFile(`coppa-memo-${slug(cp.svc || "service")}.md`, md, md, $("#cp-toast")); }

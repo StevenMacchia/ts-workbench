@@ -314,10 +314,34 @@ function renderAIWip(key){
     </div>
     ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
 }
+/* ---------- Guided: each field on its own screen, then the run ---------- */
+const aiView = {};
+function aiSpec(key){
+  const T = AI_TOOLS[key], run = AIRUN[key] = AIRUN[key] || {}, ai = !!SAMPLER && !run.off;
+  const F = () => { const st = aiGet(key); return Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f); };
+  const setV = (k, v) => { const st = aiGet(key); st.f = Object.assign(F(), st.f, {[k]:v}); st.sample = false; aiPut(key, st); };
+  const q = fd => fd.q || (fd.type === "select" || fd.type === "checks" ? fd.lab : fd.lab + "?").replace(/\?\?$/, "?");
+  const steps = T.fields.map(fd => {
+    const base = {id:fd.k, eb:fd.lab, title:esc(q(fd)), why:fd.help ? esc(fd.help) : "", opt:!fd.req};
+    if(fd.type === "select") return Object.assign(base, {kind:"single", opts:() => fd.opts.map(o => ({k:o, n:o})), get:() => F()[fd.k], set:v => setV(fd.k, v), has:() => !!(aiGet(key).f || {})[fd.k], opt:false});
+    if(fd.type === "checks") return Object.assign(base, {kind:"multi", opts:() => fd.opts.map(([k, n]) => ({k, n})), get:() => F()[fd.k] || [], toggle:k => { const cur = F()[fd.k] || []; setV(fd.k, cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)); }});
+    return Object.assign(base, {kind:"text", rows:fd.type === "area" ? (fd.rows || 4) + 1 : 1, placeholder:fd.ph || "", get:() => F()[fd.k] || "", set:v => setV(fd.k, v)});
+  });
+  return {k:key, tool:{name:T.n, icon:T.icon.replace(/^i-/, ""), color:"var(--t-ai)"},
+    intro:{title:esc(T.q), lead:esc(T.desc), facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
+    alt:[{n:"Fill everything in on one page", run:() => { aiView[key] = "page"; renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }},
+      {n:"Fill in an example", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; gdReset(key); renderAI(key); window.scrollTo(0, 0); }},
+      {n:"See an example result", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; aiView[key] = "page"; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); }}],
+    steps, finish:ai ? "Run with Claude" : "Review and run",
+    done:() => { aiView[key] = "page"; if(ai) return aiRun(key); renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
 function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
   if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
+  // Guided until there is a result or the one-page form was asked for
+  if(!st.r && !run.busy && aiView[key] !== "page" && typeof gdRender === "function") return gdRender(aiSpec(key));
+  if(typeof gdCur !== "undefined") gdCur = null;
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
@@ -330,6 +354,7 @@ function renderAI(key){
     <div class="mxm-how ai-how"><ol class="mxm-how-s">${T.steps.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="ai-grid">
       <form class="card ai-form" id="ai-form" onsubmit="return false">
+        ${st.r || run.busy ? "" : `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" id="ai-guide">Switch to guided</button></div>`}
         <div class="ai-fields">${T.fields.map(fd => aiField(T, fd, f[fd.k])).join("")}</div>
         ${fill ? `<button type="button" class="mx-link ai-fill" id="ai-fill">Use the numbers from my Metrics scorecard</button>` : ""}
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
@@ -355,7 +380,8 @@ function renderAI(key){
   view.querySelectorAll("[data-fk]").forEach(el => { el.oninput = persist; el.onchange = persist; });
   $("#ai-ex").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; renderAI(key); };
   $("#ai-sample").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 30); };
-  $("#ai-clear").onclick = () => { aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; renderAI(key); };
+  $("#ai-clear").onclick = () => { aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; aiView[key] = null; gdReset(key); renderAI(key); window.scrollTo(0, 0); };
+  const gb = $("#ai-guide"); if(gb) gb.onclick = () => { persist(); aiView[key] = null; renderAI(key); window.scrollTo(0, 0); };
   view.querySelectorAll("[data-aidepth]").forEach(b => b.onclick = () => { const s = aiGet(key); s.f = aiRead(T); s.depth = b.dataset.aidepth; aiPut(key, s); renderAI(key); });
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
   const stop = $("#ai-stop"); if(stop) stop.onclick = () => { if(run.ctl) run.ctl.abort(); };

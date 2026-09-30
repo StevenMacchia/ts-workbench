@@ -12,9 +12,13 @@ const icon = id => '<svg><use href="#i-'+id+'"/></svg>'; const view = {querySele
 const head = (t,d,c,m) => "<h1>"+t+"</h1><p>"+d+"</p>"+(m||"");
 const headCompact = (t,c,m) => "<h1>"+t+"</h1><p>"+c+"</p>"+(m||"");
 `;
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partPol.js"), rd("partPol2.js")].join("\n") + `
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partGD.js"), rd("partPol.js"), rd("partPol2.js")].join("\n") + `
 const out = [], bad = h => /undefined|NaN|\\[object/.test(h);
-renderPolicy(); if(bad(view.innerHTML)) throw new Error("empty state bad"); out.push("empty state ok, AI badge: " + (view.innerHTML.includes("Instant checks only") ? "instant only (no sampler)" : "?"));
+// a blank test opens guided: an intro, then one question per screen, the rule first
+renderPolicy(); if(bad(view.innerHTML)) throw new Error("guided intro bad"); if(!/Would your reviewers agree on this rule?/.test(view.innerHTML) || !/data-gd="start"/.test(view.innerHTML)) throw new Error("guided intro missing");
+gdGo(gdCur, "start"); if(!/What's the rule you want to test?/.test(view.innerHTML) || !/data-polex="0"/.test(view.innerHTML)) throw new Error("rule question missing"); if(!view.innerHTML.includes('data-gd="next" disabled')) throw new Error("rule is required");
+if(gdLive(gdCur).length !== 9) throw new Error("nine questions, got " + gdLive(gdCur).length); out.push("guided: intro, nine questions, the rule required");
+polView = "page"; renderPolicy(); if(bad(view.innerHTML)) throw new Error("empty state bad"); out.push("empty state ok, AI badge: " + (view.innerHTML.includes("Instant checks only") ? "instant only (no sampler)" : "?"));
 POL_EXAMPLES.forEach(([n, rule]) => { const h = polHeuristics(rule); out.push("  " + n.padEnd(15) + "instant score " + h.score + " · vague: " + h.vague.map(v=>v.term).join(", ")); });
 const strong = "Harassment means repeatedly targeting a person with unwanted insults, threats or sexual comments, for example sending messages after being blocked. We allow news reporting, satire and counter-speech. First violations get a warning; repeat violations lead to suspension.";
 out.push("well-written rule instant score: " + polHeuristics(strong).score);

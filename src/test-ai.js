@@ -9,7 +9,10 @@ const body = async function(){
     const T = AI_TOOLS[k];
     location.hash = "#" + k; store.set("ai:" + k, null); renderAI(k);
     if(T.wip){ if(bad(view.innerHTML)) throw new Error(k + " placeholder has bad values"); eq(/is being rebuilt/.test(view.innerHTML) && !/data-fk=/.test(view.innerHTML), true, k + " shows the under-construction page"); out.push(k + ": under construction page"); continue; }
-    if(bad(view.innerHTML)) throw new Error(k + " empty page has bad values");
+    // a blank tool opens guided: an intro, then one field per screen
+    if(bad(view.innerHTML)) throw new Error(k + " guided intro has bad values"); eq(/data-gd="start"/.test(view.innerHTML) && /Fill everything in on one page/.test(view.innerHTML), true, k + " guided intro");
+    gdGo(gdCur, "start"); eq(gdLive(gdCur).length, T.fields.length, k + " one screen per field"); eq(/data-gdtext|data-gdpick/.test(view.innerHTML), true, k + " first field on screen");
+    aiView[k] = "page"; renderAI(k); if(bad(view.innerHTML)) throw new Error(k + " empty page has bad values");
     eq((view.innerHTML.match(/data-fk=/g)||[]).length >= T.fields.length, true, k + " renders every field");
     eq(/Open in Claude to run|Run it in Claude/.test(view.innerHTML), true, k + " explains AI needs Claude when no sampler");
     // the hand-written example passes the tool's own validator and renders cleanly
@@ -59,6 +62,6 @@ const body = async function(){
   out.push("overview, about page, search and scorecard hand-off all include the new tools");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partGD.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 new Function(src)().then(r => console.log(r)).catch(e => { console.error("FAILED:", e.message || e); process.exit(1); });

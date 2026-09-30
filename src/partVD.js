@@ -102,12 +102,96 @@ function vdWeightsBar(){
   return CRITERIA.map((c, j) => `<i class="vd-wseg s${j}" style="width:${(+vx.weights[c.k] || 0) / tw * 100}%" title="${esc(c.n)}: ${vx.weights[c.k]}"></i>`).join("");
 }
 
+
+/* ---------- pieces both the one-page scorecard and the guided flow use ---------- */
+const vdSave = () => store.set("vx", vx);
+function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
+            ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
+function vdCritHTML(c, seen){ return `<article class="card vd-crit">
+            <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
+            <p class="vd-cq">${esc(VD_Q[c.k])}</p>
+            <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
+            <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
+              <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
+            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
+          </article>`; }
+// refresh: what to do after a score or a weight changes
+function vdBindShared(refresh){
+  const save = vdSave;
+  view.querySelectorAll("input.vname").forEach(inp => inp.onchange = e => { vx.vendors[+e.target.dataset.i].name = e.target.value.trim() || "Vendor"; save(); renderVendors(); });
+  view.querySelectorAll(".vd-seg button").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, k = b.dataset.k; vx.vendors[i].s[k] = +b.dataset.n; save();
+    b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
+    refresh();
+  });
+  view.querySelectorAll(".vd-seg").forEach(g => g.onkeydown = e => {
+    if(!["ArrowLeft", "ArrowRight"].includes(e.key)) return; e.preventDefault();
+    const bs = [...g.querySelectorAll("button")], cur = bs.findIndex(x => x.classList.contains("on")), nx = bs[cur < 0 ? (e.key === "ArrowRight" ? 0 : 4) : Math.max(0, Math.min(4, cur + (e.key === "ArrowRight" ? 1 : -1)))];
+    nx.click(); nx.focus();
+  });
+  const add = $("#vx-add"); if(add) add.onclick = () => { vx.vendors.push(vdBlank("Vendor " + "ABCD"[vx.vendors.length])); save(); renderVendors(); const ins = view.querySelectorAll("input.vname"); const f = ins[ins.length - 1]; if(f){ f.focus(); f.select(); } };
+  view.querySelectorAll("[data-vdel]").forEach(b => b.onclick = () => { const i = +b.dataset.vdel, n = vx.vendors[i].name; vx.vendors.splice(i, 1); save(); renderVendors(); gsay(n + " removed"); });
+  view.querySelectorAll("[data-vpre]").forEach(b => b.onclick = () => { const p = VD_PRESETS.find(x => x[0] === b.dataset.vpre); vx.weights = Object.assign({}, p[2]); save(); renderVendors(); const f = view.querySelector(`[data-vpre="${p[0]}"]`); if(f) f.focus(); });
+}
+/* ---------- Guided: what matters, your shortlist, then one criterion at a time ---------- */
+let vdView = null;
+const VD_PRESET_HINT = {balanced:"Every criterion counts about the same.", quality:"Decision quality and reporting first.", cost:"Cost weighs most, but quality still matters.", regulated:"Security and quality, for high-risk or regulated platforms.", scale:"Languages and surge capacity, for big global platforms."};
+const vdMode = () => vdView === "page" ? "page" : vdView === "results" || vx.vendors.some(vdDone) ? "results" : "guide";
+function vdSpec(){
+  const names = () => vx.vendors.length >= VD_MIN && vx.vendors.every(v => v.name && v.name.trim());
+  const steps = [
+    {id:"pre", eb:"What matters", title:"What matters most in this choice?", why:"Each starting point weights the eight criteria differently. You can fine-tune every weight on the one-page scorecard.", kind:"single",
+      opts:() => VD_PRESETS.map(([k, n]) => ({k, n, h:VD_PRESET_HINT[k]})).concat(!vdPresetOn() && vdTotal() ? [{k:"custom", n:"Keep my own weights", h:"Set on the one-page scorecard."}] : []),
+      get:() => vdPresetOn() || (vdTotal() ? "custom" : ""), set:k => { const p = VD_PRESETS.find(x => x[0] === k); if(p){ vx.weights = Object.assign({}, p[2]); vdSave(); } }, has:() => vdTotal() > 0},
+    {id:"names", eb:"Your shortlist", title:"Who are you comparing?", why:`Two to ${VD_MAX} vendors: specialists, outsourcing firms, regional teams or tools. Use the names you'd use in the room.`, kind:"custom", html:() => vdNamesHTML(), answered:names, has:names, next:"Continue"}
+  ].concat(CRITERIA.map(c => ({id:"c-" + c.k, eb:c.n, title:esc(VD_Q[c.k]), why:`Rate each vendor from 1 to 5. The rubric says what 1, 3 and 5 look like${c.deal ? ", and this one has a minimum: a vendor scoring 2 or lower can't win" : ""}. The questions to ask are below.`, kind:"custom",
+    html:() => vdCritHTML(c, new Set()), answered:() => vx.vendors.every(v => v.s[c.k]), has:() => vx.vendors.some(v => v.s[c.k]), next:"Continue"})));
+  return {k:"vendors", tool:{name:"Vendor scorecard", icon:"scale", color:"var(--t-vd)"},
+    intro:{title:"Which moderation vendor should you trust with your users and your reviewers?", lead:"Say what matters, name your shortlist, then score each vendor against a plain rubric, one criterion at a time. The ranking builds as you go, and at the end you'll see who wins and exactly why.",
+      facts:[["About 10 minutes", `${CRITERIA.length} criteria, one per screen, with the questions to ask in an RFP.`], ["Evidence, not pitch", "Each score has a rubric, and wellness and security have minimums."], ["Two to four vendors", "Rename them any time. The math is shown."]], start:"Start"},
+    alt:[{n:"Score everything on one page", run:() => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See a finished example", run:() => vdExample()}],
+    steps, finish:"See who wins",
+    aside:() => `<div class="card vd-railc gd-rail">${vdRailHTML()}</div>`,
+    bind:() => { const p = gdPos("vendors"), st = gdLive(gdCur), s = st[p.i];
+      vdBindShared(() => { const nb = view.querySelector('[data-gd="next"]'); const ok = s && gdAnswered(s); if(nb) nb.disabled = !ok;
+        const rail = view.querySelector(".gd-rail"); if(rail) rail.innerHTML = vdRailHTML();
+        // Every vendor scored on this criterion: move on, like a picked answer
+        if(ok && s && /^c-/.test(s.id)){ clearTimeout(gdGo.t); gdGo.t = setTimeout(() => { if(gdCur && gdCur.k === "vendors") gdGo(gdCur, "next"); }, 320); } });
+      const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); }; },
+    done:() => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
+function vdExample(){ vx = JSON.parse(JSON.stringify(DEFAULT_V)); vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); gsay("Example loaded: three vendors, already scored"); }
+function vdOwn(){ vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); }
+// The result: who wins and why, the heat map, and the ways back in
+function vdResultsRender(){
+  const {sorted, top} = vdRank(), all = sorted.every(x => x.done);
+  const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
+  view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
+    <div class="cvr">
+      <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
+      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><h1>${esc(headline)}</h1><div class="cvr-sum vd-why">${vdWhy()}</div>
+        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button></div>
+        <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
+    </div>
+    <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
+    <p class="note cvr-note">Compare any two to four vendors. Scores are yours; the rubric only says what each number should mean.</p>
+  </div>`;
+  $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
+  $("#vx-own").onclick = vdOwn; $("#vx-reset").onclick = vdExample;
+  const pb = view.querySelector && view.querySelector('[data-vd="page"]'); if(pb) pb.onclick = () => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
+  const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); };
+}
 function renderVendors(){
+  const m = vdMode();
+  if(m === "guide") return gdRender(vdSpec());
+  gdCur = null;
+  if(m === "results") return vdResultsRender();
   const seen = new Set();
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
     "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-own">Start your own</button><button class="btn sm" id="vx-reset">See the example</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
+    ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="vd-grid">
@@ -122,16 +206,8 @@ function renderVendors(){
           </div>
         </section>
         <section class="mxa-part">${step(2)}
-          <div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
-            ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>
-          ${CRITERIA.map(c => `<article class="card vd-crit">
-            <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
-            <p class="vd-cq">${esc(VD_Q[c.k])}</p>
-            <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
-            <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
-              <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
-            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
-          </article>`).join("")}
+          ${vdNamesHTML()}
+          ${CRITERIA.map(c => vdCritHTML(c, seen)).join("")}
         </section>
         <section class="mxa-part">${step(3)}<div id="vd-result">${vdResultHTML()}</div></section>
       </div>
@@ -141,28 +217,16 @@ function renderVendors(){
 
   const save = () => store.set("vx", vx);
   const refresh = () => { $("#vd-rail").innerHTML = vdRailHTML(); $("#vd-result").innerHTML = vdResultHTML(); const nb = $("#vx-norm"); if(nb) nb.onclick = () => { vdNormalize(); save(); renderVendors(); }; };
-  view.querySelectorAll("input.vname").forEach(inp => inp.onchange = e => { vx.vendors[+e.target.dataset.i].name = e.target.value.trim() || "Vendor"; save(); renderVendors(); });
+  vdBindShared(refresh);
   view.querySelectorAll("[data-wk]").forEach(r => r.oninput = () => {
     vx.weights[r.dataset.wk] = +r.value; save();
     $("#vd-wv-" + r.dataset.wk).textContent = r.value; const cw = $("#vd-cw-" + r.dataset.wk); if(cw) cw.textContent = r.value;
     $("#vd-wbar").innerHTML = vdWeightsBar(); refresh();
   });
-  view.querySelectorAll(".vd-seg button").forEach(b => b.onclick = () => {
-    const i = +b.dataset.i, k = b.dataset.k; vx.vendors[i].s[k] = +b.dataset.n; save();
-    b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
-    refresh();
-  });
-  view.querySelectorAll(".vd-seg").forEach(g => g.onkeydown = e => {
-    if(!["ArrowLeft", "ArrowRight"].includes(e.key)) return; e.preventDefault();
-    const bs = [...g.querySelectorAll("button")], cur = bs.findIndex(x => x.classList.contains("on")), nx = bs[cur < 0 ? (e.key === "ArrowRight" ? 0 : 4) : Math.max(0, Math.min(4, cur + (e.key === "ArrowRight" ? 1 : -1)))];
-    nx.click(); nx.focus();
-  });
   view.querySelectorAll(".gl").forEach(g => g.onclick = () => g.focus());
-  $("#vx-reset").onclick = () => { vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("ws:cur:vendors", null); save(); renderVendors(); gsay("Example loaded: three vendors, already scored"); };
-  $("#vx-own").onclick = () => { vx = {weights:JSON.parse(JSON.stringify(DEFAULT_V.weights)), vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; store.set("ws:cur:vendors", null); save(); renderVendors(); const f = view.querySelector("input.vname"); if(f){ f.focus(); f.select(); } };
-  const add = $("#vx-add"); if(add) add.onclick = () => { vx.vendors.push(vdBlank("Vendor " + "ABCD"[vx.vendors.length])); save(); renderVendors(); const ins = view.querySelectorAll("input.vname"); const f = ins[ins.length - 1]; if(f){ f.focus(); f.select(); } };
-  view.querySelectorAll("[data-vdel]").forEach(b => b.onclick = () => { const i = +b.dataset.vdel, n = vx.vendors[i].name; vx.vendors.splice(i, 1); save(); renderVendors(); gsay(n + " removed"); });
-  view.querySelectorAll("[data-vpre]").forEach(b => b.onclick = () => { const p = VD_PRESETS.find(x => x[0] === b.dataset.vpre); vx.weights = Object.assign({}, p[2]); save(); renderVendors(); const f = view.querySelector(`[data-vpre="${p[0]}"]`); if(f) f.focus(); });
+  $("#vx-reset").onclick = vdExample; $("#vx-own").onclick = vdOwn;
+  const gb = view.querySelector && view.querySelector("[data-vd=guide]"); if(gb) gb.onclick = () => { vdView = null; renderVendors(); window.scrollTo(0, 0); };
+  const rb = view.querySelector && view.querySelector("[data-vd=results]"); if(rb) rb.onclick = () => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); };
   const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); save(); renderVendors(); };
   $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
 }

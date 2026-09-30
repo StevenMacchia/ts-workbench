@@ -139,44 +139,44 @@ function startScreen(){
 }
 function optCard(Q, o, i, pressed, multi){
   const ic = Q.k==="type";
-  return `<button type="button" class="ocard opt-key ${multi?"multi":""} ${ic?"iconcard":""}" ${multi?`data-toggle="${Q.k}"`:`data-set="${Q.k}"`} data-v="${o.k}" aria-pressed="${pressed}">
-    ${ic?`<svg class="oi"><use href="#p-${o.k}"/></svg>`:""}${i<9?`<kbd>${i+1}</kbd>`:""}<b>${esc(o.n)}</b>${o.h?`<span>${esc(o.h)}</span>`:""}</button>`;
+  return `<button type="button" class="gd-opt opt-key ${pressed?"on":""} ${ic?"gd-icon":""}" ${multi?`data-toggle="${Q.k}"`:`data-set="${Q.k}"`} data-v="${o.k}" aria-pressed="${pressed}">
+    <span class="gd-radio ${multi?"sq":""}" aria-hidden="true"></span>${ic?`<svg class="gd-oi" aria-hidden="true"><use href="#p-${o.k}"/></svg>`:""}<span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b></span>${o.h?`<span>${esc(o.h)}</span>`:""}</span>${i<9?`<kbd aria-hidden="true">${i+1}</kbd>`:""}</button>`;
 }
+// One question per screen, in the same shape as every other guided tool; the live panel shows what each answer changes
 function askScreen(){
   const qs = visibleQs();
   pm.qi = Math.max(0, Math.min(pm.qi, qs.length-1));
   const Q = qs[pm.qi], last = pm.qi === qs.length-1;
   if(!pm.qbase || pm.qbase.k !== Q.k){ pm.qbase = qSnap(Q.k); store.set("pm3", pm); }
   let body = "";
-  if(Q.kind==="single") body = `<div class="ogrid ${Q.k==="type"?"":"two"}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k]===o.k,false)).join("")}</div>`;
+  if(Q.kind==="single") body = `<div class="gd-opts ${Q.opts.length > 5 ? "gd-grid" : ""}" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k]===o.k,false)).join("")}</div>`;
   if(Q.kind==="multi"){
-    const extra = Q.none ? `<button type="button" class="ocard opt-key" data-none="${Q.k}" aria-pressed="${!pm[Q.k].length && !!pm.answered[Q.k]}">${Q.opts.length<9?`<kbd>${Q.opts.length+1}</kbd>`:""}<b>${Q.none}</b></button>`
-      : `<button type="button" class="ocard opt-key" data-all="${Q.k}" aria-pressed="${pm[Q.k].length===Q.opts.length}">${Q.opts.length<9?`<kbd>${Q.opts.length+1}</kbd>`:""}<b>${Q.all}</b></button>`;
-    body = `<p class="note" style="margin-bottom:8px">Choose all that apply.</p><div class="ogrid two">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
+    const extra = Q.none ? `<button type="button" class="gd-opt opt-key" data-none="${Q.k}" aria-pressed="${!pm[Q.k].length && !!pm.answered[Q.k]}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.none)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`
+      : `<button type="button" class="gd-opt opt-key" data-all="${Q.k}" aria-pressed="${pm[Q.k].length===Q.opts.length}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.all)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`;
+    body = `<p class="note gd-multi-n">Choose all that apply.</p><div class="gd-opts gd-grid" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
   }
   if(Q.kind==="features"){
     const t = PLATFORMS.find(x=>x.k===pm.type);
-    body = `<div class="row" style="justify-content:space-between;margin-bottom:12px"><span class="note">${pm.features.length} selected${t?` · typical for ${esc(t.n.toLowerCase())}`:""}</span>${t?`<button type="button" class="btn sm" data-act="typical">Reset to typical</button>`:""}</div>` +
+    body = `<div class="row gd-feat-h"><span class="note">${pm.features.length} selected${t?` · typical for ${esc(t.n.toLowerCase())}`:""}</span>${t?`<button type="button" class="btn sm" data-act="typical">Reset to typical</button>`:""}</div>` +
       FGROUPS.map(([g,ks])=>`<div class="fgroup"><h4>${g}</h4><div class="ogrid">${ks.map(k=>`<button type="button" class="ocard multi" data-toggle="features" data-v="${k}" aria-pressed="${pm.features.includes(k)}"><b>${FEATURES[k][0]}</b><span>${FEATURES[k][1]}</span></button>`).join("")}</div></div>`).join("");
   }
-  if(Q.kind==="name") body = `<input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" style="max-width:520px;font-size:16px;padding:12px 14px">`;
+  if(Q.kind==="name") body = `<div class="gd-text"><label class="visually-hidden" for="pm-name">${esc(Q.t)}</label><input class="input" id="pm-name" value="${esc(pm.name)}" placeholder="e.g. Group video calls, or ${esc(labelOf(PLATFORMS,pm.type)||"my product")}" autocomplete="off"></div>`;
   const answered = Q.kind==="name" || Q.kind==="features" || pm.answered[Q.k] || qHasValue(Q);
-  return `<div class="pm-layout"><div>
+  return `<div class="gd gd-s-q gd-pm" style="--tc:var(--t-pm)">
     ${pm.fromOrg && pm.qi < 3 ? `<div class="banner"><span><strong>Pre-filled from your workspace settings.</strong> The ${typeof orgPrefillWhat === "function" ? orgPrefillWhat() : "product type and regions are"} set. Change them if this product is different.</span></div>` : ""}
     ${pm.fromProfile?`<div class="banner"><span><strong>Reusing a saved profile.</strong> Your platform answers are filled in. Choose what this feature does, then name it.</span></div>`:""}
-    <div class="card askcard">
-      <div class="qprog"><span class="eyebrow">${Q.sec}</span><span class="note mono">${pm.qi+1} / ${qs.length}</span></div>
-      <div class="bar" style="height:4px"><i style="width:${(pm.qi)/qs.length*100}%;background:var(--accent)"></i></div>
-      <h2 class="qtitle">${Q.t} ${Q.tip?tip(Q.tip):""}</h2>
-      <p class="qhelp" style="margin-bottom:18px">${Q.h}</p>
+    <div class="gd-q"><div class="gd-main">
+      <div class="gd-crumb"><span class="gd-area">${esc(Q.sec)}</span><span aria-hidden="true">/</span><span>Question ${pm.qi+1} of ${qs.length}</span></div>
+      <h1>${Q.t} ${Q.tip?tip(Q.tip):""}</h1>
+      <p class="gd-why">${Q.h}</p>
       ${body}
-      <div class="stepnav">
+      <div class="gd-foot">
         ${pm.qi>0?`<button type="button" class="btn" data-back="1">Back</button>`:`<button type="button" class="btn" data-act="home">Cancel</button>`}
-        <button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button>
+        <span class="gd-foot-r"><span class="note">${Q.kind==="single"||Q.kind==="multi" ? "Number keys pick an answer, " : ""}Enter continues.</span><button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button></span>
       </div>
     </div>
-    <p class="note keyhint">Keyboard: number keys select an answer, Enter continues.</p>
-  </div>${livePanel(assess(pm))}</div>`;
+    <aside class="gd-aside" aria-label="What your answers change">${livePanel(assess(pm))}</aside></div>
+  </div>`;
 }
 function impactBox(r){
   const qs = visibleQs(), Q = qs[Math.max(0, Math.min(pm.qi, qs.length-1))], base = pm.qbase;

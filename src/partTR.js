@@ -137,10 +137,33 @@ async function trWrite(){
 }
 
 /* ---------- page ---------- */
+/* ---------- Guided: your service, then one section of the report per screen ---------- */
+let trView = null;
+function trSpec(){
+  const yn = (k, title, why, on, set) => ({id:k, eb:title.replace(/\?$/, ""), title, why, kind:"single", opts:() => [{k:"no", n:"No"}, {k:"yes", n:"Yes"}], get:() => tr[k + "Set"] ? (on() ? "yes" : "no") : "", set:v => { set(v === "yes"); tr[k + "Set"] = true; trSave(); }});
+  const steps = [
+    {id:"org", eb:"Your service", title:"What's the company or service called?", why:"It's named in the report.", kind:"text", max:80, placeholder:"For example: Pixelry", get:() => tr.org, set:v => { tr.org = v.slice(0, 80); tr.orgSet = true; trSave(); }},
+    {id:"year", eb:"Reporting year", title:"Which year is the report for?", why:"Reports cover a calendar year. This decides when it's due.", kind:"single", opts:() => [0, 1, 2].map(i => { const y = new Date().getFullYear() - i; return {k:String(y), n:String(y), h:i === 0 ? "The current year, for a report in progress" : i === 1 ? "Last year, the usual case" : ""}; }),
+      get:() => String(tr.year || ""), set:v => { tr.year = parseInt(v, 10); trSave(); }},
+    {id:"tier", eb:"Type of service", title:"What kind of service are you under the DSA?", why:"It decides which sections the law asks for.", kind:"single", opts:() => TR_TIERS.map(([k, n, d]) => ({k, n, h:d})), get:() => tr.tierSet ? tr.tier : "", set:v => { tr.tier = v; tr.tierSet = true; trSave(); }},
+    yn("sme", "Are you a micro or small enterprise?", "Fewer than 50 staff, and annual turnover or balance sheet of €10 million or less. Micro and small enterprises are exempt from most of these reports.", () => tr.sme, v => { tr.sme = v; }),
+    yn("cmp", "Compare with the previous period?", "Optional. Adds a column for last period's numbers, so the report shows the trend.", () => tr.cmp, v => { tr.cmp = v; })
+  ].concat(trSections().map(s => ({id:"s-" + s.k, eb:s.n, title:esc(s.n), why:`${esc(s.ref)} · ${esc(s.why)}${s.note ? " " + esc(s.note) : ""}`, kind:"custom", opt:true, next:"Continue",
+    html:() => `<div class="tr-setup gd-tr"><div class="tr-fields">${s.f.map(trField).join("")}</div>${s.k === "own" ? trCatsHTML() : ""}</div>`, has:() => s.f.some(trHas)})));
+  const p = trProgress();
+  return {k:"transparency", tool:{name:"Transparency report", icon:"chart", color:"var(--t-ai)"},
+    intro:{title:"Build the transparency report the DSA asks for", lead:"Say what kind of service you are, then fill in one section at a time: only the sections the law asks for at your tier. At the end you get a readable report, a check of what's missing, and the numbers by category.",
+      facts:[["About 15 minutes", "Numbers you can look up as you go. Come back any time."], ["Only your sections", "Hosting services, platforms and very large platforms have different duties."], ["Checked against the DSA", `Articles 15, 24 and 42 and the EU templates, reviewed ${TR_REVIEWED}.`]], start:p.got ? "Continue" : "Start"},
+    alt:[{n:"Fill everything in on one page", run:() => { trView = "page"; renderTransparency(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See an example", run:() => trAct("example")}],
+    steps, finish:"Build the report",
+    done:() => { trView = null; trAct("build"); }};
+}
 function renderTransparency(){
   if(!tr.org && !tr.orgSet && typeof wsProfile === "function"){ const pr = wsProfile(); if(pr && pr.org){ tr.org = pr.org; tr.orgSet = true; trSave(); } }
   const report = tr.view === "report";
   const ai = typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff);
+  if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
+  if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
     ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit numbers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button><button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `<button type="button" class="btn sm" data-tr="example">See an example</button>`))
@@ -159,6 +182,7 @@ function trField(f){
 function trSetupHTML(){
   const p = trProgress();
   return `<div class="pol-setup tr-setup">
+    <div class="banner cvt-b"><span><strong>Prefer one section at a time?</strong> The guided version asks for the same numbers, one section per screen.</span><button type="button" class="btn sm" data-tr="guide">Switch to guided</button></div>
     <section class="card pol-card">
       <div class="pol-h"><span class="pol-num">1</span><div><span class="pol-lbl">Your service</span></div></div>
       <div class="tr-row"><div class="field"><label for="tr-org">Company or service</label><input class="input" id="tr-org" value="${esc(tr.org)}" placeholder="For example: Pixelry" maxlength="80"></div>
@@ -242,12 +266,13 @@ function trSummaryHTML(ai){
 function trNum(el){ const raw = String(el.value).replace(/[, ]/g, "").trim(); if(raw === "") return ""; const n = +raw; if(isNaN(n) || n < 0) return undefined; return el.dataset.trt === "pct" ? Math.min(1, n / 100) : n; }
 function trAct(a, arg){
   switch(a){
-    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
+    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
     case "build": tr.view = "report"; tr.tab = "report"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
-    case "edit": tr.view = "setup"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "guide": trView = null; gdReset("transparency"); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "tab": tr.tab = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtab="${arg}"]`); if(b) b.focus(); } return;
     case "tier": tr.tier = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtier="${arg}"]`); if(b) b.focus(); } return;
-    case "go": tr.view = "setup"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
+    case "go": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
     case "write": return trWrite();
     case "copy": return copyText(trMarkdown(), $("#tr-toast"));
     case "download": { const md = trMarkdown(); return offerFile(`transparency-report-${slug(tr.org || "service")}-${tr.year}.md`, md, md, $("#tr-toast")); }

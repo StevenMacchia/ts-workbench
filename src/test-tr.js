@@ -5,7 +5,14 @@ const v9 = rd("test-v9.js"), s0 = v9.indexOf("const stub = `") + 14, stub = v9.s
 const body = async function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN).{30}/) || [""])[0];
-  tr = TR_BLANK(); renderTransparency(); let h = view.innerHTML; if(bad(h)) throw new Error("blank setup bad: " + where(h));
+  // a blank report opens guided: your service, then one section per screen, only the sections your tier needs
+  tr = TR_BLANK(); trView = null; renderTransparency(); let h = view.innerHTML; if(bad(h)) throw new Error("guided intro bad: " + where(h));
+  eq(/Build the transparency report the DSA asks for/.test(h) && /data-gd="start"/.test(h), true, "guided intro");
+  gdGo(gdCur, "start"); eq(/What.s the company or service called/.test(view.innerHTML), true, "the service first");
+  eq(gdLive(gdCur).filter(z => /^s-/.test(z.id)).length, trSections().length, "one screen per section of the report");
+  tr.tier = "vlop"; eq(gdLive(trSpec()).filter(z => /^s-/.test(z.id)).length, 11, "a very large platform gets every section"); tr.tier = "platform";
+  out.push("guided: service and tier first, then " + trSections().length + " sections one per screen");
+  trView = "page"; renderTransparency(); h = view.innerHTML; if(bad(h)) throw new Error("blank setup bad: " + where(h));
   eq((h.match(/data-trtier=/g) || []).length, 4, "four service types"); eq(/Build the report/.test(h), true, "run bar");
   // tiers add duties
   const n = t => { tr.tier = t; return trSections().length; };
@@ -36,6 +43,6 @@ const body = async function(){
   out.push("saved to the workspace (" + msg + ") and searchable");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partTR.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partGD.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partTR.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 new Function(src)().then(s => console.log(s)).catch(e => { console.error("FAIL", e); process.exit(1); });

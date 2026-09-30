@@ -7,9 +7,20 @@ const body = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0];
   const gaps = () => cpScore(cp, cpCtx(cp), cpApplies(cp)).gaps.map(r => r.k);
-  // a blank check asks only who the service is for
-  cp = CP_BLANK(); renderCoppa(); let h = view.innerHTML; if(bad(h)) throw new Error("blank setup bad: " + where(h));
-  eq((h.match(/class="pol-lbl"/g) || []).length, 1, "a blank check starts with one section"); eq(/data-cp="build" disabled/.test(h), true, "can't build a plan before choosing an audience");
+  // a blank check opens guided: an intro, then one question per screen, only the ones that apply
+  cp = CP_BLANK(); cpView = null; renderCoppa(); let h = view.innerHTML; if(bad(h)) throw new Error("blank intro bad: " + where(h));
+  eq(/Does COPPA apply to you/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
+  gdGo(gdCur, "start"); eq(/What's the service or product called?/.test(view.innerHTML), true, "first question: the name (optional)"); gdGo(gdCur, "next");
+  eq(/Who is the service for?/.test(view.innerHTML) && (view.innerHTML.match(/data-gdpick=/g) || []).length, 4, "who it's for, four answers");
+  gdPick(gdCur, "mixed"); gdGo(gdCur, "next"); eq(cp.aud, "mixed", "answer saved"); eq(/Which of these are true of the service?/.test(view.innerHTML), true, "a mixed audience gets the child-audience signs");
+  gdPick(gdCur, "__none"); eq(/How could you learn that a user is under 13?/.test(view.innerHTML), true, "none of these moves on");
+  gdPick(gdCur, "reports"); gdGo(gdCur, "next"); gdPick(gdCur, "neutral"); gdGo(gdCur, "next"); eq(/What personal information do you collect from children?/.test(view.innerHTML) && /data-cppi="persist"/.test(view.innerHTML), true, "the data map on its own screen");
+  const live = gdLive(gdCur); eq(live.filter(z => /^ctrl-/.test(z.id)).length > 0, true, "one screen per group of controls"); eq(gdLive(gdCur).some(z => z.id === "fac"), true, "steps shown only when they apply");
+  cp.aud = "primary"; eq(gdLive(cpSpec()).some(z => z.id === "fac"), false, "a children's service skips the audience signs");
+  out.push("guided: " + live.length + " questions for a mixed audience, only the ones that apply, the data map and each control group on their own screens");
+  // the one-page form is still there
+  cp = CP_BLANK(); cpView = "page"; renderCoppa(); h = view.innerHTML; if(bad(h)) throw new Error("blank setup bad: " + where(h));
+  eq((h.match(/class="pol-lbl"/g) || []).length, 1, "a blank check starts with one section"); eq(/data-cp="build" disabled/.test(h) && /data-cp="guide"/.test(h), true, "can't build a plan before choosing an audience; guided is a click away"); cpView = null;
   // who it applies to
   const lvl = o => cpApplies(Object.assign(CP_BLANK(), o)).lvl;
   eq(lvl({aud:"primary"}), "all", "children's services: every user"); eq(lvl({aud:"mixed"}), "under13", "mixed audience: users under 13");
@@ -57,6 +68,6 @@ const body = function(){
   out.push("pre-fill from a pre-mortem: audience, name and " + Object.keys(pre.pi).length + " kinds of data");
   return out.join("\n");
 };
-const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partCV.js"), rd("partTK.js"), rd("partCP.js"), rd("partLOOP.js")].join("\n")
+const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partCP.js"), rd("partLOOP.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

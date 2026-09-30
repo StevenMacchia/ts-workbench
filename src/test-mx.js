@@ -32,6 +32,15 @@ const body = function(){
   out.push("glossary: " + Object.keys(MX_GLOSS).length + " terms, marked once per page, HTML escaped");
   out.push("status logic: 15 cases pass (on / watch / off, higher- and lower-is-better, ranges, typed % and $ signs)");
 
+  // a fresh scorecard opens guided: platform, stage, regulation, which metrics, the period, then one metric per screen
+  mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; mxView = null; gdReset("metrics"); renderMetrics();
+  eq(/Build the scorecard you.d bring to an executive review/.test(view.innerHTML) && /data-gd="start"/.test(view.innerHTML), true, "guided intro for a fresh scorecard");
+  eq(mxList().filter(m => m.t === "ns").every(m => mx.have[m.n]), true, "north stars pre-ticked");
+  gdGo(gdCur, "start"); eq(/What kind of platform is it\?/.test(view.innerHTML), true, "platform first"); gdPick(gdCur, "market"); eq(mx.platform, "market", "platform saved");
+  const live = gdLive(gdCur); eq(live.filter(z => /^m-/.test(z.id)).length, mxList().filter(m => mx.have[m.n]).length, "one screen per tracked metric");
+  mxView = "page"; mx.tab = "mine"; renderMetrics(); eq(/id="mx-guide"/.test(view.innerHTML), true, "the scorecard offers the guided setup");
+  out.push("guided: intro, platform first, north stars pre-ticked, " + live.filter(z => /^m-/.test(z.id)).length + " metric screens");
+  mxView = "page";
   let combos = 0, guides = 0, minN = 99, maxN = 0, shownNotes = 0;
   Object.keys(MX_PLATFORMS).forEach(p => ["1","2","3"].forEach(st => [true,false].forEach(reg => {
     mx = {platform:p, stage:st, reg}; const list = mxList(); combos++;
@@ -103,6 +112,6 @@ const body = function(){
   out.push("sample-size helper: 42,642 at 0.1% ± 0.03 points (95%); on " + Object.keys(MX_SAMPLE).length + " sampling metrics and the Data tab");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partGD.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());
