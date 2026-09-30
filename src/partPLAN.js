@@ -3,14 +3,15 @@
    Launch blockers, coverage gaps, roadmap items and COPPA gaps, in three groups (do first, next, later),
    tickable where the tool tracks it, and sent to a tracker in one go.
    ========================================================= */
-const PLAN_GROUPS = [["do", "Do first", "Launch blockers, exposed harm areas, this quarter's roadmap and critical COPPA gaps"], ["next", "Next", "Coverage gaps, next quarter's roadmap and the rest of the COPPA gaps"], ["later", "Later", "Roadmap items for after that"]];
-const PLAN_KIND = {premortem:"Pre-mortem", coverage:"Coverage", maturity:"Maturity", coppa:"COPPA"};
+const PLAN_GROUPS = [["do", "Do first", "Launch blockers, exposed harm areas, this quarter's roadmap and critical COPPA and DSA gaps"], ["next", "Next", "Coverage gaps, next quarter's roadmap and the rest of the COPPA and DSA gaps"], ["later", "Later", "Roadmap items for after that"]];
+const PLAN_KIND = {premortem:"Pre-mortem", coverage:"Coverage", maturity:"Maturity", coppa:"COPPA", dsa:"DSA"};
 function planItems(){
   const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [];
   try{ ovSavedPMs().forEach(p => p.r.safeguards.filter(s => s.rank === 3).forEach(s => out.push({g:"do", kind:"premortem", text:s.t, ctx:`${p.name} · launch blocker`, tick:"pm:" + p.it.id + "|" + s.id, done:!!(p.it.data.done && p.it.data.done[s.id])}))); }catch(e){}
   try{ if(!cv.ex && !cv.est) cvActions(cv).forEach(x => out.push({g:x.row.status === "exposed" ? "do" : "next", kind:"coverage", text:x.text, ctx:`${x.row.a.n} · ${x.layer.n.toLowerCase()} · ${x.row.status === "exposed" ? "exposed" : "gap"}`, go:"coverage", done:false})); }catch(e){}
   try{ if(!ma.ex && maAllRated(ma)) maRoadmap(ma).forEach(s => s.acts.forEach((a, i) => { const id = s.id + "-" + i; out.push({g:s.phase === "now" ? "do" : s.phase === "next" ? "next" : "later", kind:"maturity", text:a, ctx:`${s.a.n} · level ${s.from} → ${s.to}`, tick:"ma:" + id, done:!!ma.done[id]}); })); }catch(e){}
   try{ if(J.some(s => s.k === "coppa") && cp.view === "report" && cp.aud && !cp.ex) cpScore(cp, cpCtx(cp), cpApplies(cp)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"coppa", text:g.fix || g.t, ctx:`COPPA · ${g.cite}`, fix:g.k, done:false})); }catch(e){}
+  try{ if(J.some(s => s.k === "dsa") && ds.view === "report" && ds.tier && !ds.ex) dsScore(ds, dsCtx(ds)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"dsa", text:g.fix || g.t, ctx:`DSA · ${g.cite}`, fix:"ds:" + g.k, done:false})); }catch(e){}
   return out;
 }
 const planOpen = items => items.filter(x => !x.done);
@@ -18,9 +19,9 @@ const PL_SHOW = 8, plMore = {};
 function planItemHTML(x, i){
   const color = TOOL_COLOR[x.kind] || "var(--accent)";
   return `<li class="nx-i pl-i ${x.done ? "done" : ""}">
-    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color}"><svg><use href="#i-${{premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa"}[x.kind]}"/></svg></span>`}
+    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color}"><svg><use href="#i-${{premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa", dsa:"dsa"}[x.kind]}"/></svg></span>`}
     <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color} 65%, var(--ink))">${esc(PLAN_KIND[x.kind])}</span><span>${esc(x.ctx)}</span></small></div>
-    <a class="nx-open" href="#${x.go || {premortem:"premortem", maturity:"maturity", coppa:"coppa"}[x.kind]}" aria-label="Open in ${esc(PLAN_KIND[x.kind])}">${icon("arrow")}</a></li>`;
+    <a class="nx-open" href="#${x.go || {premortem:"premortem", maturity:"maturity", coppa:"coppa", dsa:"dsa"}[x.kind]}" aria-label="Open in ${esc(PLAN_KIND[x.kind])}">${icon("arrow")}</a></li>`;
 }
 function renderPlan(){
   if(typeof gdCur !== "undefined") gdCur = null;
@@ -41,7 +42,7 @@ function renderPlan(){
     ${items.length ? `<p class="note cvr-note">Coverage gaps are closed in the Coverage radar, so they have no box here. Everything else ticks off in its tool too.</p>` : ""}
   </div>`;
   view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
-  view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { cp.ctrl = Object.assign({}, cp.ctrl, {[c.dataset.plfix]:c.checked}); cp.ex = false; cpSave(); setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
+  view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
   view.querySelectorAll("[data-plmore],[data-pldone]").forEach(b => b.onclick = () => { const k = b.dataset.plmore || (b.dataset.pldone + ":done"); plMore[k] = !plMore[k]; const y = window.scrollY; renderPlan(); window.scrollTo(0, y); });
   view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => { if(b.dataset.plan === "tracker") return tkOpen("plan"); const md = planMarkdown(); offerFile(`ts-plan-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#pl-toast")); });
 }

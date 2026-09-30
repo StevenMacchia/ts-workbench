@@ -1,8 +1,8 @@
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {coppa:"var(--t-cp)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
+const TOOL_COLOR = {coppa:"var(--t-cp)", dsa:"var(--t-ds)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -21,6 +21,7 @@ function openSaved(id){
   if(it.kind==="coverage"){ cv = JSON.parse(JSON.stringify(it.data)); store.set("cv", cv); store.set("ws:cur:coverage", it.id); }
   if(it.kind==="transparency"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); store.set("tr", tr); store.set("ws:cur:transparency", it.id); }
   if(it.kind==="coppa"){ cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); cpSave(); store.set("ws:cur:coppa", it.id); }
+  if(it.kind==="dsa"){ ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); dsSave(); store.set("ws:cur:dsa", it.id); }
   goRoute(KINDS[it.kind].route);
 }
 // Move keyboard and screen-reader focus to new content without jumping the page
@@ -33,7 +34,7 @@ function shellUpdate(name){
     if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
     $$("#sb-assess .navlink[data-step]").forEach(a => { const st = JOURNEY[+a.dataset.step - 1]; let ok = false; try{ ok = !!(st && st.done()); }catch(e){} a.classList.toggle("done", ok); }); }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
-  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
+  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", dsa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";
@@ -60,7 +61,7 @@ function cmdkItems(){
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
-  go("COPPA readiness","coppa","var(--t-cp)","coppa");
+  go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("About this project","about","var(--faint)","info");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});

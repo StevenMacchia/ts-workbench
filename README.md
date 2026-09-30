@@ -16,6 +16,7 @@ Free, private tools that help Trust & Safety and product teams find risks before
 | **[Vendor scorecard](https://stevenmacchia.com/ts-workbench/#vendors)** | Choose a moderation vendor on evidence: 8 weighted criteria, rubrics, minimums and RFP questions. | [moderation-vendor-scorecard](https://github.com/stevenmacchia/moderation-vendor-scorecard) |
 | **[Coverage radar](https://stevenmacchia.com/ts-workbench/#coverage)** | Rate five layers of defense for 8 kinds of harm and see them against your products' risk. | [harm-coverage-radar](https://github.com/stevenmacchia/harm-coverage-radar) |
 | **[Program maturity](https://stevenmacchia.com/ts-workbench/#maturity)** | Rate a T&S program in 8 areas against the targets for its stage, and get a phased roadmap for the biggest gaps. | [ts-maturity-model](https://github.com/stevenmacchia/ts-maturity-model) |
+| **[Compliance readiness](https://stevenmacchia.com/ts-workbench/#dsa)** | Find which duties under the EU Digital Services Act and the US COPPA Rule apply to a service, article by article, and turn the gaps into a plan and drafts for Legal. | [ts-workbench](https://github.com/stevenmacchia/ts-workbench) |
 | **[AI assistants](https://stevenmacchia.com/ts-workbench/#policy)** | Stress-test a policy, write an enforcement notice and review an appeal, on the user's own Claude account, and build a DSA transparency report with a completeness check. | [ts-ai-assistants](https://github.com/stevenmacchia/ts-ai-assistants) |
 
 ![Overview](assets/overview.png)

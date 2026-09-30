@@ -12,7 +12,7 @@ const body = function(){
   const pms = Object.values(wsItems()).filter(i => i.kind === "premortem").map(i => i.title).sort().join(", ");
   eq(pms, "Pixelry Creator Subscriptions, Pixelry Market, Pixelry app", "three Pixelry products");
   const parts = rcParts(); eq(parts.every(p => p.score !== null), true, "every report card part is graded: " + parts.map(p => p.k + "=" + p.score).join(" "));
-  eq(JOURNEY.filter(s => s.done()).length, 6, "six of seven review steps done (Pixelry has EU users, so it gets a transparency step)"); eq(jnNext().k, "act", "next step is the plan");
+  eq(JOURNEY.filter(s => s.done()).length, 7, "seven of eight review steps done (Pixelry has EU users, so it gets DSA and transparency steps)"); eq(jnNext().k, "act", "next step is the plan");
   const xs = nxItems(); eq(xs.some(x => x.kind === "maturity" && !!x.tick), true, "roadmap items in the next moves"); eq(xs.some(x => x.kind === "premortem"), true, "launch blockers in the next moves");
   out.push("demo data: " + pms + " · grade " + rcOverall(parts).score + "/100 · " + xs.length + " next moves");
   renderOverview(); const h = view.innerHTML; if(bad(h)) throw new Error("demo overview has bad values: " + where(h));
@@ -28,6 +28,6 @@ const body = function(){
   out.push("maturity, coverage and policy pages render the demo cleanly");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partGD.js"), rd("partPol.js"), rd("partPol2.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partAI.js"), rd("partTR.js"), rd("partDEMO.js")].join("\n")
+const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partGD.js"), rd("partPol.js"), rd("partPol2.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partAI.js"), rd("partTR.js"), rd("partDSA.js"), rd("partDEMO.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

@@ -160,8 +160,13 @@ const PAGE_TOURS = {
     [".cp-report .pol-tabs", "Plan, data, drafts and requirements", "Your gaps in order, your data map, four drafts to edit, and every requirement that applies to your answers."],
     [".cp-gaps", "Close the gaps", "Each gap names the part of the Rule, who usually owns it and what to do. Mark it done once it's fixed."]
   ],
+  dsa:[
+    [".gd-intro, .ds-setup", "Four questions, then the duties", "What kind of service, how big, where established, what it does. Only the duties that apply to your answers show up."],
+    [".ds-report .pol-sum, .ds-sum", "Where you stand", "Which tier you're in, how ready you are, and how many critical gaps are left."],
+    [".ds-report .pol-tabs", "Plan, duties and drafts", "Your gaps in order with the article behind each, every duty that applies, and four drafts to edit."]
+  ],
   plan:[
-    [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA gaps in one list, sent to your tracker in one go."],
+    [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA and DSA gaps in one list, sent to your tracker in one go."],
     [".pl-group", "Do first, next, later", "Tick things off here and each tool updates. Long groups fold: show all when you need them."]
   ],
   review:[

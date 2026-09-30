@@ -1026,6 +1026,20 @@ body.tt-present .ttf-play{grid-template-columns:minmax(0,1fr) 360px}
 .pol-h .org-from{margin-left:auto}
 .ma-stages + .org-from{margin-top:10px}
 
+/* ---------- DSA readiness ---------- */
+:root{--t-ds:#2F5FA8}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-ds:#8DB4F2} }
+:root[data-theme="dark"],:root[data-mode="dark"]{--t-ds:#8DB4F2}
+:root[data-mode="light"]{--t-ds:#2F5FA8}
+.ds-setup .tr-tier.on{border-color:var(--t-ds);box-shadow:inset 0 0 0 1px var(--t-ds);background:color-mix(in oklab, var(--t-ds) 7%, var(--surface))}
+.ds-setup .tr-tier:focus-visible{outline:2px solid var(--t-ds);outline-offset:2px}
+.ds-setup .tr-chk input{accent-color:var(--t-ds)}
+.ds-setup .pol-tip{border-left-color:var(--t-ds)}
+.ds-tiers{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ds-sum{margin:4px 0 8px}
+.ds-sum.crit .pol-verdict{color:var(--crit)}
+.ds-ring{border-color:color-mix(in oklab, var(--t-ds) 35%, var(--sunk))}
+.ds-draft .ph{background:color-mix(in oklab, var(--t-ds) 16%, transparent)}
 /* ---------- COPPA readiness ---------- */
 :root{--t-cp:#8D6E4B}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-cp:#D4B48C} }

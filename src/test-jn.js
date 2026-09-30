@@ -18,10 +18,11 @@ const body = function(){
   orgSet({regions:["us", "eu"], confirmed:true}); eq(jnNext().k, "maturity", "then maturity");
   MA_AREAS.forEach(a => ma.lv[a.k] = 2); eq(jnNext().k, "premortem", "then a pre-mortem");
   pm = orgPrefillPM(blankPM()); eq(pm.type, "marketplace", "pre-mortem pre-filled"); pm.name = "Resale chat"; saveToLib(); eq(jnNext().k, "coverage", "then coverage");
-  CV_AREAS.forEach(a => { cv.r[a.k] = {}; CV_LAYERS.forEach(l => cv.r[a.k][l.k] = 1); }); eq(jnNext().k, "crisis", "then a crisis");
+  CV_AREAS.forEach(a => { cv.r[a.k] = {}; CV_LAYERS.forEach(l => cv.r[a.k][l.k] = 1); }); eq(jnNext().k, "dsa", "EU users: then the DSA check");
+  ds = Object.assign(DS_BLANK(), {svc:"Resale", tier:"platform", size:"medium", est:"eu", view:"report"}); dsSave(); eq(jnNext().k, "crisis", "then a crisis");
   store.set("tt:progress", {[ttKey(0, "marketplace")]:{best:3, runs:1}}); eq(jnNext().k, "transparency", "EU users: then the transparency report");
   wsPut({id:"TR-1", kind:"transparency", title:"Transparency report 2025", data:{org:"Resale"}}); eq(jnNext().k, "act", "then act on it");
-  eq(JOURNEY.filter(s => s.done()).length, 6, "six of seven done");
+  eq(JOURNEY.filter(s => s.done()).length, 7, "seven of eight done");
   out.push("review: setup, maturity, pre-mortem, coverage, crisis, act, completing in order");
   // hand-offs name the next step, or offer the pack when done
   eq(/Turn gaps into a plan/.test(journeyNextHTML("crisis")), true, "tabletop hands off to the tracker step");
@@ -29,7 +30,7 @@ const body = function(){
   renderCoverage(); eq(/Back to your assessment/.test(view.innerHTML) && /Step 4 of [0-9]/.test(view.innerHTML), true, "coverage returns to the assessment");
   store.set("tk:used", true); eq(jnNext(), undefined, "all done");
   eq(/Leadership pack/.test(journeyNextHTML("coverage")), true, "complete review offers the pack");
-  renderOverview(); h = view.innerHTML; eq(/All 7 steps done/.test(h) && /class="card as-complete"/.test(h), true, "a finished assessment offers the plan first");
+  renderOverview(); h = view.innerHTML; eq(/All 8 steps done/.test(h) && /class="card as-complete"/.test(h), true, "a finished assessment offers the plan first");
   out.push("hand-offs: maturity, coverage and tabletop point to the next step; a finished review offers the leadership pack");
   // leadership pack: report card, radars and priorities, as a page and a standalone file
   const inner = packInner(); if(bad(inner)) throw new Error("pack has bad values: " + where(inner));
@@ -45,7 +46,7 @@ const body = function(){
   store.set("rc:hist", [{d:"2026-07-01", s:40}]); renderOverview(); h = view.innerHTML;
   eq(/class="rc-trend"/.test(h) && /since Jul/.test(h), true, "trend since the first grade");
   const o = rcOverall(rcParts()); eq(new RegExp(`Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of 5 parts`).test(h), true, "grade in the picture");
-  eq((h.match(/<span class="as-tag"/g) || []).length, 4, "a finding from each step");
+  eq((h.match(/<span class="as-tag"/g) || []).length, 5, "a finding from each step, the DSA check included");
   out.push(`program picture: ${o.score} / 100, grade ${rcGrade(o.score)[1]}, trend line, a finding from each step`);
   // next moves: this quarter's roadmap items, launch blockers, the biggest coverage gap; ticking one works like ticking it in its tool
   const rm = maRoadmap(ma); ma.hist = [{t:Date.now(), stage:ma.stage, lv:{}}];
@@ -69,6 +70,6 @@ const body = function(){
   out.push("tier 3: what changed after editing a saved pre-mortem");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partREV.js")].join("\n")
+const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partREV.js"), rd("partGD.js"), rd("partDSA.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

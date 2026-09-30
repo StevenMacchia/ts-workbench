@@ -10,6 +10,7 @@ const KINDS = {
   maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
   coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
   coppa:{n:"COPPA readiness", plural:"COPPA checks", icon:"i-coppa", route:"coppa", prefix:"CP"},
+  dsa:{n:"DSA readiness", plural:"DSA checks", icon:"i-dsa", route:"dsa", prefix:"DS"},
   transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
@@ -46,6 +47,8 @@ function vendorResult(d){
 function itemSummary(it){
   const d = it.data || {};
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
+    return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
+  if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd)), ap = dsApplies(dd);
     return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
   if(it.kind==="transparency" && typeof trProgress === "function"){
     const keep = tr, dd = Object.assign(TR_BLANK(), d); tr = dd; const p = trProgress(); tr = keep;
@@ -217,6 +220,7 @@ function bindWorkspace(){
       if(k==="maturity"){ store.set("ws:cur:maturity", null); ma = maInit({stage:(ma && ma.stage) || "growth", lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
       if(k==="transparency"){ store.set("ws:cur:transparency", null); tr = TR_BLANK(); store.set("tr", tr); }
       if(k==="coppa"){ store.set("ws:cur:coppa", null); cp = CP_BLANK(); cpSave(); }
+      if(k==="dsa"){ store.set("ws:cur:dsa", null); ds = DS_BLANK(); dsSave(); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));
       copy.id = it.kind==="premortem" ? newId() : wsNewId(KINDS[it.kind].prefix); copy.title = (it.title||"Untitled") + " (copy)"; copy.created = null; copy.updated = null;
@@ -225,7 +229,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors","policy","maturity","coverage","transparency","coppa"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity","coverage","transparency","coppa","dsa"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();

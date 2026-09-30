@@ -37,11 +37,12 @@ const body = function(){
   // complete: the steps give way to the leadership pack and the week's work
   store.set("tt:progress", {[ttKey(0, "social")]:{best:3, last:Date.now()}}); store.set("tk:used", true);
   // EU users: the assessment grew a transparency step; a youth platform would get a COPPA step too
-  eq(JOURNEY.map(s => s.k).join(","), "setup,maturity,premortem,coverage,crisis,transparency,act", "the steps follow the profile");
+  eq(JOURNEY.map(s => s.k).join(","), "setup,maturity,premortem,coverage,dsa,crisis,transparency,act", "the steps follow the profile");
   orgSet({youth:"teens"}); eq(JOURNEY.some(s => s.k === "coppa"), true, "a teen platform gets a COPPA step"); orgSet({youth:"adult_verified"}); eq(JOURNEY.some(s => s.k === "coppa"), false, "an adults-only one doesn't");
-  eq(JOURNEY.every(s => s.done()), false, "the transparency step is still open"); wsPut({id:"TR-1", kind:"transparency", title:"Transparency report 2025", data:{org:"Test"}});
+  eq(JOURNEY.every(s => s.done()), false, "the DSA and transparency steps are still open"); wsPut({id:"TR-1", kind:"transparency", title:"Transparency report 2025", data:{org:"Test"}});
+  ds = Object.assign(DS_BLANK(), {svc:"Test", tier:"platform", size:"medium", est:"eu", view:"report"}); dsSave();
   eq(JOURNEY.every(s => s.done()), true, "every step done"); renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("complete has bad values: " + where(h));
-  eq(/All 7 steps done/.test(h) && /class="card as-complete"/.test(h) && /href="#plan"/.test(h), true, "complete offers the plan and the leadership pack");
+  eq(/All 8 steps done/.test(h) && /class="card as-complete"/.test(h) && /href="#plan"/.test(h), true, "complete offers the plan and the leadership pack");
   eq(/Across 1 rehearsal, \d+% of your first calls were strong/.test(h), true, "crisis finding"); out.push("complete: leadership pack up front, a finding from every step");
   // quarter by quarter: save the picture, change things, and the home and review page say what moved
   eq(/data-rev="save"/.test(h), true, "the picture offers to save the quarter"); eq(/class="card as-rev"/.test(h), false, "no comparison until a quarter is saved");
@@ -74,6 +75,6 @@ const body = function(){
   out.push("pre-mortem landing: current assessment hero and a mini radar on each saved assessment");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js"), rd("partREV.js")].join("\n")
+const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js"), rd("partREV.js"), rd("partGD.js"), rd("partDSA.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

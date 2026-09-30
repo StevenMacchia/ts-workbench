@@ -49,6 +49,12 @@ OV_ART.cp = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     ${[48, 62, 76, 90].map((y, i) => `<rect x="40" y="${y}" width="10" height="10" rx="3" fill="${i < 2 ? "var(--good)" : "var(--sunk)"}" stroke="${i < 2 ? "none" : "var(--line-strong)"}"/><rect x="56" y="${y + 3}" width="${[32, 26, 34, 22][i]}" height="4" rx="2" fill="var(--faint)" opacity=".5"/>`).join("")}
     <path d="M118 36l20 8v15c0 12-8.5 22-20 26-11.5-4-20-14-20-26V44l20-8z" fill="var(--surface)" stroke="var(--t-cp)" stroke-width="3" stroke-linejoin="round"/>
     <circle cx="118" cy="55" r="5" fill="var(--t-cp)"/><path d="M109 71c1.6-5 4.8-7.6 9-7.6s7.4 2.6 9 7.6" stroke="var(--t-cp)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="24" y="20" width="76" height="86" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
+    ${[36, 52, 68, 84].map((y, i) => `<rect x="36" y="${y}" width="${[44, 52, 38, 48][i]}" height="6" rx="3" fill="${i === 1 ? "var(--t-ds)" : "var(--line-strong)"}" opacity="${i === 1 ? ".9" : "1"}"/>`).join("")}
+    <circle cx="120" cy="62" r="26" fill="var(--surface)" stroke="var(--t-ds)" stroke-width="3"/>
+    ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => { const a = i * Math.PI / 6; return `<circle cx="${(120 + Math.cos(a) * 17).toFixed(1)}" cy="${(62 + Math.sin(a) * 17).toFixed(1)}" r="2.2" fill="var(--t-ds)"/>`; }).join("")}
+    <path d="M112 62l6 6 11-12" fill="none" stroke="var(--t-ds)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
@@ -61,6 +67,8 @@ function ovChip(it){
     return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
+  if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd));
+    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
     return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
   if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
@@ -68,9 +76,9 @@ function ovChip(it){
 }
 /* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
 const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
-  coverage:"Next, you'll see whether your defenses keep up with these risks.", coppa:"Next, you'll see whether COPPA applies to you and where the gaps are.", crisis:"Next, you'll see how your team would handle a real incident.", transparency:"Next, you'll build the transparency report the EU asks for."};
+  coverage:"Next, you'll see whether your defenses keep up with these risks.", coppa:"Next, you'll see whether COPPA applies to you and where the gaps are.", dsa:"Next, you'll see which DSA duties apply to you and where the gaps are.", crisis:"Next, you'll see how your team would handle a real incident.", transparency:"Next, you'll build the transparency report the EU asks for."};
 const AS_PART_STEP = {maturity:"maturity", coverage:"coverage", launch:"premortem", crisis:"crisis"};
-const asLow = t => /^[A-Z][a-z]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
+const asLow = t => /^[A-Z]([a-z]| )/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
 const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
 // What a finished step found, in one line
 function asSum(k){
@@ -83,6 +91,7 @@ function asSum(k){
     if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} rehearsed`; }
     if(k === "act") return "Sent to your tracker";
     if(k === "coppa"){ const s = cpScore(cp, cpCtx(cp), cpApplies(cp)); return `${s.pct}% ready · ${s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : "no critical gaps"}`; }
+    if(k === "dsa"){ const s = dsScore(ds, dsCtx(ds)); return `${s.pct}% ready · ${s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : "no critical gaps"}`; }
     if(k === "transparency"){ const p = trProgress(); return `${p.got} of ${p.total} sections filled in for ${tr.year}`; }
   }catch(e){}
   return "";
@@ -97,6 +106,8 @@ function asKnow(){
       out.push({tag:"Pre-mortem", c:"var(--t-pm)", t:hit ? `Before launch, ${hit.p.name} still needs ${asLow(hit.s.t.replace(/\.$/, ""))}.` : "Every launch blocker is done across your products."}); }
     if(isDone("coverage")){ const a = cvActions(cv, 1)[0];
       out.push({tag:"Coverage", c:"var(--t-cv)", t:a ? `${a.row.a.n} carries ${a.row.band ? BANDS[a.row.band][0].toLowerCase() + " " : ""}risk with ${a.row.cov}% coverage. Start with ${a.layer.n.toLowerCase()}.` : "Your coverage keeps pace with the risk in every harm area."}); }
+    if(isDone("dsa") && typeof dsScore === "function"){ const s = dsScore(ds, dsCtx(ds)), g = s.gaps[0];
+      out.push({tag:"DSA", c:"var(--t-ds)", t:g ? `${dsApplies(ds).h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))} (${g.cite}).` : `${dsApplies(ds).h}, and every duty that applies is in place.`}); }
     if(isDone("coppa") && typeof cpScore === "function"){ const s = cpScore(cp, cpCtx(cp), cpApplies(cp)), g = s.gaps[0];
       out.push({tag:"COPPA", c:"var(--t-cp)", t:g ? `${cpApplies(cp).h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))}.` : `${cpApplies(cp).h}, and every requirement that applies is in place.`}); }
     if(isDone("transparency") && typeof trProgress === "function"){ const p = trProgress();
@@ -176,20 +187,21 @@ function asWelcomeHTML(J){
       <div class="as-hero-t">
         <span class="as-eb">Free · no account · about ${Math.round(total / 5) * 5} minutes</span>
         <h1>See where your Trust &amp; Safety program stands</h1>
-        <p>${J.length === 6 ? "Six" : J.length === 7 ? "Seven" : "Eight"} guided steps, chosen for your kind of platform. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
+        <p>${asCount(J.length, true)} guided steps, chosen for your kind of platform. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
       ${asPictureHTML(true)}
     </section>
     <section class="rise" aria-labelledby="as-six-h">
-      <div class="as-sec-h"><h2 id="as-six-h">The ${J.length === 6 ? "six" : J.length === 7 ? "seven" : "eight"} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
+      <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
     </section>
     ${asFootHTML()}
   </div>`;
 }
 const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
+const asCount = (n, cap) => { const w = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n); return cap ? w.charAt(0).toUpperCase() + w.slice(1) : w; };
 function renderOverview(){
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();
   const done = J.filter(s => s.done()), next = J.find(s => !s.done());
@@ -236,6 +248,7 @@ function renderTools(){
         ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
+        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
@@ -282,6 +295,7 @@ function asRoutePct(r){
     if(r === "maturity") return maAllRated(ma) ? 100 : Math.round(MA_AREAS.filter(a => ma.lv[a.k]).length / MA_AREAS.length * 100);
     if(r === "coverage"){ const s = cvSummary(cv); return Math.round(s.rated / Math.max(1, s.total) * 100); }
     if(r === "coppa") return cp.view === "report" && cp.aud ? 100 : cp.aud ? 50 : 0;
+    if(r === "dsa") return ds.view === "report" && ds.tier ? 100 : ds.tier ? 50 : 0;
     if(r === "transparency") return tr.view === "report" ? 100 : Math.round(trProgress().pct / 2);
   }catch(e){}
   return null;
