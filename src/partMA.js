@@ -398,7 +398,7 @@ function renderMaturity(){
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
-  view.innerHTML = (maPlanMode() ? asStepBar("maturity", 100, false) + headCompact("Program Maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program Maturity",
+  view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
     <p class="mxa-q ma-q">How mature is your trust and safety program, and what should you fix first?</p>

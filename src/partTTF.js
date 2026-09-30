@@ -43,8 +43,7 @@ function ttfRender(){
   const sc = ttfSc(), n = sc.steps.length;
   const ctx = ttf.phase === "setup" ? "Team exercise · " + esc(sc.title) : ttf.phase === "debrief" ? esc(sc.title) + " · debrief" : `${esc(sc.title)} · decision ${ttf.step + 1} of ${n}`;
   const meta = `${ttf.phase === "inject" ? `<button type="button" class="btn sm" data-ttf-a="present">${document.body.classList.contains("tt-present") ? "Exit presenter view" : "Present"}</button>` : ""}<button type="button" class="btn sm" data-ttf-a="end">${ttf.phase === "debrief" ? "Close" : "End exercise"}</button>`;
-  const pct = ttf.phase === "setup" ? 0 : ttf.phase === "debrief" ? 100 : Math.round(ttf.step / n * 100);
-  view.innerHTML = (typeof asStepBar === "function" ? asStepBar("crisis", pct, false) : "") + headCompact("Incident Tabletop", ctx, meta) + (ttf.phase === "setup" ? ttfSetupHTML(sc) : ttf.phase === "debrief" ? ttfDebriefHTML(sc) : ttfInjectHTML(sc));
+  view.innerHTML = headCompact("Incident tabletop", ctx, meta) + (ttf.phase === "setup" ? ttfSetupHTML(sc) : ttf.phase === "debrief" ? ttfDebriefHTML(sc) : ttfInjectHTML(sc));
   if(ttf.phase === "inject"){ ttfPaint(); ttfTimerBtns(); if(ttf.running){ clearInterval(ttfTick); ttfTick = setInterval(ttfPaint, 250); } }
 }
 function ttfSetupHTML(sc){

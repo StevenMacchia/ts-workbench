@@ -82,11 +82,16 @@ const HEAD_META = () => {
   let stats = []; try{ stats = m[1](); }catch(e){}
   return {icon:m[0], stats};
 };
-const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(); return `
+// Which part of the workbench a page belongs to, as the sidebar groups it
+const HEAD_GROUP = {maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
+// Tool pages carry the assessment strip above the header, with the help button in it
+const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };
+const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(), strip = headStrip(), r = headRoute(); return strip + `
   <div class="pagehead">
     <svg class="ph-mark" aria-hidden="true"><use href="#i-${hm.icon}"/></svg>
     <div class="ph-main">
-      <div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span>${esc(crumb || "T&S Workbench")}${typeof helpBtn === "function" ? helpBtn() : ""}</div>
+      <div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span>${esc(HEAD_GROUP[r] || crumb || "T&S Workbench")}${!strip && typeof helpBtn === "function" ? helpBtn() : ""}</div>
       <h1>${title}</h1>
       <p>${desc}</p>
       ${hm.stats.length ? `<div class="ph-stats">${hm.stats.map(s => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
@@ -94,8 +99,8 @@ const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(); return `
     ${meta?`<div class="headmeta">${meta}</div>`:''}
   </div>`; };
 // Working screens (a question, a report, a scenario in progress, a plan) get a slim header so the work sits above the fold
-const headCompact = (title, ctx, meta='') => { const hm = HEAD_META(); return `
+const headCompact = (title, ctx, meta='') => { const hm = HEAD_META(), strip = headStrip(); return strip + `
   <div class="pagehead ph-compact">
-    <div class="ph-main"><div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span><h1 class="phc-t">${title}</h1>${ctx ? `<span class="phc-ctx">${ctx}</span>` : ""}${typeof helpBtn === "function" ? helpBtn() : ""}</div></div>
+    <div class="ph-main"><div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span><h1 class="phc-t">${title}</h1>${ctx ? `<span class="phc-ctx">${ctx}</span>` : ""}${!strip && typeof helpBtn === "function" ? helpBtn() : ""}</div></div>
     ${meta?`<div class="headmeta">${meta}</div>`:''}
   </div>`; };

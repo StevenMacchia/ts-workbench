@@ -6,11 +6,11 @@
 const orgConfirmed = () => orgReady() && (!!orgGet().confirmed || JOURNEY.slice(1).some(s => s.done()));
 const JOURNEY = [
   {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
-  {k:"maturity", n:"Rate your program", d:"Eight areas, about five minutes", min:5, get:"A maturity level for eight areas, and a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
-  {k:"premortem", n:"Pre-mortem a product", d:"How it could be misused, and what to do first", min:8, get:"How it could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
+  {k:"maturity", n:"Program maturity", d:"Rate eight areas, about five minutes", min:5, get:"Rate eight areas of your program and get a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
+  {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"See how a product could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
-  {k:"coverage", n:"Map your coverage", d:"Your defenses against that risk", min:5, get:"Whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
-  {k:"crisis", n:"Rehearse a crisis", d:"One tabletop scenario, about eight minutes", min:8, get:"One realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
+  {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"See whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
+  {k:"crisis", n:"Incident tabletop", d:"Rehearse one crisis, about eight minutes", min:8, get:"Rehearse one realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
   {k:"act", n:"Turn gaps into a plan", d:"Send your roadmap or gaps to your tracker", min:2, get:"Your roadmap and biggest gaps, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"maturity",
     go:() => { const src = MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex && maRoadmap(ma).length ? "maturity" : !cv.ex && cvActions(cv).length ? "coverage" : null; goRoute(src || "maturity"); if(src) setTimeout(() => tkOpen(src), 60); }, done:() => !!store.get("tk:used", false)}
 ];

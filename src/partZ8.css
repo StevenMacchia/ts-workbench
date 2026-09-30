@@ -1275,7 +1275,7 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 .as-delta{margin-top:6px;font-size:13px;line-height:1.45;padding:9px 11px;border-radius:10px;background:var(--high-soft);color:color-mix(in oklab, var(--high) 75%, var(--ink))}
 .as-delta.up{background:var(--good-soft);color:color-mix(in oklab, var(--good) 80%, var(--ink))}
 .as-parts{display:grid;gap:4px}
-.as-part{display:grid;grid-template-columns:140px minmax(0,1fr) 34px;gap:14px;align-items:center;padding:5px 8px;margin:0 -8px;border-radius:9px;color:inherit;text-decoration:none}
+.as-part{display:grid;grid-template-columns:140px minmax(0,1fr);gap:14px;align-items:center;padding:5px 8px;margin:0 -8px;border-radius:9px;color:inherit;text-decoration:none}
 .as-part:hover{background:var(--hover)}
 .as-pn{font-size:14px;font-weight:550}
 .as-part.open .as-pn{color:var(--muted)}
@@ -1304,9 +1304,9 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 .as-first .as-pic{box-shadow:var(--shadow-lift)}
 @media (max-width:1180px){.as-six{grid-template-columns:repeat(3,minmax(0,1fr))}.as-hero{grid-template-columns:1fr;gap:28px}.as-hero .as-pic{max-width:620px}}
 @media (max-width:980px){.as-grid{grid-template-columns:1fr}.as-prog{justify-items:start}}
-@media (max-width:640px){.as-six{grid-template-columns:1fr 1fr}.as-pic{padding:18px}.as-pic-b{grid-template-columns:1fr;gap:16px}.as-part{grid-template-columns:118px minmax(0,1fr) 30px;gap:10px}.as-rads{gap:4px}.as-rad small{display:none}.as-know{padding:16px 18px}.as-know li{grid-template-columns:1fr;gap:2px}.as-segs i{width:28px}.as-cta{width:100%;justify-content:center}}
+@media (max-width:640px){.as-six{grid-template-columns:1fr 1fr}.as-pic{padding:18px}.as-pic-b{grid-template-columns:1fr;gap:16px}.as-part{grid-template-columns:118px minmax(0,1fr);gap:10px}.as-rads{gap:4px}.as-rad small{display:none}.as-know{padding:16px 18px}.as-know li{grid-template-columns:1fr;gap:2px}.as-segs i{width:28px}.as-cta{width:100%;justify-content:center}}
 .as-first .as-pic-b{grid-template-columns:118px minmax(0,1fr);gap:20px}
-.as-first .as-part{grid-template-columns:128px minmax(0,1fr) 26px;gap:12px}
+.as-first .as-part{grid-template-columns:128px minmax(0,1fr);gap:12px}
 /* radars: crop the label margin the small versions don't need */
 .as-rad-g{aspect-ratio:1.4;overflow:hidden}
 .as-rad-g svg{position:absolute;left:50%;top:50%;width:150%;transform:translate(-50%,-50%)}
@@ -1447,3 +1447,32 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 .gd-sub{font-size:13px;color:var(--muted)}
 .gd-note{margin:0;font-size:13.5px;line-height:1.5}
 body.tt-present .asb{display:none}
+
+/* ---------- Less chrome: the strip says where you are ---------- */
+body:has(.asb) .tb-crumb{display:none}
+.pagehead{padding:26px 32px 24px;margin-bottom:24px}
+.pagehead h1{font-size:clamp(26px,3.2vw,36px)}
+.pagehead p{font-size:15.5px;margin-top:8px}
+.pagehead .ph-stats,.pagehead .ph-mark{display:none}
+.asb + .pagehead{margin-top:-6px}
+@media (max-width:640px){.pagehead{padding:20px 18px 18px}}
+
+/* ---------- Sidebar: the assessment's tools first, the rest can fold away ---------- */
+.sb-more{display:contents}
+.sb-more > summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;border-radius:8px}
+.sb-more > summary::-webkit-details-marker{display:none}
+.sb-more > summary svg{width:12px;height:12px;transition:transform .15s;opacity:.7}
+.sb-more[open] > summary svg{transform:rotate(90deg)}
+.sb-more > summary:hover{color:var(--side-ink)}
+.sb-more > summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sb-more:not([open]) > .navlink{display:none}
+
+/* ---------- Motion: guided screens ease in, radars grow as they fill ---------- */
+@keyframes gdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes gdRad{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
+@keyframes gdPick{0%{transform:scale(1)}45%{transform:scale(.985)}100%{transform:scale(1)}}
+.gd-main,.gd-w,.gd-aside,.cvr{animation:gdIn .3s cubic-bezier(.2,.7,.2,1) both}
+.gd-aside{animation-delay:.05s}
+.gd-rad .cv-cov,.gd-rad .ma-cur,.cvr-radar .cv-cov,.as-rad-g .cv-cov,.as-rad-g .ma-cur{transform-box:view-box;transform-origin:50% 50%;animation:gdRad .45s cubic-bezier(.2,.7,.2,1) both}
+.gd-opt.on{animation:gdPick .22s ease-out}
+@media (prefers-reduced-motion: reduce){.gd-main,.gd-w,.gd-aside,.cvr,.gd-rad .cv-cov,.gd-rad .ma-cur,.cvr-radar .cv-cov,.as-rad-g .cv-cov,.as-rad-g .ma-cur,.gd-opt.on{animation:none}}

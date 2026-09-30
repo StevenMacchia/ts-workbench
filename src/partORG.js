@@ -62,10 +62,10 @@ const NEW_ITEMS = [
   ["premortem", "radar", "var(--t-pm)", "Abuse pre-mortem", "Assess a product or feature before launch", () => newAssessment()],
   ["maturity", "steps", "var(--t-ma)", "Program maturity", "Rate your program in eight areas", () => goRoute("maturity")],
   ["coverage", "cover", "var(--t-cv)", "Coverage radar", "Map your defenses against risk", () => goRoute("coverage")],
-  ["tabletop", "siren", "var(--t-tt)", "Tabletop exercise", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
-  ["policy", "doc", "var(--t-pol)", "Policy test", "Find where a rule is unclear", () => goRoute("policy")],
+  ["tabletop", "siren", "var(--t-tt)", "Incident tabletop", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
+  ["policy", "doc", "var(--t-pol)", "Policy stress-tester", "Find where a rule is unclear", () => goRoute("policy")],
   ["coppa", "coppa", "var(--t-cp)", "COPPA readiness", "Check children's privacy against the amended Rule", () => { if(cp.ex){ cp = CP_BLANK(); cpSave(); store.set("ws:cur:coppa", null); } goRoute("coppa"); }],
-  ["vendors", "scale", "var(--t-vd)", "Vendor comparison", "Score moderation vendors on evidence", () => goRoute("vendors")]
+  ["vendors", "scale", "var(--t-vd)", "Vendor scorecard", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
 function newMenuToggle(open){
   const m = $("#tb-menu"), b = $("#tb-new"); if(!m || !b) return;

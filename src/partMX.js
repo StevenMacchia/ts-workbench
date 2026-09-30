@@ -508,8 +508,8 @@ function renderMetrics(){
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
-    : head("Metrics Framework",
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
+    : head("Metrics framework",
       "The numbers a T&S program should run on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform.",
       "Run the program", actions) + `
     <div class="mxm-filter">

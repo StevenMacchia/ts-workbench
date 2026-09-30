@@ -76,11 +76,11 @@ const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
 function asSum(k){
   try{
     if(k === "setup"){ const o = orgGet(); return [orgTypeName(o.type), orgStageName(o.stage), (o.regions || []).map(r => r.toUpperCase()).join(", ")].filter(Boolean).join(" · "); }
-    if(k === "maturity"){ const g = maGaps(ma).length; return `Level ${maScore(ma).toFixed(1)} of 5 · ${g ? `${g} of ${MA_AREAS.length} areas below target` : "every area at target"}`; }
+    if(k === "maturity"){ const g = maGaps(ma).length; return g ? `${g} of ${MA_AREAS.length} areas below target` : "Every area at target"; }
     if(k === "premortem"){ const pms = ovSavedPMs(); let open = 0; pms.forEach(p => { open += p.r.safeguards.filter(s => s.rank === 3 && !(p.it.data.done && p.it.data.done[s.id])).length; });
       return `${pms.length} product${pms.length === 1 ? "" : "s"} · ${open ? `${open} launch blocker${open === 1 ? "" : "s"} open` : "no open launch blockers"}`; }
-    if(k === "coverage"){ const s = cvSummary(cv); return `${s.cov}% of risk covered · ${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? `${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : "no gaps"}`; }
-    if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} practiced`; }
+    if(k === "coverage"){ const s = cvSummary(cv); return s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? "" : "s"} exposed` : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " with a gap" : "s with gaps"}` : "No gaps against your risk"; }
+    if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} rehearsed`; }
     if(k === "act") return "Sent to your tracker";
   }catch(e){}
   return "";
@@ -127,6 +127,11 @@ function asPictureHTML(empty){
   if(!empty && (!seen || seen.score !== o.score || (seen.graded || []).join() !== graded.join())) store.set("as:seen", {score:o.score, graded});
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], stepOf = k => J.findIndex(s => s.k === AS_PART_STEP[k]) + 1;
   const todo = p => p.k === "policy" ? "Optional" : `${p.detail ? p.detail + " · " : ""}Step ${stepOf(p.k)}`;
+  // Each graded part in plain words: the bar is the score, so the words say what it's made of
+  const plain = p => { const d = p.detail || "";
+    if(p.k === "coverage") return asSum("coverage");
+    if(p.k === "policy"){ const n = (d.match(/\d+/) || ["1"])[0]; return `${n} polic${n === "1" ? "y" : "ies"} tested`; }
+    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/ \(.*\)$/, "").replace(/practiced/, "rehearsed") : d; };
   // In step order, with the optional part last
   const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
   const rows = parts.slice().sort((a, b) => order(a) - order(b));
@@ -137,9 +142,8 @@ function asPictureHTML(empty){
         <span class="note">${o.score === null ? "Appears after step 2" : `Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of ${o.total} parts${o.graded < o.total ? " so far" : ""}`}</span>
         ${empty || o.score === null ? "" : rcTrend(rcRecord(o))}
         ${delta ? `<span class="as-delta ${delta.startsWith("Up") ? "up" : ""}">${esc(delta)}</span>` : ""}</div>
-      <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}"><span class="as-pn">${p.n}</span>
-        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : p.detail)}</small></span>
-        <b class="as-pv mono">${p.score === null ? "–" : p.score}</b></a>`).join("")}</div>
+      <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
+        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
     ${asRadarsHTML()}
   </section>`;
@@ -252,10 +256,24 @@ const asInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s =
 // Where this step sits in the assessment, or just this tool when someone uses it on its own.
 // A tool that isn't one of the six steps (the policy test) shows as the optional part
 function asStepBar(k, pct, help){
+  k = k === "tabletop" ? "crisis" : k;
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === k), inAs = asInAssessment() && (i >= 0 || k === "policy");
   const name = i >= 0 ? J[i].n : (typeof ROUTE_LABEL !== "undefined" && ROUTE_LABEL[k]) || "", seq = inAs && i >= 0;
   return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${AS_BACK}${inAs ? "Your assessment" : "All tools"}</a>
     <div class="asb-mid"><span>${seq ? `Step ${i + 1} of ${J.length} · ` : inAs ? "Optional · " : ""}<b>${esc(name)}</b></span>
-      <span class="asb-segs" aria-hidden="true">${seq ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span></div>
+      ${pct === null ? "" : `<span class="asb-segs" aria-hidden="true">${seq ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span>`}</div>
     <span class="asb-r"><span class="asb-saved">${icon("check")}Saved as you go</span>${help && typeof helpBtn === "function" ? helpBtn() : ""}</span></div>`;
+}
+
+// How far along a tool is, for the strip. Null means the tool isn't one of the assessment's steps
+function asRoutePct(r){
+  try{
+    if(r === "premortem") return pm.stage === "report" ? 100 : pm.stage === "ask" ? Math.round(pm.qi / Math.max(1, visibleQs().length) * 100) : Object.values(wsItems()).some(it => it.kind === "premortem") ? 100 : 0;
+    if(r === "tabletop"){ if(typeof ttf !== "undefined" && ttf && ttf.phase){ const n = ttScenario(ttf.s, ttf.v).steps.length; return ttf.phase === "setup" ? 0 : ttf.phase === "debrief" ? 100 : Math.round(ttf.step / n * 100); }
+      if(tt){ const n = ttScenario(tt.s, tt.v).steps.length; return Math.round(Math.min(tt.step, n) / n * 100); } return Object.keys(ttProgress()).length ? 100 : 0; }
+    if(r === "policy") return pol.heur && pol.view !== "setup" ? 100 : 0;
+    if(r === "maturity") return maAllRated(ma) ? 100 : Math.round(MA_AREAS.filter(a => ma.lv[a.k]).length / MA_AREAS.length * 100);
+    if(r === "coverage"){ const s = cvSummary(cv); return Math.round(s.rated / Math.max(1, s.total) * 100); }
+  }catch(e){}
+  return null;
 }

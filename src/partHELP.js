@@ -162,41 +162,9 @@ function helpOffer(r){
 function helpToggle(){ const off = !store.get("help:off", false); store.set("help:off", off); if(off) helpOfferClose();
   gsay(off ? "Page tips are off. Every page's “How this page works” button still works" : "Page tips are back on"); }
 
-/* ---------- welcome back ---------- */
-// Where the visitor was last time, read once before this visit overwrites it
-const WB_PREV = store.get("help:last", null);
-let wbOpen = null;
-const WB_ICON = {coppa:"coppa", premortem:"radar", tabletop:"siren", metrics:"gauge", vendors:"scale", maturity:"steps", coverage:"cover", policy:"doc", notice:"mail", appeal:"appeal", transparency:"chart", workspace:"user"};
-function wbAgo(t){
-  const d = new Date(t), now = new Date(), days = Math.round((new Date(now.toDateString()) - new Date(d.toDateString())) / 864e5);
-  return days <= 0 ? "earlier today" : days === 1 ? "yesterday" : days < 7 ? days + " days ago" : "over a week ago";
-}
-function wbInject(){
-  if(!wbOpen) return; const v = document.getElementById("view"); if(!v || v.querySelector(".wb")) return;
-  const host = v.querySelector(".ov") || v;
-  host.insertAdjacentHTML("afterbegin", `<div class="card wb" role="status"><span class="sb-glyph wb-ic" style="background:${(typeof TOOL_COLOR !== "undefined" && TOOL_COLOR[wbOpen.r]) || "var(--accent)"}">${icon(WB_ICON[wbOpen.r] || "arrow")}</span>
-    <p class="wb-t"><b>Welcome back.</b> You were last in ${esc(ROUTE_LABEL[wbOpen.r] || wbOpen.r)}, ${wbAgo(wbOpen.t)}.</p>
-    <a class="btn sm primary" href="#${wbOpen.r}" data-wb="go">Pick up where you left off ${icon("arrow")}</a>
-    <button type="button" class="tour-x" data-wb="x" aria-label="Dismiss">${icon("x")}</button></div>`);
-}
-const _renderOverviewBase = renderOverview;
-renderOverview = function(){ _renderOverviewBase.apply(this, arguments); wbInject(); };
-
 // Called by the router after every page render
-function helpAfterRoute(name, h){
-  const demo = typeof demoOn === "function" && demoOn();
-  if(!route.done){
-    const ok = WB_PREV && WB_PREV.r && WB_PREV.r !== "overview" && ROUTE_LABEL[WB_PREV.r] && Date.now() - WB_PREV.t > 30 * 60e3;
-    if(name === "overview" && ok && !demo && !helpQuiet()){ wbOpen = WB_PREV; wbInject(); }
-  }
-  if(name !== "overview"){ wbOpen = null; if(name !== "about" && !demo) store.set("help:last", {r:name, t:Date.now()}); }
-  clearTimeout(helpAfterRoute.t);
-  const seen = store.get("help:seen", {});
-  const direct = h === name || (!h && name === "overview");
-  if(!direct || seen[name] || demo || store.get("help:off", false) || helpQuiet() || !PAGE_TOURS[name] || (typeof tourAt !== "undefined" && tourAt >= 0)) return;
-  seen[name] = true; store.set("help:seen", seen);
-  helpAfterRoute.t = setTimeout(() => helpOffer(name), 700);
-}
+// Tours are never offered uninvited: each page explains itself, and "How this page works" replays the tour on request
+function helpAfterRoute(name, h){ helpOfferClose(); }
 
 /* ---------- plain-English terms on every page ---------- */
 // The metrics glossary plus the terms other pages use. Acronyms and names match exactly; other terms ignore case.

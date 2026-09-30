@@ -38,7 +38,7 @@ function renderPolicy(){
     if(pr && pr.org && !pol.company) pol.company = pr.org;
     if(o.type || o.youth || (o.regions && o.regions.length)){ pol.orgSet = true; savePol(); } }
   const ai = !!SAMPLER && !polRun.aiOff, report = !!pol.heur && pol.view !== "setup";
-  view.innerHTML = (typeof asStepBar === "function" ? asStepBar("policy", report ? 100 : 0, false) : "") + (report
+  view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
         `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>

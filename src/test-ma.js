@@ -24,7 +24,7 @@ const body = function(){
   maPick(2, true); eq(maG.i + "/" + ma.lv.policy, "1/2", "on to the next area"); maGo("back"); eq(maG.i, 0, "back to the first area"); maGo("back"); eq(maG.scr, "stage", "back to your size");
   maGo("page"); eq(maMode(), "page", "switch to one page any time"); eq(/Switch to guided/.test(view.innerHTML), true, "and back");
   maGo("guide"); eq(maG.scr + maG.i, "q1", "guided resumes at the first unrated area");
-  MA_AREAS.slice(1).forEach(() => maPick(3, true)); eq(maMode(), "plan", "the last area opens the plan"); eq(/id="ma-plan"/.test(view.innerHTML) && /class="asb"/.test(view.innerHTML), true, "plan with the assessment strip");
+  MA_AREAS.slice(1).forEach(() => maPick(3, true)); eq(maMode(), "plan", "the last area opens the plan"); eq(/id="ma-plan"/.test(view.innerHTML), true, "the last area opens the plan page");
   out.push("guided: size first, one area at a time with the target marked, back and resume, one page, then the plan");
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = "page"; renderMaturity(); h = view.innerHTML;
   if(bad(h)) throw new Error("blank page has bad values: " + where(h));

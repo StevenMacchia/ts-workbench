@@ -23,7 +23,7 @@ const body = function(){
   pm = fromPreset("marketplace"); pm.example = false; pm.name = "Resale chat"; saveToLib(); store.set("as:seen", null); renderOverview(); h = view.innerHTML;
   if(bad(h)) throw new Error("partway has bad values: " + where(h));
   eq((h.match(/class="as-s ok"/g) || []).length, 3, "three steps done"); eq(/Social media[^<]* · Growing · US, EU/.test(h), true, "setup summary");
-  eq(/Level 2\.3 of 5 · 7 of 8 areas below target/.test(h), true, "maturity summary"); eq(/1 product · \d+ launch blockers? open/.test(h), true, "pre-mortem summary");
+  eq(/7 of 8 areas below target/.test(h), true, "maturity summary"); eq(/1 product · \d+ launch blockers? open/.test(h), true, "pre-mortem summary");
   eq(/Up next · about 5 minutes/.test(h) && /data-jgo="coverage"/.test(h), true, "coverage is up next"); eq(waits(h), 1, "coverage radar waits for its step");
   eq(/levels? below your target of/.test(h) && /Before launch, Resale chat still needs/.test(h), true, "what we know so far");
   const o1 = rcOverall(rcParts()).score; eq(/based on 2 of 5 parts so far/.test(h), true, "score so far");

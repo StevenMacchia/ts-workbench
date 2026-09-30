@@ -29,6 +29,8 @@ const focusLost = () => !document.activeElement || document.activeElement === do
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;
+  const more = $("#sb-more"); if(more){ if(!more.dataset.bound){ more.dataset.bound = "1"; more.open = !!store.get("sb:more", false); more.addEventListener("toggle", () => { if(!more.dataset.auto) store.set("sb:more", more.open); more.dataset.auto = ""; }); }
+    if(more.querySelector(`.navlink[data-route="${name}"]`) && !more.open){ more.dataset.auto = "1"; more.open = true; } }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
   const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
@@ -63,7 +65,6 @@ function cmdkItems(){
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
-    out.push({g:"Actions", label:store.get("help:off", false) ? "Turn page tips back on" : "Turn off page tips", sub:"The tour offered on your first visit to each page", color:"var(--faint)", icon:"info", run:helpToggle});
   }
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","system"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});

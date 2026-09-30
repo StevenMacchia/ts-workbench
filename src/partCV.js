@@ -389,7 +389,7 @@ function cvResultsRender(){
 // The one-page version: every question at once
 function cvTableRender(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`, full = cvRatedAll();
-  view.innerHTML = head("Coverage Radar",
+  view.innerHTML = head("Coverage radar",
     "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
     "Run the program", cvHeadMeta()) + `
     ${cv.est ? "" : `<div class="banner cvt-b"><span>${full ? "<strong>Every defense is rated.</strong> See your radar and the gaps to close first." : "<strong>Prefer one question at a time?</strong> The guided version asks the same questions, with a result after each harm area."}</span><button type="button" class="btn sm ${full ? "primary" : ""}" data-cvg="${full ? "results" : "guide"}">${full ? "See your results" : "Switch to guided"}</button></div>`}

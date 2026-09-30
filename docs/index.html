@@ -3215,7 +3215,7 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 .as-delta{margin-top:6px;font-size:13px;line-height:1.45;padding:9px 11px;border-radius:10px;background:var(--high-soft);color:color-mix(in oklab, var(--high) 75%, var(--ink))}
 .as-delta.up{background:var(--good-soft);color:color-mix(in oklab, var(--good) 80%, var(--ink))}
 .as-parts{display:grid;gap:4px}
-.as-part{display:grid;grid-template-columns:140px minmax(0,1fr) 34px;gap:14px;align-items:center;padding:5px 8px;margin:0 -8px;border-radius:9px;color:inherit;text-decoration:none}
+.as-part{display:grid;grid-template-columns:140px minmax(0,1fr);gap:14px;align-items:center;padding:5px 8px;margin:0 -8px;border-radius:9px;color:inherit;text-decoration:none}
 .as-part:hover{background:var(--hover)}
 .as-pn{font-size:14px;font-weight:550}
 .as-part.open .as-pn{color:var(--muted)}
@@ -3244,9 +3244,9 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 .as-first .as-pic{box-shadow:var(--shadow-lift)}
 @media (max-width:1180px){.as-six{grid-template-columns:repeat(3,minmax(0,1fr))}.as-hero{grid-template-columns:1fr;gap:28px}.as-hero .as-pic{max-width:620px}}
 @media (max-width:980px){.as-grid{grid-template-columns:1fr}.as-prog{justify-items:start}}
-@media (max-width:640px){.as-six{grid-template-columns:1fr 1fr}.as-pic{padding:18px}.as-pic-b{grid-template-columns:1fr;gap:16px}.as-part{grid-template-columns:118px minmax(0,1fr) 30px;gap:10px}.as-rads{gap:4px}.as-rad small{display:none}.as-know{padding:16px 18px}.as-know li{grid-template-columns:1fr;gap:2px}.as-segs i{width:28px}.as-cta{width:100%;justify-content:center}}
+@media (max-width:640px){.as-six{grid-template-columns:1fr 1fr}.as-pic{padding:18px}.as-pic-b{grid-template-columns:1fr;gap:16px}.as-part{grid-template-columns:118px minmax(0,1fr);gap:10px}.as-rads{gap:4px}.as-rad small{display:none}.as-know{padding:16px 18px}.as-know li{grid-template-columns:1fr;gap:2px}.as-segs i{width:28px}.as-cta{width:100%;justify-content:center}}
 .as-first .as-pic-b{grid-template-columns:118px minmax(0,1fr);gap:20px}
-.as-first .as-part{grid-template-columns:128px minmax(0,1fr) 26px;gap:12px}
+.as-first .as-part{grid-template-columns:128px minmax(0,1fr);gap:12px}
 /* radars: crop the label margin the small versions don't need */
 .as-rad-g{aspect-ratio:1.4;overflow:hidden}
 .as-rad-g svg{position:absolute;left:50%;top:50%;width:150%;transform:translate(-50%,-50%)}
@@ -3387,6 +3387,35 @@ body:has(#dm-welcome) .tour-pop[data-kind="offer"]{display:none}
 .gd-sub{font-size:13px;color:var(--muted)}
 .gd-note{margin:0;font-size:13.5px;line-height:1.5}
 body.tt-present .asb{display:none}
+
+/* ---------- Less chrome: the strip says where you are ---------- */
+body:has(.asb) .tb-crumb{display:none}
+.pagehead{padding:26px 32px 24px;margin-bottom:24px}
+.pagehead h1{font-size:clamp(26px,3.2vw,36px)}
+.pagehead p{font-size:15.5px;margin-top:8px}
+.pagehead .ph-stats,.pagehead .ph-mark{display:none}
+.asb + .pagehead{margin-top:-6px}
+@media (max-width:640px){.pagehead{padding:20px 18px 18px}}
+
+/* ---------- Sidebar: the assessment's tools first, the rest can fold away ---------- */
+.sb-more{display:contents}
+.sb-more > summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;border-radius:8px}
+.sb-more > summary::-webkit-details-marker{display:none}
+.sb-more > summary svg{width:12px;height:12px;transition:transform .15s;opacity:.7}
+.sb-more[open] > summary svg{transform:rotate(90deg)}
+.sb-more > summary:hover{color:var(--side-ink)}
+.sb-more > summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sb-more:not([open]) > .navlink{display:none}
+
+/* ---------- Motion: guided screens ease in, radars grow as they fill ---------- */
+@keyframes gdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes gdRad{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
+@keyframes gdPick{0%{transform:scale(1)}45%{transform:scale(.985)}100%{transform:scale(1)}}
+.gd-main,.gd-w,.gd-aside,.cvr{animation:gdIn .3s cubic-bezier(.2,.7,.2,1) both}
+.gd-aside{animation-delay:.05s}
+.gd-rad .cv-cov,.gd-rad .ma-cur,.cvr-radar .cv-cov,.as-rad-g .cv-cov,.as-rad-g .ma-cur{transform-box:view-box;transform-origin:50% 50%;animation:gdRad .45s cubic-bezier(.2,.7,.2,1) both}
+.gd-opt.on{animation:gdPick .22s ease-out}
+@media (prefers-reduced-motion: reduce){.gd-main,.gd-w,.gd-aside,.cvr,.gd-rad .cv-cov,.gd-rad .ma-cur,.cvr-radar .cv-cov,.as-rad-g .cv-cov,.as-rad-g .ma-cur,.gd-opt.on{animation:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -3474,21 +3503,20 @@ body.tt-present .asb{display:none}
       <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Your assessment</a>
       <a class="navlink" href="#tools" data-route="tools"><svg><use href="#i-layers"/></svg>All tools</a>
       <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
-      <div class="sb-h">Assess</div>
+      <div class="sb-h">The assessment</div>
       <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
-      <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
       <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
-      <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness<span class="sb-new">New</span></a>
-      <div class="sb-h">Prepare</div>
+      <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
       <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
-      <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
+      <details class="sb-more" id="sb-more"><summary class="sb-h sb-more-h">More tools<svg><use href="#i-chev"/></svg></summary>
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
-      <div class="sb-h">Measure</div>
+      <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness<span class="sb-new">New</span></a>
+      <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
-      <div class="sb-h">AI assistants</div>
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
+      </details>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
@@ -3570,11 +3598,16 @@ const HEAD_META = () => {
   let stats = []; try{ stats = m[1](); }catch(e){}
   return {icon:m[0], stats};
 };
-const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(); return `
+// Which part of the workbench a page belongs to, as the sidebar groups it
+const HEAD_GROUP = {maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
+// Tool pages carry the assessment strip above the header, with the help button in it
+const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };
+const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(), strip = headStrip(), r = headRoute(); return strip + `
   <div class="pagehead">
     <svg class="ph-mark" aria-hidden="true"><use href="#i-${hm.icon}"/></svg>
     <div class="ph-main">
-      <div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span>${esc(crumb || "T&S Workbench")}${typeof helpBtn === "function" ? helpBtn() : ""}</div>
+      <div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span>${esc(HEAD_GROUP[r] || crumb || "T&S Workbench")}${!strip && typeof helpBtn === "function" ? helpBtn() : ""}</div>
       <h1>${title}</h1>
       <p>${desc}</p>
       ${hm.stats.length ? `<div class="ph-stats">${hm.stats.map(s => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
@@ -3582,9 +3615,9 @@ const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(); return `
     ${meta?`<div class="headmeta">${meta}</div>`:''}
   </div>`; };
 // Working screens (a question, a report, a scenario in progress, a plan) get a slim header so the work sits above the fold
-const headCompact = (title, ctx, meta='') => { const hm = HEAD_META(); return `
+const headCompact = (title, ctx, meta='') => { const hm = HEAD_META(), strip = headStrip(); return strip + `
   <div class="pagehead ph-compact">
-    <div class="ph-main"><div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span><h1 class="phc-t">${title}</h1>${ctx ? `<span class="phc-ctx">${ctx}</span>` : ""}${typeof helpBtn === "function" ? helpBtn() : ""}</div></div>
+    <div class="ph-main"><div class="ph-eb"><span class="sb-glyph ph-glyph"><svg><use href="#i-${hm.icon}"/></svg></span><h1 class="phc-t">${title}</h1>${ctx ? `<span class="phc-ctx">${ctx}</span>` : ""}${!strip && typeof helpBtn === "function" ? helpBtn() : ""}</div></div>
     ${meta?`<div class="headmeta">${meta}</div>`:''}
   </div>`; };
 
@@ -4631,11 +4664,9 @@ function renderPremortem(){
     actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
   }
-  // The assessment strip: how far through the questions, or done once there is a report
-  const stripPct = pm.stage === "report" ? 100 : pm.stage === "ask" ? Math.round(pm.qi / Math.max(1, visibleQs().length) * 100) : Object.values(wsItems()).some(it => it.kind === "premortem") ? 100 : 0;
-  view.innerHTML = (typeof asStepBar === "function" ? asStepBar("premortem", stripPct, false) : "") + (pm.stage === "start" ? head("Abuse Pre-mortem",
+  view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
-    "Build safely", actions) : headCompact("Abuse Pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
+    "Build safely", actions) : headCompact("Abuse pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">
       <span class="toast" id="pm-toast" aria-live="polite"></span>
       ${pm.stage==="start" ? startScreen() : pm.stage==="ask" ? askScreen() : renderReport(assess(pm))}
@@ -6418,13 +6449,11 @@ const freshTT = s => ({s, step:0, scores:{safety:60,trust:60,reg:60,team:60}, pi
 
 function renderTabletop(){
   if(typeof ttf !== "undefined" && ttf && ttf.phase) return ttfRender();
-  // The assessment strip: done once any scenario has been played
-  const bar = pct => typeof asStepBar === "function" ? asStepBar("crisis", pct, false) : "";
-  if(!tt) return ttPicker(t => bar(Object.keys(ttProgress()).length ? 100 : 0) + head('Incident Tabletop', t, 'Run the program'));
+  if(!tt) return ttPicker(t => head('Incident tabletop', t, 'Run the program'));
   if(!tt.first) tt.first = []; if(!tt.retried) tt.retried = [];
   const sc = ttScenario(tt.s, tt.v);
   // In a scenario the header shrinks to its name and your place in it
-  const H = () => bar(Math.round(Math.min(tt.step, sc.steps.length) / sc.steps.length * 100)) + headCompact("Incident Tabletop", esc(sc.title) + (tt.step >= sc.steps.length ? " · debrief" : ` · decision ${tt.step + 1} of ${sc.steps.length}`));
+  const H = () => headCompact("Incident tabletop", esc(sc.title) + (tt.step >= sc.steps.length ? " · debrief" : ` · decision ${tt.step + 1} of ${sc.steps.length}`));
   if(tt.step >= sc.steps.length) return ttDebrief(H, sc);
   return ttPlay(H, sc);
 }
@@ -8315,8 +8344,8 @@ function renderMetrics(){
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics Framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
-    : head("Metrics Framework",
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
+    : head("Metrics framework",
       "The numbers a T&S program should run on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform.",
       "Run the program", actions) + `
     <div class="mxm-filter">
@@ -8511,7 +8540,7 @@ function vdWeightsBar(){
 function renderVendors(){
   const seen = new Set();
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
-  view.innerHTML = head("Vendor Scorecard",
+  view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
     "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-own">Start your own</button><button class="btn sm" id="vx-reset">See the example</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
@@ -8889,6 +8918,8 @@ const focusLost = () => !document.activeElement || document.activeElement === do
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;
+  const more = $("#sb-more"); if(more){ if(!more.dataset.bound){ more.dataset.bound = "1"; more.open = !!store.get("sb:more", false); more.addEventListener("toggle", () => { if(!more.dataset.auto) store.set("sb:more", more.open); more.dataset.auto = ""; }); }
+    if(more.querySelector(`.navlink[data-route="${name}"]`) && !more.open){ more.dataset.auto = "1"; more.open = true; } }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
   const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
@@ -8923,7 +8954,6 @@ function cmdkItems(){
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
-    out.push({g:"Actions", label:store.get("help:off", false) ? "Turn page tips back on" : "Turn off page tips", sub:"The tour offered on your first visit to each page", color:"var(--faint)", icon:"info", run:helpToggle});
   }
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","system"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
@@ -9045,11 +9075,11 @@ const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
 function asSum(k){
   try{
     if(k === "setup"){ const o = orgGet(); return [orgTypeName(o.type), orgStageName(o.stage), (o.regions || []).map(r => r.toUpperCase()).join(", ")].filter(Boolean).join(" · "); }
-    if(k === "maturity"){ const g = maGaps(ma).length; return `Level ${maScore(ma).toFixed(1)} of 5 · ${g ? `${g} of ${MA_AREAS.length} areas below target` : "every area at target"}`; }
+    if(k === "maturity"){ const g = maGaps(ma).length; return g ? `${g} of ${MA_AREAS.length} areas below target` : "Every area at target"; }
     if(k === "premortem"){ const pms = ovSavedPMs(); let open = 0; pms.forEach(p => { open += p.r.safeguards.filter(s => s.rank === 3 && !(p.it.data.done && p.it.data.done[s.id])).length; });
       return `${pms.length} product${pms.length === 1 ? "" : "s"} · ${open ? `${open} launch blocker${open === 1 ? "" : "s"} open` : "no open launch blockers"}`; }
-    if(k === "coverage"){ const s = cvSummary(cv); return `${s.cov}% of risk covered · ${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? `${s.gaps.length} gap${s.gaps.length === 1 ? "" : "s"}` : "no gaps"}`; }
-    if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} practiced`; }
+    if(k === "coverage"){ const s = cvSummary(cv); return s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? "" : "s"} exposed` : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " with a gap" : "s with gaps"}` : "No gaps against your risk"; }
+    if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} rehearsed`; }
     if(k === "act") return "Sent to your tracker";
   }catch(e){}
   return "";
@@ -9096,6 +9126,11 @@ function asPictureHTML(empty){
   if(!empty && (!seen || seen.score !== o.score || (seen.graded || []).join() !== graded.join())) store.set("as:seen", {score:o.score, graded});
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], stepOf = k => J.findIndex(s => s.k === AS_PART_STEP[k]) + 1;
   const todo = p => p.k === "policy" ? "Optional" : `${p.detail ? p.detail + " · " : ""}Step ${stepOf(p.k)}`;
+  // Each graded part in plain words: the bar is the score, so the words say what it's made of
+  const plain = p => { const d = p.detail || "";
+    if(p.k === "coverage") return asSum("coverage");
+    if(p.k === "policy"){ const n = (d.match(/\d+/) || ["1"])[0]; return `${n} polic${n === "1" ? "y" : "ies"} tested`; }
+    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/ \(.*\)$/, "").replace(/practiced/, "rehearsed") : d; };
   // In step order, with the optional part last
   const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
   const rows = parts.slice().sort((a, b) => order(a) - order(b));
@@ -9106,9 +9141,8 @@ function asPictureHTML(empty){
         <span class="note">${o.score === null ? "Appears after step 2" : `Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of ${o.total} parts${o.graded < o.total ? " so far" : ""}`}</span>
         ${empty || o.score === null ? "" : rcTrend(rcRecord(o))}
         ${delta ? `<span class="as-delta ${delta.startsWith("Up") ? "up" : ""}">${esc(delta)}</span>` : ""}</div>
-      <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}"><span class="as-pn">${p.n}</span>
-        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : p.detail)}</small></span>
-        <b class="as-pv mono">${p.score === null ? "–" : p.score}</b></a>`).join("")}</div>
+      <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
+        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
     ${asRadarsHTML()}
   </section>`;
@@ -9221,12 +9255,26 @@ const asInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s =
 // Where this step sits in the assessment, or just this tool when someone uses it on its own.
 // A tool that isn't one of the six steps (the policy test) shows as the optional part
 function asStepBar(k, pct, help){
+  k = k === "tabletop" ? "crisis" : k;
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === k), inAs = asInAssessment() && (i >= 0 || k === "policy");
   const name = i >= 0 ? J[i].n : (typeof ROUTE_LABEL !== "undefined" && ROUTE_LABEL[k]) || "", seq = inAs && i >= 0;
   return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${AS_BACK}${inAs ? "Your assessment" : "All tools"}</a>
     <div class="asb-mid"><span>${seq ? `Step ${i + 1} of ${J.length} · ` : inAs ? "Optional · " : ""}<b>${esc(name)}</b></span>
-      <span class="asb-segs" aria-hidden="true">${seq ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span></div>
+      ${pct === null ? "" : `<span class="asb-segs" aria-hidden="true">${seq ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span>`}</div>
     <span class="asb-r"><span class="asb-saved">${icon("check")}Saved as you go</span>${help && typeof helpBtn === "function" ? helpBtn() : ""}</span></div>`;
+}
+
+// How far along a tool is, for the strip. Null means the tool isn't one of the assessment's steps
+function asRoutePct(r){
+  try{
+    if(r === "premortem") return pm.stage === "report" ? 100 : pm.stage === "ask" ? Math.round(pm.qi / Math.max(1, visibleQs().length) * 100) : Object.values(wsItems()).some(it => it.kind === "premortem") ? 100 : 0;
+    if(r === "tabletop"){ if(typeof ttf !== "undefined" && ttf && ttf.phase){ const n = ttScenario(ttf.s, ttf.v).steps.length; return ttf.phase === "setup" ? 0 : ttf.phase === "debrief" ? 100 : Math.round(ttf.step / n * 100); }
+      if(tt){ const n = ttScenario(tt.s, tt.v).steps.length; return Math.round(Math.min(tt.step, n) / n * 100); } return Object.keys(ttProgress()).length ? 100 : 0; }
+    if(r === "policy") return pol.heur && pol.view !== "setup" ? 100 : 0;
+    if(r === "maturity") return maAllRated(ma) ? 100 : Math.round(MA_AREAS.filter(a => ma.lv[a.k]).length / MA_AREAS.length * 100);
+    if(r === "coverage"){ const s = cvSummary(cv); return Math.round(s.rated / Math.max(1, s.total) * 100); }
+  }catch(e){}
+  return null;
 }
 /* ---------- Overview: risk radar for the current assessment ---------- */
 // The radar groups the 14 harm areas into 9 spokes so it reads at a glance.
@@ -9317,8 +9365,8 @@ const AB_GROUPS = [
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal, with a suggested reply. A person makes the final call."],
     ["t-ai","chart","Transparency report","Build the report the EU Digital Services Act asks for, with a completeness check and a summary by Claude."]]]
 ];
-const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Rate maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Pre-mortem products","Risk for each product or launch"],
-  ["cover","var(--t-cv)","Map coverage","Your defenses against that risk"], ["siren","var(--t-tt)","Rehearse a crisis","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
+const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Program maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Abuse pre-mortem","Risk for each product or launch"],
+  ["cover","var(--t-cv)","Coverage radar","Your defenses against that risk"], ["siren","var(--t-tt)","Incident tabletop","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
   const versions = SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
@@ -9689,7 +9737,7 @@ function renderPolicy(){
     if(pr && pr.org && !pol.company) pol.company = pr.org;
     if(o.type || o.youth || (o.regions && o.regions.length)){ pol.orgSet = true; savePol(); } }
   const ai = !!SAMPLER && !polRun.aiOff, report = !!pol.heur && pol.view !== "setup";
-  view.innerHTML = (typeof asStepBar === "function" ? asStepBar("policy", report ? 100 : 0, false) : "") + (report
+  view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
         `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
@@ -10824,7 +10872,7 @@ function renderMaturity(){
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
-  view.innerHTML = (maPlanMode() ? asStepBar("maturity", 100, false) + headCompact("Program Maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program Maturity",
+  view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
     <p class="mxa-q ma-q">How mature is your trust and safety program, and what should you fix first?</p>
@@ -11310,7 +11358,7 @@ function cvResultsRender(){
 // The one-page version: every question at once
 function cvTableRender(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`, full = cvRatedAll();
-  view.innerHTML = head("Coverage Radar",
+  view.innerHTML = head("Coverage radar",
     "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
     "Run the program", cvHeadMeta()) + `
     ${cv.est ? "" : `<div class="banner cvt-b"><span>${full ? "<strong>Every defense is rated.</strong> See your radar and the gaps to close first." : "<strong>Prefer one question at a time?</strong> The guided version asks the same questions, with a result after each harm area."}</span><button type="button" class="btn sm ${full ? "primary" : ""}" data-cvg="${full ? "results" : "guide"}">${full ? "See your results" : "Switch to guided"}</button></div>`}
@@ -11907,10 +11955,10 @@ const NEW_ITEMS = [
   ["premortem", "radar", "var(--t-pm)", "Abuse pre-mortem", "Assess a product or feature before launch", () => newAssessment()],
   ["maturity", "steps", "var(--t-ma)", "Program maturity", "Rate your program in eight areas", () => goRoute("maturity")],
   ["coverage", "cover", "var(--t-cv)", "Coverage radar", "Map your defenses against risk", () => goRoute("coverage")],
-  ["tabletop", "siren", "var(--t-tt)", "Tabletop exercise", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
-  ["policy", "doc", "var(--t-pol)", "Policy test", "Find where a rule is unclear", () => goRoute("policy")],
+  ["tabletop", "siren", "var(--t-tt)", "Incident tabletop", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
+  ["policy", "doc", "var(--t-pol)", "Policy stress-tester", "Find where a rule is unclear", () => goRoute("policy")],
   ["coppa", "coppa", "var(--t-cp)", "COPPA readiness", "Check children's privacy against the amended Rule", () => { if(cp.ex){ cp = CP_BLANK(); cpSave(); store.set("ws:cur:coppa", null); } goRoute("coppa"); }],
-  ["vendors", "scale", "var(--t-vd)", "Vendor comparison", "Score moderation vendors on evidence", () => goRoute("vendors")]
+  ["vendors", "scale", "var(--t-vd)", "Vendor scorecard", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
 function newMenuToggle(open){
   const m = $("#tb-menu"), b = $("#tb-new"); if(!m || !b) return;
@@ -11952,11 +12000,11 @@ function ovHeroChips(){
 const orgConfirmed = () => orgReady() && (!!orgGet().confirmed || JOURNEY.slice(1).some(s => s.done()));
 const JOURNEY = [
   {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
-  {k:"maturity", n:"Rate your program", d:"Eight areas, about five minutes", min:5, get:"A maturity level for eight areas, and a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
-  {k:"premortem", n:"Pre-mortem a product", d:"How it could be misused, and what to do first", min:8, get:"How it could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
+  {k:"maturity", n:"Program maturity", d:"Rate eight areas, about five minutes", min:5, get:"Rate eight areas of your program and get a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
+  {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"See how a product could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
-  {k:"coverage", n:"Map your coverage", d:"Your defenses against that risk", min:5, get:"Whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
-  {k:"crisis", n:"Rehearse a crisis", d:"One tabletop scenario, about eight minutes", min:8, get:"One realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
+  {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"See whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
+  {k:"crisis", n:"Incident tabletop", d:"Rehearse one crisis, about eight minutes", min:8, get:"Rehearse one realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
   {k:"act", n:"Turn gaps into a plan", d:"Send your roadmap or gaps to your tracker", min:2, get:"Your roadmap and biggest gaps, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"maturity",
     go:() => { const src = MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex && maRoadmap(ma).length ? "maturity" : !cv.ex && cvActions(cv).length ? "coverage" : null; goRoute(src || "maturity"); if(src) setTimeout(() => tkOpen(src), 60); }, done:() => !!store.get("tk:used", false)}
 ];
@@ -12179,8 +12227,7 @@ function ttfRender(){
   const sc = ttfSc(), n = sc.steps.length;
   const ctx = ttf.phase === "setup" ? "Team exercise · " + esc(sc.title) : ttf.phase === "debrief" ? esc(sc.title) + " · debrief" : `${esc(sc.title)} · decision ${ttf.step + 1} of ${n}`;
   const meta = `${ttf.phase === "inject" ? `<button type="button" class="btn sm" data-ttf-a="present">${document.body.classList.contains("tt-present") ? "Exit presenter view" : "Present"}</button>` : ""}<button type="button" class="btn sm" data-ttf-a="end">${ttf.phase === "debrief" ? "Close" : "End exercise"}</button>`;
-  const pct = ttf.phase === "setup" ? 0 : ttf.phase === "debrief" ? 100 : Math.round(ttf.step / n * 100);
-  view.innerHTML = (typeof asStepBar === "function" ? asStepBar("crisis", pct, false) : "") + headCompact("Incident Tabletop", ctx, meta) + (ttf.phase === "setup" ? ttfSetupHTML(sc) : ttf.phase === "debrief" ? ttfDebriefHTML(sc) : ttfInjectHTML(sc));
+  view.innerHTML = headCompact("Incident tabletop", ctx, meta) + (ttf.phase === "setup" ? ttfSetupHTML(sc) : ttf.phase === "debrief" ? ttfDebriefHTML(sc) : ttfInjectHTML(sc));
   if(ttf.phase === "inject"){ ttfPaint(); ttfTimerBtns(); if(ttf.running){ clearInterval(ttfTick); ttfTick = setInterval(ttfPaint, 250); } }
 }
 function ttfSetupHTML(sc){
@@ -12954,41 +13001,9 @@ function helpOffer(r){
 function helpToggle(){ const off = !store.get("help:off", false); store.set("help:off", off); if(off) helpOfferClose();
   gsay(off ? "Page tips are off. Every page's “How this page works” button still works" : "Page tips are back on"); }
 
-/* ---------- welcome back ---------- */
-// Where the visitor was last time, read once before this visit overwrites it
-const WB_PREV = store.get("help:last", null);
-let wbOpen = null;
-const WB_ICON = {coppa:"coppa", premortem:"radar", tabletop:"siren", metrics:"gauge", vendors:"scale", maturity:"steps", coverage:"cover", policy:"doc", notice:"mail", appeal:"appeal", transparency:"chart", workspace:"user"};
-function wbAgo(t){
-  const d = new Date(t), now = new Date(), days = Math.round((new Date(now.toDateString()) - new Date(d.toDateString())) / 864e5);
-  return days <= 0 ? "earlier today" : days === 1 ? "yesterday" : days < 7 ? days + " days ago" : "over a week ago";
-}
-function wbInject(){
-  if(!wbOpen) return; const v = document.getElementById("view"); if(!v || v.querySelector(".wb")) return;
-  const host = v.querySelector(".ov") || v;
-  host.insertAdjacentHTML("afterbegin", `<div class="card wb" role="status"><span class="sb-glyph wb-ic" style="background:${(typeof TOOL_COLOR !== "undefined" && TOOL_COLOR[wbOpen.r]) || "var(--accent)"}">${icon(WB_ICON[wbOpen.r] || "arrow")}</span>
-    <p class="wb-t"><b>Welcome back.</b> You were last in ${esc(ROUTE_LABEL[wbOpen.r] || wbOpen.r)}, ${wbAgo(wbOpen.t)}.</p>
-    <a class="btn sm primary" href="#${wbOpen.r}" data-wb="go">Pick up where you left off ${icon("arrow")}</a>
-    <button type="button" class="tour-x" data-wb="x" aria-label="Dismiss">${icon("x")}</button></div>`);
-}
-const _renderOverviewBase = renderOverview;
-renderOverview = function(){ _renderOverviewBase.apply(this, arguments); wbInject(); };
-
 // Called by the router after every page render
-function helpAfterRoute(name, h){
-  const demo = typeof demoOn === "function" && demoOn();
-  if(!route.done){
-    const ok = WB_PREV && WB_PREV.r && WB_PREV.r !== "overview" && ROUTE_LABEL[WB_PREV.r] && Date.now() - WB_PREV.t > 30 * 60e3;
-    if(name === "overview" && ok && !demo && !helpQuiet()){ wbOpen = WB_PREV; wbInject(); }
-  }
-  if(name !== "overview"){ wbOpen = null; if(name !== "about" && !demo) store.set("help:last", {r:name, t:Date.now()}); }
-  clearTimeout(helpAfterRoute.t);
-  const seen = store.get("help:seen", {});
-  const direct = h === name || (!h && name === "overview");
-  if(!direct || seen[name] || demo || store.get("help:off", false) || helpQuiet() || !PAGE_TOURS[name] || (typeof tourAt !== "undefined" && tourAt >= 0)) return;
-  seen[name] = true; store.set("help:seen", seen);
-  helpAfterRoute.t = setTimeout(() => helpOffer(name), 700);
-}
+// Tours are never offered uninvited: each page explains itself, and "How this page works" replays the tour on request
+function helpAfterRoute(name, h){ helpOfferClose(); }
 
 /* ---------- plain-English terms on every page ---------- */
 // The metrics glossary plus the terms other pages use. Acronyms and names match exactly; other terms ignore case.

@@ -16,8 +16,8 @@ const AB_GROUPS = [
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal, with a suggested reply. A person makes the final call."],
     ["t-ai","chart","Transparency report","Build the report the EU Digital Services Act asks for, with a completeness check and a summary by Claude."]]]
 ];
-const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Rate maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Pre-mortem products","Risk for each product or launch"],
-  ["cover","var(--t-cv)","Map coverage","Your defenses against that risk"], ["siren","var(--t-tt)","Rehearse a crisis","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
+const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and regions, once"], ["steps","var(--t-ma)","Program maturity","Eight areas against your stage"], ["radar","var(--t-pm)","Abuse pre-mortem","Risk for each product or launch"],
+  ["cover","var(--t-cv)","Coverage radar","Your defenses against that risk"], ["siren","var(--t-tt)","Incident tabletop","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
   const versions = SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
