@@ -143,7 +143,7 @@ function asPictureHTML(empty){
   const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
   const rows = parts.slice().sort((a, b) => order(a) - order(b));
   return `<section class="card as-pic" aria-labelledby="as-pic-h">
-    <div class="as-sec-h"><h2 id="as-pic-h">Your program picture</h2>${!empty && o.score !== null ? `<span class="as-pic-a"><button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button></span>` : `<span class="note">${empty ? "Fills in as you go" : "Updates after every step"}</span>`}</div>
+    <div class="as-sec-h"><h2 id="as-pic-h">Your program picture</h2>${!empty && o.score !== null ? `<span class="as-pic-a"><button type="button" class="ov-link" data-pack="1">Leadership pack</button><button type="button" class="ov-link" data-rc="download">Download</button>${typeof revSnaps === "function" && !revSnaps().length ? `<button type="button" class="ov-link" data-rev="save" title="Keep this quarter's picture to compare next quarter">Save quarter</button>` : ""}</span>` : `<span class="note">${empty ? "Fills in as you go" : "Updates after every step"}</span>`}</div>
     <div class="as-pic-b">
       <div class="as-score"><span class="as-k">Overall</span><span class="as-big ${o.score === null ? "none" : ""}"><b class="mono">${o.score === null ? "–" : o.score}</b><small>/ 100</small></span>
         <span class="note">${o.score === null ? "Appears after step 2" : `Grade ${rcGrade(o.score)[1]} · based on ${o.graded} of ${o.total} parts${o.graded < o.total ? " so far" : ""}`}</span>
@@ -208,7 +208,7 @@ function renderOverview(){
         ${next ? "" : `<div class="card as-complete"><b>Your assessment is complete.</b><p>Share it with leadership, then work the plan. Retake any step when your products or program change.</p><a class="btn primary" href="#plan">Open your plan ${icon("arrow")}</a><button type="button" class="btn" data-pack="1">Leadership pack</button></div>${typeof nxHTML === "function" ? nxHTML() : ""}`}
         <section class="as-steps" aria-labelledby="as-steps-h"><h2 id="as-steps-h" class="as-h">Your steps</h2>${J.map((s, i) => asStepHTML(s, i, next)).join("")}</section>
       </div>
-      <div class="as-right">${asPictureHTML(false)}${asKnowHTML()}</div>
+      <div class="as-right">${asPictureHTML(false)}${typeof revHomeHTML === "function" && revSnaps().length ? revHomeHTML() : ""}${asKnowHTML()}</div>
     </div>
     ${asFootHTML()}
   </div>`;

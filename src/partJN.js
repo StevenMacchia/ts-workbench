@@ -54,6 +54,11 @@ const PACK_CSS = `
 .mxop .pk-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .mxop .pk-list{margin:0;padding-left:18px;display:grid;gap:6px;font-size:13px}
 .mxop .pk-list small{color:var(--muted)}
+.mxop .pk-since{list-style:none;padding-left:0}
+.mxop .pk-since li{padding-left:16px;position:relative}
+.mxop .pk-since li::before{content:"";position:absolute;left:0;top:6px;width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.mxop .pk-since li.up::before{background:var(--good)}
+.mxop .pk-since li.dn::before{background:var(--crit)}
 .mxop .op-st.b{background:#e6f4ec;color:var(--good)} .mxop .op-st.a{background:#e6f4ec;color:var(--good)} .mxop .op-st.c{background:#fdf5d9;color:var(--med)} .mxop .op-st.d{background:#fdf0e1;color:var(--high)} .mxop .op-st.f{background:#fbe7e8;color:var(--crit)}
 @media (max-width:640px){.mxop .pk-radars,.mxop .pk-cols{grid-template-columns:1fr}}`;
 function packInner(){
@@ -67,6 +72,9 @@ function packInner(){
     radars.push(`<div class="pk-r"><h3>Abuse risk</h3><small>Worst risk across ${pms.length} product${pms.length === 1 ? "" : "s"}</small>${riskRadarSVG([{g:comb, color:"var(--t-pm)", fill:true}], "Combined abuse risk")}</div>`); }
   if(cvOk) radars.push(`<div class="pk-r"><h3>Harm coverage</h3><small>${cs.cov}% risk-weighted · ${cs.exposed.length} exposed</small>${cvRadar(cv, false)}</div>`);
   const steps = maOk ? maRoadmap(ma).filter(s => !s.done).slice(0, 4) : [], gaps = cvOk ? cvActions(cv, 4) : [];
+  // Since the last saved quarter, when there is one and something moved
+  const snaps = typeof revSnaps === "function" ? revSnaps() : [], last = snaps[snaps.length - 1], moved = last && o.score !== null ? revDiff(last, revNow()) : [];
+  const since = moved.length ? `<div class="op-sec"><h2>Since ${esc(last.label)}</h2><ul class="pk-list pk-since">${moved.slice(0, 8).map(x => `<li class="${x.good ? "up" : "dn"}">${esc(x.t)}</li>`).join("")}</ul></div>` : "";
   const blockers = []; pms.forEach(x => assess(openRecord(x.it.data)).safeguards.filter(s => s.rank === 3 && !(x.it.data.done && x.it.data.done[s.id])).slice(0, 2).forEach(s => blockers.push([x.name, s.t])));
   return `<div class="op-h"><div><span class="op-k">Trust &amp; Safety program review</span><h1>${esc((p && p.org) || "Our program")}</h1>
       <p>${esc([orgTypeName(org.type), orgStageName(org.stage), (org.regions || []).map(r => r.toUpperCase()).join(", ")].filter(Boolean).join(" · ") || "Self-assessment")}</p></div>
@@ -74,6 +82,7 @@ function packInner(){
     <div class="op-tiles">${tile(gr ? gr[1] + " · " + o.score : "–", "Overall grade (out of 100)", gr ? gr[2] : "")}${tile(maOk ? maScore(ma).toFixed(1) : "–", "Maturity level (of 5)")}${tile(cvOk ? cs.cov + "%" : "–", "Risk-weighted coverage", cvOk && cs.exposed.length ? "crit" : "")}${tile(pt("crisis").score != null ? pt("crisis").score : "–", "Crisis readiness")}</div>
     <div class="op-sec"><h2>Report card</h2><table><thead><tr><th>Part</th><th>Score</th><th>Grade</th><th>What it's based on</th></tr></thead>
       <tbody>${parts.map(x => { const g = x.score === null ? null : rcGrade(x.score); return `<tr><td>${x.n}</td><td class="num">${g ? x.score : "–"}</td><td>${g ? `<span class="op-st ${g[1].toLowerCase()}">${g[1]}</span>` : `<span class="op-st">Not graded</span>`}</td><td>${esc(g ? x.detail : x.todo)}</td></tr>`; }).join("")}</tbody></table></div>
+    ${since}
     ${radars.length ? `<div class="pk-radars" style="grid-template-columns:repeat(${radars.length},1fr)">${radars.join("")}</div>` : ""}
     <div class="op-sec pk-cols">
       <div><h2>Top priorities</h2>${steps.length || gaps.length ? `<ol class="pk-list">${steps.map(s => `<li>${esc(s.acts.find((a, i) => !ma.done[`${s.id}-${i}`]) || s.acts[0])} <small>· ${esc(s.a.n)}, level ${s.from} → ${s.to}</small></li>`).join("")}${gaps.map(x => `<li>${esc(x.text)} <small>· coverage gap</small></li>`).join("")}</ol>` : `<p>Rate maturity and coverage to see priorities.</p>`}</div>

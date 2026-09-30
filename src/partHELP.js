@@ -164,6 +164,11 @@ const PAGE_TOURS = {
     [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA gaps in one list, sent to your tracker in one go."],
     [".pl-group", "Do first, next, later", "Tick things off here and each tool updates. Long groups fold: show all when you need them."]
   ],
+  review:[
+    [".rv-top", "Then and now", "Pick a saved quarter. The score and every part sit next to today's numbers."],
+    [".rv-what", "What changed, in words", "Areas that moved, gaps closed or opened, blockers cleared, crises rehearsed. This is the story for leadership."],
+    [".rv-rads", "Two shapes on one chart", "The dotted outline is the saved quarter, the filled shape is now."]
+  ],
   workspace:[
     [".wsprofile", "Your profile", "Your name and role, shown on your workspace and in exported files."],
     [".org-card", "Your organization", "Company type, stage and regions. Every tool uses them to pre-fill its questions."],

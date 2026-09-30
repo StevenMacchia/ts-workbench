@@ -43,6 +43,26 @@ const body = function(){
   eq(JOURNEY.every(s => s.done()), true, "every step done"); renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("complete has bad values: " + where(h));
   eq(/All 7 steps done/.test(h) && /class="card as-complete"/.test(h) && /href="#plan"/.test(h), true, "complete offers the plan and the leadership pack");
   eq(/Across 1 rehearsal, \d+% of your first calls were strong/.test(h), true, "crisis finding"); out.push("complete: leadership pack up front, a finding from every step");
+  // quarter by quarter: save the picture, change things, and the home and review page say what moved
+  eq(/data-rev="save"/.test(h), true, "the picture offers to save the quarter"); eq(/class="card as-rev"/.test(h), false, "no comparison until a quarter is saved");
+  const snap = revSave(); eq(!!snap && snap.label === REV_LABEL(Date.now()) && snap.score === rcOverall(rcParts()).score, true, "the snapshot holds the score");
+  eq(!!snap.ma && !!snap.cv && !!snap.launch && !!snap.crisis && snap.find.length > 0, true, "and every part of the picture");
+  renderOverview(); h = view.innerHTML; eq(/Nothing has moved since/.test(h) && /href="#review"/.test(h), true, "nothing moved yet");
+  // move levels both ways, and fully cover the areas that were exposed
+  ma.lv.detection = 4; ma.lv.crisis = 1; const wasBad = cvSummary(cv).rows.filter(x => x.status === "exposed" || x.status === "gap").map(x => x.a);
+  eq(wasBad.length > 0, true, "there were gaps to close"); wasBad.slice(0, 2).forEach(a => { cv.r[a.k] = {policy:3, detect:3, enforce:3, appeal:3, measure:3}; }); wasBad.slice(2).forEach(a => { cv.r[a.k] = {policy:2, detect:2, enforce:2, appeal:2, measure:2}; }); cvSave();
+  renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("since block has bad values: " + where(h));
+  eq(/Since Q\d 20\d\d/.test(h) && /Overall score \d+ → \d+ \(\+\d+\)/.test(h) && /Moved up: Detection and prevention \(level 2 → 4\)/.test(h), true, "the home says what moved");
+  eq(/Moved down: Crisis response \(level 2 → 1\)/.test(h) && new RegExp("Coverage gaps closed: " + wasBad[0].n.replace(/&/g, "&amp;")).test(h) && /No longer exposed, still a gap: /.test(h), true, "up and down, gaps closed and eased");
+  const d1 = revDiff(revSnaps()[0], revNow()); eq(d1.some(x => x.k === "part" && /Harm coverage/.test(x.t)), true, "part scores in the diff"); eq(d1.findIndex(x => x.k === "part") > d1.findIndex(x => x.k === "cv"), true, "the story before the numbers");
+  const old = revSnaps()[0]; old.t -= 95 * 864e5; old.label = "Q1 2026"; store.set("as:snaps", [old]); renderOverview(); h = view.innerHTML;
+  eq(/Since Q1 2026/.test(h) && /data-rev="save">Save Q\d 20\d\d</.test(h), true, "after a quarter it nudges you to save the next one");
+  location.hash = "#review"; renderReview(); h = view.innerHTML; if(bad(h)) throw new Error("review has bad values: " + where(h)); location.hash = "#overview";
+  eq(new RegExp(`<option value="${old.t}" selected>Q1 2026`).test(h) && /class="card rv-parts"/.test(h) && /class="card rv-what"/.test(h), true, "review compares the saved quarter with now");
+  eq(/class="cv-prev"/.test(h) && /class="ma-prev"|stroke-dasharray/.test(h), true, "both radars overlay the saved quarter"); eq(/Maturity by area/.test(h) && /2 → 4/.test(h), true, "levels by area");
+  eq(/What we knew in Q1 2026/.test(h) && new RegExp(`data-revdel="${old.t}"`).test(h), true, "the old findings and a way to delete the snapshot");
+  revDelete(old.t); eq(revSnaps().length, 0, "deleted"); renderReview(); eq(/No saved quarters yet/.test(view.innerHTML), true, "empty review invites the first save");
+  out.push("quarter by quarter: save, compare (score, parts, areas, gaps, radars), nudge after a quarter, delete");
   // All tools: every tool on its own, plus recent work
   renderTools(); h = view.innerHTML; if(bad(h)) throw new Error("all tools has bad values: " + where(h));
   eq((h.match(/class="ov-tool"/g) || []).length >= 7, true, "every tool listed"); eq(/Jump back in/.test(h) && /data-open=/.test(h), true, "recent work");
@@ -54,6 +74,6 @@ const body = function(){
   out.push("pre-mortem landing: current assessment hero and a mini radar on each saved assessment");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js"), rd("partREV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

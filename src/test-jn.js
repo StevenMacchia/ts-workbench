@@ -36,6 +36,10 @@ const body = function(){
   eq((inner.match(/class="pk-r"/g) || []).length, 3, "three radars"); eq(/Report card/.test(inner) && /Top priorities/.test(inner) && /Open launch blockers/.test(inner), true, "pack sections");
   eq(/Marketplace &amp; e-commerce · Growing · US, EU/.test(inner), true, "pack names the organization");
   const doc = packDoc(); eq(/^<!doctype html>/.test(doc) && /--t-ma:#c0308a/.test(doc), true, "standalone file with its own colors");
+  eq(/Since Q/.test(inner), false, "no quarter section until one is saved");
+  const sn = revSave(); sn.t -= 100 * 864e5; sn.label = "Q1 2026"; sn.score -= 9; sn.ma.lv.policy = Math.max(1, sn.ma.lv.policy - 1); store.set("as:snaps", [sn]);
+  const inner2 = packInner(); eq(/<h2>Since Q1 2026<\/h2>/.test(inner2) && /class="pk-list pk-since"/.test(inner2) && /Overall score \d+ → \d+/.test(inner2), true, "the pack tells leadership what moved since last quarter");
+  store.set("as:snaps", []);
   out.push("leadership pack: report card, 3 radars, priorities and blockers, printable and downloadable");
   // the program picture: grade, trend and what each step found
   store.set("rc:hist", [{d:"2026-07-01", s:40}]); renderOverview(); h = view.innerHTML;
@@ -65,6 +69,6 @@ const body = function(){
   out.push("tier 3: what changed after editing a saved pre-mortem");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partREV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

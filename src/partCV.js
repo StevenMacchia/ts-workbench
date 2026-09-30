@@ -99,7 +99,7 @@ function cvActions(d, n){
 }
 
 /* ---------- radar: risk against coverage ---------- */
-function cvRadar(d, big){
+function cvRadar(d, big, prev){
   const rows = cvRows(d), n = rows.length, W = 400, H = big ? 320 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, f = v => v.toFixed(1);
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
@@ -108,13 +108,15 @@ function cvRadar(d, big){
   const hasRisk = rows.some(x => x.riskPct !== null), anyRated = rows.some(x => x.rated);
   const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round"/>` : "";
   const cover = anyRated ? `<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="var(--t-cv)" fill-opacity=".24" stroke="var(--t-cv)" stroke-width="2.2" stroke-linejoin="round"/>` : "";
+  // a previous quarter's coverage, dotted, for the quarter-by-quarter view
+  const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--t-cv)" stroke-width="1.6" stroke-dasharray="2 4" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>` : "";
   const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);
     return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4.5 : 4}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--t-cv)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("") : "";
   const labels = rows.map((x, i) => { const [a, b] = pt(i, big ? 124 : 120), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = x.a.l.length - 1;
     const anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
     return `<text x="${f(a)}" y="${f(b)}" text-anchor="${anchor}" class="cv-rl ${x.status}">${x.a.l.map((t, j) => `<tspan x="${f(a)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
   const aria = rows.map(x => `${x.a.n}: coverage ${x.cov}%${x.riskPct !== null ? `, risk ${x.riskPct}%` : ""}`).join(". ");
-  return `<svg class="cv-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc("Risk against coverage. " + aria)}">${rings}${axes}${risk}${cover}${dots}${labels}
+  return `<svg class="cv-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc("Risk against coverage. " + aria)}">${rings}${axes}${risk}${was}${cover}${dots}${labels}
     ${!anyRated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="cv-rl none">Rate a defense to start</text>` : ""}</svg>`;
 }
 const cvLegend = d => `<div class="ma-legend cv-legend"><span><i class="cv-lg-cov"></i>Your coverage</span>${cvRisk(d) ? `<span><i class="cv-lg-risk"></i>Risk</span>` : ""}<span><i class="ma-lg-gap"></i>Risk outruns coverage</span></div>`;
