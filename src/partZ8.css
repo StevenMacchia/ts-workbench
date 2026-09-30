@@ -1523,3 +1523,5 @@ body:has(.asb) .tb-crumb{display:none}
 .gd-type b,.ma-type b{color:var(--ink);font-weight:600}
 .ma-type{margin:8px 0 12px}
 .ma-type.sm{font-size:13px;margin:8px 0 0;padding:8px 12px}
+.mxm-how-line{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap}
+.mxm-how-line .note{margin:0;max-width:70ch}

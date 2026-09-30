@@ -11,7 +11,7 @@ const AB_GROUPS = [
   ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
-  ["Measure", [["t-mx","gauge","Metrics framework","The scorecard a T&S leader brings to an executive review, tailored to platform, stage and regulation."]]],
+  ["Measure", [["t-mx","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, tailored to platform, stage and regulation, with how to measure each one."]]],
   ["AI assistants", [["t-ai","mail","Enforcement notice writer","Drafts a clear, fair notice to an actioned user, checked against what an EU statement of reasons must include."],
     ["t-ai","appeal","Appeal reviewer","A structured second opinion on an appeal, with a suggested reply. A person makes the final call."],
     ["t-ai","chart","Transparency report","Build the report the EU Digital Services Act asks for, with a completeness check and a summary by Claude."]]]

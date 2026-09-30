@@ -32,14 +32,14 @@ const body = function(){
   out.push("glossary: " + Object.keys(MX_GLOSS).length + " terms, marked once per page, HTML escaped");
   out.push("status logic: 15 cases pass (on / watch / off, higher- and lower-is-better, ranges, typed % and $ signs)");
 
-  // a fresh scorecard opens guided: platform, stage, regulation, which metrics, the period, then one metric per screen
+  // a reference, not an assessment: a fresh visit opens on the metrics; the worksheet's guided fill-in is behind its own button
   mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; mxView = null; gdReset("metrics"); renderMetrics();
-  eq(/Build the scorecard you.d bring to an executive review/.test(view.innerHTML) && /data-gd="start"/.test(view.innerHTML), true, "guided intro for a fresh scorecard");
-  eq(mxList().filter(m => m.t === "ns").every(m => mx.have[m.n]), true, "north stars pre-ticked");
-  gdGo(gdCur, "start"); eq(/What kind of platform is it\?/.test(view.innerHTML), true, "platform first"); gdPick(gdCur, "market"); eq(mx.platform, "market", "platform saved");
-  const live = gdLive(gdCur); eq(live.filter(z => /^m-/.test(z.id)).length, mxList().filter(m => mx.have[m.n]).length, "one screen per tracked metric");
-  mxView = "page"; mx.tab = "mine"; renderMetrics(); eq(/id="mx-guide"/.test(view.innerHTML), true, "the scorecard offers the guided setup");
-  out.push("guided: intro, platform first, north stars pre-ticked, " + live.filter(z => /^m-/.test(z.id)).length + " metric screens");
+  eq(/not part of the assessment/.test(view.innerHTML) && (view.innerHTML.match(/class="mxm-card/g) || []).length > 0, true, "the metrics are the front door");
+  eq(MX_TABS.map(t => t[1]).join(" · "), "The metrics · What to log · Who reviews what · Your numbers", "plain tab names, the worksheet last");
+  mx.tab = "mine"; renderMetrics(); eq(/optional worksheet/.test(view.innerHTML) && /id="mx-guide"/.test(view.innerHTML), true, "the worksheet says it's optional and offers the guided fill-in");
+  mxView = "guide"; gdReset("metrics"); renderMetrics(); eq(/data-gd="start"/.test(view.innerHTML), true, "guided fill-in on request"); eq(mxList().filter(m => m.t === "ns").every(m => mx.have[m.n]), true, "north stars pre-ticked");
+  gdGo(gdCur, "start"); gdPick(gdCur, "market"); const live = gdLive(gdCur); eq(live.filter(z => /^m-/.test(z.id)).length, mxList().filter(m => mx.have[m.n]).length, "one screen per tracked metric");
+  out.push("reference first: the metrics, then what to log and who reviews what; the worksheet is optional, with a guided fill-in");
   mxView = "page";
   let combos = 0, guides = 0, minN = 99, maxN = 0, shownNotes = 0;
   Object.keys(MX_PLATFORMS).forEach(p => ["1","2","3"].forEach(st => [true,false].forEach(reg => {
