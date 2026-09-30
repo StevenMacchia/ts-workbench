@@ -3,9 +3,9 @@
 // Each step points at a real part of the page; a step whose element isn't on screen is skipped.
 const PAGE_TOURS = {
   overview:[
-    [".as-hero-t h1", "One assessment, six steps", "Each step asks a few plain questions and adds to one picture of your program. You can stop any time and pick up later."],
+    [".as-hero-t h1", "One assessment, a few steps", "Each step asks a few plain questions and adds to one picture of your program. You can stop any time and pick up later."],
     [".as-first .as-pic", "Your program picture", "It fills in as you go: an overall score, five graded parts and three radars."],
-    [".as-six", "The six steps", "What each one gives you and how long it takes. Every tool is also under All tools, to use on its own."],
+    [".as-six", "The steps", "Chosen for your kind of platform. What each one gives you and how long it takes. Every tool is also under All tools, to use on its own."],
     [".as-head", "Where you are", "How many steps are done, and about how long the rest will take."],
     [".as-steps", "Your steps", "Finished steps show what they found. The next one is highlighted, and you can start any step early."],
     [".as-grid .as-pic", "Your program picture", "The overall score, each graded part and three radars. Click any of them to open that tool."],
@@ -43,6 +43,10 @@ const PAGE_TOURS = {
     [".ttf-debrief .verdict", "The after-action report", "How the team did, the actions you captured, and a report to download or send to your tracker."]
   ],
   metrics:[
+    [".gd-intro h1", "One question at a time", "Your platform and stage, the metrics you will track, then this period's numbers one metric at a time. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The list reorders so the metrics that matter most come first."],
     [".mx-tabs", "Four views", "Metrics is the framework. My scorecard holds your own numbers, trends and a one-pager for leadership. Data to log and Running the program cover the practical side."],
     [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."],
@@ -57,6 +61,10 @@ const PAGE_TOURS = {
     [".mx-rgrid", "Put every metric on a calendar", "Which meeting should look at which metric, and how often."]
   ],
   vendors:[
+    [".gd-intro h1", "One question at a time", "What matters, your shortlist, then one criterion at a time with the ranking beside it. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".vd-weights", "Say what matters", "Set how much each criterion counts, or start from a preset. Weights add up to 100."],
     [".vd-names", "Name your vendors", "Compare two to four vendors side by side."],
     [".vd-crit", "Score with a rubric", "Rate each vendor from 1 to 5. The rubric says what each score looks like, and the RFP questions tell you what to ask first."],
@@ -96,6 +104,10 @@ const PAGE_TOURS = {
     [".vd-main > .mxa-part:last-of-type", "Close the biggest gaps", "The gaps in order, with the next step for each."]
   ],
   policy:[
+    [".gd-intro h1", "One question at a time", "Your rule first, then your platform and what worries you. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".pol-card", "Your rule", "Paste the policy rule you want to test, or start from one of the examples."],
     [".pol-co", "Your platform", "Add your company or product and what it does, so the test fits how people use it."],
     [".pol-runbar", "Run the test", "Instant checks run in your browser straight away. Claude's review, where available, adds edge cases, gaps, enforcement risks and a rewrite."],
@@ -107,16 +119,28 @@ const PAGE_TOURS = {
     ["#pol-tabs", "The findings", "Edge cases and how a team should decide them, words reviewers will read differently, a rewrite, and what your team still needs to decide."]
   ],
   notice:[
+    [".gd-intro h1", "One question at a time", "Each detail of the decision on its own screen, then Claude drafts the notice. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".ai-form", "Describe the case", "Fill in what happened and what you decided. “Fill in an example” shows the kind of detail that helps."],
     [".ai-act", "Draft the notice", "Claude drafts it on your own Claude account, only when you click. You can see an example result first."],
     [".ai-about", "How this works", "What the assistant does, what it checks, and what stays with a person."]
   ],
   appeal:[
+    [".gd-intro h1", "One question at a time", "The decision, the rule and the appeal on their own screens, then Claude reviews it. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".ai-form", "Describe the appeal", "Add the rule that was applied, the original decision, the content and what the user said."],
     [".ai-act", "Review it", "Claude reviews it on your own Claude account, only when you click. You can see an example result first."],
     [".ai-about", "How this works", "What the assistant checks, and why a person still makes the final call."]
   ],
   transparency:[
+    [".gd-intro h1", "One question at a time", "Your service and tier, then one section of the report per screen. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".pol-card", "Your service", "Name the service and choose what kind it is under the DSA. The sections you need depend on it."],
     [".pol-setup > .pol-card:nth-of-type(2)", "Fill in each section", "Each section maps to an article of the DSA and asks only for the numbers it requires."],
     [".pol-runbar", "Check and build", "The meter shows what's still missing. Build the report when you're ready, with a checklist and a summary."],
@@ -124,6 +148,10 @@ const PAGE_TOURS = {
     [".tr-report .pol-tabs", "Three views", "The report as readers will see it, a checklist of what the DSA asks for, and a summary Claude writes from your numbers only."]
   ],
   coppa:[
+    [".gd-intro h1", "One question at a time", "Who the service is for, what you collect and what you have in place, only the questions that apply. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".cp-aud", "Who it's for", "Start with your audience. It decides whether COPPA applies to every user, to users under 13, or only to the children you know about."],
     ["#cp-s-data", "Map children's data", "Mark each kind of personal information you collect, including what third-party SDKs collect through you, then why, who gets it and how long you keep it."],
     ["#cp-s-ctrl", "What you have in place", "Tick what's true today. Only the requirements that apply to your answers are shown."],
@@ -131,6 +159,10 @@ const PAGE_TOURS = {
     [".cp-report .pol-sum", "Where you stand", "Whether COPPA applies to you, how ready you are, and how many critical gaps are left."],
     [".cp-report .pol-tabs", "Plan, data, drafts and requirements", "Your gaps in order, your data map, four drafts to edit, and every requirement that applies to your answers."],
     [".cp-gaps", "Close the gaps", "Each gap names the part of the Rule, who usually owns it and what to do. Mark it done once it's fixed."]
+  ],
+  plan:[
+    [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA gaps in one list, sent to your tracker in one go."],
+    [".pl-group", "Do first, next, later", "Tick things off here and each tool updates. Long groups fold: show all when you need them."]
   ],
   workspace:[
     [".wsprofile", "Your profile", "Your name and role, shown on your workspace and in exported files."],

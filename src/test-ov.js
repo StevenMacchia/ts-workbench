@@ -36,8 +36,12 @@ const body = function(){
   renderOverview(); eq(/since you last looked/.test(view.innerHTML), false, "the note shows once");
   // complete: the steps give way to the leadership pack and the week's work
   store.set("tt:progress", {[ttKey(0, "social")]:{best:3, last:Date.now()}}); store.set("tk:used", true);
+  // EU users: the assessment grew a transparency step; a youth platform would get a COPPA step too
+  eq(JOURNEY.map(s => s.k).join(","), "setup,maturity,premortem,coverage,crisis,transparency,act", "the steps follow the profile");
+  orgSet({youth:"teens"}); eq(JOURNEY.some(s => s.k === "coppa"), true, "a teen platform gets a COPPA step"); orgSet({youth:"adult_verified"}); eq(JOURNEY.some(s => s.k === "coppa"), false, "an adults-only one doesn't");
+  eq(JOURNEY.every(s => s.done()), false, "the transparency step is still open"); wsPut({id:"TR-1", kind:"transparency", title:"Transparency report 2025", data:{org:"Test"}});
   eq(JOURNEY.every(s => s.done()), true, "every step done"); renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("complete has bad values: " + where(h));
-  eq(/All 6 steps done/.test(h) && /class="card as-complete"/.test(h) && /data-pack="1"/.test(h), true, "complete offers the leadership pack");
+  eq(/All 7 steps done/.test(h) && /class="card as-complete"/.test(h) && /href="#plan"/.test(h), true, "complete offers the plan and the leadership pack");
   eq(/Across 1 rehearsal, \d+% of your first calls were strong/.test(h), true, "crisis finding"); out.push("complete: leadership pack up front, a finding from every step");
   // All tools: every tool on its own, plus recent work
   renderTools(); h = view.innerHTML; if(bad(h)) throw new Error("all tools has bad values: " + where(h));

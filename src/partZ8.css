@@ -1507,3 +1507,19 @@ body:has(.asb) .tb-crumb{display:none}
 .gd-mx .input{font-size:16px;padding:11px 12px}
 @media (max-width:640px){.gd-mx{grid-template-columns:1fr}}
 .gd-mx-st{display:flex;align-items:center;gap:10px;margin:12px 0 0}
+
+/* ---------- Your plan ---------- */
+.pl-head{display:grid;gap:12px;max-width:760px;margin-bottom:8px}
+.pl-head h1{font-size:clamp(28px,3.2vw,38px)}
+.pl-group{margin-top:22px}
+.pl-group .as-sec-h h2{display:flex;align-items:center;gap:8px}
+.pl-i.done .nx-t b{text-decoration:line-through;color:var(--muted)}
+.as-complete .btn + .btn{margin-left:8px}
+.as-complete > .btn,.as-complete > a.btn{justify-self:start}
+.pl-more{display:flex;justify-content:center;padding:10px 0 4px}
+
+/* what an area or harm means on your kind of platform */
+.gd-type,.ma-type{margin:-6px 0 4px;padding:10px 14px;border-radius:10px;background:var(--surface-2);font-size:14px;line-height:1.5;color:var(--muted)}
+.gd-type b,.ma-type b{color:var(--ink);font-weight:600}
+.ma-type{margin:8px 0 12px}
+.ma-type.sm{font-size:13px;margin:8px 0 0;padding:8px 12px}

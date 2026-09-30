@@ -82,6 +82,9 @@ const body = function(){
   CV_AREAS.forEach(a => cvSetOff(a.k, true)); eq(cvAreas(cv).length, 3, "at least three stay"); eq(/aria-disabled="true"/.test(cvMatrixHTML()), true, "trash disabled at three");
   CV_AREAS.forEach(a => cvSetOff(a.k, false)); eq(cvSummary(cv).rows.length, 8, "all restored");
   eq(cvHarm(CV_AREAS.find(a => a.k === "ai")), "AI misuse", "acronyms keep their capitals"); cvView = null;
+  // the questions use the words of your kind of platform
+  orgSet({type:"marketplace"}); eq(/scam listings/.test(cvNoun(CV_AREAS.find(a => a.k === "fraud"))), true, "a marketplace is asked about scam listings"); eq(/scam listings/.test(CV_Q.detect.q(CV_AREAS.find(a => a.k === "fraud"))), true, "and the question says so");
+  orgSet({type:"dating"}); eq(/romance scams/.test(cvNoun(CV_AREAS.find(a => a.k === "fraud"))), true, "a dating app about romance scams"); orgSet({type:null}); eq(cvNoun(CV_AREAS.find(a => a.k === "fraud")), "fraud and scams", "no type: the plain noun");
   out.push(`not relevant: removed from the profile or the radar, grade ${s2.cov}% → ${s3.cov}% without ${risky.a.n.toLowerCase()}, at least three stay, examples unaffected`);
   // exports: markdown, tasks, workspace, overview, search
   cv = JSON.parse(JSON.stringify(CV_EXAMPLE));
@@ -94,6 +97,6 @@ const body = function(){
   out.push(`exports: markdown, ${tasks.length} tracker tasks, workspace (${msg}), search and overview`);
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partTK.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partTYPE.js"), rd("partCV.js"), rd("partOV.js"), rd("partTK.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

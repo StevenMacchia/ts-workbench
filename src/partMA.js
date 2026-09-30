@@ -127,6 +127,7 @@ function maAreasHTML(){
     return `<div class="card ma-area open" id="ma-a-${a.k}">${headRow}
       <div class="ma-body" id="ma-b-${a.k}">
         <p class="ma-whyline">${mxGloss(a.why, seen)}</p>
+        ${typeof typeArea === "function" && typeArea(a.k) ? `<p class="ma-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(a.k))}</p>` : ""}
         <p class="ma-hint">Pick the highest level where every statement is true today.</p>
         <div class="ma-opts" role="radiogroup" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" role="radio" aria-checked="${lv === j + 1}" class="ma-opt ${lv === j + 1 ? "on" : ""}" data-k="${a.k}" data-n="${j + 1}">
           <span class="ma-on">${j + 1}</span><span class="ma-ot"><span class="ma-oh"><b>${MA_LEVELS[j].n}</b>${t[a.k] === j + 1 ? `<span class="ma-tg">Target</span>` : ""}</span><span>${mxGloss(txt, seen)}</span></span></button>`).join("")}</div>
@@ -173,6 +174,7 @@ function maRoadmapHTML(){
       <div class="ma-step-h"><b>${esc(s.a.n)}</b><span class="ma-lvl">Level ${s.from} → ${s.to}</span></div>
       <span class="ma-step-to">${s.done ? `<span class="ma-reached"><svg><use href="#i-check"/></svg>Level ${s.to} reached</span>` : `Reach <b>${MA_LEVELS[s.to - 1].n.toLowerCase()}</b>`}</span>
       <ul class="ma-check">${s.acts.map((x, i) => maItemHTML(s.id, i, x, seen)).join("")}</ul>
+      ${typeof typeArea === "function" && typeArea(s.a.k) && !s.done ? `<p class="ma-type sm">${esc(typeArea(s.a.k))}</p>` : ""}
       ${plan ? `<div class="ma-step-meta"><span class="ma-own" title="Area owner">${ma.own[s.a.k] ? esc(ma.own[s.a.k]) : `<button type="button" class="ma-link" data-matab="areas" data-masel="${s.a.k}">Add an owner</button>`}</span></div>` : ""}
       ${s.a.tool ? `<a class="ma-tool" href="#${s.a.tool[0]}">${esc(s.a.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</article>`;
   return more + `<div class="ma-road">${MA_PHASES.map(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return "";
@@ -208,6 +210,7 @@ function maAreaTabHTML(){
       <header class="ma-ad-h"><div><h4>${esc(sel.n)}</h4><p class="ma-ad-q">${esc(sel.q)}</p></div>
         <span class="ma-chip ${now < t[sel.k] ? "gap" : "ok"}">Level ${now} · ${MA_LEVELS[now - 1].n}</span></header>
       <p class="ma-whyline">${mxGloss(sel.why, seen)}</p>
+      ${typeof typeArea === "function" && typeArea(sel.k) ? `<p class="ma-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(sel.k))}</p>` : ""}
       <div class="ma-ad-meta"><label class="field"><span>Owner</span><input class="input" data-maown="${sel.k}" value="${esc(ma.own[sel.k] || "")}" placeholder="Who is accountable, e.g. Head of Trust & Safety Operations"></label>
         ${sel.tool ? `<a class="ma-tool" href="#${sel.tool[0]}">${esc(sel.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</div>
       <ol class="ma-ladder">${ladder}</ol>
@@ -331,6 +334,7 @@ function maQHTML(){
       <div class="gd-crumb"><span class="gd-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Area ${i + 1} of ${MA_AREAS.length}</span></div>
       <h1>${esc(a.q)}</h1>
       <p class="gd-why">${esc(a.why)} Pick the highest level where every statement is true today.</p>
+      ${typeof typeArea === "function" && typeArea(a.k) ? `<p class="gd-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(a.k))}</p>` : ""}
       <div class="gd-opts" role="group" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" class="gd-opt ${lv === j + 1 ? "on" : ""}" data-magpick="${j + 1}" aria-pressed="${lv === j + 1}">
         <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><span class="gd-lvh"><span class="gd-lv lm">${j + 1} · ${MA_LEVELS[j].n}</span>${t[a.k] === j + 1 ? `<span class="ma-tg">Your target</span>` : ""}</span><span>${esc(txt)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
       <div class="gd-foot"><button type="button" class="btn" data-mag="back">Back</button><span class="note">Pick the closest, or press 1 to 5. You can change it later.</span></div>

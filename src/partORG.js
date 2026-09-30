@@ -17,7 +17,7 @@ const ORG_MAP = {
 Object.assign(MX_PLATFORMS, {social:"Social media & video", market:"Marketplace & e-commerce", genai:"Generative AI"});
 Object.assign(MX_STAGE, {"1":"Early stage", "2":"Growing", "3":"At scale or regulated"});
 const orgGet = () => store.get("ws:org", null) || {};
-const orgSet = o => store.set("ws:org", Object.assign({}, orgGet(), o));
+const orgSet = o => { store.set("ws:org", Object.assign({}, orgGet(), o)); if(typeof jnSync === "function") jnSync(); };
 const orgReady = () => { const o = orgGet(); return !!(o.type && o.stage); };
 const orgTypeName = k => (ORG_TYPES.find(t => t.k === k) || {n:""}).n;
 const orgStageName = k => (ORG_STAGES.find(s => s.k === k) || {n:""}).n;

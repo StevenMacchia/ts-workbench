@@ -19,16 +19,17 @@ const body = function(){
   MA_AREAS.forEach(a => ma.lv[a.k] = 2); eq(jnNext().k, "premortem", "then a pre-mortem");
   pm = orgPrefillPM(blankPM()); eq(pm.type, "marketplace", "pre-mortem pre-filled"); pm.name = "Resale chat"; saveToLib(); eq(jnNext().k, "coverage", "then coverage");
   CV_AREAS.forEach(a => { cv.r[a.k] = {}; CV_LAYERS.forEach(l => cv.r[a.k][l.k] = 1); }); eq(jnNext().k, "crisis", "then a crisis");
-  store.set("tt:progress", {[ttKey(0, "marketplace")]:{best:3, runs:1}}); eq(jnNext().k, "act", "then act on it");
-  eq(JOURNEY.filter(s => s.done()).length, 5, "five of six done");
+  store.set("tt:progress", {[ttKey(0, "marketplace")]:{best:3, runs:1}}); eq(jnNext().k, "transparency", "EU users: then the transparency report");
+  wsPut({id:"TR-1", kind:"transparency", title:"Transparency report 2025", data:{org:"Resale"}}); eq(jnNext().k, "act", "then act on it");
+  eq(JOURNEY.filter(s => s.done()).length, 6, "six of seven done");
   out.push("review: setup, maturity, pre-mortem, coverage, crisis, act, completing in order");
   // hand-offs name the next step, or offer the pack when done
   eq(/Turn gaps into a plan/.test(journeyNextHTML("crisis")), true, "tabletop hands off to the tracker step");
   renderMaturity(); h = view.innerHTML; eq(/Next in your program review/.test(h), true, "maturity plan hands off");
-  renderCoverage(); eq(/Back to your assessment/.test(view.innerHTML) && /Step 4 of 6/.test(view.innerHTML), true, "coverage returns to the assessment");
+  renderCoverage(); eq(/Back to your assessment/.test(view.innerHTML) && /Step 4 of [0-9]/.test(view.innerHTML), true, "coverage returns to the assessment");
   store.set("tk:used", true); eq(jnNext(), undefined, "all done");
   eq(/Leadership pack/.test(journeyNextHTML("coverage")), true, "complete review offers the pack");
-  renderOverview(); h = view.innerHTML; eq(/All 6 steps done/.test(h) && /class="card as-complete"/.test(h), true, "a finished assessment offers the pack first");
+  renderOverview(); h = view.innerHTML; eq(/All 7 steps done/.test(h) && /class="card as-complete"/.test(h), true, "a finished assessment offers the plan first");
   out.push("hand-offs: maturity, coverage and tabletop point to the next step; a finished review offers the leadership pack");
   // leadership pack: report card, radars and priorities, as a page and a standalone file
   const inner = packInner(); if(bad(inner)) throw new Error("pack has bad values: " + where(inner));

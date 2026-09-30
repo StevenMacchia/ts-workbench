@@ -4,16 +4,24 @@
    ========================================================= */
 // Setup counts once confirmed; workspaces set up before the confirm button existed count if any later step is done
 const orgConfirmed = () => orgReady() && (!!orgGet().confirmed || JOURNEY.slice(1).some(s => s.done()));
-const JOURNEY = [
+// Every step the assessment can have. A step with `when` appears only when the profile calls for it
+const JOURNEY_ALL = [
   {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
   {k:"maturity", n:"Program maturity", d:"Rate eight areas, about five minutes", min:5, get:"Rate eight areas of your program and get a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
   {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"See how a product could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
   {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"See whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
+  {k:"coppa", n:"COPPA readiness", d:"Children's privacy, about six minutes", min:6, get:"Whether COPPA applies to you, the gaps against the amended Rule, and drafts for parents and Legal.", icon:"coppa", c:"var(--t-cp)", route:"coppa",
+    when:() => ["kids", "teens"].includes(orgGet().youth), done:() => (typeof cp !== "undefined" && cp.view === "report" && !!cp.aud && !cp.ex) || Object.values(wsItems()).some(it => it.kind === "coppa")},
   {k:"crisis", n:"Incident tabletop", d:"Rehearse one crisis, about eight minutes", min:8, get:"Rehearse one realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
-  {k:"act", n:"Turn gaps into a plan", d:"Send your roadmap or gaps to your tracker", min:2, get:"Your roadmap and biggest gaps, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"maturity",
-    go:() => { const src = MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex && maRoadmap(ma).length ? "maturity" : !cv.ex && cvActions(cv).length ? "coverage" : null; goRoute(src || "maturity"); if(src) setTimeout(() => tkOpen(src), 60); }, done:() => !!store.get("tk:used", false)}
+  {k:"transparency", n:"Transparency report", d:"The DSA report, about fifteen minutes", min:15, get:"The transparency report the EU asks for, with a check of what's missing.", icon:"chart", c:"var(--t-ai)", route:"transparency",
+    when:() => (orgGet().regions || []).some(r => r === "eu" || r === "uk"), done:() => (typeof tr !== "undefined" && tr.view === "report" && !!tr.org) || Object.values(wsItems()).some(it => it.kind === "transparency")},
+  {k:"act", n:"Turn gaps into a plan", d:"One plan from every step, sent to your tracker", min:2, get:"One prioritized plan from every step: launch blockers, coverage gaps and your roadmap, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"plan", done:() => !!store.get("tk:used", false)}
 ];
+const JOURNEY = [];
+// Rebuild the steps from the profile. Called at load and whenever the profile changes
+function jnSync(){ JOURNEY.length = 0; JOURNEY_ALL.filter(s => { try{ return !s.when || s.when(); }catch(e){ return false; } }).forEach(s => JOURNEY.push(s)); return JOURNEY; }
+jnSync();
 const jnNext = skip => JOURNEY.find(s => s.k !== skip && !s.done());
 function jnGo(k){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
   if(k === "maturity" && ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }

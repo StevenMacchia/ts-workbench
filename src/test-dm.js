@@ -12,7 +12,7 @@ const body = function(){
   const pms = Object.values(wsItems()).filter(i => i.kind === "premortem").map(i => i.title).sort().join(", ");
   eq(pms, "Pixelry Creator Subscriptions, Pixelry Market, Pixelry app", "three Pixelry products");
   const parts = rcParts(); eq(parts.every(p => p.score !== null), true, "every report card part is graded: " + parts.map(p => p.k + "=" + p.score).join(" "));
-  eq(JOURNEY.filter(s => s.done()).length, 5, "five of six review steps done"); eq(jnNext().k, "act", "next step is sending gaps to a tracker");
+  eq(JOURNEY.filter(s => s.done()).length, 6, "six of seven review steps done (Pixelry has EU users, so it gets a transparency step)"); eq(jnNext().k, "act", "next step is the plan");
   const xs = nxItems(); eq(xs.some(x => x.kind === "maturity" && !!x.tick), true, "roadmap items in the next moves"); eq(xs.some(x => x.kind === "premortem"), true, "launch blockers in the next moves");
   out.push("demo data: " + pms + " · grade " + rcOverall(parts).score + "/100 · " + xs.length + " next moves");
   renderOverview(); const h = view.innerHTML; if(bad(h)) throw new Error("demo overview has bad values: " + where(h));

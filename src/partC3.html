@@ -83,7 +83,7 @@ const HEAD_META = () => {
   return {icon:m[0], stats};
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
-const HEAD_GROUP = {maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const HEAD_GROUP = {plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
 const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };

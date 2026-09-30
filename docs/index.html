@@ -3447,6 +3447,22 @@ body:has(.asb) .tb-crumb{display:none}
 .gd-mx .input{font-size:16px;padding:11px 12px}
 @media (max-width:640px){.gd-mx{grid-template-columns:1fr}}
 .gd-mx-st{display:flex;align-items:center;gap:10px;margin:12px 0 0}
+
+/* ---------- Your plan ---------- */
+.pl-head{display:grid;gap:12px;max-width:760px;margin-bottom:8px}
+.pl-head h1{font-size:clamp(28px,3.2vw,38px)}
+.pl-group{margin-top:22px}
+.pl-group .as-sec-h h2{display:flex;align-items:center;gap:8px}
+.pl-i.done .nx-t b{text-decoration:line-through;color:var(--muted)}
+.as-complete .btn + .btn{margin-left:8px}
+.as-complete > .btn,.as-complete > a.btn{justify-self:start}
+.pl-more{display:flex;justify-content:center;padding:10px 0 4px}
+
+/* what an area or harm means on your kind of platform */
+.gd-type,.ma-type{margin:-6px 0 4px;padding:10px 14px;border-radius:10px;background:var(--surface-2);font-size:14px;line-height:1.5;color:var(--muted)}
+.gd-type b,.ma-type b{color:var(--ink);font-weight:600}
+.ma-type{margin:8px 0 12px}
+.ma-type.sm{font-size:13px;margin:8px 0 0;padding:8px 12px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -3633,7 +3649,7 @@ const HEAD_META = () => {
   return {icon:m[0], stats};
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
-const HEAD_GROUP = {maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const HEAD_GROUP = {plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
 const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };
@@ -9026,7 +9042,7 @@ function pmProjectSelect(){
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
 const TOOL_COLOR = {coppa:"var(--t-cp)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -9080,7 +9096,7 @@ function shellUpdate(name){
 function cmdkItems(){
   const out = [];
   const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, icon:iconId, run:()=>goRoute(route)});
-  go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("My workspace","workspace","var(--faint)","user");
+  go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("Your plan","plan","var(--accent)","send"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
@@ -9203,7 +9219,7 @@ function ovChip(it){
 }
 /* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
 const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
-  coverage:"Next, you'll see whether your defenses keep up with these risks.", crisis:"Next, you'll see how your team would handle a real incident."};
+  coverage:"Next, you'll see whether your defenses keep up with these risks.", coppa:"Next, you'll see whether COPPA applies to you and where the gaps are.", crisis:"Next, you'll see how your team would handle a real incident.", transparency:"Next, you'll build the transparency report the EU asks for."};
 const AS_PART_STEP = {maturity:"maturity", coverage:"coverage", launch:"premortem", crisis:"crisis"};
 const asLow = t => /^[A-Z][a-z]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
 const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
@@ -9217,6 +9233,8 @@ function asSum(k){
     if(k === "coverage"){ const s = cvSummary(cv); return s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? "" : "s"} exposed` : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " with a gap" : "s with gaps"}` : "No gaps against your risk"; }
     if(k === "crisis"){ const n = Object.keys(ttProgress()).length; return `${n} scenario${n === 1 ? "" : "s"} rehearsed`; }
     if(k === "act") return "Sent to your tracker";
+    if(k === "coppa"){ const s = cpScore(cp, cpCtx(cp), cpApplies(cp)); return `${s.pct}% ready · ${s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : "no critical gaps"}`; }
+    if(k === "transparency"){ const p = trProgress(); return `${p.got} of ${p.total} sections filled in for ${tr.year}`; }
   }catch(e){}
   return "";
 }
@@ -9230,9 +9248,14 @@ function asKnow(){
       out.push({tag:"Pre-mortem", c:"var(--t-pm)", t:hit ? `Before launch, ${hit.p.name} still needs ${asLow(hit.s.t.replace(/\.$/, ""))}.` : "Every launch blocker is done across your products."}); }
     if(isDone("coverage")){ const a = cvActions(cv, 1)[0];
       out.push({tag:"Coverage", c:"var(--t-cv)", t:a ? `${a.row.a.n} carries ${a.row.band ? BANDS[a.row.band][0].toLowerCase() + " " : ""}risk with ${a.row.cov}% coverage. Start with ${a.layer.n.toLowerCase()}.` : "Your coverage keeps pace with the risk in every harm area."}); }
+    if(isDone("coppa") && typeof cpScore === "function"){ const s = cpScore(cp, cpCtx(cp), cpApplies(cp)), g = s.gaps[0];
+      out.push({tag:"COPPA", c:"var(--t-cp)", t:g ? `${cpApplies(cp).h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))}.` : `${cpApplies(cp).h}, and every requirement that applies is in place.`}); }
+    if(isDone("transparency") && typeof trProgress === "function"){ const p = trProgress();
+      out.push({tag:"Transparency", c:"var(--t-ai)", t:p.missing.length ? `Your ${tr.year} report is missing ${p.missing.length} section${p.missing.length === 1 ? "" : "s"}, starting with ${p.missing[0].n.toLowerCase()}.` : `Your ${tr.year} transparency report has every section the DSA asks for.`}); }
     if(isDone("crisis")){ const runs = Object.entries(ttProgress()).map(([key, p]) => { const sc = SCENARIOS.find(s => s.id === key.split(":")[0]); return sc ? (p.best || 0) / sc.steps.length : null; }).filter(x => x !== null);
       if(runs.length) out.push({tag:"Crisis", c:"var(--t-tt)", t:`Across ${runs.length} rehearsal${runs.length === 1 ? "" : "s"}, ${Math.round(runs.reduce((s, x) => s + x, 0) / runs.length * 100)}% of your first calls were strong.`}); }
   }catch(e){}
+  if(!isDone("maturity") && typeof TYPE_TIP !== "undefined" && TYPE_TIP[typeKey()]) out.push({tag:"Your type", c:"var(--faint)", t:TYPE_TIP[typeKey()], muted:true});
   const nx = J.find(s => !s.done() && AS_NEXT_LINE[s.k]);
   if(nx) out.push({tag:"Coming up", c:"var(--faint)", t:AS_NEXT_LINE[nx.k], muted:true});
   return out;
@@ -9304,14 +9327,14 @@ function asWelcomeHTML(J){
       <div class="as-hero-t">
         <span class="as-eb">Free · no account · about ${Math.round(total / 5) * 5} minutes</span>
         <h1>See where your Trust &amp; Safety program stands</h1>
-        <p>Six guided steps. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
+        <p>${J.length === 6 ? "Six" : J.length === 7 ? "Seven" : "Eight"} guided steps, chosen for your kind of platform. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
       ${asPictureHTML(true)}
     </section>
     <section class="rise" aria-labelledby="as-six-h">
-      <div class="as-sec-h"><h2 id="as-six-h">The six steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
+      <div class="as-sec-h"><h2 id="as-six-h">The ${J.length === 6 ? "six" : J.length === 7 ? "seven" : "eight"} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
     </section>
     ${asFootHTML()}
@@ -9333,7 +9356,7 @@ function renderOverview(){
     </section>
     <div class="as-grid">
       <div class="as-left">
-        ${next ? "" : `<div class="card as-complete"><b>Your assessment is complete.</b><p>Share it with leadership, then work the plan. Retake any step when your products or program change.</p><button type="button" class="btn primary" data-pack="1">Leadership pack</button></div>${typeof nxHTML === "function" ? nxHTML() : ""}`}
+        ${next ? "" : `<div class="card as-complete"><b>Your assessment is complete.</b><p>Share it with leadership, then work the plan. Retake any step when your products or program change.</p><a class="btn primary" href="#plan">Open your plan ${icon("arrow")}</a><button type="button" class="btn" data-pack="1">Leadership pack</button></div>${typeof nxHTML === "function" ? nxHTML() : ""}`}
         <section class="as-steps" aria-labelledby="as-steps-h"><h2 id="as-steps-h" class="as-h">Your steps</h2>${J.map((s, i) => asStepHTML(s, i, next)).join("")}</section>
       </div>
       <div class="as-right">${asPictureHTML(false)}${asKnowHTML()}</div>
@@ -9391,7 +9414,7 @@ const asInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s =
 // Where this step sits in the assessment, or just this tool when someone uses it on its own.
 // A tool that isn't one of the six steps (the policy test) shows as the optional part
 function asStepBar(k, pct, help){
-  k = k === "tabletop" ? "crisis" : k;
+  k = k === "tabletop" ? "crisis" : k === "plan" ? "act" : k;
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === k), inAs = asInAssessment() && (i >= 0 || k === "policy");
   const name = i >= 0 ? J[i].n : (typeof ROUTE_LABEL !== "undefined" && ROUTE_LABEL[k]) || "", seq = inAs && i >= 0;
   return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${AS_BACK}${inAs ? "Your assessment" : "All tools"}</a>
@@ -9409,6 +9432,8 @@ function asRoutePct(r){
     if(r === "policy") return pol.heur && pol.view !== "setup" ? 100 : 0;
     if(r === "maturity") return maAllRated(ma) ? 100 : Math.round(MA_AREAS.filter(a => ma.lv[a.k]).length / MA_AREAS.length * 100);
     if(r === "coverage"){ const s = cvSummary(cv); return Math.round(s.rated / Math.max(1, s.total) * 100); }
+    if(r === "coppa") return cp.view === "report" && cp.aud ? 100 : cp.aud ? 50 : 0;
+    if(r === "transparency") return tr.view === "report" ? 100 : Math.round(trProgress().pct / 2);
   }catch(e){}
   return null;
 }
@@ -10798,6 +10823,7 @@ function maAreasHTML(){
     return `<div class="card ma-area open" id="ma-a-${a.k}">${headRow}
       <div class="ma-body" id="ma-b-${a.k}">
         <p class="ma-whyline">${mxGloss(a.why, seen)}</p>
+        ${typeof typeArea === "function" && typeArea(a.k) ? `<p class="ma-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(a.k))}</p>` : ""}
         <p class="ma-hint">Pick the highest level where every statement is true today.</p>
         <div class="ma-opts" role="radiogroup" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" role="radio" aria-checked="${lv === j + 1}" class="ma-opt ${lv === j + 1 ? "on" : ""}" data-k="${a.k}" data-n="${j + 1}">
           <span class="ma-on">${j + 1}</span><span class="ma-ot"><span class="ma-oh"><b>${MA_LEVELS[j].n}</b>${t[a.k] === j + 1 ? `<span class="ma-tg">Target</span>` : ""}</span><span>${mxGloss(txt, seen)}</span></span></button>`).join("")}</div>
@@ -10844,6 +10870,7 @@ function maRoadmapHTML(){
       <div class="ma-step-h"><b>${esc(s.a.n)}</b><span class="ma-lvl">Level ${s.from} → ${s.to}</span></div>
       <span class="ma-step-to">${s.done ? `<span class="ma-reached"><svg><use href="#i-check"/></svg>Level ${s.to} reached</span>` : `Reach <b>${MA_LEVELS[s.to - 1].n.toLowerCase()}</b>`}</span>
       <ul class="ma-check">${s.acts.map((x, i) => maItemHTML(s.id, i, x, seen)).join("")}</ul>
+      ${typeof typeArea === "function" && typeArea(s.a.k) && !s.done ? `<p class="ma-type sm">${esc(typeArea(s.a.k))}</p>` : ""}
       ${plan ? `<div class="ma-step-meta"><span class="ma-own" title="Area owner">${ma.own[s.a.k] ? esc(ma.own[s.a.k]) : `<button type="button" class="ma-link" data-matab="areas" data-masel="${s.a.k}">Add an owner</button>`}</span></div>` : ""}
       ${s.a.tool ? `<a class="ma-tool" href="#${s.a.tool[0]}">${esc(s.a.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</article>`;
   return more + `<div class="ma-road">${MA_PHASES.map(([k, n, when]) => { const xs = steps.filter(s => s.phase === k); if(!xs.length) return "";
@@ -10879,6 +10906,7 @@ function maAreaTabHTML(){
       <header class="ma-ad-h"><div><h4>${esc(sel.n)}</h4><p class="ma-ad-q">${esc(sel.q)}</p></div>
         <span class="ma-chip ${now < t[sel.k] ? "gap" : "ok"}">Level ${now} · ${MA_LEVELS[now - 1].n}</span></header>
       <p class="ma-whyline">${mxGloss(sel.why, seen)}</p>
+      ${typeof typeArea === "function" && typeArea(sel.k) ? `<p class="ma-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(sel.k))}</p>` : ""}
       <div class="ma-ad-meta"><label class="field"><span>Owner</span><input class="input" data-maown="${sel.k}" value="${esc(ma.own[sel.k] || "")}" placeholder="Who is accountable, e.g. Head of Trust & Safety Operations"></label>
         ${sel.tool ? `<a class="ma-tool" href="#${sel.tool[0]}">${esc(sel.tool[1])}<svg><use href="#i-arrow"/></svg></a>` : ""}</div>
       <ol class="ma-ladder">${ladder}</ol>
@@ -11002,6 +11030,7 @@ function maQHTML(){
       <div class="gd-crumb"><span class="gd-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Area ${i + 1} of ${MA_AREAS.length}</span></div>
       <h1>${esc(a.q)}</h1>
       <p class="gd-why">${esc(a.why)} Pick the highest level where every statement is true today.</p>
+      ${typeof typeArea === "function" && typeArea(a.k) ? `<p class="gd-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(a.k))}</p>` : ""}
       <div class="gd-opts" role="group" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" class="gd-opt ${lv === j + 1 ? "on" : ""}" data-magpick="${j + 1}" aria-pressed="${lv === j + 1}">
         <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><span class="gd-lvh"><span class="gd-lv lm">${j + 1} · ${MA_LEVELS[j].n}</span>${t[a.k] === j + 1 ? `<span class="ma-tg">Your target</span>` : ""}</span><span>${esc(txt)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
       <div class="gd-foot"><button type="button" class="btn" data-mag="back">Back</button><span class="note">Pick the closest, or press 1 to 5. You can change it later.</span></div>
@@ -11425,7 +11454,7 @@ function cvOffDo(k, back){
 // cvView "table" is the one-page version with every question at once, for people who know their program
 let cvG = null, cvView = null, cvTab = "gaps";
 const CV_NOUN = {child:"child safety violations", sexual:"sexual harm", harass:"harassment and hate", violent:"violent and self-harm content", ai:"AI misuse", privacy:"privacy and safety threats", integrity:"platform abuse", fraud:"fraud and scams"};
-const cvNoun = a => CV_NOUN[a.k] || cvHarm(a);
+const cvNoun = a => (typeof typeHarm === "function" ? typeHarm(a.k, "") : "") || CV_NOUN[a.k] || cvHarm(a);
 const CV_Q = {
   policy:{q:a => `Is there a clear rule on ${cvHarm(a)} that reviewers can apply?`, why:"Reviewers can only be consistent with a rule they can actually apply."},
   detect:{q:a => `How do you find ${cvNoun(a)} today?`, why:"If you rely on user reports, most people see the harm before you do."},
@@ -12064,6 +12093,7 @@ function tkOpen(src){
   else if(src === "coverage"){ tk = {src:"your coverage gaps", tasks:tkFromCoverage(), sel:{}, opened:{}}; }
   else if(src === "tabletop"){ tk = {src:`the tabletop "${ttfSc().title}"`, tasks:tkFromTabletop(), sel:{}, opened:{}}; }
   else if(src === "coppa"){ tk = {src:"your COPPA readiness gaps", tasks:tkFromCoppa(), sel:{}, opened:{}}; }
+  else if(src === "plan"){ tk = {src:"your plan", tasks:tkFromPlan(), sel:{}, opened:{}}; }
   else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
   tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
   const prev = document.activeElement, bg = document.createElement("div");
@@ -12107,7 +12137,7 @@ const ORG_MAP = {
 Object.assign(MX_PLATFORMS, {social:"Social media & video", market:"Marketplace & e-commerce", genai:"Generative AI"});
 Object.assign(MX_STAGE, {"1":"Early stage", "2":"Growing", "3":"At scale or regulated"});
 const orgGet = () => store.get("ws:org", null) || {};
-const orgSet = o => store.set("ws:org", Object.assign({}, orgGet(), o));
+const orgSet = o => { store.set("ws:org", Object.assign({}, orgGet(), o)); if(typeof jnSync === "function") jnSync(); };
 const orgReady = () => { const o = orgGet(); return !!(o.type && o.stage); };
 const orgTypeName = k => (ORG_TYPES.find(t => t.k === k) || {n:""}).n;
 const orgStageName = k => (ORG_STAGES.find(s => s.k === k) || {n:""}).n;
@@ -12195,16 +12225,24 @@ function ovHeroChips(){
    ========================================================= */
 // Setup counts once confirmed; workspaces set up before the confirm button existed count if any later step is done
 const orgConfirmed = () => orgReady() && (!!orgGet().confirmed || JOURNEY.slice(1).some(s => s.done()));
-const JOURNEY = [
+// Every step the assessment can have. A step with `when` appears only when the profile calls for it
+const JOURNEY_ALL = [
   {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
   {k:"maturity", n:"Program maturity", d:"Rate eight areas, about five minutes", min:5, get:"Rate eight areas of your program and get a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
   {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"See how a product could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
   {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"See whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
+  {k:"coppa", n:"COPPA readiness", d:"Children's privacy, about six minutes", min:6, get:"Whether COPPA applies to you, the gaps against the amended Rule, and drafts for parents and Legal.", icon:"coppa", c:"var(--t-cp)", route:"coppa",
+    when:() => ["kids", "teens"].includes(orgGet().youth), done:() => (typeof cp !== "undefined" && cp.view === "report" && !!cp.aud && !cp.ex) || Object.values(wsItems()).some(it => it.kind === "coppa")},
   {k:"crisis", n:"Incident tabletop", d:"Rehearse one crisis, about eight minutes", min:8, get:"Rehearse one realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
-  {k:"act", n:"Turn gaps into a plan", d:"Send your roadmap or gaps to your tracker", min:2, get:"Your roadmap and biggest gaps, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"maturity",
-    go:() => { const src = MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex && maRoadmap(ma).length ? "maturity" : !cv.ex && cvActions(cv).length ? "coverage" : null; goRoute(src || "maturity"); if(src) setTimeout(() => tkOpen(src), 60); }, done:() => !!store.get("tk:used", false)}
+  {k:"transparency", n:"Transparency report", d:"The DSA report, about fifteen minutes", min:15, get:"The transparency report the EU asks for, with a check of what's missing.", icon:"chart", c:"var(--t-ai)", route:"transparency",
+    when:() => (orgGet().regions || []).some(r => r === "eu" || r === "uk"), done:() => (typeof tr !== "undefined" && tr.view === "report" && !!tr.org) || Object.values(wsItems()).some(it => it.kind === "transparency")},
+  {k:"act", n:"Turn gaps into a plan", d:"One plan from every step, sent to your tracker", min:2, get:"One prioritized plan from every step: launch blockers, coverage gaps and your roadmap, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"plan", done:() => !!store.get("tk:used", false)}
 ];
+const JOURNEY = [];
+// Rebuild the steps from the profile. Called at load and whenever the profile changes
+function jnSync(){ JOURNEY.length = 0; JOURNEY_ALL.filter(s => { try{ return !s.when || s.when(); }catch(e){ return false; } }).forEach(s => JOURNEY.push(s)); return JOURNEY; }
+jnSync();
 const jnNext = skip => JOURNEY.find(s => s.k !== skip && !s.done());
 function jnGo(k){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
   if(k === "maturity" && ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
@@ -12992,8 +13030,8 @@ function demoWelcomeClose(next){
 
 /* ---------- a short guided tour of the overview ---------- */
 const TOUR = [
-  [".as-head", "Pixelry's assessment", "A fictional social app, five of six steps in. Everything you see is sample data."],
-  [".as-steps", "Six guided steps", "Each finished step shows what it found. Review opens that tool with Pixelry's answers, and the last step is up next."],
+  [".as-head", "Pixelry's assessment", "A fictional social app, most of the way through. Everything you see is sample data."],
+  [".as-steps", "Guided steps", "Each finished step shows what it found. Review opens that tool with Pixelry's answers, and the last step is up next."],
   [".as-pic", "The program picture", "One score out of 100, each part graded, and three radars: launch risk, maturity and coverage. Click any of them to open that tool."],
   [".as-know", "What the assessment found", "The most important finding from each step, in plain words."],
   ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
@@ -13064,9 +13102,9 @@ if(demoOn() && (store.get("demo:welcome", false) || store.get("demo:tour", false
 // Each step points at a real part of the page; a step whose element isn't on screen is skipped.
 const PAGE_TOURS = {
   overview:[
-    [".as-hero-t h1", "One assessment, six steps", "Each step asks a few plain questions and adds to one picture of your program. You can stop any time and pick up later."],
+    [".as-hero-t h1", "One assessment, a few steps", "Each step asks a few plain questions and adds to one picture of your program. You can stop any time and pick up later."],
     [".as-first .as-pic", "Your program picture", "It fills in as you go: an overall score, five graded parts and three radars."],
-    [".as-six", "The six steps", "What each one gives you and how long it takes. Every tool is also under All tools, to use on its own."],
+    [".as-six", "The steps", "Chosen for your kind of platform. What each one gives you and how long it takes. Every tool is also under All tools, to use on its own."],
     [".as-head", "Where you are", "How many steps are done, and about how long the rest will take."],
     [".as-steps", "Your steps", "Finished steps show what they found. The next one is highlighted, and you can start any step early."],
     [".as-grid .as-pic", "Your program picture", "The overall score, each graded part and three radars. Click any of them to open that tool."],
@@ -13104,6 +13142,10 @@ const PAGE_TOURS = {
     [".ttf-debrief .verdict", "The after-action report", "How the team did, the actions you captured, and a report to download or send to your tracker."]
   ],
   metrics:[
+    [".gd-intro h1", "One question at a time", "Your platform and stage, the metrics you will track, then this period's numbers one metric at a time. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The list reorders so the metrics that matter most come first."],
     [".mx-tabs", "Four views", "Metrics is the framework. My scorecard holds your own numbers, trends and a one-pager for leadership. Data to log and Running the program cover the practical side."],
     [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."],
@@ -13118,6 +13160,10 @@ const PAGE_TOURS = {
     [".mx-rgrid", "Put every metric on a calendar", "Which meeting should look at which metric, and how often."]
   ],
   vendors:[
+    [".gd-intro h1", "One question at a time", "What matters, your shortlist, then one criterion at a time with the ranking beside it. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".vd-weights", "Say what matters", "Set how much each criterion counts, or start from a preset. Weights add up to 100."],
     [".vd-names", "Name your vendors", "Compare two to four vendors side by side."],
     [".vd-crit", "Score with a rubric", "Rate each vendor from 1 to 5. The rubric says what each score looks like, and the RFP questions tell you what to ask first."],
@@ -13157,6 +13203,10 @@ const PAGE_TOURS = {
     [".vd-main > .mxa-part:last-of-type", "Close the biggest gaps", "The gaps in order, with the next step for each."]
   ],
   policy:[
+    [".gd-intro h1", "One question at a time", "Your rule first, then your platform and what worries you. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".pol-card", "Your rule", "Paste the policy rule you want to test, or start from one of the examples."],
     [".pol-co", "Your platform", "Add your company or product and what it does, so the test fits how people use it."],
     [".pol-runbar", "Run the test", "Instant checks run in your browser straight away. Claude's review, where available, adds edge cases, gaps, enforcement risks and a rewrite."],
@@ -13168,16 +13218,28 @@ const PAGE_TOURS = {
     ["#pol-tabs", "The findings", "Edge cases and how a team should decide them, words reviewers will read differently, a rewrite, and what your team still needs to decide."]
   ],
   notice:[
+    [".gd-intro h1", "One question at a time", "Each detail of the decision on its own screen, then Claude drafts the notice. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".ai-form", "Describe the case", "Fill in what happened and what you decided. “Fill in an example” shows the kind of detail that helps."],
     [".ai-act", "Draft the notice", "Claude drafts it on your own Claude account, only when you click. You can see an example result first."],
     [".ai-about", "How this works", "What the assistant does, what it checks, and what stays with a person."]
   ],
   appeal:[
+    [".gd-intro h1", "One question at a time", "The decision, the rule and the appeal on their own screens, then Claude reviews it. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".ai-form", "Describe the appeal", "Add the rule that was applied, the original decision, the content and what the user said."],
     [".ai-act", "Review it", "Claude reviews it on your own Claude account, only when you click. You can see an example result first."],
     [".ai-about", "How this works", "What the assistant checks, and why a person still makes the final call."]
   ],
   transparency:[
+    [".gd-intro h1", "One question at a time", "Your service and tier, then one section of the report per screen. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".pol-card", "Your service", "Name the service and choose what kind it is under the DSA. The sections you need depend on it."],
     [".pol-setup > .pol-card:nth-of-type(2)", "Fill in each section", "Each section maps to an article of the DSA and asks only for the numbers it requires."],
     [".pol-runbar", "Check and build", "The meter shows what's still missing. Build the report when you're ready, with a checklist and a summary."],
@@ -13185,6 +13247,10 @@ const PAGE_TOURS = {
     [".tr-report .pol-tabs", "Three views", "The report as readers will see it, a checklist of what the DSA asks for, and a summary Claude writes from your numbers only."]
   ],
   coppa:[
+    [".gd-intro h1", "One question at a time", "Who the service is for, what you collect and what you have in place, only the questions that apply. At the end you get the result, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
+    [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
     [".cp-aud", "Who it's for", "Start with your audience. It decides whether COPPA applies to every user, to users under 13, or only to the children you know about."],
     ["#cp-s-data", "Map children's data", "Mark each kind of personal information you collect, including what third-party SDKs collect through you, then why, who gets it and how long you keep it."],
     ["#cp-s-ctrl", "What you have in place", "Tick what's true today. Only the requirements that apply to your answers are shown."],
@@ -13192,6 +13258,10 @@ const PAGE_TOURS = {
     [".cp-report .pol-sum", "Where you stand", "Whether COPPA applies to you, how ready you are, and how many critical gaps are left."],
     [".cp-report .pol-tabs", "Plan, data, drafts and requirements", "Your gaps in order, your data map, four drafts to edit, and every requirement that applies to your answers."],
     [".cp-gaps", "Close the gaps", "Each gap names the part of the Rule, who usually owns it and what to do. Mark it done once it's fixed."]
+  ],
+  plan:[
+    [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA gaps in one list, sent to your tracker in one go."],
+    [".pl-group", "Do first, next, later", "Tick things off here and each tool updates. Long groups fold: show all when you need them."]
   ],
   workspace:[
     [".wsprofile", "Your profile", "Your name and role, shown on your workspace and in exported files."],
@@ -13316,6 +13386,47 @@ if(typeof document !== "undefined" && document.addEventListener){
     mo.observe(gv, {childList:true, subtree:true});
   }
 }
+/* =========================================================
+   BY COMPANY TYPE: the same questions, in the words of your platform
+   Coverage asks about the harms as they show up on your kind of service; Maturity says what each area means there.
+   ========================================================= */
+// How each kind of harm shows up, by company type. Coverage's questions use these instead of the generic noun
+const TYPE_HARM = {
+  social:{child:"grooming and child sexual abuse material in feeds, comments and DMs", sexual:"unwanted sexual content and intimate images shared without consent", harass:"pile-ons, hate and targeted harassment in comments and replies", violent:"graphic violence, self-harm content and threats", ai:"AI-generated fakes and impersonation", privacy:"doxxing and location leaks", integrity:"spam, fake accounts and coordinated manipulation", fraud:"scams in DMs and fake giveaways"},
+  marketplace:{child:"listings or messages that put children at risk", sexual:"sexual services, adult items and explicit listings", harass:"abusive messages between buyers and sellers", violent:"weapons, violent items and threats in messages", ai:"AI-generated fake product photos and reviews", privacy:"buyer and seller personal data exposed in listings or messages", integrity:"fake reviews, bot listings and shill bidding", fraud:"scam listings, fake sellers and payment fraud"},
+  fintech:{child:"accounts opened by or for minors", sexual:"sextortion payments and adult-service transactions", harass:"abusive payment notes and harassment through transfers", violent:"payments tied to threats or extortion", ai:"AI-driven synthetic identities and voice-clone social engineering", privacy:"account takeover and data exposure", integrity:"mule accounts, fake merchants and money laundering", fraud:"scam payments, phishing and chargeback fraud"},
+  gaming:{child:"grooming and predatory contact in chat and voice", sexual:"sexual content in chat, usernames and user-made content", harass:"toxicity, hate speech and harassment in voice and text chat", violent:"real-world threats and self-harm talk in chat", ai:"AI-generated cheats, deepfakes and impersonation", privacy:"doxxing and swatting", integrity:"cheating, bots and account trading", fraud:"account theft, skin scams and payment fraud"},
+  dating:{child:"minors on the platform and adults seeking them", sexual:"unsolicited sexual images and sexual coercion", harass:"abusive messages after rejection", violent:"threats, stalking and violence at in-person meetings", ai:"AI-generated profile photos and chatbot romance scams", privacy:"real names, workplaces and locations exposed to matches", integrity:"fake profiles and catfishing", fraud:"romance scams and investment pitches from matches"},
+  genai:{child:"prompts for sexual content involving minors", sexual:"non-consensual intimate imagery and sexual deepfakes", harass:"harassing or hateful content generated on request", violent:"instructions for violence and self-harm content", ai:"jailbreaks, deepfakes and impersonation at scale", privacy:"personal data leaked in outputs and voice cloning", integrity:"automated spam and disinformation at scale", fraud:"generated phishing and scam scripts"},
+  gig:{child:"underage workers and children present at jobs or rentals", sexual:"sexual harassment between workers, customers and hosts", harass:"abusive ratings, messages and in-person abuse", violent:"assaults and threats during jobs, rides or stays", ai:"AI-faked identity documents and profile photos", privacy:"home addresses and phone numbers exposed to the other party", integrity:"fake accounts, rating manipulation and account sharing", fraud:"payment scams, fake bookings and chargeback abuse"},
+  kids:{child:"predatory contact and inappropriate content reaching children", sexual:"sexual content reaching children and adults soliciting them", harass:"bullying between children", violent:"violent or frightening content and self-harm talk", ai:"AI-generated content reaching children unchecked", privacy:"children's data collected or shared without consent", integrity:"adults posing as children and spam aimed at kids", fraud:"in-app purchase tricks and scams aimed at children"}
+};
+// What each program area means on each kind of platform, shown under the maturity question and on the roadmap
+const TYPE_AREA = {
+  social:{policy:"Rules for comments, DMs, live streams and creator content, with examples reviewers can apply.", detection:"Classifiers on uploads and comments, hash matching for known abuse imagery, and signals for coordinated behaviour.", operations:"Queues by severity, with live content and DMs handled fastest.", quality:"Appeals on removals and account actions, with overturn rates fed back to policy.", crisis:"A playbook for viral harmful content, a creator incident or a press story about the platform.", measurement:"Prevalence from sampled views, time to action on reports, and appeal overturn rates.", compliance:"DSA statements of reasons, transparency reports and UK Online Safety Act duties.", wellbeing:"Exposure limits for reviewers of graphic and sexual content, with counselling available."},
+  marketplace:{policy:"Prohibited-item rules, seller standards and messaging rules, with examples for reviewers.", detection:"Listing classifiers, image matching for prohibited items, and seller-behaviour signals.", operations:"Listing review before and after publication, and seller-dispute handling with time targets.", quality:"Seller appeals on removals and suspensions, with a second reviewer.", crisis:"A playbook for a recalled or dangerous item, a scam wave or a seller-data leak.", measurement:"Prohibited-listing prevalence, fraud loss rate and time to remove reported listings.", compliance:"DSA trader-traceability duties, product-safety obligations and consumer law.", wellbeing:"Support for reviewers handling abusive messages and disturbing listings."},
+  fintech:{policy:"Acceptable-use, scam and mule-account rules that fraud, compliance and support all apply the same way.", detection:"Transaction monitoring, device and identity signals, and scam-pattern detection before money moves.", operations:"Alert queues with time targets, and a path from support to fraud specialists.", quality:"A fair way to contest frozen funds or closed accounts, reviewed by someone new.", crisis:"A playbook for a scam wave, an account-takeover spike or a regulator inquiry.", measurement:"Fraud loss rate, scam reports per thousand users and time to freeze.", compliance:"AML and KYC duties, consumer-protection rules and payment-scheme requirements.", wellbeing:"Support for staff who talk to scam victims every day."},
+  gaming:{policy:"Chat, username and user-content rules, with examples from real matches.", detection:"Text and voice moderation, cheat detection and signals for grooming patterns.", operations:"In-game reports triaged by severity, with fast handling for child-safety and threats.", quality:"Appeals on bans and mutes, with a second look at contested calls.", crisis:"A playbook for a child-safety incident, a swatting threat or a toxic community event.", measurement:"Toxicity per thousand match-hours, report handling time and repeat-offender rate.", compliance:"Age-appropriate design duties, loot-box rules and platform-holder requirements.", wellbeing:"Rotation and support for reviewers of voice chat and abusive content."},
+  dating:{policy:"Rules for profiles, messages and conduct at meetings, with examples reviewers can apply.", detection:"Photo verification, fake-profile signals, and detection of scam and sexual-image patterns in messages.", operations:"Reports on unmatched users still handled, with fast action on safety threats.", quality:"Appeals on bans, with care for users reporting harm.", crisis:"A playbook for an assault report, a romance-scam ring or a data exposure.", measurement:"Fake-profile prevalence, romance-scam reports and time to act on safety reports.", compliance:"Consumer law, data-protection duties and local dating-safety rules.", wellbeing:"Support for reviewers handling sexual content and assault reports."},
+  genai:{policy:"Usage policies for prompts and outputs, with examples of what to refuse and what to allow.", detection:"Input and output classifiers, hash matching for known abuse imagery, and red-teaming for jailbreaks.", operations:"Review of flagged generations and abuse reports, with fast handling for child-safety content.", quality:"A way to contest refusals and account actions, with a second reviewer.", crisis:"A playbook for a viral harmful generation, a jailbreak in the wild or a deepfake incident.", measurement:"Refusal accuracy, harmful-output rate in sampled generations and time to patch a jailbreak.", compliance:"AI Act transparency duties, DSA obligations where you host content, and child-safety law.", wellbeing:"Exposure limits and support for red-teamers and reviewers of generated abuse content."},
+  gig:{policy:"Conduct rules for workers, customers and hosts, with examples for both sides of a job.", detection:"Identity checks, fake-account signals and detection of abusive messages.", operations:"Safety reports from jobs, rides and stays handled fast, with a path to the police where needed.", quality:"Appeals on deactivations, reviewed by someone who wasn't involved.", crisis:"A playbook for an assault, a fatality or a worker-data leak.", measurement:"Safety incidents per thousand jobs, time to act on safety reports and deactivation appeal rates.", compliance:"Worker-classification law, background-check rules and local licensing.", wellbeing:"Support for staff who handle assault and accident reports."},
+  kids:{policy:"Rules written for children and parents, with examples of what's allowed at each age.", detection:"Classifiers tuned for content reaching children, and signals for adults posing as children.", operations:"Reports from children and parents handled fast, with child-safety escalations first.", quality:"A way for parents to contest decisions, in plain language.", crisis:"A playbook for a predator incident, a data breach involving children or a harmful viral trend.", measurement:"Inappropriate-content prevalence in what children see, and time to act on reports.", compliance:"COPPA, age-appropriate design codes and school-data rules.", wellbeing:"Support for reviewers of content involving children."}
+};
+// One line for the home, before the first step is done: where programs like yours usually start
+const TYPE_TIP = {
+  social:"Programs like yours usually find their first gap in proactive detection: most harm is still found by user reports.",
+  marketplace:"Marketplaces usually find their first gap in fraud and prohibited listings, where loss shows up in the P&L before it shows up in reports.",
+  fintech:"Fintech programs usually find their first gap in scam response: detection is strong, but victims wait too long for a person.",
+  gaming:"Gaming programs usually find their first gap in voice and chat moderation, where child-safety risk hides in plain sight.",
+  dating:"Dating programs usually find their first gap in what happens after a match: off-platform contact and in-person safety.",
+  genai:"AI programs usually find their first gap in output monitoring: refusals are tested, but what gets through isn't measured.",
+  gig:"Gig and rental programs usually find their first gap in incident response: safety reports from jobs and stays reach the wrong queue.",
+  kids:"Children's services usually find their first gap in parental consent and data handling, which COPPA now checks closely."
+};
+const typeKey = () => (typeof orgGet === "function" && orgGet().type) || "";
+const typeHarm = (k, fallback) => (TYPE_HARM[typeKey()] || {})[k] || fallback;
+const typeArea = k => (TYPE_AREA[typeKey()] || {})[k] || "";
+const typeName = () => { const t = typeof TT_TYPES !== "undefined" && TT_TYPES.find(x => x.k === typeKey()); return t ? t.s : ""; };
 /* =========================================================
    GUIDED FLOWS: one engine for every tool that asks its questions one screen at a time
    A tool hands over a spec (its intro, its steps and what to do at the end); the engine draws the
@@ -14197,8 +14308,67 @@ function aiOrgDefaults(T, st){
 
 /* ---------- Phones: More in the bottom bar opens the full menu ---------- */
 document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); });
+/* =========================================================
+   YOUR PLAN: one prioritized list from every step of the assessment
+   Launch blockers, coverage gaps, roadmap items and COPPA gaps, in three groups (do first, next, later),
+   tickable where the tool tracks it, and sent to a tracker in one go.
+   ========================================================= */
+const PLAN_GROUPS = [["do", "Do first", "Launch blockers, exposed harm areas, this quarter's roadmap and critical COPPA gaps"], ["next", "Next", "Coverage gaps, next quarter's roadmap and the rest of the COPPA gaps"], ["later", "Later", "Roadmap items for after that"]];
+const PLAN_KIND = {premortem:"Pre-mortem", coverage:"Coverage", maturity:"Maturity", coppa:"COPPA"};
+function planItems(){
+  const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [];
+  try{ ovSavedPMs().forEach(p => p.r.safeguards.filter(s => s.rank === 3).forEach(s => out.push({g:"do", kind:"premortem", text:s.t, ctx:`${p.name} · launch blocker`, tick:"pm:" + p.it.id + "|" + s.id, done:!!(p.it.data.done && p.it.data.done[s.id])}))); }catch(e){}
+  try{ if(!cv.ex && !cv.est) cvActions(cv).forEach(x => out.push({g:x.row.status === "exposed" ? "do" : "next", kind:"coverage", text:x.text, ctx:`${x.row.a.n} · ${x.layer.n.toLowerCase()} · ${x.row.status === "exposed" ? "exposed" : "gap"}`, go:"coverage", done:false})); }catch(e){}
+  try{ if(!ma.ex && maAllRated(ma)) maRoadmap(ma).forEach(s => s.acts.forEach((a, i) => { const id = s.id + "-" + i; out.push({g:s.phase === "now" ? "do" : s.phase === "next" ? "next" : "later", kind:"maturity", text:a, ctx:`${s.a.n} · level ${s.from} → ${s.to}`, tick:"ma:" + id, done:!!ma.done[id]}); })); }catch(e){}
+  try{ if(J.some(s => s.k === "coppa") && cp.view === "report" && cp.aud && !cp.ex) cpScore(cp, cpCtx(cp), cpApplies(cp)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"coppa", text:g.fix || g.t, ctx:`COPPA · ${g.cite}`, fix:g.k, done:false})); }catch(e){}
+  return out;
+}
+const planOpen = items => items.filter(x => !x.done);
+const PL_SHOW = 8, plMore = {};
+function planItemHTML(x, i){
+  const color = TOOL_COLOR[x.kind] || "var(--accent)";
+  return `<li class="nx-i pl-i ${x.done ? "done" : ""}">
+    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color}"><svg><use href="#i-${{premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa"}[x.kind]}"/></svg></span>`}
+    <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color} 65%, var(--ink))">${esc(PLAN_KIND[x.kind])}</span><span>${esc(x.ctx)}</span></small></div>
+    <a class="nx-open" href="#${x.go || {premortem:"premortem", maturity:"maturity", coppa:"coppa"}[x.kind]}" aria-label="Open in ${esc(PLAN_KIND[x.kind])}">${icon("arrow")}</a></li>`;
+}
+function renderPlan(){
+  if(typeof gdCur !== "undefined") gdCur = null;
+  const items = planItems(), open = planOpen(items), J = typeof JOURNEY !== "undefined" ? JOURNEY : [], stepsDone = J.filter(s => s.k !== "act" && s.done()).length;
+  const sent = !!store.get("tk:used", false), demo = typeof demoOn === "function" && demoOn();
+  const by = g => items.filter(x => x.g === g).sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
+  const srcs = [...new Set(items.map(x => PLAN_KIND[x.kind]))];
+  view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" aria-live="polite"></span>
+    <div class="pl-head">
+      <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
+      <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>
+      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : "Start with your program's maturity or a pre-mortem."}`}</p>
+      ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button></div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
+    </div>
+    ${PLAN_GROUPS.map(([g, n, d]) => { const xs = by(g); if(!xs.length) return ""; const open = xs.filter(x => !x.done), done = xs.filter(x => x.done), all = !!plMore[g], shown = all ? open : open.slice(0, PL_SHOW);
+      return `<section class="pl-group" aria-labelledby="pl-${g}"><div class="as-sec-h"><h2 id="pl-${g}">${n} <span class="mono note">${open.length}</span></h2><span class="note">${d}</span></div>
+        <div class="card nx-card"><ul class="nx-list">${shown.map(planItemHTML).join("")}${open.length > PL_SHOW ? `<li class="pl-more"><button type="button" class="ov-link" data-plmore="${g}">${all ? "Show fewer" : `Show all ${open.length}`}</button></li>` : ""}${done.length ? `<li class="pl-more"><button type="button" class="ov-link" data-pldone="${g}">${plMore[g + ":done"] ? "Hide" : "Show"} ${done.length} done</button></li>` : ""}${plMore[g + ":done"] ? done.map(planItemHTML).join("") : ""}</ul></div></section>`; }).join("")}
+    ${items.length ? `<p class="note cvr-note">Coverage gaps are closed in the Coverage radar, so they have no box here. Everything else ticks off in its tool too.</p>` : ""}
+  </div>`;
+  view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
+  view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { cp.ctrl = Object.assign({}, cp.ctrl, {[c.dataset.plfix]:c.checked}); cp.ex = false; cpSave(); setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
+  view.querySelectorAll("[data-plmore],[data-pldone]").forEach(b => b.onclick = () => { const k = b.dataset.plmore || (b.dataset.pldone + ":done"); plMore[k] = !plMore[k]; const y = window.scrollY; renderPlan(); window.scrollTo(0, y); });
+  view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => { if(b.dataset.plan === "tracker") return tkOpen("plan"); const md = planMarkdown(); offerFile(`ts-plan-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#pl-toast")); });
+}
+function planMarkdown(){
+  const items = planItems(), p = typeof wsProfile === "function" ? wsProfile() : null;
+  const L = [`# Trust & Safety plan`, ``, `${p && p.org ? p.org + " · " : ""}${new Date().toISOString().slice(0, 10)}`, ``];
+  PLAN_GROUPS.forEach(([g, n]) => { const xs = items.filter(x => x.g === g); if(!xs.length) return; L.push(`## ${n}`, ``); xs.forEach(x => L.push(`- [${x.done ? "x" : " "}] ${x.text} _(${PLAN_KIND[x.kind]}: ${x.ctx})_`)); L.push(``); });
+  L.push(`---`, `Made with T&S Workbench. A self-assessment to guide planning, not an audit.`);
+  return L.join("\n");
+}
+// Every open item as a tracker task, in one export
+function tkFromPlan(){
+  return planOpen(planItems()).map((x, i) => ({id:`plan-${i}`, title:x.text, group:PLAN_GROUPS.find(g => g[0] === x.g)[1], owner:"", pr:x.g === "do" ? 4 : x.g === "next" ? 3 : 2, done:false, def:true,
+    labels:["trust-and-safety", x.kind], desc:[x.text, "", `${PLAN_KIND[x.kind]}: ${x.ctx}.`, "", "From the T&S Workbench plan."].join("\n")}));
+}
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, about:renderAbout, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, about:renderAbout, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   // A shareable link straight into the demo company

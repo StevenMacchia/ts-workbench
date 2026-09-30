@@ -259,7 +259,7 @@ function cvOffDo(k, back){
 // cvView "table" is the one-page version with every question at once, for people who know their program
 let cvG = null, cvView = null, cvTab = "gaps";
 const CV_NOUN = {child:"child safety violations", sexual:"sexual harm", harass:"harassment and hate", violent:"violent and self-harm content", ai:"AI misuse", privacy:"privacy and safety threats", integrity:"platform abuse", fraud:"fraud and scams"};
-const cvNoun = a => CV_NOUN[a.k] || cvHarm(a);
+const cvNoun = a => (typeof typeHarm === "function" ? typeHarm(a.k, "") : "") || CV_NOUN[a.k] || cvHarm(a);
 const CV_Q = {
   policy:{q:a => `Is there a clear rule on ${cvHarm(a)} that reviewers can apply?`, why:"Reviewers can only be consistent with a rule they can actually apply."},
   detect:{q:a => `How do you find ${cvNoun(a)} today?`, why:"If you rely on user reports, most people see the harm before you do."},

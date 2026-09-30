@@ -102,8 +102,8 @@ function demoWelcomeClose(next){
 
 /* ---------- a short guided tour of the overview ---------- */
 const TOUR = [
-  [".as-head", "Pixelry's assessment", "A fictional social app, five of six steps in. Everything you see is sample data."],
-  [".as-steps", "Six guided steps", "Each finished step shows what it found. Review opens that tool with Pixelry's answers, and the last step is up next."],
+  [".as-head", "Pixelry's assessment", "A fictional social app, most of the way through. Everything you see is sample data."],
+  [".as-steps", "Guided steps", "Each finished step shows what it found. Review opens that tool with Pixelry's answers, and the last step is up next."],
   [".as-pic", "The program picture", "One score out of 100, each part graded, and three radars: launch risk, maturity and coverage. Click any of them to open that tool."],
   [".as-know", "What the assessment found", "The most important finding from each step, in plain words."],
   ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]

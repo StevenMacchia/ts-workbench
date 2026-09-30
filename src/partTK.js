@@ -118,6 +118,7 @@ function tkOpen(src){
   else if(src === "coverage"){ tk = {src:"your coverage gaps", tasks:tkFromCoverage(), sel:{}, opened:{}}; }
   else if(src === "tabletop"){ tk = {src:`the tabletop "${ttfSc().title}"`, tasks:tkFromTabletop(), sel:{}, opened:{}}; }
   else if(src === "coppa"){ tk = {src:"your COPPA readiness gaps", tasks:tkFromCoppa(), sel:{}, opened:{}}; }
+  else if(src === "plan"){ tk = {src:"your plan", tasks:tkFromPlan(), sel:{}, opened:{}}; }
   else { tk = {src:"your maturity roadmap", tasks:tkFromMaturity(), sel:{}, opened:{}}; }
   tk.tasks.forEach(t => { tk.sel[t.id] = t.def; });
   const prev = document.activeElement, bg = document.createElement("div");

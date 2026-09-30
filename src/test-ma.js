@@ -26,6 +26,8 @@ const body = function(){
   maGo("guide"); eq(maG.scr + maG.i, "q1", "guided resumes at the first unrated area");
   MA_AREAS.slice(1).forEach(() => maPick(3, true)); eq(maMode(), "plan", "the last area opens the plan"); eq(/id="ma-plan"/.test(view.innerHTML), true, "the last area opens the plan page");
   out.push("guided: size first, one area at a time with the target marked, back and resume, one page, then the plan");
+  // each area explained for your kind of platform
+  orgSet({type:"gaming"}); maG = {scr:"q", i:1}; ma.lv = {}; renderMaturity(); eq(/For gaming platforms:/.test(view.innerHTML) && /voice moderation/.test(view.innerHTML), true, "detection explained for a gaming platform"); orgSet({type:null}); maG = null;
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = "page"; renderMaturity(); h = view.innerHTML;
   if(bad(h)) throw new Error("blank page has bad values: " + where(h));
   eq((h.match(/class="card ma-area/g) || []).length, 8, "one card per area"); eq((h.match(/class="card ma-area open"/g) || []).length, 1, "one area open");
@@ -86,6 +88,6 @@ const body = function(){
   out.push("frameworks: " + MA_AREAS.length + " areas mapped to DTSP and Ofcom, with sources");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partTYPE.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partORG.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());
