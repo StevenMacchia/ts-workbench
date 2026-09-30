@@ -29,8 +29,9 @@ const focusLost = () => !document.activeElement || document.activeElement === do
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;
-  const more = $("#sb-more"); if(more){ if(!more.dataset.bound){ more.dataset.bound = "1"; more.open = !!store.get("sb:more", false); more.addEventListener("toggle", () => { if(!more.dataset.auto) store.set("sb:more", more.open); more.dataset.auto = ""; }); }
-    if(more.querySelector(`.navlink[data-route="${name}"]`) && !more.open){ more.dataset.auto = "1"; more.open = true; } }
+  if(typeof JOURNEY !== "undefined"){ const n = $("#sb-assess-n"), done = JOURNEY.filter(s => { try{ return s.done(); }catch(e){ return false; } }).length;
+    if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
+    $$("#sb-assess .navlink[data-step]").forEach(a => { const st = JOURNEY[+a.dataset.step - 1]; let ok = false; try{ ok = !!(st && st.done()); }catch(e){} a.classList.toggle("done", ok); }); }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
   const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });

@@ -3397,25 +3397,22 @@ body:has(.asb) .tb-crumb{display:none}
 .asb + .pagehead{margin-top:-6px}
 @media (max-width:640px){.pagehead{padding:20px 18px 18px}}
 
-/* ---------- Sidebar: the assessment's tools first, the rest can fold away ---------- */
-.sb-more{display:contents}
-.sb-more > summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;border-radius:8px}
-.sb-more > summary::-webkit-details-marker{display:none}
-.sb-more > summary svg{width:12px;height:12px;transition:transform .15s;opacity:.7}
-.sb-more[open] > summary svg{transform:rotate(90deg)}
-.sb-more > summary:hover{color:var(--side-ink)}
-.sb-more > summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-.sb-more:not([open]) > .navlink{display:none}
-
-/* ---------- Motion: guided screens ease in, radars grow as they fill ---------- */
-@keyframes gdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@keyframes gdRad{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
-@keyframes gdPick{0%{transform:scale(1)}45%{transform:scale(.985)}100%{transform:scale(1)}}
-.gd-main,.gd-w,.gd-aside,.cvr{animation:gdIn .3s cubic-bezier(.2,.7,.2,1) both}
-.gd-aside{animation-delay:.05s}
-.gd-rad .cv-cov,.gd-rad .ma-cur,.cvr-radar .cv-cov,.as-rad-g .cv-cov,.as-rad-g .ma-cur{transform-box:view-box;transform-origin:50% 50%;animation:gdRad .45s cubic-bezier(.2,.7,.2,1) both}
-.gd-opt.on{animation:gdPick .22s ease-out}
-@media (prefers-reduced-motion: reduce){.gd-main,.gd-w,.gd-aside,.cvr,.gd-rad .cv-cov,.gd-rad .ma-cur,.cvr-radar .cv-cov,.as-rad-g .cv-cov,.as-rad-g .ma-cur,.gd-opt.on{animation:none}}
+/* ---------- Sidebar: the assessment's tools stand out, the rest are listed plainly ---------- */
+.sb-assess{margin:6px 0 2px;padding:6px 6px 8px;border-radius:12px;background:var(--hover);box-shadow:inset 0 0 0 1px var(--side-line)}
+.sb-assess .sb-h{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px;color:var(--side-ink);font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:10.5px}
+.sb-assess .sb-h span{font:500 11px var(--mono);color:var(--side-muted);letter-spacing:0;text-transform:none}
+.sb-assess .navlink{padding:8px 8px;font-size:14px;font-weight:500;gap:11px}
+.sb-assess .navlink .sb-glyph{width:22px;height:22px;border-radius:7px}
+.sb-assess .navlink .sb-glyph svg{width:13px;height:13px}
+.sb-assess .navlink.done::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);margin-left:auto;box-shadow:0 0 0 2px color-mix(in oklab, var(--good) 22%, transparent)}
+.sb-assess .navlink.done .sb-cnt{display:none}
+.sb-more{display:grid;gap:1px}
+.sb-more .navlink{padding:5px 10px;font-size:13px;color:var(--side-muted)}
+.sb-more .navlink:hover,.sb-more .navlink[aria-current="page"]{color:var(--ink)}
+.sb-more .navlink .sb-glyph{width:14px;height:14px;border-radius:4px;opacity:.75}
+.sb-more .navlink .sb-glyph svg{width:9px;height:9px}
+.sb-more .navlink[aria-current="page"] .sb-glyph{opacity:1}
+.sb-more .sb-new{font-size:9px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -3503,12 +3500,15 @@ body:has(.asb) .tb-crumb{display:none}
       <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Your assessment</a>
       <a class="navlink" href="#tools" data-route="tools"><svg><use href="#i-layers"/></svg>All tools</a>
       <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
-      <div class="sb-h">The assessment</div>
-      <a class="navlink" href="#maturity" data-route="maturity"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
-      <a class="navlink" href="#premortem" data-route="premortem"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
-      <a class="navlink" href="#coverage" data-route="coverage"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
-      <a class="navlink" href="#tabletop" data-route="tabletop"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
-      <details class="sb-more" id="sb-more"><summary class="sb-h sb-more-h">More tools<svg><use href="#i-chev"/></svg></summary>
+      <div class="sb-assess" id="sb-assess">
+        <div class="sb-h sb-assess-h">The assessment<span id="sb-assess-n"></span></div>
+        <a class="navlink" href="#maturity" data-route="maturity" data-step="2"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
+        <a class="navlink" href="#premortem" data-route="premortem" data-step="3"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem</a>
+        <a class="navlink" href="#coverage" data-route="coverage" data-step="4"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
+        <a class="navlink" href="#tabletop" data-route="tabletop" data-step="5"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
+      </div>
+      <div class="sb-h">More tools</div>
+      <div class="sb-more">
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
       <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness<span class="sb-new">New</span></a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
@@ -3516,7 +3516,7 @@ body:has(.asb) .tb-crumb{display:none}
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
-      </details>
+      </div>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
@@ -8918,8 +8918,9 @@ const focusLost = () => !document.activeElement || document.activeElement === do
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
   if(document.body && document.body.dataset) document.body.dataset.route = name;
-  const more = $("#sb-more"); if(more){ if(!more.dataset.bound){ more.dataset.bound = "1"; more.open = !!store.get("sb:more", false); more.addEventListener("toggle", () => { if(!more.dataset.auto) store.set("sb:more", more.open); more.dataset.auto = ""; }); }
-    if(more.querySelector(`.navlink[data-route="${name}"]`) && !more.open){ more.dataset.auto = "1"; more.open = true; } }
+  if(typeof JOURNEY !== "undefined"){ const n = $("#sb-assess-n"), done = JOURNEY.filter(s => { try{ return s.done(); }catch(e){ return false; } }).length;
+    if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
+    $$("#sb-assess .navlink[data-step]").forEach(a => { const st = JOURNEY[+a.dataset.step - 1]; let ok = false; try{ ok = !!(st && st.done()); }catch(e){} a.classList.toggle("done", ok); }); }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
   const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
