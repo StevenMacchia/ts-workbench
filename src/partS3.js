@@ -2,12 +2,13 @@
 // Text uses {placeholders}; each company type supplies its own values in `vars`.
 const ALL_TYPES = ["social","marketplace","fintech","gaming","dating","genai","gig","kids"];
 function ttFill(str, v){ return typeof str === "string" ? str.replace(/\{(\w+)\}/g, (m, k) => v[k] !== undefined ? v[k] : m) : str; }
+// Each company type gets its own title, blurb and step scenes (TT_VERSIONS, partS11.js); the decisions, consequences, lessons and law notes are shared.
 function ttScenario(i, type){
   const sc = SCENARIOS[i];
   if(!sc || !sc.vars) return sc;
-  const v = sc.vars[type] || sc.vars.all;
-  return Object.assign({}, sc, {title:ttFill(sc.title, v), platform:ttFill(sc.platform, v), blurb:ttFill(sc.blurb, v),
-    steps: sc.steps.map(st => Object.assign({}, st, {h:ttFill(st.h, v), s:ttFill(st.s, v), lesson:ttFill(st.lesson, v), law:ttFill(st.law, v),
+  const v = sc.vars[type] || sc.vars.all, ver = (typeof TT_VERSIONS !== "undefined" && TT_VERSIONS[sc.id] && TT_VERSIONS[sc.id][type]) || null;
+  return Object.assign({}, sc, {title:ttFill(ver && ver.title || sc.title, v), platform:ttFill(sc.platform, v), blurb:ttFill(ver && ver.blurb || sc.blurb, v),
+    steps: sc.steps.map((st, n) => Object.assign({}, st, {h:ttFill(st.h, v), s:ttFill(ver && ver.scenes && ver.scenes[n] || st.s, v), lesson:ttFill(st.lesson, v), law:ttFill(st.law, v),
       o: st.o.map(o => Object.assign({}, o, {l:ttFill(o.l, v), r:ttFill(o.r, v)}))}))});
 }
 NEW_SCENARIOS.push(

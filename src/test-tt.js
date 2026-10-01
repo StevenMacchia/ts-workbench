@@ -41,6 +41,15 @@ SCENARIOS.forEach((sc, si) => {
 out.push("scenarios: " + SCENARIOS.length + " (new: " + (SCENARIOS.length-3) + ")");
 out.push("strongest answer position in new scenarios, A/B/C: " + bestPos.join("/"));
 out.push("tailored variants played through: " + variants);
+// Every universal scenario has its own version for each company type: a distinct title, a blurb and four scenes, with no leftover placeholders
+{ const uni = SCENARIOS.map((s, i) => ({s, i})).filter(x => x.s.tailored);
+  uni.forEach(({s, i}) => validTypes.forEach(k => { const ver = TT_VERSIONS[s.id] && TT_VERSIONS[s.id][k];
+    if(!ver || !ver.title || !ver.blurb || !Array.isArray(ver.scenes) || ver.scenes.length !== s.steps.length) throw new Error("missing version: " + s.id + " for " + k);
+    const v = ttScenario(i, k); if(v.title === s.title) throw new Error("generic title kept: " + s.id + " for " + k);
+    [v.title, v.blurb, ...v.steps.map(st => st.s)].forEach(t => { if(/\{\w+\}/.test(t)) throw new Error("unfilled placeholder in " + s.id + " for " + k + ": " + t); }); }));
+  validTypes.forEach(k => { const titles = SCENARIOS.map((s, i) => ttScenario(i, k)).filter(s => (s.types || []).includes(k)).map(s => s.title.toLowerCase());
+    const dup = titles.find((t, n) => titles.indexOf(t) !== n); if(dup) throw new Error("duplicate title for " + k + ": " + dup); });
+  out.push("company-type versions: " + uni.length + " scenarios x " + validTypes.length + " types, all distinct"); }
 TT_TYPES.forEach(t => { store.set("tt:type", t.k); tt = null; renderTabletop(); const n = (view.innerHTML.match(/class="card scen[ "]/g)||[]).length;
   if(/\{[a-z]+\}/.test(view.innerHTML)) throw new Error("unfilled placeholder in list for " + t.k);
   if(t.k !== "all" && n < 12) throw new Error(t.n + " has only " + n); out.push("  " + t.n.padEnd(26) + n + " scenarios"); });

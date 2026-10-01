@@ -51,7 +51,7 @@ function ttPicker(H){
       <div class="ttprog">
         <div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="note mono">${completed} of ${all.length} completed</span></div>
         <div class="bar"><i style="width:${all.length?completed/all.length*100:0}%;background:var(--good)"></i></div>
-        <p class="note">${all.length} scenarios for ${tInfo.s} companies, including ones every company faces, tailored to yours.</p>
+        <p class="note">${all.length} scenarios written for ${tInfo.s} companies.</p>
       </div>
     </div>
     <div class="row ttfilters"><div class="segs tt-mode" role="group" aria-label="How to play"><button type="button" data-ttmode="solo" aria-pressed="${ttMode !== "team"}">Play solo</button><button type="button" data-ttmode="team" aria-pressed="${ttMode === "team"}">Run with a team</button></div>
@@ -67,7 +67,7 @@ function ttPicker(H){
           ${p ? `<span class="pill good" style="margin-left:auto">✓ ${p.best}/4 first try</span>` : `<span class="pill" style="margin-left:auto">New</span>`}</div>
         <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p>
         <span class="scen-foot"><span class="note">${esc(s.platform)} · ${s.steps.length} decisions</span>
-          ${s.tailored?`<span class="tag">Tailored</span>`:""}${laws?`<span class="tag">Law notes</span>`:""}</span>
+          ${laws?`<span class="tag">Law notes</span>`:""}</span>
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));

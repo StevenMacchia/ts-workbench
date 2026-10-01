@@ -51,7 +51,7 @@ const G = patch(rd("partG.js"), [
 // Scenario files: S2 ends by pushing NEW_SCENARIOS into SCENARIOS, so S3-S8 (which add to NEW_SCENARIOS) go before that line
 const S2 = rd("partS2.js"), cut = S2.indexOf("// The original three scenarios keep");
 if(cut < 0) throw new Error("partS2 marker missing");
-const scenarioLib = [rd("partS1.js"), S2.slice(0, cut), rd("partS3.js"), rd("partS4.js"), rd("partS5.js"), rd("partS6.js"), rd("partS7.js"), rd("partS8.js"), rd("partS9.js"), S2.slice(cut), rd("partS10.js")].join("\n");
+const scenarioLib = [rd("partS1.js"), S2.slice(0, cut), rd("partS3.js"), rd("partS4.js"), rd("partS5.js"), rd("partS6.js"), rd("partS7.js"), rd("partS8.js"), rd("partS9.js"), S2.slice(cut), rd("partS10.js"), rd("partS11.js")].join("\n");
 let G2 = patch(G, [
   [`let tt = store.get('tt', null);`, scenarioLib + "\nlet tt = store.get('tt', null);"],
   [`  const sc = SCENARIOS[tt.s];`, `  const sc = ttScenario(tt.s, tt.v);`],
