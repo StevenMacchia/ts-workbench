@@ -20,7 +20,7 @@
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ed43d34957a49fcb90ec8e43f7db523"}'></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#F9FAFC; --sunk:#EDF0F5; --ink:#121A2B; --muted:#5A6478; --faint:#8791A5;
@@ -3528,6 +3528,284 @@ body:has(.asb) .tb-crumb{display:none}
 .rv-list li b{min-width:80px}
 .rv-list li .note{flex:1;margin:0;font-size:12.5px}
 @media (max-width:820px){.rv-grid{grid-template-columns:1fr}.rv-score b{font-size:26px}}
+
+/* ---------- tabletop: why this scenario (public evidence) ---------- */
+.tt-why{margin:0 0 14px;padding:12px 16px;border-left:3px solid var(--accent)}
+.tt-why p{margin:4px 0 0;font-size:14px;line-height:1.55;color:var(--muted)}
+.tt-why p.note{margin-top:6px;font-size:12.5px;color:var(--faint)}
+.tt-why a{color:var(--accent);font-weight:500;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.tt-why.full{margin:14px 0 4px}
+/* =========================================================
+   INSTRUMENT THEME (phase 1): one ink, one action color, panels and hairlines instead of cards and chrome.
+   Declared last. Tokens first, then the shell, then the components every tool shares.
+   ========================================================= */
+:root, :root[data-mode="light"]{
+  color-scheme:light;
+  --canvas:#F3F2EF; --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F7F6F3; --sunk:#F3F2EF;
+  --ink:#121212; --muted:#595959; --faint:#6B6B6B;
+  --line:#DDDAD4; --line-strong:#B9B5AD;
+  --accent:#1A47B8; --accent-soft:#E8EDF9; --accent-ink:#FFFFFF;
+  --side:#F3F2EF; --side-ink:#121212; --side-muted:#595959; --side-active:#FFFFFF; --side-line:#DDDAD4;
+  --crit:#B42318; --crit-soft:#FBEAE8; --high:#B54708; --high-soft:#FCEFE3; --med:#7A5A00; --med-soft:#F7F0D6; --good:#067647; --good-soft:#E3F3EA;
+  --t-pm:#121212; --t-tt:#121212; --t-mx:#121212; --t-vd:#121212; --t-ma:#121212; --t-cv:#121212; --t-pol:#121212; --t-ai:#121212; --t-cp:#121212; --t-ds:#121212;
+  --hover:rgba(18,18,18,.05); --glow:transparent;
+  --shadow:none; --shadow-lift:none;
+  --hero-a:#FFFFFF; --hero-b:#FFFFFF; --hero-ink:#121212; --hero-muted:#595959; --hero-line:#DDDAD4;
+  --display:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){
+  color-scheme:dark;
+  --canvas:#0E0E0E; --bg:#121212; --surface:#121212; --surface-2:#1A1A1A; --sunk:#1F1F1F;
+  --ink:#F3F2EF; --muted:#A8A6A1; --faint:#8C8A85;
+  --line:#2E2E2E; --line-strong:#4A4A4A;
+  --accent:#8DB4F2; --accent-soft:rgba(141,180,242,.14); --accent-ink:#121212;
+  --side:#1A1A1A; --side-ink:#F3F2EF; --side-muted:#A8A6A1; --side-active:#121212; --side-line:#2E2E2E;
+  --crit:#F08A80; --crit-soft:rgba(240,138,128,.14); --high:#F2A65A; --high-soft:rgba(242,166,90,.14); --med:#E3C652; --med-soft:rgba(227,198,82,.12); --good:#5CC98D; --good-soft:rgba(92,201,141,.13);
+  --t-pm:#F3F2EF; --t-tt:#F3F2EF; --t-mx:#F3F2EF; --t-vd:#F3F2EF; --t-ma:#F3F2EF; --t-cv:#F3F2EF; --t-pol:#F3F2EF; --t-ai:#F3F2EF; --t-cp:#F3F2EF; --t-ds:#F3F2EF;
+  --hover:rgba(255,255,255,.06); --glow:transparent;
+  --shadow:none; --shadow-lift:none;
+  --hero-a:#121212; --hero-b:#121212; --hero-ink:#F3F2EF; --hero-muted:#A8A6A1; --hero-line:#2E2E2E;
+}}
+:root[data-theme="dark"], :root[data-mode="dark"]{
+  color-scheme:dark;
+  --canvas:#0E0E0E; --bg:#121212; --surface:#121212; --surface-2:#1A1A1A; --sunk:#1F1F1F;
+  --ink:#F3F2EF; --muted:#A8A6A1; --faint:#8C8A85;
+  --line:#2E2E2E; --line-strong:#4A4A4A;
+  --accent:#8DB4F2; --accent-soft:rgba(141,180,242,.14); --accent-ink:#121212;
+  --side:#1A1A1A; --side-ink:#F3F2EF; --side-muted:#A8A6A1; --side-active:#121212; --side-line:#2E2E2E;
+  --crit:#F08A80; --crit-soft:rgba(240,138,128,.14); --high:#F2A65A; --high-soft:rgba(242,166,90,.14); --med:#E3C652; --med-soft:rgba(227,198,82,.12); --good:#5CC98D; --good-soft:rgba(92,201,141,.13);
+  --t-pm:#F3F2EF; --t-tt:#F3F2EF; --t-mx:#F3F2EF; --t-vd:#F3F2EF; --t-ma:#F3F2EF; --t-cv:#F3F2EF; --t-pol:#F3F2EF; --t-ai:#F3F2EF; --t-cp:#F3F2EF; --t-ds:#F3F2EF;
+  --hover:rgba(255,255,255,.06); --glow:transparent;
+  --shadow:none; --shadow-lift:none;
+  --hero-a:#121212; --hero-b:#121212; --hero-ink:#F3F2EF; --hero-muted:#A8A6A1; --hero-line:#2E2E2E;
+}
+body{--tc:var(--ink);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.eyebrow,.as-h,.as-eb,.as-k,.gd-crumb,.sb-assess .sb-h,.jn-k,.loop-k,.ma-band-k,.ma-start-k,.tk-g,.tour-n,.ab-kicker,.ab-gh,.mx-sig-tone,.ma-band-next span,.ma-need .note,.ab-f small,.ab-by2-m small,.achip span,.axis,.fgroup h4,.reg-block h4,thead th,.rv-parts th{letter-spacing:0;text-transform:none}
+.eyebrow,.as-h,.as-eb,.gd-crumb,.sb-assess .sb-h,.jn-k,.ma-band-k,.ma-start-k,.tk-g,.ab-kicker,.ab-gh{font-size:12.5px;font-weight:500;color:var(--muted)}
+.gd-lv,.gd-lay .gd-lv{letter-spacing:0;text-transform:none;font-weight:600}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- shell: a quiet sidebar panel, no gradients ---------- */
+.side{--side-ink:#121212;--side-muted:#595959;--side-active:#FFFFFF;--side-line:#DDDAD4;--line-strong:#B9B5AD;--hover:rgba(18,18,18,.05);
+  --ink:#121212;--muted:#595959;--faint:#6B6B6B;--bg:#FFFFFF;--line:#DDDAD4;--sunk:#E9E7E2;
+  background:#F3F2EF;color:#121212;border-right:1px solid #DDDAD4}
+:root[data-theme="dark"] .side,:root[data-mode="dark"] .side{--side-ink:#F3F2EF;--side-muted:#A8A6A1;--side-active:#121212;--side-line:#2E2E2E;--line-strong:#4A4A4A;--hover:rgba(255,255,255,.06);
+  --ink:#F3F2EF;--muted:#A8A6A1;--faint:#8C8A85;--bg:#121212;--line:#2E2E2E;--sunk:#262626;
+  background:#1A1A1A;color:#F3F2EF;border-right:1px solid #2E2E2E}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]) .side{--side-ink:#F3F2EF;--side-muted:#A8A6A1;--side-active:#121212;--side-line:#2E2E2E;--line-strong:#4A4A4A;--hover:rgba(255,255,255,.06);
+  --ink:#F3F2EF;--muted:#A8A6A1;--faint:#8C8A85;--bg:#121212;--line:#2E2E2E;--sunk:#262626;
+  background:#1A1A1A;color:#F3F2EF;border-right:1px solid #2E2E2E}}
+.side .navlink{border-radius:4px;font-weight:450}
+.side .navlink[aria-current="page"]{background:var(--side-active);color:var(--ink);box-shadow:inset 0 0 0 1px var(--side-line);font-weight:600}
+.side .sb-search{background:var(--side-active);border-color:var(--side-line);color:var(--side-muted)}
+.side .sb-search:hover{border-color:var(--line-strong);color:var(--ink)}
+.side .kbd{background:var(--side-active);border-color:var(--side-line);color:var(--side-muted)}
+.side .themeseg{background:var(--hover)}
+.side .themeseg button[aria-pressed="true"]{background:var(--side-active);color:var(--ink);box-shadow:inset 0 0 0 1px var(--side-line)}
+.brand .mark{border-radius:2px;background:var(--ink);width:24px;height:24px}
+.brand .mark svg{width:14px;height:14px;color:var(--bg)}
+.brand b{color:var(--ink)}
+.sb-glyph{background:var(--ink)!important;color:var(--bg);border-radius:3px}
+.sb-assess{border-radius:4px;background:var(--side-active);box-shadow:inset 0 0 0 1px var(--side-line)}
+.sb-assess .navlink .sb-glyph{width:18px;height:18px;border-radius:3px}
+.sb-assess .navlink.done::after{border-radius:0;box-shadow:none;width:7px;height:7px}
+.sb-new,.sb-new.sb-ai{background:none;color:var(--side-muted);padding:0;font:500 10.5px var(--mono);letter-spacing:0}
+.navlink .new{background:none;color:var(--side-muted)}
+.sb-more .navlink .sb-glyph{opacity:.6}
+.topbar{background:var(--bg);backdrop-filter:none;border-bottom:1px solid var(--line)}
+.tb-demo-t,.tb-demo{border-radius:4px}
+
+/* ---------- page header: a plain title block ---------- */
+.pagehead,.pagehead.ph-compact{background:none;box-shadow:none;border-radius:0;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:6px 0 22px;margin:0 0 26px;overflow:visible}
+.pagehead::before,.ph-mark,.ph-glyph{display:none}
+.pagehead h1{color:var(--ink);font-size:clamp(28px,3.2vw,38px);letter-spacing:-.025em;line-height:1.08}
+.pagehead p{color:var(--muted);font-size:15px;max-width:68ch;margin:8px 0 0}
+.ph-eb{color:var(--muted);font-weight:500;font-size:13px;margin-bottom:8px}
+.ph-stats{gap:6px 18px;margin-top:12px}
+.ph-stats span{background:none;border:0;padding:0;color:var(--muted);font:500 12.5px var(--mono);border-radius:0}
+.ph-stats span::before{box-shadow:none;background:var(--ink);border-radius:0;width:6px;height:6px}
+.pagehead .headmeta .btn{background:var(--surface);border-color:var(--line-strong);color:var(--ink)}
+.pagehead .headmeta .btn:hover{background:var(--sunk);border-color:var(--ink)}
+.pagehead .headmeta .btn.primary,.pagehead .headmeta .btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.pagehead .toast{color:var(--muted)}
+.pagehead .pill,.pagehead .ai-pill{background:var(--sunk);color:var(--muted);border:0}
+.pagehead.ph-compact{padding:10px 0 14px;margin-bottom:18px}
+.ph-compact .ph-eb{color:var(--muted)}
+.ph-compact .phc-t{color:var(--ink);font-size:18px;letter-spacing:-.02em}
+.ph-compact .phc-ctx{color:var(--muted)}
+.ph-help{border-radius:4px;border-color:var(--line-strong);color:var(--muted)}
+.ph-help:hover{border-color:var(--ink);color:var(--ink)}
+@media (max-width:760px){.pagehead,.pagehead.ph-compact{padding:4px 0 16px;border-radius:0}}
+
+/* ---------- the components every tool shares ---------- */
+.card{border-radius:4px;box-shadow:none;border:1px solid var(--line)}
+.card-h{border-bottom:1px solid var(--line)}
+.hero{border-radius:4px;box-shadow:none}
+.hero-side{background:var(--surface-2)}
+.btn{border-radius:4px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-weight:500}
+.btn:hover{border-color:var(--ink);color:var(--ink);background:var(--sunk)}
+.btn.primary,.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--bg);filter:none;font-weight:600}
+.pill{border-radius:3px;background:var(--sunk);color:var(--muted);font-weight:500;padding:2px 7px}
+.pill.accent{background:var(--accent-soft);color:var(--accent)}
+.pill.crit,.pill.high,.pill.med,.pill.good{background:none;padding-left:0;font-weight:600}
+.pill.crit::before,.pill.high::before,.pill.med::before,.pill.good::before{content:"";width:8px;height:8px;background:currentColor;flex:none}
+.tag{border-radius:3px}
+.segs{background:none;border-radius:0;padding:0;gap:18px;border-bottom:1px solid var(--line)}
+.segs button{border-radius:0;padding:4px 0 10px;color:var(--muted);font-weight:500;background:none;box-shadow:none;border-bottom:2px solid transparent;margin-bottom:-1px}
+.segs button[aria-pressed="true"]{background:none;box-shadow:none;color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+.segs button:hover{color:var(--ink)}
+.pol-tabs > .card-h{background:none}
+.input,.select,textarea.input,.field input,.field select,.field textarea{border-radius:4px}
+.kbd{border-radius:3px}
+.toast{color:var(--muted)}
+.banner{border-radius:4px;background:var(--sunk);border:0}
+table th{font-weight:600;color:var(--muted);letter-spacing:0;text-transform:none;font-size:12.5px}
+
+/* step strip */
+.asb{border-bottom:1px solid var(--line)}
+.asb-mid{font:500 12.5px var(--mono)}
+.asb-mid b{font-weight:500}
+.asb-segs i{border-radius:0;height:4px;background:var(--sunk);box-shadow:none}
+.asb-segs i b{background:var(--ink)}
+.asb-segs i.cur b,.asb-segs i:last-of-type b{background:var(--accent)}
+.asb-back{color:var(--ink)}
+
+/* guided screens: numbered option rows on hairlines */
+.gd-tool{border-radius:3px;background:var(--sunk);color:var(--ink);font-weight:500}
+.gd-facts div{border-radius:4px;box-shadow:none;background:var(--sunk);border:0}
+.gd-cta{border-radius:4px}
+.gd-opts{gap:0;border-top:1px solid var(--ink)}
+.gd-opt{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:15px 4px 15px 0;background:none}
+.gd-opt:hover{border-color:var(--line);background:var(--surface-2)}
+.gd-opt.on{border-color:var(--line);background:none}
+.gd-opt.on .gd-ot b,.gd-opt.on .gd-ot > span:first-child{font-weight:600}
+.gd-radio{width:28px;height:28px;margin-top:4px;border-radius:4px;border:1px solid var(--ink);font:500 12.5px var(--mono);color:var(--ink);background:var(--surface)}
+.gd-radio.sq{border-radius:4px}
+.gd-opt.on .gd-radio{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.gd-opt.on .gd-radio::after{display:none}
+.gd-opt kbd{border-radius:3px}
+.gd-chip{border-radius:3px;font-weight:500}
+.gd-chip.now{background:var(--ink);color:var(--bg)}
+.gd-chip.full{background:var(--good-soft)}
+.gd-lay{border-radius:3px}
+.gd-rad,.gd-lays{border-radius:4px}
+.gd-done{box-shadow:none;border:1px solid var(--line);border-radius:4px}
+.gd-mbar,.gd-mbar i{border-radius:0;height:8px}
+.gd-mbar i{background:var(--ink)}
+.gd-list{border-radius:4px}
+.gd-ar input{accent-color:var(--ink)}
+.gd-area{color:var(--ink)}
+
+/* the assessment home */
+.as-s{border-radius:0}
+.as-s.ok{border:0;border-bottom:1px solid var(--line);background:none;padding:12px 0}
+.as-s.todo{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 0}
+.as-s.todo:hover{background:none;border-color:var(--line)}
+.as-steps{gap:0}
+.as-steps > .as-s:first-child,.as-steps > .as-s.ok:first-of-type{border-top:1px solid var(--ink)}
+.as-s.cur{border:1px solid var(--ink);border-radius:4px;box-shadow:none;margin-top:18px;padding:22px 24px;--c:var(--ink)}
+.as-n{border-radius:0;box-shadow:none;font:500 12.5px var(--mono);color:var(--muted);width:24px;justify-content:start}
+.as-s.ok .as-n{color:var(--muted)}
+.as-pic,.as-know{border-radius:4px}
+.as-pic{background:var(--sunk);border:0}
+.as-first .as-pic{box-shadow:none}
+.as-six li{border-radius:4px;box-shadow:none}
+.as-six-n{border-radius:3px;background:var(--ink);color:var(--bg);font:500 12.5px var(--mono)}
+.as-part{border-radius:3px}
+.as-tag{font-weight:600}
+.as-rev,.as-rev-first{border-radius:4px}
+.as-rev-l li i{border-radius:0}
+
+/* tool pages that kept their own chrome */
+.ov-tool{border-radius:4px;box-shadow:none}
+.ov-tool:hover{transform:none;box-shadow:none;border-color:var(--ink)}
+.ov-art{background:var(--surface-2)}
+.tr-tier,.cp-row,.gd-pi .cp-row{border-radius:4px}
+.tr-tier.on,.cp-setup .tr-tier.on,.ds-setup .tr-tier.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--surface)}
+.tr-chk input,.cp-setup .tr-chk input,.ds-setup .tr-chk input{accent-color:var(--ink)}
+.tr-ring,.cp-ring,.ds-ring{border-width:4px;border-color:var(--line)}
+.tr-ring b{font-size:24px}
+.cp-new{border-radius:3px;letter-spacing:0;text-transform:none}
+.cp-gap,.rv-area,.rv-rad,.rv-grid .card{border-radius:4px}
+.rv-d{border-radius:3px}
+.pl-group,.pl-item,.nx-item{border-radius:4px}
+.ma-legend i{border-radius:0}
+.bar,.as-bar,.as-bar i{border-radius:0}
+.cv-off{border-radius:3px}
+.demo-welcome,.tour-card,.help-card,.offer{border-radius:4px;box-shadow:none;border:1px solid var(--line)}
+@media (prefers-reduced-motion: no-preference){.card,.btn,.ov-tool{transition:border-color .12s}}
+.as-n,.as-n.ok,.as-n.cur{background:none;color:var(--muted);box-shadow:none;border-radius:0;width:24px;height:auto;font:500 12.5px var(--mono);justify-content:start}
+.as-n.ok{color:var(--good)}
+.as-s.cur .as-n{color:var(--ink);background:var(--ink);color:var(--bg);width:24px;height:24px;border-radius:3px;justify-content:center}
+.as-score .as-k{color:var(--muted)}
+.tb-demo{background:var(--sunk);border-color:var(--line-strong);color:var(--ink)}
+.tb-demo b,.tb-demo .btn,.tb-demo-x{background:var(--ink);color:var(--bg);border-radius:3px}
+.sb-mark{border-radius:3px;background:var(--ink);color:var(--bg);box-shadow:none;width:26px;height:26px}
+.sb-mark svg{width:15px;height:15px}
+.brandbtn,.brandbtn:hover{background:var(--surface);border-color:var(--ink);color:var(--ink);box-shadow:none;opacity:1}
+.as-segs i{border-radius:0;height:4px;box-shadow:none;background:var(--sunk)}
+.as-segs i.on{background:var(--ink)}
+.as-segs i.on + i:not(.on){background:var(--accent)}
+.tb-demo{border-radius:4px;border:1px solid var(--line-strong);background:var(--surface)}
+.tb-demo-t{border-radius:3px;color:var(--ink)}
+.tb-demo-t i{background:var(--good)!important;box-shadow:none!important;border-radius:0!important}
+.tb-demo-x,.tb-demo-x:hover{border-radius:3px;background:var(--ink);color:var(--bg);filter:none}
+.rc-trend path,.rc-trend polyline,.rc-trend line{stroke:var(--ink)}
+.rc-trend circle{fill:var(--ink)}
+.rc-trend-d,.as-score .rc-up,.as-score .rc-dn{color:var(--muted)}
+
+/* ---------- phase 2: charts ---------- */
+.ma-lg-cur,.cv-lg-cov,.ov-lg-fill{background:repeating-linear-gradient(45deg, var(--ink) 0 1px, transparent 1px 4px)!important;border:1.5px solid var(--ink)!important;border-radius:0!important}
+.ma-lg-tgt,.ov-lg-tgt{border:1.5px dotted var(--accent)!important;opacity:1;border-radius:0!important}
+.ma-lg-old,.rv-lg-dot{border-color:var(--ink)!important;opacity:.6}
+.cv-lg-risk{border:1.5px dotted var(--crit);background:none;border-radius:0!important}
+.ma-lg-gap{border-radius:0!important}
+.cv-legend .ma-lg-gap{background:var(--crit)}
+.rk-radar .ma-rl,.ma-radar .ma-rl,.cv-radar .cv-rl{fill:var(--muted);font-weight:500}
+.ma-radar .ma-rl.crit,.cv-radar .cv-rl.exposed{fill:var(--crit)}
+.tr-ring,.cp-ring,.ds-ring{border:0;width:auto;height:auto;border-radius:0;display:grid;gap:2px;text-align:left;place-content:start;padding-top:2px}
+.tr-ring b,.cp-ring b,.ds-ring b{font:700 56px/1 var(--body);letter-spacing:-.04em;color:var(--ink)}
+.tr-ring span,.cp-ring span,.ds-ring span{font-size:12.5px;color:var(--muted)}
+.tr-ring.crit b{color:var(--crit)}
+.as-bar i,.gd-mbar i,.bar i{background:var(--ink)}
+/* the home grid gives way to one column while the sidebar still takes 300px: the picture needs about 520px to draw its bars */
+@media (max-width:1180px){.as-grid{grid-template-columns:1fr}.as-prog{justify-items:start}}
+@media (max-width:1180px) and (min-width:641px){.as-pic-b{grid-template-columns:190px minmax(0,1fr)}}
+
+/* ---------- phase 3: the long tail of chrome inside tools ---------- */
+.ab-stats,.jn-next,.live,.loop,.mxm-ns .mxm-card,.ov-hr,.pol-assume,.pol-empty-art,.pol-info-b,.pol-note,.pol-sum,.starthere,.ttbar,.verdict{background:var(--surface);background-image:none}
+.ab-stats,.jn-next,.loop,.pol-sum,.starthere,.ttbar,.verdict,.live,.pol-note,.pol-empty-art,.wip-art,.mxm-card,.ma-plan,.ma-sum,.tt-card,.scen,.vd-card,.mx-card,.pl-card,.nx-card,.ov-pic,.wb,.offer,.helpcard,.dm-card,.op-tile,.pk-r{border-radius:4px}
+.starthere{border-color:var(--ink);box-shadow:none}
+.jn-next{border-color:var(--line)}
+.mxm-ns .mxm-card{border-color:var(--line-strong)}
+.askcard > .bar i{background:var(--ink)!important}
+.sb-av{background:var(--ink);color:var(--bg);border-radius:3px}
+.ov-greet::before{display:none}
+.pill .dot{width:7px;height:7px;border-radius:0;background:currentColor}
+.pill:has(.dot)::before{display:none}
+.pill.low,.pill.muted{background:none;padding-left:0;font-weight:600;color:var(--muted)}
+.sdot{border-radius:0;width:7px;height:7px}
+.tt-sev,.sev{border-radius:3px}
+[class*="-ring"] b{font-variant-numeric:tabular-nums}
+.btn.icon{border-radius:4px}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
+.select,.input{border-color:var(--line-strong)}
+.select:focus,.input:focus{border-color:var(--ink)}
+.kbd,kbd{border-radius:3px;background:var(--sunk);border-color:var(--line)}
+.cp-tw table,.cp-map{border-radius:0}
+.ma-tabs .segs,.mx-tabs .segs,.cv-tabs .segs{border-bottom:1px solid var(--line)}
+.ma-band,.ma-ladder,.ma-ad,.ma-ar,.ma-rm,.cv-mr,.cv-card,.cvr-card,.tr-card,.ds-card,.cp-card{border-radius:4px}
+.pol-meter,.pol-meter i,.vd-bar,.vd-bar i,.mx-bar,.mx-bar i,.gd-mbar{border-radius:0}
+.pol-meter i,.vd-bar i,.mx-bar i{background:var(--ink)}
+.toast.ok,.toast.good{color:var(--good)}
+.loop-k,.jn-k{color:var(--muted)}
+.loop-k svg,.jn-k svg{color:var(--ink)}
+.tour-card,.tour{border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.tour-n{font:500 12px var(--mono);color:var(--muted)}
+.dm-welcome,.dm-exit{border-radius:4px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -6903,6 +7181,342 @@ const TT_VERSIONS = {
   }
 };
 
+/* ---------- Why each scenario: public evidence that the problem is real and common ---------- */
+// One fact per scenario, from a primary or authoritative public source, checked against the source page.
+// Universal scenarios can carry a company-type fact in byType. Review the list when TT_EVIDENCE_REVIEWED gets old.
+const TT_EVIDENCE_REVIEWED = "October 2026";
+const TT_EVIDENCE = {
+  challenge:{claim:"In Ofcom's late-2025 survey, 30% of UK 11-17-year-olds said they had seen content encouraging them to do dangerous stunts and challenges in the previous four weeks.",
+    source:"Ofcom, Children's Online Experiences", url:"https://www.ofcom.org.uk/siteassets/resources/documents/online-safety/research-statistics-and-data/protecting-children/childrens-online-experiences-research-report.pdf", published:"2026-05"},
+  gifting:{claim:"In a 2024 Thorn survey of 1,200 US 13-20-year-olds, 1 in 4 said that while under 18 they had been asked online for a sexual image or interaction in exchange for something of value.",
+    source:"Thorn, Commodified Sexual Interactions Involving Minors", url:"https://info.thorn.org/hubfs/Research/Thorn_CommodifiedSexualInteractionsInvolvingMinors_Apr2025.pdf", published:"2025-04"},
+  companion:{claim:"In Thorn's late-2025 survey of US 9-17-year-olds, 1 in 9 of those who had used an AI chatbot or companion said they had used it for flirty, romantic or sexual conversations.",
+    source:"Thorn, Youth Perspectives on Online Safety", url:"https://info.thorn.org/hubfs/Research/Thorn_2025YouthPerspectives_Report.pdf", published:"2026-07"},
+  classroom:{claim:"In Thorn's late-2025 survey of US 9-17-year-olds, roughly 1 in 6 (16%) said they had been sent or shown another minor's nude image without that person's consent.",
+    source:"Thorn, Youth Perspectives on Online Safety", url:"https://info.thorn.org/hubfs/Research/Thorn_2025YouthPerspectives_Report.pdf", published:"2026-07"},
+  comments:{claim:"Meta reported that in 2025 its specialist teams removed nearly 135,000 Instagram accounts for leaving sexualized comments on, or requesting sexual images from, adult-managed accounts featuring children under 13.",
+    source:"Meta newsroom", url:"https://about.fb.com/news/2025/07/expanding-teen-account-protections-child-safety-features/", published:"2025-07"},
+  minor:{claim:"In Thorn's late-2025 survey of US 9-17-year-olds, about 1 in 6 (16%) said they had used a dating app, though these apps are built for adults.",
+    source:"Thorn, Youth Perspectives on Online Safety", url:"https://info.thorn.org/hubfs/Research/Thorn_2025YouthPerspectives_Report.pdf", published:"2026-07"},
+  lootbox:{claim:"In January 2025 a popular game's maker agreed to pay $20 million and block under-16s from in-game purchases without parental consent, settling FTC allegations it deceived children about in-game costs and rare-prize odds.",
+    source:"US Federal Trade Commission", url:"https://www.ftc.gov/news-events/news/press-releases/2025/01/genshin-impact-game-developer-will-be-banned-selling-lootboxes-teens-under-16-without-parental", published:"2025-01"},
+  mules:{claim:"UK banks and payment firms surveyed by the Financial Conduct Authority closed the accounts of 238,396 suspected money mules in 2025, up from 184,935 in 2023; 85,425 were customers aged 25 and under.",
+    source:"UK Financial Conduct Authority", url:"https://www.fca.org.uk/news/press-releases/firms-crack-down-money-mules-need-do-more", published:"2026-09"},
+  impersonation:{claim:"Americans reported losing nearly $1 billion to business impersonators in 2025, with bank impersonators causing the highest losses. The FTC says the costliest impersonation scams often start with a fake security alert from a bank.",
+    source:"US Federal Trade Commission", url:"https://www.ftc.gov/news-events/news/press-releases/2026/06/ftc-data-show-people-reported-losing-3-point-5-billion-imposter-scams-2025", published:"2026-06"},
+  sanctions:{claim:"In September 2025, OFAC settled with a crypto exchange that had no program to screen users or transactions for sanctions links. It had made 17,183 exchanges worth $12,570,956 with users in sanctioned countries.",
+    source:"US Treasury, OFAC enforcement release", url:"https://ofac.treasury.gov/media/934641/download?inline=", published:"2025-09"},
+  coerced:{claim:"US financial institutions filed 155,415 elder financial exploitation reports in one year (June 2022 to June 2023), covering roughly $27 billion in suspicious activity. About 20% involved theft by a trusted person, FinCEN found.",
+    source:"FinCEN, elder financial exploitation analysis", url:"https://www.fincen.gov/news/news-releases/fincen-issues-analysis-elder-financial-exploitation", published:"2024-04"},
+  romance:{claim:"Cryptocurrency investment fraud cost Americans $7.2 billion in 2025, the largest source of losses the FBI recorded. Scammers often make first contact through dating apps or social media, then move victims to messaging apps.",
+    source:"FBI IC3 Annual Report", url:"https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf", published:"2026-04"},
+  offplatform:{claim:"Purchase scams, where buyers pay for goods that never arrive, made up 71% of all authorised push payment scam cases UK banks reported in 2025, with record losses of £118.1 million.",
+    source:"UK Finance Annual Fraud Report", url:"https://www.ukfinance.org.uk/system/files/2026-06/UK%20Finance%20Fraud%20Report%202026.pdf", published:"2026-06"},
+  voiceclone:{claim:"Victims told the FBI they lost over $5 million in 2025 to 'distress' scams, where voice cloning mimics a loved one in trouble.",
+    source:"FBI IC3 Annual Report", url:"https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf", published:"2026-04"},
+  ato:{claim:"In June 2025 the UK's data regulator fined a genetic-testing firm £2.31 million after a credential-stuffing attack, using passwords stolen in unrelated breaches, exposed data on 155,592 UK residents.",
+    source:"UK Information Commissioner's Office", url:"https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2025/06/23andme-fined-for-failing-to-protect-uk-users-genetic-data/", published:"2025-06",
+    byType:{
+      fintech:{claim:"The FBI logged about 4,700 account takeover complaints with $359.7 million in losses in 2025. It says a single takeover can send 50 or more transfers to accounts at several banks at the same time.",
+        source:"FBI IC3 Annual Report", url:"https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf", published:"2026-04"},
+      marketplace:{claim:"UK fraud-prevention body Cifas recorded more than 78,000 account takeover cases in 2025, up 6% on 2024. Online retail accounts were the second most-targeted product, after mobile phones.",
+        source:"Cifas, Fraudscape", url:"https://www.cifas.org.uk/newsroom/fraudscape2026", published:"2026-03"}}},
+  counterfeit:{claim:"The OECD and EUIPO estimate that trade in counterfeit goods was worth about USD 467 billion in 2021, or 2.3% of global imports. This is their latest estimate, published in 2025.",
+    source:"OECD and EUIPO, Mapping Global Trade in Fakes", url:"https://www.oecd.org/content/dam/oecd/en/publications/reports/2025/05/mapping-global-trade-in-fakes-2025_5c812e3c/94d3b29f-en.pdf", published:"2025-05"},
+  recall:{claim:"In 2025 the EU's eSurveillance web crawler scanned over 1.6 million websites and found more than 20,800 products for sale online that were already listed as dangerous in the EU Safety Gate alert system.",
+    source:"European Commission, Safety Gate report", url:"https://ec.europa.eu/commission/presscorner/detail/en/ip_26_537", published:"2026-03"},
+  reviews:{claim:"In December 2025 the FTC warned 10 companies about possible violations of its Consumer Review Rule on deceptive reviews. Each violation can bring a civil penalty of up to $53,088.",
+    source:"US Federal Trade Commission", url:"https://www.ftc.gov/news-events/news/press-releases/2025/12/ftc-warns-10-companies-about-possible-violations-agencys-new-consumer-review-rule", published:"2025-12"},
+  courier:{claim:"The UK Home Office said in July 2025 that delivery platforms' crackdown on illegal account sharing had already led to thousands being offboarded. It also announced a deal for the platforms to detect shared accounts and suspend them faster.",
+    source:"UK Home Office", url:"https://www.gov.uk/government/news/new-operational-partnership-with-delivery-giants-to-combat-illegal-working", published:"2025-07"},
+  camera:{claim:"In May 2025 a US House Oversight subcommittee held a hearing on covert surveillance in private spaces. It said these include hotel rooms and short-term rentals.",
+    source:"US House Oversight Committee", url:"https://oversight.house.gov/release/hearing-wrap-up-action-needed-to-prevent-covert-surveillance-in-private-spaces", published:"2025-05"},
+  partyhouse:{claim:"Airbnb says its anti-party defenses blocked or redirected over 20,000 people from booking entire homes in the US over the July 4 holiday weekend in 2025.",
+    source:"Airbnb newsroom", url:"https://news.airbnb.com/airbnbs-anti-party-system-returns-for-july-4-weekend", published:"2026-06"},
+  fakelisting:{claim:"UK victims made 6,066 reports of holiday fraud to Action Fraud in 2024 and lost £11,183,957. Police advise that a request to pay by bank transfer can be a sign of fraud.",
+    source:"Action Fraud (City of London Police)", url:"https://www.atol.org/news-and-blogs/2025/02/24/dont-let-fraudsters-trip-you-up-this-summer-new-alert-issued-as-people-look-to-snap-up-online-holiday-deals/", published:"2025-02"},
+  assault:{claim:"A peer-reviewed study of 3,413 sexual assault forensic exam records from one US state (2017-2020) found that assaults after a dating-app meeting made up 8.02% of all cases and 13.92% of acquaintance assaults.",
+    source:"Journal of Interpersonal Violence", url:"https://doi.org/10.1177/08862605221130390", published:"2022-10"},
+  location:{claim:"Peer-reviewed security researchers who tested 15 location-based dating apps found that 6 of them let someone pinpoint a user's exact location (USENIX Security 2024).",
+    source:"USENIX Security Symposium", url:"https://www.usenix.org/conference/usenixsecurity24/presentation/dhondt", published:"2024-08"},
+  rfi:{claim:"In February 2026 the European Commission preliminarily found a major video platform in breach of the EU Digital Services Act over addictive design, including its personalised recommender system; confirmed breaches can bring fines up to 6% of worldwide annual turnover.",
+    source:"European Commission", url:"https://ec.europa.eu/commission/presscorner/detail/en/ip_26_312", published:"2026-02"},
+  vip:{claim:"The Oversight Board reported in 2022 that, under a major social network's cross-check program for high-profile users, decisions on flagged content took about 12 days on average for US users; one item waited 222 days.",
+    source:"Oversight Board", url:"https://www.oversightboard.com/wp-content/uploads/2026/03/512630074120983.pdf", published:"2022-12"},
+  swatting:{claim:"A California teenager sentenced in February 2025 made over 375 swatting and threat calls between August 2022 and January 2024 and advertised swatting-for-a-fee on social media, the US Justice Department said.",
+    source:"US Department of Justice", url:"https://www.justice.gov/opa/pr/california-teenager-sentenced-48-months-prison-nationwide-swatting-spree", published:"2025-02"},
+  ugcextremism:{claim:"In a November 2025 action on gaming and gaming-related platforms, Europol and eight countries referred about 5,408 jihadist and 1,070 violent right-wing extremist links; Europol says perpetrators re-enact terrorist attacks and school shootings in 3D gameplay.",
+    source:"Europol", url:"https://www.europol.europa.eu/media-press/newsroom/news/europol-and-partner-countries-combat-online-radicalisation-gaming-platforms", published:"2025-11"},
+  deepfake:{claim:"OpenAI estimated that in the month before the 2024 US presidential election, ChatGPT rejected over 250,000 requests to generate DALL-E images of the presidential and vice-presidential candidates and President Biden.",
+    source:"OpenAI", url:"https://openai.com/index/how-openai-is-approaching-2024-worldwide-elections/", published:"2024-11"},
+  jailbreak:{claim:"The UK AI Security Institute, which has studied more than 30 frontier AI systems, reported in December 2025 that it had found universal jailbreaks, which reliably extract policy-violating information, for every system it tested.",
+    source:"UK AI Security Institute", url:"https://www.aisi.gov.uk/frontier-ai-trends-report", published:"2025-12"},
+  insider:{claim:"In 2023 the FTC charged a home security camera company with letting any employee or contractor access customers' private videos; one employee viewed thousands of recordings from bedrooms and bathrooms. The order required $5.8 million in refunds.",
+    source:"US Federal Trade Commission", url:"https://www.ftc.gov/news-events/news/press-releases/2023/05/ftc-says-ring-employees-illegally-surveilled-customers-failed-stop-hackers-taking-control-users", published:"2023-05",
+    byType:{
+      fintech:{claim:"In May 2025 a major US crypto exchange disclosed that criminals had paid support contractors and employees outside the US to pull customer data from internal systems; it estimated costs of $180 million to $400 million.",
+        source:"Coinbase SEC filing", url:"https://www.sec.gov/Archives/edgar/data/1679788/000167978825000094/coin-20250514.htm", published:"2025-05"}}},
+  emergency:{claim:"In the second half of 2025, Snapchat received 3,081 emergency disclosure requests from US law enforcement and produced some data in 67.7% of them.",
+    source:"Snap transparency report", url:"https://values.snap.com/privacy/transparency/legal-requests-h2-2025", published:"2026"},
+  bots:{claim:"Between April 2024 and April 2025, Microsoft blocked about 1.6 million bot sign-up attempts per hour across its services.",
+    source:"Microsoft Cyber Signals", url:"https://www.microsoft.com/en-us/security/blog/2025/04/16/cyber-signals-issue-9-ai-powered-deception-emerging-fraud-threats-and-countermeasures/", published:"2025-04",
+    byType:{
+      social:{claim:"Meta took action on 1.1 billion fake Facebook accounts in Q4 2025, up from 692 million in Q3, and estimates fake accounts were about 5% of Facebook's worldwide daily active people in Q4 2025.",
+        source:"Meta, EU disinformation code report", url:"https://disinfocode.eu/reports/meta/8?commitmentId=388&chapterId=80", published:"2026-03"},
+      dating:{claim:"Match Group's dating apps in the EU banned or suspended 6,962,890 spam, inauthentic and ineligible accounts in 2025, 94% detected proactively, with about 18 million monthly users in the region.",
+        source:"Match Group, EU DSA transparency report", url:"https://cdn.prod.website-files.com/67c577f5d5cf176437c09b66/69a37a67639b2e8238609323_MG-DSA%20Safe%20Dating%20Report%20-%202025%20-%20FINAL.pdf", published:"2026-02"}}},
+  vendor:{claim:"When the pandemic cut human review capacity in 2020, YouTube relied on automated systems: removals more than doubled versus the prior quarter, and the share of appealed videos reinstated rose from 25% to 50%.",
+    source:"YouTube Official Blog", url:"https://blog.youtube/inside-youtube/responsible-policy-enforcement-during-covid-19/", published:"2020-08",
+    byType:{
+      social:{claim:"Meta reported that after sending content reviewers home in March 2020, it took action on fewer pieces of suicide and self-injury content on Facebook and Instagram, and less child nudity and sexual exploitation on Instagram.",
+        source:"Meta Community Standards Enforcement Report", url:"https://about.fb.com/news/2020/08/community-standards-enforcement-report-aug-2020/", published:"2020-08"}}},
+  bias:{claim:"NIST's test of 189 face recognition algorithms from 99 developers found higher false-positive rates for Asian and African American faces in one-to-one matching, often by a factor of 10 to 100, depending on the algorithm.",
+    source:"NIST face recognition test", url:"https://www.nist.gov/news-events/news/2019/12/nist-study-evaluates-effects-race-age-sex-face-recognition-software", published:"2019-12",
+    byType:{
+      social:{claim:"A 2019 peer-reviewed study found that hate speech detection models labeled tweets written in African American English, and tweets by self-identified African Americans, as offensive up to two times more often than others.",
+        source:"ACL 2019, Sap et al.", url:"https://aclanthology.org/P19-1163/", published:"2019-07"},
+      genai:{claim:"A 2025 peer-reviewed study found that reward models used to align large language models were 4% less accurate on average with African American Language than with White Mainstream English, and often dispreferred AAL texts.",
+        source:"NAACL Findings 2025, Mire et al.", url:"https://aclanthology.org/2025.findings-naacl.417/", published:"2025"},
+      gig:{claim:"In 2024 the UK's equality regulator announced a financial settlement for a food delivery courier who alleged racially discriminatory facial recognition checks; he had been removed from the platform after a failed check and an automated process.",
+        source:"UK Equality and Human Rights Commission", url:"https://www.equalityhumanrights.com/news/news/uber-eats-courier-wins-payout-help-equality-watchdog-after-facing-problematic-ai-checks", published:"2024-03"}}},
+  takedown:{claim:"Freedom on the Net 2025 found people in at least 57 of 72 countries were arrested or imprisoned for online expression, a record high, and 69% of internet users live where political, social or religious content was blocked.",
+    source:"Freedom House, Freedom on the Net", url:"https://freedomhouse.org/sites/default/files/2025-11/Freedom_on_the_Net_2025_Digital.pdf", published:"2025-11",
+    byType:{
+      genai:{claim:"Freedom House reports that AI governance frameworks in China and Vietnam require generative AI chatbots to follow the Communist Party line on sensitive topics.",
+        source:"Freedom House, Freedom on the Net", url:"https://freedomhouse.org/sites/default/files/2025-11/Freedom_on_the_Net_2025_Digital.pdf", published:"2025-11"}}},
+  newlaw:{claim:"In 2025, over 45 US states and Puerto Rico introduced more than 300 bills on social media and children, and at least 20 states enacted new laws, according to the National Conference of State Legislatures.",
+    source:"National Conference of State Legislatures", url:"https://www.ncsl.org/technology-and-communication/social-media-and-children-2025-legislation", published:"2025-10",
+    byType:{
+      social:{claim:"From 25 July 2025, the UK Online Safety Act requires age checks such as facial scans or photo ID before children reach the most harmful content; fines reach 10% of global revenue or 18 million pounds, whichever is greater.",
+        source:"GOV.UK", url:"https://www.gov.uk/government/news/whats-changing-for-children-on-social-media-from-25-july-2025", published:"2025-07"},
+      dating:{claim:"Under the UK Online Safety Act, in-scope services had to finish illegal-content risk assessments by 16 March 2025, and companies can be fined up to 18 million pounds or 10% of qualifying worldwide revenue, whichever is greater.",
+        source:"GOV.UK, Online Safety Act explainer", url:"https://www.gov.uk/government/publications/online-safety-act-explainer/online-safety-act-explainer", published:"2025-04"},
+      genai:{claim:"The EU AI Act's transparency rules, which the European Commission said would take effect in August 2026, require that people using AI systems such as chatbots be told they are interacting with a machine.",
+        source:"European Commission, AI Act", url:"https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", published:"2026"},
+      kids:{claim:"The FTC's January 2025 update to the COPPA Rule requires separate verifiable parental consent before sharing children's data with third parties for targeted advertising, limits data retention, and gives companies one year to comply.",
+        source:"US Federal Trade Commission", url:"https://www.ftc.gov/news-events/news/press-releases/2025/01/ftc-finalizes-changes-childrens-privacy-rule-limiting-companies-ability-monetize-kids-data", published:"2025-01"},
+      fintech:{claim:"Since October 2025, EU instant payment rules require payment providers to offer payee verification, so a payee's name must match the IBAN; the European Commission says this helps prevent mistakes and scams.",
+        source:"European Commission", url:"https://finance.ec.europa.eu/news/new-eu-rules-make-instant-euro-payments-faster-and-safer-2025-10-10_en", published:"2025-10"},
+      marketplace:{claim:"The EU General Product Safety Regulation requires online marketplaces active in the EU to register in the Safety Gate Portal and name a single point of contact; more than 1,200 had registered by the end of 2025.",
+        source:"European Commission", url:"https://commission.europa.eu/news-and-media/news/increased-action-against-dangerous-products-eu-2025-2026-03-09_en", published:"2026-03"},
+      gaming:{claim:"Brazil's Digital Statute of Children and Adolescents (ECA Digital) bans loot boxes in games for children and teenagers, the Brazilian Senate's news service reported in March 2026.",
+        source:"Brazilian Senate news service", url:"https://www12.senado.leg.br/radio/1/noticia/2026/03/27/eca-digital-proibe-rolagem-infinita-e-caixa-de-recompensa-em-games-infantojuvenis", published:"2026-03"},
+      gig:{claim:"The EU Platform Work Directive, adopted in 2024, gives people working through platforms the right to an explanation of any decision taken or supported by an automated system, without undue delay.",
+        source:"EU Platform Work Directive", url:"https://data.consilium.europa.eu/doc/document/PE-89-2024-INIT/en/pdf", published:"2024-10"}}}
+};
+function ttWhy(sc, type){ const e = sc && TT_EVIDENCE[sc.id]; if(!e) return null; return (e.byType && e.byType[type]) || e; }
+
+/* ---------- Scenarios added from a gap check against public data (October 2026) ---------- */
+// Each fills a common, well-documented incident type the library didn't cover. They are appended after the
+// existing scenarios so saved progress, which is keyed by scenario index, still points at the same scenarios.
+SCENARIOS.push(
+{ id:"sextortion", types:["social","gaming","kids"], title:"The gift card ultimatum", platform:"Teen social app", severity:"Sev 1",
+  blurb:"Fake accounts posing as teenage girls target boys at one high school, get an image, then demand gift cards. Within hours, one boy posts that he wants to die.",
+  steps:[
+    // Law note source: https://www.law.cornell.edu/uscode/text/18/2258A
+    { t:"Mon 21:00", h:"Scripted accounts swarm one school",
+      s:"In two hours, 40 new accounts posing as teenage girls follow hundreds of students at one high school. Three boys report the same script: a friendly opener in a game chat or comment thread, a move to direct messages, then a demand for gift cards and a threat to send an image to everyone they know.",
+      o:[ op("Ban the three reported accounts now and send each boy your standard guide to blocking and reporting.", "The three accounts are gone in minutes. The other 37 keep messaging students, and new reports arrive all night.", [-8,-5,-5,3]),
+          op("Link the accounts by device, sign-up pattern, scripts and payment handles, remove the whole network, preserve evidence, file mandatory reports and alert every student they contacted.", "One sweep removes 52 linked accounts, including 12 no one had reported. Targeted students get a safety notice and reports are filed by morning.", [14,6,10,-6], true),
+          op("Pause direct messages from all accounts under seven days old, platform-wide, until the morning review.", "The campaign stalls overnight, but so do thousands of real new users. By morning, the offenders switch to older accounts.", [5,-6,-2,-3]) ],
+      lesson:"Sextortion is usually run as an organized campaign. Remove the whole network on shared signals, warn the people it targeted, and preserve and report as you go.",
+      law:"In the US, 18 U.S.C. 2258A requires providers to report apparent child sexual abuse material and enticement of minors to NCMEC's CyberTipline as soon as reasonably possible. The 2024 REPORT Act extended preservation of reported content from 90 days to one year." },
+    { t:"Tue 01:15", h:"A target says he wants to die",
+      s:"Earlier tonight, one 15-year-old target paid $50 in gift cards, and the demand doubled. Now he posts a story saying he wants to die and that everyone will see the image. Your classifier flags the post while he is online.",
+      o:[ op("Remove the story under your self-harm policy and send him the standard automated support message.", "The story is gone in seconds, but the message reads like a rule warning. He goes quiet, and you don't know if he is safe.", [-6,-4,-2,3]),
+          op("Lock his account to protect him and email the parent address on file to explain what happened.", "The email reaches an address he set up himself. Locked out, he loses the friends who were reaching out and still fears the image will spread.", [-8,-6,-3,-1]),
+          op("Have a trained specialist message him now: connect him to a crisis line, tell him it's not his fault and not to pay, and request an emergency welfare check.", "He replies to the specialist and agrees to call the crisis line. Police confirm he is safe at home with a parent within the hour.", [15,6,4,-6], true) ],
+      lesson:"When a target says he wants to die, a fast, human response matters most. Tell him it isn't his fault and not to pay, and connect him to crisis support now." },
+    // Law note source: https://www.ftc.gov/business-guidance/resources/complying-take-it-down-act
+    { t:"Tue 10:00", h:"His family, police and school call",
+      s:"Last night, the offender sent the image to three of the boy's followers. His parents want it gone for good, here and elsewhere. A detective asks what you have. The principal wants to warn every family and asks for the names of all targeted students.",
+      o:[ op("Hash and remove every copy, help the family use a cross-platform hash service, route police to your preserved evidence, and help the school warn families without names.", "Copies come down within hours and are blocked on participating platforms. The detective has what she needs, and the school's warning names no one.", [12,10,8,-5], true),
+          op("Remove the copies your team finds and tell the family to report anything on other sites to police.", "Your platform is clean by evening, but a copy surfaces on another site and the family feels left on their own.", [3,-8,-2,3]),
+          op("Send the principal the list of targeted students so the school can call each family today.", "Families hear fast, but the list leaks to a student group chat and the targeted boys are named and teased.", [3,-10,-8,0]) ],
+      lesson:"Victims need the image gone everywhere, not just on your platform. Use hashing and shared hash lists, work with police through your preserved evidence, and keep every target's identity private.",
+      law:"Under the US TAKE IT DOWN Act, enforced by the FTC since May 19, 2026, covered platforms must remove non-consensual intimate images and known identical copies within 48 hours of a valid removal request." },
+    { t:"Week 3", h:"Closing the door on strangers",
+      s:"The campaign is over. Your review finds offenders used public follower lists to find targets and make their threats credible, and messaged teens freely from accounts made that day. Leadership wants changes before next term but worries about growth.",
+      o:[ op("Add a sextortion warning banner to teens' inboxes and leave messaging and privacy settings as they are.", "Teens stop noticing the banner within a week, and the next campaign uses the same public follower lists.", [-3,2,-2,4]),
+          op("By default for teens, limit messages from accounts they don't follow, hide friend and follower lists from strangers, and blur suspected nudity behind a warning.", "Unwanted messages to teens drop sharply, and the next campaign struggles to find targets. Some teens complain about the limits, and growth dips slightly.", [13,8,8,-5], true),
+          op("Require a government ID check for every new account before it can send any message.", "Fake accounts slow down, but sign-ups fall, privacy groups object to collecting teens' IDs, and offenders buy older accounts instead.", [4,-8,-3,-6]) ],
+      lesson:"Sextortion depends on easy access to teens and their friend lists. Default protections that limit what strangers can see and send work better than warnings alone or blanket ID checks." }
+  ]},
+{ id:"aiimages", types:["genai","social"], title:"The school photo edits", platform:"AI photo app", severity:"Sev 1",
+  blurb:"A school says your AI editing feature is being used to turn students' photos into sexualized images. Copies are already spreading beyond your app.",
+  steps:[
+    { t:"Mon 08:30", h:"A school reports edited student photos",
+      s:"A school and three parents report that students' school photos, copied from public profiles, have been turned into sexualized images with your AI editing feature. Your logs confirm the edits were made in your app. The feature drives 35% of daily sessions and anchors this month's ad campaign.",
+      o:[ op("Add the wording from the reported requests to your blocklist and keep the feature live while you investigate.", "Within hours, logs show users rephrasing requests to get past the list. The school asks why the feature is still on.", [-10,-8,-5,0]),
+          op("Take the whole app offline until the investigation is complete.", "No new edits are made, but millions of users lose access to their photos, support is swamped and the outage becomes the headline.", [10,-8,0,-12]),
+          op("Switch off the AI editing feature for everyone now, keep the rest of the app running, and preserve the generation logs.", "Daily sessions fall by a third and the ad campaign is paused, but no new edits can be made and the evidence is intact.", [12,6,6,-4], true) ],
+      lesson:"Engagement can recover; harm to a child can't. Switch off the smallest thing that fully stops the harm, and keep the evidence." },
+    // Law note source: https://www.govinfo.gov/content/pkg/USCODE-2024-title18/html/USCODE-2024-title18-partI-chap110-sec2258A.htm
+    { t:"Mon 16:00", h:"A hotline finds copies elsewhere",
+      s:"A child-protection hotline tells you images carrying your app's watermark are circulating in group chats and on another platform. Your team has traced 212 edited images to nine accounts. An engineer proposes deleting every image and account today so nothing can leak again.",
+      o:[ op("Suspend the nine accounts, report each case to the national child-abuse reporting center, preserve the evidence with restricted access, and share hashes through an industry hash-sharing program.", "Reports go in within hours. The other platform blocks matching copies the same day, and investigators later use your preserved logs to identify the account holders.", [12,6,10,-5], true),
+          op("Delete every edited image and the nine accounts today so the material can never leak from your systems.", "Your systems are clean, but the evidence investigators need is gone, and you have nothing to hash so other platforms can block copies.", [-5,-5,-15,3]),
+          op("Suspend the accounts, but hold off reporting until legal confirms whether AI-edited images are covered by the reporting law.", "Legal confirms four days later that they are. Meanwhile copies keep spreading, and your late reports draw questions from investigators.", [-8,-3,-10,2]) ],
+      lesson:"Never delete first. Images altered to show a real child count as abuse material: report them, preserve the evidence, and share hashes so other platforms can block copies.",
+      law:"Under 18 U.S.C. 2258A, US providers must report apparent child sexual abuse material to NCMEC's CyberTipline as soon as reasonably possible. A completed report is treated as a request to preserve its contents for one year." },
+    // Law note source: https://www.ftc.gov/business-guidance/resources/complying-take-it-down-act
+    { t:"Tue 11:00", h:"Families, the regulator and the press",
+      s:"Worried parents are forwarding copies they found to the school as proof. The school wants your help writing to families, the regulator has asked for a call today, and a local reporter knows which school is involved.",
+      o:[ op("Ask the school to collect copies parents have found and send them to your team so you can find every match.", "You find a few more copies, but the images pass through more inboxes, and the school's lawyer warns that forwarding them is itself illegal.", [-10,-5,-8,0]),
+          op("Ask families to stop forwarding copies, give them a named contact and a way to report without sharing images, and brief the regulator before a short public statement.", "Families stop circulating copies and use the reporting route. The regulator credits your early briefing, and your statement names no school or child.", [10,10,10,-6], true),
+          op("Issue a holding statement that your safeguards are robust and this was isolated misuse, and route the regulator's questions through your press team.", "The reporter learns copies are on another platform and 'isolated' falls apart. The regulator, kept at arm's length, opens a formal inquiry.", [0,-12,-10,3]) ],
+      lesson:"Every forward exposes the child again. Give families a way to act without sharing images, and brief the regulator before the press does.",
+      law:"Since May 2026, the US TAKE IT DOWN Act requires covered platforms to remove reported intimate images, including AI-made 'digital forgeries', and known identical copies within 48 hours of a valid request." },
+    { t:"Week 3", h:"Bringing the feature back",
+      s:"Engagement is down 30%, and leadership wants the editing feature back before the holidays. Your review finds it never checked whether an uploaded photo showed a real person or a child, and was never red-teamed for this misuse.",
+      o:[ op("Relaunch only once the feature blocks sexualized edits of real people, refuses edits to photos that appear to show minors, and passes an external red-team review.", "Relaunch slips four weeks and some family-photo edits are refused, but red-team attempts to repeat the misuse fail and the regulator accepts your plan.", [12,8,10,-6], true),
+          op("Relaunch next week with a longer blocked-words list and a new terms-of-use rule against sexualized edits of real people.", "Engagement recovers, but within days users find wording the list misses, and the hotline sends a new batch of reports.", [-12,-6,-8,3]),
+          op("Relaunch only for paying users who verify they are adults, keeping the current filters.", "Misuse dips at first, but checking the uploader's age does nothing for the child in the photo, and reports resume from verified accounts.", [-3,-5,-3,-2]) ],
+      lesson:"Safeguards must protect the person in the photo, not just check the person using the app. Block sexualized edits of real people, detect minors, and red-team for abuse before launch." }
+  ]},
+{ id:"investscam", types:["fintech"], title:"The guaranteed returns club", platform:"Payments app", severity:"Sev 2",
+  blurb:"Hundreds of customers are paying the same new accounts after a celebrity video ad promised guaranteed returns. The celebrity never made it, and the platform is fake.",
+  steps:[
+    { t:"Mon 09:00", h:"Many customers, the same new payees",
+      s:"Your fraud team spots 340 customers making first-time payments, averaging £3,500, to six accounts at two other banks, all opened last month. Most chose \"paying a friend\" as the reason. Support chats mention a trading platform found through a celebrity video ad and an investment \"club\" on a messaging app.",
+      o:[ op("Hold new payments to the six accounts for a scam warning and a call, contact customers who already paid, and alert the two receiving banks.", "Calls confirm a fake trading platform. Most customers stop paying, and the receiving banks freeze two accounts that still hold £180,000.", [12,6,6,-6], true),
+          op("Block all payments to the six accounts and restrict the 340 customers to small payments until each customer is reviewed.", "Payments to the six stop, but customers can't pay rent or bills, complaints spike, and the scammers send victims new account details within hours.", [6,-10,-2,-10]),
+          op("Add the six accounts to a watchlist and wait for confirmed fraud reports before stepping in.", "It avoids false alarms, but 120 more customers pay over two days, and by the first reports the money has left the receiving banks.", [-12,-5,-5,3]) ],
+      lesson:"Many customers paying the same new accounts, with reasons that don't fit, is a strong scam signal. Interrupt the payments, talk to customers and alert the receiving banks the same day." },
+    // Law note source: https://www.legislation.gov.uk/uksi/2024/1013/body/made
+    { t:"Wed 11:00", h:"Scammers adapt and coach their victims",
+      s:"The scammers now switch payee accounts every few days and coach victims on what to tell your staff. Your product lead asks how much friction to add. One customer, called twice, says \"I know what I'm doing\" and threatens to close his account if you block another payment.",
+      o:[ op("Hold every first-time payment over £1,000 for 48 hours, for all customers, until the scam wave passes.", "Scam payments drop, but house deposits, rent and invoices stall for thousands of genuine customers, and support calls triple.", [8,-8,-4,-10]),
+          op("Target friction by risk: a warning describing this exact scam, a hold and specialist call for high-risk payments, and a second conversation for customers who insist.", "Most genuine payments go through untouched. On the second call, the insistent customer hears how the fake platform works and stops paying.", [12,5,7,-6], true),
+          op("Show a stronger warning on all transfers and let customers proceed once they confirm they understand the risk.", "Coached customers tap through it in seconds. Losses continue, and the insistent customer sends another £15,000.", [-10,-4,-5,5]) ],
+      lesson:"Friction works when it is targeted: generic warnings get tapped through, blanket holds punish genuine customers, and a customer under a scammer's influence often needs a real conversation.",
+      law:"Since 30 October 2024, the UK Payment Services (Amendment) Regulations 2024 let firms delay a payment by up to four business days when they have reasonable grounds to suspect the customer is being scammed. They must tell the customer why." },
+    // Law note source: https://www.psr.org.uk/information-for-consumers/app-fraud-reimbursement-protections/
+    { t:"Fri 10:00", h:"Victims want their money back",
+      s:"About 400 customers have lost a total of £1.4 million, and a few ignored your warnings. Some are now getting calls offering to recover their money for a fee. The receiving banks have frozen part of the funds, and a local newspaper is preparing a story.",
+      o:[ op("Reimburse customers who never saw a warning, and decline everyone who tapped through one as grossly negligent.", "It looks consistent, but gross negligence is a high bar. The ombudsman overturns many declines, and the newspaper leads with refused victims.", [-5,-10,-8,-2]),
+          op("Ask victims to wait while the receiving banks recover what they can, then reimburse the shortfall.", "Recovery takes months. Victims wait well past the reimbursement deadline, complaints reach the regulator, and the newspaper runs their stories.", [-6,-8,-10,2]),
+          op("Reimburse eligible victims within the deadline, assess warning cases individually, claim the receiving banks' share, warn victims about recovery scams, and brief the newspaper on what you're doing.", "Most victims are repaid within days. The receiving banks pay their half and close linked accounts, and the story credits your fast response.", [10,10,8,-6], true) ],
+      lesson:"Reimbursement is a cost you share with the banks that received the money. Repay victims promptly, treat gross negligence as a high bar, and warn victims that recovery offers are often a second scam.",
+      law:"Under the UK Payment Systems Regulator's reimbursement requirement, since 7 October 2024 payment firms must reimburse most authorised push payment scam victims up to £85,000, with sending and receiving firms splitting the cost 50:50. The gross negligence exception is a high bar." },
+    { t:"Week 3", h:"Stopping the next wave earlier",
+      s:"Losses have fallen, but copycat trading platforms appear every week. Almost every victim first saw a deepfake celebrity ad on social media or joined an investment group on a messaging app. Your CEO asks what changes now.",
+      o:[ op("Launch a customer awareness campaign about investment scams and keep your detection rules as they are.", "Awareness rises a little, but coached victims trust the scammers over your emails, and the next platform takes a week to spot.", [-3,3,-3,3]),
+          op("Block payments to cryptocurrency exchanges and newly registered investment firms for all customers.", "Genuine investors complain and move their money elsewhere, while the scammers keep collecting payments through personal accounts at other banks.", [2,-10,-3,-2]),
+          op("Report the ads and groups to the platforms with evidence, share payee details with other banks and police, and add alerts for many customers paying one new payee.", "Dozens of ads and groups come down, other banks close linked accounts faster, and the next copycat platform is caught within a day.", [10,8,7,-4], true) ],
+      lesson:"Investment scams start on social media and messaging apps, not in your app. Reporting ads, sharing data with other banks and spotting payee clusters early stops each new wave sooner." }
+  ]},
+{ id:"ridehail", types:["gig"], title:"The fourth complaint", platform:"Ride-hailing app", severity:"Sev 1",
+  blurb:"At 2 a.m., a rider calls your safety line to report that her driver sexually assaulted her. By morning, you learn he had three earlier complaints nobody connected.",
+  steps:[
+    { t:"Sat 02:10", h:"A rider calls the safety line",
+      s:"A rider calls your in-app safety line to report that her driver sexually assaulted her on a trip that ended 30 minutes ago. She is home, shaken and alone. The driver is online and has just accepted another trip. Trip GPS and in-app messages auto-delete after 30 days.",
+      o:[ op("Leave the driver active until an investigator reviews the case on Monday, and have the agent take her full written account tonight.", "The driver completes 40 more trips before Monday. She retells every detail to a generalist agent, then stops answering your messages.", [-12,-8,-4,2]),
+          op("Put the driver on a temporary hold, connect her to a trained safety specialist who offers police and support contacts, and preserve the trip's GPS, messages and call logs.", "His pending pickup is reassigned and he can't drive while the case is open. She chooses next steps with a specialist, and the trip record is preserved.", [12,6,5,-4], true),
+          op("Permanently deactivate the driver right away and tell her he has been removed from the platform for good.", "She feels believed tonight, but the case is closed with no evidence kept. When the driver appeals, your team has nothing to stand behind.", [8,-3,-4,-5]) ],
+      lesson:"A temporary hold manages risk without deciding guilt. In the first hour, support the person reporting and preserve the evidence, because deletion schedules don't pause for investigations." },
+    { t:"Sat 09:00", h:"Three complaints nobody connected",
+      s:"Your investigator finds three earlier complaints about this driver in eight months: two for inappropriate comments, one for a long late-night route deviation. Each was closed by a different agent with a warning. The driver denies the report, says he relies on the income, and asks to be reinstated today.",
+      o:[ op("Keep the hold, tell the driver the general nature of the report, hear his side, and decide within ten days using trip data and his full history.", "Within a week, trip GPS and the complaint pattern support her account. You deactivate him with a written reason and a right to appeal.", [12,6,6,-5], true),
+          op("Reinstate the driver while police decide whether to act, since the earlier complaints were minor and none was ever upheld.", "He is back on the road within hours. Ten days later, another rider reports a late-night detour and unwanted comments from him.", [-14,-8,-5,3]),
+          op("Keep him on hold with no explanation until police finish their investigation, however long that takes.", "Riders are protected, but months pass with no decision. The driver files repeated appeals, a drivers' group takes up his case, and your own review stalls.", [8,-5,-3,-6]) ],
+      lesson:"Police timelines aren't yours. Run a fair process of your own on the evidence you hold, and review past complaints as a pattern, not one at a time." },
+    { t:"Mon 11:00", h:"The detective and the rider",
+      s:"A detective asks for the driver's identity, the trip's GPS and messages, and \"everything you have on both of them.\" Meanwhile, your automated systems have asked the rider to rate the trip. She writes back asking whether anyone is actually handling her case.",
+      o:[ op("Send the detective everything on both accounts right away, including her full trip history, to show you are cooperating fully.", "The case moves, but two years of her unrelated trips end up in a file that the driver's defense lawyer can later see.", [2,-8,-5,0]),
+          op("Insist on a warrant for any data, and route all contact with the rider through legal so nothing you say affects the case.", "The warrant takes three weeks. Her only messages from you are formal legal letters, and she tells the detective she feels abandoned.", [-6,-8,1,2]),
+          op("Share the trip's GPS, messages and driver details once valid legal process arrives, switch off automated prompts to her, and assign her one named specialist.", "The detective has what the case needs within days. She hears from one person, is never asked to retell her account, and keeps working with police.", [10,8,6,-3], true) ],
+      lesson:"Share what the case needs under proper legal process, not everything you hold. One trained contact, and never making her retell it, is what trauma-informed support looks like." },
+    // Law note source: https://www.tdlr.texas.gov/tnc/drivers.htm
+    { t:"Week 3", h:"Why the pattern was missed",
+      s:"The driver is deactivated and the police case continues. Your review finds complaints are filed by trip, so no one ever saw a driver's history in one place. Criminal record checks rerun only once a year. Your CEO wants a plan by Friday.",
+      o:[ op("Automatically deactivate any driver after a single complaint about inappropriate comments or route deviation.", "Hundreds of drivers lose their income over traffic detours and false reports. Appeals swamp your team, and drivers start refusing late-night trips.", [3,-8,-2,-12]),
+          op("Link every complaint to the driver's full history with escalation rules, add continuous criminal-record monitoring, and build in-trip safety tools for riders and drivers alike.", "Patterns reach an investigator by the second complaint. Drivers, who face assaults from riders too, get the same emergency button and audio recording.", [12,8,7,-5], true),
+          op("Launch a rider emergency button and a public safety report this month, and plan the complaint-system changes for next year.", "The launch gets good coverage. But complaints are still reviewed one trip at a time, and two months later another pattern slips through.", [2,3,-2,2]) ],
+      lesson:"Low-level complaints are often early warnings, so review them as one history, not trip by trip. Build the same protections for drivers, who are assaulted by riders too.",
+      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires companies to rerun criminal background and driving history checks on every driver at least once a year. Continuous monitoring goes beyond that minimum." }
+  ]},
+{ id:"datingsextortion", types:["dating"], title:"The video-call blackmail ring", platform:"Dating app", severity:"Sev 2",
+  blurb:"A ring of fake profiles lures members to video chat, records them and demands money. One report leads to hundreds, and the network is still matching.",
+  steps:[
+    { t:"Mon 08:30", h:"A member reports blackmail",
+      s:"A member reports that a match moved him to a video-chat app within an hour, secretly recorded an intimate call, and now demands money or the recording goes to his contacts. Your team searches and finds 340 similar reports in six weeks, most from members in their twenties. The profiles look different, but their opening messages are nearly identical.",
+      o:[ op("Ban the 340 reported profiles today and send each reporter your standard harassment reply.", "The profiles are gone by evening, but new ones with the same scripts appear overnight. Reporters get no advice on the blackmail itself.", [3,-4,-2,-6]),
+          op("Block video-chat links and phone numbers in all chats across the app while you investigate.", "Fast moves off the app slow down, but so do genuine dates. Members complain loudly, and the group switches to spelled-out usernames within two days.", [5,-8,0,-4]),
+          op("Open an incident, give the reporter clear advice (don't pay, stop replying, keep evidence), preserve all reports, and map the linked profiles today.", "The reporter stops replying and doesn't pay. By evening, matching photos, scripts and devices link 1,100 profiles, far more than were reported.", [10,6,5,-5], true) ],
+      lesson:"One sextortion report is often a window into a network. Support the victim first, preserve evidence, and map the network before you start banning." },
+    { t:"Tue 09:00", h:"Deciding how wide to sweep",
+      s:"Investigators link 1,100 profiles through AI-generated photos, copied scripts and 40 shared devices. About 900 match on several strong signals; 200 match on one weak signal, such as a photo flagged as possibly AI-edited. New fakes appear daily, and any sweep will tell the group you have found them.",
+      o:[ op("Keep watching for another week so you can map every profile and device before acting.", "The map gets more complete, but about 70 more members are blackmailed that week, and the group starts moving to new devices.", [-12,-6,-3,0]),
+          op("Remove the 900 in one coordinated sweep, block their devices, preserve evidence, and send the 200 borderline profiles to fast human review.", "The 900 go within an hour and new sign-ups from those devices fail. Review clears 130 real members and removes 70 more fakes.", [12,6,5,-5], true),
+          op("Ban all 1,100 now, plus any account that shares a device or an opening line with them.", "The network is gone overnight, but so are about 400 real members. Appeals flood support, and a viral thread calls your bans random.", [8,-10,-3,-10]) ],
+      lesson:"Remove networks in one coordinated sweep using several strong signals together. Waiting costs victims, and banning on one weak signal costs innocent members." },
+    // Law note source: https://www.ftc.gov/news-events/news/press-releases/2026/05/ftc-begins-enforcing-take-it-down-act
+    { t:"Wed 11:00", h:"Hundreds of members need help",
+      s:"About 2,300 members chatted with the network, and 400 have reported blackmail. Some paid and were asked for more; several write that they feel desperate. A national police cybercrime unit asks what you can share.",
+      o:[ op("Message all 2,300 with clear steps (don't pay, stop contact, keep evidence), offer takedown help and crisis support, and refer the network to police with preserved evidence.", "More victims come forward and fewer pay. Dozens use your takedown help, and police trace the payment accounts to a crime group abroad.", [12,10,8,-6], true),
+          op("Contact only the 400 members who reported blackmail, so you don't alarm the 1,900 who may not have been targeted.", "Reporters get help, but many targeted members never reported out of shame. Some keep paying, and others learn about the network from the news.", [2,-8,-2,0]),
+          op("Tell victims to report to police themselves, and wait for a formal legal request before engaging with the police unit.", "Victims bounce between your support team and the police. The legal request takes weeks, and by then the group's payment accounts have closed.", [-5,-6,-2,3]) ],
+      lesson:"Paying rarely ends the threats, so tell everyone exposed, not just reporters, what to do, help with takedowns, and give police a case they can act on.",
+      law:"Since May 19, 2026, the US TAKE IT DOWN Act requires covered platforms to offer a way to request removal of non-consensual intimate images, and to remove them and known identical copies within 48 hours of a valid request." },
+    // Law note source: https://www.legislation.gov.uk/ukpga/2023/50/schedule/7
+    { t:"Week 6", h:"Stopping the next network",
+      s:"The sweep holds, but a smaller copy of the network appears a month later. Your data shows most blackmail cases moved off the app within an hour of matching. Your CEO asks what changes.",
+      o:[ op("Warn members in chat when a new match pushes to move off the app, screen new photos for AI generation, and share network signals with other platforms.", "Many members pause after the warning, and blackmail reports fall by more than half. New copycat profiles are caught at sign-up.", [12,8,8,-5], true),
+          op("Require every member to pass a live selfie video check before they can send any message.", "Fake profiles drop sharply, but sign-ups fall by a quarter, and within weeks the group buys verified accounts from real people.", [6,-4,2,-8]),
+          op("Publish a sextortion safety guide in the help center and send it to all members in a one-off email.", "The guide gets good press, but few members read it, and the copycat network runs the same playbook.", [-5,3,-3,2]) ],
+      lesson:"Sextortion follows a pattern: fast trust, a fast move off the app, then threats. Put warnings at that moment, and share signals so networks can't just move elsewhere.",
+      law:"The UK Online Safety Act lists sharing or threatening to share intimate images as a priority offence. Platforms with UK users must take proportionate steps to reduce the risk of their service being used to commit or facilitate it." }
+  ]},
+{ id:"triangulation", types:["marketplace"], title:"The bargains bought with stolen cards", platform:"Online marketplace", severity:"Sev 2",
+  blurb:"Buyers love the cheap headphones and consoles. Then a big retailer's fraud team calls: the goods were bought with stolen cards, and the orders trace back to your sellers.",
+  steps:[
+    // Law note source: https://www.ftc.gov/business-guidance/resources/informing-businesses-about-inform-consumers-act
+    { t:"Mon 09:00", h:"A retailer's fraud team calls",
+      s:"A large retailer's investigators say hundreds of its orders, paid with stolen cards, trace back to sellers on your marketplace. Your data points to 85 sellers who joined in the last eight weeks, most with hundreds of sales of consoles and headphones at 20-30% below market. Their tracking numbers come from that retailer, and buyers' photos show its boxes.",
+      o:[ op("Hold payouts to the 85 sellers, confirm the pattern on a sample of orders, and set up a direct line with the retailer's investigators.", "By evening 46 of 50 sampled orders match the retailer's stolen-card list, and about $700,000 in pending payouts stays with you.", [10,5,8,-5], true),
+          op("Ask the retailer to send a formal legal request with evidence before you act against any seller.", "It feels careful, but the request takes nine days. Meanwhile payouts go out and every new order triggers another stolen-card purchase.", [-10,-3,-5,3]),
+          op("Log the report and leave it to the retailer, since your buyers paid and got their goods.", "Your metrics look fine for a week. Then the retailer starts canceling shipments to your buyers, and the sellers cash out and disappear.", [-12,-8,-8,5]) ],
+      lesson:"Triangulation fraud hides behind happy buyers: new high-volume sellers, below-market prices and another retailer's tracking are the signal. Hold payouts while you confirm it.",
+      law:"The US INFORM Consumers Act requires online marketplaces to collect and verify bank, tax ID and contact details from high-volume third-party sellers: those with 200 or more sales and $5,000 or more in revenue in a 12-month period." },
+    { t:"Tue 09:00", h:"Thousands of paid orders in limbo",
+      s:"The pattern is confirmed. The 85 sellers have 3,400 open orders from real buyers who have already paid. Every order these sellers fill means another purchase with a stolen card. Your marketplace team warns that canceling them all will flood support and anger loyal buyers.",
+      o:[ op("Let the open orders complete so buyers get what they paid for, and block the sellers from taking new ones.", "Buyers stay happy, but about 3,400 more stolen-card purchases go through, and the retailer says it is weighing legal action.", [-15,-5,-8,5]),
+          op("Ban all 85 sellers and cancel every open order now, using your standard seller-unavailable notice and refund timeline.", "The fraud stops, but buyers get a vague email and a 7-day refund wait. Support queues triple and buyers post that you took their money.", [10,-8,0,-10]),
+          op("Remove the sellers, cancel their open orders, refund buyers in full today from held payouts, and tell buyers plainly what happened.", "Some buyers are annoyed to lose a bargain, but most accept the explanation, and the stolen-card purchases tied to your sellers stop.", [12,5,5,-6], true) ],
+      lesson:"Every order a triangulation seller fills creates a new card-fraud victim. Stop the flow, then make buyers whole quickly and honestly; held payouts are what pay for it." },
+    { t:"Thu 11:00", h:"Everyone wants answers at once",
+      s:"Your payment processor warns that your dispute rate has doubled and is nearing card network limits, driven by buyers whose shipments the retailer canceled. The retailer wants every buyer's name and address, police have opened a case, and a consumer reporter asks what you knew.",
+      o:[ op("Send the retailer your full buyer and seller records so it can recover its losses as fast as possible.", "The retailer is grateful, but buyers start getting demand letters, and your privacy team flags sharing innocent buyers' data in bulk as a likely privacy breach.", [0,-8,-10,3]),
+          op("Refund buyers with canceled shipments, send the processor a written plan, share seller evidence with the retailer and police, and tell the reporter the facts.", "Disputes fall within two weeks and the processor holds off on penalties. Police link the sellers to a known fraud ring, and the story runs with your response.", [8,8,10,-6], true),
+          op("Fight each dispute case by case and say nothing publicly until police finish their investigation.", "Your team loses most disputes, and the processor starts holding back a share of your funds. The reporter runs the story without your side.", [-3,-10,-6,-5]) ],
+      lesson:"Share what each party needs, not everything you have. Fixing the cause of disputes and giving your processor a plan protects your ability to take payments." },
+    // Law note source: https://digital-strategy.ec.europa.eu/en/policies/dsa-impact-platforms
+    { t:"Week 3", h:"Fixing how sellers get in",
+      s:"The network is gone. Its sellers needed only an email and a bank account to start, and reached hundreds of sales before anyone checked who they were. Leadership asks what changes before the holiday rush.",
+      o:[ op("Block new sellers from listing consoles and headphones until they have six months of history.", "This network can't return in those categories, but genuine new sellers go elsewhere and the next ring moves into phones and laptops.", [4,-6,0,0]),
+          op("Add an automatic rule that flags listings priced more than 20% below market for manual review.", "Reviewers drown in genuine clearance deals, and the next ring prices just 15% below market and slips through.", [3,0,0,-8]),
+          op("Verify seller identity and bank details before first sale, hold early payouts for fast-growing sellers, flag other retailers' tracking numbers, and share signals with retailers.", "Sign-ups dip slightly. A copycat ring is caught in its first week with payouts still held, and the retailer joins a standing signal-sharing channel.", [10,6,10,-4], true) ],
+      lesson:"Triangulation rings need fast access to payouts. Verifying who sellers are, slowing early payouts and sharing signals with retailers remove what makes the scheme pay.",
+      law:"In the EU, the Digital Services Act requires online marketplaces to make sure sellers give verified identity information before they can start selling." }
+  ]}
+);
+// Why each new scenario: one checked fact from a primary or authoritative source (see partS12.js)
+Object.assign(TT_EVIDENCE, {
+  sextortion:{claim:"NCMEC received an average of 137 financial sextortion reports a day in 2025, up 37% on 2024, and knows of at least three dozen US teenage boys who took their lives after being targeted.",
+    source:"NCMEC, CyberTipline Data", url:"https://www.missingkids.org/gethelpnow/cybertipline/cybertiplinedata", published:"2026"},
+  aiimages:{claim:"In 2025, more than 182,000 reports to NCMEC's CyberTipline involved offenders possessing, generating or attempting to generate AI-generated child sexual abuse material.",
+    source:"NCMEC, CyberTipline Data", url:"https://www.missingkids.org/gethelpnow/cybertipline/cybertiplinedata", published:"2026"},
+  investscam:{claim:"Investment scams made up 38% of all authorised push payment scam losses at UK banks in 2025, reaching a record £221.5 million, up 40% on 2024.",
+    source:"UK Finance Annual Fraud Report", url:"https://www.ukfinance.org.uk/system/files/2026-06/UK%20Finance%20Fraud%20Report%202026.pdf", published:"2026-06"},
+  ridehail:{claim:"In 2021 and 2022, two US ride-hail companies reported a combined 52 fatal assaults and 4,469 of the five most serious types of sexual assault, according to the US Government Accountability Office.",
+    source:"US Government Accountability Office", url:"https://www.gao.gov/products/gao-26-108552", published:"2026-07"},
+  datingsextortion:{claim:"People aged 20 to 29 filed 22,061 sextortion complaints with the FBI's Internet Crime Complaint Center in 2025, more than any other age group.",
+    source:"FBI IC3 Annual Report", url:"https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf", published:"2026-04"},
+  triangulation:{claim:"Fraud using stolen card details to buy online, by phone or by mail order reached 3,196,962 UK cases in 2025, up 13%, with £423.5 million lost.",
+    source:"UK Finance Annual Fraud Report", url:"https://www.ukfinance.org.uk/system/files/2026-06/UK%20Finance%20Fraud%20Report%202026.pdf", published:"2026-06"}
+});
+
 let tt = store.get('tt', null);
 const scoreColor = v => v >= 65 ? 'var(--good)' : v >= 40 ? 'var(--high)' : 'var(--crit)';
 const clamp = v => Math.max(0, Math.min(100, v));
@@ -6938,6 +7552,13 @@ const lawBox = law => law ? `<div class="lawbox"><span class="eyebrow"><svg><use
 const firstWasBest = (sc, i) => tt.first[i]!==undefined && sc.steps[i].o[tt.first[i]] && sc.steps[i].o[tt.first[i]].best;
 function ttIcon(s, type){ return s.tailored ? (TT_ICON[type] || "i-layers") : (TT_ICON[(s.types||[])[0]] || "i-layers"); }
 function ttStart(i, v){ tt = freshTT(i); tt.v = v; tt.first = []; tt.retried = []; ttSave(); renderTabletop(); window.scrollTo(0,0); focusQuiet(document.querySelector("#view h2") || document.querySelector("#view h1")); }
+
+/* ---------- why this scenario: the public evidence behind it ---------- */
+function ttWhyHTML(sc, type, full){
+  const e = typeof ttWhy === "function" ? ttWhy(sc, type) : null; if(!e) return "";
+  const yr = String(e.published || "").slice(0, 4);
+  return `<div class="card tt-why${full ? " full" : ""}"><span class="eyebrow">Why this scenario</span><p>${esc(e.claim)} <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.source)}${yr ? ", " + yr : ""}</a></p>${full ? `<p class="note">From public data, last reviewed ${TT_EVIDENCE_REVIEWED}. The incident itself is fictional.</p>` : ""}</div>`;
+}
 
 /* ---------- picker ---------- */
 function ttPicker(H){
@@ -6977,7 +7598,7 @@ function ttPicker(H){
           ${p ? `<span class="pill good" style="margin-left:auto">✓ ${p.best}/4 first try</span>` : `<span class="pill" style="margin-left:auto">New</span>`}</div>
         <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p>
         <span class="scen-foot"><span class="note">${esc(s.platform)} · ${s.steps.length} decisions</span>
-          ${laws?`<span class="tag">Law notes</span>`:""}</span>
+          ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
@@ -7029,6 +7650,7 @@ function ttPlay(H, sc){
   const st = sc.steps[tt.step], picked = tt.answered ? tt.picks[tt.step] : null;
   view.innerHTML = H(`${esc(sc.platform)}. Decision ${tt.step+1} of ${sc.steps.length}.`) + `
     ${ttTimeline(sc)}
+    ${tt.step === 0 ? ttWhyHTML(sc, tt.v && tt.v !== "all" ? tt.v : ttCompanyType()) : ""}
     <div class="play">
       <div>
         <div class="card inject">
@@ -7080,6 +7702,7 @@ function ttDebrief(H, sc){
         <div class="card learnbox"><span class="eyebrow">Laws and standards in this scenario</span>
           ${laws.length ? `<ul>${laws.map(l=>`<li>${gloss(l)}</li>`).join("")}</ul>` : `<p class="note">This scenario is mostly about judgment rather than specific legal duties.</p>`}</div>
       </div>
+      ${ttWhyHTML(sc, type, true)}
       <h3 class="dhead">Decision by decision</h3>
       <div class="debrief">${sc.steps.map((st,i)=>{ const f = st.o[tt.first[i]], fin = st.o[tt.picks[i]], b = st.o.find(o=>o.best);
         return `<div class="card dcard">
@@ -9883,11 +10506,13 @@ function pmGroupData(r){
 // The risk radar, drawn like the maturity radar: polygon rings, the same size and labels.
 // layers: [{g, color, fill, dash}]; the filled layer is the main shape and sets the dots and label colors.
 // Rings mark 4, 8, 12 and 16 out of 16; the dashed red ring is where risks turn critical.
+let rkSeq = 0;
 function riskRadarSVG(layers, label, opts){
+  const hid = "rk-h" + (++rkSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const o = opts || {}, n = RADAR_GROUPS.length, W = 400, H = o.big ? 330 : 300, cx = W / 2, cy = H / 2, R = o.big ? 104 : 96, f = v => v.toFixed(1);
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, s) => [cx + Math.cos(ang(i)) * R * s / 16, cy + Math.sin(ang(i)) * R * s / 16];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
-  const rings = [4, 8, 12, 16].map(v => `<polygon points="${poly(RADAR_GROUPS.map(() => v))}" fill="${v === 16 ? "var(--sunk)" : "none"}" fill-opacity="${v === 16 ? .5 : 0}" stroke="var(--line${v === 16 ? "-strong" : ""})" stroke-width="1"/>`).join("")
+  const rings = [4, 8, 12, 16].map(v => `<polygon points="${poly(RADAR_GROUPS.map(() => v))}" fill="${v === 16 ? "var(--surface)" : "none"}" stroke="var(--line${v === 16 ? "-strong" : ""})" stroke-width="1"/>`).join("")
     + `<polygon points="${poly(RADAR_GROUPS.map(() => 12))}" fill="none" stroke="var(--crit)" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 3"/>`;
   const axes = RADAR_GROUPS.map((g, i) => { const [x, y] = pt(i, 16); return `<line x1="${cx}" y1="${cy}" x2="${f(x)}" y2="${f(y)}" stroke="var(--line)" stroke-width="1"/>`; }).join("");
   const main = layers.find(l => l.fill) || layers[0];
@@ -9895,11 +10520,11 @@ function riskRadarSVG(layers, label, opts){
     const anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
     return `<text x="${f(x)}" y="${f(y)}" text-anchor="${anchor}" class="ma-rl ${d && d.band === "crit" ? "crit" : d && d.score ? "" : "none"}">${g.l.map((t, j) => `<tspan x="${f(x)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
   const shapes = layers.map(l => { const pts = poly(l.g.map(d => d.score));
-    return l.fill ? `<polygon class="rk-shape" points="${pts}" fill="${l.color}" fill-opacity=".2" stroke="${l.color}" stroke-width="2" stroke-linejoin="round"/>`
+    return l.fill ? `${hatch(hid, l.color)}<polygon class="rk-shape" points="${pts}" fill="url(#${hid})" stroke="${l.color}" stroke-width="1.8" stroke-linejoin="round"/>`
                   : `<polygon points="${pts}" fill="none" stroke="${l.color}" stroke-width="1.4" stroke-opacity=".85" stroke-linejoin="round" stroke-dasharray="${l.dash || ""}"/>`; }).join("");
   const dots = main ? main.g.map((d, i) => { const [x, y] = pt(i, d.score), fill = d.band ? `var(--${d.band === "low" ? "muted" : d.band})` : "var(--line-strong)";
     if(!d.score && !o.interactive) return "";
-    const dot = `<circle cx="${f(x)}" cy="${f(y)}" r="${d.band ? (o.big ? 4.5 : 4) : 3}" fill="${fill}" stroke="var(--surface)" stroke-width="2"/>`;
+    const dot = `<circle cx="${f(x)}" cy="${f(y)}" r="${d.band ? (o.big ? 4 : 3.5) : 2.5}" fill="${fill}" stroke="var(--surface)" stroke-width="1.5"/>`;
     if(!o.interactive) return dot;
     const inc = d.g.cats.length > 1 ? d.g.cats.map(k => CATS[k]).join(", ") : "";
     return `<g class="rpt" tabindex="0" data-a="${esc(d.g.n)}" data-i="${esc(inc)}" data-b="${d.band ? BANDS[d.band][0] : "No risks"}" data-s="${d.score}" data-w="${esc(d.worst)}" data-n="${d.n}"><circle cx="${f(x)}" cy="${f(y)}" r="12" fill="transparent"/>${dot}</g>`; }).join("") : "";
@@ -11180,23 +11805,25 @@ function maNextItem(d){
 }
 
 /* ---------- radar ---------- */
+let maSeq = 0;
 function maRadar(d, big, prev){
+  const hid = "ma-h" + (++maSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const W = 400, H = big ? 330 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, n = MA_AREAS.length, t = maStage(d).t;
   const pt = (i, v) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(ang) * R * v / 5, cy + Math.sin(ang) * R * v / 5]; };
   const poly = vals => vals.map((v, i) => pt(i, v).map(x => x.toFixed(1)).join(",")).join(" ");
   const rated = MA_AREAS.filter(a => d.lv[a.k]).length, lv = k => maLevelOf(d, k);
-  const rings = [1, 2, 3, 4, 5].map(l => `<polygon points="${poly(MA_AREAS.map(() => l))}" fill="${l === 5 ? "var(--sunk)" : "none"}" fill-opacity="${l === 5 ? .5 : 0}" stroke="var(--line${l === 5 ? "-strong" : ""})" stroke-width="1"/>`).join("");
+  const rings = [1, 2, 3, 4, 5].map(l => `<polygon points="${poly(MA_AREAS.map(() => l))}" fill="${l === 5 ? "var(--surface)" : "none"}" stroke="var(--line${l === 5 ? "-strong" : ""})" stroke-width="1"/>`).join("");
   const axes = MA_AREAS.map((a, i) => { const [x, y] = pt(i, 5); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`; }).join("");
   const labels = MA_AREAS.map((a, i) => {
     const [x, y] = pt(i, 5 + (big ? 1.25 : 1.1)), c = Math.cos(-Math.PI / 2 + i * 2 * Math.PI / n), anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle";
     const v = lv(a.k), below = v && v < t[a.k];
     return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${anchor}" class="ma-rl">${esc(a.s)}${big && v ? `<tspan class="ma-rv ${below ? "gap" : ""}" dx="5">${v}</tspan>` : ""}</text>`;
   }).join("");
-  const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--ink)" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="4 4"/>`;
-  const old = prev && rated ? `<polygon points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--t-ma)" stroke-opacity=".75" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
-  const cur = rated ? `<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="var(--t-ma)" fill-opacity=".2" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>` : "";
+  const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>`;
+  const old = prev && rated ? `<polygon points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
+  const cur = rated ? `${hatch(hid, "var(--ink)")}<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   const dots = MA_AREAS.map((a, i) => { const v = lv(a.k); if(!v) return ""; const [x, y] = pt(i, v);
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4.5 : 4}" fill="${v < t[a.k] ? "var(--crit)" : "var(--t-ma)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("");
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${lv(a.k)} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";
   return `<svg class="ma-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${tgt}${old}${cur}${dots}${labels}
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;
@@ -11719,19 +12346,21 @@ function cvActions(d, n){
 }
 
 /* ---------- radar: risk against coverage ---------- */
+let cvSeq = 0;
 function cvRadar(d, big, prev){
+  const hid = "cv-h" + (++cvSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const rows = cvRows(d), n = rows.length, W = 400, H = big ? 320 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, f = v => v.toFixed(1);
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
-  const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(rows.map(() => p))}" fill="${p === 100 ? "var(--sunk)" : "none"}" fill-opacity=".5" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
+  const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(rows.map(() => p))}" fill="${p === 100 ? "var(--surface)" : "none"}" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
   const axes = rows.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
   const hasRisk = rows.some(x => x.riskPct !== null), anyRated = rows.some(x => x.rated);
-  const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round"/>` : "";
-  const cover = anyRated ? `<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="var(--t-cv)" fill-opacity=".24" stroke="var(--t-cv)" stroke-width="2.2" stroke-linejoin="round"/>` : "";
+  const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="none" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round" stroke-linejoin="round"/>` : "";
+  const cover = anyRated ? `${hatch(hid, "var(--ink)")}<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   // a previous quarter's coverage, dotted, for the quarter-by-quarter view
-  const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--t-cv)" stroke-width="1.6" stroke-dasharray="2 4" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>` : "";
+  const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>` : "";
   const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);
-    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4.5 : 4}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--t-cv)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("") : "";
+    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4 : 3.5}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("") : "";
   const labels = rows.map((x, i) => { const [a, b] = pt(i, big ? 124 : 120), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = x.a.l.length - 1;
     const anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
     return `<text x="${f(a)}" y="${f(b)}" text-anchor="${anchor}" class="cv-rl ${x.status}">${x.a.l.map((t, j) => `<tspan x="${f(a)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
@@ -12136,8 +12765,8 @@ function miniRiskRadar(r){
   const g = pmGroupData(r), n = g.length, c = 28, R = 24, f = v => v.toFixed(1), pt = (i, v) => { const a = (-90 + i * 360 / n) * Math.PI / 180; return [c + Math.cos(a) * R * v, c + Math.sin(a) * R * v]; };
   const ring = v => g.map((d, i) => pt(i, v).map(f).join(",")).join(" "), worst = g.reduce((m, d) => d.score > m.score ? d : m, {score:0, band:null});
   const col = worst.band ? `var(--${worst.band === "low" ? "muted" : worst.band})` : "var(--faint)";
-  return `<svg class="mini-radar" viewBox="0 0 56 56" aria-hidden="true"><polygon points="${ring(1)}" fill="var(--sunk)" stroke="var(--line-strong)"/><polygon points="${ring(.5)}" fill="none" stroke="var(--line)"/>
-    <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+  return `<svg class="mini-radar" viewBox="0 0 56 56" aria-hidden="true"><polygon points="${ring(1)}" fill="var(--surface)" stroke="var(--line-strong)"/><polygon points="${ring(.5)}" fill="none" stroke="var(--line)"/>
+    <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".18" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 }
 
 function bindOverviewPicture(){
@@ -12238,7 +12867,7 @@ function rcTrend(hist){
   if(hist.length < 2) return "";
   const pts = hist.slice(-8), W = 120, H = 34, x = i => 4 + i * (W - 8) / (pts.length - 1), lo = Math.min(...pts.map(p => p.s)) - 5, hi = Math.max(...pts.map(p => p.s)) + 5, y = v => H - 4 - (v - lo) / Math.max(1, hi - lo) * (H - 8);
   const first = hist[0], last = hist[hist.length - 1], d = last.s - first.s;
-  return `<span class="rc-trend"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline points="${pts.map((p, i) => x(i).toFixed(1) + "," + y(p.s).toFixed(1)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(last.s).toFixed(1)}" r="3" fill="var(--accent)"/></svg>
+  return `<span class="rc-trend"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline points="${pts.map((p, i) => x(i).toFixed(1) + "," + y(p.s).toFixed(1)).join(" ")}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(last.s).toFixed(1)}" r="3" fill="var(--ink)"/></svg>
     <small class="${d > 0 ? "up" : d < 0 ? "dn" : ""}">${d > 0 ? "+" : ""}${d} since ${esc(new Date(first.d + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"}))}</small></span>`;
 }
 function rcMarkdown(){

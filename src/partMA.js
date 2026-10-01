@@ -59,23 +59,25 @@ function maNextItem(d){
 }
 
 /* ---------- radar ---------- */
+let maSeq = 0;
 function maRadar(d, big, prev){
+  const hid = "ma-h" + (++maSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const W = 400, H = big ? 330 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, n = MA_AREAS.length, t = maStage(d).t;
   const pt = (i, v) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(ang) * R * v / 5, cy + Math.sin(ang) * R * v / 5]; };
   const poly = vals => vals.map((v, i) => pt(i, v).map(x => x.toFixed(1)).join(",")).join(" ");
   const rated = MA_AREAS.filter(a => d.lv[a.k]).length, lv = k => maLevelOf(d, k);
-  const rings = [1, 2, 3, 4, 5].map(l => `<polygon points="${poly(MA_AREAS.map(() => l))}" fill="${l === 5 ? "var(--sunk)" : "none"}" fill-opacity="${l === 5 ? .5 : 0}" stroke="var(--line${l === 5 ? "-strong" : ""})" stroke-width="1"/>`).join("");
+  const rings = [1, 2, 3, 4, 5].map(l => `<polygon points="${poly(MA_AREAS.map(() => l))}" fill="${l === 5 ? "var(--surface)" : "none"}" stroke="var(--line${l === 5 ? "-strong" : ""})" stroke-width="1"/>`).join("");
   const axes = MA_AREAS.map((a, i) => { const [x, y] = pt(i, 5); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`; }).join("");
   const labels = MA_AREAS.map((a, i) => {
     const [x, y] = pt(i, 5 + (big ? 1.25 : 1.1)), c = Math.cos(-Math.PI / 2 + i * 2 * Math.PI / n), anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle";
     const v = lv(a.k), below = v && v < t[a.k];
     return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${anchor}" class="ma-rl">${esc(a.s)}${big && v ? `<tspan class="ma-rv ${below ? "gap" : ""}" dx="5">${v}</tspan>` : ""}</text>`;
   }).join("");
-  const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--ink)" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="4 4"/>`;
-  const old = prev && rated ? `<polygon points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--t-ma)" stroke-opacity=".75" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
-  const cur = rated ? `<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="var(--t-ma)" fill-opacity=".2" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>` : "";
+  const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>`;
+  const old = prev && rated ? `<polygon points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
+  const cur = rated ? `${hatch(hid, "var(--ink)")}<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   const dots = MA_AREAS.map((a, i) => { const v = lv(a.k); if(!v) return ""; const [x, y] = pt(i, v);
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4.5 : 4}" fill="${v < t[a.k] ? "var(--crit)" : "var(--t-ma)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("");
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${lv(a.k)} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";
   return `<svg class="ma-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${tgt}${old}${cur}${dots}${labels}
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;

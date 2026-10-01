@@ -4,12 +4,12 @@ const D = path.dirname(__filename), rd = f => fs.readFileSync(path.join(D, f), "
 const v9 = rd("test-v9.js"), s0 = v9.indexOf("const stub = `") + 14, stub = v9.slice(s0, v9.indexOf("`;", s0));
 const body = function(){
   const types = TT_TYPES.filter(t => t.k !== "all");
-  const scen = SCENARIOS.map((s, i) => ({i, types:s.types || [], tailored:!!s.tailored,
+  const scen = SCENARIOS.map((s, i) => ({i, types:s.types || [], tailored:!!s.tailored, evidence:(typeof TT_EVIDENCE !== "undefined" && TT_EVIDENCE[s.id]) || null,
     versions:(s.tailored ? types.map(t => t.k) : [(s.types || [])[0]]).map(k => { const v = ttScenario(i, k); return {type:k, v}; })}));
   pol = Object.assign(POL_BLANK(), POL_FULL_EXAMPLE); const polP = polPrompt();
   return JSON.stringify({
     premortem:{CATS, PLATFORMS, YOUTH, AUD, ADULT, IDENTITY, CONTACT, MONEY, REGIONS, SCALE, TEAM, FEATURES, FGROUPS, OWNERS, EFFORT, SG, HARMS, OBL, DECISIONS, BANDS, TIERS},
-    tabletop:{TT_TYPES, scenarios:scen},
+    tabletop:{TT_TYPES, scenarios:scen, evidenceReviewed:typeof TT_EVIDENCE_REVIEWED !== "undefined" ? TT_EVIDENCE_REVIEWED : null},
     metrics:{LAYERS, TIER, METRICS, VANITY, MX_PLATFORMS, MX_LOGS, MX_UNITS, MX_LAYER_HOW, MX_HOW, MX_PF, MX_PF_ON, MX_Q, MX_SC, MX_GLOSS, MX_SAMPLE, MX_RV, MX_TARGETS, MX_DEMO},
     vendors:{CRITERIA, DEFAULT_V, VD_Q, VD_RUBRIC},
     maturity:{MA_LEVELS, MA_AREAS, MA_STAGES, MA_ORDER, MA_PHASES, MA_EXAMPLE},

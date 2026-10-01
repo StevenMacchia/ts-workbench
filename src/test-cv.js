@@ -72,7 +72,7 @@ const body = function(){
   let s2 = cvSummary(cv); eq(s2.rows.length + "/" + s2.total + "/" + s2.rated, "7/35/35", "the area leaves the rows and the count to rate");
   renderCoverage(); h = view.innerHTML; if(bad(h)) throw new Error("removed area has bad values: " + where(h));
   eq((h.match(/class="cv-mr"/g) || []).length, 7, "matrix drops the row"); eq(/data-cvon="ai"/.test(h) && /Doesn't apply to/.test(h), true, "removed areas can be restored");
-  eq((cvRadar(cv, false).match(/<line /g) || []).length, 7, "seven axes on the radar"); eq(JOURNEY.find(s => s.k === "coverage").done(), true, "still complete");
+  eq((cvRadar(cv, false).match(/<line x1="200"/g) || []).length, 7, "seven axes on the radar"); eq(JOURNEY.find(s => s.k === "coverage").done(), true, "still complete");
   eq(/aria-pressed="false" data-orgharm="ai"/.test(orgCardHTML()) && /aria-pressed="true" data-orgharm="child"/.test(orgCardHTML()), true, "company profile shows which apply");
   const risky = s2.rows.filter(x => x.score >= 8)[0]; CV_LAYERS.forEach(l => cv.r[risky.a.k][l.k] = 0); s2 = cvSummary(cv);
   cvSetOff(risky.a.k, true); const s3 = cvSummary(cv); eq(s3.cov > s2.cov, true, `grade recalculates without ${risky.a.n} (${s2.cov}% → ${s3.cov}%)`);

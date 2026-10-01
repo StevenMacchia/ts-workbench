@@ -51,7 +51,7 @@ const G = patch(rd("partG.js"), [
 // Scenario files: S2 ends by pushing NEW_SCENARIOS into SCENARIOS, so S3-S8 (which add to NEW_SCENARIOS) go before that line
 const S2 = rd("partS2.js"), cut = S2.indexOf("// The original three scenarios keep");
 if(cut < 0) throw new Error("partS2 marker missing");
-const scenarioLib = [rd("partS1.js"), S2.slice(0, cut), rd("partS3.js"), rd("partS4.js"), rd("partS5.js"), rd("partS6.js"), rd("partS7.js"), rd("partS8.js"), rd("partS9.js"), S2.slice(cut), rd("partS10.js"), rd("partS11.js")].join("\n");
+const scenarioLib = [rd("partS1.js"), S2.slice(0, cut), rd("partS3.js"), rd("partS4.js"), rd("partS5.js"), rd("partS6.js"), rd("partS7.js"), rd("partS8.js"), rd("partS9.js"), S2.slice(cut), rd("partS10.js"), rd("partS11.js"), rd("partS12.js"), rd("partS13.js")].join("\n");
 let G2 = patch(G, [
   [`let tt = store.get('tt', null);`, scenarioLib + "\nlet tt = store.get('tt', null);"],
   [`  const sc = SCENARIOS[tt.s];`, `  const sc = ttScenario(tt.s, tt.v);`],
@@ -195,7 +195,7 @@ console.log("v8 assembled");
 {
   const A9 = patch(rd("partA.html"), [[
     `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Public+Sans:wght@400;500;600;700&family=Schibsted+Grotesk:wght@600;700&display=swap">`,
-    `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">`
+    `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">`
   ]], "partA fonts");
   const C3 = rd("partC3.html"), a = C3.indexOf('<div class="app">'), b = C3.indexOf("\n<script>\n(function(){");
   if(a < 0 || b < 0) throw new Error("partC3 split points not found");
@@ -210,7 +210,7 @@ console.log("v8 assembled");
      `<div class="rephead"><div class="rephead-b">\n      <div class="row" style="justify-content:space-between;align-items:flex-end"><div><span class="rep-kicker"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem report</span><h2 class="rep-title">`],
     [`<div class="section-title" style="margin-top:28px"><h2>The detail</h2>`, `<div class="section-title rep-detail"><h2>The detail</h2>`]
   ], "partF3 report header");
-  const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css");
+  const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css") + rd("partZ9.css");
   const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partTTF.js"), rd("partTR.js"), rd("partDEMO.js"), rd("partHELP.js"), rd("partTYPE.js"), rd("partGD.js"), rd("partCP.js"), rd("partDSA.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js"), R9].join("");
   fs.writeFileSync(path.join(D, "_F3_9.js"), F3_9);
   const STANDALONE_BUILD = true;

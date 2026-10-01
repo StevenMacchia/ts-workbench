@@ -29,6 +29,13 @@ const firstWasBest = (sc, i) => tt.first[i]!==undefined && sc.steps[i].o[tt.firs
 function ttIcon(s, type){ return s.tailored ? (TT_ICON[type] || "i-layers") : (TT_ICON[(s.types||[])[0]] || "i-layers"); }
 function ttStart(i, v){ tt = freshTT(i); tt.v = v; tt.first = []; tt.retried = []; ttSave(); renderTabletop(); window.scrollTo(0,0); focusQuiet(document.querySelector("#view h2") || document.querySelector("#view h1")); }
 
+/* ---------- why this scenario: the public evidence behind it ---------- */
+function ttWhyHTML(sc, type, full){
+  const e = typeof ttWhy === "function" ? ttWhy(sc, type) : null; if(!e) return "";
+  const yr = String(e.published || "").slice(0, 4);
+  return `<div class="card tt-why${full ? " full" : ""}"><span class="eyebrow">Why this scenario</span><p>${esc(e.claim)} <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.source)}${yr ? ", " + yr : ""}</a></p>${full ? `<p class="note">From public data, last reviewed ${TT_EVIDENCE_REVIEWED}. The incident itself is fictional.</p>` : ""}</div>`;
+}
+
 /* ---------- picker ---------- */
 function ttPicker(H){
   const ttMode = typeof ttfNew === "function" ? store.get("tt:mode", "solo") : "solo";
@@ -67,7 +74,7 @@ function ttPicker(H){
           ${p ? `<span class="pill good" style="margin-left:auto">✓ ${p.best}/4 first try</span>` : `<span class="pill" style="margin-left:auto">New</span>`}</div>
         <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p>
         <span class="scen-foot"><span class="note">${esc(s.platform)} · ${s.steps.length} decisions</span>
-          ${laws?`<span class="tag">Law notes</span>`:""}</span>
+          ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
@@ -119,6 +126,7 @@ function ttPlay(H, sc){
   const st = sc.steps[tt.step], picked = tt.answered ? tt.picks[tt.step] : null;
   view.innerHTML = H(`${esc(sc.platform)}. Decision ${tt.step+1} of ${sc.steps.length}.`) + `
     ${ttTimeline(sc)}
+    ${tt.step === 0 ? ttWhyHTML(sc, tt.v && tt.v !== "all" ? tt.v : ttCompanyType()) : ""}
     <div class="play">
       <div>
         <div class="card inject">
@@ -170,6 +178,7 @@ function ttDebrief(H, sc){
         <div class="card learnbox"><span class="eyebrow">Laws and standards in this scenario</span>
           ${laws.length ? `<ul>${laws.map(l=>`<li>${gloss(l)}</li>`).join("")}</ul>` : `<p class="note">This scenario is mostly about judgment rather than specific legal duties.</p>`}</div>
       </div>
+      ${ttWhyHTML(sc, type, true)}
       <h3 class="dhead">Decision by decision</h3>
       <div class="debrief">${sc.steps.map((st,i)=>{ const f = st.o[tt.first[i]], fin = st.o[tt.picks[i]], b = st.o.find(o=>o.best);
         return `<div class="card dcard">

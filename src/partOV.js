@@ -13,8 +13,8 @@ function miniRiskRadar(r){
   const g = pmGroupData(r), n = g.length, c = 28, R = 24, f = v => v.toFixed(1), pt = (i, v) => { const a = (-90 + i * 360 / n) * Math.PI / 180; return [c + Math.cos(a) * R * v, c + Math.sin(a) * R * v]; };
   const ring = v => g.map((d, i) => pt(i, v).map(f).join(",")).join(" "), worst = g.reduce((m, d) => d.score > m.score ? d : m, {score:0, band:null});
   const col = worst.band ? `var(--${worst.band === "low" ? "muted" : worst.band})` : "var(--faint)";
-  return `<svg class="mini-radar" viewBox="0 0 56 56" aria-hidden="true"><polygon points="${ring(1)}" fill="var(--sunk)" stroke="var(--line-strong)"/><polygon points="${ring(.5)}" fill="none" stroke="var(--line)"/>
-    <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".25" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+  return `<svg class="mini-radar" viewBox="0 0 56 56" aria-hidden="true"><polygon points="${ring(1)}" fill="var(--surface)" stroke="var(--line-strong)"/><polygon points="${ring(.5)}" fill="none" stroke="var(--line)"/>
+    <polygon points="${g.map((d, i) => pt(i, d.score / 16).map(f).join(",")).join(" ")}" fill="${col}" fill-opacity=".18" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
 }
 
 function bindOverviewPicture(){

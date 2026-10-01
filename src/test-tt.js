@@ -46,10 +46,17 @@ out.push("tailored variants played through: " + variants);
   uni.forEach(({s, i}) => validTypes.forEach(k => { const ver = TT_VERSIONS[s.id] && TT_VERSIONS[s.id][k];
     if(!ver || !ver.title || !ver.blurb || !Array.isArray(ver.scenes) || ver.scenes.length !== s.steps.length) throw new Error("missing version: " + s.id + " for " + k);
     const v = ttScenario(i, k); if(v.title === s.title) throw new Error("generic title kept: " + s.id + " for " + k);
-    [v.title, v.blurb, ...v.steps.map(st => st.s)].forEach(t => { if(/\{\w+\}/.test(t)) throw new Error("unfilled placeholder in " + s.id + " for " + k + ": " + t); }); }));
+    [v.title, v.blurb, ...v.steps.map(st => st.s)].forEach(t => { if(/[{][a-zA-Z]+[}]/.test(t)) throw new Error("unfilled placeholder in " + s.id + " for " + k + ": " + t); }); }));
   validTypes.forEach(k => { const titles = SCENARIOS.map((s, i) => ttScenario(i, k)).filter(s => (s.types || []).includes(k)).map(s => s.title.toLowerCase());
     const dup = titles.find((t, n) => titles.indexOf(t) !== n); if(dup) throw new Error("duplicate title for " + k + ": " + dup); });
   out.push("company-type versions: " + uni.length + " scenarios x " + validTypes.length + " types, all distinct"); }
+// Every scenario cites public evidence: a short claim, a named source, an https link and a date; it shows at decision 1 and in the debrief
+{ let facts = 0; SCENARIOS.forEach((s, i) => { const e = TT_EVIDENCE[s.id]; if(!e) throw new Error("no evidence for " + s.id);
+    [e].concat(Object.values(e.byType || {})).forEach(x => { facts++; if(!x.claim || x.claim.split(" ").length > 45 || !x.source || x.url.indexOf("https://") !== 0 || !/^20[0-9][0-9]/.test(x.published)) throw new Error("bad evidence for " + s.id + ": " + JSON.stringify(x).slice(0, 120)); }); });
+  const k = SCENARIOS.findIndex(s => s.id === "ato"); tt = Object.assign(freshTT(k), {v:"fintech"}); renderTabletop();
+  if(!view.innerHTML.includes("Why this scenario") || !view.innerHTML.includes(TT_EVIDENCE.ato.byType.fintech.url)) throw new Error("evidence missing at decision 1");
+  tt.step = tt.picks.length = 4; tt.first = [0,0,0,0]; tt.picks = [0,0,0,0]; renderTabletop(); if(!view.innerHTML.includes("last reviewed " + TT_EVIDENCE_REVIEWED)) throw new Error("evidence missing in debrief");
+  tt = null; out.push("evidence: " + SCENARIOS.length + " scenarios sourced, " + facts + " facts, shown at decision 1 and in the debrief"); }
 TT_TYPES.forEach(t => { store.set("tt:type", t.k); tt = null; renderTabletop(); const n = (view.innerHTML.match(/class="card scen[ "]/g)||[]).length;
   if(/\{[a-z]+\}/.test(view.innerHTML)) throw new Error("unfilled placeholder in list for " + t.k);
   if(t.k !== "all" && n < 12) throw new Error(t.n + " has only " + n); out.push("  " + t.n.padEnd(26) + n + " scenarios"); });

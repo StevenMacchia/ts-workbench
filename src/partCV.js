@@ -99,19 +99,21 @@ function cvActions(d, n){
 }
 
 /* ---------- radar: risk against coverage ---------- */
+let cvSeq = 0;
 function cvRadar(d, big, prev){
+  const hid = "cv-h" + (++cvSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const rows = cvRows(d), n = rows.length, W = 400, H = big ? 320 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, f = v => v.toFixed(1);
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
-  const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(rows.map(() => p))}" fill="${p === 100 ? "var(--sunk)" : "none"}" fill-opacity=".5" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
+  const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(rows.map(() => p))}" fill="${p === 100 ? "var(--surface)" : "none"}" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
   const axes = rows.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
   const hasRisk = rows.some(x => x.riskPct !== null), anyRated = rows.some(x => x.rated);
-  const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round"/>` : "";
-  const cover = anyRated ? `<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="var(--t-cv)" fill-opacity=".24" stroke="var(--t-cv)" stroke-width="2.2" stroke-linejoin="round"/>` : "";
+  const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="none" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round" stroke-linejoin="round"/>` : "";
+  const cover = anyRated ? `${hatch(hid, "var(--ink)")}<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   // a previous quarter's coverage, dotted, for the quarter-by-quarter view
-  const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--t-cv)" stroke-width="1.6" stroke-dasharray="2 4" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>` : "";
+  const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>` : "";
   const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);
-    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4.5 : 4}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--t-cv)"}" stroke="var(--surface)" stroke-width="2"/>`; }).join("") : "";
+    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4 : 3.5}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("") : "";
   const labels = rows.map((x, i) => { const [a, b] = pt(i, big ? 124 : 120), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = x.a.l.length - 1;
     const anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
     return `<text x="${f(a)}" y="${f(b)}" text-anchor="${anchor}" class="cv-rl ${x.status}">${x.a.l.map((t, j) => `<tspan x="${f(a)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
