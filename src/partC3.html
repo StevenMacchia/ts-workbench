@@ -76,6 +76,7 @@ const HEAD_META = () => {
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
     coppa:["coppa", () => ["The 2025 amended Rule", "4 ready-to-edit drafts", "The rule behind every requirement"]],
     dsa:["dsa", () => ["Every duty, article by article", "4 ready-to-edit drafts", "Enforcement to learn from"]],
+    eval:["eval", () => [EV_CATS.length + " kinds of hard case", "Precision and recall by kind", "Works with any classifier"]],
     tools:["layers", () => ["Use any tool on its own", "Free and private", "No sign-up"]],
     workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
@@ -84,7 +85,7 @@ const HEAD_META = () => {
   return {icon:m[0], stats};
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
-const HEAD_GROUP = {plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const HEAD_GROUP = {plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
 const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };

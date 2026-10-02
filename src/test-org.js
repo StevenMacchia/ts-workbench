@@ -26,7 +26,7 @@ const body = function(){
   ma.lv.crisis = 2; eq(wsSaveLabel("maturity", ma), "Save changes", "changed since saving");
   out.push("save states: Save to workspace, Saved, Save changes");
   // New menu, header chips, workspace and about pages
-  eq(NEW_ITEMS.length, 8, "eight things to start"); eq(NEW_ITEMS.some(x => x[0] === "dsa"), true, "DSA readiness can be started"); eq(NEW_ITEMS.some(x => x[0] === "coppa"), true, "COPPA readiness can be started"); eq(NEW_ITEMS.every(x => typeof x[5] === "function"), true, "each starts something");
+  eq(NEW_ITEMS.length, 9, "nine things to start"); eq(NEW_ITEMS.some(x => x[0] === "dsa"), true, "DSA readiness can be started"); eq(NEW_ITEMS.some(x => x[0] === "coppa"), true, "COPPA readiness can be started"); eq(NEW_ITEMS.every(x => typeof x[5] === "function"), true, "each starts something");
   const chips = ovHeroChips(); eq(chips.some(c => /Dating · At scale or regulated/.test(c)), true, "header shows the organization");
   renderWorkspace(); let h = view.innerHTML; if(bad(h)) throw new Error("workspace has bad values"); eq(/Your organization/.test(h) && /data-orgstage="scale"/.test(h) && /Save workspace file/.test(h), true, "workspace settings and file");
   renderAbout(); h = view.innerHTML; if(bad(h)) throw new Error("about has bad values"); eq(/How it fits together/.test(h) && /How the scores work/.test(h) && /Coverage radar/.test(h), true, "about covers the whole toolkit");

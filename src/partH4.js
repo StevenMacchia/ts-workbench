@@ -55,6 +55,9 @@ OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <circle cx="120" cy="62" r="26" fill="var(--surface)" stroke="var(--t-ds)" stroke-width="3"/>
     ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => { const a = i * Math.PI / 6; return `<circle cx="${(120 + Math.cos(a) * 17).toFixed(1)}" cy="${(62 + Math.sin(a) * 17).toFixed(1)}" r="2.2" fill="var(--t-ds)"/>`; }).join("")}
     <path d="M112 62l6 6 11-12" fill="none" stroke="var(--t-ds)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
+    <text x="110" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">gold</text><text x="124" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">got</text></svg>`;
 function ovChip(it){
   const d = it.data || {};
   if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
@@ -67,6 +70,8 @@ function ovChip(it){
     return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
   if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
     return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
+  if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
+    return `<span class="ov-chip"><span class="sdot" style="background:${m.acc === null ? "var(--faint)" : m.acc >= .9 ? "var(--good)" : m.acc >= .75 ? "var(--high)" : "var(--crit)"}"></span>${m.pct(m.acc)} accurate</span>`; }
   if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd));
     return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
@@ -250,6 +255,7 @@ function renderTools(){
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
@@ -296,6 +302,7 @@ function asRoutePct(r){
     if(r === "coverage"){ const s = cvSummary(cv); return Math.round(s.rated / Math.max(1, s.total) * 100); }
     if(r === "coppa") return cp.view === "report" && cp.aud ? 100 : cp.aud ? 50 : 0;
     if(r === "dsa") return ds.view === "report" && ds.tier ? 100 : ds.tier ? 50 : 0;
+    if(r === "eval") return ev.preds ? 100 : ev.cases.length ? 66 : ev.policy ? 33 : 0;
     if(r === "transparency") return tr.view === "report" ? 100 : Math.round(trProgress().pct / 2);
   }catch(e){}
   return null;

@@ -66,6 +66,7 @@ const NEW_ITEMS = [
   ["policy", "doc", "var(--t-pol)", "Policy stress-tester", "Find where a rule is unclear", () => goRoute("policy")],
   ["coppa", "coppa", "var(--t-cp)", "COPPA readiness", "Check children's privacy against the amended Rule", () => { if(cp.ex){ cp = CP_BLANK(); cpSave(); store.set("ws:cur:coppa", null); } goRoute("coppa"); }],
   ["dsa", "dsa", "var(--t-ds)", "DSA readiness", "Find which EU Digital Services Act duties apply", () => { if(ds.ex){ ds = DS_BLANK(); dsSave(); store.set("ws:cur:dsa", null); } goRoute("dsa"); }],
+  ["eval", "eval", "var(--t-ai)", "Classifier eval", "Test a moderation classifier against your rule", () => { if(ev.ex){ ev = EV_BLANK(); evSave(); store.set("ws:cur:eval", null); } goRoute("eval"); }],
   ["vendors", "scale", "var(--t-vd)", "Vendor scorecard", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
 function newMenuToggle(open){

@@ -165,6 +165,12 @@ const PAGE_TOURS = {
     [".ds-report .pol-sum, .ds-sum", "Where you stand", "Which tier you're in, how ready you are, and how many critical gaps are left."],
     [".ds-report .pol-tabs", "Plan, duties and drafts", "Your gaps in order with the article behind each, every duty that applies, and four drafts to edit."]
   ],
+  eval:[
+    [".gd-intro, .ev-setup", "Six questions", "The rule, what the classifier sees, its labels, how many cases, and how you'll run it: Claude with the rule, Claude with your prompt, or your own model's labels."],
+    [".ev-cases", "The gold labels", "What a careful reviewer would say under the rule as written. Change any you disagree with; the classifier is scored against your labels."],
+    [".ev-report .pol-sum", "Precision and recall", "Of what it flagged, how much deserved it; of what deserved it, how much it caught."],
+    [".ev-where", "Where it fails", "By kind of case, and what to change in the rule or the prompt for each."]
+  ],
   plan:[
     [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA and DSA gaps in one list, sent to your tracker in one go."],
     [".pl-group", "Do first, next, later", "Tick things off here and each tool updates. Long groups fold: show all when you need them."]
