@@ -19,7 +19,7 @@ const EV_SIZES = [[24, "24 cases", "Quick: a first read in about a minute."], [4
 const EV_MODES = [
   ["policy", "Claude, prompted with my policy", "Claude reads the rule as written and labels each case. Tests whether the rule itself is clear enough to apply."],
   ["prompt", "Claude, with my own system prompt", "Paste the prompt your production classifier uses. Tests the prompt, not just the rule."],
-  ["paste", "My own classifier's labels", "Download the cases, run them through your model, paste the labels back. Works for any classifier, and without Claude."]
+  ["paste", "My own classifier's labels", "Download the cases, run them through your model, paste the labels back. Works for any text classifier, and without Claude: your own, or an open model like gpt-oss-safeguard with the runner script."]
 ];
 // The kinds of case a test set needs: the ones classifiers get wrong
 const EV_CATS = [
@@ -132,6 +132,30 @@ function evParsePaste(d, txt){
   lines.forEach((l, i) => { if(bare){ const c = d.cases[i]; if(c) out[c.id] = {label:l.toLowerCase(), why:""}; return; }
     const m = l.match(/^(c\d+)\s*[,\t;: ]\s*([a-z]+)\s*(?:[,\t;]\s*(.*))?$/i); if(!m) return; const lab = m[2].toLowerCase(); if(L.includes(lab) && d.cases.some(c => c.id === m[1])) out[m[1]] = {label:lab, why:(m[3] || "").slice(0, 160)}; });
   return Object.keys(out).length ? out : null;
+}
+// The rule as a policy for policy-following models (gpt-oss-safeguard, CoPE): Zentropi's four parts, filled in from the
+// setup, with TODO lines where only the author can decide. Never the cases: that would hand the model the test set.
+function evPolicyDoc(d){
+  const L = evLabels(d), three = d.labels === "three", c = EV_CONTENT.find(x => x[0] === d.content), ct = c ? c[1].toLowerCase() : "user content";
+  const rule = d.policy.trim().split(/\r?\n/).map(l => "> " + l).join("\n"), q = s => `"${s}"`;
+  const def = three
+    ? {remove:["Content that plainly does what the rule forbids, in any wording, spelling or language.", `Content near the line or unclear in intent: that is ${q("review")}.`],
+       review:["Content that may break the rule but that a careful reviewer would want to see before deciding: near the line, context-dependent, or unclear in intent.", `Content that plainly breaks the rule (${q("remove")}) or plainly stays within it (${q("allow")}).`],
+       allow:["Content the rule does not cover, including content on the same topic that stays within the rule.", `Anything that qualifies for ${q("remove")} or ${q("review")}.`]}
+    : {violates:["Content that does what the rule forbids, in any wording, spelling or language.", ""], allowed:["Content the rule does not cover, including content on the same topic that stays within the rule.", `Anything that qualifies for ${q("violates")}.`]};
+  const lab = l => [`### ${l}`, "", "Includes:", "", `- ${def[l][0]}`, `- TODO: the specific characteristics that qualify content for ${q(l)}, one per line.`, "", "Excludes:", ""].concat(def[l][1] ? [`- ${def[l][1]}`] : [], l === L[L.length - 1] ? [] : [`- TODO: the characteristics that disqualify content from ${q(l)}, for example the exceptions decided above.`], [""]);
+  return [`# Policy: ${d.name || "Untitled rule"}`, "",
+    `_A policy file for an open model that labels content against a written policy, such as gpt-oss-safeguard. Before you use it, fill in or delete every line marked TODO, then delete this note: the model reads the whole file. Keep the eval's test cases out, or the model sees the answers. Made with T&S Workbench._`, "",
+    "## Overview", "", `This policy classifies ${ct}${c ? ` (${c[2].replace(/\.$/, "").toLowerCase()})` : ""} under one rule:`, "", rule, "", `Every piece of content gets exactly one label: ${L.join(", ")}. Apply the rule as written, not a general sense of what should be allowed.`, "",
+    "## Definition of Terms", "", "TODO: define each term the rule relies on, one line each. A term the rule uses without defining is a term the classifier will define for itself.", "", "- **Term**: TODO.", "",
+    "## Interpretation of Language", "", "TODO: say how to read ambiguous content under this rule. Decide each of these and write the answer down:", "",
+    "- Quoting, reporting or condemning the behavior (counter-speech): TODO, allowed or not, and what marks it as counter-speech.",
+    "- Sarcasm, banter between friends, in-group and reclaimed language: TODO, whether context changes the label, and what context counts.",
+    "- Figures of speech and hyperbole: TODO, what separates a figure of speech from the real thing.",
+    "- News, documentation and education about the behavior: TODO, allowed or not, and what marks it (framing, intent, no glorification).",
+    "- Spacing, symbols, misspellings and coded language: TODO. Most policies say these don't change the meaning.",
+    "- Languages other than English: TODO. Most policies say the rule applies the same way in every language.", "",
+    "## Definition of Labels", ""].concat(...L.map(lab)).join("\n");
 }
 function evMarkdown(d){
   const m = evMetrics(d, d.preds), L = evLabels(d), adv = evAdvice(d, m);
@@ -283,12 +307,12 @@ function evCasesHTML(ai){
     ${EVRUN.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account. ${EVRUN.total ? "About 15 seconds per dozen cases." : "Usually under a minute."}</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : ""}
     ${EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : ""}
     <div class="card"><div class="card-h"><div><h3 style="margin:0;font-size:16px">The test set${has ? ` <span class="note">${has} cases</span>` : ""}</h3><p class="note" style="margin:4px 0 0">${has ? "These are the gold labels: what a careful reviewer would say under the rule as written. Change any you disagree with before you run. The labels you set are what the classifier is scored against." : "No cases yet."}</p></div>
-      <div class="ev-case-a">${has ? `<button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy as TSV</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download cases</button>` : ""}` : ""}${ai ? `<button type="button" class="btn sm" data-ev="gen">${has ? "Regenerate" : "Generate with Claude"}</button>` : ""}</div></div>
+      <div class="ev-case-a">${has ? `<button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy as TSV</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download cases</button>` : ""}${ev.mode === "paste" && ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for an open model such as gpt-oss-safeguard. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Download policy` : `${icon("copy")}Copy policy`}</button>` : ""}` : ""}${ai ? `<button type="button" class="btn sm" data-ev="gen">${has ? "Regenerate" : "Generate with Claude"}</button>` : ""}</div></div>
       ${has ? `<div class="cp-mapw"><table class="cp-map ev-table"><thead><tr><th>id</th><th>Content</th><th>Kind</th><th>Expected</th><th>Why</th></tr></thead><tbody>${ev.cases.map(row).join("")}</tbody></table></div>` : ""}
       <div class="card-b ev-add"><details><summary>Add your own cases</summary><p class="note">One per line: <span class="mono">label<span class="muted">⇥</span>text</span>, with a label from ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Real cases from your queue are the best test, anonymized first.</p><textarea class="input" id="ev-own" rows="4" placeholder="violates	you're pathetic, nobody wants you here"></textarea><div style="margin-top:8px"><button type="button" class="btn sm" data-ev="addown">Add these</button></div></details></div></div>
     ${has ? `<div class="card ev-run"><div class="card-b">
       <h3 style="margin:0 0 6px;font-size:16px">Run the classifier</h3>
-      ${ev.mode === "paste" ? `<p class="note">Run the cases through your own classifier, then paste its labels here: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span> or just the labels in order.</p><textarea class="input" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(ev.pasted || "")}</textarea><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="score">Score the labels</button></div>`
+      ${ev.mode === "paste" ? `<p class="note">Run the cases through your own classifier, then paste its labels here: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span> or just the labels in order. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model, such as gpt-oss-safeguard, on your own computer. Download the cases and the policy above, fill in the policy's TODO lines, and the script writes labels you can paste here. Setup takes Node.js, Ollama and a 14 GB download.</p><textarea class="input" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(ev.pasted || "")}</textarea><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="score">Score the labels</button></div>`
         : `<p class="note">${ev.mode === "prompt" ? "Claude runs your system prompt against every case" : "Claude labels every case from the rule as written"}, a dozen at a time, on your account.${ev.mode === "prompt" ? ` <button type="button" class="pol-add" data-ev="edit">Change the prompt</button>` : ""}</p><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="run" ${ai && !EVRUN.busy ? "" : "disabled"}>${ai ? "Run with Claude" : "Open in Claude to run"}</button><span class="note">${ai ? `${ev.cases.length} cases, about ${Math.max(1, Math.round(ev.cases.length / 12 * 0.3))} minute${ev.cases.length > 36 ? "s" : ""}.` : "Or switch to pasting your own classifier's labels in the setup."}</span></div>`}
     </div></div>` : ""}
   </div>`;
@@ -357,6 +381,7 @@ function evAct(a){
       if(added){ ev.preds = null; ev.ex = false; evSave(); renderEval(); } return gsay(added ? `${added} case${added === 1 ? "" : "s"} added` : "No lines matched label, a tab, then the text"); }
     case "csv": return copyText(evCSV(ev), $("#ev-toast"));
     case "dlcsv": { const c = evCSV(ev); return offerFile(`eval-cases-${slug(ev.name || "classifier")}.tsv`, c, c, $("#ev-toast")); }
+    case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
   }

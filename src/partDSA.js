@@ -108,7 +108,7 @@ const DS_CTRL = [
   {k:"complaints", n:"Complaints and disputes", h:"How a user challenges a decision, inside your service and beyond it.", items:[
     {k:"c_int", t:"A free internal complaint system, open for at least six months after a decision, covering removals, demotions, suspensions, demonetization and rejected reports", sev:"crit", o:"product", cite:"Art. 20(1), 20(2)", a:"platform",
       why:"Both the person whose content was actioned and the reporter whose report was rejected can complain. Six months is the minimum window.", kase:"meta",
-      fix:"Add an appeal route to every enforcement message and to every rejected-report message, keep it open for six months, and let the user add an explanation and evidence."},
+      fix:"Add an appeal route to every enforcement message and to every rejected-report message, keep it open for six months, and let the user add an explanation and evidence. An open-source option: ROOST's Coop has an appeals API you can build the complaint route on."},
     {k:"c_human", t:"Complaints get a qualified human review, not only automation, and decisions are reversed when the complaint is justified", sev:"crit", o:"ops", cite:"Art. 20(4), 20(6)", a:"platform",
       why:"Complaints must be handled in a timely, non-discriminatory, diligent and non-arbitrary way, under the supervision of appropriately qualified staff.",
       fix:"Staff an appeals queue separate from first-line review, measure reversal rates, and feed reversals back into reviewer calibration."},

@@ -229,6 +229,7 @@ const GT_MORE = {
   "UGC":"User-generated content: the posts, images, videos and messages your users create.",
   "NCII":"Non-consensual intimate imagery: intimate images shared without the person's consent.",
   "BPO":"Business process outsourcing: an outside company that supplies staff, such as content moderators.",
+  "gpt-oss-safeguard":"An open model from OpenAI that labels content against a policy you write. Free to download; you run it on your own hardware.",
   "RFP":"Request for proposal: the document you send vendors asking how they would meet your requirements, and at what price.",
   "DTSP":"The Digital Trust & Safety Partnership, an industry group whose Safe Framework sets out Trust & Safety good practice.",
   "sextortion":"Threatening to share someone's intimate images unless they pay or send more. Teenagers are frequent targets.",

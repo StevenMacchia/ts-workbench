@@ -275,6 +275,8 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .ev-tiers3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:760px){.ev-tiers3{grid-template-columns:1fr}}
 .ev-cases{display:grid;gap:16px}
+.ev-cases>.card{min-width:0}
+.sb-h-tag{display:flex;align-items:center;padding-right:10px}
 .ev-case-a{display:flex;gap:8px;flex-wrap:wrap}
 .ev-table td:nth-child(2){min-width:260px}
 .ev-table .select.sm{padding:4px 8px;font-size:13px}

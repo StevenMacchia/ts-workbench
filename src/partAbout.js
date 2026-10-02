@@ -91,3 +91,35 @@ function renderAbout(){
     </section>
   </article>`;
 }
+
+/* =========================================================
+   WORKS WITH ROOST (where the workbench meets ROOST's open-source tools)
+   ========================================================= */
+const RO_GH = "https://github.com/StevenMacchia";
+const RO_TOOLS = [
+  ["Coop", "https://github.com/roostorg/coop", "A review console you host yourself: queues, routing and enforcement rules, appeals, moderator wellness settings, and hash matching with NCMEC reporting."],
+  ["Osprey", "https://github.com/roostorg/osprey", "A real-time rules engine and investigation console, built at Discord. It suits teams with engineers and event streams."],
+  ["Model Community", "https://github.com/roostorg/model-community", "A community for open safety models, such as OpenAI's gpt-oss-safeguard, that label content against a policy you write. It publishes guides and example policies for them."]
+];
+function renderRoost(){
+  const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
+  const meta = `<span class="wip-tag">Work in progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
+  view.innerHTML = head("Works with ROOST", "ROOST is a nonprofit that makes free, open-source trust and safety tools. The workbench helps you decide what to build, and ROOST's tools are things you can build with. This page lists where they meet so far.", "Overview", meta) + `<article class="ab">
+    <section class="ab-sec rise">
+      <h2>What ROOST is</h2>
+      <p>ROOST (Robust Open Online Safety Tools) builds trust and safety tools as a public good. Three of its projects:</p>
+      <div class="ab-tools">${RO_TOOLS.map(([n, href, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span><div><h3>${ext(href, n)}</h3><p>${d}</p></div></div>`).join("")}</div>
+    </section>
+
+    <section class="ab-sec rise">
+      <h2>How the workbench connects today</h2>
+      <div class="ab-tools"><div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval</a></h3><p>The one direct link. No classifier of your own? Test your rule on a free open model, such as gpt-oss-safeguard, on your own computer. Download the cases and a policy file, run them with the runner script, and paste the labels back to score them. On this website you write the cases yourself.</p><p>${ext(RO_GH + "/ts-workbench/tree/main/tools/open-model-eval", "The runner script")}</p></div></div></div>
+      <p>The other tools don't use ROOST's tools. Some recommendations in the pre-mortem, maturity and DSA tools name Coop, Osprey or gpt-oss-safeguard as a free option. Two reference files on GitHub map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy format")}.</p>
+    </section>
+
+    <section class="ab-sec ab-note rise">
+      <h2>Where this stands</h2>
+      <p>An early start, and text only for now, not images or video. Expect this page to change. The workbench is an independent project, not made by or affiliated with ROOST. ROOST's tools are free and open source under their own licenses; see ${ext("https://github.com/roostorg", "ROOST on GitHub")}.</p>
+    </section>
+  </article>`;
+}

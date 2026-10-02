@@ -30,7 +30,8 @@ const body = function(){
   const chips = ovHeroChips(); eq(chips.some(c => /Dating · At scale or regulated/.test(c)), true, "header shows the organization");
   renderWorkspace(); let h = view.innerHTML; if(bad(h)) throw new Error("workspace has bad values"); eq(/Your organization/.test(h) && /data-orgstage="scale"/.test(h) && /Save workspace file/.test(h), true, "workspace settings and file");
   renderAbout(); h = view.innerHTML; if(bad(h)) throw new Error("about has bad values"); eq(/How it fits together/.test(h) && /How the scores work/.test(h) && /Coverage radar/.test(h), true, "about covers the whole toolkit");
-  out.push("New menu (6 items), header chips, workspace settings card and refreshed About page");
+  renderRoost(); h = view.innerHTML; if(bad(h)) throw new Error("roost page has bad values"); eq(/What ROOST is/.test(h) && /href="#eval"/.test(h) && /running-on-coop\.md/.test(h) && /not made by or affiliated with ROOST/.test(h), true, "roost page explains ROOST and links each tool");
+  out.push("New menu (6 items), header chips, workspace settings card, refreshed About page and Works with ROOST page");
   return out.join("\n");
 };
 const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js")].join("\n")

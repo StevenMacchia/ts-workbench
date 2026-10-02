@@ -3812,6 +3812,8 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .ev-tiers3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:760px){.ev-tiers3{grid-template-columns:1fr}}
 .ev-cases{display:grid;gap:16px}
+.ev-cases>.card{min-width:0}
+.sb-h-tag{display:flex;align-items:center;padding-right:10px}
 .ev-case-a{display:flex;gap:8px;flex-wrap:wrap}
 .ev-table td:nth-child(2){min-width:260px}
 .ev-table .select.sm{padding:4px 8px;font-size:13px}
@@ -3917,6 +3919,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
   <symbol id="i-eval" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h7M4 18h10"/><path d="M14.5 13.5l2.2 2.2L21 11.5"/></g></symbol>
   <symbol id="i-dsa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2v9.6M7.2 12h9.6M8.6 8.6l6.8 6.8M15.4 8.6l-6.8 6.8" opacity=".55"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></g></symbol>
   <symbol id="i-coppa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.4-3.1 8.1-7.5 9.5-4.4-1.4-7.5-5.1-7.5-9.5V6L12 3z"/><circle cx="12" cy="10" r="2.1"/><path d="M8.7 16.2c.6-1.9 1.8-3 3.3-3s2.7 1.1 3.3 3"/></g></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4"/><path d="M6.5 7h11v3.5a5.5 5.5 0 01-11 0z"/><path d="M12 16v5"/></g></symbol>
 </svg>
 <div class="app" id="app">
   <aside class="side" id="side" aria-label="Sidebar">
@@ -3941,12 +3944,16 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
       <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness</a>
       <a class="navlink" href="#dsa" data-route="dsa"><span class="sb-glyph" style="background:var(--t-ds)"><svg><use href="#i-dsa"/></svg></span>DSA readiness</a>
-      <a class="navlink" href="#eval" data-route="eval"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span>Classifier eval<span class="sb-new">New</span></a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
+      </div>
+      <div class="sb-h sb-h-tag">Works with ROOST<span class="sb-new">WIP</span></div>
+      <div class="sb-more">
+      <a class="navlink" href="#roost" data-route="roost"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span>Overview</a>
+      <a class="navlink" href="#eval" data-route="eval"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span>Classifier eval<span class="sb-new">New</span></a>
       </div>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
@@ -4179,7 +4186,7 @@ const CATS = {
 const SG = {
   report_btn:{t:"In-product reporting on every user, message, post and listing, with reasons that match your policies", o:"product", e:"S"},
   block_mute:{t:"Block and mute, where a block stops all contact and hides the person who blocked", o:"product", e:"S"},
-  review_queue:{t:"A review queue with a named owner, response times by severity and an escalation path", o:"ops", e:"M", lite:"Start with a shared inbox and a severity triage rule; move to tooling as volume grows."},
+  review_queue:{t:"A review queue with a named owner, response times by severity and an escalation path", o:"ops", e:"M", lite:"Start with a shared inbox and a severity triage rule; move to tooling as volume grows. Then a free option is ROOST's open-source Coop, a review console with queues, routing and appeals, if you have an engineer to host it."},
   policies:{t:"Written community guidelines that cover these harms, with examples of what crosses the line", o:"policy", e:"S"},
   appeals:{t:"Appeals for enforcement decisions, reviewed by someone other than the original reviewer", o:"ops", e:"M"},
   sor:{t:"Tell users which rule they broke, what action was taken and how to appeal", o:"product", e:"S"},
@@ -4191,12 +4198,12 @@ const SG = {
   captcha:{t:"Bot friction at sign-up (e.g. Cloudflare Turnstile or reCAPTCHA) and blocking of disposable emails", o:"eng", e:"S"},
   phone_email_verify:{t:"Email or phone verification before posting, messaging or claiming rewards", o:"eng", e:"S"},
   device_signals:{t:"Device, network and behavior signals to link duplicate, banned and fake accounts", o:"eng", e:"M", lite:"Start with your fraud or bot-protection vendor's device fingerprinting."},
-  text_screening:{t:"Automated screening of text for abuse, spam and scam patterns, routed to human review", o:"eng", e:"M", lite:"Start with keyword lists and an off-the-shelf moderation API."},
+  text_screening:{t:"Automated screening of text for abuse, spam and scam patterns, routed to human review", o:"eng", e:"M", lite:"Start with keyword lists and an off-the-shelf moderation API. Later, an open model such as gpt-oss-safeguard can check text against your own written policy. The model is free, but you run it on your own servers."},
   link_scanning:{t:"Check links against phishing and malware lists (e.g. Google Safe Browsing) before they are clickable", o:"eng", e:"S"},
   file_scanning:{t:"Malware scanning of uploaded files and blocking of executable file types", o:"eng", e:"S"},
   media_classifier:{t:"Nudity, violence and gore detection on uploads, with sensitive media behind a warning screen", o:"eng", e:"M", lite:"Start with an off-the-shelf image moderation API."},
   dm_nudity_blur:{t:"Blur explicit images in private messages by default, with a warning and one-tap reporting", o:"product", e:"M"},
-  csam_hash:{t:"Hash-match every image and video against known CSAM (e.g. PhotoDNA, Thorn's Safer, NCMEC and IWF hash lists)", o:"eng", e:"M", lite:"PhotoDNA is free for qualifying services, and several vendors offer turnkey CSAM matching."},
+  csam_hash:{t:"Hash-match every image and video against known CSAM (e.g. PhotoDNA, Thorn's Safer, NCMEC and IWF hash lists)", o:"eng", e:"M", lite:"PhotoDNA is free for qualifying services, and several vendors offer turnkey CSAM matching. Free option: ROOST's open-source Coop, which you host yourself, matches uploads against NCMEC's hash list through Meta's HMA and walks reviewers through CyberTip reports. Access to NCMEC's hashes comes from NCMEC, not Coop."},
   csam_reporting:{t:"A documented process to report apparent CSAM to NCMEC (US) and national authorities, preserving evidence", o:"legal", e:"M"},
   csam_review:{t:"A restricted escalation path for child-safety cases, handled by specially trained and supported reviewers", o:"ops", e:"M"},
   minor_contact:{t:"Adults can't find or message minors they aren't connected to, and minors' accounts are private by default", o:"product", e:"M"},
@@ -10115,7 +10122,7 @@ function pmProjectSelect(){
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
 const TOOL_COLOR = {coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -10177,7 +10184,7 @@ function cmdkItems(){
   go("Policy stress-tester","policy","var(--t-pol)","doc");
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
-  go("About this project","about","var(--faint)","info");
+  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
@@ -10696,6 +10703,38 @@ function renderAbout(){
     <section class="ab-sec ab-note rise">
       <h2>Limits and what's next</h2>
       <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}. Next: a transparency report drafter and a rebuilt metrics flow.</p>
+    </section>
+  </article>`;
+}
+
+/* =========================================================
+   WORKS WITH ROOST (where the workbench meets ROOST's open-source tools)
+   ========================================================= */
+const RO_GH = "https://github.com/StevenMacchia";
+const RO_TOOLS = [
+  ["Coop", "https://github.com/roostorg/coop", "A review console you host yourself: queues, routing and enforcement rules, appeals, moderator wellness settings, and hash matching with NCMEC reporting."],
+  ["Osprey", "https://github.com/roostorg/osprey", "A real-time rules engine and investigation console, built at Discord. It suits teams with engineers and event streams."],
+  ["Model Community", "https://github.com/roostorg/model-community", "A community for open safety models, such as OpenAI's gpt-oss-safeguard, that label content against a policy you write. It publishes guides and example policies for them."]
+];
+function renderRoost(){
+  const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
+  const meta = `<span class="wip-tag">Work in progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
+  view.innerHTML = head("Works with ROOST", "ROOST is a nonprofit that makes free, open-source trust and safety tools. The workbench helps you decide what to build, and ROOST's tools are things you can build with. This page lists where they meet so far.", "Overview", meta) + `<article class="ab">
+    <section class="ab-sec rise">
+      <h2>What ROOST is</h2>
+      <p>ROOST (Robust Open Online Safety Tools) builds trust and safety tools as a public good. Three of its projects:</p>
+      <div class="ab-tools">${RO_TOOLS.map(([n, href, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span><div><h3>${ext(href, n)}</h3><p>${d}</p></div></div>`).join("")}</div>
+    </section>
+
+    <section class="ab-sec rise">
+      <h2>How the workbench connects today</h2>
+      <div class="ab-tools"><div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval</a></h3><p>The one direct link. No classifier of your own? Test your rule on a free open model, such as gpt-oss-safeguard, on your own computer. Download the cases and a policy file, run them with the runner script, and paste the labels back to score them. On this website you write the cases yourself.</p><p>${ext(RO_GH + "/ts-workbench/tree/main/tools/open-model-eval", "The runner script")}</p></div></div></div>
+      <p>The other tools don't use ROOST's tools. Some recommendations in the pre-mortem, maturity and DSA tools name Coop, Osprey or gpt-oss-safeguard as a free option. Two reference files on GitHub map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy format")}.</p>
+    </section>
+
+    <section class="ab-sec ab-note rise">
+      <h2>Where this stands</h2>
+      <p>An early start, and text only for now, not images or video. Expect this page to change. The workbench is an independent project, not made by or affiliated with ROOST. ROOST's tools are free and open source under their own licenses; see ${ext("https://github.com/roostorg", "ROOST on GitHub")}.</p>
     </section>
   </article>`;
 }
@@ -11653,7 +11692,7 @@ const MA_AREAS = [
       "Precision and recall are measured for each detection system, models learn from reviewer decisions, and account signals catch networks, not just single posts.",
       "New features get an abuse risk review before launch, a red team probes for gaps, and signals are shared with industry partners."],
     next:[["Add reporting to every place where users meet or post", "Start block lists for the words and links behind your top harms"],
-      ["Match uploads against known CSAM hashes, for example with PhotoDNA, and report matches as the law requires", "Rank the review queue by severity instead of arrival time"],
+      ["Match uploads against known CSAM hashes, for example with PhotoDNA or ROOST's free, open-source Coop, and report matches as the law requires", "Rank the review queue by severity instead of arrival time"],
       ["Measure precision and recall for each classifier on a labeled sample", "Add account and network signals to catch coordinated abuse"],
       ["Run an abuse pre-mortem on every new feature before launch", "Join an industry signal-sharing program, such as the GIFCT hash database or the Tech Coalition's Lantern"]]},
   {k:"operations", n:"Review operations", s:"Operations", tool:["vendors", "Score moderation vendors"],
@@ -11667,7 +11706,7 @@ const MA_AREAS = [
     next:[["Make a named team or vendor responsible for the review queue", "Set a target time to act on user reports"],
       ["Set service levels by severity, with round-the-clock cover for child safety and threats to life", "Write an escalation path to legal, communications and leadership"],
       ["Forecast review capacity from volume trends every quarter", "Score vendors on quality, wellness and surge capacity"],
-      ["Automate clear-cut decisions and route complex cases to specialists", "Test a surge plan that adds reviewers within hours"]]},
+      ["Automate clear-cut decisions and route complex cases to specialists, for example with ROOST's free Coop or Osprey", "Test a surge plan that adds reviewers within hours"]]},
   {k:"quality", n:"Quality and appeals", s:"Quality", tool:["appeal", "Try the appeal reviewer"],
     q:"Are your decisions accurate and consistent, and can users get a mistake fixed?",
     why:"Wrong decisions hurt good users and erode trust. In the EU, the Digital Services Act requires online platforms to offer a way to appeal.",
@@ -11725,7 +11764,7 @@ const MA_AREAS = [
       "Wellbeing is measured through surveys and attrition, and vendor contracts require the same standards as in-house teams.",
       "Wellbeing is designed into tools and workflows, support continues after people leave the role, and a senior leader is accountable for it."],
     next:[["Give reviewers access to confidential counseling", "Tell every new reviewer what they'll see and how to get support"],
-      ["Set daily exposure limits for the most harmful content", "Turn on blurring and grayscale by default in review tools"],
+      ["Set daily exposure limits for the most harmful content", "Turn on blurring and grayscale by default in review tools (ROOST's open-source Coop has both)"],
       ["Survey reviewer wellbeing and track attrition every quarter", "Write wellness standards into every vendor contract"],
       ["Offer support after people leave review roles", "Make a senior leader accountable for reviewer wellbeing"]]}
 ];
@@ -11747,6 +11786,9 @@ Object.assign(MX_GLOSS, {
   "PhotoDNA":"Microsoft's widely used tool for hash matching known child sexual abuse images.",
   "GIFCT":"The Global Internet Forum to Counter Terrorism. It runs a shared database of hashes of terrorist content for its member companies.",
   "Lantern":"A Tech Coalition program where companies share signals about accounts and activity that break child safety policies.",
+  "ROOST":"Robust Open Online Safety Tools: a nonprofit that makes free, open-source trust and safety tools such as Coop and Osprey.",
+  "Coop":"ROOST's free, open-source review console: queues, routing and enforcement rules, reporting and appeals APIs, and built-in hash matching with NCMEC reporting. You host it yourself.",
+  "Osprey":"ROOST's free, open-source real-time rules engine and investigation console, built at Discord. It needs an engineering team to run.",
   "blameless review":"A review after an incident that looks for what in the system failed rather than who to blame, so people report problems openly.",
   "tabletop exercise":"A practice session where a team talks through a realistic crisis, step by step, to test its plan.",
   "service level":"An agreed target for how quickly work gets done, such as acting on a severe report within an hour.",
@@ -14450,6 +14492,7 @@ const GT_MORE = {
   "UGC":"User-generated content: the posts, images, videos and messages your users create.",
   "NCII":"Non-consensual intimate imagery: intimate images shared without the person's consent.",
   "BPO":"Business process outsourcing: an outside company that supplies staff, such as content moderators.",
+  "gpt-oss-safeguard":"An open model from OpenAI that labels content against a policy you write. Free to download; you run it on your own hardware.",
   "RFP":"Request for proposal: the document you send vendors asking how they would meet your requirements, and at what price.",
   "DTSP":"The Digital Trust & Safety Partnership, an industry group whose Safe Framework sets out Trust & Safety good practice.",
   "sextortion":"Threatening to share someone's intimate images unless they pay or send more. Teenagers are frequent targets.",
@@ -15382,7 +15425,7 @@ const DS_CTRL = [
   {k:"complaints", n:"Complaints and disputes", h:"How a user challenges a decision, inside your service and beyond it.", items:[
     {k:"c_int", t:"A free internal complaint system, open for at least six months after a decision, covering removals, demotions, suspensions, demonetization and rejected reports", sev:"crit", o:"product", cite:"Art. 20(1), 20(2)", a:"platform",
       why:"Both the person whose content was actioned and the reporter whose report was rejected can complain. Six months is the minimum window.", kase:"meta",
-      fix:"Add an appeal route to every enforcement message and to every rejected-report message, keep it open for six months, and let the user add an explanation and evidence."},
+      fix:"Add an appeal route to every enforcement message and to every rejected-report message, keep it open for six months, and let the user add an explanation and evidence. An open-source option: ROOST's Coop has an appeals API you can build the complaint route on."},
     {k:"c_human", t:"Complaints get a qualified human review, not only automation, and decisions are reversed when the complaint is justified", sev:"crit", o:"ops", cite:"Art. 20(4), 20(6)", a:"platform",
       why:"Complaints must be handled in a timely, non-discriminatory, diligent and non-arbitrary way, under the supervision of appropriately qualified staff.",
       fix:"Staff an appeals queue separate from first-line review, measure reversal rates, and feed reversals back into reviewer calibration."},
@@ -15748,7 +15791,7 @@ const EV_SIZES = [[24, "24 cases", "Quick: a first read in about a minute."], [4
 const EV_MODES = [
   ["policy", "Claude, prompted with my policy", "Claude reads the rule as written and labels each case. Tests whether the rule itself is clear enough to apply."],
   ["prompt", "Claude, with my own system prompt", "Paste the prompt your production classifier uses. Tests the prompt, not just the rule."],
-  ["paste", "My own classifier's labels", "Download the cases, run them through your model, paste the labels back. Works for any classifier, and without Claude."]
+  ["paste", "My own classifier's labels", "Download the cases, run them through your model, paste the labels back. Works for any text classifier, and without Claude: your own, or an open model like gpt-oss-safeguard with the runner script."]
 ];
 // The kinds of case a test set needs: the ones classifiers get wrong
 const EV_CATS = [
@@ -15861,6 +15904,30 @@ function evParsePaste(d, txt){
   lines.forEach((l, i) => { if(bare){ const c = d.cases[i]; if(c) out[c.id] = {label:l.toLowerCase(), why:""}; return; }
     const m = l.match(/^(c\d+)\s*[,\t;: ]\s*([a-z]+)\s*(?:[,\t;]\s*(.*))?$/i); if(!m) return; const lab = m[2].toLowerCase(); if(L.includes(lab) && d.cases.some(c => c.id === m[1])) out[m[1]] = {label:lab, why:(m[3] || "").slice(0, 160)}; });
   return Object.keys(out).length ? out : null;
+}
+// The rule as a policy for policy-following models (gpt-oss-safeguard, CoPE): Zentropi's four parts, filled in from the
+// setup, with TODO lines where only the author can decide. Never the cases: that would hand the model the test set.
+function evPolicyDoc(d){
+  const L = evLabels(d), three = d.labels === "three", c = EV_CONTENT.find(x => x[0] === d.content), ct = c ? c[1].toLowerCase() : "user content";
+  const rule = d.policy.trim().split(/\r?\n/).map(l => "> " + l).join("\n"), q = s => `"${s}"`;
+  const def = three
+    ? {remove:["Content that plainly does what the rule forbids, in any wording, spelling or language.", `Content near the line or unclear in intent: that is ${q("review")}.`],
+       review:["Content that may break the rule but that a careful reviewer would want to see before deciding: near the line, context-dependent, or unclear in intent.", `Content that plainly breaks the rule (${q("remove")}) or plainly stays within it (${q("allow")}).`],
+       allow:["Content the rule does not cover, including content on the same topic that stays within the rule.", `Anything that qualifies for ${q("remove")} or ${q("review")}.`]}
+    : {violates:["Content that does what the rule forbids, in any wording, spelling or language.", ""], allowed:["Content the rule does not cover, including content on the same topic that stays within the rule.", `Anything that qualifies for ${q("violates")}.`]};
+  const lab = l => [`### ${l}`, "", "Includes:", "", `- ${def[l][0]}`, `- TODO: the specific characteristics that qualify content for ${q(l)}, one per line.`, "", "Excludes:", ""].concat(def[l][1] ? [`- ${def[l][1]}`] : [], l === L[L.length - 1] ? [] : [`- TODO: the characteristics that disqualify content from ${q(l)}, for example the exceptions decided above.`], [""]);
+  return [`# Policy: ${d.name || "Untitled rule"}`, "",
+    `_A policy file for an open model that labels content against a written policy, such as gpt-oss-safeguard. Before you use it, fill in or delete every line marked TODO, then delete this note: the model reads the whole file. Keep the eval's test cases out, or the model sees the answers. Made with T&S Workbench._`, "",
+    "## Overview", "", `This policy classifies ${ct}${c ? ` (${c[2].replace(/\.$/, "").toLowerCase()})` : ""} under one rule:`, "", rule, "", `Every piece of content gets exactly one label: ${L.join(", ")}. Apply the rule as written, not a general sense of what should be allowed.`, "",
+    "## Definition of Terms", "", "TODO: define each term the rule relies on, one line each. A term the rule uses without defining is a term the classifier will define for itself.", "", "- **Term**: TODO.", "",
+    "## Interpretation of Language", "", "TODO: say how to read ambiguous content under this rule. Decide each of these and write the answer down:", "",
+    "- Quoting, reporting or condemning the behavior (counter-speech): TODO, allowed or not, and what marks it as counter-speech.",
+    "- Sarcasm, banter between friends, in-group and reclaimed language: TODO, whether context changes the label, and what context counts.",
+    "- Figures of speech and hyperbole: TODO, what separates a figure of speech from the real thing.",
+    "- News, documentation and education about the behavior: TODO, allowed or not, and what marks it (framing, intent, no glorification).",
+    "- Spacing, symbols, misspellings and coded language: TODO. Most policies say these don't change the meaning.",
+    "- Languages other than English: TODO. Most policies say the rule applies the same way in every language.", "",
+    "## Definition of Labels", ""].concat(...L.map(lab)).join("\n");
 }
 function evMarkdown(d){
   const m = evMetrics(d, d.preds), L = evLabels(d), adv = evAdvice(d, m);
@@ -16012,12 +16079,12 @@ function evCasesHTML(ai){
     ${EVRUN.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account. ${EVRUN.total ? "About 15 seconds per dozen cases." : "Usually under a minute."}</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : ""}
     ${EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : ""}
     <div class="card"><div class="card-h"><div><h3 style="margin:0;font-size:16px">The test set${has ? ` <span class="note">${has} cases</span>` : ""}</h3><p class="note" style="margin:4px 0 0">${has ? "These are the gold labels: what a careful reviewer would say under the rule as written. Change any you disagree with before you run. The labels you set are what the classifier is scored against." : "No cases yet."}</p></div>
-      <div class="ev-case-a">${has ? `<button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy as TSV</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download cases</button>` : ""}` : ""}${ai ? `<button type="button" class="btn sm" data-ev="gen">${has ? "Regenerate" : "Generate with Claude"}</button>` : ""}</div></div>
+      <div class="ev-case-a">${has ? `<button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy as TSV</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download cases</button>` : ""}${ev.mode === "paste" && ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for an open model such as gpt-oss-safeguard. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Download policy` : `${icon("copy")}Copy policy`}</button>` : ""}` : ""}${ai ? `<button type="button" class="btn sm" data-ev="gen">${has ? "Regenerate" : "Generate with Claude"}</button>` : ""}</div></div>
       ${has ? `<div class="cp-mapw"><table class="cp-map ev-table"><thead><tr><th>id</th><th>Content</th><th>Kind</th><th>Expected</th><th>Why</th></tr></thead><tbody>${ev.cases.map(row).join("")}</tbody></table></div>` : ""}
       <div class="card-b ev-add"><details><summary>Add your own cases</summary><p class="note">One per line: <span class="mono">label<span class="muted">⇥</span>text</span>, with a label from ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Real cases from your queue are the best test, anonymized first.</p><textarea class="input" id="ev-own" rows="4" placeholder="violates	you're pathetic, nobody wants you here"></textarea><div style="margin-top:8px"><button type="button" class="btn sm" data-ev="addown">Add these</button></div></details></div></div>
     ${has ? `<div class="card ev-run"><div class="card-b">
       <h3 style="margin:0 0 6px;font-size:16px">Run the classifier</h3>
-      ${ev.mode === "paste" ? `<p class="note">Run the cases through your own classifier, then paste its labels here: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span> or just the labels in order.</p><textarea class="input" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(ev.pasted || "")}</textarea><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="score">Score the labels</button></div>`
+      ${ev.mode === "paste" ? `<p class="note">Run the cases through your own classifier, then paste its labels here: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span> or just the labels in order. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model, such as gpt-oss-safeguard, on your own computer. Download the cases and the policy above, fill in the policy's TODO lines, and the script writes labels you can paste here. Setup takes Node.js, Ollama and a 14 GB download.</p><textarea class="input" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(ev.pasted || "")}</textarea><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="score">Score the labels</button></div>`
         : `<p class="note">${ev.mode === "prompt" ? "Claude runs your system prompt against every case" : "Claude labels every case from the rule as written"}, a dozen at a time, on your account.${ev.mode === "prompt" ? ` <button type="button" class="pol-add" data-ev="edit">Change the prompt</button>` : ""}</p><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="run" ${ai && !EVRUN.busy ? "" : "disabled"}>${ai ? "Run with Claude" : "Open in Claude to run"}</button><span class="note">${ai ? `${ev.cases.length} cases, about ${Math.max(1, Math.round(ev.cases.length / 12 * 0.3))} minute${ev.cases.length > 36 ? "s" : ""}.` : "Or switch to pasting your own classifier's labels in the setup."}</span></div>`}
     </div></div>` : ""}
   </div>`;
@@ -16086,6 +16153,7 @@ function evAct(a){
       if(added){ ev.preds = null; ev.ex = false; evSave(); renderEval(); } return gsay(added ? `${added} case${added === 1 ? "" : "s"} added` : "No lines matched label, a tab, then the text"); }
     case "csv": return copyText(evCSV(ev), $("#ev-toast"));
     case "dlcsv": { const c = evCSV(ev); return offerFile(`eval-cases-${slug(ev.name || "classifier")}.tsv`, c, c, $("#ev-toast")); }
+    case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
   }
@@ -16451,7 +16519,7 @@ document.addEventListener("click", e => {
   if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = (location.hash || "").slice(1).split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
 });
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   // A shareable link straight into the demo company
