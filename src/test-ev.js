@@ -38,7 +38,7 @@ const body = function(){
   // own cases: the paste route works without AI
   ev.mode = "paste"; ev.view = "cases"; ev.preds = null; renderEval(); h = view.innerHTML; eq(/data-ev="score"/.test(h) && /Add your own cases/.test(h) && /data-evgold="c1"/.test(h), true, "cases page with the paste box and editable gold labels");
   eq(/data-ev="dlpol"/.test(h) && /tools\/open-model-eval/.test(h) && /gpt-oss-safeguard/.test(h), true, "the policy download and the runner script, for paste-mode users");
-  ev.mode = "policy"; renderEval(); eq(/data-ev="dlpol"/.test(view.innerHTML), false, "not on the Claude routes"); ev.mode = "paste";
+  ev.mode = "policy"; renderEval(); eq(/data-ev="dlpol"/.test(view.innerHTML), false, "not on the Claude routes"); eq(/data-ev="topaste"/.test(view.innerHTML), !evAI(), "without Claude, the Claude routes say what to do instead of going blank"); ev.mode = "paste";
   view.querySelector = () => null; // no DOM for the textarea; add through the data path instead
   ev.cases.push({id:"c25", text:"you people are all the same, go back where you came from", expect:"violates", cat:"own", why:"Your own case."});
   const p3 = Object.fromEntries(ev.cases.map(c => [c.id, {label:c.expect, why:""}])); p3.c25 = {label:"allowed", why:""}; evFinish(p3);
