@@ -117,7 +117,7 @@ const RO_USES = [
   ["Transformers.js", "Hugging Face's library that runs the baseline model in your browser, loaded from jsDelivr. Version 3.8.1, pinned.", "Transformers.js", "https://huggingface.co/docs/transformers.js"],
   ["gpt-oss-safeguard", "Optional, on your own computer. OpenAI's open-weight safety model, run with Ollama by the runner script.", "The runner script", RO_GH + "/ts-workbench/tree/main/tools/open-model-eval"],
   ["Claude", "Optional, in the Claude version only. Writes test cases and labels them, on your own Claude account.", "", ""],
-  ["Nothing else", "No server and no accounts. What you type stays in your browser, and the model files above download only when you ask.", "", ""]
+  ["Nothing else", "No server and no accounts. What you type stays in your browser, and the model files above download only when you ask. Page views are counted anonymously, without cookies.", "", ""]
 ];
 function renderRoost(){
   const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
@@ -144,8 +144,8 @@ function renderRoost(){
       <div class="ab-dec">
         <div><h3>Built from public sources</h3><p>Each export follows a format ROOST publishes. Nothing was copied from private material, and nothing here was made with or reviewed by ROOST.</p></div>
         <div><h3>Checked, not deployed</h3><p>The generated files are checked by automated tests: valid structure, every platform-specific value marked TODO, labels on every file. They have not been run in Osprey or Coop.</p></div>
-        <div><h3>Same rules as the rest of the workbench</h3><p>One HTML file, plain JavaScript, no framework. Your work is saved only in this browser.</p></div>
-        <div><h3>Open source</h3><p>The code and tests are on GitHub under the MIT license. ${ext(RO_GH + "/ts-workbench", "ts-workbench")}</p></div>
+        <div><h3>Made with AI help</h3><p>Steven Macchia built it with Claude Code, Anthropic's coding assistant, which helped write the code and check the sources. Automated tests run on every build.</p></div>
+        <div><h3>One file, open source</h3><p>Plain JavaScript in one HTML file, MIT licensed. Your work is saved only in this browser. ${ext(RO_GH + "/ts-workbench", "ts-workbench")}</p></div>
       </div>
     </section>
 

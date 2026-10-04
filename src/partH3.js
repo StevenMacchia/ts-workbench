@@ -35,7 +35,7 @@ function renderOverview(){
         <span class="foot"><span>${t.f}</span><span style="color:var(--accent);display:inline-flex;align-items:center;gap:4px">Open <svg style="width:14px;height:14px"><use href="#i-arrow"/></svg></span></span>
       </a>`).join("")}</div>
     <div class="principles">
-      <div><h4>Private by design</h4><p>Nothing you type leaves your browser. There are no accounts, tracking or uploads.</p></div>
+      <div><h4>Private by design</h4><p>Nothing you type leaves your browser. No accounts, no uploads, no cookies: just an anonymous page-view count.</p></div>
       <div><h4>Explains its reasoning</h4><p>Every risk rating shows the platform factors that raised or lowered it, so you can challenge it.</p></div>
       <div><h4>A starting point, not legal advice</h4><p>Use the outputs to start conversations with your Legal, Policy and Engineering partners.</p></div>
     </div>`;

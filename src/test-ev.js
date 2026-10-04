@@ -12,7 +12,7 @@ const body = function(){
   gdGo(gdCur, "start"); gdGo(gdCur, "next"); h = view.innerHTML; eq(/Paste the rule the classifier enforces/.test(h) && /data-ev="useex"/.test(h), true, "the rule step, with the example rule a click away");
   gdCur.steps[1].set(EV_EXAMPLE.policy); gdGo(gdCur, "next"); gdPick(gdCur, "comments"); gdGo(gdCur, "next"); gdPick(gdCur, "binary"); gdGo(gdCur, "next"); gdPick(gdCur, "24"); gdGo(gdCur, "next");
   h = view.innerHTML; eq(/What are you running the cases through/.test(h) && (h.match(/data-gdpick=/g) || []).length, 3, "three ways to run it");
-  gdPick(gdCur, "prompt"); gdGo(gdCur, "next"); h = view.innerHTML; eq(/Paste the system prompt/.test(h), true, "the prompt step appears only for the prompt route");
+  gdPick(gdCur, "prompt"); eq(ev.mode === "prompt", evAI(), "Claude routes can be picked only where Claude runs"); ev.mode = "prompt"; gdRender(gdCur); gdGo(gdCur, "next"); h = view.innerHTML; eq(/Paste the system prompt/.test(h), true, "the prompt step appears only for the prompt route");
   ev.mode = "paste"; eq(gdLive(gdCur).some(s => s.id === "sys"), false, "and not for the paste route");
   out.push("guided: six questions, the prompt step only when it applies");
   // the example: a harassment rule, 24 cases, a keyword-ish classifier that fails the hard cases
