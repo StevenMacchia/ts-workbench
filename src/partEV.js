@@ -45,7 +45,7 @@ const evTitle = d => "Classifier eval: " + (d.name || "Untitled classifier");
 const EVRUN = {busy:false, phase:"", done:0, total:0, err:"", ctl:null, off:false};
 const evLabels = d => (EV_LABELS[d.labels] || EV_LABELS.binary).labels;
 const evPos = d => (EV_LABELS[d.labels] || EV_LABELS.binary).pos;
-const evCat = k => (typeof evCatList === "function" ? evCatList(ev) : EV_CATS).find(c => c[0] === k) || [k, k, ""];
+const evCat = k => (typeof evCatList === "function" ? evCatList(ev) : EV_CATS).find(c => c[0] === k) || (k === "own" ? ["own", "Your own", "A case you added yourself."] : [k, k, ""]);
 const evGold = (d, c) => (d.gold && d.gold[c.id]) || c.expect;
 const evAI = () => typeof SAMPLER !== "undefined" && !!SAMPLER && !EVRUN.off;
 
@@ -233,11 +233,11 @@ const EV_TILES = [
 // How a kind of case reads in the summary sentence: when it's flagged by mistake, and when it's missed
 const EV_PLAIN = {
   clear_violation:["", "clear violations"], clear_allowed:["clearly fine content on the same topic", ""], borderline:["borderline cases", "borderline cases"],
-  counter:["people quoting or condemning abuse to report it", "counter-speech"], context:["banter and sarcasm between friends", "abuse that depends on context"],
-  adversarial:["", "misspelled or spaced-out abuse"], newsworthy:["news and education about the behavior", "violations dressed up as news"], hyperbole:["figures of speech", ""],
+  counter:["people quoting abuse to report it", "counter-speech"], context:["banter between friends", "abuse that depends on context"],
+  adversarial:["", "misspelled abuse"], newsworthy:["news about the behavior", "violations dressed up as news"], hyperbole:["figures of speech", ""],
   offtopic:["unrelated content", ""], multilingual:["harmless content in other languages", "abuse in other languages"], own:["some of your own cases", "some of your own cases"],
-  news:["news and documentary footage", "violations framed as news"], medical:["medical and educational material", ""], art:["art", ""], meme:["memes", "memes where the violation is in the caption"],
-  screenshot:["screenshots", "violations inside screenshots"], edited:["", "cropped or edited copies"], ai:["AI-generated images", "AI-generated violations"], lookalike:["look-alikes: toys, costumes, props", ""], other:["other kinds of item", "other kinds of item"]
+  news:["news and documentary footage", "violations framed as news"], medical:["medical and educational material", ""], art:["art", ""], meme:["memes", "memes whose caption breaks the rule"],
+  screenshot:["screenshots", "violations inside screenshots"], edited:["", "cropped or edited copies"], ai:["AI-generated images", "AI-generated violations"], lookalike:["look-alikes such as toys and props", ""], other:["other kinds of item", "other kinds of item"]
 };
 // The result in one plain sentence: how many right, then what it flags by mistake and what it misses, by kind of case
 function evSummary(d, m){
@@ -248,7 +248,7 @@ function evSummary(d, m){
   const flags = hot.filter(c => c.fp > c.fn).map(c => phrase(c, 0)).slice(0, 2), misses = hot.filter(c => c.fn > c.fp).map(c => phrase(c, 1)).slice(0, 2), wrong = hot.filter(c => c.fp === c.fn).map(c => c.n.toLowerCase()).slice(0, 2);
   const list = a => a.length > 1 ? a.slice(0, -1).join(", ") + " and " + a[a.length - 1] : a[0];
   const parts = [].concat(flags.length ? [`flags ${list(flags)}`] : [], misses.length ? [`misses ${list(misses)}`] : [], wrong.length ? [`gets ${list(wrong)} wrong`] : []);
-  if(!parts.length) return first + (m.correct === m.n ? " Add harder cases, or real ones from your queue." : " No kind of case stands out.");
+  if(!parts.length) return first + (m.correct === m.n ? " Add harder cases, or real ones from your queue." : m.cats.length ? " No kind of case stands out." : " These are your own cases, so there is no breakdown by kind; the wrong ones are below.");
   return `${first} It ${parts.length === 1 ? parts[0] : parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1]}.`;
 }
 const EV_TIPS = {
@@ -303,7 +303,7 @@ function evFinish(preds, runName){
 function evGoResults(msg){ evGoStep("ev-s3"); if(msg) gsay(msg); }
 function evGoStep(id, sel){
   const el = document.getElementById(id); if(!el) return;
-  if(el.scrollIntoView) el.scrollIntoView({block:"start", behavior:"smooth"});
+  if(el.scrollIntoView) el.scrollIntoView({block:"start"}); // instant, so a redraw that restores the scroll position doesn't land mid-way
   const f = sel ? el.querySelector(sel) : null; if(f){ try{ f.focus({preventScroll:true}); }catch(e){} } else focusQuiet(el.querySelector("h2") || el);
 }
 
@@ -319,7 +319,7 @@ function renderEval(){
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
     ${fresh ? evHeroHTML() : ""}
-    ${ev.ex && !media ? `<div class="banner ev-ex"><span><strong>This is the example:</strong> a harassment rule as many platforms write it, and 24 comments of the kinds classifiers get wrong.${m && ev.mode === "policy" ? " The labels came from Claude prompted with the rule alone: it gets the easy cases and fails the ones that matter." : ""} Change the right answers, add cases, or start over with your own rule.</span><button type="button" class="btn sm" data-ev="reset">Start over</button></div>` : ""}
+    ${ev.ex && !media ? `<div class="banner ev-ex"><span><strong>This is the example:</strong> a harassment rule as many platforms write it, and 24 comments of the kinds classifiers get wrong.${m && ev.mode === "policy" ? " The labels came from Claude prompted with the rule alone: it gets the easy cases and fails the ones that matter." : ""} Change the right answers, add cases, or start over (top right) with your own rule.</span></div>` : ""}
     ${media ? evMediaHTML(steps[0]) : evStepHTML(steps[0], 0, evStep1HTML(n)) + evStepHTML(steps[1], 1, evStep2HTML(n))}
     ${evStepHTML(steps[steps.length - 1], steps.length - 1, m ? evResultsHTML(m, media) : evWaitHTML(media))}
     ${m && !media && typeof evLoopHTML === "function" ? evLoopHTML() : ""}
@@ -458,7 +458,7 @@ function evAct(a){
       ev.mode = "paste"; ev.pasted = txt; EVL.paste = ""; ev.ex = false; const missing = ev.cases.filter(c => !p[c.id]).length; evFinish(p); renderEval(); evGoResults(missing ? `${missing} case${missing === 1 ? "" : "s"} had no label and were left out` : ""); return; }
     case "addown": { const L = evLabels(ev), lines = (($("#ev-own") || {}).value || EVL.own || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean); let added = 0;
       if(typeof evLeaveMedia === "function" && lines.length) evLeaveMedia();
-      lines.forEach(l => { const m = l.match(/^([a-z]+)\s*[\t|,;]\s*(.+)$/i); if(!m || !L.includes(m[1].toLowerCase())) return; ev.cases.push({id:"c" + (ev.cases.length + 1), text:m[2].trim().slice(0, 400), expect:m[1].toLowerCase(), cat:"own", why:"Your own case."}); added++; });
+      lines.forEach(l => { const m = l.match(/^([a-z]+)\s*[\t|,;]\s*(.+)$/i); if(!m || !L.includes(m[1].toLowerCase())) return; ev.cases.push({id:"c" + (ev.cases.length + 1), text:m[2].trim().slice(0, 400), expect:m[1].toLowerCase(), cat:"own", why:""}); added++; });
       if(added){ if(ev.preds && typeof evLoopBefore === "function") evLoopBefore(ev.preds); /* the last run stays as the one to compare with */ ev.preds = null; ev.ex = false; ev.view = "text"; EVL.own = ""; EVU.own = false; EVU.all = true; evSave(); renderEval(); evGoStep("ev-s2"); }
       return gsay(added ? `${added} case${added === 1 ? "" : "s"} added` : `No lines matched. Start each line with ${L.join(" or ")}, then a tab or comma, then the text.`); }
     case "csv": return copyText(evCSV(ev), $("#ev-toast"));

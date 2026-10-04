@@ -108,10 +108,10 @@ function evCompareHTML(){
         <p class="note">${r.n} ${ev.media ? "items" : "cases"} labeled in both runs, scored against the same right answers.${chg ? ` The ${key === "sys" ? "prompt" : "rule"} changed in between; the change is below.` : ""}</p></div>
       <div class="ev-cmp-kpis">${kpi("Right", r.before.acc, r.after.acc, r.delta.acc)}${kpi(`Precision on "${esc(pos)}"`, r.before.main ? r.before.main.pr : null, r.after.main ? r.after.main.pr : null, r.delta.pr)}${kpi(`Recall on "${esc(pos)}"`, r.before.main ? r.before.main.rc : null, r.after.main ? r.after.main.rc : null, r.delta.rc)}</div></div>
     ${r.fixed.length || r.broke.length ? `<div class="ev-cmp-flips"><h4>What flipped</h4><div class="cp-gaps">${r.fixed.map((x, i) => flip(x, i, "fixed")).join("")}${r.broke.map((x, i) => flip(x, r.fixed.length + i, "broke")).join("")}</div></div>` : ""}
-    <div class="ev-cmp-grid">
+    ${r.cats.length ? `<div class="ev-cmp-grid">
       <div class="ev-cmp-radar"><h4>Wrong by kind, before and after</h4>${r.cats.length >= 3 ? `${evRadar(r.cats, names)}<div class="ma-legend"><span><i class="ma-lg-cur"></i>${esc(names[1])}</span><span><i class="ma-lg-old"></i>${esc(names[0])}</span><span><i class="ma-lg-gap"></i>Got worse</span></div><p class="note">The further out, the larger the share of that kind labeled wrong.</p>` : `<p class="note">Fewer than three kinds of case in both runs, so no chart; the table has the numbers.</p>`}</div>
       <div><h4>The numbers</h4><table class="ev-ct ev-cmp-t"><thead><tr><th>Kind</th><th>Cases</th><th>Before</th><th>After</th></tr></thead><tbody>${r.cats.map(c => `<tr class="${c.after > c.before ? "bad" : c.after < c.before ? "ok" : ""}"><td>${esc(c.n)}</td><td class="mono">${c.total}</td><td class="mono">${c.before}</td><td class="mono ev-arrow">${c.after}${c.after < c.before ? ' <span class="ev-delta up">▾</span>' : c.after > c.before ? ' <span class="ev-delta down">▴</span>' : ""}</td></tr>`).join("")}</tbody></table></div>
-    </div>
+    </div>` : ""}
     ${chg ? `<div class="ev-cmp-diff"><h4>What changed in the ${key === "sys" ? "prompt" : "rule"}</h4><div class="pol-diff"><div><span class="eyebrow">Before · ${esc(names[0])}</span><blockquote>${esc(P[key] || "")}</blockquote></div><div><span class="eyebrow">Now · ${esc(names[1])}</span><blockquote class="new">${esc(evLastOf(ev, key) || "")}</blockquote></div></div></div>` : ""}
   </div>`;
 }

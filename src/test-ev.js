@@ -31,7 +31,7 @@ const body = function(){
   eq(m.cats.find(c => c.k === "counter").miss, 2, "both counter-speech cases flagged"); eq(m.cats.find(c => c.k === "adversarial").miss, 2, "both obfuscated cases missed");
   eq(m.cats.find(c => c.k === "clear_violation").miss, 0, "clear violations all caught");
   const adv = evAdvice(ev, m); eq(adv.some(a => /quote or condemn/.test(a.t)) && adv.some(a => /obfuscated/.test(a.t)) && adv.some(a => /Precision on "violates"/.test(a.t)), true, "advice names counter-speech, obfuscation and precision");
-  const sum = evSummary(ev, m); eq(/^Got 16 of 24 right\. It flags people quoting or condemning abuse to report it/.test(sum) && /misses misspelled or spaced-out abuse/.test(sum), true, "the summary in plain words: " + sum);
+  const sum = evSummary(ev, m); eq(/^Got 16 of 24 right\. It flags people quoting abuse to report it/.test(sum) && /misses misspelled abuse/.test(sum), true, "the summary in plain words: " + sum);
   eq(evSummary(ev, evMetrics(ev, Object.fromEntries(ev.cases.map(c => [c.id, {label:c.expect}])))), "Got all 24 right. Add harder cases, or real ones from your queue.", "a perfect run says so");
   eq(/67%/.test(h) && /What it got wrong/.test(h) && /What to change/.test(h) && /This is the example/.test(h) && /class="card ev-step done" id="ev-s3"/.test(h), true, "results in step 3, with the example banner");
   eq(/Since the last run/.test(h) && (h.match(/class="ev-flip fixed"/g) || []).length === 3 && (h.match(/class="ev-flip broke"/g) || []).length === 1, true, "the earlier run compared automatically: three fixed, one broke");
