@@ -97,13 +97,13 @@ function evCompareHTML(){
   const dl = v => v === null ? "" : `<span class="ev-delta ${v > 0 ? "up" : v < 0 ? "down" : ""}">${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(Math.round(v * 100))}</span>`;
   const kpi = (lbl, a, b, d) => `<div class="ev-kpi"><span class="eyebrow">${lbl}</span><b class="mono">${pct(a)} <span class="muted">→</span> ${pct(b)}</b>${dl(d)}</div>`;
   const flip = (x, i, kind) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
-    <span class="eyebrow"><span class="ev-flip ${kind}">${kind === "fixed" ? "Fixed" : "Broke"}</span> ${esc(evCat(x.c.cat)[1])} · ${esc(x.c.id)}</span><h4>“${esc(x.c.text)}”</h4>
+    <span class="eyebrow"><span class="ev-flip ${kind}">${kind === "fixed" ? "Fixed" : "Broke"}</span> ${esc(evCat(x.c.cat)[1])} · ${esc(x.c.id)}</span>${ev.media && x.c.text === x.c.id ? "" : `<h4>“${esc(x.c.text)}”</h4>`}
     <p>Expected <b>${esc(x.gold)}</b>. Was <b>${esc(x.was)}</b>, now <b>${esc(x.now)}</b>.${x.c.why ? ` Reviewer: ${esc(x.c.why)}` : ""}${ev.preds[x.c.id].why ? ` Classifier now: ${esc(ev.preds[x.c.id].why)}` : ""}</p></div></article>`;
   const sum = !r.fixed.length && !r.broke.length ? "No case flipped." : `${r.fixed.length} fixed, ${r.broke.length} broke.`;
   const chg = evLoopChanged(ev), key = ev.mode === "prompt" ? "sys" : "policy";
   return `<div class="ev-cmp">
     <div class="ev-cmp-top"><div><span class="eyebrow">${esc(names[0])} → ${esc(names[1])}</span><h4>${sum} Accuracy ${pct(r.before.acc)} → ${pct(r.after.acc)}.</h4>
-        <p class="note">${r.n} cases labeled in both runs, scored against the same gold labels.${chg ? ` The ${key === "sys" ? "prompt" : "rule"} changed in between; the change is below.` : ev.mode === "paste" && !ev.media ? " Change the rule your classifier enforces, and the diff shows here too." : ""}</p></div>
+        <p class="note">${r.n} cases labeled in both runs, scored against the same gold labels.${chg ? ` The ${key === "sys" ? "prompt" : "rule"} changed in between; the change is below.` : ev.mode === "paste" && !ev.media ? " If you change the rule under Edit setup between runs, the diff shows here too." : ""}</p></div>
       <div class="ev-cmp-kpis">${kpi("Accuracy", r.before.acc, r.after.acc, r.delta.acc)}${kpi(`Precision on "${esc(pos)}"`, r.before.main ? r.before.main.pr : null, r.after.main ? r.after.main.pr : null, r.delta.pr)}${kpi(`Recall on "${esc(pos)}"`, r.before.main ? r.before.main.rc : null, r.after.main ? r.after.main.rc : null, r.delta.rc)}</div></div>
     <div class="ev-cmp-grid">
       <div class="ev-cmp-radar"><h4>Misses by kind</h4>${r.cats.length >= 3 ? `${evRadar(r.cats, names)}<div class="ma-legend"><span><i class="ma-lg-cur"></i>${esc(names[1])}</span><span><i class="ma-lg-old"></i>${esc(names[0])}</span><span><i class="ma-lg-gap"></i>Got worse</span></div><p class="note">The further out, the larger the share of that kind labeled wrong.</p>` : `<p class="note">Fewer than three kinds of case in both runs, so no chart; the table has the numbers.</p>`}</div>
@@ -128,10 +128,11 @@ function evCompareMarkdown(d){
 
 /* ---------- the loop card: edit next to the cases, run again ---------- */
 function evLoopHTML(onReport){
-  const ai = evAI(), mode = ev.mode, dr = ev.draft || {}, media = ev.media, n = ev.cases.length;
-  const title = media ? "Paste the next list and compare" : mode === "paste" ? "Run your classifier again and compare" : mode === "prompt" ? "Change the prompt and run again" : "Change the rule and run again";
+  const ai = evAI(), mode = ev.mode, dr = ev.draft || {}, media = ev.media, n = ev.cases.length, can = ai || mode === "paste" || media; // without Claude, the rule or prompt can't be run again here
+  const title = media ? "Paste the next list and compare" : mode === "paste" ? "Run your classifier again and compare" : !can ? "Run again and compare" : mode === "prompt" ? "Change the prompt and run again" : "Change the rule and run again";
   const fields = media ? evManifestFieldHTML()
     : mode === "paste" ? `<p class="note">Change the rule or the prompt your classifier uses, run the same cases through it, and paste the new labels: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in order.</p><textarea class="input mono" id="ev-loop-paste" rows="5" placeholder="c1	violates&#10;c2	allowed" aria-label="New labels">${esc(EVL.paste)}</textarea>`
+    : !can ? `<p class="note">Changing the ${mode === "prompt" ? "prompt" : "rule"} and running the same cases again needs Claude. Here, run the cases through your own classifier and paste its labels; the Compare tab then shows what flipped.</p>`
     : mode === "prompt" ? `<div class="field"><label for="ev-loop-sys">Your system prompt</label><textarea class="input" id="ev-loop-sys" rows="7" placeholder="You are a content moderation classifier…">${esc(dr.sys !== undefined ? dr.sys : ev.sys)}</textarea></div>`
     : `<div class="field"><label for="ev-loop-policy">The rule</label><textarea class="input" id="ev-loop-policy" rows="5" placeholder="Users must not harass, bully or intimidate other users…">${esc(dr.policy !== undefined ? dr.policy : ev.policy)}</textarea></div>`;
   const name = `<div class="field ev-loop-name"><label for="ev-loop-name">A name for the next run <span class="note">optional</span></label><input class="input" id="ev-loop-name" maxlength="80" value="${esc(dr.name || "")}" placeholder="${esc(evNextName(ev.name))}"></div>`;
@@ -143,7 +144,7 @@ function evLoopHTML(onReport){
   const busy = onReport && EVRUN.busy ? `<div class="ai-busy ev-loop-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account.</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : "";
   const err = onReport && EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : "";
   return `<section class="card ev-loop" id="ev-loop" aria-labelledby="ev-loop-h"><div class="card-h"><div><h3 id="ev-loop-h">${title}</h3><p class="note">${media ? "Same ids, same expected labels. The report then shows which items flipped, and precision and recall before and after." : `Same ${n} cases, same gold labels. The next report shows which cases flipped, and precision and recall before and after.`}</p></div></div>
-    <div class="card-b">${busy}${err}${fields}${media ? "" : name}<div class="pol-run">${run}</div></div></section>`;
+    <div class="card-b">${busy}${err}${fields}${media || !can ? "" : name}<div class="pol-run">${run}</div></div></section>`;
 }
 
 /* ---------- images and video: a labeled list, never the media ---------- */
@@ -186,7 +187,8 @@ const EV_MTEMPLATE = ["id\tkind\texpected\tmodel_label\tnote", "img_0041\tnews\t
 function evManifestFieldHTML(){
   const L = evLabels(ev);
   return `<div class="field"><label for="ev-manifest">The list: one line per item</label><p class="note">Columns: <span class="mono">id</span>, <span class="mono">kind</span>, <span class="mono">expected</span>, <span class="mono">model_label</span>, and an optional note. Tabs or commas; a header row is fine. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Expected is what your reviewers decided; model label is what the classifier said.</p>
-    <textarea class="input mono" id="ev-manifest" rows="8" placeholder="${esc(EV_MTEMPLATE).replace(/\n/g, "&#10;")}">${esc(EVL.manifest)}</textarea></div>`;
+    <textarea class="input mono" id="ev-manifest" rows="8" placeholder="${esc(EV_MTEMPLATE).replace(/\n/g, "&#10;")}">${esc(EVL.manifest)}</textarea>
+    ${EVL.bad.length ? `<p class="note" role="status">Last list: ${EVL.bad.length} line${EVL.bad.length === 1 ? "" : "s"} skipped. Line ${EVL.bad[0].line}: ${esc(EVL.bad[0].why)}.${EVL.bad.length > 1 ? ` Line ${EVL.bad[1].line}: ${esc(EVL.bad[1].why)}.` : ""}</p>` : ""}</div>`;
 }
 function evMediaHTML(){
   const L = evLabels(ev), has = ev.media && ev.cases.length, stale = !ev.media && ev.cases.length;

@@ -25,6 +25,7 @@
 .ev-loop .field+.field,.ev-loop .note+textarea{margin-top:12px}
 .ev-loop textarea.input,.ev-media textarea.input{width:100%;max-width:none;box-sizing:border-box}
 .ev-loop textarea.mono,.ev-media textarea.mono{font-family:var(--mono);font-size:13px;white-space:pre}
+.ev-cases .card-b>.pol-run{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap}
 .ev-loop .pol-run,.ev-media .pol-run{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;margin-top:14px;padding:0;border:0;position:static;background:none;box-shadow:none}
 .ev-loop .pol-run .note,.ev-media .pol-run .note{flex:1 1 220px;min-width:0}
 .ev-loop .ai-busy{margin:0 0 14px;padding:14px 16px}

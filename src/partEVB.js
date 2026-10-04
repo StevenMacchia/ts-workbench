@@ -11,9 +11,9 @@ const EVB_LIB = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
 // sigmoid per label. Sizes are what the browser fetches (quantized ONNX weights plus tokenizer), measured with the progress callback.
 const EVB_MODELS = [
   {id:"minuva/MiniLMv2-toxic-jigsaw-onnx", name:"MiniLMv2 toxic", lic:"Apache-2.0", mb:24, bytes:23578876, opts:{dtype:"q8", subfolder:".", model_file_name:"model_optimized"},
-   about:"a 23 MB open model distilled from Jigsaw's toxic-bert (unitary/toxic-bert, also Apache-2.0)"},
+   about:"an open model of about 24 MB, distilled from Unitary's toxic-bert (unitary/toxic-bert, also Apache-2.0) and trained on Jigsaw's toxic comment data"},
   {id:"Xenova/toxic-bert", name:"toxic-bert", lic:"Apache-2.0", mb:111, bytes:111433092, opts:{dtype:"q8"},
-   about:"Jigsaw's toxic-bert (unitary/toxic-bert), 111 MB quantized, in the ONNX port by Xenova"}
+   about:"Unitary's toxic-bert (unitary/toxic-bert), trained on Jigsaw's toxic comment data, 111 MB quantized, in the ONNX port by Xenova"}
 ];
 const EVB_CATS = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"];
 const EVB_T = {pos:.5, review:.25}; // highest score at or above pos: the positive label; three labels: review band from .25
@@ -86,7 +86,7 @@ function evbCardHTML(){
       <details class="evb-all"><summary>Every score</summary><p class="note">${esc(rule)}</p><div class="cp-mapw"><table class="cp-map ev-table evb-table"><thead><tr><th>id</th><th>Content</th><th>Top category</th><th>Baseline</th><th>Expected</th></tr></thead><tbody>${ev.cases.map(c => { const p = preds[c.id]; if(!p) return ""; const ok = p.label === evGold(ev, c); return `<tr class="${ok ? "" : "bad"}"><td class="mono">${c.id}</td><td>${esc(c.text)}</td><td class="mono">${esc(p.top.replace("_", " "))} ${p.score.toFixed(2)}</td><td><b>${esc(p.label)}</b>${ok ? "" : ' <span class="ev-x">✕</span>'}</td><td>${esc(evGold(ev, c))}</td></tr>`; }).join("")}</tbody></table></div></details>
       <div class="pol-run"><button type="button" class="btn sm" data-evb="keep">Keep in the runs table</button><button type="button" class="btn sm" data-evb="run">Run again</button><span class="note">${mt.n} cases in ${EVB.ms < 1000 ? EVB.ms + " ms" : (EVB.ms / 1000).toFixed(1) + " s"}, in this browser. The model stays cached here.</span></div>`;
   } else {
-    body = `<p>Before your own classifier runs, see what a general toxicity model makes of these cases. <b>${esc(m.name)}</b> (${esc(m.lic)}) is ${esc(m.about)}. It downloads to this browser from the Hugging Face and jsDelivr CDNs, runs here, and <b>the text of your cases never leaves your browser</b>. Once downloaded it stays cached in this browser.</p>
+    body = `<p>See what a general toxicity model makes of these cases. <b>${esc(m.name)}</b> (${esc(m.lic)}) is ${esc(m.about)}. It downloads to this browser from the Hugging Face and jsDelivr CDNs, runs here, and <b>the text of your cases never leaves your browser</b>. Once downloaded it stays cached in this browser.</p>
       <p class="note">${esc(rule)}</p>
       ${stale ? `<p class="note">The cases changed since the baseline ran. Run it again to score the new set.</p>` : EVB.note ? `<p class="note">${esc(EVB.note)}</p>` : ""}
       <div class="pol-run"><button type="button" class="btn primary" data-evb="run">${has ? "Run the baseline" : `Download and run (${m.mb} MB)`}</button><span class="note">${has ? "Already downloaded. A few seconds." : `${m.mb} MB once, plus about 4 MB of runtime, then a few seconds to score.`}</span></div>`;

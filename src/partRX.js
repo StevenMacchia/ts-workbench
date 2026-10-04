@@ -246,7 +246,7 @@ function rxBuildHTML(r){
 }
 function rxPolicyBtnHTML(){
   if(typeof pol === "undefined" || !pol || !pol.result || !pol.result.rewrite) return "";
-  return `<button type="button" class="btn sm" data-rx="policy" title="The rewrite as a policy file for an open model such as gpt-oss-safeguard. ${RX_WIP}.">${rxIcon()}${rxVerb()} as policy file</button><span class="wip-chip">starter</span>`;
+  return `<button type="button" class="btn sm" data-rx="policy" title="The rewrite as a policy file for an open model such as gpt-oss-safeguard. Starter, untested: fill in its TODO lines first.">${rxIcon()}${rxVerb()} as policy file</button><span class="wip-chip">starter</span>`;
 }
 function rxAct(id){
   const toast = $("#rx-toast") || $("#pol-rwtoast") || $("#pm-toast");
