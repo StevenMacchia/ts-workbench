@@ -784,11 +784,11 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .ttf-go{gap:10px;align-items:center;flex-wrap:wrap}
 .ttf-steps{list-style:none;margin:0 0 14px;padding:0;display:flex;gap:6px;flex-wrap:wrap}
 .ttf-steps li{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-family:var(--mono);color:var(--muted)}
-.ttf-steps li span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sunk);font-family:var(--body);font-size:12px;font-weight:600}
+.ttf-steps li>span:first-child{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sunk);font-family:var(--body);font-size:12px;font-weight:600}
 .ttf-steps li.now{border-color:var(--t-tt);color:var(--ink)}
-.ttf-steps li.now span{background:var(--t-tt);color:#fff}
-.ttf-steps li.ok span{background:color-mix(in oklab, var(--good) 18%, transparent);color:var(--good)}
-.ttf-steps li.miss span{background:color-mix(in oklab, var(--high) 18%, transparent);color:var(--high)}
+.ttf-steps li.now>span:first-child{background:var(--t-tt);color:#fff}
+.ttf-steps li.ok>span:first-child{background:color-mix(in oklab, var(--good) 18%, transparent);color:var(--good)}
+.ttf-steps li.miss>span:first-child{background:color-mix(in oklab, var(--high) 18%, transparent);color:var(--high)}
 .ttf-play{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
 @media (max-width:1000px){.ttf-play{grid-template-columns:1fr}}
 .ttf-main{display:grid;gap:14px;min-width:0}

@@ -47,9 +47,9 @@
 .pol-sec h4 .note{font-family:var(--body);font-weight:400}
 .pol-find{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13.5px}
 .pol-find li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start}
-.pol-find li span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono)}
-.pol-find li.ok span{background:var(--good-soft);color:var(--good)}
-.pol-find li.warn span{background:var(--high-soft);color:var(--high)}
+.pol-find li>span:first-child{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono)}
+.pol-find li.ok>span:first-child{background:var(--good-soft);color:var(--good)}
+.pol-find li.warn>span:first-child{background:var(--high-soft);color:var(--high)}
 .pol-busy{display:flex;gap:14px;align-items:center}
 .pol-spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--sunk);border-top-color:var(--t-pol);animation:polspin .9s linear infinite;flex:none}
 @keyframes polspin{to{transform:rotate(360deg)}}
@@ -138,7 +138,7 @@
 .pol-fold > summary::-webkit-details-marker{display:none}
 .pol-fold > summary h4{margin:0}
 .pol-fold[open] > summary h4{margin-bottom:10px}
-.pol-find li.info span{background:var(--accent-soft);color:var(--accent)}
+.pol-find li.info>span:first-child{background:var(--accent-soft);color:var(--accent)}
 .pol-sec-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .pol-sec-h h4{margin:0}
 .pol-check{margin:0;padding:0;list-style:none;counter-reset:pc;display:grid;gap:6px}

@@ -1117,9 +1117,9 @@ thead th{background:var(--surface-2)}
 .pol-sec h4 .note{font-family:var(--body);font-weight:400}
 .pol-find{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13.5px}
 .pol-find li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start}
-.pol-find li span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono)}
-.pol-find li.ok span{background:var(--good-soft);color:var(--good)}
-.pol-find li.warn span{background:var(--high-soft);color:var(--high)}
+.pol-find li>span:first-child{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--mono)}
+.pol-find li.ok>span:first-child{background:var(--good-soft);color:var(--good)}
+.pol-find li.warn>span:first-child{background:var(--high-soft);color:var(--high)}
 .pol-busy{display:flex;gap:14px;align-items:center}
 .pol-spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--sunk);border-top-color:var(--t-pol);animation:polspin .9s linear infinite;flex:none}
 @keyframes polspin{to{transform:rotate(360deg)}}
@@ -1208,7 +1208,7 @@ thead th{background:var(--surface-2)}
 .pol-fold > summary::-webkit-details-marker{display:none}
 .pol-fold > summary h4{margin:0}
 .pol-fold[open] > summary h4{margin-bottom:10px}
-.pol-find li.info span{background:var(--accent-soft);color:var(--accent)}
+.pol-find li.info>span:first-child{background:var(--accent-soft);color:var(--accent)}
 .pol-sec-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .pol-sec-h h4{margin:0}
 .pol-check{margin:0;padding:0;list-style:none;counter-reset:pc;display:grid;gap:6px}
@@ -2724,11 +2724,11 @@ body[data-route="coverage"]{--tc:var(--t-cv)}
 .ttf-go{gap:10px;align-items:center;flex-wrap:wrap}
 .ttf-steps{list-style:none;margin:0 0 14px;padding:0;display:flex;gap:6px;flex-wrap:wrap}
 .ttf-steps li{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-family:var(--mono);color:var(--muted)}
-.ttf-steps li span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sunk);font-family:var(--body);font-size:12px;font-weight:600}
+.ttf-steps li>span:first-child{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sunk);font-family:var(--body);font-size:12px;font-weight:600}
 .ttf-steps li.now{border-color:var(--t-tt);color:var(--ink)}
-.ttf-steps li.now span{background:var(--t-tt);color:#fff}
-.ttf-steps li.ok span{background:color-mix(in oklab, var(--good) 18%, transparent);color:var(--good)}
-.ttf-steps li.miss span{background:color-mix(in oklab, var(--high) 18%, transparent);color:var(--high)}
+.ttf-steps li.now>span:first-child{background:var(--t-tt);color:#fff}
+.ttf-steps li.ok>span:first-child{background:color-mix(in oklab, var(--good) 18%, transparent);color:var(--good)}
+.ttf-steps li.miss>span:first-child{background:color-mix(in oklab, var(--high) 18%, transparent);color:var(--high)}
 .ttf-play{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
 @media (max-width:1000px){.ttf-play{grid-template-columns:1fr}}
 .ttf-main{display:grid;gap:14px;min-width:0}
@@ -11296,7 +11296,7 @@ function polReportHTML(ai){
 }
 function polTabHTML(tab){
   const h = pol.heur, r = pol.result;
-  if(tab === "checks") return `<ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span>${esc(t)}</li>`).join("")}</ul>`;
+  if(tab === "checks") return `<ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span><div>${esc(t)}</div></li>`).join("")}</ul>`;
   if(tab === "cases"){
     const counts = {all:r.edge_cases.length, allow:0, remove:0, escalate:0}; r.edge_cases.forEach(c => counts[c.decision]++);
     const cases = r.edge_cases.filter(c => pol.filter === "all" || c.decision === pol.filter);

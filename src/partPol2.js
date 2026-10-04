@@ -180,7 +180,7 @@ function polReportHTML(ai){
 }
 function polTabHTML(tab){
   const h = pol.heur, r = pol.result;
-  if(tab === "checks") return `<ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span>${esc(t)}</li>`).join("")}</ul>`;
+  if(tab === "checks") return `<ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span><div>${esc(t)}</div></li>`).join("")}</ul>`;
   if(tab === "cases"){
     const counts = {all:r.edge_cases.length, allow:0, remove:0, escalate:0}; r.edge_cases.forEach(c => counts[c.decision]++);
     const cases = r.edge_cases.filter(c => pol.filter === "all" || c.decision === pol.filter);
