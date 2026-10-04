@@ -10797,37 +10797,61 @@ function renderAbout(){
    ========================================================= */
 const RO_GH = "https://github.com/StevenMacchia";
 const RO_TOOLS = [
-  ["Coop", "https://github.com/roostorg/coop", "A review console you host yourself: queues, routing and enforcement rules, appeals, moderator wellness settings, and hash matching with NCMEC reporting."],
-  ["Osprey", "https://github.com/roostorg/osprey", "A real-time rules engine and investigation console, built at Discord. It suits teams with engineers and event streams."],
-  ["Model Community", "https://github.com/roostorg/model-community", "A community for open safety models, such as OpenAI's gpt-oss-safeguard, that label content against a policy you write. It publishes guides and example policies for them."]
+  ["Coop", "https://github.com/roostorg/coop", "A review console you host yourself: queues, routing, enforcement, appeals, and hash matching with NCMEC reporting."],
+  ["Osprey", "https://github.com/roostorg/osprey", "A real-time rules engine and investigation console, built at Discord. For teams with engineers and event streams."],
+  ["Model Community", "https://github.com/roostorg/model-community", "Guides and example policies for open safety models that label content against a policy you write."]
+];
+// What you can do today: [title, route, glyph color, icon, text, starter?]
+const RO_NOW = [
+  ["Test a rule on an open model", "eval", "var(--t-ai)", "eval", "Download the cases and a policy file, run them on an open model such as gpt-oss-safeguard on your own computer, and paste the labels back."],
+  ["Improve a rule, run by run", "eval", "var(--t-ai)", "eval", "Edit the rule, run again, and see which cases were fixed or broke."],
+  ["Get an instant baseline", "eval", "var(--t-ai)", "eval", "A small open model runs in your browser and shows where a generic toxicity filter misreads your rule."],
+  ["Score images and video", "eval", "var(--t-ai)", "eval", "Paste a labeled list from your own classifier. The media never leaves where it is."],
+  ["Start Osprey rules and a Coop setup", "premortem", "var(--t-pm)", "radar", "From a pre-mortem's top risks: an Osprey rules file and a Coop setup checklist.", true],
+  ["Turn a rewrite into a policy file", "policy", "var(--t-pol)", "doc", "Download the stress-tester's rewrite in the format open safety models read.", true]
+];
+// What it uses: [name, what for, link text, link]
+const RO_USES = [
+  ["ROOST's public docs and code", "The Osprey rule syntax and the Coop setup terms come from ROOST's documentation, example rules and source on GitHub, read in October 2026.", "roostorg on GitHub", "https://github.com/roostorg"],
+  ["MiniLMv2 toxicity model", "The in-browser baseline. Apache-2.0, about 24 MB, distilled from Unitary's toxic-bert and trained on Jigsaw's toxic comment data. Downloads only when you click.", "Model card", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
+  ["Transformers.js", "Hugging Face's library that runs the baseline model in your browser, loaded from jsDelivr. Version 3.8.1, pinned.", "Transformers.js", "https://huggingface.co/docs/transformers.js"],
+  ["gpt-oss-safeguard", "Optional, on your own computer. OpenAI's open-weight safety model, run with Ollama by the runner script.", "The runner script", RO_GH + "/ts-workbench/tree/main/tools/open-model-eval"],
+  ["Claude", "Optional, in the Claude version only. Writes test cases and labels them, on your own Claude account.", "", ""],
+  ["Nothing else", "No server and no accounts. What you type stays in your browser, and the model files above download only when you ask.", "", ""]
 ];
 function renderRoost(){
   const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
   const meta = `<span class="wip-tag">Work in progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
-  view.innerHTML = head("Works with ROOST", "ROOST is a nonprofit that makes free, open-source trust and safety tools. The workbench helps you decide what to build, and ROOST's tools are things you can build with. This page lists where they meet so far.", "Overview", meta) + `<article class="ab">
+  view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
     <section class="ab-sec rise">
-      <h2>What ROOST is</h2>
-      <p>ROOST (Robust Open Online Safety Tools) builds trust and safety tools as a public good. Three of its projects:</p>
+      <h2>What you can do today</h2>
+      <div class="ab-tools">${RO_NOW.map(([t, r, c, ic, d, wip]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a>${wip ? ' <span class="wip-tag">Starter, untested</span>' : ""}</h3><p>${d}</p></div></div>`).join("")}</div>
+      <p class="note" style="margin-top:12px">None of this is a ROOST integration: the workbench makes files and numbers you take to ROOST's tools yourself. Starters have every platform-specific value marked TODO and have never run against a real deployment.</p>
+    </section>
+
+    <section class="ab-sec rise">
+      <h2>ROOST's tools</h2>
       <div class="ab-tools">${RO_TOOLS.map(([n, href, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span><div><h3>${ext(href, n)}</h3><p>${d}</p></div></div>`).join("")}</div>
     </section>
 
     <section class="ab-sec rise">
-      <h2>How the workbench connects today</h2>
-      <p>What exists now. Each item is something you can open or download today; none of it is a ROOST integration.</p>
-      <div class="ab-tools">
-        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: test a rule on an open model</a></h3><p>No classifier of your own? Download the cases and a policy file, run them on a free open model such as gpt-oss-safeguard on your own computer with the runner script, and paste the labels back to score them. On this website you write the cases yourself.</p><p>${ext(RO_GH + "/ts-workbench/tree/main/tools/open-model-eval", "The runner script")}</p></div></div>
-        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: improve the rule, run by run</a></h3><p>Edit the rule, the prompt or the pasted labels next to the cases and run again. The Compare tab shows which cases were fixed or broke, precision and recall before and after, and misses by kind.</p></div></div>
-        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: an instant baseline in your browser</a></h3><p>A small open toxicity model (MiniLMv2, distilled from toxic-bert, Apache-2.0, about 24 MB) downloads to your browser when you click, and labels your cases there. It shows where a fixed-category model misreads your rule: counter-speech, banter, quoting abuse to report it. Your text never leaves the browser.</p></div></div>
-        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: images and video, without uploads</a></h3><p>Paste a list of item ids, kinds, your expected labels and your model's labels, and score it the same way. The media stays where it is. Includes a short guide to building a test set from your own data.</p></div></div>
-        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><h3><a href="#premortem">Pre-mortem: Osprey starter rules and a Coop checklist</a> <span class="wip-tag">Starter, untested</span></h3><p>From a pre-mortem report's top risks: a rules file in Osprey's SML, with syntax checked against Osprey's docs and examples but never run, and a Markdown checklist for setting up Coop (policies, item types, queues including NCMEC, actions, routing). Every platform-specific value is a marked TODO. Neither has run against a real deployment.</p></div></div>
-        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span><div><h3><a href="#policy">Policy stress-tester: the rewrite as a policy file</a> <span class="wip-tag">Starter, untested</span></h3><p>Download Claude's suggested rewrite as a policy file for open models that follow a written policy, in the same format as the eval's. Fill in its TODO lines first.</p></div></div>
+      <h2>What it uses</h2>
+      <div class="ab-dec">${RO_USES.map(([n, d, lt, lh]) => `<div><h3>${n}</h3><p>${d}${lt ? ` ${ext(lh, lt)}` : ""}</p></div>`).join("")}</div>
+    </section>
+
+    <section class="ab-sec rise">
+      <h2>How this was made</h2>
+      <div class="ab-dec">
+        <div><h3>Built from public sources</h3><p>Each export follows a format ROOST publishes. Nothing was copied from private material, and nothing here was made with or reviewed by ROOST.</p></div>
+        <div><h3>Checked, not deployed</h3><p>The generated files are checked by automated tests: valid structure, every platform-specific value marked TODO, labels on every file. They have not been run in Osprey or Coop.</p></div>
+        <div><h3>Same rules as the rest of the workbench</h3><p>One HTML file, plain JavaScript, no framework. Your work is saved only in this browser.</p></div>
+        <div><h3>Open source</h3><p>The code and tests are on GitHub under the MIT license. ${ext(RO_GH + "/ts-workbench", "ts-workbench")}</p></div>
       </div>
-      <p>Some recommendations in the pre-mortem, maturity and DSA tools name Coop, Osprey or gpt-oss-safeguard as a free option. Two reference files on GitHub map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy format")}.</p>
     </section>
 
     <section class="ab-sec ab-note rise">
       <h2>Where this stands</h2>
-      <p>An early start. The exports are starters to edit, not tested configurations, and images and video are scored from your own labeled lists, not analyzed here. Expect this page to change. The workbench is an independent project, not made by or affiliated with ROOST. ROOST's tools are free and open source under their own licenses; see ${ext("https://github.com/roostorg", "ROOST on GitHub")}.</p>
+      <p>An early start; expect changes. The workbench is an independent project, not made by or affiliated with ROOST. Some recommendations in other tools name Coop, Osprey or gpt-oss-safeguard as free options, and two reference files map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy")}.</p>
     </section>
   </article>`;
 }

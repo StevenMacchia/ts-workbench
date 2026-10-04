@@ -30,7 +30,7 @@ const body = function(){
   const chips = ovHeroChips(); eq(chips.some(c => /Dating · At scale or regulated/.test(c)), true, "header shows the organization");
   renderWorkspace(); let h = view.innerHTML; if(bad(h)) throw new Error("workspace has bad values"); eq(/Your organization/.test(h) && /data-orgstage="scale"/.test(h) && /Save workspace file/.test(h), true, "workspace settings and file");
   renderAbout(); h = view.innerHTML; if(bad(h)) throw new Error("about has bad values"); eq(/How it fits together/.test(h) && /How the scores work/.test(h) && /Coverage radar/.test(h), true, "about covers the whole toolkit");
-  renderRoost(); h = view.innerHTML; if(bad(h)) throw new Error("roost page has bad values"); eq(/What ROOST is/.test(h) && /href="#eval"/.test(h) && /running-on-coop\.md/.test(h) && /not made by or affiliated with ROOST/.test(h), true, "roost page explains ROOST and links each tool");
+  renderRoost(); h = view.innerHTML; if(bad(h)) throw new Error("roost page has bad values"); eq(/What you can do today/.test(h) && /What it uses/.test(h) && /How this was made/.test(h) && /Apache-2.0/.test(h) && /None of this is a ROOST integration/.test(h) && /href="#eval"/.test(h) && /running-on-coop\.md/.test(h) && /not made by or affiliated with ROOST/.test(h), true, "roost page: what you can do, what it uses, how it was made, and the disclaimers");
   out.push("New menu (6 items), header chips, workspace settings card, refreshed About page and Works with ROOST page");
   return out.join("\n");
 };
