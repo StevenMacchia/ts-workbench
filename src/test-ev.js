@@ -60,9 +60,62 @@ const body = function(){
   ev.labels = "three"; const pd3 = evPolicyDoc(ev); eq(/### remove\n/.test(pd3) && /### review\n/.test(pd3) && /### allow\n/.test(pd3) && /careful reviewer/.test(pd3), true, "three labels, review defined"); ev.labels = "binary";
   const msg = wsSaveTool("eval", ev, evTitle(ev)); eq(/saved/i.test(msg), true, "saved"); const it = Object.values(wsItems()).find(z => z.kind === "eval"); eq(/accurate/.test(itemSummary(it).html) && /accurate/.test(ovChip(it)), true, "workspace summary and chip");
   out.push("paste route, own cases, prompts and validators, markdown, tsv and policy, workspace");
+  // the loop: the example carries its earlier run (a broader v0 rule), and the comparison is pure
+  evAct("example"); eq(!!(ev.prev && ev.prev.preds && ev.last), true, "the example has a previous run and remembers what produced the latest");
+  const cm = evCompare(ev, ev.prev.preds, ev.preds);
+  eq(cm.fixed.length, 3, "three cases fixed between v0 and v1"); eq(cm.broke.length, 1, "one broke"); eq(cm.broke[0].c.id, "c6", "the blunt recipe comment");
+  eq(cm.fixed.map(x => x.c.id).join(","), "c8,c12,c18", "two dismissals and a figure of speech");
+  eq(cm.before.correct, 14, "14 right before"); eq(cm.after.correct, 16, "16 right after"); eq(Math.round(cm.delta.acc * 100), 8, "up 8 points");
+  eq(Math.round(cm.before.main.pr * 100), 42, "precision 42% before"); eq(Math.round(cm.after.main.pr * 100), 50, "50% after"); eq(cm.delta.rc, 0, "recall unchanged");
+  eq(cm.cats.length >= 3 && cm.cats.find(c => c.k === "context").before === 2 && cm.cats.find(c => c.k === "context").after === 1, true, "misses by kind, before and after");
+  eq(ev.runs.length === 2 && /v0/.test(ev.runs[0].name), true, "both runs listed in the example"); eq(evLoopChanged(ev), true, "the rule changed between them");
+  ev.tab = "compare"; renderEval(); h = view.innerHTML; if(bad(h)) throw new Error("compare bad: " + where(h));
+  eq((h.match(/class="ev-flip fixed"/g) || []).length, 3, "three Fixed cards"); eq((h.match(/class="ev-flip broke"/g) || []).length, 1, "one Broke card");
+  eq(/<svg class="ma-radar ev-radar"/.test(h) && /ev-r-prev/.test(h) && /ev-r-now/.test(h) && /ma-lg-old/.test(h), true, "one radar with both runs and a legend");
+  eq(/58% <span class="muted">→<\/span> 67%/.test(h) && /class="pol-diff"/.test(h) && /Offensive, abusive or hurtful/.test(h), true, "accuracy before and after, and the rule diff");
+  eq(/data-evtab="compare"/.test(h) && /id="ev-loop-policy"/.test(h) && (evAI() ? /data-ev="looprun"/.test(h) : /data-ev="topaste"/.test(h)), true, "the tab, the rule editable on the report, and a way to run it or what to do instead");
+  const md2 = evMarkdown(ev); eq(/## Since the previous run/.test(md2) && /Fixed \[Borderline\]/.test(md2) && /Broke \[Clearly allowed\]/.test(md2) && /Rule before:/.test(md2), true, "the comparison in the markdown");
+  eq(evNextName("Harassment rule, v1 prompt"), "Harassment rule, v2 prompt", "the next run's suggested name"); eq(evNextName(""), "v2", "or just v2");
+  // paste mode: successive label sets compare, each against the one before
+  ev.mode = "paste"; const q1 = Object.fromEntries(ev.cases.map(c => [c.id, {label:c.expect, why:""}])); q1.c9 = {label:"violates", why:""}; q1.c13 = {label:"allowed", why:""};
+  evFinish(q1); eq(ev.prev.name === "Harassment rule, v1 prompt" && ev.prev.preds.c6.label === "violates" && ev.prev.policy === EV_EXAMPLE.policy && ev.tab === "compare", true, "the example run became the previous one, with its rule, and the report opens on Compare");
+  const cm2 = evCompare(ev, ev.prev.preds, ev.preds); eq(cm2.fixed.length, 6, "six fixed"); eq(cm2.broke.length, 0, "none broke"); eq(cm2.after.correct, 22, "22 right now");
+  ev.name = "v2 labels"; const q2 = Object.assign({}, q1, {c9:{label:"allowed", why:""}, c1:{label:"allowed", why:""}}); evFinish(q2);
+  const cm3 = evCompare(ev, ev.prev.preds, ev.preds); eq(cm3.fixed.map(x => x.c.id).join(), "c9", "c9 fixed since the last paste"); eq(cm3.broke.map(x => x.c.id).join(), "c1", "c1 broke"); eq(ev.runs.length, 2, "the example's runs dropped, two real ones kept");
+  renderEval(); h = view.innerHTML; if(bad(h)) throw new Error("paste compare bad: " + where(h)); eq(/id="ev-loop-paste"/.test(h) && /data-ev="loopscore"/.test(h) && /1 fixed, 1 broke/.test(h), true, "paste mode: a box for the next label set on the report, and the flips counted");
+  eq(/class="pol-diff"/.test(h), false, "no rule diff when the rule didn't change");
+  ev.mode = "prompt"; ev.prev.sys = "Only flag direct threats."; ev.sys = "Flag threats and insults."; renderEval(); h = view.innerHTML; eq(/class="pol-diff"/.test(h) && /Flag threats and insults/.test(h) && /id="ev-loop-sys"/.test(h), true, "prompt mode: the prompt diff and the prompt editable");
+  ev.mode = "policy"; ev.view = "cases"; renderEval(); h = view.innerHTML; eq(/id="ev-loop"/.test(h) && /id="ev-loop-policy"/.test(h), true, "once a run exists, the cases page has the rule editable next to the cases"); eq(evAI() || /data-ev="topaste"/.test(h), true, "and without Claude it points to pasting labels");
+  { const keep = ev.cases; ev.cases = keep.filter(c => ["counter", "adversarial"].includes(c.cat)); const fp = Object.fromEntries(ev.cases.map(c => [c.id, {label:c.expect, why:""}])); const kp = ev.prev.preds, kq = ev.preds; ev.prev.preds = fp; ev.preds = fp; ev.view = "report"; ev.tab = "compare"; renderEval(); h = view.innerHTML;
+    eq(evCompare(ev, fp, fp).cats.length, 2, "two kinds"); eq(/Fewer than three kinds/.test(h) && !/ev-radar/.test(h) && /ev-cmp-t/.test(h) && !bad(h), true, "fewer than three kinds: no radar, still the table"); ev.cases = keep; ev.prev.preds = kp; ev.preds = kq; }
+  out.push(`loop: example v0 → v1 ${cm.fixed.length} fixed, ${cm.broke.length} broke; compare tab, radar, diff, markdown; paste-mode successions`);
+  // images and video: a labeled list, never the media
+  const L2 = ["violates", "allowed"];
+  const mf = evParseManifest("﻿id,kind,expected,model_label\r\nimg_1,news,allowed,violates\r\nimg_2\tclear_violation\tviolates\tviolates\tgraphic\r\n\"img_3\",weird kind,allowed,allowed\r\nimg_4,art,maybe,allowed\r\nimg_5,meme,allowed\r\nimg_1,art,allowed,allowed\r\n", L2);
+  eq(mf.header, true, "header row skipped"); eq(mf.items.length, 3, "three good lines"); eq(mf.items[0].cat === "news" && mf.items[0].label === "violates" && mf.items[1].note === "graphic" && mf.items[2].id === "img_3" && mf.items[2].cat === "other", true, "tabs, commas, quotes, notes, unknown kind to other");
+  eq(mf.bad.length, 3, "three bad lines"); eq(/maybe/.test(mf.bad[0].why) && mf.bad[0].line === 5 && /four columns/.test(mf.bad[1].why) && /duplicate/.test(mf.bad[2].why), true, "a bad label, a short line and a duplicate id, each with its line and reason");
+  eq(evMKind("Look-alike"), "lookalike", "kind words normalized"); eq(evMKind("clear violation"), "clear_violation", "spaces to underscores"); eq(evMKind(""), "other", "blank kind is other"); eq(evParseManifest("hello", L2).items.length, 0, "garbage gives no items");
+  ev = EV_BLANK(); evView = "page"; renderEval(); eq(/data-ev="media"/.test(view.innerHTML), true, "the setup page offers the image or video path");
+  ev = Object.assign(EV_BLANK(), {labels:"binary", view:"media"}); renderEval(); h = view.innerHTML; if(bad(h)) throw new Error("media page bad: " + where(h));
+  eq(/Paste a list, not the media/.test(h) && /id="ev-manifest"/.test(h) && /type="file" id="ev-mfile"/.test(h) && /data-ev="mscore"/.test(h) && /data-evlabels="three"/.test(h), true, "the media page: a list box, a local file input, the labels, and the promise");
+  eq(/Never build a test set containing CSAM/.test(h) && /hash-matching providers and NCMEC/.test(h) && /held-out/.test(h) && /Two reviewers/.test(h), true, "the guide says it plainly");
+  evMediaScore("hello"); eq(/Couldn't read any items. Line 1/.test(EVRUN.err) && ev.view === "media", true, "a bad list says which line"); EVRUN.err = "";
+  const kinds = ["news", "medical", "art", "meme", "edited", "ai", "lookalike", "context", "clear_violation", "clear_allowed", "screenshot", "nonsense"];
+  const list1 = ["id\tkind\texpected\tmodel_label\tnote"].concat(kinds.map((k, i) => `v${i + 1}\t${k}\t${i % 3 === 0 ? "violates" : "allowed"}\t${i < 6 ? "violates" : "allowed"}\titem ${i + 1}`)).join("\n");
+  evMediaScore(list1); eq(ev.media && ev.view === "report" && ev.cases.length === 12 && ev.mode === "paste" && ev.tab === "where" && !ev.prev, true, "a list becomes the items and a run, with nothing to compare yet");
+  const mm = evMetrics(ev, ev.preds); eq(mm.n, 12, "12 items scored"); eq(mm.correct, 6, "6 right"); eq(Math.round(mm.main.pr * 100), 33, "precision 33%"); eq(Math.round(mm.main.rc * 100), 50, "recall 50%");
+  eq(mm.cats.some(c => c.k === "news") && mm.cats.find(c => c.k === "other").total === 1 && !mm.cats.some(c => c.k === "counter"), true, "misses by media kind, unknown kinds in other, no text kinds");
+  h = view.innerHTML; if(bad(h)) throw new Error("media report bad: " + where(h)); eq(/Every item/.test(h) && /Images and video/.test(h) && /News and documentary/.test(h) && /id="ev-manifest"/.test(h), true, "the report in media terms, with the box for the next list");
+  const list2 = list1.replace("v2\tmedical\tallowed\tviolates", "v2\tmedical\tallowed\tallowed").replace("v3\tart\tallowed\tviolates", "v3\tart\tallowed\tallowed").replace("v8\tcontext\tallowed\tallowed", "v8\tcontext\tallowed\tviolates");
+  ev.name = "model v2"; evMediaScore(list2); const cm4 = evCompare(ev, ev.prev.preds, ev.preds);
+  eq(cm4.fixed.map(x => x.c.id).join(), "v2,v3", "two items fixed by the next list"); eq(cm4.broke.map(x => x.c.id).join(), "v8", "one broke"); eq(ev.tab, "compare", "and the report opens on Compare");
+  h = view.innerHTML; if(bad(h)) throw new Error("media compare bad: " + where(h)); eq((h.match(/class="ev-flip fixed"/g) || []).length === 2 && /ev-radar/.test(h) && /Medical and educational/.test(h), true, "media flips and the radar by media kind");
+  const md3 = evMarkdown(ev); eq(/items from your own labeled set/.test(md3) && /Never build a test set containing CSAM/.test(md3) && /## Since the previous run/.test(md3), true, "the media report's markdown carries the guide and the comparison");
+  ev.view = "cases"; renderEval(); h = view.innerHTML; eq(/Image or video classifier/.test(h) && /ev-mtable/.test(h) && /data-ev="report"/.test(h) && !bad(h), true, "the items page lists the items and leads back to the report");
+  out.push(`media: list parsed (${mf.items.length} good, ${mf.bad.length} bad), ${mm.n} items scored through evMetrics, successive lists compared, guide present`);
   return out.join("\n");
 };
-const parts = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partCP.js"), rd("partEV.js")].join("\n");
+const parts = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partCP.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js")].join("\n");
 console.log(new Function(parts + "\nreturn (" + body.toString() + ")();")());
 
 // The runner for open models (tools/open-model-eval/run.mjs): a mock chat-completions server stands in for Ollama, and

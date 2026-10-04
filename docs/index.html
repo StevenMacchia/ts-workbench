@@ -3842,6 +3842,89 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .ev-conf td.bad{background:var(--crit-soft);font-weight:600}
 .ev-ring.good b{color:var(--good)}.ev-ring.crit b{color:var(--crit)}
 @media (max-width:820px){.ev-where{grid-template-columns:1fr}}
+/* partZ10.css: classifier eval, the improvement loop and image/video lists */
+.ev-cmp{display:grid;gap:24px}
+.ev-cmp-top{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px 28px;align-items:start}
+.ev-cmp-top h4{margin:6px 0 6px;font-size:18px;letter-spacing:-.015em;line-height:1.3}
+.ev-cmp-top .note{margin:0}
+.ev-cmp-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ev-kpi{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--line);background:var(--surface);min-width:0}
+.ev-kpi b{font-size:15px;font-weight:600;white-space:nowrap}
+.ev-kpi b .muted{color:var(--muted);font-weight:400}
+.ev-delta{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.ev-delta.up{color:var(--good)}.ev-delta.down{color:var(--crit)}
+.ev-cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 28px;align-items:start}
+.ev-cmp h4{font-size:14.5px}
+.ev-cmp-grid h4,.ev-cmp-flips h4,.ev-cmp-diff h4{margin:0 0 10px}
+.ev-radar{max-width:420px;margin:0 auto;display:block}
+.ev-cmp-radar .ma-legend{justify-content:center;margin-top:4px}
+.ev-cmp-radar .note{text-align:center;margin:8px 0 0}
+.ev-cmp-t td.mono{width:60px}
+.ev-cmp-t td:last-child{width:72px}
+.ev-cmp-t tr.ok td{background:color-mix(in oklab, var(--good) 6%, transparent)}
+.ev-cmp-flips .cp-gaps,.ev-cmp-diff .pol-diff{margin:0}
+.ev-flip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.02em;padding:1px 7px;border-radius:99px;margin-right:4px;vertical-align:middle}
+.ev-flip.fixed{background:var(--good-soft);color:var(--good)}.ev-flip.broke{background:var(--crit-soft);color:var(--crit)}
+.ev-loop .card-b>.field,.ev-loop .card-b>.note{margin-top:0}
+.ev-loop .field+.field,.ev-loop .note+textarea{margin-top:12px}
+.ev-loop textarea.input,.ev-media textarea.input{width:100%;max-width:none;box-sizing:border-box}
+.ev-loop textarea.mono,.ev-media textarea.mono{font-family:var(--mono);font-size:13px;white-space:pre}
+.ev-loop .pol-run,.ev-media .pol-run{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;margin-top:14px;padding:0;border:0;position:static;background:none;box-shadow:none}
+.ev-loop .pol-run .note,.ev-media .pol-run .note{flex:1 1 220px;min-width:0}
+.ev-loop .ai-busy{margin:0 0 14px;padding:14px 16px}
+.ev-loop .ai-err{margin-bottom:14px}
+.ev-loop-name .input{max-width:360px}
+.ev-media .ev-mtwo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:14px 20px;margin-bottom:14px}
+.ev-media .field+.field{margin-top:14px}
+.ev-media .field .note{margin:0}
+.ev-media .field>.lbl{font-size:13px;font-weight:600}
+.ev-media .tr-tiers{gap:8px}
+.ev-media .tr-tier{padding:10px 12px}
+.ev-media .tr-tier b{font-size:13.5px}
+.ev-kinds{margin-top:16px}
+.ev-kinds summary,.ev-guide summary{cursor:pointer;font-weight:600;font-size:14px}
+.ev-kinds .ev-ct{margin-top:10px}
+.ev-kinds .ev-ct td:last-child{width:auto}
+.ev-kinds .ev-ct td .mono{font-size:12px}
+.ev-guide summary{padding:14px 18px}
+.ev-guide .card-b{padding-top:0}
+.ev-guide-l{padding-left:18px;display:grid;gap:10px;font-size:14px;margin:0;line-height:1.55}
+.ev-guide-l li strong{color:var(--crit)}
+.ev-media-b{margin:4px 0 0}
+.ev-mtable td:nth-child(2){min-width:0}
+.ev-table.ev-mtable td:nth-child(5){min-width:200px}
+@media (max-width:820px){.ev-cmp-top,.ev-cmp-grid,.ev-media .ev-mtwo{grid-template-columns:1fr}}
+@media (max-width:640px){.ev-cmp-kpis{gap:8px}.ev-kpi{padding:8px 10px}.ev-kpi b{font-size:13.5px}.ev-kpi .eyebrow{font-size:10.5px}.ev-cmp-top h4{font-size:16px}}
+@media (max-width:420px){.ev-cmp-kpis{grid-template-columns:1fr}.ev-kpi{grid-template-columns:auto 1fr auto;align-items:center;gap:10px}}
+/* ---------- classifier eval: the in-browser baseline card ---------- */
+.evb .card-b p{margin:0 0 10px;font-size:14px;line-height:1.55}
+.evb .card-b p.note{font-size:13px}
+.evb .pol-run{position:static;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:0;margin-top:12px;border:0;box-shadow:none}
+.evb-busy{display:flex;align-items:center;gap:14px}
+.evb-busy>div{display:grid;gap:3px;flex:1;min-width:0}
+.evb-busy b{font-size:14px}
+.evb-bar{height:6px;margin-top:6px;max-width:420px}
+.evb-bar i{background:var(--ink);transition:width .2s linear}
+.evb-kpis{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.evb .cp-gaps{margin:2px 0 12px}
+.evb .cp-gap{grid-template-columns:minmax(72px,auto) minmax(0,1fr)}
+.evb-sc{font-size:12px;color:var(--muted);white-space:nowrap;padding-top:3px}
+.evb-all summary{cursor:pointer;font-weight:600;font-size:14px}
+.evb-all .note{margin:8px 0}
+.evb-table td:nth-child(2){min-width:220px}
+.evb-table td.mono{white-space:nowrap;font-size:12.5px}
+@media (max-width:640px){.evb .cp-gap{grid-template-columns:1fr}.evb-sc{padding-top:0}.evb-bar{max-width:none}}
+@media (prefers-reduced-motion: reduce){.evb-bar i{transition:none}}
+/* partZ12.css: starter exports (Osprey rules, Coop checklist, policy file) */
+.rx-build{margin-top:16px;padding:18px 20px;display:grid;gap:8px;border-style:dashed;border-color:var(--line-strong)}
+.rx-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rx-h .eyebrow{margin:0}
+.rx-build h3{margin:0;font-size:17px;letter-spacing:-.015em}
+.rx-build p{margin:0;font-size:14.5px;line-height:1.55;color:var(--muted);max-width:72ch}
+.rx-acts{gap:8px;flex-wrap:wrap;margin-top:4px}
+.rx-files{font-size:12.5px;color:var(--faint)}
+.rx-files .mono{font-size:12px}
+@media (max-width:600px){.rx-build{padding:16px}.rx-acts .btn{flex:1 1 auto;justify-content:center}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5456,6 +5539,7 @@ function renderReport(r){
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>
     </div>
+    ${typeof rxBuildHTML === "function" ? rxBuildHTML(r) : ""}
     ${typeof loopCardHTML === "function" ? loopCardHTML(r) : ""}
     ${pm.example || typeof journeyNextHTML !== "function" ? "" : journeyNextHTML("premortem")}`;
 }
@@ -10728,13 +10812,21 @@ function renderRoost(){
 
     <section class="ab-sec rise">
       <h2>How the workbench connects today</h2>
-      <div class="ab-tools"><div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval</a></h3><p>The one direct link. No classifier of your own? Test your rule on a free open model, such as gpt-oss-safeguard, on your own computer. Download the cases and a policy file, run them with the runner script, and paste the labels back to score them. On this website you write the cases yourself.</p><p>${ext(RO_GH + "/ts-workbench/tree/main/tools/open-model-eval", "The runner script")}</p></div></div></div>
-      <p>The other tools don't use ROOST's tools. Some recommendations in the pre-mortem, maturity and DSA tools name Coop, Osprey or gpt-oss-safeguard as a free option. Two reference files on GitHub map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy format")}.</p>
+      <p>What exists now. Each item is something you can open or download today; none of it is a ROOST integration.</p>
+      <div class="ab-tools">
+        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: test a rule on an open model</a></h3><p>No classifier of your own? Download the cases and a policy file, run them on a free open model such as gpt-oss-safeguard on your own computer with the runner script, and paste the labels back to score them. On this website you write the cases yourself.</p><p>${ext(RO_GH + "/ts-workbench/tree/main/tools/open-model-eval", "The runner script")}</p></div></div>
+        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: improve the rule, run by run</a></h3><p>Edit the rule, the prompt or the pasted labels next to the cases and run again. The Compare tab shows which cases were fixed or broke, precision and recall before and after, and misses by kind.</p></div></div>
+        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: an instant baseline in your browser</a></h3><p>A small open toxicity model (MiniLMv2, distilled from toxic-bert, Apache-2.0, about 24 MB) downloads to your browser when you click, and labels your cases there. It shows where a fixed-category model misreads your rule: counter-speech, banter, quoting abuse to report it. Your text never leaves the browser.</p></div></div>
+        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span><div><h3><a href="#eval">Classifier eval: images and video, without uploads</a></h3><p>Paste a list of item ids, kinds, your expected labels and your model's labels, and score it the same way. The media stays where it is. Includes a short guide to building a test set from your own data.</p></div></div>
+        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span><div><h3><a href="#premortem">Pre-mortem: Osprey starter rules and a Coop checklist</a> <span class="wip-tag">Starter, untested</span></h3><p>From a pre-mortem report's top risks: a rules file in Osprey's SML, written only with syntax checked against Osprey's docs and examples, and a Markdown checklist for setting up Coop (policies, item types, queues including NCMEC, actions, routing). Every platform-specific value is a marked TODO. Neither has run against a real deployment.</p></div></div>
+        <div class="ab-tool"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span><div><h3><a href="#policy">Policy stress-tester: the rewrite as a policy file</a> <span class="wip-tag">Starter, untested</span></h3><p>Download Claude's suggested rewrite as a policy file for open models that follow a written policy, in the same format as the eval's. Fill in its TODO lines first.</p></div></div>
+      </div>
+      <p>Some recommendations in the pre-mortem, maturity and DSA tools name Coop, Osprey or gpt-oss-safeguard as a free option. Two reference files on GitHub map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy format")}.</p>
     </section>
 
     <section class="ab-sec ab-note rise">
       <h2>Where this stands</h2>
-      <p>An early start, and text only for now, not images or video. Expect this page to change. The workbench is an independent project, not made by or affiliated with ROOST. ROOST's tools are free and open source under their own licenses; see ${ext("https://github.com/roostorg", "ROOST on GitHub")}.</p>
+      <p>An early start. The exports are starters to edit, not tested configurations, and images and video are scored from your own labeled lists, not analyzed here. Expect this page to change. The workbench is an independent project, not made by or affiliated with ROOST. ROOST's tools are free and open source under their own licenses; see ${ext("https://github.com/roostorg", "ROOST on GitHub")}.</p>
     </section>
   </article>`;
 }
@@ -11190,7 +11282,7 @@ function polTabHTML(tab){
   if(tab === "wording") return `${r.vague_terms.length ? `<h4 class="pol-sub">Words reviewers will read differently</h4><div class="pol-terms">${r.vague_terms.map(v=>`<div class="pol-term"><b>“${esc(v.term)}”</b><p>${esc(v.why||"")}</p>${v.suggest?`<p class="pol-sug"><span>Try:</span> ${esc(v.suggest)}</p>`:""}</div>`).join("")}</div>` : ""}
     ${r.gaps.length ? `<h4 class="pol-sub">What the rule forgets</h4><ul class="pol-gaps">${r.gaps.map(g=>`<li><b>${esc(g.gap)}</b><span>${esc(g.why||"")}</span></li>`).join("")}</ul>` : ""}`;
   if(tab === "rewrite") return `<div class="pol-diff"><div><span class="eyebrow">Your rule</span><blockquote>${esc(pol.rule)}</blockquote></div><div><span class="eyebrow">Rewrite</span><blockquote class="new">${esc(r.rewrite)}</blockquote></div></div>
-    <div class="row" style="gap:8px;margin-top:14px"><button type="button" class="btn sm" id="pol-copy">${icon("copy")}Copy rewrite</button><button type="button" class="btn sm primary" id="pol-retest">Test the rewrite ${icon("arrow")}</button><span class="toast" id="pol-rwtoast" aria-live="polite"></span></div>`;
+    <div class="row" style="gap:8px;margin-top:14px"><button type="button" class="btn sm" id="pol-copy">${icon("copy")}Copy rewrite</button><button type="button" class="btn sm primary" id="pol-retest">Test the rewrite ${icon("arrow")}</button>${typeof rxPolicyBtnHTML === "function" ? rxPolicyBtnHTML() : ""}<span class="toast" id="pol-rwtoast" aria-live="polite"></span></div>`;
   if(tab === "team") return `${r.reviewer_checklist.length ? `<h4 class="pol-sub">Reviewer checklist <span class="note">Apply in order</span></h4><ol class="pol-check">${r.reviewer_checklist.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>` : ""}
     ${r.open_questions.length ? `<h4 class="pol-sub">Open questions for your team</h4><ul class="pol-qs">${r.open_questions.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     ${r.enforcement_risks.length ? `<h4 class="pol-sub">Enforcement risks</h4><ul class="pol-risks">${r.enforcement_risks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}`;
@@ -15806,14 +15898,14 @@ const EV_CATS = [
   ["offtopic", "Off topic", "Unrelated content that a jumpy classifier might still flag."],
   ["multilingual", "Other languages", "The same kinds of case in a language other than English."]
 ];
-const EV_BLANK = () => ({name:"", policy:"", content:"", labels:"", n:0, mode:"", sys:"", cases:[], gold:{}, preds:null, runs:[], view:"setup", tab:"where", ex:false, pasted:""});
+const EV_BLANK = () => ({name:"", policy:"", content:"", labels:"", n:0, mode:"", sys:"", cases:[], gold:{}, preds:null, runs:[], view:"setup", tab:"where", ex:false, pasted:"", prev:null, last:null, draft:null, media:false});
 let ev = Object.assign(EV_BLANK(), store.get("ev", null) || {});
 const evSave = () => store.set("ev", ev);
 const evTitle = d => "Classifier eval: " + (d.name || "Untitled classifier");
 const EVRUN = {busy:false, phase:"", done:0, total:0, err:"", ctl:null, off:false};
 const evLabels = d => (EV_LABELS[d.labels] || EV_LABELS.binary).labels;
 const evPos = d => (EV_LABELS[d.labels] || EV_LABELS.binary).pos;
-const evCat = k => EV_CATS.find(c => c[0] === k) || [k, k, ""];
+const evCat = k => (typeof evCatList === "function" ? evCatList(ev) : EV_CATS).find(c => c[0] === k) || [k, k, ""];
 const evGold = (d, c) => (d.gold && d.gold[c.id]) || c.expect;
 const evAI = () => typeof SAMPLER !== "undefined" && !!SAMPLER && !EVRUN.off;
 
@@ -15870,7 +15962,7 @@ function evMetrics(d, preds){
     const pr = tp + fp ? tp / (tp + fp) : null, rc = tp + fn ? tp / (tp + fn) : null, f1 = pr !== null && rc !== null && pr + rc ? 2 * pr * rc / (pr + rc) : null;
     return {label:l, tp, fp, fn, n:tp + fn, pr, rc, f1}; });
   const correct = rows.filter(c => preds[c.id].label === evGold(d, c)).length, acc = rows.length ? correct / rows.length : null;
-  const cats = EV_CATS.map(c => { const cs = rows.filter(x => x.cat === c[0]); const miss = cs.filter(x => preds[x.id].label !== evGold(d, x));
+  const cats = (typeof evCatList === "function" ? evCatList(d) : EV_CATS).map(c => { const cs = rows.filter(x => x.cat === c[0]); const miss = cs.filter(x => preds[x.id].label !== evGold(d, x));
     return {k:c[0], n:c[1], total:cs.length, miss:miss.length, fp:miss.filter(x => preds[x.id].label === pos && evGold(d, x) !== pos).length, fn:miss.filter(x => evGold(d, x) === pos && preds[x.id].label !== pos).length}; }).filter(c => c.total);
   const main = per.find(p => p.label === pos), fails = rows.filter(c => preds[c.id].label !== evGold(d, c));
   return {n:rows.length, correct, acc, conf, per, main, cats, fails, pct:x => x === null ? "–" : Math.round(x * 100) + "%"};
@@ -15931,7 +16023,7 @@ function evPolicyDoc(d){
 }
 function evMarkdown(d){
   const m = evMetrics(d, d.preds), L = evLabels(d), adv = evAdvice(d, m);
-  const lines = [`# Classifier eval: ${d.name || "Untitled classifier"}`, "", `_${new Date().toISOString().slice(0, 10)} · ${d.cases.length} synthetic cases · ${cpLabel(EV_CONTENT, d.content)} · ${cpLabel(EV_MODES, d.mode)}. Made with T&S Workbench._`, "",
+  const lines = [`# Classifier eval: ${d.name || "Untitled classifier"}`, "", `_${new Date().toISOString().slice(0, 10)} · ${d.cases.length} ${d.media ? "items from your own labeled set" : "synthetic cases"} · ${typeof evContentLabel === "function" ? evContentLabel(d) : cpLabel(EV_CONTENT, d.content)} · ${cpLabel(EV_MODES, d.mode)}. Made with T&S Workbench._`, "",
     "## The rule", "", d.policy.trim(), "", "## Result", "", `- Accuracy: ${m.pct(m.acc)} (${m.correct} of ${m.n})`];
   if(m.main) lines.push(`- "${m.main.label}": precision ${m.pct(m.main.pr)}, recall ${m.pct(m.main.rc)}, F1 ${m.pct(m.main.f1)}`);
   lines.push("", "| Expected \\ Got | " + L.join(" | ") + " |", "|---|" + L.map(() => "---").join("|") + "|");
@@ -15939,11 +16031,13 @@ function evMarkdown(d){
   lines.push("", "## Where it fails", "", "| Kind of case | Cases | Wrong |", "|---|---|---|");
   m.cats.forEach(c => lines.push(`| ${c.n} | ${c.total} | ${c.miss} |`));
   lines.push("", "## What to change", "", ...adv.map(a => `- **${a.t}** ${a.fix}`));
+  if(typeof evCompareMarkdown === "function") lines.push(...evCompareMarkdown(d));
   lines.push("", "## Failures", "");
   m.fails.forEach(c => lines.push(`- [${evCat(c.cat)[1]}] expected **${evGold(d, c)}**, got **${d.preds[c.id].label}**: "${c.text}"${d.preds[c.id].why ? ` (model: ${d.preds[c.id].why})` : ""}`));
   lines.push("", "## Every case", "", "| id | kind | expected | got | text |", "|---|---|---|---|---|");
   d.cases.forEach(c => lines.push(`| ${c.id} | ${c.cat} | ${evGold(d, c)} | ${d.preds && d.preds[c.id] ? d.preds[c.id].label : ""} | ${c.text.replace(/\|/g, "/")} |`));
-  lines.push("", "Synthetic cases written to probe the rule, not a sample of real traffic. A classifier that passes this needs a second eval on real, anonymized queue data before it decides anything on its own.");
+  if(d.media && typeof evGuideMarkdown === "function") lines.push("", ...evGuideMarkdown(), "", "Items from your own labeled set, scored against the labels your reviewers gave them. The list named the items; the images and videos were never part of the eval.");
+  else lines.push("", "Synthetic cases written to probe the rule, not a sample of real traffic. A classifier that passes this needs a second eval on real, anonymized queue data before it decides anything on its own.");
   return lines.join("\n");
 }
 
@@ -16000,7 +16094,7 @@ function evSpec(){
   return {k:"eval", tool:{name:"Classifier eval", icon:"eval", color:"var(--t-ai)"},
     intro:{title:"Does your classifier apply the policy the way you meant it?", lead:"Paste a rule. You get a labeled set of hard cases: counter-speech, sarcasm, obfuscation, hyperbole, other languages. Run a classifier against them and see precision, recall and exactly where it fails, with what to change.",
       facts:[["About 5 minutes", "Six short questions, a minute to build the cases, a minute to run them."], [ai ? "Runs on your Claude account" : "Open in Claude to generate", ai ? "Cases and labels are made only when you click, and nothing leaves your browser." : "Or paste your own cases and your classifier's labels: that works anywhere."], ["Synthetic, on purpose", "Cases probe the rule's edges. Confirm on real, anonymized data before trusting a classifier to act alone."]], start:"Start"},
-    alt:[{n:"Fill everything in on one page", run:() => { evView = "page"; renderEval(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See a finished example", run:() => evAct("example")}],
+    alt:[{n:"Fill everything in on one page", run:() => { evView = "page"; renderEval(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See a finished example", run:() => evAct("example")}].concat(typeof evMediaHTML === "function" ? [{n:"Test an image or video classifier", run:() => evAct("media")}] : []),
     steps, finish:ai || ev.mode === "paste" ? "Build the test set" : "Review",
     done:() => { ev.view = "cases"; evView = "page"; evSave(); if(evAI() && !ev.cases.length) return evGenerate(); renderEval(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
@@ -16013,7 +16107,7 @@ async function evGenerate(){
   try{
     const cases = evGenValid(await SAMPLER.json(evGenPrompt(ev), {signal:EVRUN.ctl.signal, modelTier:"complex"}), ev);
     if(!cases) throw {code:"invalid_json"};
-    ev.cases = cases; ev.gold = {}; ev.preds = null; ev.ex = false; ev.view = "cases"; evSave();
+    ev.cases = cases; ev.gold = {}; ev.preds = null; ev.prev = null; ev.last = null; ev.ex = false; ev.view = "cases"; evSave();
   }catch(e){ const code = e && e.code; if(POL_OFF.includes(code)){ EVRUN.off = true; EVRUN.err = "AI isn't available in this view. Paste your own cases, or look at the example."; } else if(code !== "cancelled") EVRUN.err = AI_ERR[code] || AI_ERR.upstream_error; }
   finally{ EVRUN.busy = false; EVRUN.ctl = null; if(evHere()) renderEval(); }
 }
@@ -16035,24 +16129,27 @@ async function evRunClassifier(){
   finally{ EVRUN.busy = false; EVRUN.ctl = null; if(evHere()) renderEval(); }
 }
 function evFinish(preds){
-  ev.preds = preds; ev.ex = false; ev.view = "report"; ev.tab = "where";
+  if(typeof evLoopBefore === "function") evLoopBefore(preds); // keeps the run being replaced, for the comparison
+  ev.preds = preds; ev.ex = false; ev.view = "report"; ev.tab = ev.prev && typeof evCompareHTML === "function" ? "compare" : "where";
   const m = evMetrics(ev, preds);
   ev.runs = (ev.runs || []).filter(r => r.t).concat([{t:Date.now(), name:ev.name || cpLabel(EV_MODES, ev.mode), n:m.n, acc:m.acc, pr:m.main ? m.main.pr : null, rc:m.main ? m.main.rc : null}]).slice(-6);
+  if(typeof evLoopAfter === "function") evLoopAfter();
   evSave();
 }
 
 /* ---------- page ---------- */
 function renderEval(){
   const report = ev.view === "report" && ev.preds && ev.cases.length, cases = ev.view === "cases" && !report;
-  if(!report && !cases && evView !== "page" && !EVRUN.busy) return gdRender(evSpec());
+  const media = (ev.view === "media" || (cases && ev.media)) && !report && typeof evMediaHTML === "function"; // an image or video list: its own page, also where "the cases" live
+  if(!report && !cases && !media && evView !== "page" && !EVRUN.busy) return gdRender(evSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   const ai = evAI();
-  view.innerHTML = (report || cases
-    ? headCompact("Classifier eval", `${esc(ev.name || "Untitled classifier")} · ${ev.cases.length} cases${report ? " · " + evMetrics(ev, ev.preds).pct(evMetrics(ev, ev.preds).acc) + " accurate" : ""}`,
-        `<button type="button" class="btn sm" data-ev="edit">Edit setup</button>${report ? `<button type="button" class="btn sm" data-ev="cases">The cases</button>` : ""}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${report ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download report</button>` : ""}`)
+  view.innerHTML = (report || cases || media
+    ? headCompact("Classifier eval", `${esc(ev.name || "Untitled classifier")}${media ? " · Image or video classifier" : ""}${media && !ev.media ? "" : ` · ${ev.cases.length} ${ev.media ? "items" : "cases"}`}${report ? " · " + evMetrics(ev, ev.preds).pct(evMetrics(ev, ev.preds).acc) + " accurate" : ""}`,
+        `<span class="toast" id="ev-toast" aria-live="polite"></span>${media ? `<button type="button" class="btn sm" data-ev="reset">Start over</button>${ev.media && ev.preds ? `<button type="button" class="btn sm" data-ev="report">The report</button>` : ""}` : `<button type="button" class="btn sm" data-ev="edit">Edit setup</button>`}${report ? `<button type="button" class="btn sm" data-ev="cases">${ev.media ? "The items" : "The cases"}</button>` : ""}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${report ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download report</button>` : ""}`)
     : head("Classifier eval", "Build a labeled test set from a rule, run a moderation classifier against it, and see precision, recall and where it fails: counter-speech, sarcasm, obfuscation, other languages.", "Measure",
         `<span class="toast" id="ev-toast" aria-live="polite"></span>${ev.policy ? `<button type="button" class="btn sm" data-ev="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-ev="example">See an example</button>`))
-    + `<div class="ev-root cp-root">${report ? evReportHTML() : cases ? evCasesHTML(ai) : evSetupHTML(ai)}</div>`;
+    + `<div class="ev-root cp-root">${report ? evReportHTML() : media ? evMediaHTML() : cases ? evCasesHTML(ai) : evSetupHTML(ai)}</div>`;
   evBind();
 }
 function evSetupHTML(ai){
@@ -16070,6 +16167,7 @@ function evSetupHTML(ai){
     ${sec(++n, "ev-mode", "How to run it", "", `<div class="tr-tiers ev-tiers3" role="radiogroup" aria-label="How to run">${EV_MODES.map(([k, nm, h]) => tile("evmode", ev.mode, k, nm, h)).join("")}</div>${ev.mode === "prompt" ? `<div class="field" style="margin-top:14px"><label for="ev-sys-in">Your system prompt, exactly as it runs</label><textarea class="input" id="ev-sys-in" rows="7" placeholder="You are a content moderation classifier…">${esc(ev.sys)}</textarea></div>` : ""}`)}
     ${EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : ""}
     <div class="pol-run"><button type="button" class="btn primary" data-ev="build" ${ev.policy.trim() && ev.content && ev.labels && ev.n && ev.mode ? "" : "disabled"}>${ai ? "Build the test set" : "Continue to the cases"}</button><span class="note">${ai ? "Claude writes the cases on your account, in about a minute." : STANDALONE ? `Generating cases needs the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>. Here you can paste your own cases.` : "AI runs inside Claude. You can still paste your own cases."}</span></div>
+    ${typeof evMediaHTML === "function" ? `<div class="banner ev-media-b"><span><strong>Image or video classifier?</strong> Score it from a labeled list of your own items. The list names them; the media stays where it is.</span><button type="button" class="btn sm" data-ev="media">Paste a labeled list</button></div>` : ""}
   </div>`;
 }
 function evCasesHTML(ai){
@@ -16083,27 +16181,30 @@ function evCasesHTML(ai){
       <div class="ev-case-a">${has ? `<button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy as TSV</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download cases</button>` : ""}${ev.mode === "paste" && ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for an open model such as gpt-oss-safeguard. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Download policy` : `${icon("copy")}Copy policy`}</button>` : ""}` : ""}${ai ? `<button type="button" class="btn sm" data-ev="gen">${has ? "Regenerate" : "Generate with Claude"}</button>` : ""}</div></div>
       ${has ? `<div class="cp-mapw"><table class="cp-map ev-table"><thead><tr><th>id</th><th>Content</th><th>Kind</th><th>Expected</th><th>Why</th></tr></thead><tbody>${ev.cases.map(row).join("")}</tbody></table></div>` : ""}
       <div class="card-b ev-add"><details${!has && !ai && ev.mode === "paste" ? " open" : ""}><summary>Add your own cases</summary><p class="note">One per line: <span class="mono">label<span class="muted">⇥</span>text</span>, with a label from ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Real cases from your queue are the best test, anonymized first.</p><textarea class="input" id="ev-own" rows="4" placeholder="violates	you're pathetic, nobody wants you here"></textarea><div style="margin-top:8px"><button type="button" class="btn sm" data-ev="addown">Add these</button></div></details></div></div>
-    ${has ? `<div class="card ev-run"><div class="card-b">
+    ${has && ev.preds && typeof evLoopHTML === "function" ? evLoopHTML() : has ? `<div class="card ev-run"><div class="card-b">
       <h3 style="margin:0 0 6px;font-size:16px">Run the classifier</h3>
       ${ev.mode === "paste" ? `<p class="note">Run the cases through your own classifier, then paste its labels here: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span> or just the labels in order. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model, such as gpt-oss-safeguard, on your own computer. Download the cases and the policy above, fill in the policy's TODO lines, and the script writes labels you can paste here. Setup takes Node.js, Ollama and a 14 GB download.</p><textarea class="input" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(ev.pasted || "")}</textarea><div class="pol-run" style="margin-top:10px"><button type="button" class="btn primary" data-ev="score">Score the labels</button></div>`
         : `<p class="note">${ev.mode === "prompt" ? "Claude runs your system prompt against every case" : "Claude labels every case from the rule as written"}, a dozen at a time, on your account.${ev.mode === "prompt" ? ` <button type="button" class="pol-add" data-ev="edit">Change the prompt</button>` : ""}</p><div class="pol-run" style="margin-top:10px">${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" data-ev="run" ${ai && !EVRUN.busy ? "" : "disabled"}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}<span class="note">${ai ? `${ev.cases.length} cases, about ${Math.max(1, Math.round(ev.cases.length / 12 * 0.3))} minute${ev.cases.length > 36 ? "s" : ""}.` : `Or <button type="button" class="pol-add" data-ev="topaste">use your own classifier's labels</button> instead.`}</span></div>`}
     </div></div>` : ""}
+    ${has && typeof evbCardHTML === "function" ? evbCardHTML() : ""}
   </div>`;
 }
 function evReportHTML(){
-  const m = evMetrics(ev, ev.preds), L = evLabels(ev), pos = evPos(ev), adv = evAdvice(ev, m), tab = ["where", "fails", "all", "runs"].includes(ev.tab) ? ev.tab : "where";
+  const loop = typeof evCompareHTML === "function", tab = ["where", "fails", "all", "runs"].concat(loop ? ["compare"] : []).includes(ev.tab) ? ev.tab : "where";
+  const m = evMetrics(ev, ev.preds), L = evLabels(ev), pos = evPos(ev), adv = evAdvice(ev, m), cmp = loop && ev.prev && ev.prev.preds ? evCompare(ev, ev.prev.preds, ev.preds) : null;
   const tone = m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit";
-  const body = tab === "fails" ? evFailsHTML(m) : tab === "all" ? evAllHTML(m) : tab === "runs" ? evRunsHTML() : evWhereHTML(m, adv);
+  const body = tab === "fails" ? evFailsHTML(m) : tab === "all" ? evAllHTML(m) : tab === "runs" ? evRunsHTML() : tab === "compare" ? evCompareHTML() : evWhereHTML(m, adv);
   return `<div class="pol-report cp-report ev-report">
     ${ev.ex ? `<div class="banner"><span><strong>This is an example:</strong> a harassment rule as many platforms write it, with Claude prompted by the rule alone. It gets the easy cases and fails the ones that matter. Start over to test your own.</span><button type="button" class="btn sm" data-ev="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>accurate</span></div>
       <div><span class="eyebrow">${esc(ev.name || "Untitled classifier")} · ${esc(cpLabel(EV_MODES, ev.mode))}</span><h2 class="pol-verdict">${m.correct} of ${m.n} cases labeled the way a reviewer would</h2>
         <p class="note">${m.main ? `On "${pos}": precision ${m.pct(m.main.pr)} (of what it flags, how much deserved it) and recall ${m.pct(m.main.rc)} (of what deserved it, how much it caught).` : ""} ${m.fails.length ? `The misses sit mostly in ${m.cats.filter(c => c.miss).sort((a, b) => b.miss / b.total - a.miss / a.total).slice(0, 2).map(c => c.n.toLowerCase()).join(" and ")}.` : "No misses on this set."}</p>
-        <div class="cp-kpis">${m.per.map(p => `<span class="pill">${p.label}: P ${m.pct(p.pr)} · R ${m.pct(p.rc)}</span>`).join("")}<span class="pill">${esc(cpLabel(EV_CONTENT, ev.content))}</span></div>
+        <div class="cp-kpis">${m.per.map(p => `<span class="pill">${p.label}: P ${m.pct(p.pr)} · R ${m.pct(p.rc)}</span>`).join("")}${(c => c ? `<span class="pill">${esc(c)}</span>` : "")(typeof evContentLabel === "function" ? evContentLabel(ev) : cpLabel(EV_CONTENT, ev.content))}</div>
         <span class="toast" id="ev-toast" aria-live="polite"></span></div></div>
-    <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["where", "Where it fails", m.cats.filter(c => c.miss).length], ["fails", "The failures", m.fails.length], ["all", "Every case", m.n], ["runs", "Runs", (ev.runs || []).length]].map(([k, nm, c]) => `<button type="button" data-evtab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
+    <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["where", "Where it fails", m.cats.filter(c => c.miss).length], ["fails", "The failures", m.fails.length], ["all", ev.media ? "Every item" : "Every case", m.n]].concat(loop ? [["compare", "Compare", cmp ? cmp.fixed.length + cmp.broke.length : 0]] : [], [["runs", "Runs", (ev.runs || []).length]]).map(([k, nm, c]) => `<button type="button" data-evtab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div></div>
-    <p class="note">Synthetic cases written to probe the rule's edges, not a sample of real traffic. Before a classifier acts on its own, run a second eval on anonymized cases from your real queue.</p>
+    ${typeof evLoopHTML === "function" ? evLoopHTML(true) : ""}
+    <p class="note">${ev.media ? "Items from your own labeled set, scored against your reviewers' labels. Keep a held-out set the model team never sees, and re-run this when the model or the policy changes." : "Synthetic cases written to probe the rule's edges, not a sample of real traffic. Before a classifier acts on its own, run a second eval on anonymized cases from your real queue."}</p>
   </div>`;
 }
 function evWhereHTML(m, adv){
@@ -16144,10 +16245,10 @@ function evAct(a){
     case "cases": ev.view = "cases"; evView = "page"; evSave(); renderEval(); window.scrollTo(0, 0); return;
     case "usepol": ev.policy = pol.rule.trim(); ev.ex = false; evSave(); const t = $("#ev-policy-in"); if(t) t.value = ev.policy; else if(typeof gdCur !== "undefined" && gdCur) gdRender(gdCur); return gsay("Rule copied from the policy stress-tester");
     case "useex": ev.policy = EV_EXAMPLE.policy; ev.ex = false; evSave(); { const t2 = $("#ev-policy-in"); if(t2) t2.value = ev.policy; else if(typeof gdCur !== "undefined" && gdCur) gdRender(gdCur); } return;
-    case "build": evReadSetup(); ev.view = "cases"; evSave(); if(evAI() && !ev.cases.length) return evGenerate(); renderEval(); return window.scrollTo(0, 0);
+    case "build": evReadSetup(); if(typeof evLeaveMedia === "function") evLeaveMedia(); ev.view = "cases"; evSave(); if(evAI() && !ev.cases.length) return evGenerate(); renderEval(); return window.scrollTo(0, 0);
     case "gen": return evGenerate();
     case "run": return evRunClassifier();
-    case "again": ev.preds = null; ev.view = "cases"; evSave(); renderEval(); return window.scrollTo(0, 0);
+    case "again": ev.view = "cases"; evSave(); renderEval(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#ev-loop textarea, #ev-loop, #view h1")); // the labels stay, so the next run has something to compare with
     case "stop": if(EVRUN.ctl) EVRUN.ctl.abort(); return;
     case "score": { const p = evParsePaste(ev, ($("#ev-paste") || {}).value || ""); if(!p){ EVRUN.err = "Couldn't read any labels. One per line, as id, a tab or comma, then the label."; return renderEval(); } ev.pasted = ($("#ev-paste") || {}).value || ""; const missing = ev.cases.filter(c => !p[c.id]).length; evFinish(p); renderEval(); window.scrollTo(0, 0); return missing ? gsay(`${missing} case${missing === 1 ? "" : "s"} had no label and were left out`) : undefined; }
     case "addown": { const L = evLabels(ev), lines = (($("#ev-own") || {}).value || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean); let added = 0;
@@ -16158,6 +16259,7 @@ function evAct(a){
     case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
+    default: if(typeof evAct2 === "function") return evAct2(a); // the loop and the image/video list, in partEV2
   }
 }
 function evReadSetup(){
@@ -16189,6 +16291,680 @@ Object.assign(GT_MORE, {
   "recall":"Of everything that deserved to be flagged, the share the classifier caught. Low recall means false negatives: violations missed.",
   "counter-speech":"Content that quotes, condemns or reports the behavior a rule bans, rather than doing it. Keyword classifiers flag it by mistake."
 });
+/* =========================================================
+   CLASSIFIER EVAL, part 2: the rule-improvement loop and image/video lists
+   Loop: each run keeps the one before it (its labels, and the rule or prompt that produced them), so the report can show
+   what flipped: fixed, broke, precision and recall before and after, and misses by kind on one radar. The rule, the prompt
+   or a new label set is edited next to the cases and run again without leaving the page.
+   Media: an image or video classifier is scored from a labeled list the user pastes or opens locally. The list names
+   items; the media itself is never pasted, uploaded or read.
+   ========================================================= */
+// The kinds of case an image or video test set needs. The fourth field lists other words a list may use for the kind.
+const EV_MCATS = [
+  ["clear_violation", "Clear violation", "Plainly breaks the rule.", "violation,violating,clear,clear violation"],
+  ["clear_allowed", "Clearly allowed", "Plainly fine, on the same topic.", "allowed,benign,fine,ok,clearly allowed"],
+  ["news", "News and documentary", "Reporting or documenting the behavior: conflict, protest, crime, disaster.", "newsworthy,documentary,journalism,reporting"],
+  ["medical", "Medical and educational", "Clinical, anatomical, health or teaching material.", "educational,education,health,clinical"],
+  ["art", "Art", "Painting, sculpture, illustration, performance.", "artistic,artwork"],
+  ["meme", "Memes with text", "The meaning sits in the caption or overlay, not the picture.", "memes,text,overlay,caption"],
+  ["screenshot", "Screenshots", "Screens of chats, posts or other apps; the violation is in the captured text.", "screenshots,screen"],
+  ["edited", "Cropped or edited copies", "Crops, flips, filters, re-encodes and borders of known items.", "cropped,crop,copy,copies,altered,modified"],
+  ["ai", "AI-generated", "Synthetic images or video, including of real-looking people.", "generated,synthetic,deepfake,ai-generated"],
+  ["lookalike", "Look-alikes", "Innocent content that resembles the violation: toys, costumes, props, similar objects.", "look-alike,lookalikes,look-alikes,similar"],
+  ["context", "Context-dependent", "Depends on the caption, the audience or where it was posted.", "contextual,caption"],
+  ["other", "Other", "Kinds the list didn't name, or named differently.", "unknown,misc"]
+];
+// Which kinds a test set is scored by: an explicit list, the media kinds, or the text kinds
+const evCatList = d => (d && d.catList) || (d && d.media ? EV_MCATS : EV_CATS);
+const evContentLabel = d => cpLabel(EV_CONTENT, d.content) || (d.media ? "Images and video" : "");
+const EVL = {manifest:"", paste:"", bad:[]};
+
+/* ---------- the example's earlier run: the rule before the author narrowed it to harassment ---------- */
+// A one-line "no offensive content" rule flagged dismissals, banter and a figure of speech. Narrowing it to harassment of
+// other users fixed three of those and broke one (blunt feedback about a recipe). The misses that remain are the hard ones.
+EV_EXAMPLE.prev = {name:"v0: no offensive content", t:0, sys:"", policy:"Offensive, abusive or hurtful content will be removed.",
+  preds:{c1:{label:"violates", why:"Abusive."}, c2:{label:"violates", why:"Mocks appearance."}, c3:{label:"violates", why:"Hurtful pile-on."}, c4:{label:"allowed", why:"Disagreement."}, c5:{label:"allowed", why:"Positive."}, c6:{label:"allowed", why:"About the recipe."},
+    c7:{label:"violates", why:"'Lazy' is offensive."}, c8:{label:"violates", why:"Dismissive and hurtful."}, c9:{label:"violates", why:"Contains 'delete her account'."}, c10:{label:"violates", why:"Contains 'you're worthless'."}, c11:{label:"violates", why:"Calls the user an idiot."}, c12:{label:"violates", why:"Dismissive of a group."},
+    c13:{label:"allowed", why:"No offensive words detected."}, c14:{label:"allowed", why:"No clear abuse."}, c15:{label:"allowed", why:"Discussion of harassment."}, c16:{label:"allowed", why:"Educational."}, c17:{label:"allowed", why:"Hyperbole."}, c18:{label:"violates", why:"Hurtful language about death."},
+    c19:{label:"allowed", why:"Unrelated."}, c20:{label:"allowed", why:"Unrelated."}, c21:{label:"allowed", why:"Language not recognized."}, c22:{label:"allowed", why:"Positive."}, c23:{label:"violates", why:"Threat."}, c24:{label:"violates", why:"Insults appearance."}}};
+EV_EXAMPLE.last = {policy:EV_EXAMPLE.policy, sys:"", name:EV_EXAMPLE.name, t:0};
+EV_EXAMPLE.runs.unshift({t:0, name:"v0: no offensive content", n:24, acc:14 / 24, pr:5 / 12, rc:5 / 8});
+
+/* ---------- the loop: keep the previous run, compare with the latest ---------- */
+// Called by evFinish before it overwrites the labels: the run being replaced becomes the one to compare with
+function evLoopBefore(preds){
+  const old = ev.preds; if(!old || !ev.cases.some(c => old[c.id])) return;
+  const l = ev.last || {};
+  ev.prev = {preds:old, policy:l.policy !== undefined ? l.policy : ev.policy, sys:l.sys !== undefined ? l.sys : ev.sys, name:l.name !== undefined ? l.name : ev.name, t:l.t || 0};
+}
+// And after: remember what produced this run, so the next comparison can show how the rule changed
+function evLoopAfter(){ ev.last = {policy:ev.policy, sys:ev.sys, name:ev.name, t:Date.now()}; ev.draft = null; }
+// Leaving the media path for a text eval: its cases and runs don't carry over
+function evLeaveMedia(){ if(!ev.media) return; ev.media = false; ev.cases = []; ev.preds = null; ev.prev = null; ev.last = null; ev.gold = {}; }
+// Pure comparison of two label sets over the same cases
+function evCompare(d, prevPreds, preds){
+  const before = evMetrics(d, prevPreds), after = evMetrics(d, preds);
+  const both = d.cases.filter(c => prevPreds && prevPreds[c.id] && preds && preds[c.id]);
+  const fl = both.map(c => { const gold = evGold(d, c), was = prevPreds[c.id].label, now = preds[c.id].label; return {c, gold, was, now, wasOk:was === gold, nowOk:now === gold}; });
+  const fixed = fl.filter(x => !x.wasOk && x.nowOk), broke = fl.filter(x => x.wasOk && !x.nowOk);
+  const cats = evCatList(d).map(k => { const cs = both.filter(c => c.cat === k[0]); if(!cs.length) return null; const miss = p => cs.filter(c => p[c.id].label !== evGold(d, c)).length;
+    return {k:k[0], n:k[1], total:cs.length, before:miss(prevPreds), after:miss(preds)}; }).filter(Boolean);
+  const dv = (a, b) => a === null || a === undefined || b === null || b === undefined ? null : b - a, mm = m => m.main || {pr:null, rc:null};
+  return {n:both.length, fixed, broke, before, after, cats, delta:{acc:dv(before.acc, after.acc), pr:dv(mm(before).pr, mm(after).pr), rc:dv(mm(before).rc, mm(after).rc)}};
+}
+// Did the rule or prompt change between the two runs?
+const evLoopChanged = d => d.prev ? (d.mode === "prompt" ? String(d.prev.sys || "") !== String(d.sys || "") : String(d.prev.policy || "") !== String(d.policy || "")) : false;
+// "Harassment rule, v1 prompt" suggests "Harassment rule, v2 prompt"
+function evNextName(name){
+  const s = String(name || "").trim(); if(!s) return "v2";
+  return /v(\d+)/i.test(s) ? s.replace(/v(\d+)/i, (m, n) => "v" + (+n + 1)) : s.slice(0, 70) + " v2";
+}
+
+/* ---------- misses by kind: previous run against the latest, drawn like the maturity and coverage radars ---------- */
+const evRadarLabel = n => { const w = String(n).split(" "); if(n.length <= 11 || w.length < 2) return [n]; let best = 1, diff = 1e9;
+  for(let i = 1; i < w.length; i++){ const a = w.slice(0, i).join(" ").length, b = w.slice(i).join(" ").length; if(Math.abs(a - b) < diff){ diff = Math.abs(a - b); best = i; } } return [w.slice(0, best).join(" "), w.slice(best).join(" ")]; };
+let evSeq = 0;
+function evRadar(cats, names){
+  const hid = "ev-h" + (++evSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
+  const n = cats.length, W = 400, H = 300, cx = W / 2, cy = H / 2, R = 96, f = v => v.toFixed(1), rate = c => c.total ? Math.round(c.before / c.total * 100) : 0, rate2 = c => c.total ? Math.round(c.after / c.total * 100) : 0;
+  const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
+  const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
+  const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(cats.map(() => p))}" fill="${p === 100 ? "var(--surface)" : "none"}" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
+  const axes = cats.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
+  const was = `<polygon class="ev-r-prev" points="${poly(cats.map(rate))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>`;
+  const now = `${hatch(hid, "var(--ink)")}<polygon class="ev-r-now" points="${poly(cats.map(rate2))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>`;
+  const dots = cats.map((c, i) => { if(!c.after) return ""; const [a, b] = pt(i, rate2(c)); return `<circle cx="${f(a)}" cy="${f(b)}" r="3.5" fill="${c.after > c.before ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
+  const labels = cats.map((c, i) => { const [a, b] = pt(i, 120), cs = Math.cos(ang(i)), sn = Math.sin(ang(i)), ls = evRadarLabel(c.n), extra = ls.length - 1;
+    const anchor = cs > .3 ? "start" : cs < -.3 ? "end" : "middle", dy0 = sn < -.6 ? `${-.2 - 1.1 * extra}em` : sn > .6 ? ".9em" : `${.35 - .55 * extra}em`;
+    return `<text x="${f(a)}" y="${f(b)}" text-anchor="${anchor}" class="ma-rl ${c.after > c.before ? "crit" : c.after ? "" : "none"}">${ls.map((t, j) => `<tspan x="${f(a)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");
+  const aria = `Share of cases wrong by kind, ${names[0]} against ${names[1]}. ` + cats.map(c => `${c.n}: ${c.before} then ${c.after} of ${c.total} wrong`).join(". ") + ".";
+  return `<svg class="ma-radar ev-radar" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${was}${now}${dots}${labels}</svg>`;
+}
+
+/* ---------- the Compare tab ---------- */
+function evCompareHTML(){
+  const P = ev.prev;
+  if(!P || !P.preds) return `<p class="note">Nothing to compare with yet. ${ev.media ? "Paste the next list from your classifier" : ev.mode === "paste" ? "Change your classifier, run the same cases through it and paste the new labels" : `Change the ${ev.mode === "prompt" ? "prompt" : "rule"} below and run the same cases again`}. This tab then shows every case that flipped, and precision and recall before and after.</p>`;
+  const r = evCompare(ev, P.preds, ev.preds), pct = r.after.pct, pos = evPos(ev), n0 = P.name || "Previous run", n1 = ev.name || "Latest run", same = n0 === n1;
+  const names = same ? ["Previous run", "Latest run"] : [n0, n1];
+  const dl = v => v === null ? "" : `<span class="ev-delta ${v > 0 ? "up" : v < 0 ? "down" : ""}">${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(Math.round(v * 100))}</span>`;
+  const kpi = (lbl, a, b, d) => `<div class="ev-kpi"><span class="eyebrow">${lbl}</span><b class="mono">${pct(a)} <span class="muted">→</span> ${pct(b)}</b>${dl(d)}</div>`;
+  const flip = (x, i, kind) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
+    <span class="eyebrow"><span class="ev-flip ${kind}">${kind === "fixed" ? "Fixed" : "Broke"}</span> ${esc(evCat(x.c.cat)[1])} · ${esc(x.c.id)}</span><h4>“${esc(x.c.text)}”</h4>
+    <p>Expected <b>${esc(x.gold)}</b>. Was <b>${esc(x.was)}</b>, now <b>${esc(x.now)}</b>.${x.c.why ? ` Reviewer: ${esc(x.c.why)}` : ""}${ev.preds[x.c.id].why ? ` Classifier now: ${esc(ev.preds[x.c.id].why)}` : ""}</p></div></article>`;
+  const sum = !r.fixed.length && !r.broke.length ? "No case flipped." : `${r.fixed.length} fixed, ${r.broke.length} broke.`;
+  const chg = evLoopChanged(ev), key = ev.mode === "prompt" ? "sys" : "policy";
+  return `<div class="ev-cmp">
+    <div class="ev-cmp-top"><div><span class="eyebrow">${esc(names[0])} → ${esc(names[1])}</span><h4>${sum} Accuracy ${pct(r.before.acc)} → ${pct(r.after.acc)}.</h4>
+        <p class="note">${r.n} cases labeled in both runs, scored against the same gold labels.${chg ? ` The ${key === "sys" ? "prompt" : "rule"} changed in between; the change is below.` : ev.mode === "paste" && !ev.media ? " Change the rule your classifier enforces, and the diff shows here too." : ""}</p></div>
+      <div class="ev-cmp-kpis">${kpi("Accuracy", r.before.acc, r.after.acc, r.delta.acc)}${kpi(`Precision on "${esc(pos)}"`, r.before.main ? r.before.main.pr : null, r.after.main ? r.after.main.pr : null, r.delta.pr)}${kpi(`Recall on "${esc(pos)}"`, r.before.main ? r.before.main.rc : null, r.after.main ? r.after.main.rc : null, r.delta.rc)}</div></div>
+    <div class="ev-cmp-grid">
+      <div class="ev-cmp-radar"><h4>Misses by kind</h4>${r.cats.length >= 3 ? `${evRadar(r.cats, names)}<div class="ma-legend"><span><i class="ma-lg-cur"></i>${esc(names[1])}</span><span><i class="ma-lg-old"></i>${esc(names[0])}</span><span><i class="ma-lg-gap"></i>Got worse</span></div><p class="note">The further out, the larger the share of that kind labeled wrong.</p>` : `<p class="note">Fewer than three kinds of case in both runs, so no chart; the table has the numbers.</p>`}</div>
+      <div><h4>Wrong, before and after</h4><table class="ev-ct ev-cmp-t"><thead><tr><th>Kind</th><th>Cases</th><th>Before</th><th>After</th></tr></thead><tbody>${r.cats.map(c => `<tr class="${c.after > c.before ? "bad" : c.after < c.before ? "ok" : ""}"><td>${esc(c.n)}</td><td class="mono">${c.total}</td><td class="mono">${c.before}</td><td class="mono ev-arrow">${c.after}${c.after < c.before ? ' <span class="ev-delta up">▾</span>' : c.after > c.before ? ' <span class="ev-delta down">▴</span>' : ""}</td></tr>`).join("")}</tbody></table></div>
+    </div>
+    ${r.fixed.length || r.broke.length ? `<div class="ev-cmp-flips"><h4>What flipped</h4><div class="cp-gaps">${r.fixed.map((x, i) => flip(x, i, "fixed")).join("")}${r.broke.map((x, i) => flip(x, r.fixed.length + i, "broke")).join("")}</div></div>` : ""}
+    ${chg ? `<div class="ev-cmp-diff"><h4>What changed in the ${key === "sys" ? "prompt" : "rule"}</h4><div class="pol-diff"><div><span class="eyebrow">Before · ${esc(names[0])}</span><blockquote>${esc(P[key] || "")}</blockquote></div><div><span class="eyebrow">Now · ${esc(names[1])}</span><blockquote class="new">${esc(ev[key] || "")}</blockquote></div></div></div>` : ""}
+  </div>`;
+}
+function evCompareMarkdown(d){
+  const P = d.prev; if(!P || !P.preds || !d.preds) return [];
+  const r = evCompare(d, P.preds, d.preds), pct = r.after.pct, n0 = P.name || "previous run", n1 = d.name || "latest run";
+  const met = (l, a, b) => `- ${l}: ${pct(a)} → ${pct(b)}`;
+  const lines = ["", `## Since the previous run (${n0} → ${n1})`, "", `${r.fixed.length} fixed, ${r.broke.length} broke, over ${r.n} cases labeled in both runs.`, "",
+    met("Accuracy", r.before.acc, r.after.acc), met("Precision", r.before.main ? r.before.main.pr : null, r.after.main ? r.after.main.pr : null), met("Recall", r.before.main ? r.before.main.rc : null, r.after.main ? r.after.main.rc : null), "",
+    "| Kind of case | Cases | Wrong before | Wrong after |", "|---|---|---|---|"].concat(r.cats.map(c => `| ${c.n} | ${c.total} | ${c.before} | ${c.after} |`));
+  r.fixed.forEach(x => lines.push(`- Fixed [${evCat(x.c.cat)[1]}] ${x.was} → ${x.now}: "${x.c.text}"`));
+  r.broke.forEach(x => lines.push(`- Broke [${evCat(x.c.cat)[1]}] ${x.was} → ${x.now}: "${x.c.text}"`));
+  if(evLoopChanged(d)){ const k = d.mode === "prompt" ? "sys" : "policy"; lines.push("", `${k === "sys" ? "Prompt" : "Rule"} before:`, "", ...String(P[k] || "").trim().split(/\r?\n/).map(l => "> " + l), "", `${k === "sys" ? "Prompt" : "Rule"} now:`, "", ...String(d[k] || "").trim().split(/\r?\n/).map(l => "> " + l)); }
+  return lines;
+}
+
+/* ---------- the loop card: edit next to the cases, run again ---------- */
+function evLoopHTML(onReport){
+  const ai = evAI(), mode = ev.mode, dr = ev.draft || {}, media = ev.media, n = ev.cases.length;
+  const title = media ? "Paste the next list and compare" : mode === "paste" ? "Run your classifier again and compare" : mode === "prompt" ? "Change the prompt and run again" : "Change the rule and run again";
+  const fields = media ? evManifestFieldHTML()
+    : mode === "paste" ? `<p class="note">Change the rule or the prompt your classifier uses, run the same cases through it, and paste the new labels: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in order.</p><textarea class="input mono" id="ev-loop-paste" rows="5" placeholder="c1	violates&#10;c2	allowed" aria-label="New labels">${esc(EVL.paste)}</textarea>`
+    : mode === "prompt" ? `<div class="field"><label for="ev-loop-sys">Your system prompt</label><textarea class="input" id="ev-loop-sys" rows="7" placeholder="You are a content moderation classifier…">${esc(dr.sys !== undefined ? dr.sys : ev.sys)}</textarea></div>`
+    : `<div class="field"><label for="ev-loop-policy">The rule</label><textarea class="input" id="ev-loop-policy" rows="5" placeholder="Users must not harass, bully or intimidate other users…">${esc(dr.policy !== undefined ? dr.policy : ev.policy)}</textarea></div>`;
+  const name = `<div class="field ev-loop-name"><label for="ev-loop-name">A name for the next run <span class="note">optional</span></label><input class="input" id="ev-loop-name" maxlength="80" value="${esc(dr.name || "")}" placeholder="${esc(evNextName(ev.name))}"></div>`;
+  const run = media ? `<button type="button" class="btn primary" data-ev="mscore">Score the list</button><label class="btn" for="ev-mfile">Open a file<input type="file" id="ev-mfile" class="visually-hidden" accept=".tsv,.csv,.txt,text/plain,text/csv,text/tab-separated-values"></label><span class="note">Read in your browser. The file isn't sent anywhere.</span>`
+    : mode === "paste" ? `<button type="button" class="btn primary" data-ev="loopscore">Score the new labels</button><button type="button" class="btn" data-ev="csv">${icon("copy")}Copy the cases as TSV</button>`
+    : ai ? `<button type="button" class="btn primary" data-ev="looprun" ${EVRUN.busy ? "disabled" : ""}>Run again with Claude</button><span class="note">${n} cases, same gold labels, on your account.</span>`
+    : STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a><span class="note">This free version can't call Claude. Or <button type="button" class="pol-add" data-ev="topaste">paste your own classifier's labels</button> instead.</span>`
+    : `<button type="button" class="btn primary" disabled>Open in Claude to run</button><span class="note">AI runs inside Claude. Or <button type="button" class="pol-add" data-ev="topaste">paste your own classifier's labels</button> instead.</span>`;
+  const busy = onReport && EVRUN.busy ? `<div class="ai-busy ev-loop-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account.</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : "";
+  const err = onReport && EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : "";
+  return `<section class="card ev-loop" id="ev-loop" aria-labelledby="ev-loop-h"><div class="card-h"><div><h3 id="ev-loop-h">${title}</h3><p class="note">${media ? "Same ids, same expected labels. The report then shows which items flipped, and precision and recall before and after." : `Same ${n} cases, same gold labels. The next report shows which cases flipped, and precision and recall before and after.`}</p></div></div>
+    <div class="card-b">${busy}${err}${fields}${media ? "" : name}<div class="pol-run">${run}</div></div></section>`;
+}
+
+/* ---------- images and video: a labeled list, never the media ---------- */
+// A kind word from the list: the key, the name, or one of the words in the fourth field. Anything else is "other".
+function evMKind(s){
+  const k = String(s || "").trim().toLowerCase().replace(/\s+/g, " "); if(!k) return "other";
+  const hit = EV_MCATS.find(c => c[0] === k || c[0] === k.replace(/[ -]/g, "_") || c[1].toLowerCase() === k || c[3].split(",").includes(k));
+  return hit ? hit[0] : "other";
+}
+// One line per item: id, kind, expected, model label, optional note. Tabs or commas, a header row, CRLF and quotes all fine.
+function evParseManifest(txt, L){
+  const out = {items:[], bad:[], header:false}, seen = {};
+  String(txt || "").replace(/^﻿/, "").split(/\r?\n/).forEach((raw, i) => {
+    const line = raw.trim(); if(!line) return;
+    const cols = (line.includes("\t") ? line.split("\t") : line.split(",")).map(s => s.trim().replace(/^"(.*)"$/, "$1").trim());
+    if(!out.items.length && !out.bad.length && !out.header && cols.some(c => /^(id|item|kind|category|expected|gold|label|model_label|model|note)$/i.test(c))){ out.header = true; return; }
+    const [id, kind, exp, lab, ...rest] = cols, e = (exp || "").toLowerCase(), l = (lab || "").toLowerCase(), no = i + 1;
+    if(cols.length < 4) return out.bad.push({line:no, why:"needs four columns: id, kind, expected, model label"});
+    if(!id) return out.bad.push({line:no, why:"no id"});
+    if(!L.includes(e)) return out.bad.push({line:no, why:`expected label "${exp}" isn't one of ${L.join(", ")}`});
+    if(!L.includes(l)) return out.bad.push({line:no, why:`model label "${lab}" isn't one of ${L.join(", ")}`});
+    if(seen[id]) return out.bad.push({line:no, why:`duplicate id ${id}`});
+    seen[id] = 1; out.items.push({id:id.slice(0, 80), cat:evMKind(kind), kind:String(kind || "").slice(0, 40), expect:e, label:l, note:rest.join(" ").trim().slice(0, 200)});
+  });
+  return out;
+}
+// The parsed list becomes the cases and the run; expected labels are the gold labels
+function evMediaScore(txt){
+  const L = evLabels(ev), p = evParseManifest(txt, L);
+  if(!p.items.length){ EVRUN.err = p.bad.length ? `Couldn't read any items. Line ${p.bad[0].line}: ${p.bad[0].why}.` : "Couldn't read any items. One per line: id, kind, expected, model label, separated by tabs or commas."; return renderEval(); }
+  if(!ev.media){ ev.preds = null; ev.prev = null; ev.last = null; } // a text set was here: its runs don't compare with this one
+  ev.media = true; ev.mode = "paste"; ev.content = ""; ev.ex = false; ev.n = p.items.length; EVRUN.err = "";
+  ev.cases = p.items.map(x => ({id:x.id, text:x.note || x.id, expect:x.expect, cat:x.cat, why:x.cat === "other" && x.kind ? `Listed as "${x.kind}".` : ""}));
+  ev.gold = {}; EVL.manifest = ""; EVL.bad = p.bad;
+  evFinish(Object.fromEntries(p.items.map(x => [x.id, {label:x.label, why:""}])));
+  renderEval(); window.scrollTo(0, 0);
+  if(p.bad.length) gsay(`${p.items.length} items scored; ${p.bad.length} line${p.bad.length === 1 ? "" : "s"} skipped`);
+}
+const EV_MTEMPLATE = ["id\tkind\texpected\tmodel_label\tnote", "img_0041\tnews\tallowed\tviolates\tprotest photo, crowd", "img_0042\tclear_violation\tviolates\tviolates\t", "vid_0107\tedited\tviolates\tallowed\tcropped copy of a known item", "img_0043\tlookalike\tallowed\tviolates\ttoy that resembles a weapon"].join("\n");
+function evManifestFieldHTML(){
+  const L = evLabels(ev);
+  return `<div class="field"><label for="ev-manifest">The list: one line per item</label><p class="note">Columns: <span class="mono">id</span>, <span class="mono">kind</span>, <span class="mono">expected</span>, <span class="mono">model_label</span>, and an optional note. Tabs or commas; a header row is fine. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Expected is what your reviewers decided; model label is what the classifier said.</p>
+    <textarea class="input mono" id="ev-manifest" rows="8" placeholder="${esc(EV_MTEMPLATE).replace(/\n/g, "&#10;")}">${esc(EVL.manifest)}</textarea></div>`;
+}
+function evMediaHTML(){
+  const L = evLabels(ev), has = ev.media && ev.cases.length, stale = !ev.media && ev.cases.length;
+  const tile = (attr, cur, k, n, h) => `<button type="button" role="radio" aria-checked="${cur === k}" class="card tr-tier ${cur === k ? "on" : ""}" data-${attr}="${k}"><b>${esc(n)}</b>${h ? `<span>${esc(h)}</span>` : ""}</button>`;
+  const row = c => { const p = ev.preds && ev.preds[c.id], ok = p && p.label === evGold(ev, c); return `<tr class="${p && !ok ? "bad" : ""}"><td class="mono">${esc(c.id)}</td><td><span class="note">${esc(evCat(c.cat)[1])}</span></td><td>${esc(evGold(ev, c))}</td><td>${p ? `<b>${esc(p.label)}</b>${ok ? "" : ' <span class="ev-x">✕</span>'}` : "–"}</td><td class="note">${esc(c.text === c.id ? "" : c.text)}</td></tr>`; };
+  return `<div class="ev-cases ev-media">
+    ${EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : ""}
+    <section class="card" aria-labelledby="ev-media-h"><div class="card-h"><div><h3 id="ev-media-h" style="margin:0;font-size:16px">Image or video classifier</h3><p class="note" style="margin:4px 0 0">Bring your own labeled set. Paste a list, not the media. The images and videos stay where they are: nothing here is uploaded, and the list stays in your browser.</p></div></div>
+      <div class="card-b">
+        <div class="ev-mtwo">
+          <div class="field"><label for="ev-name-in">A name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" value="${esc(ev.name)}" maxlength="80" placeholder="For example: Nudity model, v3"></div>
+          <div class="field"><span class="lbl" id="ev-mlabels-l">Labels</span><div class="tr-tiers cp-two" role="radiogroup" aria-labelledby="ev-mlabels-l">${Object.entries(EV_LABELS).map(([k, v]) => tile("evlabels", ev.labels || "binary", k, v.n, v.h)).join("")}</div></div>
+        </div>
+        <div class="field"><label for="ev-policy-in">The rule it enforces <span class="note">optional, goes in the report</span></label><textarea class="input" id="ev-policy-in" rows="3" placeholder="For example: No sexual content involving real people…">${esc(ev.policy)}</textarea></div>
+        ${evManifestFieldHTML()}
+        <div class="pol-run"><button type="button" class="btn primary" data-ev="mscore">Score the list</button><label class="btn" for="ev-mfile">Open a file<input type="file" id="ev-mfile" class="visually-hidden" accept=".tsv,.csv,.txt,text/plain,text/csv,text/tab-separated-values"></label><button type="button" class="btn" data-ev="mtemplate">${icon("copy")}Copy a template</button><span class="note">${stale ? "Scoring a list replaces the text cases you have now." : "A file is read in your browser; it isn't sent anywhere."}</span></div>
+        <details class="ev-kinds"><summary>The kinds of case, and the words the list can use for them</summary><div class="cp-mapw"><table class="ev-ct ev-kinds-t"><thead><tr><th>Kind</th><th>What it covers</th><th>Also read as</th></tr></thead><tbody>${EV_MCATS.map(c => `<tr><td><span class="mono">${c[0]}</span><br>${esc(c[1])}</td><td class="note">${esc(c[2])}</td><td class="note">${esc(c[3].split(",").join(", "))}</td></tr>`).join("")}</tbody></table></div><p class="note">A kind the list names some other way lands in Other. Cases there still count toward accuracy, precision and recall.</p></details>
+      </div></section>
+    ${has ? `<section class="card"><div class="card-h"><div><h3 style="margin:0;font-size:16px">The items <span class="note">${ev.cases.length}</span></h3><p class="note" style="margin:4px 0 0">From the last list you scored. Expected labels are what the classifier is scored against.</p></div><div class="ev-case-a">${ev.preds ? `<button type="button" class="btn sm primary" data-ev="report">See the report</button>` : ""}</div></div>
+      <div class="cp-mapw"><table class="cp-map ev-table ev-mtable"><thead><tr><th>id</th><th>Kind</th><th>Expected</th><th>Got</th><th>Note</th></tr></thead><tbody>${ev.cases.map(row).join("")}</tbody></table></div></section>` : ""}
+    <details class="card ev-guide" id="ev-guide"><summary>How to build a test set from your own images and video</summary><div class="card-b">${evGuideHTML()}</div></details>
+  </div>`;
+}
+
+/* ---------- the guide: a test set from your own data ---------- */
+const EV_GUIDE = [
+  ["Sample from real decisions", "Pull items from your own queue decisions, not from a search for examples. Take a random sample for the overall numbers, then add items so each kind of case has at least 20; a kind with five items can't tell you much."],
+  ["Label twice", "Two reviewers label every item without seeing each other's label. Resolve the disagreements together and write down the reason; those reasons are policy clarifications waiting to be made."],
+  ["Hold some out", "Keep a held-out set that the people tuning the model never see. Tune on one set, report on the other. A test set that shaped the model stops measuring it."],
+  ["Store references, not copies", "Where you can, keep ids, hashes or storage references and read the media from where it already lives. Fewer copies means fewer places to protect, and to delete when the time comes."],
+  ["Follow your retention and privacy rules", "A test set is personal data too. Apply the same retention limits, access controls and deletion duties as the queue it came from, and keep it out of general-purpose storage and shared drives."],
+  ["Look after the reviewers", "Labeling graphic material is moderation work. Keep sessions short, let reviewers blur or grayscale by default, make support available, and never make labeling a side task."],
+  ["Never build a test set containing CSAM", "Never build a test set containing CSAM. Known-CSAM detection is tested through hash-matching providers and NCMEC's processes, not with a test set. Holding the material is illegal even for testing. If you find it in your data, stop, follow your legal reporting duty (in the US, a report to NCMEC's CyberTipline) and your escalation procedure."]
+];
+const evGuideHTML = () => `<ol class="pk-list ev-guide-l">${EV_GUIDE.map(([t, b], i) => `<li>${i === EV_GUIDE.length - 1 ? `<strong>${esc(t)}.</strong> ${esc(b.replace(/^Never build a test set containing CSAM\. /, ""))}` : `<b>${esc(t)}.</b> ${esc(b)}`}</li>`).join("")}</ol>`;
+const evGuideMarkdown = () => ["## Building a test set from your own images and video", ""].concat(EV_GUIDE.map(([t, b]) => `- **${t}.** ${b}`));
+
+/* ---------- actions and events ---------- */
+function evAct2(a){
+  switch(a){
+    case "media": ev.view = "media"; evView = "page"; EVRUN.err = ""; if(!ev.labels) ev.labels = "binary"; evSave(); renderEval(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "report": if(!ev.preds) return; ev.view = "report"; evSave(); renderEval(); return window.scrollTo(0, 0);
+    case "mscore": { const t = $("#ev-manifest"); return evMediaScore((t && t.value) || EVL.manifest); }
+    case "mtemplate": return copyText(EV_MTEMPLATE, $("#ev-toast"));
+    case "looprun": { const dr = ev.draft || {};
+      if(dr.policy !== undefined) ev.policy = dr.policy.slice(0, 4000); if(dr.sys !== undefined) ev.sys = dr.sys.slice(0, 8000); if(dr.name && dr.name.trim()) ev.name = dr.name.trim().slice(0, 80);
+      ev.draft = Object.assign({}, dr, {name:""}); ev.ex = false; evSave();
+      if(ev.mode === "policy" && !ev.policy.trim()){ EVRUN.err = "Paste the rule first."; return renderEval(); }
+      return evRunClassifier(); }
+    case "loopscore": { const t = $("#ev-loop-paste"), txt = (t && t.value) || EVL.paste, p = evParsePaste(ev, txt);
+      if(!p){ EVRUN.err = "Couldn't read any labels. One per line, as id, a tab or comma, then the label."; return renderEval(); }
+      const dr = ev.draft || {}; if(dr.name && dr.name.trim()) ev.name = dr.name.trim().slice(0, 80);
+      ev.pasted = txt; EVL.paste = ""; EVRUN.err = ""; const missing = ev.cases.filter(c => !p[c.id]).length; evFinish(p); renderEval(); window.scrollTo(0, 0);
+      return missing ? gsay(`${missing} case${missing === 1 ? "" : "s"} had no label and were left out`) : undefined; }
+  }
+}
+document.addEventListener("input", e => { const t = e.target; if(!t || !evHere()) return;
+  if(t.id === "ev-loop-policy" || t.id === "ev-loop-sys" || t.id === "ev-loop-name"){ ev.draft = Object.assign({}, ev.draft, {[t.id.slice(8)]:t.value}); evSave(); }
+  else if(t.id === "ev-manifest") EVL.manifest = t.value; else if(t.id === "ev-loop-paste") EVL.paste = t.value; });
+// A list opened from disk is read here, in the browser, and dropped into the box. Nothing is uploaded.
+document.addEventListener("change", e => { const t = e.target; if(!t || t.id !== "ev-mfile" || !evHere()) return; const f = t.files && t.files[0]; if(!f) return;
+  const r = new FileReader(); r.onload = () => { EVL.manifest = String(r.result || "").slice(0, 2e6); const ta = $("#ev-manifest"); if(ta) ta.value = EVL.manifest; gsay(`Read ${f.name} in your browser: ${EVL.manifest.split(/\r?\n/).filter(l => l.trim()).length} lines. Nothing was uploaded.`); }; r.readAsText(f); t.value = ""; });
+Object.assign(GT_MORE, {
+  "hash matching":"Comparing a fingerprint of an image or video against a list of known items. How known CSAM and known terrorist content are detected; tested through the matching provider, not with a test set.",
+  "held-out set":"Test cases the people tuning a model never see. The number you report comes from this set, so tuning can't inflate it."
+});
+/* =========================================================
+   CLASSIFIER EVAL, baseline: a small open toxicity model that runs in the visitor's own browser.
+   Nothing loads until the visitor clicks. Then transformers.js (pinned, from jsDelivr) and the model's ONNX weights (from the
+   Hugging Face CDN) download to this browser, the browser caches them (Cache API), and the cases are scored here: the text of
+   the cases never leaves the browser. A fixed-category model scores words and tone, not the visitor's rule, and the point of
+   the card is to show exactly where that goes wrong against the rule: counter-speech, banter, quoting abuse to report it.
+   Verified in a browser on 2026-10-03: MiniLMv2 loads cold in under a second on a fast line, scores 24 cases in ~0.2 s on WASM.
+   ========================================================= */
+const EVB_LIB = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+// The first model is the default. The second is offered only if the first fails to load. Both: Jigsaw toxic-comment labels,
+// sigmoid per label. Sizes are what the browser fetches (quantized ONNX weights plus tokenizer), measured with the progress callback.
+const EVB_MODELS = [
+  {id:"minuva/MiniLMv2-toxic-jigsaw-onnx", name:"MiniLMv2 toxic", lic:"Apache-2.0", mb:24, bytes:23578876, opts:{dtype:"q8", subfolder:".", model_file_name:"model_optimized"},
+   about:"a 23 MB open model distilled from Jigsaw's toxic-bert (unitary/toxic-bert, also Apache-2.0)"},
+  {id:"Xenova/toxic-bert", name:"toxic-bert", lic:"Apache-2.0", mb:111, bytes:111433092, opts:{dtype:"q8"},
+   about:"Jigsaw's toxic-bert (unitary/toxic-bert), 111 MB quantized, in the ONNX port by Xenova"}
+];
+const EVB_CATS = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"];
+const EVB_T = {pos:.5, review:.25}; // highest score at or above pos: the positive label; three labels: review band from .25
+const EVB = {state:"idle", model:0, loaded:0, total:0, files:{}, err:"", note:"", lib:null, pipes:{}, scores:null, key:"", ms:0, loadMs:0, done:0, n:0, stop:false, last:0};
+const evbModel = () => EVB_MODELS[EVB.model] || EVB_MODELS[0];
+const evbMB = b => (b / 1e6).toFixed(b < 1e7 ? 1 : 0);
+// Which cases the scores belong to: the cases can change under a finished run (regenerate, add your own)
+const evbKey = d => (d.cases || []).map(c => c.id + "\t" + c.text).join("\n");
+
+/* ---------- pure helpers ---------- */
+// The pipeline returns [{label, score}] for one string, or nested arrays; make it {label: score} over the known labels
+function evbNorm(out){
+  const flat = [], walk = x => { if(Array.isArray(x)) x.forEach(walk); else if(x && typeof x.label === "string") flat.push(x); };
+  walk(out);
+  const s = {}; EVB_CATS.forEach(k => s[k] = 0);
+  flat.forEach(x => { const k = String(x.label).toLowerCase(), v = +x.score; if(k in s && Number.isFinite(v)) s[k] = Math.min(1, Math.max(0, v)); });
+  return s;
+}
+// The categories by score, highest first
+const evbRank = s => EVB_CATS.filter(k => k in s).map(k => ({k, v:+s[k] || 0})).sort((a, b) => b.v - a.v);
+// The model's six scores, mapped to the eval's labels with the stated thresholds
+function evbMap(scores, d){
+  const L = evLabels(d), pos = evPos(d), r = evbRank(scores || {}), top = r[0] || {k:"toxic", v:0};
+  const label = top.v >= EVB_T.pos ? pos : L.length === 3 && top.v >= EVB_T.review ? L[1] : L[L.length - 1];
+  const why = r.slice(0, 2).filter((x, i) => !i || x.v >= .1).map(x => `${x.k.replace("_", " ")} ${x.v.toFixed(2)}`).join(", ");
+  return {label, why, top:top.k, score:top.v};
+}
+const evbPreds = d => EVB.scores ? Object.fromEntries(d.cases.filter(c => EVB.scores[c.id]).map(c => [c.id, evbMap(EVB.scores[c.id], d)])) : null;
+// Why a word-and-tone model misses this kind of case, one line each
+const EVB_WHY = {
+  counter:"Quoting or condemning abuse contains the same words as abuse. The model can't be told that reporting it is allowed.",
+  context:"Banter, sarcasm and in-group language score on the words, not on who is talking to whom.",
+  newsworthy:"Reporting and teaching about the behavior use its vocabulary.",
+  hyperbole:"Figures of speech about dying or killing score like threats.",
+  adversarial:"Spacing, symbols and misspellings hide the words it was trained on.",
+  multilingual:"Trained on English comments: other languages score near zero either way.",
+  clear_violation:"Abuse without swear words or slurs scores low. The model keys on vocabulary, not on the target.",
+  borderline:"The model has no idea where your rule draws the line; it only has a toxicity score.",
+  clear_allowed:"Blunt or negative words about the work score as abuse of the person.",
+  offtopic:"A word it associates with toxicity, out of context.",
+  own:"Your own case: see which words the score follows."
+};
+// The misses, with the kinds the rule decides first: that's where a fixed-category model is wrong by design
+function evbGaps(d, preds){
+  const order = ["counter", "context", "newsworthy", "hyperbole", "adversarial", "multilingual", "clear_violation", "clear_allowed", "borderline", "offtopic", "own"];
+  return d.cases.filter(c => preds[c.id] && preds[c.id].label !== evGold(d, c))
+    .map(c => ({c, got:preds[c.id], want:evGold(d, c), why:EVB_WHY[c.cat] || ""}))
+    .sort((a, b) => (order.indexOf(a.c.cat) + 1 || 99) - (order.indexOf(b.c.cat) + 1 || 99) || b.got.score - a.got.score);
+}
+
+/* ---------- the card ---------- */
+function evbCardHTML(){
+  const m = evbModel(), L = evLabels(ev), pos = evPos(ev), last = L[L.length - 1], three = L.length === 3, has = !!EVB.pipes[m.id];
+  const stale = EVB.state === "done" && EVB.key !== evbKey(ev);
+  const rule = `How it's scored: the model gives six scores, 0 to 1, for ${EVB_CATS.map(k => k.replace("_", " ")).join(", ")}. The highest score at or above ${EVB_T.pos.toFixed(2)} counts as "${pos}"${three ? `, from ${EVB_T.review.toFixed(2)} as "${L[1]}"` : ""}, anything lower as "${last}".`;
+  const head = `<div class="card-h"><div><h3 style="margin:0;font-size:16px">Instant baseline: a small open model in your browser</h3><p class="note" style="margin:4px 0 0">Not your classifier. A general toxicity model, to show what a fixed-category model gets wrong against your rule.</p></div></div>`;
+  let body;
+  if(EVB.state === "loading" || EVB.state === "running"){
+    const dl = EVB.state === "loading", total = Math.max(EVB.total, m.bytes), pct = dl ? Math.min(99, Math.round(EVB.loaded / total * 100)) : Math.round(EVB.done / Math.max(1, EVB.n) * 100);
+    body = `<div class="evb-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="evb-stage" aria-live="polite">${dl ? `Downloading ${esc(m.name)}… ${evbMB(EVB.loaded)} of ${evbMB(total)} MB` : `Scoring ${EVB.done} of ${EVB.n}…`}</b><span class="note">${dl ? "To this browser only, from the Hugging Face and jsDelivr CDNs." : "In this browser. Nothing is sent anywhere."}</span><div class="ev-bar evb-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div></div><button type="button" class="btn sm" data-evb="stop">Stop</button></div>`;
+  } else if(EVB.state === "error"){
+    const alt = EVB_MODELS[EVB.model + 1];
+    body = `<p class="ai-err" role="alert">${esc(EVB.err)}</p><div class="pol-run"><button type="button" class="btn" data-evb="run">Try again</button>${alt ? `<button type="button" class="btn" data-evb="alt">Try ${esc(alt.name)} instead (${alt.mb} MB)</button>` : ""}<span class="note">Nothing about your cases was sent. The download is the only network use.</span></div>`;
+  } else if(EVB.state === "done" && !stale){
+    const preds = evbPreds(ev), mt = evMetrics(ev, preds), gaps = evbGaps(ev, preds), yours = ev.preds ? evMetrics(ev, ev.preds) : null;
+    const gap = g => `<article class="cp-gap"><span class="evb-sc mono">${esc(g.got.top.replace("_", " "))} ${g.got.score.toFixed(2)}</span><div class="cp-gb"><span class="eyebrow">${esc(evCat(g.c.cat)[1])} · ${g.c.id}</span><h4>“${esc(g.c.text)}”</h4><p>Your label <b>${esc(g.want)}</b>, baseline <b>${esc(g.got.label)}</b>.${g.why ? ` ${esc(g.why)}` : ""}</p></div></article>`;
+    body = `<div class="evb-kpis"><span class="pill">Baseline: ${mt.pct(mt.acc)} accurate</span>${mt.main ? `<span class="pill">${esc(pos)}: P ${mt.pct(mt.main.pr)} · R ${mt.pct(mt.main.rc)}</span>` : ""}${yours ? `<span class="pill">${esc(ev.name || "Your classifier")}: ${yours.pct(yours.acc)} accurate</span>` : ""}</div>
+      <p>${esc(m.name)} agrees with your labels on ${mt.correct} of ${mt.n} cases${gaps.length ? ` and disagrees on ${gaps.length}` : ""}. A fixed-category model scores words and tone, not your rule. It can't be told that reporting abuse is allowed, or that these two are friends. ${gaps.length ? "Where it disagrees with your labels:" : "On this set, that didn't cost it anything. Harder cases would."}</p>
+      ${gaps.length ? `<div class="cp-gaps">${gaps.map(gap).join("")}</div>` : ""}
+      <details class="evb-all"><summary>Every score</summary><p class="note">${esc(rule)}</p><div class="cp-mapw"><table class="cp-map ev-table evb-table"><thead><tr><th>id</th><th>Content</th><th>Top category</th><th>Baseline</th><th>Expected</th></tr></thead><tbody>${ev.cases.map(c => { const p = preds[c.id]; if(!p) return ""; const ok = p.label === evGold(ev, c); return `<tr class="${ok ? "" : "bad"}"><td class="mono">${c.id}</td><td>${esc(c.text)}</td><td class="mono">${esc(p.top.replace("_", " "))} ${p.score.toFixed(2)}</td><td><b>${esc(p.label)}</b>${ok ? "" : ' <span class="ev-x">✕</span>'}</td><td>${esc(evGold(ev, c))}</td></tr>`; }).join("")}</tbody></table></div></details>
+      <div class="pol-run"><button type="button" class="btn sm" data-evb="keep">Keep in the runs table</button><button type="button" class="btn sm" data-evb="run">Run again</button><span class="note">${mt.n} cases in ${EVB.ms < 1000 ? EVB.ms + " ms" : (EVB.ms / 1000).toFixed(1) + " s"}, in this browser. The model stays cached here.</span></div>`;
+  } else {
+    body = `<p>Before your own classifier runs, see what a general toxicity model makes of these cases. <b>${esc(m.name)}</b> (${esc(m.lic)}) is ${esc(m.about)}. It downloads to this browser from the Hugging Face and jsDelivr CDNs, runs here, and <b>the text of your cases never leaves your browser</b>. Once downloaded it stays cached in this browser.</p>
+      <p class="note">${esc(rule)}</p>
+      ${stale ? `<p class="note">The cases changed since the baseline ran. Run it again to score the new set.</p>` : EVB.note ? `<p class="note">${esc(EVB.note)}</p>` : ""}
+      <div class="pol-run"><button type="button" class="btn primary" data-evb="run">${has ? "Run the baseline" : `Download and run (${m.mb} MB)`}</button><span class="note">${has ? "Already downloaded. A few seconds." : `${m.mb} MB once, plus about 4 MB of runtime, then a few seconds to score.`}</span></div>`;
+  }
+  return `<section class="card evb" id="evb" aria-label="Instant baseline">${head}<div class="card-b">${body}</div></section>`;
+}
+// Redraw only the card, so the rest of the page (the paste box, the gold labels) stays as the visitor left it
+function evbDraw(){
+  if(!evHere()) return;
+  const el = document.getElementById("evb"); if(!el) return;
+  const y = window.scrollY; el.outerHTML = evbCardHTML(); window.scrollTo(0, y);
+}
+const evbTick = force => { const t = Date.now(); if(force || t - EVB.last > 120){ EVB.last = t; evbDraw(); } };
+
+/* ---------- loading and scoring ---------- */
+async function evbLoad(m){
+  if(EVB.pipes[m.id]) return EVB.pipes[m.id];
+  EVB.lib = EVB.lib || await import(EVB_LIB);
+  const T = EVB.lib; T.env.allowLocalModels = false; T.env.useBrowserCache = true;
+  const pipe = await T.pipeline("text-classification", m.id, Object.assign({progress_callback:p => {
+    if(!p || EVB.state !== "loading") return;
+    if(p.status === "progress" && p.file){ EVB.files[p.file] = [p.loaded || 0, p.total || 0]; }
+    else if(p.status === "done" && p.file && EVB.files[p.file]) EVB.files[p.file][0] = EVB.files[p.file][1];
+    const f = Object.values(EVB.files); EVB.loaded = f.reduce((s, x) => s + x[0], 0); EVB.total = f.reduce((s, x) => s + x[1], 0); evbTick(p.status !== "progress");
+  }}, m.opts));
+  EVB.pipes[m.id] = pipe;
+  return pipe;
+}
+function evbErr(e){
+  const s = String(e && e.message || e || "");
+  if(/fetch|network|Failed to|404|load/i.test(s)) return "Couldn't download the model. Check the connection, and whether a blocker stops huggingface.co or cdn.jsdelivr.net, then try again.";
+  if(/WebAssembly|wasm|memory|backend/i.test(s)) return "This browser couldn't run the model. A current Chrome, Edge, Firefox or Safari on a desktop or a recent phone should work.";
+  return "The baseline couldn't run" + (s ? `: ${s.slice(0, 140)}` : ".");
+}
+async function evbRun(){
+  if(EVB.state === "loading" || EVB.state === "running") return;
+  const m = evbModel(), cases = ev.cases.slice(), key = evbKey(ev);
+  EVB.state = EVB.pipes[m.id] ? "running" : "loading"; EVB.err = ""; EVB.note = ""; EVB.stop = false; EVB.files = {}; EVB.loaded = 0; EVB.total = 0; EVB.done = 0; EVB.n = cases.length; evbDraw();
+  try{
+    const t0 = Date.now(), pipe = await evbLoad(m); EVB.loadMs = Date.now() - t0;
+    if(EVB.stop) return;
+    EVB.state = "running"; evbTick(true);
+    const t1 = Date.now(), scores = {};
+    for(const c of cases){
+      if(EVB.stop) return;
+      scores[c.id] = evbNorm(await pipe(String(c.text).slice(0, 2000), {top_k:null}));
+      EVB.done++; evbTick();
+    }
+    EVB.ms = Date.now() - t1; EVB.scores = scores; EVB.key = key; EVB.state = "done";
+  }catch(e){ if(!EVB.stop){ EVB.state = "error"; EVB.err = evbErr(e); } }
+  finally{ if(EVB.state === "loading" || EVB.state === "running") EVB.state = "idle"; evbDraw(); }
+}
+// The baseline's numbers next to the visitor's own runs, under its own name; never as the visitor's classifier
+function evbKeep(){
+  const preds = evbPreds(ev); if(!preds) return "";
+  const m = evbModel(), mt = evMetrics(ev, preds), name = "Baseline: " + m.name;
+  ev.runs = (ev.runs || []).filter(r => r.name !== name).concat([{t:Date.now(), name, n:mt.n, acc:mt.acc, pr:mt.main ? mt.main.pr : null, rc:mt.main ? mt.main.rc : null}]).slice(-6);
+  evSave(); return `Kept as "${name}". It appears under Runs in the report.`;
+}
+function evbAct(a){
+  switch(a){
+    case "run": return evbRun();
+    case "alt": if(EVB_MODELS[EVB.model + 1]){ EVB.model++; EVB.state = "idle"; EVB.err = ""; } return evbRun();
+    case "stop": EVB.stop = true; EVB.note = EVB.state === "loading" ? "Stopped. Whatever had downloaded stays cached, so the next click starts further along." : "Stopped."; EVB.state = "idle"; return evbDraw();
+    case "keep": return gsay(evbKeep());
+  }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest && e.target.closest("[data-evb]");
+  if(!b || !evHere() || !view.contains(b)) return;
+  evbAct(b.dataset.evb);
+});
+/* =========================================================
+   STARTER EXPORTS: from a decision to something you can build
+   Three files a team can start from: Osprey starter rules (SML) and a Coop setup checklist from a pre-mortem
+   report, and a policy file for open models from the stress-tester's rewrite. Every output is a starter,
+   untested: nothing here has run against a real deployment, and every platform-specific value is a TODO.
+   Syntax and names were checked against github.com/roostorg/osprey (docs.roost.tools/osprey/latest/rules/,
+   example_rules/, docs/rules/configuration.md) and github.com/roostorg/coop (docs/user, docs/api,
+   server/graphql/modules) on 2026-10-03. The workbench is independent and not affiliated with ROOST.
+   Pure generators: rxOsprey(r, pm), rxCoop(r, pm, pol, ev), rxPolicyFile(pol, ev). UI: rxBuildHTML(r), rxPolicyBtnHTML().
+   ========================================================= */
+const RX_WIP = "starter, untested";
+const RX_TOP = 5;
+const RX_SITE = "https://stevenmacchia.com/ts-workbench/";
+const RX_OSPREY_DOCS = "https://docs.roost.tools/osprey/latest/rules/", RX_OSPREY_REPO = "https://github.com/roostorg/osprey";
+const RX_COOP_DOCS = "https://github.com/roostorg/coop/tree/main/docs";
+const RX_PENALTIES = ["NONE", "LOW", "MEDIUM", "HIGH", "SEVERE"]; // as GET /api/v1/policies/ returns it (coop/docs/api/policies.md)
+const rxDate = () => new Date().toISOString().slice(0, 10);
+const rxTop = (r, n) => (r && r.risks ? r.risks : []).slice(0, n || RX_TOP);
+const rxIdent = s => String(s || "x").split(/[^a-z0-9]+/i).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join("") || "Risk";
+const rxPlain = s => String(s || "").replace(/["{}\\]/g, "").replace(/\s+/g, " ").trim();
+const rxWrap = (text, prefix, width) => { const out = [], words = rxPlain(text).split(" "); let line = ""; width = width || 100;
+  words.forEach(w => { if((line + " " + w).trim().length > width){ out.push(prefix + line.trim()); line = w; } else line = (line + " " + w).trim(); });
+  if(line) out.push(prefix + line); return out; };
+const rxProfile = p => [labelOf(PLATFORMS, p.type), labelOf(YOUTH, p.youth), labelOf(IDENTITY, p.identity), labelOf(CONTACT, p.contact), `money: ${p.money.map(k => labelOf(MONEY, k)).join(", ") || "none"}`, `regions: ${p.regions.map(k => k.toUpperCase()).join(", ") || "none"}`, labelOf(SCALE, p.scale)].filter(x => x && x !== "Not answered").join("; ");
+const rxPenalty = band => ({crit:"SEVERE", high:"HIGH", med:"MEDIUM", low:"LOW"})[band] || "LOW";
+// A rule's harm area, from the words in it, for filing the stress-tested rule under the right parent policy
+const RX_KEYWORDS = [["child", /\b(child|children|minor|minors|under.?age|under 18|grooming|csam)\b/i, "Child safety"], ["harass", /\b(harass|bully|bullying|intimidat|hate|slur|abus)/i, "Harassment"],
+  ["fraud", /\b(scam|fraud|phish|mislead|trick)/i, "Scams and fraud"], ["sexual", /\b(nudity|sexual|porn|intimate|explicit)\b/i, "Nudity and sexual content"], ["selfharm", /\b(self.?harm|suicide|eating disorder)\b/i, "Self-harm"],
+  ["violent", /\b(violen|terror|extremis|gore|graphic)/i, "Violence"], ["integrity", /\b(spam|bot|fake account|manipulat|inauthentic)/i, "Spam and platform integrity"], ["illegal", /\b(drug|weapon|firearm|counterfeit|regulated goods|illegal)/i, "Illegal and regulated goods"],
+  ["privacy", /\b(doxx|personal (data|information)|private information|address|surveil)/i, "Privacy"], ["ai", /\b(deepfake|generated|jailbreak|prompt)\b/i, "AI misuse"]];
+const rxRuleCat = text => { const m = RX_KEYWORDS.find(([, re]) => re.test(text || "")); return m ? {cat:m[0], n:m[2]} : null; };
+
+/* ---------- Osprey: placeholder features and one starter rule per harm ---------- */
+// name: [annotation, JSON path, what it means]. Every path is a placeholder for a field your events may not carry.
+const RX_FEAT = {
+  AccountAgeSeconds:["int", "$.user.account_age_seconds", "seconds since the account was created"],
+  IsVerified:["bool", "$.user.is_verified", "the account passed email, phone or ID verification"],
+  ReportsReceived24h:["int", "$.user.reports_received_24h", "reports filed against this user in the last 24 hours, computed upstream"],
+  NewRecipients1h:["int", "$.user.new_recipients_1h", "distinct people this user messaged for the first time in the last hour, computed upstream"],
+  IsFirstContact:["bool", "$.message.is_first_contact", "the sender has never messaged this recipient before"],
+  RecipientIsMinor:["bool", "$.recipient.is_minor", "the recipient is under 18, from your age signal"],
+  MentionsOffPlatform:["bool", "$.content.mentions_off_platform", "the text asks to move to another app, a phone number or a meeting"],
+  ContainsLink:["bool", "$.content.contains_link", "the text contains a URL"],
+  MediaHashMatch:["bool", "$.media.hash_match", "a match against a known-abuse hash list from your hash-matching service, such as HMA"],
+  ClassifierLabel:["Optional[str]", "$.content.classifier_label", "the label your text or media classifier gave this content, if it ran"],
+  ClassifierScore:["float", "$.content.classifier_score", "that classifier's confidence, 0 to 1"],
+  PostsCreated1h:["int", "$.user.posts_created_1h", "posts or listings created in the last hour, computed upstream"],
+  DuplicateContent24h:["int", "$.content.duplicate_count_24h", "how many times this exact text was posted in the last day, computed upstream"],
+  PaymentsSent1h:["int", "$.user.payments_sent_1h", "payments or transfers sent in the last hour, computed upstream"],
+  CountryMismatch:["bool", "$.session.country_mismatch", "the session country differs from the account's usual country"],
+  LoginFailures1h:["int", "$.user.login_failures_1h", "failed logins on this account in the last hour, computed upstream"],
+  NewDevice:["bool", "$.session.new_device", "the device has not been seen on this account before"],
+  LinkedBannedAccounts:["int", "$.device.linked_banned_accounts", "banned accounts that share this device or network fingerprint"],
+  IncludesPersonalData:["bool", "$.content.includes_personal_data", "the text contains an address, phone number, ID number or similar"],
+  PromptSafetyLabel:["Optional[str]", "$.prompt.safety_label", "the label your prompt or output filter gave this request, if it ran"],
+  PromptsBlocked24h:["int", "$.user.prompts_blocked_24h", "requests this user had blocked in the last day, computed upstream"]
+};
+// Starter signals per harm area, overridden for a few specific harms. event: the placeholder event name; when: conditions
+// over the features above; label: what the rule adds to the user; days: label expiry; note: how to read the rule.
+const RX_SIG = {
+  child:{event:"send_message", when:["RecipientIsMinor == True", "IsFirstContact == True", "AccountAgeSeconds < 604800", "NewRecipients1h >= 5"], label:"minor_contact_review", days:7, note:"A new account opening many first conversations with minors. Send to a trained reviewer; do not act automatically."},
+  csam:{event:"upload_media", when:["MediaHashMatch == True"], label:"csam_hash_match", days:30, note:"A hash match against a known-CSAM list. Preserve evidence and follow your legal reporting process (NCMEC in the US). Confirm before any user-facing action."},
+  grooming:{event:"send_message", when:["RecipientIsMinor == True", "AccountAgeSeconds < 604800", "NewRecipients1h >= 5", "MentionsOffPlatform == True"], label:"grooming_review", days:7, note:"A new account contacting many minors and trying to move them off the platform. Route to a reviewer trained in child safety."},
+  underage:{event:"create_account", when:["ClassifierLabel == 'likely_minor'"], label:"age_review", days:30, note:"Your age signal thinks a new account on an adult-only service belongs to a minor. Hold access until checked."},
+  sexual:{event:"send_message", when:["ClassifierLabel == 'sexual'", "IsFirstContact == True", "ReportsReceived24h >= 1"], label:"sexual_abuse_review", days:7, note:"Unsolicited sexual content to someone the sender has never spoken to, already reported once."},
+  fraud:{event:"send_message", when:["ContainsLink == True", "AccountAgeSeconds < 86400", "NewRecipients1h >= 10"], label:"scam_pattern", days:7, note:"A day-old account sending links to many strangers. Classic scam outreach; rate-limit or review."},
+  fincrime:{event:"send_payment", when:["AccountAgeSeconds < 86400", "PaymentsSent1h >= 5", "CountryMismatch == True"], label:"fincrime_review", days:30, note:"Rapid payments from a new account in an unexpected country. Hold for review rather than block outright."},
+  security:{event:"login", when:["LoginFailures1h >= 10", "NewDevice == True"], label:"takeover_suspect", days:1, note:"Many failed logins then a new device: a possible account takeover or credential stuffing. Step up authentication."},
+  harass:{event:"send_message", when:["ReportsReceived24h >= 3", "ClassifierLabel == 'harassment'"], label:"harassment_review", days:7, note:"Repeated reports plus a classifier hit. Review the pattern, not the single message."},
+  violent:{event:"create_post", when:["ClassifierLabel == 'violent_extremist'", "ClassifierScore >= 0.8"], label:"violent_content_review", days:7, note:"A confident classifier hit for violent or extremist content. Hash lists (e.g. GIFCT) are a second signal to add."},
+  selfharm:{event:"create_post", when:["ClassifierLabel == 'self_harm'", "ClassifierScore >= 0.8"], label:"selfharm_outreach", days:7, note:"Not an enforcement rule. Use the label to show support resources and route to a trained reviewer; never punish the person at risk."},
+  privacy:{event:"create_post", when:["IncludesPersonalData == True", "ReportsReceived24h >= 1"], label:"doxxing_review", days:7, note:"Personal data in a post that someone has already reported. Review quickly: harm compounds while it stays up."},
+  physical:{event:"send_message", when:["MentionsOffPlatform == True", "ReportsReceived24h >= 1", "AccountAgeSeconds < 604800"], label:"physical_safety_review", days:7, note:"A new account pushing to meet or move off the platform and already reported. A reviewer should see the conversation."},
+  integrity:{event:"create_post", when:["PostsCreated1h >= 20", "DuplicateContent24h >= 5", "not HasLabel(entity=UserId, label='trusted')"], label:"spam_suspect", days:7, note:"High volume of repeated content from an account you have not marked trusted. Rate-limit first, review second."},
+  illegal:{event:"create_listing", when:["ClassifierLabel == 'regulated_goods'"], label:"regulated_goods_review", days:7, note:"A listing your classifier thinks is a regulated or prohibited item. Hold it from search until reviewed."},
+  ai:{event:"ai_prompt", when:["PromptSafetyLabel == 'disallowed'", "PromptsBlocked24h >= 5"], label:"ai_misuse_review", days:7, note:"Repeated blocked requests in a day: someone probing the filters. Review the account rather than each prompt."}
+};
+function rxOsprey(r, p){
+  p = p || pm; const risks = rxTop(r), date = rxDate(), name = p.name || "Untitled assessment", L = [];
+  const c = (s = "") => L.push(s ? "# " + s : "#");
+  c(`Osprey starter rules for: ${rxPlain(name)}`); c(`STARTER, UNTESTED. Generated by T&S Workbench (${RX_SITE}) on ${date}.`);
+  c("The workbench is independent and not affiliated with ROOST. Nothing here has run against an Osprey deployment."); c();
+  c(`Profile: ${rxProfile(p)}.`); c();
+  c(`What this is: one starter rule per top risk from the abuse pre-mortem (${risks.length} of ${r.risks.length} risks), over placeholder`);
+  c("features. Every feature path, event name and threshold is a guess about your events, marked TODO(platform). Rules add");
+  c("labels only; anything that acts on a user (a ban, a queue hand-off, a notification) is a plugin UDF you register."); c();
+  c(`Verified against Osprey's docs and example ruleset on ${date}:`); c(`  ${RX_OSPREY_DOCS}`); c(`  ${RX_OSPREY_REPO}/tree/main/example_rules`); c(`  ${RX_OSPREY_REPO}/blob/main/docs/rules/configuration.md`);
+  c("Constructs used: Entity[str] = EntityJson(type=, path=, coerce_type=True); JsonData(path=, coerce_type=True, required=False);");
+  c("GetActionName(); Rule(when_all=[...], description=...); WhenRules(rules_any=[...], then=[...]); LabelAdd(entity=, label=,");
+  c("expires_after=TimeDelta(days=)); HasLabel(entity=, label=); ==, !=, <, >= and not. The docs show int, str, List[str] and");
+  c("Optional[str] annotations; bool and float below are not in Osprey's examples, so check your deployment's UDF registry.");
+  c("Layout: one file. The example ruleset splits models/ and rules/ and composes them with Import(rules=[...]) and");
+  c("Require(rule=...); do the same once this grows. Labels must be declared in config/labels.yaml: a starter block is at the end."); c();
+  // features: the base entities plus whatever the chosen rules use
+  const used = new Set(); const sigOf = x => RX_SIG[x.id] || RX_SIG[x.cat] || null;
+  risks.forEach(x => { const s = sigOf(x); if(s) s.when.forEach(w => Object.keys(RX_FEAT).forEach(f => { if(new RegExp("\\b" + f + "\\b").test(w)) used.add(f); })); });
+  L.push("", "# ---- Features (models). Entities persist across events so labels can stick to them. ----", "# TODO(platform): the field that identifies the acting user");
+  L.push("UserId: Entity[str] = EntityJson(", "  type='User',", "  path='$.user_id',", "  coerce_type=True,", ")", "", "# TODO(platform): the field that names the event, e.g. create_post, send_message, upload_media");
+  L.push("EventType: str = JsonData(path='$.event_type', coerce_type=True)", "", "ActionName = GetActionName()", "");
+  [...used].sort().forEach(f => { const [t, path, what] = RX_FEAT[f]; L.push(`# TODO(platform): ${what}`); L.push(`${f}: ${t} = JsonData(path='${path}'${t.startsWith("Optional") ? ", required=False" : ""})`); L.push(""); });
+  // one rule per risk
+  const labels = [];
+  risks.forEach((x, i) => {
+    const s = sigOf(x), ident = rxIdent(x.id) + "Starter";
+    L.push("# " + "-".repeat(98)); L.push(`# Risk ${i + 1} of ${risks.length}: ${rxPlain(x.n)} (${CATS[x.cat]})`);
+    L.push(`# Pre-mortem rating: ${BANDS[x.band][0]}: ${SEVL[x.sev]} severity x ${LIKL[x.lik]} likelihood`);
+    const why = x.drivers.map(d => d[2]).concat(x.ups.map(u => u[1])).slice(0, 3); if(why.length) rxWrap("Why: " + why.join("; ") + ".", "# ").forEach(l => L.push(l));
+    if(!s){ L.push("# This risk is about readiness, not something a per-event rule can detect. No rule generated."); L.push("# " + "-".repeat(98), ""); return; }
+    rxWrap("Starter signal: " + s.note, "# ").forEach(l => L.push(l));
+    L.push(`# TODO(platform): replace '${s.event}' with your event name and tune every threshold against your own data.`); L.push("# " + "-".repeat(98));
+    L.push(`${ident} = Rule(`, "  when_all=[", `    EventType == '${s.event}',`); s.when.forEach(w => L.push(`    ${w},`)); L.push("  ],", `  description="${RX_WIP}: ${rxPlain(x.n)}",`, ")", "");
+    L.push("# TODO(platform): add an effect from your UDF registry to hand this to review. Osprey ships labels and verdicts;");
+    L.push("# bans and queue hand-offs are plugin UDFs (see example_plugins/ in the Osprey repo).");
+    L.push("WhenRules(", `  rules_any=[${ident}],`, "  then=[", `    LabelAdd(entity=UserId, label='${s.label}', expires_after=TimeDelta(days=${s.days})),`, "  ],", ")", "");
+    labels.push([s.label, x.n]);
+  });
+  L.push("# ---- config/labels.yaml: copy this block into that file so the labels above validate ----");
+  L.push("# connotation: the Osprey UI docs name Negative, Positive and Neutral labels; the example file writes positive in lowercase.");
+  L.push("# labels:"); labels.forEach(([lab, n]) => { L.push(`#   ${lab}:`, "#     valid_for: [User]", "#     connotation: negative", `#     description: "${RX_WIP}: ${rxPlain(n)} (T&S Workbench)"`); });
+  if(!labels.length) L.push("#   (no labels: none of the top risks produced a rule)");
+  return L.join("\n") + "\n";
+}
+
+/* ---------- Coop: a setup checklist for the review console ---------- */
+const RX_CONTENT_TYPES = {posts:["Post", "text, media, link, author, created_at"], media:["Media upload", "file, type, author, created_at"], dm:["Message", "text, sender, recipient, thread, created_at"], listings:["Listing", "title, description, price, images, seller, created_at"],
+  reviews:["Review", "text, rating, author, subject, created_at"], live:["Live stream", "title, streamer, started_at (plus clips or transcripts if you keep them)"], files:["File upload", "file, type, uploader, created_at"], ai_gen:["Generated media", "prompt, output, user, created_at"], ai_chat:["AI message", "prompt, reply, user, conversation, created_at"]};
+const RX_THREAD_TYPES = {dm:["Direct message thread", "participants, messages"], groups:["Group", "name, members, messages"], posts:["Comment thread", "post, comments"], ai_chat:["AI conversation", "user, messages"]};
+function rxCoop(r, p, po, e){
+  p = p || pm; po = po === undefined ? (typeof pol !== "undefined" ? pol : null) : po; e = e === undefined ? (typeof ev !== "undefined" ? ev : null) : e;
+  const risks = rxTop(r), c = r.c, date = rxDate(), name = p.name || "Untitled assessment", L = [];
+  const cats = []; risks.forEach(x => { if(!cats.includes(x.cat)) cats.push(x.cat); });
+  const child = cats.includes("child") || cats.includes("sexual") || c.hostsMedia, media = c.hostsMedia, text = risks.some(x => ["harass", "fraud", "violent", "selfharm", "privacy", "illegal", "sexual"].includes(x.cat));
+  L.push(`# Coop setup checklist: ${name}`, "", `_Starter, untested. Generated by T&S Workbench (${RX_SITE}) on ${date} from the abuse pre-mortem "${name}" (${rxProfile(p)}). Coop is ROOST's open-source review console; the workbench is independent and not affiliated with ROOST. Names and fields below were checked against Coop's docs and schema on ${date} (${RX_COOP_DOCS}); check them again before you build, and treat every suggestion as a draft for your team to change._`, "");
+  L.push("Coop is configured in its UI: **Settings → Item Types**, **Settings → Actions**, the **Policies** dashboard, **Review Console → Queues** and **Routing**, **Automated Enforcement → Proactive Rules** and **User Strikes**. Its REST API (`docs/api`) submits items, reports and appeals and reads policies, actions and item types; it does not create them. So this is a checklist to work through in the UI.", "");
+  // 1. policies
+  L.push("## 1. Policies (Policies dashboard)", "", `One parent per harm area in the top ${risks.length} risks, one child per risk. Each policy has a **Policy Name**, a **Policy Definition** (\`policyText\`), **Enforcement Guidelines** (\`enforcementGuidelines\`) and a parent (\`parentId\`). The Policies API also returns a \`penalty\` of ${RX_PENALTIES.join(", ")}; the suggestions below come from the pre-mortem's rating of each risk, so adjust them to your own enforcement ladder.`, "");
+  const polRule = po && po.rule ? (po.result && po.result.rewrite ? po.result.rewrite : po.rule) : "", polCat = polRule ? rxRuleCat(polRule) : null;
+  const evRule = e && e.policy && e.policy.trim() && e.policy.trim() !== (po && po.rule || "").trim() && e.policy.trim() !== polRule.trim() ? e.policy.trim() : "", evCat = evRule ? rxRuleCat(evRule) : null;
+  cats.forEach(k => {
+    L.push(`- [ ] Parent policy: **${CATS[k]}**. policyText: TODO, one sentence on what this area covers. enforcementGuidelines: TODO.`);
+    risks.filter(x => x.cat === k).forEach(x => {
+      const own = polCat && polCat.cat === k ? polRule : evCat && evCat.cat === k ? evRule : "";
+      L.push(`  - [ ] Child policy: **${x.n}**. Suggested penalty: ${rxPenalty(x.band)} (the pre-mortem rates this ${BANDS[x.band][0].toLowerCase()}; adjust).`);
+      L.push(own ? `    - policyText (from your ${polCat && polCat.cat === k ? "stress-tested rule" : "classifier eval's rule"}): "${rxPlain(own)}"` : `    - policyText: TODO. Draft from the pre-mortem's description of the harm, rewritten as a rule: "${rxPlain(x.d)}"`);
+      L.push(`    - enforcementGuidelines: TODO, what reviewers do on a first and a repeat violation. Safeguards the pre-mortem lists: ${x.sgs.slice(0, 3).map(id => SG[id] ? SG[id].t.split(",")[0].split("(")[0].trim() : id).join("; ")}.`);
+    });
+  });
+  if(polRule && !(polCat && cats.includes(polCat.cat))){ const ck = po.result && po.result.reviewer_checklist && po.result.reviewer_checklist.length ? po.result.reviewer_checklist.slice(0, 3).map(rxPlain).join(" ") : "";
+    L.push(`- [ ] Parent policy: **${polCat ? polCat.n : "Your stress-tested rule"}**. Suggested penalty: TODO.`, `  - policyText (${po.result && po.result.rewrite ? "the rewrite from" : "from"} the policy stress-tester): "${rxPlain(polRule)}"`, `  - enforcementGuidelines: ${ck ? `from the stress-tester's reviewer checklist: ${ck}` : "TODO"}`); }
+  if(evRule && !(evCat && cats.includes(evCat.cat))) L.push(`- [ ] Parent policy: **${evCat ? evCat.n : "Rule from the classifier eval"}**. Suggested penalty: TODO.`, `  - policyText (from the classifier eval${e.name ? `, "${rxPlain(e.name)}"` : ""}): "${rxPlain(evRule)}"`, "  - enforcementGuidelines: TODO");
+  L.push(`- [ ] Delete or merge anything above that duplicates a policy you already have. ${r.risks.length - risks.length > 0 ? `The pre-mortem has ${r.risks.length - risks.length} more risks; add policies for them as you go.` : ""}`.trim(), "");
+  // 2. item types
+  L.push("## 2. Item types (Settings → Item Types)", "", "Coop has three kinds: **Content**, **User** and **Thread**. Each item type has a name, a description and a schema of fields reviewers see and rules can use. Suggested from the pre-mortem's capabilities:", "");
+  L.push("- [ ] User: **User** (the default user type). Fields: TODO, e.g. username, display name, account age, verification status, age band, country.");
+  const ct = Object.keys(RX_CONTENT_TYPES).filter(k => p.features.includes(k)); ct.forEach(k => L.push(`- [ ] Content: **${RX_CONTENT_TYPES[k][0]}**. Fields: TODO, e.g. ${RX_CONTENT_TYPES[k][1]}.`));
+  if(p.features.includes("profiles")) L.push("- [ ] Content or User fields: **Profile** (bio, photo, links). Decide whether profiles are their own content type or fields on the user; Coop's docs use a profile as the schema example.");
+  const tt = Object.keys(RX_THREAD_TYPES).filter(k => p.features.includes(k)); tt.forEach(k => L.push(`- [ ] Thread: **${RX_THREAD_TYPES[k][0]}**. Fields: TODO, e.g. ${RX_THREAD_TYPES[k][1]}.`));
+  if(p.features.includes("voice")) L.push("- [ ] Voice and video calls: no content item unless you keep recordings or transcripts. TODO: decide what, if anything, a reviewer can see.");
+  if(!ct.length && !tt.length) L.push("- [ ] No user-generated content types from the capabilities chosen. Reports will mostly be about users: TODO, confirm the User type carries what reviewers need.");
+  L.push("");
+  // 3. actions
+  L.push("## 3. Actions (Settings → Actions)", "", "Each action has a name, a description, the item types it applies to, a penalty (" + RX_PENALTIES.join("/") + ") and whether it counts toward user strikes. Coop's kinds: **Custom** (Coop POSTs to a callback URL on your platform), **Enqueue to review**, **Enqueue author to review** and **Enqueue to NCMEC**.", "");
+  const act = (n, kind, types, pen, strikes, note) => L.push(`- [ ] **${n}**: ${kind}. Item types: ${types}. Penalty: ${pen}. User strikes: ${strikes}.${note ? " " + note : ""}`);
+  if(ct.length) act("Remove content", "Custom, callback URL TODO", "every content type", "LOW", "yes", "");
+  act("Warn user", "Custom, callback URL TODO", "User", "LOW", "yes", "Tell the user which rule they broke and how to appeal.");
+  act("Restrict account", "Custom, callback URL TODO", "User", "MEDIUM", "yes", "For example no messaging or posting for 7 days.");
+  act("Suspend user", "Custom, callback URL TODO", "User", "HIGH", "yes", "");
+  act("Ban user", "Custom, callback URL TODO", "User", "SEVERE", "yes", "Hide this action in triage queues (section 4).");
+  act("Send to review", "Enqueue to review", "every type", "NONE", "no", "For proactive rules that should not act on their own.");
+  if(ct.length) act("Send author to review", "Enqueue author to review", "every content type", "NONE", "no", "When the pattern matters more than the item.");
+  if(child) act("Enqueue to NCMEC", "Enqueue to NCMEC", "User and media types", "NONE", "no", "Creates an NCMEC review job (section 4). US providers must report CSAM to NCMEC's CyberTipline; TODO, your legal process elsewhere.");
+  if(c.moneyMoves) act("Hold payment or payout", "Custom, callback URL TODO", "User" + (p.features.includes("listings") ? ", Listing" : ""), "MEDIUM", "no", "Hold, don't reverse, until a reviewer decides.");
+  if(risks.some(x => x.cat === "selfharm")) act("Show support resources", "Custom, callback URL TODO", "User", "NONE", "no", "Not an enforcement action: never count it as a strike.");
+  L.push("- [ ] Verify each callback URL's webhook signature on your side (Coop's docs: Handling Actions, `docs/api/actions.md`).", "");
+  // 4. queues
+  L.push("## 4. Queues (Review Console)", "", "A queue has a name, a description, assigned reviewers, **hidden actions** (actions reviewers in this queue cannot take), an appeals flag and auto-close. Two moderators never get the same job.", "");
+  L.push("- [ ] **Triage**: the default queue for anything not routed elsewhere. Hidden actions: Ban user. Reviewers: TODO.");
+  cats.forEach(k => L.push(`- [ ] **${CATS[k]}**: reports and rule hits under that parent policy. Hidden actions: ${k === "selfharm" ? "Ban user, Suspend user (support, not punishment)" : "none, or Ban user if juniors staff it"}. Reviewers: ${k === "child" ? "trained child-safety reviewers only (Child Safety Moderator role)" : "TODO"}.`));
+  if(child) L.push("- [ ] **NCMEC review jobs**: Coop creates these itself (job kind NCMEC) from hash matches (HMA), Google's Content Safety API, user reports flagged as CSAM and the Enqueue to NCMEC action, grouping a user's media into one job. Only Admin, Moderator Manager and Child Safety Moderator roles can see them. TODO: NCMEC org settings (CyberTipline credentials, contact email, media review requirement: review all media, or a minimum). Outside the US, TODO: your national reporting body. Pair with moderator wellness settings (blur, grayscale, mute).");
+  L.push("- [ ] **Appeals**: an appeals queue (`isAppealsQueue`), staffed by someone other than the original reviewer. Appeals arrive through `POST /api/v1/report/appeal`.", "");
+  // 5. routing
+  L.push("## 5. Routing rules (Review Console → Routing)", "", "Routing rules send incoming reports to a queue. They are evaluated in order and the first match wins; each has a name, item types, a condition set and a destination queue. Appeals have their own rule list.", "");
+  let n = 1; if(child) L.push(`- [ ] ${n++}. Report reason is child safety → **${cats.includes("child") ? CATS.child : "Triage"}**${cats.includes("child") ? "" : " (or a dedicated child-safety queue)"}. Coop routes reports flagged as CSAM to NCMEC review itself.`);
+  cats.forEach(k => { if(k === "child") return; L.push(`- [ ] ${n++}. Report policy is under **${CATS[k]}** → **${CATS[k]}** queue.`); });
+  L.push(`- [ ] ${n++}. Everything else → **Triage**.`, "- [ ] Appeals rule: every appeal → **Appeals**.", "- [ ] Reporting reasons in your product match the parent policies above, so routing has something to match on.", "");
+  // 6. automation
+  L.push("## 6. Automated enforcement (Automated Enforcement → Proactive Rules, User Strikes)", "", "Proactive rules evaluate submitted items against conditions over signals and matching banks (text banks of phrases and regexes, hash banks through HMA, location banks); every matching rule fires. Start with rules that send to review, not rules that act.", "");
+  if(risks.some(x => x.cat === "fraud")) L.push("- [ ] Text bank: scam phrases and payment-app handles seen in reports. Rule: match → Send to review.");
+  if(media) L.push("- [ ] Hash bank through HMA: known CSAM" + (risks.some(x => x.cat === "violent") ? " and terrorist content" : "") + ". Rule: match → Enqueue to NCMEC or Send to review.");
+  if(text) L.push("- [ ] Classifier signal (OpenAI Moderation API, Zentropi CoPE or your own, under Settings → Integrations): high confidence → Send to review; never remove on a classifier alone until you have measured its precision (the classifier eval can help).");
+  if(p.features.includes("location") || p.features.includes("meetups")) L.push("- [ ] Location bank: places you cannot serve or that are off limits. Rule: match → Send to review.");
+  L.push("- [ ] User strikes: Policy Scores per policy above (start with the suggested penalties), Strike Enabled Actions (Remove content, Warn, Restrict, Suspend), Thresholds (e.g. restrict at 3, suspend at 5 in 90 days). TODO, your numbers.", "");
+  // 7. integrations and go-live
+  L.push("## 7. Integrations and go-live", "");
+  if(child) L.push("- [ ] NCMEC CyberTipline and Hasher-Matcher-Actioner (HMA) integrations, if you host media and serve US users.", "- [ ] Google Content Safety API for novel CSAM detection, if you qualify for access.");
+  if(text) L.push("- [ ] A text classifier integration: OpenAI Moderation API, Zentropi CoPE (a policy-following classifier; the workbench's policy stress-tester can export your rule as a policy file) or a custom one.");
+  L.push("- [ ] Submit items with `POST /api/v1/items/async/` and reports with `POST /api/v1/report`, with your API key in the `X-API-KEY` header (Settings → API Keys).", "- [ ] Roles: who is Admin, Moderator Manager, Rules Manager, Moderator, Child Safety Moderator.", "- [ ] Log every decision for your transparency report and statements of reasons (the pre-mortem's enforcement_log safeguard).", "- [ ] Run a tabletop on your top risk before the queue goes live.", "");
+  L.push(`_${RX_WIP.charAt(0).toUpperCase() + RX_WIP.slice(1)}. Generated from the pre-mortem's top ${risks.length} risks: ${risks.map(x => x.n).join("; ")}._`);
+  return L.join("\n") + "\n";
+}
+
+/* ---------- Policy file: the stress-tester's rewrite in the four-part format evPolicyDoc writes ---------- */
+function rxPolicyName(po){ const t = (po.result && po.result.rewrite) || po.rule || "", k = rxRuleCat(t); if(k) return k.n; const w = rxPlain(t).replace(/[^\w\s'-]/g, " ").trim().split(/\s+/).filter(Boolean).slice(0, 6).join(" "); return w || "Rule from the stress-tester"; }
+function rxPolicyFile(po, e){
+  po = po === undefined ? (typeof pol !== "undefined" ? pol : null) : po; e = e === undefined ? (typeof ev !== "undefined" ? ev : null) : e;
+  const r = po && po.result; if(!r || !r.rewrite || typeof evPolicyDoc !== "function") return "";
+  const name = rxPolicyName(po), rewrite = r.rewrite.trim();
+  let doc = evPolicyDoc({name, policy:rewrite, content:"", labels:"binary"});
+  const ctx = [labelOf(PLATFORMS, po.type), po.youth ? labelOf(YOUTH, po.youth) : "", (po.regions || []).length ? po.regions.map(k => k.toUpperCase()).join(", ") : ""].filter(Boolean).join(", ");
+  const head = `_Starter, untested. The rule below is the rewrite Claude suggested in T&S Workbench's policy stress-tester on ${rxDate()}${ctx ? ` for ${ctx}` : ""}; your original read: "${rxPlain(po.rule)}". Nothing here has been tested against a model. Review every line, then fill in or delete every TODO._`;
+  doc = doc.replace(/^(# Policy: [^\n]*\n)/, `$1\n${head}\n`);
+  // terms the stress-test flagged, where the rewrite still uses them
+  const terms = (r.vague_terms || []).filter(v => v && v.term && v.suggest && new RegExp("\\b" + v.term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(rewrite));
+  if(terms.length) doc = doc.replace("- **Term**: TODO.", terms.map(v => `- **${rxPlain(v.term)}**: ${rxPlain(v.suggest)} _(TODO: confirm; the stress-test flagged this word as one reviewers read differently)_`).join("\n") + "\n- **Term**: TODO.");
+  // decisions from the stress-test, as guidance. Never a case the classifier eval tests on: the model would read the answers.
+  const evTexts = new Set(((e && e.cases) || []).map(x => rxPlain(x.text).toLowerCase()));
+  const cases = (r.edge_cases || []).filter(x => x && x.case && !evTexts.has(rxPlain(x.case).toLowerCase()));
+  const word = {allow:"Allowed", remove:"Violates", escalate:"Unclear"};
+  const extra = [];
+  if(cases.length){ extra.push("Decisions from the stress-test, as guidance (not test cases):", "");
+    cases.forEach(x => extra.push(`- ${word[x.decision] || "Decide"}: ${rxPlain(x.reasoning || "")}${x.reasoning ? " " : ""}(for example: ${rxPlain(x.case)})${x.decision === "escalate" ? ". TODO: pick the label such cases get, or keep them out of automated labeling and send them to a reviewer" : ""}.`));
+    extra.push("", "TODO: if you run the classifier eval on this rule, keep its test cases distinct from these examples, or delete this list; a model that has read the answers tells you nothing.", ""); }
+  if((r.gaps || []).length){ extra.push("Gaps the stress-test found, to decide here:", ""); r.gaps.forEach(g => { if(g && g.gap) extra.push(`- ${rxPlain(g.gap)}: TODO.${g.why ? " " + rxPlain(g.why) : ""}`); }); extra.push(""); }
+  if(extra.length) doc = doc.replace("\n## Definition of Labels", "\n" + extra.join("\n") + "\n## Definition of Labels");
+  return doc;
+}
+
+/* ---------- UI: a Build it panel in the pre-mortem report, a button in the rewrite tab ---------- */
+const RX_EXPORTS = [
+  {id:"osprey", fn:"rxOsprey", n:"Osprey starter rules", file:"osprey-starter-<name>.sml", from:"the pre-mortem's top risks"},
+  {id:"coop", fn:"rxCoop", n:"Coop setup checklist", file:"coop-checklist-<name>.md", from:"the pre-mortem's top risks and your policies"},
+  {id:"policy", fn:"rxPolicyFile", n:"Policy file for open models", file:"policy-<name>.md", from:"the stress-tester's rewrite"}
+];
+const rxIcon = () => typeof DL !== "undefined" && DL ? `<svg><use href="#i-download"/></svg>` : icon("copy");
+const rxVerb = () => typeof DL !== "undefined" && DL ? "Download" : "Copy";
+function rxBuildHTML(r){
+  if(!r || !r.risks || !r.risks.length) return "";
+  const n = rxTop(r).length, fname = slug(pm.name);
+  return `<section class="card rx-build" aria-labelledby="rx-h">
+    <div class="rx-h"><span class="eyebrow">Build it</span><span class="wip-tag">Starter, untested</span></div>
+    <h3 id="rx-h">From this report to files you can start from</h3>
+    <p>Two starters from the top ${n} risks: rules for Osprey, ROOST's open-source rules engine, and a setup checklist for Coop, its review console. Every platform-specific value is a TODO, and nothing has run against a real deployment. The workbench is independent of ROOST.</p>
+    <div class="row rx-acts"><button type="button" class="btn sm" data-rx="osprey">${rxIcon()}Osprey starter rules</button><button type="button" class="btn sm" data-rx="coop">${rxIcon()}Coop checklist</button><span class="toast" id="rx-toast" aria-live="polite"></span></div>
+    <p class="note rx-files"><span class="mono">osprey-starter-${esc(fname)}.sml</span> · <span class="mono">coop-checklist-${esc(fname)}.md</span>${typeof pol !== "undefined" && pol && pol.result && pol.result.rewrite ? " · The Coop checklist includes your stress-tested rule." : ""}</p>
+  </section>`;
+}
+function rxPolicyBtnHTML(){
+  if(typeof pol === "undefined" || !pol || !pol.result || !pol.result.rewrite) return "";
+  return `<button type="button" class="btn sm" data-rx="policy" title="The rewrite as a policy file for an open model such as gpt-oss-safeguard. ${RX_WIP}.">${rxIcon()}${rxVerb()} as policy file</button><span class="wip-chip">starter</span>`;
+}
+function rxAct(id){
+  const toast = $("#rx-toast") || $("#pol-rwtoast") || $("#pm-toast");
+  if(id === "policy"){ const txt = rxPolicyFile(); if(!txt) return; return offerFile(`policy-${slug(rxPolicyName(pol))}.md`, txt, txt, toast); }
+  const r = assess(pm); if(!r.risks.length) return;
+  if(id === "osprey"){ const txt = rxOsprey(r, pm); return offerFile(`osprey-starter-${slug(pm.name)}.sml`, txt, txt, toast); }
+  if(id === "coop"){ const txt = rxCoop(r, pm); return offerFile(`coop-checklist-${slug(pm.name)}.md`, txt, txt, toast); }
+}
+if(typeof document !== "undefined" && document.addEventListener) document.addEventListener("click", e => { const b = e.target && e.target.closest ? e.target.closest("[data-rx]") : null; if(b) rxAct(b.dataset.rx); });
 /* =========================================================
    PROGRAM LOOP: a pre-mortem's biggest remaining risks point to the crises to rehearse,
    the metrics to track, the coverage to map and how to weigh a moderation vendor
