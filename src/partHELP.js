@@ -166,10 +166,10 @@ const PAGE_TOURS = {
     [".ds-report .pol-tabs", "Plan, duties and drafts", "Your gaps in order with the article behind each, every duty that applies, and four drafts to edit."]
   ],
   eval:[
-    [".gd-intro, .ev-setup", "Six questions", "The rule, what the classifier sees, its labels, how many cases, and how you'll run it: Claude with the rule, Claude with your prompt, or your own model's labels."],
-    [".ev-cases", "The gold labels", "What a careful reviewer would say under the rule as written. Change any you disagree with; the classifier is scored against your labels."],
-    [".ev-report .pol-sum", "Precision and recall", "Of what it flagged, how much deserved it; of what deserved it, how much it caught."],
-    [".ev-where", "Where it fails", "By kind of case, and what to change in the rule or the prompt for each."]
+    ["#ev-s1", "Step 1: the rule and the cases", "Paste the rule, then start from the example cases or paste your own. The right answer next to each case is what a careful reviewer would say; change any you disagree with."],
+    ["#ev-s2", "Step 2: get labels", "Three ways: a free model that runs in your browser, your own classifier's labels pasted back, or Claude in the Claude version."],
+    ["#ev-s3", "Step 3: results", "How many it got right, in plain words; the cases it got wrong; what to change. Precision, recall and the numbers by kind sit under Details."],
+    ["#ev-loop", "Change the rule and try again", "From the second run on, the results open with what flipped and the scores before and after."]
   ],
   plan:[
     [".pl-head", "One plan from every step", "Launch blockers, coverage gaps, roadmap items and COPPA and DSA gaps in one list, sent to your tracker in one go."],

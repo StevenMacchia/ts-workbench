@@ -271,24 +271,12 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .dm-welcome,.dm-exit{border-radius:4px}
 
 /* ---------- classifier eval ---------- */
-.ev-tiers{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
 .ev-tiers3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:760px){.ev-tiers3{grid-template-columns:1fr}}
-.ev-cases{display:grid;gap:16px}
-.ev-cases>.card{min-width:0}
 .sb-h-tag{display:flex;align-items:center;padding-right:10px}
-.ev-case-a{display:flex;gap:8px;flex-wrap:wrap}
-.ev-table td:nth-child(2){min-width:260px}
-.ev-table .select.sm{padding:4px 8px;font-size:13px}
+.ev-table td:nth-child(2){min-width:240px}
 .ev-table tr.bad td{background:color-mix(in oklab, var(--crit) 6%, transparent)}
 .ev-x{color:var(--crit);font-weight:600}
-.ev-add summary{cursor:pointer;font-weight:600;font-size:14px}
-.ev-add textarea{margin-top:8px;font-family:var(--mono);font-size:13px}
-.ev-run .pol-run{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.ev-where{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px}
-.ev-where h4{margin:0 0 10px;font-size:14.5px}
-.ev-adv{grid-column:1/-1;border-top:1px solid var(--line);padding-top:18px}
-.ev-adv .pk-list{padding-left:18px;display:grid;gap:8px;font-size:14px}
 .ev-ct{width:100%;min-width:0;border-collapse:collapse;font-size:13.5px}
 .ev-ct th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:0 8px 8px 0}
 .ev-ct td{padding:8px 8px 8px 0;border-top:1px solid var(--line);vertical-align:top}
@@ -304,4 +292,3 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .ev-conf td.ok{background:var(--good-soft)}
 .ev-conf td.bad{background:var(--crit-soft);font-weight:600}
 .ev-ring.good b{color:var(--good)}.ev-ring.crit b{color:var(--crit)}
-@media (max-width:820px){.ev-where{grid-template-columns:1fr}}

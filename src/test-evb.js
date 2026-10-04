@@ -1,6 +1,6 @@
 // Checks the classifier eval's in-browser baseline without a browser or a network: the output normalization, the mapping
-// from the model's six scores to the eval's labels and thresholds, the card in every state, the gap cards for the kinds
-// of case a fixed-category model gets wrong, the scores table, and keeping the baseline as a run. The model itself is
+// from the model's six scores to the eval's labels and thresholds, the step-2 panel in every state, the order of the
+// wrong cases for a fixed-category model, and the scores becoming the run in the results. The model itself is
 // never loaded here: the scores below were measured in a browser on the example's 24 cases (MiniLMv2 toxic, q8, WASM).
 const fs = require("fs"), path = require("path");
 const D = path.dirname(__filename), rd = f => fs.readFileSync(path.join(D, f), "utf8");
@@ -21,11 +21,11 @@ const body = function(){
   ev.labels = "three"; eq(evbMap({toxic:0.6}, ev).label, "remove", "three labels: remove"); eq(evbMap({toxic:0.25}, ev).label, "review", "the review band"); eq(evbMap({toxic:0.24}, ev).label, "allow", "below it, allow");
   eq(evbMap({}, ev).label, "allow", "no scores is the last label");
   out.push("normalization and label mapping, binary and three labels");
-  // the card before anything loads: model, license, size, where it runs, what stays here, and the thresholds; nothing auto-loads
-  evAct("example"); ev.view = "cases"; renderEval(); let h = view.innerHTML; if(bad(h)) throw new Error("cases page bad: " + where(h));
-  eq(/id="evb"/.test(h) && /Instant baseline: a small open model in your browser/.test(h), true, "the card sits on the cases page");
+  // the panel before anything loads: model, license, size, where it runs, what stays here, and the thresholds; nothing auto-loads
+  evAct("example"); ev.mode = "baseline"; renderEval(); let h = view.innerHTML; if(bad(h)) throw new Error("page bad: " + where(h));
+  eq(/id="evb"/.test(h) && /class="card tr-tier on" data-evmode="baseline"/.test(h) && /Free model in your browser/.test(h), true, "the panel sits under the free-model tile in step 2");
   eq(/MiniLMv2 toxic/.test(h) && /Apache-2\.0/.test(h) && /Download and run \(24 MB\)/.test(h) && /data-evb="run"/.test(h), true, "model, license, size and the one button");
-  eq(/never leaves your browser/.test(h) && /Hugging Face and jsDelivr/.test(h) && /stays cached in this browser/.test(h), true, "says where it downloads from and what stays here");
+  eq(/never leaves your browser/.test(h) && /Hugging Face and jsDelivr/.test(h) && /stays cached in this browser/.test(h) && /Not your classifier/.test(h), true, "says where it downloads from, what stays here, and what it is not");
   eq(/at or above 0\.50 counts as &quot;violates&quot;/.test(h) && /anything lower as &quot;allowed&quot;/.test(h), true, "the threshold, stated");
   eq(EVB.state === "idle" && EVB.lib === null && Object.keys(EVB.pipes).length === 0, true, "nothing loaded by rendering");
   ev.labels = "three"; h = evbCardHTML(); eq(/counts as &quot;remove&quot;, from 0\.25 as &quot;review&quot;, anything lower as &quot;allow&quot;/.test(h), true, "three labels: the review band is stated"); ev.labels = "binary";
@@ -45,22 +45,23 @@ const body = function(){
   eq(gaps[0].c.id, "c10", "counter-speech first: the quoted abuse"); eq(gaps[1].c.id, "c11", "then the banter"); eq(gaps[2].c.id, "c18", "then the hyperbole"); eq(gaps[3].c.cat, "adversarial", "then the obfuscated miss");
   eq(/reporting it is allowed/.test(gaps[0].why) && /who is talking to whom/.test(gaps[1].why) && /other languages/.test(gaps.find(g => g.c.id === "c21").why), true, "each gap says why a word-and-tone model misses it");
   h = evbCardHTML(); if(bad(h)) throw new Error("done bad: " + where(h));
-  eq(/Baseline: 63% accurate/.test(h) && /violates: P 40% · R 25%/.test(h) && /Harassment rule, v1 prompt: 67% accurate/.test(h), true, "the baseline's numbers next to the visitor's run");
-  eq((h.match(/class="cp-gap"/g) || []).length, 9, "a gap card per disagreement"); eq(/toxic 0\.59<\/span>[\s\S]*Counter-speech · c10/.test(h) && /you're worthless/.test(h), true, "with the model's score and the case");
-  eq(/scores words and tone, not your rule/.test(h) && /can't be told that reporting abuse is allowed/.test(h), true, "the explanation");
-  eq((h.match(/<tr class="(bad)?">/g) || []).length, 24, "every score in the table"); eq(/data-evb="keep"/.test(h) && /24 cases in 204 ms/.test(h) && /stays cached here/.test(h), true, "keep, timing, cache note");
-  eq(/data-evb="run">Run again/.test(h), true, "run again");
-  // kept as a run under its own name, never as the visitor's classifier; running twice doesn't duplicate it
-  const before = ev.preds, runs0 = ev.runs.length, msg = evbKeep(); eq(/Kept as "Baseline: MiniLMv2 toxic"/.test(msg), true, "kept"); eq(ev.runs.length, runs0 + 1, "one more run");
-  evbKeep(); eq(ev.runs.length, runs0 + 1, "not duplicated"); eq(ev.preds, before, "the visitor's predictions untouched"); eq(ev.runs[ev.runs.length - 1].acc, 15 / 24, "with the baseline's accuracy");
-  ev.tab = "runs"; ev.view = "report"; renderEval(); eq(/Baseline: MiniLMv2 toxic/.test(view.innerHTML), true, "shown in the runs table");
-  // the cases change under a finished run: the card says so instead of showing stale scores; a loaded model means no re-download
-  ev.view = "cases"; ev.cases.push({id:"c25", text:"a new case", expect:"allowed", cat:"own", why:"Your own case."}); h = evbCardHTML();
-  eq(/The cases changed since the baseline ran/.test(h) && !/cp-gap/.test(h), true, "stale scores aren't shown");
-  EVB.pipes["minuva/MiniLMv2-toxic-jigsaw-onnx"] = {}; h = evbCardHTML(); eq(/data-evb="run">Run the baseline</.test(h) && /Already downloaded/.test(h), true, "a loaded model runs without downloading"); delete EVB.pipes["minuva/MiniLMv2-toxic-jigsaw-onnx"];
-  // the fallback model switches the whole card
+  eq(/Done\./.test(h) && /agreed with your right answers on 15 of 24 cases, in 204 ms/.test(h) && /data-ev="again"/.test(h) && /data-evb="run">Run again/.test(h) && /stays cached/.test(h), true, "the panel after a run: the count, a way to the results, run again, cache note");
+  // the scores become the run in step 3, under the model's own name; the visitor's example run becomes the one to compare with
+  const was = ev.preds, name = evbFinish(); eq(name, "Baseline: MiniLMv2 toxic", "named as the baseline");
+  eq(ev.mode === "baseline" && ev.preds !== was && ev.preds.c10.label === "violates" && ev.preds.c10.why === "toxic 0.59, insult 0.15", true, "the free model's labels and scores are the run");
+  eq(ev.runs[ev.runs.length - 1].name === name && ev.runs[ev.runs.length - 1].acc === 15 / 24, true, "listed as a run with its accuracy"); eq(ev.prev && ev.prev.name, "Harassment rule, v1 prompt", "the example's run is the one before");
+  renderEval(); h = view.innerHTML; if(bad(h)) throw new Error("results bad: " + where(h));
+  eq(/63%/.test(h) && /Got 15 of 24 right/.test(h) && /scores words and tone, not your rule/.test(h) && /class="card ev-step done" id="ev-s3"/.test(h), true, "results in step 3, with the honest note");
+  const wrong = h.slice(h.indexOf("What it got wrong")); eq(wrong.indexOf("Counter-speech · c10") > 0 && wrong.indexOf("Counter-speech · c10") < wrong.indexOf("Context-dependent · c11") && /reporting it is allowed/.test(wrong) && /you're worthless/.test(wrong), true, "the wrong cases led by counter-speech, each saying why a word-and-tone model misses it");
+  eq(/doesn't read your rule/.test(h) && /data-ev="topaste"/.test(h), true, "the loop box says a new wording won't change this model's labels, and where to go");
+  ev.tab = "runs"; renderEval(); eq(/Baseline: MiniLMv2 toxic/.test(view.innerHTML) && /Harassment rule, v1 prompt/.test(view.innerHTML), true, "both in the runs table"); ev.tab = "kinds";
+  // the cases change under a finished run: the panel says so instead of showing stale scores; a loaded model means no re-download
+  ev.cases.push({id:"c25", text:"a new case", expect:"allowed", cat:"own", why:"Your own case."}); h = evbCardHTML();
+  eq(/The cases changed since this model ran/.test(h) && !/Done\./.test(h), true, "stale scores aren't shown");
+  EVB.pipes["minuva/MiniLMv2-toxic-jigsaw-onnx"] = {}; h = evbCardHTML(); eq(/data-evb="run">Run the free model</.test(h) && /Already downloaded/.test(h), true, "a loaded model runs without downloading"); delete EVB.pipes["minuva/MiniLMv2-toxic-jigsaw-onnx"];
+  // the fallback model switches the whole panel
   EVB.model = 1; h = evbCardHTML(); eq(/toxic-bert/.test(h) && /Download and run \(111 MB\)/.test(h) && /Xenova/.test(h), true, "the fallback's name, size and port"); EVB.model = 0; EVB.state = "idle"; EVB.scores = null;
-  out.push("results: 15/24, nine gaps led by counter-speech and banter, scores table, kept as a run, stale and fallback states");
+  out.push("results: 15/24 as the run in step 3, nine gaps led by counter-speech and banter, runs table, stale and fallback states");
   return out.join("\n");
 };
 const parts = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partCP.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js")].join("\n");

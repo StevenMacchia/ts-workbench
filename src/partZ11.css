@@ -1,19 +1,13 @@
-/* ---------- classifier eval: the in-browser baseline card ---------- */
-.evb .card-b p{margin:0 0 10px;font-size:14px;line-height:1.55}
-.evb .card-b p.note{font-size:13px}
-.evb .pol-run{position:static;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:0;margin-top:12px;border:0;box-shadow:none}
+/* ---------- classifier eval: the free model's panel in step 2 ---------- */
+.evb{display:grid;gap:10px}
+.evb p{margin:0;font-size:14px;line-height:1.55}
+.evb p.note{font-size:13px}
+.evb .pol-run{position:static;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:0;margin:2px 0 0;border:0;box-shadow:none;background:none}
+.evb .pol-run .note{flex:1 1 220px;min-width:0;margin:0}
 .evb-busy{display:flex;align-items:center;gap:14px}
 .evb-busy>div{display:grid;gap:3px;flex:1;min-width:0}
 .evb-busy b{font-size:14px}
 .evb-bar{height:6px;margin-top:6px;max-width:420px}
 .evb-bar i{background:var(--ink);transition:width .2s linear}
-.evb-kpis{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
-.evb .cp-gaps{margin:2px 0 12px}
-.evb .cp-gap{grid-template-columns:minmax(72px,auto) minmax(0,1fr)}
-.evb-sc{font-size:12px;color:var(--muted);white-space:nowrap;padding-top:3px}
-.evb-all summary{cursor:pointer;font-weight:600;font-size:14px}
-.evb-all .note{margin:8px 0}
-.evb-table td:nth-child(2){min-width:220px}
-.evb-table td.mono{white-space:nowrap;font-size:12.5px}
-@media (max-width:640px){.evb .cp-gap{grid-template-columns:1fr}.evb-sc{padding-top:0}.evb-bar{max-width:none}}
+@media (max-width:640px){.evb-bar{max-width:none}}
 @media (prefers-reduced-motion: reduce){.evb-bar i{transition:none}}

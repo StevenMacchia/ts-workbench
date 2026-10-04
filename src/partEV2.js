@@ -1,8 +1,8 @@
 /* =========================================================
    CLASSIFIER EVAL, part 2: the rule-improvement loop and image/video lists
    Loop: each run keeps the one before it (its labels, and the rule or prompt that produced them), so the report can show
-   what flipped: fixed, broke, precision and recall before and after, and misses by kind on one radar. The rule, the prompt
-   or a new label set is edited next to the cases and run again without leaving the page.
+   what flipped: fixed, broke, precision and recall before and after, and misses by kind on one radar. From the second run
+   on, that comparison sits at the top of the results; the box under the results is where the rule is changed and run again.
    Media: an image or video classifier is scored from a labeled list the user pastes or opens locally. The list names
    items; the media itself is never pasted, uploaded or read.
    ========================================================= */
@@ -24,7 +24,7 @@ const EV_MCATS = [
 // Which kinds a test set is scored by: an explicit list, the media kinds, or the text kinds
 const evCatList = d => (d && d.catList) || (d && d.media ? EV_MCATS : EV_CATS);
 const evContentLabel = d => cpLabel(EV_CONTENT, d.content) || (d.media ? "Images and video" : "");
-const EVL = {manifest:"", paste:"", bad:[]};
+const EVL = {manifest:"", paste:"", own:"", bad:[]}; // text typed into the boxes but not yet used, so a redraw doesn't lose it
 
 /* ---------- the example's earlier run: the rule before the author narrowed it to harassment ---------- */
 // A one-line "no offensive content" rule flagged dismissals, banter and a figure of speech. Narrowing it to harassment of
@@ -45,7 +45,9 @@ function evLoopBefore(preds){
   ev.prev = {preds:old, policy:l.policy !== undefined ? l.policy : ev.policy, sys:l.sys !== undefined ? l.sys : ev.sys, name:l.name !== undefined ? l.name : ev.name, t:l.t || 0};
 }
 // And after: remember what produced this run, so the next comparison can show how the rule changed
-function evLoopAfter(){ ev.last = {policy:ev.policy, sys:ev.sys, name:ev.name, t:Date.now()}; ev.draft = null; }
+function evLoopAfter(name){ ev.last = {policy:ev.policy, sys:ev.sys, name:name || ev.name, t:Date.now()}; ev.draft = null; }
+// The rule or prompt the latest run used (the one in the box may have been edited since)
+const evLastOf = (d, key) => d.last && d.last[key] !== undefined ? d.last[key] : d[key];
 // Leaving the media path for a text eval: its cases and runs don't carry over
 function evLeaveMedia(){ if(!ev.media) return; ev.media = false; ev.cases = []; ev.preds = null; ev.prev = null; ev.last = null; ev.gold = {}; }
 // Pure comparison of two label sets over the same cases
@@ -60,7 +62,7 @@ function evCompare(d, prevPreds, preds){
   return {n:both.length, fixed, broke, before, after, cats, delta:{acc:dv(before.acc, after.acc), pr:dv(mm(before).pr, mm(after).pr), rc:dv(mm(before).rc, mm(after).rc)}};
 }
 // Did the rule or prompt change between the two runs?
-const evLoopChanged = d => d.prev ? (d.mode === "prompt" ? String(d.prev.sys || "") !== String(d.sys || "") : String(d.prev.policy || "") !== String(d.policy || "")) : false;
+const evLoopChanged = d => d.prev ? (d.mode === "prompt" ? String(d.prev.sys || "") !== String(evLastOf(d, "sys") || "") : String(d.prev.policy || "") !== String(evLastOf(d, "policy") || "")) : false;
 // "Harassment rule, v1 prompt" suggests "Harassment rule, v2 prompt"
 function evNextName(name){
   const s = String(name || "").trim(); if(!s) return "v2";
@@ -88,29 +90,29 @@ function evRadar(cats, names){
   return `<svg class="ma-radar ev-radar" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${was}${now}${dots}${labels}</svg>`;
 }
 
-/* ---------- the Compare tab ---------- */
+/* ---------- since the last run: shown on the results from the second run on ---------- */
 function evCompareHTML(){
   const P = ev.prev;
-  if(!P || !P.preds) return `<p class="note">Nothing to compare with yet. ${ev.media ? "Paste the next list from your classifier" : ev.mode === "paste" ? "Change your classifier, run the same cases through it and paste the new labels" : `Change the ${ev.mode === "prompt" ? "prompt" : "rule"} below and run the same cases again`}. This tab then shows every case that flipped, and precision and recall before and after.</p>`;
-  const r = evCompare(ev, P.preds, ev.preds), pct = r.after.pct, pos = evPos(ev), n0 = P.name || "Previous run", n1 = ev.name || "Latest run", same = n0 === n1;
+  if(!P || !P.preds) return "";
+  const r = evCompare(ev, P.preds, ev.preds), pct = r.after.pct, pos = evPos(ev), n0 = P.name || "Previous run", n1 = (ev.last && ev.last.name) || ev.name || "Latest run", same = n0 === n1;
   const names = same ? ["Previous run", "Latest run"] : [n0, n1];
   const dl = v => v === null ? "" : `<span class="ev-delta ${v > 0 ? "up" : v < 0 ? "down" : ""}">${v > 0 ? "+" : v < 0 ? "−" : "±"}${Math.abs(Math.round(v * 100))}</span>`;
   const kpi = (lbl, a, b, d) => `<div class="ev-kpi"><span class="eyebrow">${lbl}</span><b class="mono">${pct(a)} <span class="muted">→</span> ${pct(b)}</b>${dl(d)}</div>`;
   const flip = (x, i, kind) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
     <span class="eyebrow"><span class="ev-flip ${kind}">${kind === "fixed" ? "Fixed" : "Broke"}</span> ${esc(evCat(x.c.cat)[1])} · ${esc(x.c.id)}</span>${ev.media && x.c.text === x.c.id ? "" : `<h4>“${esc(x.c.text)}”</h4>`}
-    <p>Expected <b>${esc(x.gold)}</b>. Was <b>${esc(x.was)}</b>, now <b>${esc(x.now)}</b>.${x.c.why ? ` Reviewer: ${esc(x.c.why)}` : ""}${ev.preds[x.c.id].why ? ` Classifier now: ${esc(ev.preds[x.c.id].why)}` : ""}</p></div></article>`;
+    <p>Right answer <b>${esc(x.gold)}</b>. Was <b>${esc(x.was)}</b>, now <b>${esc(x.now)}</b>.${x.c.why ? ` Reviewer: ${esc(x.c.why)}` : ""}${ev.preds[x.c.id].why ? ` Classifier now: ${esc(ev.preds[x.c.id].why)}` : ""}</p></div></article>`;
   const sum = !r.fixed.length && !r.broke.length ? "No case flipped." : `${r.fixed.length} fixed, ${r.broke.length} broke.`;
   const chg = evLoopChanged(ev), key = ev.mode === "prompt" ? "sys" : "policy";
   return `<div class="ev-cmp">
-    <div class="ev-cmp-top"><div><span class="eyebrow">${esc(names[0])} → ${esc(names[1])}</span><h4>${sum} Accuracy ${pct(r.before.acc)} → ${pct(r.after.acc)}.</h4>
-        <p class="note">${r.n} cases labeled in both runs, scored against the same right answers.${chg ? ` The ${key === "sys" ? "prompt" : "rule"} changed in between; the change is below.` : ev.mode === "paste" && !ev.media ? " If you change the rule under Edit setup between runs, the diff shows here too." : ""}</p></div>
-      <div class="ev-cmp-kpis">${kpi("Accuracy", r.before.acc, r.after.acc, r.delta.acc)}${kpi(`Precision on "${esc(pos)}"`, r.before.main ? r.before.main.pr : null, r.after.main ? r.after.main.pr : null, r.delta.pr)}${kpi(`Recall on "${esc(pos)}"`, r.before.main ? r.before.main.rc : null, r.after.main ? r.after.main.rc : null, r.delta.rc)}</div></div>
-    <div class="ev-cmp-grid">
-      <div class="ev-cmp-radar"><h4>Misses by kind</h4>${r.cats.length >= 3 ? `${evRadar(r.cats, names)}<div class="ma-legend"><span><i class="ma-lg-cur"></i>${esc(names[1])}</span><span><i class="ma-lg-old"></i>${esc(names[0])}</span><span><i class="ma-lg-gap"></i>Got worse</span></div><p class="note">The further out, the larger the share of that kind labeled wrong.</p>` : `<p class="note">Fewer than three kinds of case in both runs, so no chart; the table has the numbers.</p>`}</div>
-      <div><h4>Wrong, before and after</h4><table class="ev-ct ev-cmp-t"><thead><tr><th>Kind</th><th>Cases</th><th>Before</th><th>After</th></tr></thead><tbody>${r.cats.map(c => `<tr class="${c.after > c.before ? "bad" : c.after < c.before ? "ok" : ""}"><td>${esc(c.n)}</td><td class="mono">${c.total}</td><td class="mono">${c.before}</td><td class="mono ev-arrow">${c.after}${c.after < c.before ? ' <span class="ev-delta up">▾</span>' : c.after > c.before ? ' <span class="ev-delta down">▴</span>' : ""}</td></tr>`).join("")}</tbody></table></div>
-    </div>
+    <div class="ev-cmp-top"><div><span class="eyebrow">${esc(names[0])} → ${esc(names[1])}</span><h4>${sum} ${pct(r.before.acc)} → ${pct(r.after.acc)} right.</h4>
+        <p class="note">${r.n} ${ev.media ? "items" : "cases"} labeled in both runs, scored against the same right answers.${chg ? ` The ${key === "sys" ? "prompt" : "rule"} changed in between; the change is below.` : ""}</p></div>
+      <div class="ev-cmp-kpis">${kpi("Right", r.before.acc, r.after.acc, r.delta.acc)}${kpi(`Precision on "${esc(pos)}"`, r.before.main ? r.before.main.pr : null, r.after.main ? r.after.main.pr : null, r.delta.pr)}${kpi(`Recall on "${esc(pos)}"`, r.before.main ? r.before.main.rc : null, r.after.main ? r.after.main.rc : null, r.delta.rc)}</div></div>
     ${r.fixed.length || r.broke.length ? `<div class="ev-cmp-flips"><h4>What flipped</h4><div class="cp-gaps">${r.fixed.map((x, i) => flip(x, i, "fixed")).join("")}${r.broke.map((x, i) => flip(x, r.fixed.length + i, "broke")).join("")}</div></div>` : ""}
-    ${chg ? `<div class="ev-cmp-diff"><h4>What changed in the ${key === "sys" ? "prompt" : "rule"}</h4><div class="pol-diff"><div><span class="eyebrow">Before · ${esc(names[0])}</span><blockquote>${esc(P[key] || "")}</blockquote></div><div><span class="eyebrow">Now · ${esc(names[1])}</span><blockquote class="new">${esc(ev[key] || "")}</blockquote></div></div></div>` : ""}
+    <div class="ev-cmp-grid">
+      <div class="ev-cmp-radar"><h4>Wrong by kind, before and after</h4>${r.cats.length >= 3 ? `${evRadar(r.cats, names)}<div class="ma-legend"><span><i class="ma-lg-cur"></i>${esc(names[1])}</span><span><i class="ma-lg-old"></i>${esc(names[0])}</span><span><i class="ma-lg-gap"></i>Got worse</span></div><p class="note">The further out, the larger the share of that kind labeled wrong.</p>` : `<p class="note">Fewer than three kinds of case in both runs, so no chart; the table has the numbers.</p>`}</div>
+      <div><h4>The numbers</h4><table class="ev-ct ev-cmp-t"><thead><tr><th>Kind</th><th>Cases</th><th>Before</th><th>After</th></tr></thead><tbody>${r.cats.map(c => `<tr class="${c.after > c.before ? "bad" : c.after < c.before ? "ok" : ""}"><td>${esc(c.n)}</td><td class="mono">${c.total}</td><td class="mono">${c.before}</td><td class="mono ev-arrow">${c.after}${c.after < c.before ? ' <span class="ev-delta up">▾</span>' : c.after > c.before ? ' <span class="ev-delta down">▴</span>' : ""}</td></tr>`).join("")}</tbody></table></div>
+    </div>
+    ${chg ? `<div class="ev-cmp-diff"><h4>What changed in the ${key === "sys" ? "prompt" : "rule"}</h4><div class="pol-diff"><div><span class="eyebrow">Before · ${esc(names[0])}</span><blockquote>${esc(P[key] || "")}</blockquote></div><div><span class="eyebrow">Now · ${esc(names[1])}</span><blockquote class="new">${esc(evLastOf(ev, key) || "")}</blockquote></div></div></div>` : ""}
   </div>`;
 }
 function evCompareMarkdown(d){
@@ -122,29 +124,28 @@ function evCompareMarkdown(d){
     "| Kind of case | Cases | Wrong before | Wrong after |", "|---|---|---|---|"].concat(r.cats.map(c => `| ${c.n} | ${c.total} | ${c.before} | ${c.after} |`));
   r.fixed.forEach(x => lines.push(`- Fixed [${evCat(x.c.cat)[1]}] ${x.was} → ${x.now}: "${x.c.text}"`));
   r.broke.forEach(x => lines.push(`- Broke [${evCat(x.c.cat)[1]}] ${x.was} → ${x.now}: "${x.c.text}"`));
-  if(evLoopChanged(d)){ const k = d.mode === "prompt" ? "sys" : "policy"; lines.push("", `${k === "sys" ? "Prompt" : "Rule"} before:`, "", ...String(P[k] || "").trim().split(/\r?\n/).map(l => "> " + l), "", `${k === "sys" ? "Prompt" : "Rule"} now:`, "", ...String(d[k] || "").trim().split(/\r?\n/).map(l => "> " + l)); }
+  if(evLoopChanged(d)){ const k = d.mode === "prompt" ? "sys" : "policy"; lines.push("", `${k === "sys" ? "Prompt" : "Rule"} before:`, "", ...String(P[k] || "").trim().split(/\r?\n/).map(l => "> " + l), "", `${k === "sys" ? "Prompt" : "Rule"} now:`, "", ...String(evLastOf(d, k) || "").trim().split(/\r?\n/).map(l => "> " + l)); }
   return lines;
 }
 
-/* ---------- the loop card: edit next to the cases, run again ---------- */
-function evLoopHTML(onReport){
-  const ai = evAI(), mode = ev.mode, dr = ev.draft || {}, media = ev.media, n = ev.cases.length, can = ai || mode === "paste" || media; // without Claude, the rule or prompt can't be run again here
-  const title = media ? "Paste the next list and compare" : mode === "paste" ? "Run your classifier again and compare" : !can ? "Run again and compare" : mode === "prompt" ? "Change the prompt and run again" : "Change the rule and run again";
-  const fields = media ? evManifestFieldHTML()
-    : mode === "paste" ? `<p class="note">Change the rule or the prompt your classifier uses, run the same cases through it, and paste the new labels: one per line, as <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in order.</p><textarea class="input mono" id="ev-loop-paste" rows="5" placeholder="c1	violates&#10;c2	allowed" aria-label="New labels">${esc(EVL.paste)}</textarea>`
-    : !can ? `<p class="note">Changing the ${mode === "prompt" ? "prompt" : "rule"} and running the same cases again needs Claude. Here, run the cases through your own classifier and paste its labels; the Compare tab then shows what flipped.</p>`
-    : mode === "prompt" ? `<div class="field"><label for="ev-loop-sys">Your system prompt</label><textarea class="input" id="ev-loop-sys" rows="7" placeholder="You are a content moderation classifier…">${esc(dr.sys !== undefined ? dr.sys : ev.sys)}</textarea></div>`
-    : `<div class="field"><label for="ev-loop-policy">The rule</label><textarea class="input" id="ev-loop-policy" rows="5" placeholder="Users must not harass, bully or intimidate other users…">${esc(dr.policy !== undefined ? dr.policy : ev.policy)}</textarea></div>`;
-  const name = `<div class="field ev-loop-name"><label for="ev-loop-name">A name for the next run <span class="note">optional</span></label><input class="input" id="ev-loop-name" maxlength="80" value="${esc(dr.name || "")}" placeholder="${esc(evNextName(ev.name))}"></div>`;
-  const run = media ? `<button type="button" class="btn primary" data-ev="mscore">Score the list</button><label class="btn" for="ev-mfile">Open a file<input type="file" id="ev-mfile" class="visually-hidden" accept=".tsv,.csv,.txt,text/plain,text/csv,text/tab-separated-values"></label><span class="note">Read in your browser. The file isn't sent anywhere.</span>`
-    : mode === "paste" ? `<button type="button" class="btn primary" data-ev="loopscore">Score the new labels</button><button type="button" class="btn" data-ev="csv">${icon("copy")}Copy the cases as TSV</button>`
-    : ai ? `<button type="button" class="btn primary" data-ev="looprun" ${EVRUN.busy ? "disabled" : ""}>Run again with Claude</button><span class="note">${n} cases, same right answers, on your account.</span>`
-    : STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a><span class="note">This free version can't call Claude. Or <button type="button" class="pol-add" data-ev="topaste">paste your own classifier's labels</button> instead.</span>`
-    : `<button type="button" class="btn primary" disabled>Open in Claude to run</button><span class="note">AI runs inside Claude. Or <button type="button" class="pol-add" data-ev="topaste">paste your own classifier's labels</button> instead.</span>`;
-  const busy = onReport && EVRUN.busy ? `<div class="ai-busy ev-loop-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account.</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : "";
-  const err = onReport && EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : "";
-  return `<section class="card ev-loop" id="ev-loop" aria-labelledby="ev-loop-h"><div class="card-h"><div><h3 id="ev-loop-h">${title}</h3><p class="note">${media ? "Same ids, same expected labels. The report then shows which items flipped, and precision and recall before and after." : `Same ${n} cases, same right answers. The next report shows which cases flipped, and precision and recall before and after.`}</p></div></div>
-    <div class="card-b">${busy}${err}${fields}${media || !can ? "" : name}<div class="pol-run">${run}</div></div></section>`;
+/* ---------- the loop box: change the rule and try again, under the results ---------- */
+function evLoopHTML(){
+  const ai = evAI(), mode = ev.mode, n = ev.cases.length, dr = ev.draft || {}, edited = ev.last && String(ev.last.policy || "") !== String(ev.policy || "");
+  const since = `The results then show which cases flipped, and the scores before and after.`;
+  const name = `<div class="field ev-loop-name"><label for="ev-loop-name">Name for the next run <span class="note">optional</span></label><input class="input" id="ev-loop-name" maxlength="80" value="${esc(dr.name || "")}" placeholder="${esc(evNextName(ev.last ? ev.last.name : ev.name))}"></div>`;
+  let title = "Change the rule and try again", body;
+  if(mode === "baseline") body = `<p class="note">The free model doesn't read your rule, so a new wording won't change its labels: it's a floor to measure a real classifier against. To test a change to the rule, get labels from your own classifier${ai ? " or from Claude" : ""} in step 2.</p>
+      <div class="pol-run"><button type="button" class="btn" data-ev="topaste">Use my own classifier</button>${ai ? `<button type="button" class="btn" data-ev="toclaude">Run with Claude</button>` : STANDALONE ? `<a class="btn" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Open in Claude</a>` : ""}<span class="note">Same ${n} cases, same right answers.</span></div>`;
+  else if(mode === "paste") body = `<p class="note">Change the rule in step 1 or the prompt your classifier uses, run the same ${n} cases through it again, and paste the new labels in step 2. ${since}</p>
+      <div class="pol-run"><button type="button" class="btn primary" data-ev="topaste">Paste the new labels</button><button type="button" class="btn" data-ev="csv">${icon("copy")}Copy the cases</button>${edited ? `<span class="note">The rule has changed since the last run.</span>` : ""}</div>`;
+  else if(!ai) body = `<p class="note">Running the same cases through Claude again needs the Claude version. Here, change the rule in step 1, run the cases through your own classifier and paste its labels in step 2. ${since}</p>
+      <div class="pol-run"><button type="button" class="btn primary" data-ev="topaste">Paste my classifier's labels</button>${STANDALONE ? `<a class="btn" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Open in Claude</a>` : ""}</div>`;
+  else { const key = mode === "prompt" ? "sys" : "policy"; title = mode === "prompt" ? "Change the prompt and try again" : "Change the rule and try again";
+    body = `<p class="note">Same ${n} cases, same right answers, on your account. ${since}</p>
+      <div class="field"><label for="ev-loop-${key}">${key === "sys" ? "Your system prompt" : "The rule"}</label><textarea class="input" id="ev-loop-${key}" rows="5" placeholder="${key === "sys" ? "You are a content moderation classifier…" : "Users must not harass, bully or intimidate other users…"}">${esc(ev[key])}</textarea><span class="note">The same ${key === "sys" ? "prompt as in step 2" : "rule as in step 1"}; edit it in either place.</span></div>
+      ${name}${EVRUN.busy ? `<div class="ai-busy ev-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account.</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : ""}${evErrHTML("loop")}
+      <div class="pol-run"><button type="button" class="btn primary" data-ev="looprun" ${EVRUN.busy ? "disabled" : ""}>Run again with Claude</button></div>`; }
+  return `<section class="card ev-loop" id="ev-loop" aria-labelledby="ev-loop-h"><div class="card-h"><h3 id="ev-loop-h">${title}</h3></div><div class="card-b">${body}</div></section>`;
 }
 
 /* ---------- images and video: a labeled list, never the media ---------- */
@@ -174,43 +175,35 @@ function evParseManifest(txt, L){
 // The parsed list becomes the cases and the run; expected labels are the gold labels
 function evMediaScore(txt){
   const L = evLabels(ev), p = evParseManifest(txt, L);
-  if(!p.items.length){ EVRUN.err = p.bad.length ? `Couldn't read any items. Line ${p.bad[0].line}: ${p.bad[0].why}.` : "Couldn't read any items. One per line: id, kind, expected, model label, separated by tabs or commas."; return renderEval(); }
-  if(!ev.media){ ev.preds = null; ev.prev = null; ev.last = null; } // a text set was here: its runs don't compare with this one
+  if(!p.items.length){ ev.view = "media"; evErr(p.bad.length ? `Couldn't read any items. Line ${p.bad[0].line}: ${p.bad[0].why}.` : "Couldn't read any items. One per line: id, kind, expected, model label, separated by tabs or commas.", "media"); return renderEval(); }
+  if(!ev.media){ ev.preds = null; ev.prev = null; ev.last = null; ev.runs = []; } // a text set was here: its runs don't compare with this one
   ev.media = true; ev.mode = "paste"; ev.content = ""; ev.ex = false; ev.n = p.items.length; EVRUN.err = "";
   ev.cases = p.items.map(x => ({id:x.id, text:x.note || x.id, expect:x.expect, cat:x.cat, why:x.cat === "other" && x.kind ? `Listed as "${x.kind}".` : ""}));
   ev.gold = {}; EVL.manifest = ""; EVL.bad = p.bad;
   evFinish(Object.fromEntries(p.items.map(x => [x.id, {label:x.label, why:""}])));
-  renderEval(); window.scrollTo(0, 0);
-  if(p.bad.length) gsay(`${p.items.length} items scored; ${p.bad.length} line${p.bad.length === 1 ? "" : "s"} skipped`);
+  renderEval(); evGoResults(p.bad.length ? `${p.items.length} items scored; ${p.bad.length} line${p.bad.length === 1 ? "" : "s"} skipped` : `${p.items.length} items scored`);
 }
 const EV_MTEMPLATE = ["id\tkind\texpected\tmodel_label\tnote", "img_0041\tnews\tallowed\tviolates\tprotest photo, crowd", "img_0042\tclear_violation\tviolates\tviolates\t", "vid_0107\tedited\tviolates\tallowed\tcropped copy of a known item", "img_0043\tlookalike\tallowed\tviolates\ttoy that resembles a weapon"].join("\n");
 function evManifestFieldHTML(){
   const L = evLabels(ev);
-  return `<div class="field"><label for="ev-manifest">The list: one line per item</label><p class="note">Columns: <span class="mono">id</span>, <span class="mono">kind</span>, <span class="mono">expected</span>, <span class="mono">model_label</span>, and an optional note. Tabs or commas; a header row is fine. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Expected is what your reviewers decided; model label is what the classifier said.</p>
+  return `<div class="field"><label for="ev-manifest">The list: one line per item</label><p class="note">Columns: <span class="mono">id</span>, <span class="mono">kind</span>, <span class="mono">expected</span>, <span class="mono">model_label</span>, and an optional note. Tabs or commas; a header row is fine. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}. Expected is the right answer, what your reviewers decided; model label is what the classifier said.</p>
     <textarea class="input mono" id="ev-manifest" rows="8" placeholder="${esc(EV_MTEMPLATE).replace(/\n/g, "&#10;")}">${esc(EVL.manifest)}</textarea>
     ${EVL.bad.length ? `<p class="note" role="status">Last list: ${EVL.bad.length} line${EVL.bad.length === 1 ? "" : "s"} skipped. Line ${EVL.bad[0].line}: ${esc(EVL.bad[0].why)}.${EVL.bad.length > 1 ? ` Line ${EVL.bad[1].line}: ${esc(EVL.bad[1].why)}.` : ""}</p>` : ""}</div>`;
 }
-function evMediaHTML(){
-  const L = evLabels(ev), has = ev.media && ev.cases.length, stale = !ev.media && ev.cases.length;
+// Step 1 of the images-and-video page: the list box, the file picker, the options, and the guide. It stays the input for the next list too.
+function evMediaHTML(step){
+  const has = ev.media && ev.cases.length, stale = !ev.media && ev.cases.length;
   const tile = (attr, cur, k, n, h) => `<button type="button" role="radio" aria-checked="${cur === k}" class="card tr-tier ${cur === k ? "on" : ""}" data-${attr}="${k}"><b>${esc(n)}</b>${h ? `<span>${esc(h)}</span>` : ""}</button>`;
-  const row = c => { const p = ev.preds && ev.preds[c.id], ok = p && p.label === evGold(ev, c); return `<tr class="${p && !ok ? "bad" : ""}"><td class="mono">${esc(c.id)}</td><td><span class="note">${esc(evCat(c.cat)[1])}</span></td><td>${esc(evGold(ev, c))}</td><td>${p ? `<b>${esc(p.label)}</b>${ok ? "" : ' <span class="ev-x">✕</span>'}` : "–"}</td><td class="note">${esc(c.text === c.id ? "" : c.text)}</td></tr>`; };
-  return `<div class="ev-cases ev-media">
-    ${EVRUN.err ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : ""}
-    <section class="card" aria-labelledby="ev-media-h"><div class="card-h"><div><h3 id="ev-media-h" style="margin:0;font-size:16px">Image or video classifier</h3><p class="note" style="margin:4px 0 0">Bring your own labeled set. Paste a list, not the media. The images and videos stay where they are: nothing here is uploaded, and the list stays in your browser.</p></div></div>
-      <div class="card-b">
-        <div class="ev-mtwo">
-          <div class="field"><label for="ev-name-in">A name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" value="${esc(ev.name)}" maxlength="80" placeholder="For example: Nudity model, v3"></div>
-          <div class="field"><span class="lbl" id="ev-mlabels-l">Labels</span><div class="tr-tiers cp-two" role="radiogroup" aria-labelledby="ev-mlabels-l">${Object.entries(EV_LABELS).map(([k, v]) => tile("evlabels", ev.labels || "binary", k, v.n, v.h)).join("")}</div></div>
-        </div>
-        <div class="field"><label for="ev-policy-in">The rule it enforces <span class="note">optional, goes in the report</span></label><textarea class="input" id="ev-policy-in" rows="3" placeholder="For example: No sexual content involving real people…">${esc(ev.policy)}</textarea></div>
-        ${evManifestFieldHTML()}
-        <div class="pol-run"><button type="button" class="btn primary" data-ev="mscore">Score the list</button><label class="btn" for="ev-mfile">Open a file<input type="file" id="ev-mfile" class="visually-hidden" accept=".tsv,.csv,.txt,text/plain,text/csv,text/tab-separated-values"></label><button type="button" class="btn" data-ev="mtemplate">${icon("copy")}Copy a template</button><span class="note">${stale ? "Scoring a list replaces the text cases you have now." : "A file is read in your browser; it isn't sent anywhere."}</span></div>
-        <details class="ev-kinds"><summary>The kinds of case, and the words the list can use for them</summary><div class="cp-mapw"><table class="ev-ct ev-kinds-t"><thead><tr><th>Kind</th><th>What it covers</th><th>Also read as</th></tr></thead><tbody>${EV_MCATS.map(c => `<tr><td><span class="mono">${c[0]}</span><br>${esc(c[1])}</td><td class="note">${esc(c[2])}</td><td class="note">${esc(c[3].split(",").join(", "))}</td></tr>`).join("")}</tbody></table></div><p class="note">A kind the list names some other way lands in Other. Cases there still count toward accuracy, precision and recall.</p></details>
-      </div></section>
-    ${has ? `<section class="card"><div class="card-h"><div><h3 style="margin:0;font-size:16px">The items <span class="note">${ev.cases.length}</span></h3><p class="note" style="margin:4px 0 0">From the last list you scored. Expected labels are what the classifier is scored against.</p></div><div class="ev-case-a">${ev.preds ? `<button type="button" class="btn sm primary" data-ev="report">See the report</button>` : ""}</div></div>
-      <div class="cp-mapw"><table class="cp-map ev-table ev-mtable"><thead><tr><th>id</th><th>Kind</th><th>Expected</th><th>Got</th><th>Note</th></tr></thead><tbody>${ev.cases.map(row).join("")}</tbody></table></div></section>` : ""}
-    <details class="card ev-guide" id="ev-guide"><summary>How to build a test set from your own images and video</summary><div class="card-b">${evGuideHTML()}</div></details>
-  </div>`;
+  const body = `<p class="note ev-mlead">Bring your own labeled set. <strong>Paste a list, not the media.</strong> The images and videos stay where they are: nothing here is uploaded, and the list stays in your browser.</p>
+    ${evErrHTML("media")}${evManifestFieldHTML()}
+    <div class="pol-run"><button type="button" class="btn primary" data-ev="mscore">${has ? "Score the next list" : "Score the list"}</button><label class="btn" for="ev-mfile">Open a file<input type="file" id="ev-mfile" class="visually-hidden" accept=".tsv,.csv,.txt,text/plain,text/csv,text/tab-separated-values"></label><button type="button" class="btn" data-ev="mtemplate">${icon("copy")}Copy a template</button><span class="note">${stale ? "Scoring a list replaces the text cases you have now." : has ? "Same ids, same right answers, and the results compare the two lists." : "A file is read in your browser; it isn't sent anywhere."}</span></div>
+    <details class="ev-opts" id="ev-opts-d" data-evd="opts" ${EVU.opts ? "open" : ""}><summary>Options <span class="note">${esc((EV_LABELS[ev.labels] || EV_LABELS.binary).n.toLowerCase())}${ev.name ? " · " + esc(ev.name) : ""}</span></summary><div class="ev-opts-b">
+      <div class="field"><label for="ev-name-in">Name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" value="${esc(ev.name)}" maxlength="80" placeholder="For example: Nudity model, v3"></div>
+      <div class="field"><span class="lbl" id="ev-mlabels-l">Labels</span><div class="tr-tiers cp-two" role="radiogroup" aria-labelledby="ev-mlabels-l">${Object.entries(EV_LABELS).map(([k, v]) => tile("evlabels", ev.labels || "binary", k, v.n, v.h)).join("")}</div></div>
+      <div class="field ev-opt-wide"><label for="ev-policy-in">The rule it enforces <span class="note">optional, goes in the report</span></label><textarea class="input" id="ev-policy-in" rows="3" placeholder="For example: No sexual content involving real people…">${esc(ev.policy)}</textarea></div>
+    </div></details>
+    <details class="ev-kinds"><summary>The kinds of item, and the words the list can use for them</summary><div class="cp-mapw"><table class="ev-ct ev-kinds-t"><thead><tr><th>Kind</th><th>What it covers</th><th>Also read as</th></tr></thead><tbody>${EV_MCATS.map(c => `<tr><td><span class="mono">${c[0]}</span><br>${esc(c[1])}</td><td class="note">${esc(c[2])}</td><td class="note">${esc(c[3].split(",").join(", "))}</td></tr>`).join("")}</tbody></table></div><p class="note">A kind the list names some other way lands in Other. Items there still count toward the scores.</p></details>`;
+  return evStepHTML(step, 0, body) + `<details class="card ev-guide" id="ev-guide"><summary>How to build a test set from your own images and video</summary><div class="card-b">${evGuideHTML()}</div></details>`;
 }
 
 /* ---------- the guide: a test set from your own data ---------- */
@@ -229,25 +222,22 @@ const evGuideMarkdown = () => ["## Building a test set from your own images and 
 /* ---------- actions and events ---------- */
 function evAct2(a){
   switch(a){
-    case "media": ev.view = "media"; evView = "page"; EVRUN.err = ""; if(!ev.labels) ev.labels = "binary"; evSave(); renderEval(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
-    case "report": if(!ev.preds) return; ev.view = "report"; evSave(); renderEval(); return window.scrollTo(0, 0);
-    case "mscore": { const t = $("#ev-manifest"); return evMediaScore((t && t.value) || EVL.manifest); }
+    case "media": ev.view = "media"; evView = "page"; EVRUN.err = ""; if(!ev.labels) ev.labels = "binary"; evSave(); renderEval(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#ev-s1 h2"));
+    case "mscore": { const t = $("#ev-manifest"); evReadSetup(); return evMediaScore((t && t.value) || EVL.manifest); }
     case "mtemplate": return copyText(EV_MTEMPLATE, $("#ev-toast"));
-    case "looprun": { const dr = ev.draft || {};
-      if(dr.policy !== undefined) ev.policy = dr.policy.slice(0, 4000); if(dr.sys !== undefined) ev.sys = dr.sys.slice(0, 8000); if(dr.name && dr.name.trim()) ev.name = dr.name.trim().slice(0, 80);
-      ev.draft = Object.assign({}, dr, {name:""}); ev.ex = false; evSave();
-      if(ev.mode === "policy" && !ev.policy.trim()){ EVRUN.err = "Paste the rule first."; return renderEval(); }
+    case "looprun": { const dr = ev.draft || {}, t = $("#ev-loop-policy"), s = $("#ev-loop-sys");
+      if(t && t.value !== undefined) ev.policy = String(t.value).slice(0, 4000); if(s && s.value !== undefined) ev.sys = String(s.value).slice(0, 8000);
+      if(dr.name && dr.name.trim()) ev.name = dr.name.trim().slice(0, 80); ev.draft = null; ev.ex = false; evSave();
+      if(ev.mode === "policy" && !ev.policy.trim()){ evErr("Paste the rule first.", "loop"); return renderEval(); }
+      if(ev.mode === "prompt" && !ev.sys.trim()){ evErr("Paste your system prompt first.", "loop"); return renderEval(); }
       return evRunClassifier(); }
-    case "loopscore": { const t = $("#ev-loop-paste"), txt = (t && t.value) || EVL.paste, p = evParsePaste(ev, txt);
-      if(!p){ EVRUN.err = "Couldn't read any labels. One per line, as id, a tab or comma, then the label."; return renderEval(); }
-      const dr = ev.draft || {}; if(dr.name && dr.name.trim()) ev.name = dr.name.trim().slice(0, 80);
-      ev.pasted = txt; EVL.paste = ""; EVRUN.err = ""; const missing = ev.cases.filter(c => !p[c.id]).length; evFinish(p); renderEval(); window.scrollTo(0, 0);
-      return missing ? gsay(`${missing} case${missing === 1 ? "" : "s"} had no label and were left out`) : undefined; }
   }
 }
 document.addEventListener("input", e => { const t = e.target; if(!t || !evHere()) return;
-  if(t.id === "ev-loop-policy" || t.id === "ev-loop-sys" || t.id === "ev-loop-name"){ ev.draft = Object.assign({}, ev.draft, {[t.id.slice(8)]:t.value}); evSave(); }
-  else if(t.id === "ev-manifest") EVL.manifest = t.value; else if(t.id === "ev-loop-paste") EVL.paste = t.value; });
+  if(t.id === "ev-loop-name"){ ev.draft = Object.assign({}, ev.draft, {name:t.value}); evSave(); }
+  else if(t.id === "ev-loop-policy"){ ev.policy = String(t.value).slice(0, 4000); ev.ex = false; evSave(); const o = $("#ev-policy-in"); if(o && o !== t) o.value = ev.policy; }
+  else if(t.id === "ev-loop-sys"){ ev.sys = String(t.value).slice(0, 8000); evSave(); const o = $("#ev-sys-in"); if(o && o !== t) o.value = ev.sys; }
+  else if(t.id === "ev-manifest") EVL.manifest = t.value; });
 // A list opened from disk is read here, in the browser, and dropped into the box. Nothing is uploaded.
 document.addEventListener("change", e => { const t = e.target; if(!t || t.id !== "ev-mfile" || !evHere()) return; const f = t.files && t.files[0]; if(!f) return;
   const r = new FileReader(); r.onload = () => { EVL.manifest = String(r.result || "").slice(0, 2e6); const ta = $("#ev-manifest"); if(ta) ta.value = EVL.manifest; gsay(`Read ${f.name} in your browser: ${EVL.manifest.split(/\r?\n/).filter(l => l.trim()).length} lines. Nothing was uploaded.`); }; r.readAsText(f); t.value = ""; });
