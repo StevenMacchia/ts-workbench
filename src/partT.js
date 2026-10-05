@@ -5,5 +5,5 @@ function applyTheme(m){
   else document.documentElement.removeAttribute("data-mode");
   $$(".themeseg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.thememode===(m==="light"||m==="dark"?m:"system"))));
 }
-applyTheme(store.get("theme","system"));
+applyTheme(store.get("theme","light"));
 $$(".themeseg button").forEach(b => b.addEventListener("click", () => { store.set("theme", b.dataset.thememode); applyTheme(b.dataset.thememode); }));

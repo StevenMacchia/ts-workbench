@@ -11,7 +11,7 @@
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
- <script>try{var m=JSON.parse(localStorage.getItem("tswb:theme")||"null");if(m==="dark"||m==="light")document.documentElement.setAttribute("data-mode",m);}catch(e){}</script>
+ <script>try{var m=JSON.parse(localStorage.getItem("tswb:theme")||"null");if(m!=="dark"&&m!=="system")m="light";if(m==="dark"||m==="light")document.documentElement.setAttribute("data-mode",m);}catch(e){document.documentElement.setAttribute("data-mode","light");}</script>
 <div class="app">
   <aside class="side">
     <a class="brand" href="#overview">
