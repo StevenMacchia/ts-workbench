@@ -3987,113 +3987,6 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .rx-files{font-size:12.5px;color:var(--faint)}
 .rx-files .mono{font-size:12px}
 @media (max-width:600px){.rx-build{padding:16px}.rx-acts .btn{flex:1 1 auto;justify-content:center}}
-/* =========================================================
-   MODERN THEME (phase 4): the same system, cooler and softer. Cool neutrals instead of warm paper, one electric
-   accent that does the work (buttons, bars, radars), rounded panels with a hint of depth, and short transitions.
-   Declared last, so it only changes tokens and the handful of rules that gave the page its paper look.
-   ========================================================= */
-:root, :root[data-mode="light"]{
-  --canvas:#F4F5F8; --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F8F9FB; --sunk:#EEF0F4;
-  --ink:#0F1115; --muted:#5B6270; --faint:#7B8290;
-  --line:#E4E7EC; --line-strong:#C8CED8;
-  --accent:#2F5FEA; --accent-soft:#E8EEFF; --accent-ink:#FFFFFF;
-  --side:#F4F5F8; --side-ink:#0F1115; --side-muted:#5B6270; --side-active:#FFFFFF; --side-line:#E4E7EC;
-  --hover:rgba(15,17,21,.05);
-  --shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
-  --shadow-lift:0 10px 30px rgba(16,24,40,.10), 0 2px 6px rgba(16,24,40,.06);
-  --glow:0 0 0 4px rgba(47,95,234,.16);
-}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){
-  --canvas:#0B0C10; --bg:#111318; --surface:#14171D; --surface-2:#191D24; --sunk:#1F242C;
-  --ink:#F2F4F8; --muted:#A3ABB8; --faint:#7E8794;
-  --line:#262B34; --line-strong:#3B424D;
-  --accent:#7FA3FF; --accent-soft:rgba(127,163,255,.16); --accent-ink:#0B0C10;
-  --side:#0E1014; --side-ink:#F2F4F8; --side-muted:#A3ABB8; --side-active:#191D24; --side-line:#262B34;
-  --hover:rgba(255,255,255,.06);
-  --shadow:0 1px 2px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.3);
-  --shadow-lift:0 12px 32px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.4);
-  --glow:0 0 0 4px rgba(127,163,255,.22);
-}}
-:root[data-theme="dark"], :root[data-mode="dark"]{
-  --canvas:#0B0C10; --bg:#111318; --surface:#14171D; --surface-2:#191D24; --sunk:#1F242C;
-  --ink:#F2F4F8; --muted:#A3ABB8; --faint:#7E8794;
-  --line:#262B34; --line-strong:#3B424D;
-  --accent:#7FA3FF; --accent-soft:rgba(127,163,255,.16); --accent-ink:#0B0C10;
-  --side:#0E1014; --side-ink:#F2F4F8; --side-muted:#A3ABB8; --side-active:#191D24; --side-line:#262B34;
-  --hover:rgba(255,255,255,.06);
-  --shadow:0 1px 2px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.3);
-  --shadow-lift:0 12px 32px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.4);
-  --glow:0 0 0 4px rgba(127,163,255,.22);
-}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;box-shadow:var(--glow)}
-
-/* ---------- shell: the sidebar on the same cool neutrals, a soft active pill, a translucent top bar ---------- */
-.side{--ink:#0F1115;--muted:#5B6270;--faint:#7B8290;--bg:#FFFFFF;--line:#E4E7EC;--line-strong:#C8CED8;--sunk:#E6E9EF;--hover:rgba(15,17,21,.05);
-  --side-ink:#0F1115;--side-muted:#5B6270;--side-active:#FFFFFF;--side-line:#E4E7EC;
-  background:#F4F5F8;color:#0F1115;border-right:1px solid #E4E7EC}
-:root[data-theme="dark"] .side,:root[data-mode="dark"] .side{--ink:#F2F4F8;--muted:#A3ABB8;--faint:#7E8794;--bg:#111318;--line:#262B34;--line-strong:#3B424D;--sunk:#242931;--hover:rgba(255,255,255,.06);
-  --side-ink:#F2F4F8;--side-muted:#A3ABB8;--side-active:#191D24;--side-line:#262B34;
-  background:#0E1014;color:#F2F4F8;border-right:1px solid #262B34}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]) .side{--ink:#F2F4F8;--muted:#A3ABB8;--faint:#7E8794;--bg:#111318;--line:#262B34;--line-strong:#3B424D;--sunk:#242931;--hover:rgba(255,255,255,.06);
-  --side-ink:#F2F4F8;--side-muted:#A3ABB8;--side-active:#191D24;--side-line:#262B34;
-  background:#0E1014;color:#F2F4F8;border-right:1px solid #262B34}}
-.side .navlink{border-radius:8px}
-.side .navlink[aria-current="page"]{box-shadow:var(--shadow), inset 0 0 0 1px var(--side-line)}
-.side .sb-search,.side .kbd{border-radius:8px}
-.sb-assess{border-radius:10px}
-.sb-glyph,.sb-assess .navlink .sb-glyph,.sb-mark,.sb-av,.brand .mark{border-radius:6px}
-.sb-assess .navlink.done::after{border-radius:50%}
-.topbar{background:color-mix(in oklab, var(--bg) 82%, transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px)}
-.tb-demo,.tb-demo-t,.tb-demo-x,.tb-demo-x:hover,.tb-demo b,.tb-demo .btn{border-radius:8px}
-.tb-demo-t i{border-radius:50%!important}
-
-/* ---------- the components every tool shares: rounded, a hint of depth, one accent for actions ---------- */
-.card,.hero,.gd-done,.demo-welcome,.tour-card,.help-card,.offer,.ov-tool,.as-s.cur,.as-pic,.as-know,.as-rev,.as-rev-first,.as-six li,.gd-facts div,.gd-list,.gd-rad,.gd-lays,
-.ab-stats,.jn-next,.loop,.pol-sum,.starthere,.ttbar,.verdict,.live,.pol-note,.pol-empty-art,.wip-art,.mxm-card,.ma-plan,.ma-sum,.tt-card,.scen,.vd-card,.mx-card,.pl-card,.nx-card,.ov-pic,.wb,.helpcard,.dm-card,.op-tile,.pk-r,
-.ma-band,.ma-ladder,.ma-ad,.ma-ar,.ma-rm,.cv-mr,.cv-card,.cvr-card,.tr-card,.ds-card,.cp-card,.cp-gap,.rv-area,.rv-rad,.rv-grid .card,.pl-group,.pl-item,.nx-item,.tr-tier,.cp-row,.gd-pi .cp-row,.dm-welcome,.dm-exit,.area{border-radius:12px}
-.card{box-shadow:var(--shadow)}
-.card .card,.gd-facts div,.as-pic,.banner,.gd-opts .card{box-shadow:none}
-.ov-tool,.scen,.excard,.achip,.ocard,.tr-tier{transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease}
-.ov-tool:hover,.scen:hover,.excard:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift);border-color:var(--line-strong)}
-.banner{border-radius:10px;background:var(--accent-soft);color:var(--ink)}
-.btn,.btn.icon,.gd-cta,.ph-help,.pagehead .headmeta .btn{border-radius:9px}
-.btn{box-shadow:var(--shadow);border-color:var(--line);transition:background .14s ease, border-color .14s ease, box-shadow .14s ease, transform .14s ease}
-.btn:hover{background:var(--surface-2);border-color:var(--line-strong)}
-.btn:active{transform:translateY(1px);box-shadow:none}
-.btn.primary,.pagehead .headmeta .btn.primary{background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 86%, white), var(--accent));border-color:color-mix(in oklab, var(--accent) 80%, black);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 1px 2px rgba(16,24,40,.12), 0 4px 14px color-mix(in oklab, var(--accent) 28%, transparent)}
-.btn.primary:hover,.pagehead .headmeta .btn.primary:hover{background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 78%, white), color-mix(in oklab, var(--accent) 92%, black));border-color:color-mix(in oklab, var(--accent) 70%, black);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 2px 4px rgba(16,24,40,.14), 0 6px 18px color-mix(in oklab, var(--accent) 36%, transparent)}
-:root[data-theme="dark"] .btn.primary,:root[data-mode="dark"] .btn.primary,:root[data-theme="dark"] .btn.primary:hover,:root[data-mode="dark"] .btn.primary:hover{color:#0B0C10}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]) .btn.primary,:root:not([data-theme="light"]):not([data-mode="light"]) .btn.primary:hover{color:#0B0C10}}
-.pill,.tag,.gd-tool,.gd-chip,.gd-lay,.as-part,.as-six-n,.cp-new,.tt-sev,.sev,.cv-off,.rv-d,.sb-new,.kbd,kbd,.gd-opt kbd{border-radius:999px}
-.pill.crit::before,.pill.high::before,.pill.med::before,.pill.good::before,.pill .dot,.sdot,.ph-stats span::before,.ma-legend i,.as-rev-l li i{border-radius:50%}
-.input,.select,textarea.input,.field input,.field select,.field textarea,.dq textarea{border-radius:10px;border-color:var(--line);background:var(--surface);transition:border-color .14s ease, box-shadow .14s ease}
-.select:focus,.input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:var(--glow)}
-.segs button[aria-pressed="true"]{border-bottom-color:var(--accent)}
-input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup .tr-chk input,.ds-setup .tr-chk input{accent-color:var(--accent)}
-.tr-tier.on,.cp-setup .tr-tier.on,.ds-setup .tr-tier.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
-.ocard[aria-pressed="true"]{border-color:var(--accent)}
-.starthere{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
-.tour-card,.tour{border-radius:14px;box-shadow:var(--shadow-lift)}
-
-/* ---------- progress and charts: the accent does the work, no hatching ---------- */
-.asb-segs i,.as-segs i,.gd-mbar,.gd-mbar i,.bar,.as-bar,.as-bar i,.bar i,.pol-meter,.pol-meter i,.vd-bar,.vd-bar i,.mx-bar,.mx-bar i,.ev-bar,.ev-bar i{border-radius:999px}
-.as-bar i,.gd-mbar i,.bar i,.pol-meter i,.vd-bar i,.mx-bar i,.asb-segs i b,.as-segs i.on,.askcard > .bar i{background:linear-gradient(90deg, color-mix(in oklab, var(--accent) 80%, white), var(--accent))!important}
-.asb-segs i.cur b,.asb-segs i:last-of-type b,.as-segs i.on + i:not(.on){background:var(--accent)}
-.ma-cur,.cv-cov,.ev-r-now{fill:color-mix(in oklab, var(--accent) 22%, transparent);stroke:var(--accent)}
-.rk-shape{fill:color-mix(in oklab, var(--ink) 14%, transparent)}
-.ma-lg-cur,.cv-lg-cov,.ov-lg-fill{background:color-mix(in oklab, var(--accent) 24%, transparent)!important;border:1.5px solid var(--accent)!important;border-radius:3px!important}
-.ma-lg-tgt,.ov-lg-tgt,.cv-lg-risk,.ma-lg-gap{border-radius:3px!important}
-.rc-trend path,.rc-trend polyline,.rc-trend line{stroke:var(--accent)}
-.rc-trend circle{fill:var(--accent)}
-.gd-radio,.gd-radio.sq,.as-s.cur .as-n{border-radius:8px}
-.gd-opt.on .gd-radio{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.gd-opt{border-radius:10px;padding-left:10px;padding-right:10px}
-.gd-opt:hover{background:var(--surface-2)}
-.gd-opt.on{background:var(--accent-soft);border-bottom-color:transparent}
-.gd-chip.now,.as-s.cur .as-n{background:var(--accent);color:var(--accent-ink)}
-.as-six-n{background:var(--accent);color:var(--accent-ink)}
-.cp-tw table,.cp-map,.ev-conf td{border-radius:0}
-@media (prefers-reduced-motion: reduce){.btn,.ov-tool,.scen,.excard,.achip,.ocard,.tr-tier,.input,.select{transition:none}.ov-tool:hover,.scen:hover,.excard:hover,.btn:active{transform:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -10691,7 +10584,7 @@ function asWelcomeHTML(J){
     ${asFootHTML()}
   </div>`;
 }
-const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser: no accounts, no cookies, just an anonymous page-view count. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
+const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
 const asCount = (n, cap) => { const w = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n); return cap ? w.charAt(0).toUpperCase() + w.slice(1) : w; };
 function renderOverview(){
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();
@@ -11358,12 +11251,11 @@ function renderPolicy(){
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
         `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
-         <button type="button" class="btn sm" id="pol-reset">Start over</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
          <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
-        `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}<button type="button" class="btn sm" id="pol-full">See an example</button>`))
+        `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
   polBind();
 }
@@ -11505,8 +11397,6 @@ function polBind(){
   $$("[data-polreport]").forEach(b => b.onclick = () => { polReadForm(); pol.view = "report"; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
   const loadFull = () => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); renderPolicy(); gsay("Complete example loaded. Run the test at the bottom to see the full report."); };
   const full = $("#pol-full"); if(full) full.onclick = loadFull;
-  // Start over: a blank test, back at the guided intro. A running Claude review is stopped first.
-  const reset = $("#pol-reset"); if(reset) reset.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); pol = Object.assign(POL_BLANK(), {depth:pol.depth}); polRun.err = ""; polView = null; store.set("ws:cur:policy", null); gdReset("policy"); savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
   const info = $("#pol-info"); if(info && info.addEventListener) info.addEventListener("toggle", () => store.set("pol:info", info.open));
   const run = $("#pol-run"); if(run) run.onclick = polAnalyze;
   const stop = $("#pol-stop"); if(stop) stop.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); };
@@ -12546,7 +12436,7 @@ function renderMaturity(){
       </div>
       <aside class="vd-rail"><div class="card vd-railc" id="ma-rail">${maRailHTML()}</div></aside>
     </div>`) + `
-    <p class="note" style="margin-top:18px">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Levels are adapted from common capability maturity models.</p>`;
+    <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Levels are adapted from common capability maturity models.</p>`;
   bindMaturity();
 }
 function maRefresh(parts){
@@ -13014,7 +12904,7 @@ function cvResultsRender(){
     </div>
     <div class="segs cvr-tabs" role="tablist" aria-label="Coverage detail">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${cvTab === k}" class="${cvTab === k ? "on" : ""}" data-cvtab="${k}">${n}</button>`).join("")}</div>
     <div class="cvr-tab" role="tabpanel">${cvTab === "answers" ? `<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div>` : cvTab === "source" ? `<div id="cv-src-wrap">${cvSourceHTML()}</div>` : cvGapsHTML()}</div>
-    <p class="note cvr-note">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
+    <p class="note cvr-note">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
   </div>`;
 }
 // The one-page version: every question at once
@@ -13032,7 +12922,7 @@ function cvTableRender(){
       </div>
       <aside class="vd-rail"><div class="card vd-railc" id="cv-rail">${cvRailHTML()}</div></aside>
     </div>
-    <p class="note" style="margin-top:18px">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>`;
+    <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>`;
 }
 // keep: a redraw within the page (a confirm row, a tab) rather than arriving at it
 function renderCoverage(keep){
