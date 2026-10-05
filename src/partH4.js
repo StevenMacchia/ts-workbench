@@ -205,7 +205,7 @@ function asWelcomeHTML(J){
     ${asFootHTML()}
   </div>`;
 }
-const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
+const asFootHTML = () => `<footer class="ov-foot-note"><span><svg><use href="#i-lock"/></svg>Your work stays in your browser: no accounts, no cookies, just an anonymous page-view count. AI analysis, when you ask for it, runs on your own Claude account.</span><span>A self-assessment to guide planning, not an audit or legal advice.</span><a href="#about" style="margin-left:auto;color:var(--faint);text-decoration:none">Built by Steven Macchia · About this project</a></footer>`;
 const asCount = (n, cap) => { const w = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] || String(n); return cap ? w.charAt(0).toUpperCase() + w.slice(1) : w; };
 function renderOverview(){
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();

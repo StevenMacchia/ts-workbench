@@ -74,11 +74,12 @@ function renderPolicy(){
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
         `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
+         <button type="button" class="btn sm" id="pol-reset">Start over</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
          <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
-        `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>`))
+        `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}<button type="button" class="btn sm" id="pol-full">See an example</button>`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
   polBind();
 }
@@ -220,6 +221,8 @@ function polBind(){
   $$("[data-polreport]").forEach(b => b.onclick = () => { polReadForm(); pol.view = "report"; savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); });
   const loadFull = () => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); renderPolicy(); gsay("Complete example loaded. Run the test at the bottom to see the full report."); };
   const full = $("#pol-full"); if(full) full.onclick = loadFull;
+  // Start over: a blank test, back at the guided intro. A running Claude review is stopped first.
+  const reset = $("#pol-reset"); if(reset) reset.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); pol = Object.assign(POL_BLANK(), {depth:pol.depth}); polRun.err = ""; polView = null; store.set("ws:cur:policy", null); gdReset("policy"); savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
   const info = $("#pol-info"); if(info && info.addEventListener) info.addEventListener("toggle", () => store.set("pol:info", info.open));
   const run = $("#pol-run"); if(run) run.onclick = polAnalyze;
   const stop = $("#pol-stop"); if(stop) stop.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); };

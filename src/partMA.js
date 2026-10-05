@@ -420,7 +420,7 @@ function renderMaturity(){
       </div>
       <aside class="vd-rail"><div class="card vd-railc" id="ma-rail">${maRailHTML()}</div></aside>
     </div>`) + `
-    <p class="note" style="margin-top:18px">A self-assessment to guide planning, not an audit or legal advice. Levels are adapted from common capability maturity models.</p>`;
+    <p class="note" style="margin-top:18px">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Levels are adapted from common capability maturity models.</p>`;
   bindMaturity();
 }
 function maRefresh(parts){
