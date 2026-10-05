@@ -152,3 +152,8 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .imp.dn span{color:var(--muted)}
 .imp .pill{flex:none;min-width:56px;font-size:11px;font-weight:600;padding:0;background:none;letter-spacing:.01em}
 .imp .pill .dot,.imp .pill::before{display:none}
+
+/* ---------- severity colors retuned to the palette: coral, orange, amber, green instead of brick, rust and olive ---------- */
+:root, :root[data-mode="light"]{--crit:#E5484D;--crit-soft:rgba(229,72,77,.12);--high:#F2762E;--high-soft:rgba(242,118,46,.13);--med:#D99A0B;--med-soft:rgba(226,165,22,.15);--good:#1FA971;--good-soft:rgba(31,169,113,.12)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--crit:#FF7B7B;--crit-soft:rgba(255,123,123,.16);--high:#FFA26B;--high-soft:rgba(255,162,107,.16);--med:#F3C64B;--med-soft:rgba(243,198,75,.15);--good:#4ED49A;--good-soft:rgba(78,212,154,.15)}}
+:root[data-theme="dark"], :root[data-mode="dark"]{--crit:#FF7B7B;--crit-soft:rgba(255,123,123,.16);--high:#FFA26B;--high-soft:rgba(255,162,107,.16);--med:#F3C64B;--med-soft:rgba(243,198,75,.15);--good:#4ED49A;--good-soft:rgba(78,212,154,.15)}
