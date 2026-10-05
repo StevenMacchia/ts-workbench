@@ -1,0 +1,13 @@
+{
+  "name": "ts-workbench-screenshots",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Regenerates the workbench README and portfolio showcase screenshots from the local build.",
+  "main": "capture.js",
+  "scripts": {
+    "capture": "node capture.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^23.0.0"
+  }
+}
