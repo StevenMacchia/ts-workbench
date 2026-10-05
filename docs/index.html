@@ -20,7 +20,7 @@
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ed43d34957a49fcb90ec8e43f7db523"}'></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#F9FAFC; --sunk:#EDF0F5; --ink:#121A2B; --muted:#5A6478; --faint:#8791A5;
@@ -3987,6 +3987,128 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .rx-files{font-size:12.5px;color:var(--faint)}
 .rx-files .mono{font-size:12px}
 @media (max-width:600px){.rx-build{padding:16px}.rx-acts .btn{flex:1 1 auto;justify-content:center}}
+/* =========================================================
+   AURORA THEME: the instrument system with light in it. A soft violet-and-peach wash behind the content, frosted
+   panels, Inter for the type, one violet accent for actions and data (gradient on the primary button and the bars,
+   a translucent fill on the radars), rounded corners and a hint of depth. Declared last: tokens plus the handful of
+   rules that gave the page its paper look. Markup and logic are untouched.
+   ========================================================= */
+:root, :root[data-mode="light"]{
+  --canvas:#EEF0F7; --bg:#F7F8FC; --surface:#FFFFFF; --surface-2:#F3F4F9; --sunk:#E6E8F0;
+  --ink:#15172B; --muted:#636A85; --faint:#7C839C;
+  --line:rgba(21,23,43,.10); --line-strong:rgba(21,23,43,.22);
+  --accent:#6D5DF6; --accent-soft:rgba(109,93,246,.12); --accent-ink:#FFFFFF;
+  --side:rgba(255,255,255,.55); --side-ink:#15172B; --side-muted:#636A85; --side-active:#FFFFFF; --side-line:rgba(21,23,43,.10);
+  --panel:rgba(255,255,255,.72);
+  --hover:rgba(21,23,43,.05);
+  --shadow:0 1px 1px rgba(21,23,43,.04), 0 10px 30px rgba(21,23,43,.07);
+  --shadow-lift:0 14px 40px rgba(21,23,43,.14), 0 2px 6px rgba(21,23,43,.06);
+  --glow:0 0 0 4px rgba(109,93,246,.18);
+  --wash:radial-gradient(900px 420px at 72% -10%, rgba(109,93,246,.26), transparent 62%), radial-gradient(700px 380px at 22% 0%, rgba(255,160,120,.26), transparent 60%);
+  --display:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){
+  --canvas:#0B0C18; --bg:#10121F; --surface:#171A2B; --surface-2:#1C2033; --sunk:#232840;
+  --ink:#EEF0FA; --muted:#A0A6C0; --faint:#7E85A0;
+  --line:rgba(238,240,250,.10); --line-strong:rgba(238,240,250,.24);
+  --accent:#9B8CFF; --accent-soft:rgba(155,140,255,.16); --accent-ink:#0B0C18;
+  --side:rgba(16,18,31,.55); --side-ink:#EEF0FA; --side-muted:#A0A6C0; --side-active:#1C2033; --side-line:rgba(238,240,250,.10);
+  --panel:rgba(23,26,43,.66);
+  --hover:rgba(255,255,255,.06);
+  --shadow:0 1px 1px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  --shadow-lift:0 14px 40px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.4);
+  --glow:0 0 0 4px rgba(155,140,255,.22);
+  --wash:radial-gradient(900px 420px at 72% -10%, rgba(109,93,246,.30), transparent 62%), radial-gradient(700px 380px at 22% 0%, rgba(255,140,100,.14), transparent 60%);
+}}
+:root[data-theme="dark"], :root[data-mode="dark"]{
+  --canvas:#0B0C18; --bg:#10121F; --surface:#171A2B; --surface-2:#1C2033; --sunk:#232840;
+  --ink:#EEF0FA; --muted:#A0A6C0; --faint:#7E85A0;
+  --line:rgba(238,240,250,.10); --line-strong:rgba(238,240,250,.24);
+  --accent:#9B8CFF; --accent-soft:rgba(155,140,255,.16); --accent-ink:#0B0C18;
+  --side:rgba(16,18,31,.55); --side-ink:#EEF0FA; --side-muted:#A0A6C0; --side-active:#1C2033; --side-line:rgba(238,240,250,.10);
+  --panel:rgba(23,26,43,.66);
+  --hover:rgba(255,255,255,.06);
+  --shadow:0 1px 1px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  --shadow-lift:0 14px 40px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.4);
+  --glow:0 0 0 4px rgba(155,140,255,.22);
+  --wash:radial-gradient(900px 420px at 72% -10%, rgba(109,93,246,.30), transparent 62%), radial-gradient(700px 380px at 22% 0%, rgba(255,140,100,.14), transparent 60%);
+}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;box-shadow:var(--glow)}
+body{font-size:14.5px}
+h1,h2,h3,h4{letter-spacing:-.022em}
+
+/* ---------- the wash and the frosted shell ---------- */
+.app{background:var(--wash), var(--bg);border-radius:18px}
+.side,:root[data-theme="dark"] .side,:root[data-mode="dark"] .side{background:var(--side);border-right:1px solid var(--side-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]) .side{background:var(--side);border-right:1px solid var(--side-line)}}
+.side{--ink:var(--side-ink);--muted:var(--side-muted);--bg:var(--side-active);--line:var(--side-line);--sunk:var(--accent-soft)}
+.side .navlink{border-radius:9px}
+.side .navlink[aria-current="page"]{background:var(--side-active);box-shadow:var(--shadow), inset 0 0 0 1px var(--side-line)}
+.side .sb-search,.side .kbd{border-radius:9px}
+.sb-assess{border-radius:12px;background:var(--side-active)}
+.sb-glyph,.sb-assess .navlink .sb-glyph,.sb-mark,.sb-av,.brand .mark{border-radius:6px}
+.sb-assess .navlink.done::after{border-radius:50%}
+.topbar{background:transparent;border-bottom:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.tb-demo,.tb-demo-t,.tb-demo-x,.tb-demo-x:hover,.tb-demo b,.tb-demo .btn{border-radius:9px}
+.tb-demo-t i{border-radius:50%!important}
+
+/* ---------- headlines ---------- */
+.as-hero-t h1,.pagehead h1{background:linear-gradient(100deg, var(--ink) 30%, var(--accent) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagehead{border-bottom-color:var(--line)}
+
+/* ---------- panels: frosted, rounded, a hint of depth ---------- */
+.card,.hero,.gd-done,.demo-welcome,.tour-card,.help-card,.offer,.ov-tool,.as-s.cur,.as-pic,.as-know,.as-rev,.as-rev-first,.as-six li,.gd-facts div,.gd-list,.gd-rad,.gd-lays,
+.ab-stats,.jn-next,.loop,.pol-sum,.starthere,.ttbar,.verdict,.live,.pol-note,.pol-empty-art,.wip-art,.mxm-card,.ma-plan,.ma-sum,.tt-card,.scen,.vd-card,.mx-card,.pl-card,.nx-card,.ov-pic,.wb,.helpcard,.dm-card,.op-tile,.pk-r,
+.ma-band,.ma-ladder,.ma-ad,.ma-ar,.ma-rm,.cv-mr,.cv-card,.cvr-card,.tr-card,.ds-card,.cp-card,.cp-gap,.rv-area,.rv-rad,.rv-grid .card,.pl-group,.pl-item,.nx-item,.tr-tier,.cp-row,.gd-pi .cp-row,.dm-welcome,.dm-exit,.area{border-radius:14px}
+.card,.as-pic,.gd-done,.ov-tool,.scen,.as-s.cur{background:var(--panel);box-shadow:var(--shadow);border:1px solid var(--line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.card .card,.gd-facts div,.gd-opts .card{background:var(--surface);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.as-pic{border:1px solid var(--line)}
+.as-s.cur{border-color:var(--line)}
+.ov-tool,.scen,.excard,.achip,.ocard,.tr-tier{transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease}
+.ov-tool:hover,.scen:hover,.excard:hover{transform:translateY(-1px);box-shadow:var(--shadow-lift);border-color:var(--line-strong)}
+.banner{border-radius:12px;background:var(--accent-soft);color:var(--ink)}
+.hero-side{background:var(--surface-2)}
+
+/* ---------- actions ---------- */
+.btn,.btn.icon,.gd-cta,.ph-help,.pagehead .headmeta .btn{border-radius:10px}
+.btn,.pagehead .headmeta .btn{background:var(--surface);border-color:var(--line);box-shadow:0 1px 2px rgba(21,23,43,.05);transition:background .14s ease, border-color .14s ease, box-shadow .14s ease, transform .14s ease}
+.btn:hover,.pagehead .headmeta .btn:hover{background:var(--surface);border-color:var(--line-strong);box-shadow:var(--shadow)}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.primary,.btn.primary:hover,.pagehead .headmeta .btn.primary,.pagehead .headmeta .btn.primary:hover{background:linear-gradient(135deg, #6D5DF6, #9B6BFF);border-color:transparent;color:#fff;box-shadow:0 6px 18px rgba(109,93,246,.35)}
+.btn.primary:hover,.pagehead .headmeta .btn.primary:hover{background:linear-gradient(135deg, #7A6BFF, #A77DFF);box-shadow:0 8px 22px rgba(109,93,246,.45)}
+.tb-demo b,.tb-demo .btn,.tb-demo-x,.tb-demo-x:hover,.sb-mark,.sb-av,.sb-glyph{background:var(--ink)!important;color:var(--bg)}
+.pill,.tag,.gd-tool,.gd-chip,.gd-lay,.as-part,.as-six-n,.cp-new,.tt-sev,.sev,.cv-off,.rv-d,.sb-new,.kbd,kbd,.gd-opt kbd{border-radius:999px}
+.pill.accent{background:var(--accent-soft);color:var(--accent)}
+.pill.crit::before,.pill.high::before,.pill.med::before,.pill.good::before,.pill .dot,.sdot,.ph-stats span::before,.ma-legend i,.as-rev-l li i{border-radius:50%}
+.input,.select,textarea.input,.field input,.field select,.field textarea,.dq textarea{border-radius:10px;border-color:var(--line-strong);background:var(--surface);transition:border-color .14s ease, box-shadow .14s ease}
+.select:focus,.input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:var(--glow)}
+.segs button[aria-pressed="true"]{border-bottom-color:var(--accent)}
+input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup .tr-chk input,.ds-setup .tr-chk input{accent-color:var(--accent)}
+.tr-tier.on,.cp-setup .tr-tier.on,.ds-setup .tr-tier.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.ocard[aria-pressed="true"]{border-color:var(--accent)}
+.starthere{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.tour-card,.tour{border-radius:16px;box-shadow:var(--shadow-lift)}
+.ph-stats span::before{background:var(--accent)}
+
+/* ---------- progress and charts: violet does the work, no hatching ---------- */
+.asb-segs i,.as-segs i,.gd-mbar,.gd-mbar i,.bar,.as-bar,.as-bar i,.bar i,.pol-meter,.pol-meter i,.vd-bar,.vd-bar i,.mx-bar,.mx-bar i,.ev-bar,.ev-bar i{border-radius:999px}
+.as-bar i,.gd-mbar i,.bar i,.pol-meter i,.vd-bar i,.mx-bar i,.asb-segs i b,.as-segs i.on,.askcard > .bar i{background:linear-gradient(90deg, #6D5DF6, #FF9A7A)!important}
+.asb-segs i.cur b,.asb-segs i:last-of-type b,.as-segs i.on + i:not(.on){background:var(--accent)}
+.ma-cur,.cv-cov,.ev-r-now{fill:rgba(109,93,246,.18);stroke:var(--accent)}
+.rk-shape{fill:rgba(109,93,246,.14)}
+.ma-lg-cur,.cv-lg-cov,.ov-lg-fill{background:rgba(109,93,246,.22)!important;border:1.5px solid var(--accent)!important;border-radius:3px!important}
+.ma-lg-tgt,.ov-lg-tgt,.cv-lg-risk,.ma-lg-gap{border-radius:3px!important}
+.rc-trend path,.rc-trend polyline,.rc-trend line{stroke:var(--accent)}
+.rc-trend circle{fill:var(--accent)}
+.gd-radio,.gd-radio.sq,.as-s.cur .as-n{border-radius:8px}
+.gd-opt.on .gd-radio{background:var(--accent);border-color:var(--accent);color:#fff}
+.gd-opt{border-radius:10px;padding-left:10px;padding-right:10px}
+.gd-opt:hover{background:var(--surface-2)}
+.gd-opt.on{background:var(--accent-soft);border-bottom-color:transparent}
+.gd-chip.now,.as-s.cur .as-n,.as-six-n{background:var(--accent);color:#fff}
+.cp-tw table,.cp-map,.ev-conf td{border-radius:0}
+@media (prefers-reduced-motion: reduce){.btn,.ov-tool,.scen,.excard,.achip,.ocard,.tr-tier,.input,.select{transition:none}.ov-tool:hover,.scen:hover,.excard:hover,.btn:active{transform:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4051,7 +4173,7 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
- <script>try{var m=JSON.parse(localStorage.getItem("tswb:theme")||"null");if(m==="dark"||m==="light")document.documentElement.setAttribute("data-mode",m);}catch(e){}</script>
+ <script>try{var m=JSON.parse(localStorage.getItem("tswb:theme")||"null");if(m!=="dark"&&m!=="system")m="light";if(m==="dark"||m==="light")document.documentElement.setAttribute("data-mode",m);}catch(e){document.documentElement.setAttribute("data-mode","light");}</script>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></g></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
@@ -4212,7 +4334,7 @@ function applyTheme(m){
   else document.documentElement.removeAttribute("data-mode");
   $$(".themeseg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.thememode===(m==="light"||m==="dark"?m:"system"))));
 }
-applyTheme(store.get("theme","system"));
+applyTheme(store.get("theme","light"));
 $$(".themeseg button").forEach(b => b.addEventListener("click", () => { store.set("theme", b.dataset.thememode); applyTheme(b.dataset.thememode); }));
 /* =========================================================
    ABUSE PRE-MORTEM: PROFILE MODEL
@@ -10336,7 +10458,7 @@ function cmdkItems(){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
   }
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
-  out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","system"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
+  out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","light"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
   Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(it =>
     out.push({g:"Your saved work", label:it.title||"Untitled", sub:KINDS[it.kind].n, color:TOOL_COLOR[it.kind], icon:KINDS[it.kind].icon.replace("i-",""), run:()=>openSaved(it.id)}));
   if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", icon:"gauge", run:()=>{ location.hash = "metrics/" + mxSlug(m); }}));
