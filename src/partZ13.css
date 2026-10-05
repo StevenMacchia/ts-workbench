@@ -120,3 +120,23 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .gd-chip.now,.as-s.cur .as-n,.as-six-n{background:var(--accent);color:#fff}
 .cp-tw table,.cp-map,.ev-conf td{border-radius:0}
 @media (prefers-reduced-motion: reduce){.btn,.ov-tool,.scen,.excard,.achip,.ocard,.tr-tier,.input,.select{transition:none}.ov-tool:hover,.scen:hover,.excard:hover,.btn:active{transform:none}}
+
+/* ---------- rings: the clarity score ring, drawn in SVG with a severity color, takes the accent like the bars ---------- */
+.pol-sum svg circle:last-of-type{stroke:var(--accent)}
+.pol-sum svg circle:first-of-type{stroke:var(--sunk)}
+.tr-ring.crit b,.cp-ring.crit b,.ds-ring.crit b,.ev-ring.crit b{color:var(--ink)}
+.mini-radar polygon:last-of-type{fill:var(--accent);stroke:var(--accent)}
+
+/* ---------- sweep: the per-tool colors, the icon tiles, previous-run outlines, radar dots, the guided radio ---------- */
+:root, :root[data-mode="light"], :root[data-theme="dark"], :root[data-mode="dark"]{--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}}
+.sb-glyph,.sb-assess .navlink .sb-glyph{background:var(--accent-soft)!important;color:var(--accent)}
+.sb-mark,.sb-av,.brand .mark{background:linear-gradient(135deg,#6D5DF6,#9B6BFF)!important;color:#fff}
+.brand .mark svg{color:#fff}
+.ma-lg-old,.rv-lg-dot{border-color:var(--accent)!important}
+.ma-old,.cv-prev,.ev-r-prev{stroke:var(--accent);stroke-opacity:.55}
+.ma-dot.ok,.cv-dot.ok{fill:var(--accent)}
+.ov-art-ring{stroke:var(--accent);stroke-opacity:.4}
+.gd-radio{border-color:var(--line-strong);color:var(--muted)}
+.gd-opt.on .gd-radio{border-color:var(--accent);color:#fff}
+.pagehead h1{display:inline-block}

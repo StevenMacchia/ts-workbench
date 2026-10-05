@@ -74,10 +74,10 @@ function maRadar(d, big, prev){
     return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${anchor}" class="ma-rl">${esc(a.s)}${big && v ? `<tspan class="ma-rv ${below ? "gap" : ""}" dx="5">${v}</tspan>` : ""}</text>`;
   }).join("");
   const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>`;
-  const old = prev && rated ? `<polygon points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
+  const old = prev && rated ? `<polygon class="ma-old" points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
   const cur = rated ? `${hatch(hid, "var(--ink)")}<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   const dots = MA_AREAS.map((a, i) => { const v = lv(a.k); if(!v) return ""; const [x, y] = pt(i, v);
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" class="ma-dot ${v < t[a.k] ? "" : "ok"}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${lv(a.k)} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";
   return `<svg class="ma-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${tgt}${old}${cur}${dots}${labels}
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;

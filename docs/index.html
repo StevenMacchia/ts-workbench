@@ -4109,6 +4109,26 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .gd-chip.now,.as-s.cur .as-n,.as-six-n{background:var(--accent);color:#fff}
 .cp-tw table,.cp-map,.ev-conf td{border-radius:0}
 @media (prefers-reduced-motion: reduce){.btn,.ov-tool,.scen,.excard,.achip,.ocard,.tr-tier,.input,.select{transition:none}.ov-tool:hover,.scen:hover,.excard:hover,.btn:active{transform:none}}
+
+/* ---------- rings: the clarity score ring, drawn in SVG with a severity color, takes the accent like the bars ---------- */
+.pol-sum svg circle:last-of-type{stroke:var(--accent)}
+.pol-sum svg circle:first-of-type{stroke:var(--sunk)}
+.tr-ring.crit b,.cp-ring.crit b,.ds-ring.crit b,.ev-ring.crit b{color:var(--ink)}
+.mini-radar polygon:last-of-type{fill:var(--accent);stroke:var(--accent)}
+
+/* ---------- sweep: the per-tool colors, the icon tiles, previous-run outlines, radar dots, the guided radio ---------- */
+:root, :root[data-mode="light"], :root[data-theme="dark"], :root[data-mode="dark"]{--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}}
+.sb-glyph,.sb-assess .navlink .sb-glyph{background:var(--accent-soft)!important;color:var(--accent)}
+.sb-mark,.sb-av,.brand .mark{background:linear-gradient(135deg,#6D5DF6,#9B6BFF)!important;color:#fff}
+.brand .mark svg{color:#fff}
+.ma-lg-old,.rv-lg-dot{border-color:var(--accent)!important}
+.ma-old,.cv-prev,.ev-r-prev{stroke:var(--accent);stroke-opacity:.55}
+.ma-dot.ok,.cv-dot.ok{fill:var(--accent)}
+.ov-art-ring{stroke:var(--accent);stroke-opacity:.4}
+.gd-radio{border-color:var(--line-strong);color:var(--muted)}
+.gd-opt.on .gd-radio{border-color:var(--accent);color:#fff}
+.pagehead h1{display:inline-block}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -10536,7 +10556,7 @@ OV_ART.pol = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" ari
   OV_ART.ma = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[46, 34, 22].map(r => `<polygon points="${oct(r)}" fill="none" stroke="var(--line-strong)"/>`).join("")}
     <polygon points="${oct(46, cur)}" fill="var(--t-ma)" fill-opacity=".22" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>
-    <polygon points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
+    <polygon class="ov-art-ring" points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
     <circle cx="${(80 + Math.cos(low)*1.4/4*46).toFixed(1)}" cy="${(62 + Math.sin(low)*1.4/4*46).toFixed(1)}" r="4" fill="var(--crit)"/></svg>`;
 }
 OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -12215,10 +12235,10 @@ function maRadar(d, big, prev){
     return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${anchor}" class="ma-rl">${esc(a.s)}${big && v ? `<tspan class="ma-rv ${below ? "gap" : ""}" dx="5">${v}</tspan>` : ""}</text>`;
   }).join("");
   const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>`;
-  const old = prev && rated ? `<polygon points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
+  const old = prev && rated ? `<polygon class="ma-old" points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
   const cur = rated ? `${hatch(hid, "var(--ink)")}<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   const dots = MA_AREAS.map((a, i) => { const v = lv(a.k); if(!v) return ""; const [x, y] = pt(i, v);
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" class="ma-dot ${v < t[a.k] ? "" : "ok"}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${lv(a.k)} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";
   return `<svg class="ma-radar ${big ? "big" : ""}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(aria)}">${rings}${axes}${tgt}${old}${cur}${dots}${labels}
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;
@@ -12755,7 +12775,7 @@ function cvRadar(d, big, prev){
   // a previous quarter's coverage, dotted, for the quarter-by-quarter view
   const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>` : "";
   const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);
-    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4 : 3.5}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("") : "";
+    return `<circle cx="${f(a)}" cy="${f(b)}" r="${big ? 4 : 3.5}" class="cv-dot ${x.status === "exposed" || x.status === "gap" ? "" : "ok"}" fill="${x.status === "exposed" ? "var(--crit)" : x.status === "gap" ? "var(--high)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("") : "";
   const labels = rows.map((x, i) => { const [a, b] = pt(i, big ? 124 : 120), c = Math.cos(ang(i)), s = Math.sin(ang(i)), extra = x.a.l.length - 1;
     const anchor = c > .3 ? "start" : c < -.3 ? "end" : "middle", dy0 = s < -.6 ? `${-.2 - 1.1 * extra}em` : s > .6 ? ".9em" : `${.35 - .55 * extra}em`;
     return `<text x="${f(a)}" y="${f(b)}" text-anchor="${anchor}" class="cv-rl ${x.status}">${x.a.l.map((t, j) => `<tspan x="${f(a)}" dy="${j ? "1.1em" : dy0}">${esc(t)}</tspan>`).join("")}</text>`; }).join("");

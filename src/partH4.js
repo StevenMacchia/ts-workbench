@@ -35,7 +35,7 @@ OV_ART.pol = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" ari
   OV_ART.ma = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[46, 34, 22].map(r => `<polygon points="${oct(r)}" fill="none" stroke="var(--line-strong)"/>`).join("")}
     <polygon points="${oct(46, cur)}" fill="var(--t-ma)" fill-opacity=".22" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>
-    <polygon points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
+    <polygon class="ov-art-ring" points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
     <circle cx="${(80 + Math.cos(low)*1.4/4*46).toFixed(1)}" cy="${(62 + Math.sin(low)*1.4/4*46).toFixed(1)}" r="4" fill="var(--crit)"/></svg>`;
 }
 OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
