@@ -79,7 +79,7 @@ function renderPolicy(){
          <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
-        `<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}<button type="button" class="btn sm" id="pol-full">See an example</button>`))
+        `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}<button type="button" class="btn sm" id="pol-full">See an example</button>`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
   polBind();
 }

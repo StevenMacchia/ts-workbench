@@ -47,6 +47,14 @@ const body = function(){
   const p1 = evParsePaste(ev, "c1\tviolates\nc2, allowed\nc3;violates\nnonsense"); eq(Object.keys(p1).length, 3, "id and label lines parsed");
   const p2 = evParsePaste(ev, ev.cases.map(c => c.expect).join("\n")); eq(Object.keys(p2).length, 24, "bare labels in order"); eq(evMetrics(ev, p2).acc, 1, "and a perfect classifier scores 100%");
   eq(evParsePaste(ev, "hello world"), null, "garbage is rejected");
+  // where the labels came from: the runner's header line is skipped by the parser and read as the source; the badge names model and maker
+  eq(Object.keys(evParsePaste(ev, "# source: policylm\n" + ev.cases.map(c => c.expect).join("\n"))).length, 24, "a source header line is skipped");
+  eq(evPasteSource("# source: PolicyLM\nc1\tviolates"), "policylm", "the runner's source line is read"); eq(evPasteSource("c1\tviolates") + evPasteSource("# source: unknown"), "", "no header or an unknown one: no source");
+  eq(/class="pw"/.test(view.innerHTML) && /Powered by/.test(view.innerHTML) && /MiniLMv2/.test(view.innerHTML) && /PolicyLM-1\.7B/.test(view.innerHTML), true, "the eval's header says what powers it");
+  eq(/PolicyLM-1\.7B/.test(evSourceBadge("policylm")) && /Musubi/.test(evSourceBadge("policylm")) && /huggingface/.test(evSourceBadge("policylm")) && evSourceBadge("") === "" && !/href/.test(evSourceBadge("own")), true, "source badge names the model and its maker");
+  { const sv = JSON.stringify(ev); ev.mode = "paste"; ev.pasteSrc = "policylm"; evFinish(p2); renderEval(); const hh = view.innerHTML;
+    eq(/class="ev-src"/.test(hh) && /Musubi/.test(hh) && evLastRun().src === "policylm", true, "a pasted run carries the source badge"); eq(/labels from PolicyLM-1\.7B \(Musubi, with ROOST\)/.test(evMarkdown(ev)), true, "the report names the source");
+    ev.mode = "baseline"; evFinish(p2); eq(evLastRun().src, "minilm", "the baseline records its model"); ev.mode = "policy"; evFinish(p2); eq(evLastRun().src, "claude", "a Claude run records Claude"); ev = JSON.parse(sv); }
   // your own classifier: the paste panel works without AI, with the policy file and the runner script
   ev.mode = "paste"; ev.preds = null; renderEval(); h = view.innerHTML; eq(/data-ev="score"/.test(h) && /id="ev-paste"/.test(h) && /Add your own cases/.test(h) && /data-evgold="c1"/.test(h), true, "the paste panel and editable right answers");
   eq(/data-ev="dlpol"/.test(h) && /data-ev="dlpoljson"/.test(h) && /PolicyLM/.test(h) && /tools\/open-model-eval/.test(h) && /gpt-oss-safeguard/.test(h) && /data-ev="dlcsv"/.test(h), true, "the cases, both policy files and the runner script");
@@ -177,7 +185,7 @@ const api = new Function(parts + "\nreturn {evParsePaste, evCSV, evMetrics, evPo
   eq(r.kind, "binary", "label set inferred for the run"); eq(seen.length === 24 && seen[seen.length - 1].done === 24, true, "a progress call per case");
   eq(r.failed.slice().sort().join(","), "c3,c4", "the silent case times out and the nonsense one is reported, nothing else");
   eq(r.results.find(x => x.id === "c2").label, d.cases[1].expect, "a 500 is retried"); eq(/no label in reply/.test(r.results.find(x => x.id === "c4").error) && /timeout/.test(r.results.find(x => x.id === "c3").error), true, "errors say why");
-  const txt = fs.readFileSync(outF, "utf8"), lines = txt.split("\n").filter(Boolean); eq(lines.length, 22, "22 lines written"); eq(lines[0].split("\t")[0] === "c1" && lines[21].split("\t")[0] === "c24", true, "in id order");
+  const txt = fs.readFileSync(outF, "utf8"), all = txt.split("\n").filter(Boolean), lines = all.filter(l => l[0] !== "#"); eq(all[0], "# source: safeguard", "the file starts with the source line the eval reads"); eq(lines.length, 22, "22 lines written"); eq(lines[0].split("\t")[0] === "c1" && lines[21].split("\t")[0] === "c24", true, "in id order");
   const p = api.evParsePaste(d, txt); eq(Object.keys(p).length, 22, "and the eval reads all 22"); eq(p.c6.why === "fenced" && p.c7.why === "because c7" && p.c5.label === d.cases[4].expect, true, "labels and whys as sent");
   eq(api.evMetrics(d, p).acc, 1, "gold labels round-trip at 100%");
   fs.rmSync(tmp, {recursive:true, force:true});

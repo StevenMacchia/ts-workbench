@@ -131,7 +131,7 @@ export async function run(o, onProgress) {
   if (o.limit) cases = cases.slice(0, o.limit);
   const results = new Array(cases.length), order = cases.map((_, i) => i);
   let done = 0, next = 0;
-  const flush = () => { const lines = results.filter(r => r && r.label).sort((a, b) => +a.id.slice(1) - +b.id.slice(1) || (a.id < b.id ? -1 : 1)).map(r => formatLine(r.id, r.label, r.why)); if (o.out && o.out !== "-") fs.writeFileSync(o.out, lines.join("\n") + (lines.length ? "\n" : "")); return lines; };
+  const flush = () => { const lines = results.filter(r => r && r.label).sort((a, b) => +a.id.slice(1) - +b.id.slice(1) || (a.id < b.id ? -1 : 1)).map(r => formatLine(r.id, r.label, r.why)); if (o.out && o.out !== "-") fs.writeFileSync(o.out, "# source: safeguard\n" + lines.join("\n") + (lines.length ? "\n" : "")); return lines; }; // the file starts with "# source: safeguard" so the eval can show which model labeled the cases
   const worker = async () => {
     while (next < order.length) {
       const i = order[next++], c = cases[i];

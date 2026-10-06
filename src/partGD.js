@@ -27,6 +27,7 @@ function gdIntroHTML(spec){
     <span class="gd-tool"><span class="sb-glyph" style="background:${T.color}"><svg><use href="#i-${T.icon}"/></svg></span>${esc(T.name)}</span>
     <h1>${I.title}</h1>
     <p class="gd-lead">${I.lead}</p>
+    ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
     ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}

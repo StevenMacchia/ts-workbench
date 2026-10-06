@@ -484,6 +484,7 @@ def main(argv):
     out = args["out"]
     if out and out != "-":
         with open(out, "w", encoding="utf-8", newline="\n") as f:
+            f.write("# source: policylm\n")  # the first line tells the eval which model labeled the cases
             f.write("\n".join(lines) + ("\n" if lines else ""))
     else:
         sys.stdout.write("\n".join(lines) + ("\n" if lines else ""))

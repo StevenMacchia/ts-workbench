@@ -328,7 +328,7 @@ function aiSpec(key){
     return Object.assign(base, {kind:"text", rows:fd.type === "area" ? (fd.rows || 4) + 1 : 1, placeholder:fd.ph || "", get:() => F()[fd.k] || "", set:v => setV(fd.k, v)});
   });
   return {k:key, tool:{name:T.n, icon:T.icon.replace(/^i-/, ""), color:"var(--t-ai)"},
-    intro:{title:esc(T.q), lead:esc(T.desc), facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
+    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { aiView[key] = "page"; renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }},
       {n:"Fill in an example", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; gdReset(key); renderAI(key); window.scrollTo(0, 0); }},
       {n:"See an example result", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; aiView[key] = "page"; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); }}],
@@ -349,7 +349,7 @@ function renderAI(key){
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
         <div class="ai-out-a"><span class="toast" id="ai-toast" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
         <div class="ai-out">${T.render(st.r)}</div>` : "";
-  view.innerHTML = head(T.n, T.desc, "AI assistants", `<span class="pill ai-pill">AI · runs on your Claude account</span>`) + `
+  view.innerHTML = head(T.n, T.desc, "AI assistants", `${typeof poweredBy === "function" ? poweredBy(["claude"]) : ""}<span class="pill ai-pill">AI · runs on your Claude account</span>`) + `
     <p class="mxa-q ai-q">${esc(T.q)}</p>
     <div class="mxm-how ai-how"><ol class="mxm-how-s">${T.steps.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="ai-grid">
