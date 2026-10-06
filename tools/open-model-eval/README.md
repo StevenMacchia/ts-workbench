@@ -95,7 +95,7 @@ With no `--model`, the first run downloads `musubilabs/policylm-1.7b` into the n
 ### The round trip
 
 1. **In the eval**, choose **My own classifier's labels**, and set up or paste your cases. Click **Download cases** (`eval-cases-….tsv`) and **Download policy for PolicyLM** (`policy-….json`).
-2. **Finish the policy.** Open the JSON file and fill in or delete every value that starts with `TODO`. A `TODO` field left as-is is treated as blank, with a warning; it won't stop the run, but an empty `not_violation_rule` and `exception_override` give the model less to go on than a filled one.
+2. **Finish the policy.** Open the JSON file and fill in or delete every value that starts with `TODO`. A `TODO` field left as-is is treated as blank, with a warning; it won't stop the run, but an empty `not_violation_rule` and `exception_override` give the model less to go on than a filled one. PolicyLM scores direct rules ("Flag messages that…") noticeably higher than a policy pasted in verbatim ("Users must not…"); lead `violation_rule` with the direct version, and keep your original wording after it for the humans who'll read the file later.
 3. **Get the script.** Save [run_policylm.py](https://raw.githubusercontent.com/StevenMacchia/ts-workbench/main/tools/open-model-eval/run_policylm.py) into the same folder as your two downloads.
 4. **Open a terminal in that folder** (with the virtual environment active) and try five cases first:
 
@@ -134,11 +134,11 @@ You can try the pipeline with no download at all using `--stub`, which scores wi
 
 ### How scores become labels
 
-PolicyLM returns a score from 0 to 1 for every category in your policy; the script takes the highest one. At or above the policy's `thresholds.positive` (0.5 by default), the case gets the positive label (`violates` or `remove`). For a three-label set, a score at or above `thresholds.review` (0.25 by default) but below `positive` gets the middle label (`review`); anything lower gets the last label (`allow`). `--threshold` and `--review` override the policy file's numbers for one run, which is a quick way to trade false positives for false negatives without re-exporting the policy.
+PolicyLM returns a score from 0 to 1 for every category in your policy; the script takes the highest one. At or above the policy's `thresholds.positive` (0.335 by default, the model's own precision cutoff), the case gets the positive label (`violates` or `remove`). For a three-label set, a score at or above `thresholds.review` (0.2 by default) but below `positive` gets the middle label (`review`); anything lower gets the last label (`allow`). `--threshold` and `--review` override the policy file's numbers for one run, which is a quick way to trade false positives for false negatives without re-exporting the policy.
 
 The markdown policy file (`policy-….md`, written for gpt-oss-safeguard) works too, as a fallback: the whole file becomes one category, named after its `# Policy:` heading.
 
 ### Tested on
 
 - `--stub`, every time: `node src/test-pl.js` in the main repo exercises parsing, the `TODO` handling, both label sets and the markdown fallback with no model and no download.
-- A live model on 2026-10-06, on an RTX 4080 Super (16 GB), against the classifier eval's own 24-case harassment example.
+- A live model on 2026-10-06, on an RTX 4080 Super (16 GB), against the classifier eval's own 24-case harassment example: model load plus all 24 cases in 71 seconds, 23 of 24 right (96%), precision 1.00, recall 0.88, at the model's own "precision" cutoff (0.335) as the policy's threshold. Also confirmed against the model card's own worked example (0.96 / 0.99 and 0.00 / 0.06), to check this script calls the library the same way.

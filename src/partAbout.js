@@ -82,6 +82,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>How it was built</h2>
       <p>${AUTHOR.name ? `Designed and directed by <strong>${esc(AUTHOR.name)}</strong>. ` : ""}Built as a single HTML file with no frameworks, accounts or servers, using AI-assisted development. Automated checks play every tabletop scenario in every tailored version, render every screen in its empty, partial and complete states, and verify every score before each release.</p>
+      <p><a href="#credits">Everything it's built with ${icon("arrow")}</a>: the models, libraries, services and public sources, with licenses.</p>
       ${AUTHOR.link ? `<p><a href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">Connect with ${esc(AUTHOR.name || "the author")} ${icon("arrow")}</a></p>` : ""}
     </section>
 
@@ -138,6 +139,7 @@ function renderRoost(){
     <section class="ab-sec rise">
       <h2>What it uses</h2>
       <div class="ab-dec">${RO_USES.map(([n, d, lt, lh]) => `<div><h3>${n}</h3><p>${d}${lt ? ` ${ext(lh, lt)}` : ""}</p></div>`).join("")}</div>
+      <p class="note" style="margin-top:12px">Everything the workbench uses, with licenses, is on one page: <a href="#credits">Built with</a>.</p>
     </section>
 
     <section class="ab-sec rise">

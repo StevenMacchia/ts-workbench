@@ -75,6 +75,6 @@ npm run build # rebuilds docs/index.html
 
 ## License and credit
 
-Code is [MIT](LICENSE). The knowledge content (risks, safeguards, scenarios, metrics, rubrics and prompts) is [CC BY 4.0](LICENSE-CONTENT). Law notes are general information, not legal advice.
+Code is [MIT](LICENSE). The knowledge content (risks, safeguards, scenarios, metrics, rubrics and prompts) is [CC BY 4.0](LICENSE-CONTENT). Law notes are general information, not legal advice. The site's [Built with](https://stevenmacchia.com/ts-workbench/#credits) page lists every model, library, service and public source the workbench uses or names, with licenses.
 
 Built by [Steven Macchia](https://www.linkedin.com/in/stevenmacchia), Trust & Safety leader, with AI-assisted development (Claude).

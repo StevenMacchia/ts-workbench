@@ -169,10 +169,10 @@ function evPolicyJSON(d){
   return JSON.stringify({
     format:"ts-workbench-policylm-1",
     _note:"A policy for Musubi's PolicyLM-1.7B, run by the workbench's runner script (tools/open-model-eval). Fill in or delete every value that starts with TODO: the model reads every field. Keep the eval's test cases out, or the model sees the answers. Made with T&S Workbench.",
-    name, content:ct, labels:L, thresholds:{positive:.5, review:.25},
+    name, content:ct, labels:L, thresholds:{positive:.335, review:.2}, // .335 is the model's own precision cutoff; a verbatim rule scores low without it
     categories:[{
       name,
-      violation_rule:`Content that does what this rule forbids, in any wording, spelling or language. The rule: ${d.policy.trim()}`,
+      violation_rule:`Flag content that does what this rule forbids, in any wording, spelling or language. The rule, as written: ${d.policy.trim()}`,
       not_violation_rule:"TODO: content on the same topic that stays within the rule, for example quoting or reporting the behavior, banter between friends, figures of speech, or news and education about it. Say which of these the rule allows.",
       exception_override:"TODO: content that looks like a violation but must not be flagged, for example a user quoting a threat in order to report it."
     }]

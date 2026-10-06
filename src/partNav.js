@@ -2,7 +2,7 @@
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
 const TOOL_COLOR = {coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -64,7 +64,7 @@ function cmdkItems(){
   go("Policy stress-tester","policy","var(--t-pol)","doc");
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
-  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info");
+  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","plug");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
