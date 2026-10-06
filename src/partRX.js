@@ -237,7 +237,7 @@ function rxBuildHTML(r){
   if(!r || !r.risks || !r.risks.length) return "";
   const n = rxTop(r).length, fname = slug(pm.name);
   return `<section class="card rx-build" aria-labelledby="rx-h">
-    <div class="rx-h"><span class="eyebrow">Build it</span><span class="wip-tag">Starter, untested</span></div>
+    <div class="rx-h"><span class="eyebrow">Build it</span><span class="wip-tag">Starter, untested</span>${typeof poweredBy === "function" ? poweredBy(["roost"], "Formats by") : ""}</div>
     <h3 id="rx-h">From this report to files you can start from</h3>
     <p>Two starters from the top ${n} risks: rules for Osprey, ROOST's open-source rules engine, and a setup checklist for Coop, its review console. Every platform-specific value is a TODO, and nothing has run against a real deployment. The workbench is independent of ROOST.</p>
     <div class="row rx-acts"><button type="button" class="btn sm" data-rx="osprey">${rxIcon()}Osprey starter rules</button><button type="button" class="btn sm" data-rx="coop">${rxIcon()}Coop checklist</button><span class="toast" id="rx-toast" aria-live="polite"></span></div>

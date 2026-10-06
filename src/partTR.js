@@ -152,7 +152,7 @@ function trSpec(){
     html:() => `<div class="tr-setup gd-tr"><div class="tr-fields">${s.f.map(trField).join("")}</div>${s.k === "own" ? trCatsHTML() : ""}</div>`, has:() => s.f.some(trHas)})));
   const p = trProgress();
   return {k:"transparency", tool:{name:"Transparency report", icon:"chart", color:"var(--t-ai)"},
-    intro:{title:"Build the transparency report the DSA asks for", lead:"Say what kind of service you are, then fill in one section at a time: only the sections the law asks for at your tier. At the end you get a readable report, a check of what's missing, and the numbers by category.",
+    intro:{title:"Build the transparency report the DSA asks for", powered:typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff) ? ["claude"] : [], lead:"Say what kind of service you are, then fill in one section at a time: only the sections the law asks for at your tier. At the end you get a readable report, a check of what's missing, and the numbers by category.",
       facts:[["About 15 minutes", "Numbers you can look up as you go. Come back any time."], ["Only your sections", "Hosting services, platforms and very large platforms have different duties."], ["Checked against the DSA", `Articles 15, 24 and 42 and the EU templates, reviewed ${TR_REVIEWED}.`]], start:p.got ? "Continue" : "Start"},
     alt:[{n:"Fill everything in on one page", run:() => { trView = "page"; renderTransparency(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See an example", run:() => trAct("example")}],
     steps, finish:"Build the report",
@@ -166,7 +166,7 @@ function renderTransparency(){
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
     ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit numbers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button><button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
-    : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `<button type="button" class="btn sm" data-tr="example">See an example</button>`))
+    : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
 function trField(f){

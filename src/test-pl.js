@@ -78,7 +78,7 @@ eq(r4.status, 2, "17 categories is a clear failure, not a crash"); eq(/\b16\b/.t
 const outF = path.join(tmp, "labels.txt");
 const r5 = run([casesF, polF, "--stub", "--out", outF]);
 eq(r5.status, 0, "writing to a file exits 0: " + r5.stderr);
-const written = fs.readFileSync(outF, "utf8").trim().split("\n");
+const writtenAll = fs.readFileSync(outF, "utf8").trim().split("\n"), written = writtenAll.filter(l => l[0] !== "#"); eq(writtenAll[0], "# source: policylm", "the file starts with the source line the eval reads");
 eq(written.length, 2, "both cases in the file"); eq(/^c1\tviolates\tHarassment 0\.50$/.test(written[0]), true, "id, label, why: " + written[0]);
 
 fs.rmSync(tmp, { recursive: true, force: true });

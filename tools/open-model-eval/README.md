@@ -37,7 +37,7 @@ With the default settings nothing leaves your computer.
    ```
 
    You'll see one line per case and a summary. If that works, run it again without `--limit 5`.
-6. **Score it.** Open `labels.txt`, copy everything, paste it into the eval's label box and click **Score the labels**. Cases that failed are listed in the summary and left out of the file; the eval scores the rest.
+6. **Score it.** Open `labels.txt`, copy everything, paste it into the eval's label box and click **Score the labels**. The file's first line names the model, so the eval shows where the labels came from. Cases that failed are listed in the summary and left out of the file; the eval scores the rest.
 
 ### If it fails
 
@@ -104,7 +104,7 @@ With no `--model`, the first run downloads `musubilabs/policylm-1.7b` into the n
    ```
 
    The first run downloads the model, so it's slower; after that it's cached. You'll see one line per case and a summary. If that works, run it again without `--limit 5`.
-5. **Score it.** Open `labels.txt`, copy everything, paste it into the eval's label box and click **Score the labels**.
+5. **Score it.** Open `labels.txt`, copy everything, paste it into the eval's label box and click **Score the labels**. The file's first line names the model, so the eval shows where the labels came from.
 
 You can try the pipeline with no download at all using `--stub`, which scores with a deterministic keyword stand-in instead of the model — useful for checking your files are shaped right before committing to the 3.5 GB download.
 

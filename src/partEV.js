@@ -38,7 +38,7 @@ const EV_CATS = [
   ["multilingual", "Other languages", "The same kinds of case in a language other than English."]
 ];
 // view: "text" or "media" (which page is showing; older saves say "setup", "cases" or "report", read as text unless media). tab: the open Details tab.
-const EV_BLANK = () => ({name:"", policy:"", content:"", labels:"", n:0, mode:"", sys:"", cases:[], gold:{}, preds:null, runs:[], view:"text", tab:"kinds", ex:false, pasted:"", prev:null, last:null, draft:null, media:false});
+const EV_BLANK = () => ({name:"", policy:"", content:"", labels:"", n:0, mode:"", sys:"", pasteSrc:"", cases:[], gold:{}, preds:null, runs:[], view:"text", tab:"kinds", ex:false, pasted:"", prev:null, last:null, draft:null, media:false});
 let ev = Object.assign(EV_BLANK(), store.get("ev", null) || {});
 const evSave = () => store.set("ev", ev);
 const evTitle = d => "Classifier eval: " + (d.name || "Untitled classifier");
@@ -130,8 +130,31 @@ function evAdvice(d, m){
 /* ---------- the test set as text ---------- */
 const evCSV = d => ["id\tkind\texpected\ttext"].concat(d.cases.map(c => [c.id, c.cat, evGold(d, c), c.text.replace(/[\t\n]+/g, " ")].join("\t"))).join("\n");
 // Pasted labels: one per line as "id<tab or comma>label", or one label per line in case order
+// Where a run's labels came from: the model and who made it, shown as a badge on the run and named in the report. The
+// browser baseline and Claude set it themselves; the runner scripts write "# source: <key>" as the labels file's first
+// line, which the paste reads; a paste with no header is "your own classifier".
+const EV_SOURCES = {
+  policylm:{n:"PolicyLM-1.7B", by:"Musubi, with ROOST", href:"https://huggingface.co/musubilabs/policylm-1.7b"},
+  safeguard:{n:"gpt-oss-safeguard", by:"OpenAI", href:"https://huggingface.co/openai/gpt-oss-safeguard-20b"},
+  minilm:{n:"MiniLMv2 toxic", by:"minuva, from Unitary's toxic-bert", href:"https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"},
+  toxicbert:{n:"toxic-bert", by:"Unitary, ONNX port by Xenova", href:"https://huggingface.co/Xenova/toxic-bert"},
+  claude:{n:"Claude", by:"Anthropic", href:"https://www.anthropic.com"},
+  own:{n:"Your own classifier", by:"", href:""},
+  roost:{n:"ROOST", by:"Coop and Osprey formats", href:"https://roost.tools"}
+};
+// A "Powered by" plate for a tool's header: the models it runs on, or the formats it writes, each a badge with a tooltip
+// and a link to the maker. Tools call it guarded (typeof poweredBy === "function"), since tests load parts separately.
+function poweredBy(keys, label){ const b = (keys || []).map(k => evSourceBadge(k)).filter(Boolean); return b.length ? `<span class="pw"><span class="pw-l">${esc(label || "Powered by")}</span>${b.join("")}</span>` : ""; }
+const evPowered = () => ["minilm", "policylm", "safeguard"].concat(typeof evAI === "function" && evAI() ? ["claude"] : []);
+function evPasteSource(txt){ const m = String(txt || "").match(/^\s*#\s*source\s*:\s*([a-z0-9_-]+)/im); const k = m ? m[1].toLowerCase() : ""; return EV_SOURCES[k] ? k : ""; }
+const evRunSource = d => d.mode === "baseline" ? (typeof evbModel === "function" && /toxic-bert/i.test(evbModel().id) ? "toxicbert" : "minilm") : d.mode === "policy" || d.mode === "prompt" ? "claude" : d.mode === "paste" ? (EV_SOURCES[d.pasteSrc] ? d.pasteSrc : "own") : "";
+function evSourceBadge(src, small){
+  const s = EV_SOURCES[src]; if(!s) return "";
+  const inner = `<span class="ev-src-dot"></span>${esc(s.n)}${s.by ? `<span class="ev-src-by">${esc(s.by)}</span>` : ""}`, cls = `ev-src${small ? " sm" : ""}`, title = `Where these labels came from: ${esc(s.n)}${s.by ? ", by " + esc(s.by) : ""}`;
+  return s.href ? `<a class="${cls}" href="${s.href}" target="_blank" rel="noopener" title="${title}">${inner}</a>` : `<span class="${cls}" title="${title}">${inner}</span>`;
+}
 function evParsePaste(d, txt){
-  const L = evLabels(d), out = {}, lines = String(txt || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const L = evLabels(d), out = {}, lines = String(txt || "").split(/\r?\n/).map(l => l.trim()).filter(l => l && l[0] !== "#");
   const bare = lines.every(l => L.includes(l.toLowerCase()));
   lines.forEach((l, i) => { if(bare){ const c = d.cases[i]; if(c) out[c.id] = {label:l.toLowerCase(), why:""}; return; }
     const m = l.match(/^(c\d+)\s*[,\t;: ]\s*([a-z]+)\s*(?:[,\t;]\s*(.*))?$/i); if(!m) return; const lab = m[2].toLowerCase(); if(L.includes(lab) && d.cases.some(c => c.id === m[1])) out[m[1]] = {label:lab, why:(m[3] || "").slice(0, 160)}; });
@@ -180,7 +203,8 @@ function evPolicyJSON(d){
 }
 function evMarkdown(d){
   const m = evMetrics(d, d.preds), L = evLabels(d), adv = evAdvice(d, m);
-  const lines = [`# Classifier eval: ${d.name || "Untitled classifier"}`, "", `_${new Date().toISOString().slice(0, 10)} · ${d.cases.length} ${d.media ? "items from your own labeled set" : "synthetic cases"} · ${typeof evContentLabel === "function" ? evContentLabel(d) : cpLabel(EV_CONTENT, d.content)} · ${cpLabel(EV_MODES, d.mode)}. Made with T&S Workbench._`, "",
+  const LR = (d.runs || []).slice(-1)[0], S = LR && EV_SOURCES[LR.src];
+  const lines = [`# Classifier eval: ${d.name || "Untitled classifier"}`, "", `_${new Date().toISOString().slice(0, 10)} · ${d.cases.length} ${d.media ? "items from your own labeled set" : "synthetic cases"} · ${typeof evContentLabel === "function" ? evContentLabel(d) : cpLabel(EV_CONTENT, d.content)} · ${cpLabel(EV_MODES, d.mode)}${S ? ` · labels from ${S.n}${S.by ? ` (${S.by})` : ""}` : ""}. Made with T&S Workbench._`, "",
     "## The rule", "", d.policy.trim() || "_No rule recorded._", "", "## Result", "", typeof evSummary === "function" ? evSummary(d, m) : "", "", `- Accuracy: ${m.pct(m.acc)} (${m.correct} of ${m.n})`];
   if(m.main) lines.push(`- "${m.main.label}": precision ${m.pct(m.main.pr)} (of what it flagged, the share that deserved it), recall ${m.pct(m.main.rc)} (of what deserved flagging, the share it caught), F1 ${m.pct(m.main.f1)}`);
   lines.push("", "| Right answer \\ Got | " + L.join(" | ") + " |", "|---|" + L.map(() => "---").join("|") + "|");
@@ -311,8 +335,8 @@ async function evRunClassifier(){
 function evFinish(preds, runName){
   if(typeof evLoopBefore === "function") evLoopBefore(preds); // keeps the run being replaced, for the comparison
   ev.preds = preds; ev.view = ev.media ? "media" : "text"; EVRUN.err = ""; EVU.errAt = "";
-  const m = evMetrics(ev, preds), name = runName || ev.name || cpLabel(EV_MODES, ev.mode) || "Untitled run";
-  ev.runs = (ev.runs || []).filter(r => r.t).concat([{t:Date.now(), name, n:m.n, acc:m.acc, pr:m.main ? m.main.pr : null, rc:m.main ? m.main.rc : null}]).slice(-6);
+  const m = evMetrics(ev, preds), name = runName || ev.name || cpLabel(EV_MODES, ev.mode) || "Untitled run", src = evRunSource(ev);
+  ev.runs = (ev.runs || []).filter(r => r.t).concat([{t:Date.now(), name, src, n:m.n, acc:m.acc, pr:m.main ? m.main.pr : null, rc:m.main ? m.main.rc : null}]).slice(-6);
   if(typeof evLoopAfter === "function") evLoopAfter(name);
   evSave();
 }
@@ -331,7 +355,7 @@ function renderEval(){
   const m = n && ev.preds ? evMetrics(ev, ev.preds) : null, fresh = !ev.policy && !ev.cases.length && !ev.preds && !media;
   const steps = evSteps(media, n, m);
   view.innerHTML = head("Classifier eval", "Does your classifier apply your rule the way you meant it? Paste the rule and some cases, get labels from a classifier, and see what it gets wrong and what to change.", "Measure",
-      `<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download report</button>` : ""}`)
+      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download report</button>` : ""}`)
     + `<div class="ev-root cp-root">
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
@@ -413,7 +437,7 @@ function evResultsHTML(m, media){
   const tone = m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit", tab = ["kinds", "scores", "all", "runs"].includes(ev.tab) ? ev.tab : "kinds";
   const body = tab === "scores" ? evScoresHTML(m) : tab === "all" ? evAllHTML(m) : tab === "runs" ? evRunsHTML() : evKindsHTML(m);
   return `<div class="ev-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>right</span></div>
-      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span><h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>
+      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>
         <p class="note">${base ? "A general toxicity model scores words and tone, not your rule: it can't be told that reporting abuse is allowed, or that two people are friends. Where it disagrees with your right answers is where a fixed-category model stops being enough." : media ? "Scored against the labels your reviewers gave. The list named the items; the images and videos were never part of this." : m.main ? `Precision on "${esc(pos)}" ${m.pct(m.main.pr)}${evTip("precision")}, recall ${m.pct(m.main.rc)}${evTip("recall")}. The numbers by kind of case are under Details.` : ""}</p></div></div>
     ${loop ? `<div class="ev-sec ev-since"><h4>Since the last run</h4>${evCompareHTML()}</div>` : ""}
     <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evFailsHTML(m)}</div>
@@ -446,7 +470,7 @@ function evAllHTML(m){
 }
 function evRunsHTML(){
   const runs = (ev.runs || []).slice().reverse(), pct = x => x === null || x === undefined ? "–" : Math.round(x * 100) + "%";
-  return `<table class="ev-ct"><thead><tr><th>Run</th><th>When</th><th>Cases</th><th>Right</th><th>Precision</th><th>Recall</th></tr></thead><tbody>${runs.map(r => `<tr><td>${esc(r.name || "Untitled")}</td><td class="note">${r.t ? relTime(r.t) : "example"}</td><td class="mono">${r.n}</td><td class="mono">${pct(r.acc)}</td><td class="mono">${pct(r.pr)}</td><td class="mono">${pct(r.rc)}</td></tr>`).join("")}</tbody></table>
+  return `<table class="ev-ct"><thead><tr><th>Run</th><th>When</th><th>Cases</th><th>Right</th><th>Precision</th><th>Recall</th></tr></thead><tbody>${runs.map(r => `<tr><td>${esc(r.name || "Untitled")}${r.src ? evSourceBadge(r.src, true) : ""}</td><td class="note">${r.t ? relTime(r.t) : "example"}</td><td class="mono">${r.n}</td><td class="mono">${pct(r.acc)}</td><td class="mono">${pct(r.pr)}</td><td class="mono">${pct(r.rc)}</td></tr>`).join("")}</tbody></table>
     <p class="note">Every run against this set of cases, latest first. ${ev.media ? "Paste the next list" : "Change the rule and try again, below,"} and it lines up here.</p>`;
 }
 
@@ -470,9 +494,9 @@ function evAct(a){
     case "topaste": ev.mode = "paste"; EVRUN.err = ""; evSave(); renderEval(); return evGoStep("ev-s2", "#ev-paste");
     case "toclaude": ev.mode = ev.mode === "prompt" ? "prompt" : "policy"; EVRUN.err = ""; evSave(); renderEval(); return evGoStep("ev-s2", "#ev-sys-in, [data-ev=\"run\"]");
     case "again": return evGoStep("ev-loop");
-    case "score": { const txt = ($("#ev-paste") || {}).value || EVL.paste || "", p = evParsePaste(ev, txt); evReadSetup();
+    case "score": { const txt = ($("#ev-paste") || {}).value || EVL.paste || "", p = evParsePaste(ev, txt), psrc = evPasteSource(txt); evReadSetup();
       if(!p){ evErr("Couldn't read any labels. One per line: the case id, a tab or comma, then the label; or just the labels in case order.", "paste"); return renderEval(); }
-      ev.mode = "paste"; ev.pasted = txt; EVL.paste = ""; ev.ex = false; const missing = ev.cases.filter(c => !p[c.id]).length; evFinish(p); renderEval(); evGoResults(missing ? `${missing} case${missing === 1 ? "" : "s"} had no label and were left out` : ""); return; }
+      ev.mode = "paste"; ev.pasted = txt; ev.pasteSrc = psrc; EVL.paste = ""; ev.ex = false; const missing = ev.cases.filter(c => !p[c.id]).length; evFinish(p); renderEval(); evGoResults(missing ? `${missing} case${missing === 1 ? "" : "s"} had no label and were left out` : ""); return; }
     case "addown": { const L = evLabels(ev), lines = (($("#ev-own") || {}).value || EVL.own || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean); let added = 0;
       if(typeof evLeaveMedia === "function" && lines.length) evLeaveMedia();
       lines.forEach(l => { const m = l.match(/^([a-z]+)\s*[\t|,;]\s*(.+)$/i); if(!m || !L.includes(m[1].toLowerCase())) return; ev.cases.push({id:"c" + (ev.cases.length + 1), text:m[2].trim().slice(0, 400), expect:m[1].toLowerCase(), cat:"own", why:""}); added++; });
