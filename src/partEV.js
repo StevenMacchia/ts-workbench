@@ -20,7 +20,7 @@ const EV_SIZES = [[24, "24 cases", "Quick: a first read in about a minute."], [4
 // Where the labels came from. The first three are the step-2 tiles (Claude covers two modes); the mode names the run in the report.
 const EV_MODES = [
   ["baseline", "Free model in your browser", "A small open toxicity model, downloaded once and run here. Not your classifier: a floor to measure against."],
-  ["paste", "Your own classifier", "Copy or download the cases, run them through your model, paste its labels back. Any classifier, or an open model such as gpt-oss-safeguard on your own computer."],
+  ["paste", "Your own classifier", "Copy or download the cases, run them through your model, paste its labels back. Any classifier, or an open model such as PolicyLM or gpt-oss-safeguard on your own computer."],
   ["policy", "Claude, with my rule", "Claude reads the rule as written and labels each case. Tests whether the rule itself is clear enough to apply."],
   ["prompt", "Claude, with my system prompt", "Claude runs the prompt your production classifier uses. Tests the prompt, not just the rule."]
 ];
@@ -160,6 +160,23 @@ function evPolicyDoc(d){
     "- Spacing, symbols, misspellings and coded language: TODO. Most policies say these don't change the meaning.",
     "- Languages other than English: TODO. Most policies say the rule applies the same way in every language.", "",
     "## Definition of Labels", ""].concat(...L.map(lab)).join("\n");
+}
+// The rule as a policy for PolicyLM (Musubi's small open model that scores content against a written policy): one category
+// per rule, the model's three fields, TODO where only the author can decide, and the cutoffs that turn its 0 to 1 scores into
+// the eval's labels. Never the cases. Read by tools/open-model-eval/run_policylm.py.
+function evPolicyJSON(d){
+  const L = evLabels(d), c = EV_CONTENT.find(x => x[0] === d.content), ct = c ? c[1].toLowerCase() : "user content", name = (d.name || "Untitled rule").trim();
+  return JSON.stringify({
+    format:"ts-workbench-policylm-1",
+    _note:"A policy for Musubi's PolicyLM-1.7B, run by the workbench's runner script (tools/open-model-eval). Fill in or delete every value that starts with TODO: the model reads every field. Keep the eval's test cases out, or the model sees the answers. Made with T&S Workbench.",
+    name, content:ct, labels:L, thresholds:{positive:.5, review:.25},
+    categories:[{
+      name,
+      violation_rule:`Content that does what this rule forbids, in any wording, spelling or language. The rule: ${d.policy.trim()}`,
+      not_violation_rule:"TODO: content on the same topic that stays within the rule, for example quoting or reporting the behavior, banter between friends, figures of speech, or news and education about it. Say which of these the rule allows.",
+      exception_override:"TODO: content that looks like a violation but must not be flagged, for example a user quoting a threat in order to report it."
+    }]
+  }, null, 2);
 }
 function evMarkdown(d){
   const m = evMetrics(d, d.preds), L = evLabels(d), adv = evAdvice(d, m);
@@ -373,8 +390,8 @@ function evStep2HTML(n){
 function evPastePanelHTML(n){
   const L = evLabels(ev);
   return `<div class="ev-pp" id="ev-panel-paste">
-    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}${ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for an open model such as gpt-oss-safeguard. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Download the policy file` : `${icon("copy")}Copy the policy file`}</button>` : ""}</div>
-      <p class="note">${n} cases, one per line: id, kind, right answer, text. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model such as gpt-oss-safeguard, on your own computer: download the cases and the policy file, fill in the file's TODO lines, and the script writes labels you can paste here. It needs Node.js, Ollama and a 14 GB download.</p></div>
+    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}${ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpoljson" title="Your rule as a policy for PolicyLM, Musubi's small open model. Fill in its TODO fields first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for PolicyLM` : `${icon("copy")}Copy the PolicyLM policy`}</button><button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for gpt-oss-safeguard or another policy-following model. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for gpt-oss-safeguard` : `${icon("copy")}Copy the gpt-oss-safeguard policy`}</button>` : ""}</div>
+      <p class="note">${n} cases, one per line: id, kind, right answer, text. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model on your own computer: download the cases and a policy file, fill in the file's TODO lines, and the script writes labels you can paste here. PolicyLM (Musubi, 3.5 GB) runs on a laptop and needs Python. gpt-oss-safeguard (OpenAI, 14 GB) explains each label and needs Node.js, Ollama and a big graphics card.</p></div>
     <div class="ev-pp-s"><label for="ev-paste"><b>2. Paste its labels.</b></label><p class="note">One per line: <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in case order. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}.</p><textarea class="input mono" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(EVL.paste || "")}</textarea></div>
     <div class="field ev-name-f"><label for="ev-name-in">Name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" maxlength="80" value="${esc(ev.name)}" placeholder="${esc(ev.last ? evNextName(ev.last.name) : "For example: vendor model, keyword list, v2 prompt")}"></div>
     ${evErrHTML("paste")}<div class="pol-run"><button type="button" class="btn primary" data-ev="score">Score the labels</button><span class="note">Scored here, in your browser.</span></div></div>`;
@@ -463,6 +480,7 @@ function evAct(a){
       return gsay(added ? `${added} case${added === 1 ? "" : "s"} added` : `No lines matched. Start each line with ${L.join(" or ")}, then a tab or comma, then the text.`); }
     case "csv": return copyText(evCSV(ev), $("#ev-toast"));
     case "dlcsv": { const c = evCSV(ev); return offerFile(`eval-cases-${slug(ev.name || "classifier")}.tsv`, c, c, $("#ev-toast")); }
+    case "dlpoljson": { const p = evPolicyJSON(ev); return offerFile(`policy-policylm-${slug(ev.name || "classifier")}.json`, p, p, $("#ev-toast")); }
     case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
