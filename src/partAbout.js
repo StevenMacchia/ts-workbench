@@ -82,6 +82,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>How it was built</h2>
       <p>${AUTHOR.name ? `Designed and directed by <strong>${esc(AUTHOR.name)}</strong>. ` : ""}Built as a single HTML file with no frameworks, accounts or servers, using AI-assisted development. Automated checks play every tabletop scenario in every tailored version, render every screen in its empty, partial and complete states, and verify every score before each release.</p>
+      <p><a href="#credits">Everything it's built with ${icon("arrow")}</a>: the models, libraries, services and public sources, with licenses.</p>
       ${AUTHOR.link ? `<p><a href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">Connect with ${esc(AUTHOR.name || "the author")} ${icon("arrow")}</a></p>` : ""}
     </section>
 
@@ -99,11 +100,11 @@ const RO_GH = "https://github.com/StevenMacchia";
 const RO_TOOLS = [
   ["Coop", "https://github.com/roostorg/coop", "A review console you host yourself: queues, routing, enforcement, appeals, and hash matching with NCMEC reporting."],
   ["Osprey", "https://github.com/roostorg/osprey", "A real-time rules engine and investigation console, built at Discord. For teams with engineers and event streams."],
-  ["Model Community", "https://github.com/roostorg/model-community", "Guides and example policies for open safety models that label content against a policy you write."]
+  ["Model Community", "https://github.com/roostorg/model-community", "Guides and example policies for open safety models that label content against a policy you write, among them PolicyLM and gpt-oss-safeguard."]
 ];
 // What you can do today: [title, route, glyph color, icon, text, starter?]
 const RO_NOW = [
-  ["Test a rule on an open model", "eval", "var(--t-ai)", "eval", "Download the cases and a policy file, run them on an open model such as gpt-oss-safeguard on your own computer, and paste the labels back."],
+  ["Test a rule on an open model", "eval", "var(--t-ai)", "eval", "Download the cases and a policy file, run them on an open model such as PolicyLM or gpt-oss-safeguard on your own computer, and paste the labels back."],
   ["Improve a rule, run by run", "eval", "var(--t-ai)", "eval", "Edit the rule, run again, and see which cases were fixed or broke."],
   ["Get an instant baseline", "eval", "var(--t-ai)", "eval", "A small open model runs in your browser and shows where a generic toxicity filter misreads your rule."],
   ["Score images and video", "eval", "var(--t-ai)", "eval", "Paste a labeled list from your own classifier. The media never leaves where it is."],
@@ -115,6 +116,7 @@ const RO_USES = [
   ["ROOST's public docs and code", "The Osprey rule syntax and the Coop setup terms come from ROOST's documentation, example rules and source on GitHub, read in October 2026.", "roostorg on GitHub", "https://github.com/roostorg"],
   ["MiniLMv2 toxicity model", "The in-browser baseline. Apache-2.0, about 24 MB, distilled from Unitary's toxic-bert and trained on Jigsaw's toxic comment data. Downloads only when you click.", "Model card", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
   ["Transformers.js", "Hugging Face's library that runs the baseline model in your browser, loaded from jsDelivr. Version 3.8.1, pinned.", "Transformers.js", "https://huggingface.co/docs/transformers.js"],
+  ["PolicyLM-1.7B", "Optional, on your own computer. Musubi's small open-weight model that scores content against the policy you write, released with ROOST in October 2026. Run by the runner script; needs Python and a 3.5 GB download.", "Model card", "https://huggingface.co/musubilabs/policylm-1.7b"],
   ["gpt-oss-safeguard", "Optional, on your own computer. OpenAI's open-weight safety model, run with Ollama by the runner script.", "The runner script", RO_GH + "/ts-workbench/tree/main/tools/open-model-eval"],
   ["Claude", "Optional, in the Claude version only. Writes test cases and labels them, on your own Claude account.", "", ""],
   ["Nothing else", "No server and no accounts. What you type stays in your browser, and the model files above download only when you ask. Page views are counted anonymously, without cookies.", "", ""]
@@ -137,6 +139,7 @@ function renderRoost(){
     <section class="ab-sec rise">
       <h2>What it uses</h2>
       <div class="ab-dec">${RO_USES.map(([n, d, lt, lh]) => `<div><h3>${n}</h3><p>${d}${lt ? ` ${ext(lh, lt)}` : ""}</p></div>`).join("")}</div>
+      <p class="note" style="margin-top:12px">Everything the workbench uses, with licenses, is on one page: <a href="#credits">Built with</a>.</p>
     </section>
 
     <section class="ab-sec rise">

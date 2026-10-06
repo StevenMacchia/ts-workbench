@@ -49,7 +49,7 @@ const body = function(){
   eq(evParsePaste(ev, "hello world"), null, "garbage is rejected");
   // your own classifier: the paste panel works without AI, with the policy file and the runner script
   ev.mode = "paste"; ev.preds = null; renderEval(); h = view.innerHTML; eq(/data-ev="score"/.test(h) && /id="ev-paste"/.test(h) && /Add your own cases/.test(h) && /data-evgold="c1"/.test(h), true, "the paste panel and editable right answers");
-  eq(/data-ev="dlpol"/.test(h) && /tools\/open-model-eval/.test(h) && /gpt-oss-safeguard/.test(h) && /data-ev="dlcsv"/.test(h), true, "the cases, the policy file and the runner script");
+  eq(/data-ev="dlpol"/.test(h) && /data-ev="dlpoljson"/.test(h) && /PolicyLM/.test(h) && /tools\/open-model-eval/.test(h) && /gpt-oss-safeguard/.test(h) && /data-ev="dlcsv"/.test(h), true, "the cases, both policy files and the runner script");
   ev.mode = "policy"; renderEval(); h = view.innerHTML; eq(/data-ev="dlpol"/.test(h), false, "the policy file is for the paste route"); eq(/data-evsub="prompt"/.test(h), true, "Claude: with the rule or with a system prompt");
   eq(evAI() ? /data-ev="run"/.test(h) : /Open in Claude/.test(h) && !/data-ev="run"/.test(h), true, "without Claude the Claude panel links out instead of a dead button"); ev.mode = "paste";
   view.querySelector = () => null; // no DOM for the textarea; add through the data path instead
@@ -70,6 +70,9 @@ const body = function(){
   const pd = evPolicyDoc(ev); eq(/## Overview/.test(pd) && /## Definition of Terms/.test(pd) && /## Interpretation of Language/.test(pd) && /## Definition of Labels/.test(pd), true, "policy doc has the four parts");
   eq(pd.includes("> " + ev.policy.trim()) && /comments and replies/.test(pd) && /### violates\n/.test(pd) && /### allowed\n/.test(pd) && /Includes:/.test(pd) && /Excludes:/.test(pd), true, "with the rule, the content type and the labels defined");
   eq(ev.cases.some(c => pd.includes(c.text)), false, "and none of the test cases"); eq((pd.match(/TODO/g) || []).length >= 8, true, "author prompts marked TODO");
+  // the policy for PolicyLM: one category, the rule in it, TODO where the author decides, the eval's labels and cutoffs, never the cases
+  const pj = JSON.parse(evPolicyJSON(ev)); eq(pj.format === "ts-workbench-policylm-1" && pj.categories.length === 1 && pj.categories[0].violation_rule.includes(ev.policy.trim()) && /^TODO/.test(pj.categories[0].not_violation_rule) && /^TODO/.test(pj.categories[0].exception_override) && pj.labels.join() === evLabels(ev).join() && pj.thresholds.positive === .335 && pj.thresholds.review < pj.thresholds.positive && /^Flag /.test(pj.categories[0].violation_rule) && !ev.cases.some(c => JSON.stringify(pj).includes(c.text)), true, "PolicyLM policy: one category, the rule, TODO fields, labels, no cases");
+  ev.labels = "three"; eq(JSON.parse(evPolicyJSON(ev)).labels.join(), "remove,review,allow", "PolicyLM policy carries the three labels"); ev.labels = "binary";
   ev.labels = "three"; const pd3 = evPolicyDoc(ev); eq(/### remove\n/.test(pd3) && /### review\n/.test(pd3) && /### allow\n/.test(pd3) && /careful reviewer/.test(pd3), true, "three labels, review defined"); ev.labels = "binary";
   const msg = wsSaveTool("eval", ev, evTitle(ev)); eq(/saved/i.test(msg), true, "saved"); const it = Object.values(wsItems()).find(z => z.kind === "eval"); eq(/accurate/.test(itemSummary(it).html) && /accurate/.test(ovChip(it)), true, "workspace summary and chip");
   out.push("paste route, own cases, prompts and validators, markdown, tsv and policy, workspace");

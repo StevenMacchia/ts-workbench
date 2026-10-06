@@ -4261,6 +4261,7 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
       </div>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
+      <a class="navlink" href="#credits" data-route="credits"><svg><use href="#i-plug"/></svg>Built with</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
       <div id="sb-pins" class="sb-pins"></div>
     </nav>
@@ -4502,7 +4503,7 @@ const SG = {
   captcha:{t:"Bot friction at sign-up (e.g. Cloudflare Turnstile or reCAPTCHA) and blocking of disposable emails", o:"eng", e:"S"},
   phone_email_verify:{t:"Email or phone verification before posting, messaging or claiming rewards", o:"eng", e:"S"},
   device_signals:{t:"Device, network and behavior signals to link duplicate, banned and fake accounts", o:"eng", e:"M", lite:"Start with your fraud or bot-protection vendor's device fingerprinting."},
-  text_screening:{t:"Automated screening of text for abuse, spam and scam patterns, routed to human review", o:"eng", e:"M", lite:"Start with keyword lists and an off-the-shelf moderation API. Later, an open model such as gpt-oss-safeguard can check text against your own written policy. The model is free, but you run it on your own servers."},
+  text_screening:{t:"Automated screening of text for abuse, spam and scam patterns, routed to human review", o:"eng", e:"M", lite:"Start with keyword lists and an off-the-shelf moderation API. Later, an open model such as PolicyLM or gpt-oss-safeguard can check text against your own written policy. The models are free, but you run them on your own servers."},
   link_scanning:{t:"Check links against phishing and malware lists (e.g. Google Safe Browsing) before they are clickable", o:"eng", e:"S"},
   file_scanning:{t:"Malware scanning of uploaded files and blocking of executable file types", o:"eng", e:"S"},
   media_classifier:{t:"Nudity, violence and gore detection on uploads, with sensitive media behind a warning screen", o:"eng", e:"M", lite:"Start with an off-the-shelf image moderation API."},
@@ -10427,7 +10428,7 @@ function pmProjectSelect(){
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
 const TOOL_COLOR = {coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -10489,7 +10490,7 @@ function cmdkItems(){
   go("Policy stress-tester","policy","var(--t-pol)","doc");
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
-  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info");
+  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","plug");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
@@ -11002,6 +11003,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>How it was built</h2>
       <p>${AUTHOR.name ? `Designed and directed by <strong>${esc(AUTHOR.name)}</strong>. ` : ""}Built as a single HTML file with no frameworks, accounts or servers, using AI-assisted development. Automated checks play every tabletop scenario in every tailored version, render every screen in its empty, partial and complete states, and verify every score before each release.</p>
+      <p><a href="#credits">Everything it's built with ${icon("arrow")}</a>: the models, libraries, services and public sources, with licenses.</p>
       ${AUTHOR.link ? `<p><a href="${esc(AUTHOR.link)}" target="_blank" rel="noopener">Connect with ${esc(AUTHOR.name || "the author")} ${icon("arrow")}</a></p>` : ""}
     </section>
 
@@ -11019,11 +11021,11 @@ const RO_GH = "https://github.com/StevenMacchia";
 const RO_TOOLS = [
   ["Coop", "https://github.com/roostorg/coop", "A review console you host yourself: queues, routing, enforcement, appeals, and hash matching with NCMEC reporting."],
   ["Osprey", "https://github.com/roostorg/osprey", "A real-time rules engine and investigation console, built at Discord. For teams with engineers and event streams."],
-  ["Model Community", "https://github.com/roostorg/model-community", "Guides and example policies for open safety models that label content against a policy you write."]
+  ["Model Community", "https://github.com/roostorg/model-community", "Guides and example policies for open safety models that label content against a policy you write, among them PolicyLM and gpt-oss-safeguard."]
 ];
 // What you can do today: [title, route, glyph color, icon, text, starter?]
 const RO_NOW = [
-  ["Test a rule on an open model", "eval", "var(--t-ai)", "eval", "Download the cases and a policy file, run them on an open model such as gpt-oss-safeguard on your own computer, and paste the labels back."],
+  ["Test a rule on an open model", "eval", "var(--t-ai)", "eval", "Download the cases and a policy file, run them on an open model such as PolicyLM or gpt-oss-safeguard on your own computer, and paste the labels back."],
   ["Improve a rule, run by run", "eval", "var(--t-ai)", "eval", "Edit the rule, run again, and see which cases were fixed or broke."],
   ["Get an instant baseline", "eval", "var(--t-ai)", "eval", "A small open model runs in your browser and shows where a generic toxicity filter misreads your rule."],
   ["Score images and video", "eval", "var(--t-ai)", "eval", "Paste a labeled list from your own classifier. The media never leaves where it is."],
@@ -11035,6 +11037,7 @@ const RO_USES = [
   ["ROOST's public docs and code", "The Osprey rule syntax and the Coop setup terms come from ROOST's documentation, example rules and source on GitHub, read in October 2026.", "roostorg on GitHub", "https://github.com/roostorg"],
   ["MiniLMv2 toxicity model", "The in-browser baseline. Apache-2.0, about 24 MB, distilled from Unitary's toxic-bert and trained on Jigsaw's toxic comment data. Downloads only when you click.", "Model card", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
   ["Transformers.js", "Hugging Face's library that runs the baseline model in your browser, loaded from jsDelivr. Version 3.8.1, pinned.", "Transformers.js", "https://huggingface.co/docs/transformers.js"],
+  ["PolicyLM-1.7B", "Optional, on your own computer. Musubi's small open-weight model that scores content against the policy you write, released with ROOST in October 2026. Run by the runner script; needs Python and a 3.5 GB download.", "Model card", "https://huggingface.co/musubilabs/policylm-1.7b"],
   ["gpt-oss-safeguard", "Optional, on your own computer. OpenAI's open-weight safety model, run with Ollama by the runner script.", "The runner script", RO_GH + "/ts-workbench/tree/main/tools/open-model-eval"],
   ["Claude", "Optional, in the Claude version only. Writes test cases and labels them, on your own Claude account.", "", ""],
   ["Nothing else", "No server and no accounts. What you type stays in your browser, and the model files above download only when you ask. Page views are counted anonymously, without cookies.", "", ""]
@@ -11057,6 +11060,7 @@ function renderRoost(){
     <section class="ab-sec rise">
       <h2>What it uses</h2>
       <div class="ab-dec">${RO_USES.map(([n, d, lt, lh]) => `<div><h3>${n}</h3><p>${d}${lt ? ` ${ext(lh, lt)}` : ""}</p></div>`).join("")}</div>
+      <p class="note" style="margin-top:12px">Everything the workbench uses, with licenses, is on one page: <a href="#credits">Built with</a>.</p>
     </section>
 
     <section class="ab-sec rise">
@@ -11072,6 +11076,74 @@ function renderRoost(){
     <section class="ab-sec ab-note rise">
       <h2>Where this stands</h2>
       <p>An early start; expect changes. The workbench is an independent project, not made by or affiliated with ROOST. Some recommendations in other tools name Coop, Osprey or gpt-oss-safeguard as free options, and two reference files map ${ext(RO_GH + "/ts-metrics-framework/blob/main/running-on-coop.md", "the metrics to Coop's data")} and ${ext(RO_GH + "/abuse-premortem/blob/main/data/roost-harm-taxonomy.yaml", "the risk areas to ROOST's taxonomy")}.</p>
+    </section>
+  </article>`;
+}
+/* =========================================================
+   BUILT WITH (credits and sources)
+   Every model, library, service, program and public source the workbench uses or names, who made it, what it is used
+   for, and its terms. One place, so each tool's page can stay short. Add here when something new is used. The ROOST
+   page keeps its own short "What it uses" list and links here for the rest.
+   ========================================================= */
+const CR_GROUPS = [
+  {t:"Models that read content", ic:"eval", c:"var(--t-ai)", intro:"Each one downloads from its maker's own repository, unchanged, and only when you ask. Nothing from them is bundled into this page.", items:[
+    ["MiniLMv2 toxic", "minuva, distilled from Unitary's toxic-bert and trained on Jigsaw's Toxic Comment data", "The free baseline in the classifier eval. About 24 MB, runs in your browser.", "Apache-2.0", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
+    ["toxic-bert", "Unitary, with an ONNX port by Xenova", "The eval's fallback baseline when MiniLMv2 can't load. About 111 MB.", "Apache-2.0", "https://huggingface.co/Xenova/toxic-bert"],
+    ["PolicyLM-1.7B", "Musubi, released with ROOST in October 2026", "Scores your cases against the policy you write, on your own computer, through the runner script. 3.5 GB.", "Apache-2.0", "https://huggingface.co/musubilabs/policylm-1.7b"],
+    ["gpt-oss-safeguard", "OpenAI", "Labels your cases against a written policy and explains each label, on your own computer with Ollama, through the runner script. 14 GB.", "Apache-2.0", "https://huggingface.co/openai/gpt-oss-safeguard-20b"],
+    ["Claude", "Anthropic", "In the Claude version only: writes test cases and labels them, reviews rules, drafts notices and appeal replies. Runs on your own Claude account, under Anthropic's terms.", "", "https://www.anthropic.com"]
+  ]},
+  {t:"Open-source trust and safety tools", ic:"plug", c:"var(--accent)", intro:"The workbench writes files in formats these projects publish. It does not connect to any of them, and none of them made or reviewed it.", items:[
+    ["ROOST", "Robust Open Online Safety Tools, a nonprofit", "The pre-mortem's starters follow Coop's setup and Osprey's rule syntax; the eval's model notes follow its Model Community guides.", "", "https://roost.tools"],
+    ["Coop", "ROOST", "A review console you host yourself. The pre-mortem writes a setup checklist in its terms.", "Open source", "https://github.com/roostorg/coop"],
+    ["Osprey", "ROOST, built at Discord", "A real-time rules engine. The pre-mortem writes a starter rules file in its syntax.", "Open source", "https://github.com/roostorg/osprey"],
+    ["Hasher-Matcher-Actioner", "Meta, open source; the hash-matching piece Coop uses", "Named in the Coop starter.", "Open source", "https://github.com/facebook/ThreatExchange"],
+    ["Policy format for open safety models", "The four-part layout (overview, terms, interpretation, labels) that gpt-oss-safeguard and Zentropi's CoPE read", "The eval's and the stress-tester's policy files use it.", "", "https://developers.openai.com/cookbook/articles/gpt-oss-safeguard-guide"]
+  ]},
+  {t:"Libraries and services", ic:"layers", c:"var(--faint)", intro:"What the page is made of and served by.", items:[
+    ["Transformers.js 3.8.1", "Hugging Face", "Runs the baseline model in your browser. Loaded from jsDelivr only when you click.", "Apache-2.0", "https://huggingface.co/docs/transformers.js"],
+    ["jsDelivr", "Prospect One", "The open content delivery network that serves Transformers.js.", "", "https://www.jsdelivr.com"],
+    ["Hugging Face Hub", "Hugging Face", "Hosts the model files your browser or the runner script downloads.", "", "https://huggingface.co"],
+    ["GitHub Pages", "GitHub", "Serves this page. The source is public in the same repository.", "", "https://github.com/StevenMacchia/ts-workbench"],
+    ["Cloudflare Web Analytics", "Cloudflare", "Counts visits without cookies. It never sees what you type.", "", "https://www.cloudflare.com/web-analytics/"],
+    ["Inter, Instrument Sans and IBM Plex Mono", "Rasmus Andersson; Rodrigo Fuenzalida; IBM. Served by Google Fonts", "The typefaces: Inter and Instrument Sans for text, IBM Plex Mono for data.", "SIL Open Font License", "https://fonts.google.com"],
+    ["Node.js, Python, PyTorch and Ollama", "The OpenJS Foundation; the Python Software Foundation; the PyTorch Foundation; Ollama", "Only for the runner scripts you run on your own computer. vLLM and LM Studio work too.", "", "https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval"]
+  ]},
+  {t:"Programs and bodies named in recommendations", ic:"shield", c:"var(--t-pm)", intro:"Recommendations name these as options. The workbench has no connection to any of them.", items:[
+    ["NCMEC", "National Center for Missing & Exploited Children", "The US body for CyberTipline reports, and a hash list.", "", "https://www.missingkids.org"],
+    ["Internet Watch Foundation", "IWF, UK", "A hash list and reporting body.", "", "https://www.iwf.org.uk"],
+    ["PhotoDNA", "Microsoft", "Image hash matching, named as a tooling option.", "", "https://www.microsoft.com/en-us/photodna"],
+    ["Safer", "Thorn", "Hash matching and classifiers for child safety, named as a tooling option. Thorn's research is also cited in the tabletop.", "", "https://www.thorn.org"],
+    ["Hash-sharing database", "Global Internet Forum to Counter Terrorism (GIFCT)", "Named as the hash-sharing program for terrorist content.", "", "https://gifct.org"],
+    ["Lantern", "Tech Coalition", "Named as the cross-platform signal-sharing program for child safety.", "", "https://www.technologycoalition.org"]
+  ]},
+  {t:"Laws, frameworks and research the content draws on", ic:"doc", c:"var(--t-ds)", intro:"Every law note and evidence line links to its own source where it appears. This is the roll-up.", items:[
+    ["Digital Services Act", "European Union, Regulation (EU) 2022/2065", "The DSA readiness tool, the transparency report, and the notice writer's statement-of-reasons check.", "", "https://eur-lex.europa.eu/eli/reg/2022/2065/oj"],
+    ["COPPA Rule", "US Federal Trade Commission, 16 CFR Part 312, as amended in 2025", "The COPPA readiness tool.", "", "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312"],
+    ["Online Safety Act codes", "Ofcom, UK", "The program maturity model maps each area to Ofcom's illegal content and children's codes.", "", "https://www.ofcom.org.uk/online-safety"],
+    ["Safe Framework Specification", "Digital Trust & Safety Partnership, June 2025", "The maturity model maps each area to DTSP's commitments and practices.", "", "https://dtspartnership.org"],
+    ["Research and reports cited in the tabletop", "Thorn; the FBI's IC3; Freedom House; the OECD and EUIPO; NIST; Meta's Oversight Board and enforcement reports; Sap et al. (ACL 2019); Mire et al. (NAACL 2025)", "Evidence lines in the incident tabletop's scenarios, each linked where it appears.", "", "#tabletop"]
+  ]}
+];
+function renderCredits(){
+  const ext = (href, text) => href.charAt(0) === "#" ? `<a href="${href}">${text}</a>` : `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
+  const n = CR_GROUPS.reduce((a, g) => a + g.items.length, 0);
+  const meta = `<a class="btn sm" href="#about">About this project</a><a class="btn sm primary" href="https://github.com/StevenMacchia/ts-workbench" target="_blank" rel="noopener">Source on GitHub</a>`;
+  view.innerHTML = head("Built with", `The ${n} models, tools, services and public sources the workbench uses or names, who made each one, what it is used for, and on what terms. The workbench is an independent project: none of these organizations made, reviewed or endorsed it.`, "Credits and sources", meta) + `<article class="ab">
+    ${CR_GROUPS.map(g => `<section class="ab-sec rise">
+      <h2>${g.t}</h2>
+      <p class="note" style="margin:-6px 0 14px">${g.intro}</p>
+      <div class="ab-tools">${g.items.map(([name, maker, use, lic, href]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${g.c}"><svg><use href="#i-${g.ic}"/></svg></span><div><h3>${ext(href, esc(name))}${lic ? ` <span class="pill">${esc(lic)}</span>` : ""}</h3><p><strong>${esc(maker)}.</strong> ${esc(use)}</p></div></div>`).join("")}</div>
+    </section>`).join("\n")}
+
+    <section class="ab-sec rise">
+      <h2>Terms</h2>
+      <div class="ab-dec">
+        <div><h3>This project</h3><p>The code is MIT licensed. The content (risks, safeguards, scenarios, metrics, rubrics and prompts) is CC BY 4.0: use it, adapt it, credit it. A line like "T&amp;S Workbench by Steven Macchia, stevenmacchia.com/ts-workbench, CC BY 4.0" is enough. ${ext("https://github.com/StevenMacchia/ts-workbench/blob/main/LICENSE-CONTENT", "Content license")}</p></div>
+        <div><h3>The models</h3><p>Downloaded unchanged from their makers' repositories, so each one's license and notices travel with it. The page copies nothing from them, and your text goes to a model only when you run one.</p></div>
+        <div><h3>Names and marks</h3><p>Belong to their owners. Naming a program or a tool here means the workbench mentions it as an option, not that it is connected to it or recommended by it.</p></div>
+        <div><h3>Missing or wrong?</h3><p>If something the workbench uses isn't listed, or a credit is wrong, say so. ${ext("https://github.com/StevenMacchia/ts-workbench/issues", "Open an issue")}</p></div>
+      </div>
     </section>
   </article>`;
 }
@@ -16132,7 +16204,7 @@ const EV_SIZES = [[24, "24 cases", "Quick: a first read in about a minute."], [4
 // Where the labels came from. The first three are the step-2 tiles (Claude covers two modes); the mode names the run in the report.
 const EV_MODES = [
   ["baseline", "Free model in your browser", "A small open toxicity model, downloaded once and run here. Not your classifier: a floor to measure against."],
-  ["paste", "Your own classifier", "Copy or download the cases, run them through your model, paste its labels back. Any classifier, or an open model such as gpt-oss-safeguard on your own computer."],
+  ["paste", "Your own classifier", "Copy or download the cases, run them through your model, paste its labels back. Any classifier, or an open model such as PolicyLM or gpt-oss-safeguard on your own computer."],
   ["policy", "Claude, with my rule", "Claude reads the rule as written and labels each case. Tests whether the rule itself is clear enough to apply."],
   ["prompt", "Claude, with my system prompt", "Claude runs the prompt your production classifier uses. Tests the prompt, not just the rule."]
 ];
@@ -16272,6 +16344,23 @@ function evPolicyDoc(d){
     "- Spacing, symbols, misspellings and coded language: TODO. Most policies say these don't change the meaning.",
     "- Languages other than English: TODO. Most policies say the rule applies the same way in every language.", "",
     "## Definition of Labels", ""].concat(...L.map(lab)).join("\n");
+}
+// The rule as a policy for PolicyLM (Musubi's small open model that scores content against a written policy): one category
+// per rule, the model's three fields, TODO where only the author can decide, and the cutoffs that turn its 0 to 1 scores into
+// the eval's labels. Never the cases. Read by tools/open-model-eval/run_policylm.py.
+function evPolicyJSON(d){
+  const L = evLabels(d), c = EV_CONTENT.find(x => x[0] === d.content), ct = c ? c[1].toLowerCase() : "user content", name = (d.name || "Untitled rule").trim();
+  return JSON.stringify({
+    format:"ts-workbench-policylm-1",
+    _note:"A policy for Musubi's PolicyLM-1.7B, run by the workbench's runner script (tools/open-model-eval). Fill in or delete every value that starts with TODO: the model reads every field. Keep the eval's test cases out, or the model sees the answers. Made with T&S Workbench.",
+    name, content:ct, labels:L, thresholds:{positive:.335, review:.2}, // .335 is the model's own precision cutoff; a verbatim rule scores low without it
+    categories:[{
+      name,
+      violation_rule:`Flag content that does what this rule forbids, in any wording, spelling or language. The rule, as written: ${d.policy.trim()}`,
+      not_violation_rule:"TODO: content on the same topic that stays within the rule, for example quoting or reporting the behavior, banter between friends, figures of speech, or news and education about it. Say which of these the rule allows.",
+      exception_override:"TODO: content that looks like a violation but must not be flagged, for example a user quoting a threat in order to report it."
+    }]
+  }, null, 2);
 }
 function evMarkdown(d){
   const m = evMetrics(d, d.preds), L = evLabels(d), adv = evAdvice(d, m);
@@ -16485,8 +16574,8 @@ function evStep2HTML(n){
 function evPastePanelHTML(n){
   const L = evLabels(ev);
   return `<div class="ev-pp" id="ev-panel-paste">
-    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}${ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for an open model such as gpt-oss-safeguard. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Download the policy file` : `${icon("copy")}Copy the policy file`}</button>` : ""}</div>
-      <p class="note">${n} cases, one per line: id, kind, right answer, text. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model such as gpt-oss-safeguard, on your own computer: download the cases and the policy file, fill in the file's TODO lines, and the script writes labels you can paste here. It needs Node.js, Ollama and a 14 GB download.</p></div>
+    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}${ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpoljson" title="Your rule as a policy for PolicyLM, Musubi's small open model. Fill in its TODO fields first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for PolicyLM` : `${icon("copy")}Copy the PolicyLM policy`}</button><button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for gpt-oss-safeguard or another policy-following model. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for gpt-oss-safeguard` : `${icon("copy")}Copy the gpt-oss-safeguard policy`}</button>` : ""}</div>
+      <p class="note">${n} cases, one per line: id, kind, right answer, text. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model on your own computer: download the cases and a policy file, fill in the file's TODO lines, and the script writes labels you can paste here. PolicyLM (Musubi, 3.5 GB) runs on a laptop and needs Python. gpt-oss-safeguard (OpenAI, 14 GB) explains each label and needs Node.js, Ollama and a big graphics card.</p></div>
     <div class="ev-pp-s"><label for="ev-paste"><b>2. Paste its labels.</b></label><p class="note">One per line: <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in case order. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}.</p><textarea class="input mono" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(EVL.paste || "")}</textarea></div>
     <div class="field ev-name-f"><label for="ev-name-in">Name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" maxlength="80" value="${esc(ev.name)}" placeholder="${esc(ev.last ? evNextName(ev.last.name) : "For example: vendor model, keyword list, v2 prompt")}"></div>
     ${evErrHTML("paste")}<div class="pol-run"><button type="button" class="btn primary" data-ev="score">Score the labels</button><span class="note">Scored here, in your browser.</span></div></div>`;
@@ -16575,6 +16664,7 @@ function evAct(a){
       return gsay(added ? `${added} case${added === 1 ? "" : "s"} added` : `No lines matched. Start each line with ${L.join(" or ")}, then a tab or comma, then the text.`); }
     case "csv": return copyText(evCSV(ev), $("#ev-toast"));
     case "dlcsv": { const c = evCSV(ev); return offerFile(`eval-cases-${slug(ev.name || "classifier")}.tsv`, c, c, $("#ev-toast")); }
+    case "dlpoljson": { const p = evPolicyJSON(ev); return offerFile(`policy-policylm-${slug(ev.name || "classifier")}.json`, p, p, $("#ev-toast")); }
     case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
@@ -17625,7 +17715,7 @@ document.addEventListener("click", e => {
   if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = (location.hash || "").slice(1).split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
 });
 /* ---------- Router ---------- */
-const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), credits:()=>renderCredits(), policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
   const h = (location.hash || '').slice(1).split('/')[0];
   // A shareable link straight into the demo company

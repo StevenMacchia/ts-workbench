@@ -127,7 +127,7 @@ const SG = {
   captcha:{t:"Bot friction at sign-up (e.g. Cloudflare Turnstile or reCAPTCHA) and blocking of disposable emails", o:"eng", e:"S"},
   phone_email_verify:{t:"Email or phone verification before posting, messaging or claiming rewards", o:"eng", e:"S"},
   device_signals:{t:"Device, network and behavior signals to link duplicate, banned and fake accounts", o:"eng", e:"M", lite:"Start with your fraud or bot-protection vendor's device fingerprinting."},
-  text_screening:{t:"Automated screening of text for abuse, spam and scam patterns, routed to human review", o:"eng", e:"M", lite:"Start with keyword lists and an off-the-shelf moderation API. Later, an open model such as gpt-oss-safeguard can check text against your own written policy. The model is free, but you run it on your own servers."},
+  text_screening:{t:"Automated screening of text for abuse, spam and scam patterns, routed to human review", o:"eng", e:"M", lite:"Start with keyword lists and an off-the-shelf moderation API. Later, an open model such as PolicyLM or gpt-oss-safeguard can check text against your own written policy. The models are free, but you run them on your own servers."},
   link_scanning:{t:"Check links against phishing and malware lists (e.g. Google Safe Browsing) before they are clickable", o:"eng", e:"S"},
   file_scanning:{t:"Malware scanning of uploaded files and blocking of executable file types", o:"eng", e:"S"},
   media_classifier:{t:"Nudity, violence and gore detection on uploads, with sensitive media behind a warning screen", o:"eng", e:"M", lite:"Start with an off-the-shelf image moderation API."},
