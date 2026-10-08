@@ -232,6 +232,8 @@ const GT_MORE = {
   "gpt-oss-safeguard":"An open model from OpenAI that labels content against a policy you write. Free to download; you run it on your own hardware.",
   "RFP":"Request for proposal: the document you send vendors asking how they would meet your requirements, and at what price.",
   "DTSP":"The Digital Trust & Safety Partnership, an industry group whose Safe Framework sets out Trust & Safety good practice.",
+  "ICU":"Ofcom's code prefix for its Illegal Content Code of Practice for user-to-user services, under the UK Online Safety Act.",
+  "PCU":"Ofcom's code prefix for its Protection of Children Code of Practice for user-to-user services, under the UK Online Safety Act.",
   "sextortion":"Threatening to share someone's intimate images unless they pay or send more. Teenagers are frequent targets.",
   "grooming":"When an adult builds a child's trust over time in order to sexually abuse or exploit them.",
   "incident command":"A clear structure for running a crisis: one person in charge, defined roles and a regular rhythm of updates.",

@@ -42,6 +42,20 @@ const body = async function(){
     let called = false; SAMPLER = {json: async () => { called = true; return T.sample; }}; AIRUN[k] = {}; store.set("ai:" + k, {f:{}, r:null, ts:0}); renderAI(k); await aiRun(k);
     eq(called, false, k + " doesn't call Claude with required fields empty"); eq(/^Add /.test(AIRUN[k].err), true, k + " asks for required fields");
     SAMPLER = null; AIRUN[k] = {};
+    // No-Claude fallback on the public site: a plain, editable template built from the visitor's own answers, clearly labeled as a template
+    store.set("ai:" + k, {f:T.example, r:null, ts:0, sample:false}); renderAI(k);
+    if(T.tmpl){
+      eq(/Build a template without Claude/.test(view.innerHTML), true, k + " offers a no-Claude template fallback on the public site");
+      $("#ai-tmpl").onclick();
+      const stT = store.get("ai:" + k); if(bad(stT.tmplText || "")) throw new Error(k + " template has bad values: " + stT.tmplText);
+      eq(typeof stT.tmplText === "string" && stT.tmplText.length > 40, true, k + " builds a real draft, not an empty one");
+      eq(/Template draft/.test(view.innerHTML) && /Template, not an AI review/.test(view.innerHTML), true, k + " labels the fallback as a template, not Claude's work");
+      eq(stT.tmplText.includes(T.example.policy), true, k + " draft is built from the visitor's own answers, not invented text");
+      eq(/\[.*\]/.test(stT.tmplText), true, k + " marks what's left for the visitor to fill in or edit");
+      out.push(k + ": no-Claude template fallback, built from the visitor's own answers and labeled as a template");
+    } else {
+      eq(/Build a template without Claude/.test(view.innerHTML), false, k + " has no fallback button when it has no template to offer");
+    }
     out.push(k + ": " + T.fields.length + " fields, example validates, stubbed run saves a result, deep review, honest progress, declined / rate-limited / junk / empty inputs handled");
   }
   // Text from the user under review is tagged as evidence and can't close its own tag

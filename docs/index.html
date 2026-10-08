@@ -1848,6 +1848,8 @@ text.mxt-a{fill:var(--crit)}
 .ai-secs{display:grid;gap:18px;max-width:780px}
 .ai-secs h4{margin:0 0 4px;font-size:16px}
 .ai-secs p{margin:0;font-size:15.5px;line-height:1.7}
+.ai-tmpl-out{max-width:760px}
+.ai-tmpl-ta{width:100%;min-height:220px;font:14.5px/1.6 var(--body);resize:vertical}
 .ov-ai{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .ov-aic{display:flex;gap:14px;align-items:flex-start;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s ease, transform .15s ease}
 .ov-aic:hover{border-color:color-mix(in oklab, var(--t-ai) 55%, var(--line));transform:translateY(-1px)}
@@ -3884,10 +3886,11 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--ink)}
 .ev-rid{font-size:11.5px;color:var(--muted);margin-right:6px}
 .ev-rk{font-size:12.5px;color:var(--muted);padding-top:2px}
 .ev-row .select.sm{padding:4px 8px;font-size:13px;width:100%;box-sizing:border-box}
-.ev-own summary,.ev-opts summary,.ev-details summary,.ev-kinds summary,.ev-guide summary{cursor:pointer;font-weight:600;font-size:14px}
-.ev-own summary .note,.ev-opts summary .note,.ev-details summary .note{font-weight:400;margin-left:6px}
+.ev-own summary,.ev-opts summary,.ev-details summary,.ev-kinds summary,.ev-guide summary,.ev-local summary{cursor:pointer;font-weight:600;font-size:14px}
+.ev-own summary .note,.ev-opts summary .note,.ev-details summary .note,.ev-local summary .note{font-weight:400;margin-left:6px}
 .ev-own>.note,.ev-own textarea{margin-top:8px}
 .ev-own>.pol-run{margin-top:10px}
+.ev-local>.note,.ev-local>.ev-case-a{margin-top:8px}
 .ev-opts-b{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 20px;margin-top:12px}
 .ev-opts-b .ev-opt-wide{grid-column:1/-1}
 .ev-opts-b .tr-tiers{gap:8px}.ev-opts-b .tr-tier{padding:10px 12px}.ev-opts-b .tr-tier b{font-size:13.5px}
@@ -14864,6 +14867,16 @@ The checklist must cover: the action and what it means, the facts, the rule reli
     checklist:AI_ARR(r.checklist).filter(c => c && c.item).map(c => ({item:AI_STR(c.item), present:!!c.present, note:AI_STR(c.note)})),
     risks:AI_ARR(r.risks).map(AI_STR).filter(Boolean), reading_level:AI_STR(r.reading_level), assumptions:AI_ARR(r.assumptions).map(AI_STR).filter(Boolean)};
     return o.notice ? o : null; },
+  // No-Claude fallback: a plain substitution of the visitor's own answers into a letter shape, so the public site
+  // never returns nothing. Not scored or reviewed - the visitor edits it themselves before sending.
+  tmpl:f => { const act = AI_STR(f.action) || "[say what action you took]", prod = AI_STR(f.product);
+    const regionNote = (f.regions || []).length ? ` If you're in ${f.regions.map(r => ({eu:"the EU", uk:"the UK", us:"the US", other:"your region"}[r] || r)).join(" or ")}, check whether local law requires you to mention a specific appeal route or dispute body.` : "";
+    return [`Subject: Action on your ${prod ? prod.split(",")[0].trim() + " " : ""}account`, "", "Hi,", "",
+      `Action taken: ${act}.`, `Reason: this didn't follow ${AI_STR(f.policy) || "[name the exact rule or policy section]"}.`, "",
+      `What happened: ${AI_STR(f.facts) || "[say what happened, when, and how often]"}`, "",
+      `How this was decided: ${AI_STR(f.auto) || "[say whether automation, a person, or both made this decision]"}`, "",
+      `How to appeal: ${AI_STR(f.appeal) || "[say where, and by what deadline, the user can appeal]"}`, "",
+      "[This is a plain template built only from the answers above - edit every bracket, and the rest, before you send it.]" + regionNote].join("\n"); },
   render:r => `
     <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy notice</button></div>
       <div class="ai-letter"><div class="ai-subj"><span>Subject</span><b>${esc(r.subject)}</b></div><div class="ai-body">${esc(r.notice)}</div></div></div>
@@ -14945,6 +14958,17 @@ Return ONLY a JSON object with exactly these keys:
     suggested_action:AI_STR(r.suggested_action), reply_to_user:AI_STR(r.reply_to_user), note_for_record:AI_STR(r.note_for_record), policy_feedback:AI_STR(r.policy_feedback),
     steering_attempts:AI_ARR(r.steering_attempts).map(AI_STR).filter(Boolean)};
     return o.summary && o.elements.length ? o : null; },
+  // No-Claude fallback: lays out the same facts as a worksheet with the questions a reviewer would ask themselves,
+  // instead of Claude's structured opinion. Not a review - the visitor decides and fills in their own reasoning.
+  tmpl:f => [`Case worksheet (template - work through this yourself; not Claude's review)`, "",
+    `Rule applied: ${AI_STR(f.policy) || "[paste the rule, including exceptions]"}`,
+    `Original decision: ${AI_STR(f.action) || "[the action taken]"}${AI_STR(f.reason) ? ` - reviewer's reason: ${AI_STR(f.reason)}` : ""}`, "",
+    `The content or behavior: ${AI_STR(f.content) || "[describe the content]"}`, "",
+    `The user's appeal: ${AI_STR(f.appeal) || "[what the user said]"}`,
+    ...(AI_STR(f.context) ? ["", `Other context: ${AI_STR(f.context)}`] : []), "",
+    "Work through each part of the rule:", "- Does every element of the rule apply to these facts?", "- Does any exception in the rule apply?",
+    "- Is the user's explanation credible given the context you have?", "- What's missing before you could decide confidently?", "",
+    "Decision: [uphold / overturn / change to a lesser action / escalate to a specialist]", "Reply to the user: [write your reply here]"].join("\n"),
   render:r => { const R = AI_REC[r.recommendation], met = {yes:["Met","crit"], no:["Not met","good"], unclear:["Unclear","med"]};
     return `
     <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
@@ -15159,12 +15183,16 @@ function renderAI(key){
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}
+          ${!ai && STANDALONE && T.tmpl ? `<button type="button" class="btn" id="ai-tmpl">Build a template without Claude</button>` : ""}
           ${ai ? `<div class="segs" role="group" aria-label="Review depth"><button type="button" data-aidepth="default" aria-pressed="${st.depth !== "deep"}">Standard</button><button type="button" data-aidepth="deep" aria-pressed="${st.depth === "deep"}">Deep</button></div>` : ""}
           <button type="button" class="btn" id="ai-ex">Fill in an example</button>
           <button type="button" class="btn" id="ai-sample">See an example result</button>
           <button type="button" class="btn ghost" id="ai-clear">Clear</button>
         </div>
-        ${!ai ? `<p class="note ai-off">${STANDALONE ? `This is the free public version. To run the AI step on your own case, open the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>, where it uses your own Claude account. The example result shows what you'll get.` : "The AI step runs inside Claude, on the viewer's own account. You can still explore the example result."}</p>` : missing.length ? `<p class="note">Fill in ${missing.map(fd => fd.lab.toLowerCase()).join(", ")} to get the best result.</p>` : ""}
+        ${!ai ? `<p class="note ai-off">${STANDALONE ? `This is the free public version. To run the AI step on your own case, open the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>, where it uses your own Claude account.${T.tmpl ? " Or build a plain template below from your own answers right now." : " The example result shows what you'll get."}` : "The AI step runs inside Claude, on the viewer's own account. You can still explore the example result."}</p>` : missing.length ? `<p class="note">Fill in ${missing.map(fd => fd.lab.toLowerCase()).join(", ")} to get the best result.</p>` : ""}
+        ${st.tmplText ? `<div class="ai-sec ai-tmpl-out"><div class="ai-sec-h"><h3>Template draft</h3><span class="pill">Template, not an AI review</span><span class="toast" id="ai-tmpl-toast" aria-live="polite"></span><button type="button" class="btn sm" id="ai-tmpl-copy">${icon("copy")}Copy</button></div>
+          <p class="note">Built only by filling your own answers into a letter shape - no AI wrote or checked this. Edit the brackets, and anything else, before you use it.</p>
+          <textarea class="input ai-tmpl-ta" id="ai-tmpl-ta" rows="12">${esc(st.tmplText)}</textarea></div>` : ""}
       </form>
       <aside class="ai-rail">
         <div class="card ai-about"><h4>How this works</h4>
@@ -15185,6 +15213,9 @@ function renderAI(key){
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
   const stop = $("#ai-stop"); if(stop) stop.onclick = () => { if(run.ctl) run.ctl.abort(); };
   const rb = $("#ai-run"); if(rb) rb.onclick = () => aiRun(key);
+  const tb = $("#ai-tmpl"); if(tb) tb.onclick = () => { if(document.getElementById("ai-form")) persist(); const s = aiGet(key); s.tmplText = T.tmpl(s.f); aiPut(key, s); renderAI(key); setTimeout(() => { const ta = $("#ai-tmpl-ta"); if(ta && ta.scrollIntoView) ta.scrollIntoView({behavior:"smooth", block:"nearest"}); }, 30); };
+  const tta = $("#ai-tmpl-ta"); if(tta) tta.oninput = () => { const s = aiGet(key); s.tmplText = tta.value; aiPut(key, s); };
+  const tcp = $("#ai-tmpl-copy"); if(tcp) tcp.onclick = () => { const ta2 = $("#ai-tmpl-ta"); copyText(ta2 ? ta2.value : st.tmplText, $("#ai-tmpl-toast")); };
   if(st.r){
     const md = T.md(st.r, st.f);
     view.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copyText(b.dataset.copy === "__md" ? md : st.r[b.dataset.copy], $("#ai-toast")));
@@ -18055,6 +18086,8 @@ const GT_MORE = {
   "gpt-oss-safeguard":"An open model from OpenAI that labels content against a policy you write. Free to download; you run it on your own hardware.",
   "RFP":"Request for proposal: the document you send vendors asking how they would meet your requirements, and at what price.",
   "DTSP":"The Digital Trust & Safety Partnership, an industry group whose Safe Framework sets out Trust & Safety good practice.",
+  "ICU":"Ofcom's code prefix for its Illegal Content Code of Practice for user-to-user services, under the UK Online Safety Act.",
+  "PCU":"Ofcom's code prefix for its Protection of Children Code of Practice for user-to-user services, under the UK Online Safety Act.",
   "sextortion":"Threatening to share someone's intimate images unless they pay or send more. Teenagers are frequent targets.",
   "grooming":"When an adult builds a child's trust over time in order to sexually abuse or exploit them.",
   "incident command":"A clear structure for running a crisis: one person in charge, defined roles and a regular rhythm of updates.",
@@ -19592,7 +19625,7 @@ const EV_EXAMPLE = {name:"Harassment rule, v1 prompt", policy:"Users must not ha
 
 /* ---------- the page: one page, three steps, top to bottom ---------- */
 let evView = null; // set by callers that open a saved eval; the page has no separate views any more, so it's kept only for them
-const EVU = {all:false, opts:false, own:false, details:false, errAt:""}; // page state that isn't worth saving
+const EVU = {all:false, opts:false, own:false, details:false, local:false, errAt:""}; // page state that isn't worth saving
 const evErr = (msg, at) => { EVRUN.err = msg; EVU.errAt = at || ""; };
 const evErrHTML = at => EVRUN.err && EVU.errAt === at ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : "";
 const evMediaView = () => ev.view === "media" || (!!ev.media && ev.view !== "text");
@@ -19740,15 +19773,22 @@ function evStep1HTML(n){
 /* ---------- step 2: where the labels come from ---------- */
 function evStep2HTML(n){
   const ai = evAI(), tile = evTile(), has = n > 0;
-  const tiles = `<div class="tr-tiers ev-tiers3" role="radiogroup" aria-label="Where the labels come from">${EV_TILES.map(([k, nm, h]) => `<button type="button" role="radio" aria-checked="${tile === k}" class="card tr-tier ${tile === k ? "on" : ""}" data-evmode="${k}" ${has ? "" : "disabled"}><b>${esc(nm)}${k === "claude" && !ai ? ' <span class="pill">Claude version only</span>' : ""}</b><span>${esc(h)}</span></button>`).join("")}</div>`;
+  // The free in-browser model needs no classifier and no Claude account, so it's the one newcomer-safe default: promote it visually, not just logically.
+  const tiles = `<div class="tr-tiers ev-tiers3" role="radiogroup" aria-label="Where the labels come from">${EV_TILES.map(([k, nm, h]) => `<button type="button" role="radio" aria-checked="${tile === k}" class="card tr-tier ${tile === k ? "on" : ""}" data-evmode="${k}" ${has ? "" : "disabled"}><b>${esc(nm)}${k === "baseline" ? ' <span class="pill accent">Start here if you don’t have a classifier</span>' : k === "claude" && !ai ? ' <span class="pill">Claude version only</span>' : ""}</b><span>${esc(h)}</span></button>`).join("")}</div>`;
   if(!has) return `${tiles}<p class="note ev-wait">Add cases in step 1 first.</p>`;
   return `${tiles}<div class="ev-panel">${tile === "baseline" && typeof evbCardHTML === "function" ? evbCardHTML() : tile === "paste" ? evPastePanelHTML(n) : evClaudePanelHTML(ai, n)}</div>`;
 }
 function evPastePanelHTML(n){
   const L = evLabels(ev);
+  // "Paste your own classifier's labels" and "run a model locally with the runner script" are two different workflows
+  // that only share step 2; keep the local-model setup in its own disclosure instead of one mixed paragraph.
+  const localPolicy = ev.policy.trim() ? `<div class="ev-case-a"><button type="button" class="btn sm" data-ev="dlpoljson" title="Your rule as a policy for PolicyLM, Musubi's small open model. Fill in its TODO fields first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for PolicyLM` : `${icon("copy")}Copy the PolicyLM policy`}</button><button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for gpt-oss-safeguard or another policy-following model. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for gpt-oss-safeguard` : `${icon("copy")}Copy the gpt-oss-safeguard policy`}</button></div>` : `<p class="note">Add a rule in step 1 above first, to get a filled-in policy file.</p>`;
   return `<div class="ev-pp" id="ev-panel-paste">
-    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}${ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpoljson" title="Your rule as a policy for PolicyLM, Musubi's small open model. Fill in its TODO fields first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for PolicyLM` : `${icon("copy")}Copy the PolicyLM policy`}</button><button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for gpt-oss-safeguard or another policy-following model. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for gpt-oss-safeguard` : `${icon("copy")}Copy the gpt-oss-safeguard policy`}</button>` : ""}</div>
-      <p class="note">${n} cases, one per line: id, kind, right answer, text. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model on your own computer: download the cases and a policy file, fill in the file's TODO lines, and the script writes labels you can paste here. PolicyLM (Musubi, 3.5 GB) runs on a laptop and needs Python. gpt-oss-safeguard (OpenAI, 14 GB) explains each label and needs Node.js, Ollama and a big graphics card.</p></div>
+    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}</div>
+      <p class="note">${n} cases, one per line: id, kind, right answer, text.</p>
+      <details class="ev-local" id="ev-local-d" data-evd="local" ${EVU.local ? "open" : ""}><summary>No classifier of your own? Run a free open model on your own computer</summary>
+        <p class="note">The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases above on a free open model, locally: download a policy file below, fill in its TODO lines, and the script writes labels you paste into step 2. PolicyLM (Musubi, 3.5 GB) runs on a laptop and needs Python. gpt-oss-safeguard (OpenAI, 14 GB) explains each label and needs Node.js, Ollama and a big graphics card.</p>
+        ${localPolicy}</details></div>
     <div class="ev-pp-s"><label for="ev-paste"><b>2. Paste its labels.</b></label><p class="note">One per line: <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in case order. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}.</p><textarea class="input mono" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(EVL.paste || "")}</textarea></div>
     <div class="field ev-name-f"><label for="ev-name-in">Name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" maxlength="80" value="${esc(ev.name)}" placeholder="${esc(ev.last ? evNextName(ev.last.name) : "For example: vendor model, keyword list, v2 prompt")}"></div>
     ${evErrHTML("paste")}<div class="pol-run"><button type="button" class="btn primary" data-ev="score">Score the labels</button><span class="note">Scored here, in your browser.</span></div></div>`;
@@ -19773,12 +19813,24 @@ function evResultsHTML(m, media){
       <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>
         <p class="note">${base ? "A general toxicity model scores words and tone, not your rule: it can't be told that reporting abuse is allowed, or that two people are friends. Where it disagrees with your right answers is where a fixed-category model stops being enough." : media ? "Scored against the labels your reviewers gave. The list named the items; the images and videos were never part of this." : m.main ? `Precision on "${esc(pos)}" ${m.pct(m.main.pr)}${evTip("precision")}, recall ${m.pct(m.main.rc)}${evTip("recall")}. The numbers by kind of case are under Details.` : ""}</p></div></div>
     ${loop ? `<div class="ev-sec ev-since"><h4>Since the last run</h4>${evCompareHTML()}</div>` : ""}
-    <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evFailsHTML(m)}</div>
+    <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evWorstLineHTML(m)}${evFailsHTML(m)}</div>
     <div class="ev-sec"><h4>What to change</h4><ol class="pk-list ev-adv-l">${adv.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.fix)}</li>`).join("")}</ol></div>
     <details class="ev-details" id="ev-details-d" data-evd="details" ${EVU.details ? "open" : ""}><summary>Details <span class="note">by kind of case, precision and recall, every ${media ? "item" : "case"}, runs</span></summary>
       <div class="segs" role="group" aria-label="Details">${[["kinds", "By kind of case", m.cats.filter(c => c.miss).length], ["scores", "Precision and recall", null], ["all", media ? "Every item" : "Every case", m.n], ["runs", "Runs", (ev.runs || []).length]].map(([k, nm, c]) => `<button type="button" data-evtab="${k}" aria-pressed="${tab === k}">${nm}${c === null ? "" : ` <span class="mono" style="opacity:.6">${c}</span>`}</button>`).join("")}</div>
       <div class="ev-tab">${body}</div></details>
     <p class="note ev-honest">${media ? "Items from your own labeled set, scored against your reviewers' labels. Keep a held-out set the model team never sees, and re-run this when the model or the policy changes." : "Synthetic cases written to probe the rule's edges, not a sample of real traffic. Before a classifier acts on its own, run a second eval on anonymized cases from your real queue."}</p>`;
+}
+// The aggregate "which kind of case is this worst at" view already exists under Details > By kind of case,
+// but it was a click away; lead with a one-line version right above the per-case list.
+function evWorstCat(m){
+  const cats = (m.cats || []).filter(c => c.miss > 0);
+  if(!cats.length) return null;
+  return cats.slice().sort((a, b) => (b.miss / b.total) - (a.miss / a.total) || b.miss - a.miss)[0];
+}
+function evWorstLineHTML(m){
+  const w = evWorstCat(m);
+  if(!w) return "";
+  return `<p class="note ev-worst">Worst at <b>${esc(w.n)}</b>: ${w.miss} of ${w.total} wrong (${Math.round(w.miss / w.total * 100)}%). Case by case, below.</p>`;
 }
 function evFailsHTML(m){
   if(!m.fails.length) return `<p class="note">Every ${ev.media ? "item" : "case"} was labeled the way a reviewer would. Add harder cases, or real ones from your queue.</p>`;
@@ -19891,7 +19943,9 @@ Object.assign(GT_MORE, {
   "precision":"Of everything the classifier flagged, the share that deserved it. Low precision means false positives: good content actioned.",
   "recall":"Of everything that deserved to be flagged, the share the classifier caught. Low recall means false negatives: violations missed.",
   "counter-speech":"Content that quotes, condemns or reports the behavior a rule bans, rather than doing it. Keyword classifiers flag it by mistake.",
-  "right answer":"In the classifier eval, the label a careful reviewer would give a case under the rule as written. Also called the gold label. The classifier is scored against it."
+  "right answer":"In the classifier eval, the label a careful reviewer would give a case under the rule as written. Also called the gold label. The classifier is scored against it.",
+  "PolicyLM":"A small open model from Musubi that labels content against a policy you write. About 3.5 GB; runs on a laptop and needs Python.",
+  "Ollama":"Free software that runs open AI models, such as gpt-oss-safeguard, on your own computer instead of in the cloud."
 });
 /* =========================================================
    CLASSIFIER EVAL, part 2: the rule-improvement loop and image/video lists
