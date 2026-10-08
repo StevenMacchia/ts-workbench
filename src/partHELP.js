@@ -190,7 +190,16 @@ const PAGE_TOURS = {
 const helpRoute = () => (location.hash || "#overview").slice(1).split("/")[0] || "overview";
 // Screenshots and automated checks run without tips
 const helpQuiet = () => /[?&]shot=/.test(location.search || "");
-function helpBtn(){ return PAGE_TOURS[helpRoute()] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this page works</button>` : ""; }
+// Two different jobs, so two buttons: "How this page works" walks the real, current page
+// (PAGE_TOURS, above); "How this works" (added by partINTRO.js, once it has loaded) opens the
+// calmer, fixed walkthrough that also opens from the purpose card on first visit. Neither replaces
+// the other.
+function helpBtn(){
+  const r = helpRoute();
+  const tour = PAGE_TOURS[r] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this page works</button>` : "";
+  const intro = (typeof INTRO_SPECS !== "undefined" && INTRO_SPECS[r]) ? `<button type="button" class="ph-help" data-intro="how">${icon("info")}How this works</button>` : "";
+  return tour + intro;
+}
 function helpTour(r){
   r = r || helpRoute(); const steps = PAGE_TOURS[r];
   if(!steps || !steps.some(([s]) => document.querySelector(s))) return gsay("This page doesn't have a tour");

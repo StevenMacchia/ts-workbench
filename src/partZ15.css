@@ -151,3 +151,10 @@
 .ln-term-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .ln-term>p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
 .ln-term-know{width:fit-content}
+
+/* intro: the shared purpose card and walkthrough for every tool outside the red team studio */
+/* (src/partINTRO.js). No new look: the card reuses .card/.rtf-card/.rtf-eb/.rtf-h1/.rtf-list/ */
+/* .rtf-intro-list/.rtf-act/.rtf-link from the studio's own intro (partZ14.css, this file above), */
+/* and the walkthrough modal reuses .ln-eb/.ln-why/.ln-body/.ln-pager/.rtf-walk-prev the same way. */
+/* .ph-help (partZ8.css) already spaces a second button of its own kind with margin-left, so the */
+/* new "How this works" link sits cleanly beside the existing "How this page works" button. */
