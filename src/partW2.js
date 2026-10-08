@@ -13,7 +13,11 @@ const KINDS = {
   dsa:{n:"DSA readiness", plural:"DSA checks", icon:"i-dsa", route:"dsa", prefix:"DS"},
   redteam:{n:"Red team studio", plural:"Red teams", icon:"i-shield", route:"redteam", prefix:"RT"},
   eval:{n:"Classifier eval", plural:"Classifier evals", icon:"i-eval", route:"eval", prefix:"EV"},
-  transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"}
+  transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"},
+  // Saved from a Learn guide's Practice tab, not started fresh from the workspace, so it's left out of the
+  // "Start something new" buttons (see the two `k !== "learn"` filters below) but otherwise behaves like any
+  // other kind: it's listed, filterable, counted, and opens back to the right place (openSaved, partNav.js).
+  learn:{n:"Exercise", plural:"Exercises", icon:"i-save", route:"redteamllm", prefix:"EX"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
 function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }
@@ -51,6 +55,8 @@ function vendorResult(d){
 // overview's "Jump back in" list shows (ovChip() below). Every number here says what it counts.
 function itemSummary(it){
   const d = it.data || {};
+  if(it.kind==="learn"){ const label = "Exercise · " + (d.guide === "world" ? "world models" : "LLMs");
+    return {html:`<span class="pill">${esc(label)}</span><span class="note">${d.text ? d.text.length + " characters saved" : "No text saved"}</span>`, chip:{cls:"", label}}; }
   if(it.kind==="redteam" && typeof rtDrills === "function"){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
     const cls = s4 ? "crit" : open ? "high" : "good", label = s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s");
     return {html:`<span class="pill ${cls}">${label}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`, chip:{cls, label}}; }
@@ -158,7 +164,7 @@ function projectCards(items){
 function itemRows(items){
   const projects = Object.values(wsProjects()).sort((a,b)=>a.name.localeCompare(b.name));
   if(!items.length) return `<div class="card wsempty"><b>Nothing saved here yet</b><p class="note">Run a tool and save the result, or start one now.</p>
-    <div class="row">${typeof asInAssessment === "function" && !asInAssessment() ? `<a class="btn sm primary" href="#overview"><svg><use href="#i-arrow"/></svg>Start the guided assessment</a>` : ""}${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
+    <div class="row">${typeof asInAssessment === "function" && !asInAssessment() ? `<a class="btn sm primary" href="#overview"><svg><use href="#i-arrow"/></svg>Start the guided assessment</a>` : ""}${Object.entries(KINDS).filter(([k])=>k!=="learn").map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
   return `<div class="card wslist">${items.map(it => {
     const s = itemSummary(it), confirming = wsUI.confirm==="item:"+it.id;
     const title = wsUI.rename===it.id
@@ -208,7 +214,7 @@ function renderWorkspace(){
       <div class="segs" role="group" aria-label="Filter by tool"><button type="button" data-ws-kind="" aria-pressed="${!kind}">All <span class="mono" style="opacity:.6">${inProject.length}</span></button>${Object.entries(KINDS).map(([k,v])=>`<button type="button" data-ws-kind="${k}" aria-pressed="${kind===k}">${v.plural} <span class="mono" style="opacity:.6">${inProject.filter(i=>i.kind===k).length}</span></button>`).join("")}</div></div>
     ${active?`<div class="banner" style="margin-top:12px"><span>New results you save from any tool go into <strong>${esc(projName(active))}</strong>.</span><button type="button" class="btn sm" data-wsproj="">Show all results</button></div>`:""}
     ${empty ? "" : itemRows(shown)}
-    ${shown.length?`<div class="row wsnew"><span class="note">Start something new:</span>${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div>`:""}
+    ${shown.length?`<div class="row wsnew"><span class="note">Start something new:</span>${Object.entries(KINDS).filter(([k])=>k!=="learn").map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div>`:""}
   </div>`;
   bindWorkspace();
 }

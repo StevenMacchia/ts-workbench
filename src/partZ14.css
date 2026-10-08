@@ -429,3 +429,22 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-cardacts{gap:8px;flex-wrap:wrap;margin:0 0 12px}
 .ln-checkmark{width:12px;height:12px;color:var(--good);flex:none;margin-left:2px}
 @media (max-width:760px){.ln-cardacts{flex-direction:column;align-items:stretch}}
+
+/* ticks: "Applies to us" on a row, a card's own tick count, the supplementary surface/guardrail lists, and
+   the note a worksheet shows once a tick has prefilled it */
+.ln-body li.ln-row.ln-tickable{display:flex;align-items:stretch;gap:8px;padding:0}
+.ln-tickbox{display:flex;align-items:center;flex:none;padding:0 0 0 2px;cursor:pointer}
+.ln-tickbox input,.ln-tick input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+.ln-row.ln-tickable > details{flex:1;min-width:0}
+.ln-ticklbl{margin:14px 0 6px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.ln-ticklbl:first-child{margin-top:0}
+.ln-ticklist{list-style:none;margin:0 0 4px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.ln-tick{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13.5px;cursor:pointer}
+.ln-prefilled{display:flex;align-items:center;gap:6px;color:var(--good);font-weight:600;margin:0 0 10px}
+.ln-prefilled svg{width:14px;height:14px}
+
+/* saving an exercise's output to the workspace */
+.ln-save{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.ln-savelbl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.ln-savedwhen{font-weight:500;color:var(--good)}
+.ln-save textarea{width:100%;margin:0 0 8px;font:inherit;font-size:14px;resize:vertical}

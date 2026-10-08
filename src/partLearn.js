@@ -938,6 +938,92 @@ const LN_STEP_EXTRA = {
   }
 };
 Object.keys(LN_STEP_EXTRA).forEach(k => LN_GUIDES[k].steps.forEach(s => { if(LN_STEP_EXTRA[k][s.id]) Object.assign(s, LN_STEP_EXTRA[k][s.id]); }));
+// Which cards get a tick ("Applies to us"): a per-card flag in data, not a heuristic. rowCards are card indexes
+// (within that step's rendered cards) whose existing rows -- the attacker list, the technique table, the harm
+// table -- each get a tick. extra adds a small supplementary tick list to a card, built from the concrete
+// surface/guardrail names already named in that card's own prose (not new facts, just pulled into rows of
+// their own so each one can be ticked on its own, since the card's own <li>s are one row per *topic*
+// -- "Every surface a user can reach" -- not one row per surface).
+const LN_TICK = {
+  llm: {
+    scope: {rowCards:[1], extra:{0:[
+      {group:"Surfaces", items:["Chat", "API", "Voice", "File upload", "Tools the model can call"]},
+      {group:"Guardrails", items:["Input classifier", "Output classifier", "Rate limit"]}
+    ]}},
+    techniques: {rowCards:[0]},
+    harms: {rowCards:[0]}
+  },
+  world: {
+    scope: {rowCards:[1], extra:{0:[
+      {group:"Surfaces", items:["Text-to-video", "Image-to-video", "Video-to-video", "Edit tools", "Interactive world", "Audio and voice", "Export or share path"]},
+      {group:"Guardrails", items:["Prompt classifier", "Upload filter", "Frame or clip classifier", "Realism classifier", "Likeness detector", "Watermark and content credentials"]}
+    ]}},
+    techniques: {rowCards:[0]},
+    harms: {rowCards:[0]}
+  }
+};
+// The attacker and harm-area names, for turning ticks back into worksheet text -- the applies store is a flat
+// {rowKey:true} map with no category of its own, so prefill matches ticked keys against these known lists.
+const LN_ATTACKERS = {
+  llm:["The curious user", "The motivated individual", "The organised actor", "The insider or integrator"],
+  world:["The curious user", "The motivated individual", "The organised actor", "The integrator"]
+};
+const LN_HARM_NAMES = {
+  llm:["Child sexual abuse and exploitation", "Non-consensual intimate content", "Violent extremism and terrorism", "Suicide, self-harm and eating disorders", "Weapons and CBRN uplift", "Hate and harassment", "Fraud, scams and impersonation", "Deceptive media and misinformation", "Privacy and personal data", "Graphic violence and cruelty", "Illegal goods, services and trafficking", "Minors as users", "Bias and discrimination", "Manipulation and dependence", "Agentic misuse", "Over-refusal"],
+  world:["Child sexual abuse and exploitation", "Non-consensual intimate imagery", "Violent extremism and terrorism", "Suicide, self-harm and eating disorders", "Weapons and CBRN uplift", "Hate and harassment", "Fraud, scams and impersonation", "Deceptive media and misinformation", "Privacy and personal data", "Graphic violence and cruelty", "Illegal goods and trafficking", "Minors as users", "Bias and discrimination", "Manipulation and dependence", "Provenance failure", "Over-refusal"]
+};
+const lnSlug = s => s.replace(/<[^>]+>/g, " ").toLowerCase().replace(/&[a-z]+;/g, " ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+const lnTicked = k => lnStore.get(k + ":applies", {});
+// Tick a control onto each existing collapsed row (an attacker <li>, a technique or harm-area table row) --
+// the checkbox sits beside the row, outside its <details>, so ticking it never also opens the row.
+function lnAddTicks(html, k){
+  const applied = lnTicked(k);
+  let count = 0;
+  const out = html.replace(/<li class="(ln-row[^"]*)"><details><summary><b>([\s\S]*?)<\/b>/g, (whole, cls, lead) => {
+    const key = lnSlug(lead), checked = !!applied[key]; if(checked) count++;
+    return `<li class="${cls} ln-tickable"><label class="ln-tickbox" title="Applies to us"><input type="checkbox" data-tickrow="${key}"${checked ? " checked" : ""}></label><details><summary><b>${lead}</b>`;
+  });
+  return {html:out, count};
+}
+// A supplementary tick list for names that are already in the card's prose but not each its own row.
+function lnExtraTicks(groups, k){
+  const applied = lnTicked(k);
+  let count = 0;
+  const html = groups.map(g => {
+    const items = g.items.map(name => {
+      const key = lnSlug(name), checked = !!applied[key]; if(checked) count++;
+      return `<li><label class="ln-tick" data-tickrow-label="${key}"><input type="checkbox" data-tickrow="${key}"${checked ? " checked" : ""}><span>${esc(name)}</span></label></li>`;
+    }).join("");
+    return `<p class="ln-ticklbl">${esc(g.group)}</p><ul class="ln-ticklist">${items}</ul>`;
+  }).join("");
+  return {html, count};
+}
+function lnBindTicks(k, onChange){
+  $$("[data-tickrow]").forEach(inp => inp.onchange = () => {
+    const applied = lnTicked(k);
+    if(inp.checked) applied[inp.dataset.tickrow] = true; else delete applied[inp.dataset.tickrow];
+    lnStore.set(k + ":applies", applied);
+    if(onChange) onChange();
+  });
+}
+// Worksheet prefill: ticked surfaces and attackers into the coverage grid (also the exercise-1/scope
+// worksheet -- same file), ticked harm areas into the seed card. The template text is otherwise unchanged;
+// with nothing ticked, lnPrefillWorksheet returns the worksheet's own text untouched.
+function lnPrefillWorksheet(k, w){
+  const applied = lnTicked(k);
+  const named = list => list.filter(n => applied[lnSlug(n)]);
+  let text = w.text, changed = false;
+  if(w.id === "w1"){
+    const tick = LN_TICK[k].scope, surfaces = named(tick.extra[0].find(g => g.group === "Surfaces").items), attackers = named(LN_ATTACKERS[k]);
+    if(surfaces.length){ const t2 = text.replace(/Surface: _{3,}/, "Surface: " + surfaces.join(", ")); if(t2 !== text){ text = t2; changed = true; } }
+    if(attackers.length){ text = text.replace(/\n(Fill each cell)/, `\nAttackers in scope: ${attackers.join(", ")}\n$1`); changed = true; }
+  }
+  if(w.id === "w2"){
+    const harms = named(LN_HARM_NAMES[k]);
+    if(harms.length){ const t2 = text.replace(/(Harm area:[^\n]*\n)/, `$1Harm areas ticked:     ${harms.join(", ")}\n`); if(t2 !== text){ text = t2; changed = true; } }
+  }
+  return {text, changed};
+}
 
 /* ---------- modal ---------- */
 function lnClose(){ const bg = $("#ln-modal"); if(!bg) return; bg.hidden = true; bg.innerHTML = ""; document.body.classList.remove("ln-lock"); document.removeEventListener("keydown", lnModal.key); if(lnModal.prev && lnModal.prev.focus) try{ lnModal.prev.focus(); }catch(e){} }
@@ -1200,9 +1286,16 @@ function lnMethod(k, g){
       const haveLine = ci === 0 && s.have ? `<p class="note ln-have">You'll have: ${esc(s.have)} · about ${s.mins} min</p>` : "";
       const egText = s.eg && s.eg[ci];
       const egRow = egText ? `<ul class="ln-rows ln-eg"><li class="ln-row"><details><summary><b>For Pixelry</b><svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary><div class="ln-rowb">${esc(egText)}</div></details></li></ul>` : "";
+      const tickInfo = LN_TICK[k] && LN_TICK[k][s.id];
+      let cardHtml = card.html, tickedCount = 0, extraHtml = "";
+      if(tickInfo){
+        if(tickInfo.rowCards && tickInfo.rowCards.includes(ci)){ const r = lnAddTicks(cardHtml, k); cardHtml = r.html; tickedCount += r.count; }
+        if(tickInfo.extra && tickInfo.extra[ci]){ const r = lnExtraTicks(tickInfo.extra[ci], k); extraHtml = r.html; tickedCount += r.count; }
+      }
+      eyebrowExtra += tickedCount ? `<span class="ln-subcount">${tickedCount} ticked</span>` : "";
       body = `<h2>${esc(card.heading || s.title)}</h2>
         ${ci === 0 ? `<p class="ln-why">${s.why}</p>${haveLine}` : ""}
-        <div class="ln-body">${card.html}${(drillBtn || bridgeBtn) ? `<p class="row ln-cardacts">${drillBtn}${bridgeBtn}</p>` : ""}${egRow}</div>`;
+        <div class="ln-body">${cardHtml}${extraHtml}${(drillBtn || bridgeBtn) ? `<p class="row ln-cardacts">${drillBtn}${bridgeBtn}</p>` : ""}${egRow}</div>`;
     }
     $("#ln-view").innerHTML = `${total > 1 ? `<div class="rtf-dots" aria-hidden="true">${Array.from({length:total}, (_, i) => `<span class="${i <= ci ? "on" : ""}"></span>`).join("")}</div>` : ""}
       <div class="card ln-panel">
@@ -1217,6 +1310,7 @@ function lnMethod(k, g){
     $$("[data-ex]").forEach(b => b.onclick = () => lnOpenExercise(k, g, b.dataset.ex));
     const bridge = $("[data-bridge]"); if(bridge) bridge.onclick = () => lnToStudio(k, s.id);
     if(isCheck) $$("[data-checkpick]").forEach(b => b.onclick = () => { picked = +b.dataset.checkpick; lnStore.set(lnCheckKey(k, s.id), {ok:picked === s.check.a, at:Date.now()}); draw(); });
+    lnBindTicks(k, draw);
     lnBindOpenAll();
     lnBindTableFlip();
   };
@@ -1240,6 +1334,29 @@ function lnBindTableFlip(){ $$("[data-astable]").forEach(b => b.onclick = () => 
 // looks like" sit behind one "Full version" disclosure -- plain and full steps don't line up 1:1 (e.g. e3 has
 // six full steps but five plain ones) so a per-row pairing isn't possible; "Run it" still opens the existing
 // exercise modal, which is where marking done and the worksheet link live, unchanged.
+// Saving an exercise's output: one workspace item per (guide, exercise), id stable so a re-save updates it
+// instead of piling up duplicates -- the same wsPut path a tool's "Save to workspace" uses (partW1.js), under
+// the new "learn" kind registered in KINDS (partW2.js).
+const lnSavedId = (k, exId) => "learn-" + k + "-" + exId;
+const lnSavedExercise = (k, exId) => wsItems()[lnSavedId(k, exId)];
+function lnSaveExercise(k, e, text){ wsPut({id:lnSavedId(k, e.id), kind:"learn", title:e.title, projectId:wsActive(), data:{guide:k, exId:e.id, text}}); }
+function lnSaveBlockHTML(k, e){
+  const saved = lnSavedExercise(k, e.id);
+  return `<div class="ln-save">
+    <p class="ln-savelbl">Save what you produced${saved ? `<span class="ln-savedwhen">Saved ${relTime(saved.updated)} · Edit</span>` : ""}</p>
+    <textarea class="input" id="ln-save-text" rows="3" placeholder="${esc(e.output)}, or a link to it">${saved ? esc(saved.data.text) : ""}</textarea>
+    <div class="row" style="gap:8px"><button type="button" class="btn sm" data-save-ex>Save</button><span class="ln-toast" id="ln-save-toast" aria-live="polite"></span></div>
+  </div>`;
+}
+function lnBindSave(k, e, onSaved){
+  const btn = $("[data-save-ex]"); if(!btn) return;
+  btn.onclick = () => {
+    const ta = $("#ln-save-text");
+    lnSaveExercise(k, e, ta ? ta.value.trim() : "");
+    const toast = $("#ln-save-toast"); if(toast) flashIn(toast, savedWhere());
+    if(onSaved) onSaved();
+  };
+}
 function lnPractice(k, g){
   const posKey = k + ":epos", n = g.exercises.length;
   let i = Math.min(Math.max(lnStore.get(posKey, 0), 0), n - 1);
@@ -1258,12 +1375,14 @@ function lnPractice(k, g){
           <details class="rtf-det"><summary>Full version, and what good looks like</summary>
             <h3>Do this</h3>${lnDo(e.steps.map(esc))}<h3>What good looks like</h3>${lnGood(e.good.map(esc))}</details>
           <p><button type="button" class="btn sm primary" data-run>Run it${did ? " again" : ""}</button></p>
+          ${lnSaveBlockHTML(k, e)}
         </div>
         <div class="ln-pager rtf-foot">${i > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Exercise ${i + 1} of ${n}</span><span></span></div>
         <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${i < n - 1 ? "Next" : "Worksheets"} →</button></div>
       </div>`;
     const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to an exercise · " + g.name, g.exercises.map(x => ({label:x.title, done:lnIsDone(k + ":e:" + x.id)})), i, j => { i = j; save(); draw(); });
     const run = $("[data-run]"); if(run) run.onclick = () => lnOpenExercise(k, g, e.id, draw);
+    lnBindSave(k, e, draw);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
     const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/worksheets"; };
   };
@@ -1274,7 +1393,7 @@ function lnOpenExercise(k, g, id, after){
   const e = g.exercises[i], did = lnIsDone(k + ":e:" + e.id), ws = e.ws && g.worksheets.find(w => w.id === e.ws);
   const nav = e2 => { lnOpenExercise(k, g, e2.id, after); };
   lnModal(`<p class="ln-eb">Exercise ${i + 1} of ${g.exercises.length}</p><h2>${esc(e.title)}</h2><p class="ln-why">${esc(e.why)}</p>${lnChips(e)}
-    <div class="ln-body">${e.warn ? lnNote(e.warn, true) : ""}<h3>Do this</h3>${lnDo(e.steps.map(esc))}<h3>What good looks like</h3>${lnGood(e.good.map(esc))}${ws ? `<p><button type="button" class="btn sm" data-ws="${ws.id}">Open the worksheet: ${esc(ws.title)}</button></p>` : ""}</div>
+    <div class="ln-body">${e.warn ? lnNote(e.warn, true) : ""}<h3>Do this</h3>${lnDo(e.steps.map(esc))}<h3>What good looks like</h3>${lnGood(e.good.map(esc))}${ws ? `<p><button type="button" class="btn sm" data-ws="${ws.id}">Open the worksheet: ${esc(ws.title)}</button></p>` : ""}${lnSaveBlockHTML(k, e)}</div>
     <div class="ln-pager"><div class="row">${i > 0 ? `<button type="button" class="btn" data-prev>← Exercise ${i}</button>` : ""}</div>
       <div class="row"><button type="button" class="btn" data-done aria-pressed="${did}">${did ? '<svg><use href="#i-check"/></svg>Done' : "Mark as done"}</button>${i < g.exercises.length - 1 ? `<button type="button" class="btn primary" data-next>Exercise ${i + 2} →</button>` : `<button type="button" class="btn primary" data-close>Done with the drills</button>`}</div></div>`,
     ev => { if(ev.key === "ArrowRight" && i < g.exercises.length - 1) nav(g.exercises[i + 1]); if(ev.key === "ArrowLeft" && i > 0) nav(g.exercises[i - 1]); });
@@ -1282,6 +1401,7 @@ function lnOpenExercise(k, g, id, after){
   const p = $("[data-prev]", bg); if(p) p.onclick = () => nav(g.exercises[i - 1]);
   const nx = $("[data-next]", bg); if(nx) nx.onclick = () => nav(g.exercises[i + 1]);
   const c = $("[data-close]", bg); if(c) c.onclick = lnClose;
+  lnBindSave(k, e, () => { if(after) after(); nav(e); });
   $("[data-done]", bg).onclick = () => { lnToggleDone(k + ":e:" + e.id); if(after) after(); lnRefreshCount(k, g); lnOpenExercise(k, g, id, after); };
   const w = $("[data-ws]", bg); if(w) w.onclick = () => lnOpenWorksheet(k, g, ws.id);
 }
@@ -1296,10 +1416,11 @@ function lnWorksheets(k, g){
   const draw = () => {
     i = Math.min(Math.max(i, 0), n - 1);
     const w = items[i];
+    const pre = w.checklist ? null : lnPrefillWorksheet(k, w);
     const body = w.checklist
       ? `<p><button type="button" class="btn sm primary" data-open-check>Open the checklist · ${g.checklist.length} items</button></p>`
-      : `<div class="row" style="gap:8px;margin:0 0 10px"><button type="button" class="btn sm" data-copy><svg><use href="#i-copy"/></svg>Copy</button><button type="button" class="btn sm" data-dl><svg><use href="#i-download"/></svg>Download ${esc(w.file)}</button><span class="ln-toast" id="ln-toast" aria-live="polite"></span></div>
-        <details class="rtf-det"><summary>Preview the text</summary><pre class="ln-pre ${w.wide ? "wide" : ""}">${esc(w.text)}</pre></details>`;
+      : `${pre.changed ? `<p class="note ln-prefilled"><svg><use href="#i-check"/></svg>Prefilled from your ticks</p>` : ""}<div class="row" style="gap:8px;margin:0 0 10px"><button type="button" class="btn sm" data-copy><svg><use href="#i-copy"/></svg>Copy</button><button type="button" class="btn sm" data-dl><svg><use href="#i-download"/></svg>Download ${esc(w.file)}</button><span class="ln-toast" id="ln-toast" aria-live="polite"></span></div>
+        <details class="rtf-det"><summary>Preview the text</summary><pre class="ln-pre ${w.wide ? "wide" : ""}">${esc(pre.text)}</pre></details>`;
     $("#ln-view").innerHTML = `<div class="card ln-panel">
       <p class="ln-eb">Worksheet ${i + 1} of ${n}<button type="button" class="rtf-link ln-all" data-all>All worksheets</button></p>
       <h2>${esc(w.title)}</h2>
@@ -1309,8 +1430,8 @@ function lnWorksheets(k, g){
       <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${i < n - 1 ? "Next" : "Sources"} →</button></div>
     </div>`;
     const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a worksheet · " + g.name, items.map(x => ({label:x.title, done:false})), i, j => { i = j; save(); draw(); });
-    const cp = $("[data-copy]"); if(cp) cp.onclick = () => copyText(w.text, $("#ln-toast"));
-    const dl = $("[data-dl]"); if(dl) dl.onclick = () => offerFile(w.file, w.text, w.text, $("#ln-toast"));
+    const cp = $("[data-copy]"); if(cp) cp.onclick = () => copyText(pre ? pre.text : w.text, $("#ln-toast"));
+    const dl = $("[data-dl]"); if(dl) dl.onclick = () => offerFile(w.file, pre ? pre.text : w.text, pre ? pre.text : w.text, $("#ln-toast"));
     const oc = $("[data-open-check]"); if(oc) oc.onclick = () => lnOpenChecklist(k, g);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
     const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/sources"; };
@@ -1320,12 +1441,13 @@ function lnWorksheets(k, g){
 function lnOpenWorksheet(k, g, id){
   if(id === "check"){ lnOpenChecklist(k, g); return; }
   const w = g.worksheets.find(x => x.id === id); if(!w) return;
+  const pre = lnPrefillWorksheet(k, w);
   lnModal(`<p class="ln-eb">Worksheet · ${esc(g.name)}</p><h2>${esc(w.title)}</h2><p class="ln-why">${esc(w.why)}</p>
-    <div class="ln-body"><div class="row" style="gap:8px;margin-bottom:10px"><button type="button" class="btn sm" data-copy><svg><use href="#i-copy"/></svg>Copy</button><button type="button" class="btn sm" data-dl><svg><use href="#i-download"/></svg>Download ${esc(w.file)}</button><span class="ln-toast" id="ln-toast" aria-live="polite"></span></div>
-    <pre class="ln-pre ${w.wide ? "wide" : ""}">${esc(w.text)}</pre></div>`);
+    <div class="ln-body">${pre.changed ? `<p class="note ln-prefilled"><svg><use href="#i-check"/></svg>Prefilled from your ticks</p>` : ""}<div class="row" style="gap:8px;margin-bottom:10px"><button type="button" class="btn sm" data-copy><svg><use href="#i-copy"/></svg>Copy</button><button type="button" class="btn sm" data-dl><svg><use href="#i-download"/></svg>Download ${esc(w.file)}</button><span class="ln-toast" id="ln-toast" aria-live="polite"></span></div>
+    <pre class="ln-pre ${w.wide ? "wide" : ""}">${esc(pre.text)}</pre></div>`);
   const bg = $("#ln-modal");
-  $("[data-copy]", bg).onclick = () => copyText(w.text, $("#ln-toast"));
-  $("[data-dl]", bg).onclick = () => offerFile(w.file, w.text, w.text, $("#ln-toast"));
+  $("[data-copy]", bg).onclick = () => copyText(pre.text, $("#ln-toast"));
+  $("[data-dl]", bg).onclick = () => offerFile(w.file, pre.text, pre.text, $("#ln-toast"));
 }
 function lnOpenChecklist(k, g){
   const key = k + ":checks";
@@ -1372,12 +1494,14 @@ function lnSources(k, g){
 function renderGlossary(){
   const known = () => lnStore.get("gloss:known", {});
   let q = "", f = "all";
-  const meta = `<button type="button" class="btn sm primary" id="ln-practice">Practice the terms</button><a class="btn sm" href="#redteamllm">LLM guide</a><a class="btn sm" href="#redteamworld">World model guide</a>`;
+  const due0 = glDueCount();
+  const meta = `<button type="button" class="btn sm primary" id="ln-practice">Practice the terms</button>${due0 ? `<button type="button" class="btn sm" id="ln-review-due">${due0} due for review</button>` : ""}<a class="btn sm" href="#redteamllm">LLM guide</a><a class="btn sm" href="#redteamworld">World model guide</a>`;
   view.innerHTML = head("Glossary", `${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
     <div class="ln-gl-tools"><label class="ln-search"><svg><use href="#i-search"/></svg><input id="ln-q" type="search" placeholder="Search terms" autocomplete="off" aria-label="Search terms"></label>
       <div class="segs" role="group" aria-label="Filter"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="llm" aria-pressed="false">LLMs</button><button type="button" data-f="world" aria-pressed="false">World models</button></div>
       <span class="note" id="ln-known"></span></div>
     <div class="ln-gl" id="ln-gl"></div></div>`;
+  const rd = $("#ln-review-due"); if(rd) rd.onclick = () => lnPracticeTerms(f, draw, true);
   // Grouped A-Z, one letter group per card, each term a collapsed row (name visible, definition behind the tap)
   // instead of the old always-expanded grid of 46 term cards.
   let gi = 0;
@@ -1423,9 +1547,30 @@ function lnOpenTerm(i, after){
   $("[data-known]", bg).onclick = () => { const k = lnStore.get("gloss:known", {}); k[i] = !k[i]; lnStore.set("gloss:known", k); if(after) after(); lnOpenTerm(i, after); };
 }
 function lnShuffle(a){ const b = a.slice(); for(let i = b.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
-function lnPracticeTerms(f, after){
-  const pool = LN_GLOSS.map((t, i) => i).filter(i => f === "all" || LN_GLOSS[i][1] === f || LN_GLOSS[i][1] === "both");
-  let mode = "cards", deck = lnShuffle(pool), pos = 0, shown = false, again = [], right = 0, asked = 0, quiz = [], picked = null;
+// Spaced review for the glossary, the same 1/3/7/21-day schedule the studio's judge uses (partRT5.js's
+// RT_DUE_DAYS/rtJSchedule/rtJDueCount) -- a separate new store key, the term's index into LN_GLOSS as the id.
+const GL_DUE_DAYS = [1, 3, 7, 21], GL_DAY_MS = 86400000;
+const glDue = () => lnStore.get("gloss:due", {});
+function glSchedule(i, right){
+  const d = glDue(), cur = d[i] || {stage:0};
+  if(right) d[i] = {stage:Math.min((cur.stage || 0) + 1, GL_DUE_DAYS.length), due:Date.now() + GL_DUE_DAYS[Math.min(cur.stage || 0, GL_DUE_DAYS.length - 1)] * GL_DAY_MS};
+  else d[i] = {stage:0, due:Date.now() + GL_DUE_DAYS[0] * GL_DAY_MS};
+  lnStore.set("gloss:due", d);
+}
+const glDueCount = () => { const d = glDue(), now = Date.now(); return Object.keys(d).filter(i => d[i].due <= now).length; };
+// due first, then never-answered, then everything else -- same shape as rtJStart's ordering
+function glOrder(pool){
+  const d = glDue(), now = Date.now();
+  const due = lnShuffle(pool.filter(i => d[i] && d[i].due <= now));
+  const unseen = lnShuffle(pool.filter(i => !d[i]));
+  const rest = lnShuffle(pool.filter(i => d[i] && d[i].due > now));
+  return due.concat(unseen, rest);
+}
+function lnPracticeTerms(f, after, dueOnly){
+  const fullPool = LN_GLOSS.map((t, i) => i).filter(i => f === "all" || LN_GLOSS[i][1] === f || LN_GLOSS[i][1] === "both");
+  let pool = fullPool;
+  if(dueOnly){ const d = glDue(), now = Date.now(); pool = pool.filter(i => d[i] && d[i].due <= now); }
+  let mode = dueOnly ? "quiz" : "cards", deck = lnShuffle(pool), pos = 0, shown = false, again = [], right = 0, asked = 0, quiz = [], picked = null;
   const label = f === "llm" ? "LLM terms" : f === "world" ? "world model terms" : "all terms";
   const draw = () => {
     const modeBar = `<div class="segs" role="group" aria-label="Mode" style="margin:0 0 12px"><button type="button" data-m="cards" aria-pressed="${mode === "cards"}">Flashcards</button><button type="button" data-m="quiz" aria-pressed="${mode === "quiz"}">Quiz</button></div>`;
@@ -1440,7 +1585,7 @@ function lnPracticeTerms(f, after){
           <div class="ln-pager"><div class="row"><span class="note">${esc(label)} · space to reveal, ← again, → got it</span></div><div class="row">${shown ? `<button type="button" class="btn" data-again1>Again</button><button type="button" class="btn primary" data-got>Got it</button>` : ""}</div></div>`;
       }
     } else {
-      if(!quiz.length){ quiz = lnShuffle(pool).slice(0, Math.min(10, pool.length)).map(i => ({i, opts:lnShuffle([i].concat(lnShuffle(pool.filter(x => x !== i)).slice(0, 3)))})); asked = 0; right = 0; picked = null; }
+      if(!quiz.length){ quiz = glOrder(pool).slice(0, Math.min(10, pool.length)).map(i => ({i, opts:lnShuffle([i].concat(lnShuffle(fullPool.filter(x => x !== i)).slice(0, 3)))})); asked = 0; right = 0; picked = null; }
       if(asked >= quiz.length){
         body = `<div class="ln-score card"><b>${right} of ${quiz.length}</b><span>right</span><button type="button" class="btn primary" data-requiz>Another ten</button></div>`;
       } else {
@@ -1462,25 +1607,25 @@ function lnPracticeTerms(f, after){
     const a1 = $("[data-again1]", bg); if(a1) a1.onclick = miss;
     const ag = $("[data-again]", bg); if(ag) ag.onclick = () => { deck = lnShuffle(again); again = []; pos = 0; shown = false; draw(); };
     const rs = $("[data-restart]", bg); if(rs) rs.onclick = () => { deck = lnShuffle(pool); again = []; pos = 0; shown = false; draw(); };
-    $$("[data-o]", bg).forEach(b => b.onclick = () => { if(picked !== null) return; picked = +b.dataset.o; if(picked === quiz[asked].i){ right++; const k = lnStore.get("gloss:known", {}); k[picked] = true; lnStore.set("gloss:known", k); if(after) after(); } draw(); });
+    $$("[data-o]", bg).forEach(b => b.onclick = () => { if(picked !== null) return; picked = +b.dataset.o; const correct = picked === quiz[asked].i; glSchedule(quiz[asked].i, correct); if(correct){ right++; const k = lnStore.get("gloss:known", {}); k[picked] = true; lnStore.set("gloss:known", k); if(after) after(); } draw(); });
     const nq = $("[data-nextq]", bg); if(nq) nq.onclick = () => { asked++; picked = null; draw(); };
     const rq = $("[data-requiz]", bg); if(rq) rq.onclick = () => { quiz = []; draw(); };
   };
-  const got = () => { const k = lnStore.get("gloss:known", {}); k[deck[pos]] = true; lnStore.set("gloss:known", k); if(after) after(); pos++; shown = false; draw(); };
-  const miss = () => { again.push(deck[pos]); pos++; shown = false; draw(); };
+  const got = () => { const k = lnStore.get("gloss:known", {}); k[deck[pos]] = true; lnStore.set("gloss:known", k); glSchedule(deck[pos], true); if(after) after(); pos++; shown = false; draw(); };
+  const miss = () => { again.push(deck[pos]); glSchedule(deck[pos], false); pos++; shown = false; draw(); };
   draw();
 }
 
 /* ---------- hub ---------- */
 function renderLearn(){
-  const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length;
+  const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length, due = glDueCount();
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
   view.innerHTML = head("Learn", "Guides, drills and the words you will hear. Free, nothing leaves your browser, your progress is saved here.", "Learn") + `<div class="ln">
     <div class="ln-hub">
       <a class="card" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><h3>Red teaming LLMs</h3><p>Chat and agent models: nine steps, eleven drills, six worksheets.</p><span class="note">${prog("llm")}</span><span class="go">Open the guide →</span></a>
       <a class="card" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><h3>Red teaming world models</h3><p>Video and interactive models: ten steps, twelve drills, six worksheets.</p><span class="note">${prog("world")}</span><span class="go">Open the guide →</span></a>
       <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Red team studio</h3><p>Test your own AI feature, one calm step at a time.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
-      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Glossary and practice</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
+      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Glossary and practice</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${due ? `${due} due for review · ` : ""}${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
     </div>
     <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
 }

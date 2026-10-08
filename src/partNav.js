@@ -1,7 +1,7 @@
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)"};
+const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
 const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice"};
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
@@ -24,6 +24,15 @@ function openSaved(id){
   if(it.kind==="dsa"){ ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); dsSave(); store.set("ws:cur:dsa", it.id); }
   if(it.kind==="redteam"){ rt = Object.assign(RT_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); rtSave(); store.set("ws:cur:redteam", it.id); }
   if(it.kind==="eval"){ ev = Object.assign(EV_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); evView = "page"; evSave(); store.set("ws:cur:eval", it.id); }
+  // learn: not a goRoute(KINDS[it.kind].route) case -- that fires ROUTES[r]() verbatim, with no "/" split, and
+  // throws if the hash is already exactly this one; jump to the guide's Practice tab at the saved exercise instead.
+  if(it.kind==="learn"){
+    const k = it.data.guide === "world" ? "world" : "llm", g = LN_GUIDES[k], i = g.exercises.findIndex(e => e.id === it.data.exId);
+    if(i >= 0) lnStore.set(k + ":epos", i);
+    const h = g.route + "/practice";
+    if(location.hash.slice(1) === h) renderRedteam(k); else location.hash = h;
+    return;
+  }
   goRoute(KINDS[it.kind].route);
 }
 // Move keyboard and screen-reader focus to new content without jumping the page

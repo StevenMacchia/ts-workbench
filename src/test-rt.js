@@ -401,3 +401,59 @@ const body10 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body10.toString() + ")();")());
+// Pass two on the Learn section: ticks that prefill worksheets, spaced glossary review on the judge's own
+// schedule, and saving an exercise's output into the workspace (the real KINDS/itemSummary/openSaved path,
+// via the rebuilt _W9.js -- partW2.js's own test double of the current build).
+const body11 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  // ticks: harm areas and attackers applied, surfaces/guardrails from the supplementary list, prefilling
+  // the coverage grid (surfaces + attackers) and the seed card (harm areas); nothing ticked, nothing changes
+  ["llm", "world"].forEach(k => {
+    const w1 = LN_GUIDES[k].worksheets.find(w => w.id === "w1"), w2 = LN_GUIDES[k].worksheets.find(w => w.id === "w2");
+    eq(lnPrefillWorksheet(k, w1).changed, false, k + " coverage grid untouched with nothing ticked");
+    eq(lnPrefillWorksheet(k, w2).changed, false, k + " seed card untouched with nothing ticked");
+    const surf = LN_TICK[k].scope.extra[0].find(g => g.group === "Surfaces").items[0];
+    lnStore.set(k + ":applies", {[lnSlug(surf)]:true, [lnSlug(LN_ATTACKERS[k][0])]:true, [lnSlug(LN_HARM_NAMES[k][0])]:true});
+    const p1 = lnPrefillWorksheet(k, w1), p2 = lnPrefillWorksheet(k, w2);
+    eq(p1.changed && p1.text.includes(surf) && p1.text.includes(LN_ATTACKERS[k][0]), true, k + " coverage grid prefills the ticked surface and attacker");
+    eq(p2.changed && p2.text.includes(LN_HARM_NAMES[k][0]), true, k + " seed card prefills the ticked harm area");
+    eq(p1.text.replace(surf, "________").replace(/Attackers in scope:[^\n]*\n/, ""), w1.text, k + " coverage grid template text is otherwise unchanged");
+    lnStore.set(k + ":applies", {});
+    // a tickable card's rows carry the control, and ticking one updates the per-card count the eyebrow shows
+    const harmCards = lnStepCards(k, LN_GUIDES[k].steps.find(s => s.id === "harms"));
+    const r0 = lnAddTicks(harmCards[0].html, k); eq(r0.count, 0, k + " no rows ticked yet");
+    lnStore.set(k + ":applies", {[lnSlug(LN_HARM_NAMES[k][1])]:true});
+    const r1 = lnAddTicks(harmCards[0].html, k); eq(r1.count, 1, k + " one row now carries a tick");
+    eq(/data-tickrow="/.test(r1.html), true, k + " the row has a tick control");
+    lnStore.set(k + ":applies", {});
+  });
+  out.push("ticks prefill the coverage grid (surfaces, attackers) and the seed card (harm areas); untouched with nothing ticked");
+  // spaced glossary review, same 1/3/7/21 schedule as the judge (RT_DUE_DAYS), under its own new store key
+  const d0 = glSchedule(0, true), after1 = glDue()[0].due; glSchedule(0, true); const after2 = glDue()[0].due;
+  eq(after2 > after1, true, "a second right answer in a row spaces out further, same as the judge");
+  glSchedule(0, false); eq(glDue()[0].stage, 0, "a miss resets the stage to 0");
+  eq(glDue()[0].due < after2, true, "a miss schedules a sooner review than the streak it broke");
+  eq(glDueCount(), 0, "nothing due yet shows no count");
+  const dd = glDue(); dd[0].due = Date.now() - 1000; lnStore.set("gloss:due", dd);
+  eq(glDueCount(), 1, "one forced-due item shows a count of one");
+  eq(glOrder([0, 1, 2])[0], 0, "the due item is drawn first");
+  eq(glOrder([0, 1, 2]).includes(1) && !glDue()[1], true, "a never-answered term has no due record yet (drawn as unseen)");
+  lnStore.set("gloss:due", {});
+  out.push("glossary spaced review: a right streak spaces out further, a miss resets it, due items are drawn first");
+  // saving an exercise: the real KINDS/itemSummary/openSaved path from partW2.js/partNav.js
+  const k = "llm", g = LN_GUIDES.llm, e = g.exercises[1];
+  eq(!!KINDS.learn && KINDS.learn.n === "Exercise", true, "the learn kind is registered in KINDS");
+  eq(lnSavedExercise(k, e.id), undefined, "nothing saved yet for this exercise");
+  lnSaveExercise(k, e, "my notes on the taxonomy map");
+  const saved = wsItems()[lnSavedId(k, e.id)];
+  eq(!!saved && saved.kind === "learn" && saved.title === e.title && saved.data.guide === k && saved.data.exId === e.id, true, "saving an exercise writes a learn-kind workspace item with the right shape");
+  eq(itemSummary(saved).chip.label, "Exercise · LLMs", "itemSummary gives it a one-line chip");
+  const listed = Object.values(wsItems()).filter(i => KINDS[i.kind]); eq(listed.some(i => i.id === saved.id), true, "the saved exercise is listed like any other kind (All tools' Jump back in, the workspace list)");
+  lnStore.set("llm:epos", 0); location.hash = "redteamworld/method"; // land somewhere else first
+  openSaved(saved.id);
+  eq(location.hash, "redteamllm/practice", "openSaved lands on the guide's Practice tab");
+  eq(lnStore.get("llm:epos", -1), 1, "openSaved jumps Practice to the saved exercise's position");
+  out.push("a saved exercise is a real workspace item (wsItems, itemSummary, the KINDS list) and openSaved lands on its card");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body11.toString() + ")();")());
