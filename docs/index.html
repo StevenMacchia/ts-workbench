@@ -14818,14 +14818,27 @@ function rtM1Bind(sc){
   $$("[data-actor]").forEach(b => b.onclick = () => { m.finding.actor = b.dataset.actor; rtSave(); re(); });
   $$("[data-f1]").forEach(a => a.oninput = e => { m.finding[a.dataset.f1] = e.target.value.slice(0, 600); rtSave(); });
 }
+// The three "llm"-kind targets (support, search, agent) each wrote their own 9-item checklist, in their
+// own order, so the item a given move or aim actually describes sits at a different index per target.
+// (media, the only "world"-kind target, keeps a single map since there's no other target to collide with.)
+const RT_CHECK_MOVE = {
+  support:{direct:0, story:1, build:2, doc:3, minor:5, staff:7},
+  search:{direct:0, doc:[1, 7], build:3},
+  agent:{direct:0, doc:1, build:3, minor:5},
+  world:{direct:0, style:1, upload:2, steps:3, edit:4, minor:7}
+};
+const RT_CHECK_AIM = {
+  support:{privacy:6, agentic:7},
+  search:{privacy:[2, 6]},
+  agent:{},
+  world:{deceptive:5, prov:4}
+};
 function rtM1Check(tr){
   const m = rtM1(), t = rtTarget(); if(!t) return;
-  const map = {llm:{direct:0, story:1, build:2, doc:3, staff:7, minor:5}, world:{direct:0, style:1, upload:2, steps:3, edit:4, minor:7}}[t.kind] || {};
-  if(map[tr.move] !== undefined) m.done[map[tr.move]] = true;
-  if(tr.aim === "privacy" && t.kind === "llm") m.done[6] = true;
-  if(tr.aim === "agentic" && t.kind === "llm") m.done[7] = true;
-  if(tr.aim === "deceptive" && t.kind === "world") m.done[5] = true;
-  if(tr.aim === "prov") m.done[4] = true;
+  const key = t.kind === "world" ? "world" : t.k;
+  const tick = i => { if(i == null) return; (Array.isArray(i) ? i : [i]).forEach(x => m.done[x] = true); };
+  tick((RT_CHECK_MOVE[key] || {})[tr.move]);
+  tick((RT_CHECK_AIM[key] || {})[tr.aim]);
 }
 function rtM1File(){
   const m = rtM1(), w = rtWorstTry(), t = rtTarget(); if(!w || m.filed) return;
