@@ -109,7 +109,14 @@ function libraryBlock(){
     </div>`;}).join("")}</div>`;
 }
 function startScreen(){
-  const cur = pmCurrentHero();
+  const cur = pmCurrentHero(), libEmpty = !Object.keys(libLoad()).length;
+  const exampleBlock = `<div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
+    <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
+      return `<button type="button" class="card excard" data-preset="${k}">
+        <span class="row" style="gap:10px;flex-wrap:nowrap"><span class="libicon sm"><svg><use href="#p-${p.type}"/></svg></span><b>${esc(p.name.replace(" (example)",""))}</b></span>
+        <span class="note">${esc(labelOf(PLATFORMS,p.type))} · ${esc(QS[2].opts.find(o=>o.k===p.youth).n)}</span>
+        <span class="row" style="gap:6px"><span class="pill ${r.posture[1]}">${r.posture[0]} exposure</span><span class="note">${r.risks.length} risks</span></span>
+      </button>`;}).join("")}</div>`;
   return `${cur}
     ${cur ? libraryBlock() : ""}
     <div class="card hero ${cur ? "pm-new" : ""}">
@@ -128,14 +135,7 @@ function startScreen(){
         </ul>
       </div>
     </div>
-    ${cur ? "" : libraryBlock()}
-    <div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
-    <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
-      return `<button type="button" class="card excard" data-preset="${k}">
-        <span class="row" style="gap:10px;flex-wrap:nowrap"><span class="libicon sm"><svg><use href="#p-${p.type}"/></svg></span><b>${esc(p.name.replace(" (example)",""))}</b></span>
-        <span class="note">${esc(labelOf(PLATFORMS,p.type))} · ${esc(QS[2].opts.find(o=>o.k===p.youth).n)}</span>
-        <span class="row" style="gap:6px"><span class="pill ${r.posture[1]}">${r.posture[0]} exposure</span><span class="note">${r.risks.length} risks</span></span>
-      </button>`;}).join("")}</div>`;
+    ${cur ? "" : libEmpty ? exampleBlock + libraryBlock() : libraryBlock() + exampleBlock}`;
 }
 function optCard(Q, o, i, pressed, multi){
   const ic = Q.k==="type";

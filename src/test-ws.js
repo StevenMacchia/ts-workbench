@@ -35,3 +35,38 @@ pm.saved = true; out.push("project picker: " + (pmProjectSelect().includes("Mark
 out.push("report still renders: " + (renderReport(assess(pm)).length > 1000 ? "ok" : "short"));
 return out.join("\\n");`;
 console.log(new Function(src)());
+
+// A fresh workspace, with nothing migrated and nothing saved: the stat tiles stay hidden,
+// the "nothing saved" invitation shows in their place, and "New project" carries a nudge
+// until there are a few results to actually group.
+const stub2 = `
+const mem = {}; const store = {get:(k,d)=> k in mem ? JSON.parse(mem[k]) : d, set(k,v){ mem[k] = JSON.stringify(v); }};
+const fake = () => ({ addEventListener(){}, setAttribute(){}, removeAttribute(){}, querySelectorAll(){ return []; }, querySelector(){ return null; }, classList:{ add(){}, remove(){}, toggle(){} }, style:{}, dataset:{}, hidden:true, textContent:"", innerHTML:"", value:"", focus(){} });
+const els = {}; const $ = s => (els[s] = els[s] || fake()); const $$ = () => [];
+const document = {addEventListener(){}, activeElement:null, getElementById(){ return null; }}; const location = {hash:"#workspace"}; const window = {};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const icon = () => ""; const view = {}; const head = (t,d,c,m) => "<h1>"+t+"</h1>"+(m||""); const copyText = () => {};
+`;
+const src2 = stub2 + ["partD.js","partE1.js","partE2.js","partF1.js","_F2.js","partW1.js","_L.js","_F3.js","_G.js","_W2.js"].map(rd).join("\n") + `
+const out = [];
+const eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+renderWorkspace(); let h = view.innerHTML;
+eq(/undefined|NaN/.test(h), false, "empty workspace renders cleanly");
+eq(/class="wsstats"/.test(h), false, "no stat-tile dashboard when nothing is saved");
+eq(/Nothing saved here yet/.test(h), true, "the invitation shows in its place");
+eq(/With 0 saved so far, you probably don't need one yet/.test(h), true, "New project carries a nudge");
+out.push("empty workspace: no .wsstats, the invitation shows instead, New project is nudged");
+// one result saved: still under three, the nudge stays and the stats reappear
+pm = fromPreset("dating"); pm.example = false; pm.name = "First one"; saveToLib();
+renderWorkspace(); h = view.innerHTML;
+eq(/class="wsstats"/.test(h), true, "stats return once something is saved");
+eq(/probably don't need one yet/.test(h), true, "nudge still shows with only one result");
+// two more: at three, the nudge drops
+tt = {s:0, step:4, scores:{safety:80,trust:70,reg:75,team:55}, picks:[0,0,1,0], answered:false}; wsSaveTabletop();
+mx = {platform:"market", stage:"2", reg:true}; wsSaveTool("metrics", mx, metricsTitle(mx));
+renderWorkspace(); h = view.innerHTML;
+eq(Object.keys(wsItems()).length, 3, "three results now saved");
+eq(/probably don't need one yet/.test(h), false, "the nudge drops once there are a few results");
+out.push("New project nudge: shown under three results, gone at three");
+return out.join("\\n");`;
+console.log(new Function(src2)());

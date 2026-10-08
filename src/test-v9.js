@@ -29,8 +29,19 @@ out.push("overview with saved work: greeting " + (view.innerHTML.includes("Alex"
 shellUpdate("overview"); out.push("sidebar recent: " + ((els["#sb-pins"].innerHTML.match(/sb-pin/g)||[]).length) + " items; profile: " + (els["#sb-me"].innerHTML.includes("Alex Rivera") ? "shown" : "missing"));
 const items = cmdkItems(); const groups = [...new Set(items.map(x=>x.g))];
 out.push("command palette: " + items.length + " items in groups " + groups.join(", "));
-renderAbout(); if(bad(view.innerHTML)) throw new Error("bad about page"); out.push("about page: " + (view.innerHTML.match(/class="ab-sec/g)||[]).length + " sections, stats " + (view.innerHTML.match(/<b class="mono">\\d+/g)||[]).map(s=>s.replace(/\\D/g,"")).join("/"));
+renderAbout(); if(bad(view.innerHTML)) throw new Error("bad about page");
+if(!/About the content in this tool, not about your program/.test(view.innerHTML)) throw new Error("about page: stat tiles aren't captioned as the tool's own content");
+out.push("about page: " + (view.innerHTML.match(/class="ab-sec/g)||[]).length + " sections, stats " + (view.innerHTML.match(/<b class="mono">\\d+/g)||[]).map(s=>s.replace(/\\D/g,"")).join("/") + ", captioned as the tool's content");
 pm = fromPreset("dating"); const rep = renderReport(assess(pm)); if(!rep.includes("rep-title") || !rep.includes("rep-detail") || bad(rep)) throw new Error("report header patch missing");
 out.push("report header: document title and detail section present");
+// pre-mortem report: the four stat tiles fold into Start Here's own sentence and move into a disclosure
+if(!rep.includes("pm-kpis-d")) throw new Error("the kpis dashboard is no longer behind a disclosure");
+if(!rep.includes("launch blockers are done")) throw new Error("Start Here's summary doesn't say what the numbers count");
+if(rep.indexOf('class="starthere"') > rep.indexOf('pm-kpis-d')) throw new Error("Start Here should come before the numbers disclosure");
+out.push("pre-mortem report: the kpi dashboard is now a line in Start Here, with the tiles behind a 'See the numbers' disclosure");
+// pre-mortem start screen: the example grid leads when there's nothing saved yet
+pm = blankPM(); store.set("ws:items", {}); const start = startScreen(); if(bad(start)) throw new Error("start screen has bad values");
+if(start.indexOf("Or explore an example") > start.indexOf("No saved pre-mortems yet")) throw new Error("with nothing saved, the example grid should lead, not the empty library placeholder");
+out.push("pre-mortem start: with nothing saved, the example grid leads the saved-work library");
 return out.join("\\n");`;
 console.log(new Function(src)());

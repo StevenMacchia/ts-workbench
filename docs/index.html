@@ -4555,6 +4555,22 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .rt-sb-chat .rt-sb-busy{display:flex;align-items:center;gap:8px;color:var(--muted)}
 .rt-sb-grade{margin-top:16px}
 @media (max-width:760px){.rt-sb-chat p{max-width:92%}}
+
+/* ---------- Pre-mortem report: the four stat tiles move into a disclosure, folded ---------- */
+/* into startHere()'s own summary sentence instead of standing alone as a dashboard. ---------- */
+.pm-kpis-d{margin-top:16px;overflow:hidden}
+.pm-kpis-d > summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:14px 18px;font-weight:600;font-size:14.5px;position:relative}
+.pm-kpis-d > summary::-webkit-details-marker{display:none}
+.pm-kpis-d > summary::after{content:"";position:absolute;right:18px;top:50%;width:8px;height:8px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg)}
+.pm-kpis-d[open] > summary::after{transform:translateY(-30%) rotate(-135deg)}
+.pm-kpis-d[open] > summary{border-bottom:1px solid var(--line)}
+.pm-kpis-d .kpis{margin-top:0;padding:16px 18px}
+
+/* ---------- Workspace empty state: the "New project" nudge before a few results exist ---------- */
+.wsnudge{margin:-6px 0 10px}
+
+/* ---------- About: caption the stat tiles as the tool's own content, not the visitor's program ---------- */
+.ab-stats-cap{margin-top:8px;text-align:center}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5711,7 +5727,14 @@ function libraryBlock(){
     </div>`;}).join("")}</div>`;
 }
 function startScreen(){
-  const cur = pmCurrentHero();
+  const cur = pmCurrentHero(), libEmpty = !Object.keys(libLoad()).length;
+  const exampleBlock = `<div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
+    <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
+      return `<button type="button" class="card excard" data-preset="${k}">
+        <span class="row" style="gap:10px;flex-wrap:nowrap"><span class="libicon sm"><svg><use href="#p-${p.type}"/></svg></span><b>${esc(p.name.replace(" (example)",""))}</b></span>
+        <span class="note">${esc(labelOf(PLATFORMS,p.type))} · ${esc(QS[2].opts.find(o=>o.k===p.youth).n)}</span>
+        <span class="row" style="gap:6px"><span class="pill ${r.posture[1]}">${r.posture[0]} exposure</span><span class="note">${r.risks.length} risks</span></span>
+      </button>`;}).join("")}</div>`;
   return `${cur}
     ${cur ? libraryBlock() : ""}
     <div class="card hero ${cur ? "pm-new" : ""}">
@@ -5730,14 +5753,7 @@ function startScreen(){
         </ul>
       </div>
     </div>
-    ${cur ? "" : libraryBlock()}
-    <div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
-    <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
-      return `<button type="button" class="card excard" data-preset="${k}">
-        <span class="row" style="gap:10px;flex-wrap:nowrap"><span class="libicon sm"><svg><use href="#p-${p.type}"/></svg></span><b>${esc(p.name.replace(" (example)",""))}</b></span>
-        <span class="note">${esc(labelOf(PLATFORMS,p.type))} · ${esc(QS[2].opts.find(o=>o.k===p.youth).n)}</span>
-        <span class="row" style="gap:6px"><span class="pill ${r.posture[1]}">${r.posture[0]} exposure</span><span class="note">${r.risks.length} risks</span></span>
-      </button>`;}).join("")}</div>`;
+    ${cur ? "" : libEmpty ? exampleBlock + libraryBlock() : libraryBlock() + exampleBlock}`;
 }
 function optCard(Q, o, i, pressed, multi){
   const ic = Q.k==="type";
@@ -6095,12 +6111,16 @@ function startHere(r){
   const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
   const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
   const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
+  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, allDone = r.safeguards.filter(s=>pm.done[s.id]).length;
+  const applies = r.obligations.filter(o=>o.status==="applies").length;
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
     : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
+  // The numbers used to sit in their own four-tile dashboard; said in one line instead, each one naming what it counts
+  const counted = `You've logged <strong>${r.risks.length} risk${r.risks.length===1?"":"s"}</strong>, each scored severity × likelihood. ${bDone} of ${blockers.length} launch blockers are done, and ${applies} of ${r.obligations.length} legal duties apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"} you named.`;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p><p class="note">${counted}</p></div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -6160,6 +6180,7 @@ function renderReport(r){
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
     <div class="section-title rep-detail"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
+    <details class="card pm-kpis-d"><summary>See the numbers<span class="note">Overall exposure, risk count, launch blockers and legal obligations</span></summary>
     <div class="kpis">
       <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
       <div class="card kpi"><span class="eyebrow">Risks identified ${tip("Each risk is scored severity (1–4) × likelihood (1–4). 12 or more is critical, 8–11 high, 4–7 medium and below 4 low.")}</span><span class="v">${total}</span>
@@ -6167,7 +6188,7 @@ function renderReport(r){
         <span class="s">${r.counts.crit} critical · ${r.counts.high} high · ${r.counts.med} medium · ${r.counts.low} low</span></div>
       <div class="card kpi"><span class="eyebrow">Launch blockers done ${tip("The core controls for critical risks, plus anything the law likely requires where you operate. Don't ship without these.","tip-r")}</span><span class="v">${bDone}<small> / ${blockers.length}</small></span><div class="bar"><i style="width:${blockers.length?bDone/blockers.length*100:0}%;background:${blockers.length&&bDone===blockers.length?"var(--good)":"var(--crit)"}"></i></div><span class="s">${allDone} of ${r.safeguards.length} safeguards in place overall</span></div>
       <div class="card kpi"><span class="eyebrow">Legal obligations ${tip("Laws matched to your answers and jurisdictions. A starting map for your legal team, not legal advice.","tip-r")}</span><span class="v">${applies}<small> apply</small></span><span class="s">${r.obligations.length-applies} more may apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"}</span></div>
-    </div>
+    </div></details>
     <div class="viz">
       <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent. After safeguards counts the safeguards you've ticked in the launch plan.")}</h3>
           <div class="segs" role="group" aria-label="Which ratings to show"><button type="button" data-mview="inh" aria-pressed="${!resView}">Before safeguards</button><button type="button" data-mview="res" aria-pressed="${resView}">After safeguards</button></div></div>
@@ -10600,56 +10621,69 @@ function vendorResult(d){
   const rows = d.vendors.map(v=>({v, score:CRITERIA.reduce((a,c)=>a+(+d.weights[c.k]||0)*v.s[c.k],0)/tw, bad:CRITERIA.some(c=>c.deal && v.s[c.k]<=2)}));
   return rows.filter(x=>!x.bad).sort((a,b)=>b.score-a.score)[0] || null;
 }
+// One source of truth for "how do we summarize a saved result": used for the fuller workspace
+// row (pill + note) and reused, via the `chip` field, for the compact one-line chip the
+// overview's "Jump back in" list shows (ovChip() below). Every number here says what it counts.
 function itemSummary(it){
   const d = it.data || {};
   if(it.kind==="redteam" && typeof rtDrills === "function"){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
-    return {html:`<span class="pill ${s4 ? "crit" : open ? "high" : "good"}">${s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s")}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`}; }
+    const cls = s4 ? "crit" : open ? "high" : "good", label = s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s");
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
-    return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
+    const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
-    return {html:`<span class="pill ${m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit"}">${m.pct(m.acc)} accurate</span><span class="note">${dd.cases.length} cases${m.main ? ` · P ${m.pct(m.main.pr)} · R ${m.pct(m.main.rc)}` : ""}</span>`}; }
+    const cls = m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit";
+    return {html:`<span class="pill ${cls}">${m.pct(m.acc)} accurate</span><span class="note">${dd.cases.length} case${dd.cases.length === 1 ? "" : "s"}${m.main ? ` · P ${m.pct(m.main.pr)} · R ${m.pct(m.main.rc)}` : ""}</span>`,
+      chip:{cls, label:`${m.pct(m.acc)} accurate (of ${dd.cases.length} case${dd.cases.length === 1 ? "" : "s"})`}}; }
   if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd)), ap = dsApplies(dd);
-    return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
+    const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="transparency" && typeof trProgress === "function"){
     const keep = tr, dd = Object.assign(TR_BLANK(), d); tr = dd; const p = trProgress(); tr = keep;
-    return {html:`<span class="pill ${p.pct >= 90 ? "good" : "high"}">${p.pct}% complete</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`};
+    const cls = p.pct >= 90 ? "good" : "high", label = `${p.pct}% complete`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`, chip:{cls, label}};
   }
   if(it.kind==="premortem"){
     const r = assess(openRecord(d)), bl = r.safeguards.filter(s=>s.rank===3), bd = bl.filter(s=>d.done&&d.done[s.id]).length;
-    return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd};
+    const cls = r.posture[1] || "faint";
+    return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd, chip:{cls, label:r.posture[0]}};
   }
   if(it.kind==="tabletop"){
     const sc = SCENARIOS[d.s]; if(!sc) return {html:""};
     const best = ((d.first && d.first.length) ? d.first : (d.picks||[])).filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
     const avg = Math.round(DIMS.reduce((a,x)=>a+(d.scores?d.scores[x.k]:0),0)/DIMS.length);
     const cls = best===sc.steps.length ? "good" : best>=2 ? "high" : "crit";
-    return {html:`<span class="pill ${cls}">${best} of ${sc.steps.length} strong calls</span><span class="note">Average score ${avg}/100</span>`};
+    return {html:`<span class="pill ${cls}">${best} of ${sc.steps.length} strong calls</span><span class="note">Average score ${avg}/100</span>`, chip:{cls, label:`${best}/${sc.steps.length} first try`}};
   }
   if(it.kind==="metrics"){
     const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length;
     const c = typeof mxStatusCounts === "function" ? mxStatusCounts(d) : {on:0, watch:0, off:0};
     const st = c.on + c.watch + c.off ? `<span class="pill good">${c.on} on track</span>${c.watch ? `<span class="pill med">${c.watch} watch</span>` : ""}${c.off ? `<span class="pill crit">${c.off} off track</span>` : ""}` : "";
-    return {html:`<span class="pill">${n} metrics</span>${st}<span class="note">${esc(MX_PLATFORMS[d.platform]||"")}${d.reg?" · regulated":""}${d.period ? " · " + esc(d.period) : ""}</span>`};
+    return {html:`<span class="pill">${n} metrics</span>${st}<span class="note">${esc(MX_PLATFORMS[d.platform]||"")}${d.reg?" · regulated":""}${d.period ? " · " + esc(d.period) : ""}</span>`, chip:{cls:"", label:`${n} metrics`}};
   }
   if(it.kind==="vendors"){
     const top = vendorResult(d);
     return {html: top ? `<span class="pill accent">Recommended: ${esc(top.v.name)}</span><span class="note">Score ${top.score.toFixed(2)} / 5 · ${d.vendors.length} vendors</span>`
-                      : `<span class="pill crit">No vendor meets the minimums</span>`};
+                      : `<span class="pill crit">No vendor meets the minimums</span>`,
+      chip: top ? {cls:"accent", label:top.v.name.split(" (")[0]} : {cls:"crit", label:"None qualify"}};
   }
   if(it.kind==="maturity" && typeof maScore === "function"){
     const sc = maScore(d), g = maGaps(d).length, n = MA_AREAS.filter(a => d.lv && d.lv[a.k]).length;
     if(sc === null) return {html:`<span class="note">Not rated yet</span>`};
-    return {html:`<span class="pill ${g ? "high" : "good"}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`};
+    const cls = g ? "high" : "good";
+    return {html:`<span class="pill ${cls}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`, chip:{cls, label:`Level ${sc.toFixed(1)}`}};
   }
   if(it.kind==="coverage" && typeof cvSummary === "function"){
     const s = cvSummary(d); if(!s.rated) return {html:`<span class="note">Not rated yet</span>`};
-    return {html:`<span class="pill ${s.exposed.length ? "crit" : s.gaps.length ? "high" : "good"}">${s.cov}% coverage</span><span class="note">${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "No gaps"} · ${s.rated} of ${s.total} rated</span>`};
+    const cls = s.exposed.length ? "crit" : s.gaps.length ? "high" : "good";
+    return {html:`<span class="pill ${cls}">${s.cov}% coverage</span><span class="note">${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "No gaps"} · ${s.rated} of ${s.total} rated</span>`, chip:{cls, label:`${s.cov}% covered`}};
   }
   if(it.kind==="policy"){
     const s = d.result ? d.result.score : d.heur ? d.heur.score : null;
     if(s===null) return {html:`<span class="note">Not tested yet</span>`};
     const cls = s>=75 ? "good" : s>=50 ? "high" : "crit";
-    return {html:`<span class="pill ${cls}">Clarity ${s}/100</span><span class="note">${d.result ? d.result.edge_cases.length + " edge cases" : "Instant checks"}</span>`};
+    return {html:`<span class="pill ${cls}">Clarity ${s}/100</span><span class="note">${d.result ? d.result.edge_cases.length + " edge cases" : "Instant checks"}</span>`, chip:{cls, label:`Clarity ${s}`}};
   }
   return {html:""};
 }
@@ -10725,7 +10759,7 @@ function renderWorkspace(){
   const inProject = active ? all.filter(i=>(i.projectId||null)===active) : all;
   const shown = kind ? inProject.filter(i=>i.kind===kind) : inProject;
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
-  const p = wsProfile();
+  const p = wsProfile(), empty = all.length === 0, projCount = Object.keys(wsProjects()).length;
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
     `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
     `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
@@ -10735,19 +10769,20 @@ function renderWorkspace(){
       ${profileCard()}
       ${typeof orgCardHTML === "function" ? orgCardHTML() : ""}
     </div>
-    <div class="wsstats">
-        <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${Object.keys(wsProjects()).length}</span></div>
+    ${empty ? itemRows([]) : `<div class="wsstats">
+        <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${projCount}</span></div>
         <div class="card kpi"><span class="eyebrow">Saved results</span><span class="v">${all.length}</span></div>
         <div class="card kpi"><span class="eyebrow">Pre-mortems</span><span class="v">${all.filter(i=>i.kind==="premortem").length}</span></div>
         <div class="card kpi"><span class="eyebrow">Open launch blockers ${tip("Launch blockers not yet ticked off, added up across every saved pre-mortem.","tip-r")}</span><span class="v" style="${openBlockers?"color:var(--crit)":""}">${openBlockers}</span></div>
-    </div>
+    </div>`}
     <div class="section-title"><h2>Projects ${tip("Group results by launch, product area or client. Click a project to see its results; anything you save while it's selected goes into it.")}</h2>
       <button type="button" class="btn sm" data-ws="newproj"><svg><use href="#i-plus"/></svg>New project</button></div>
+    ${!projCount && all.length < 3 ? `<p class="note wsnudge">Projects help once you have a few results to group. With ${all.length} saved so far, you probably don't need one yet.</p>` : ""}
     ${projectCards(all)}
     <div class="section-title"><h2>${active?`Results in ${esc(projName(active))}`:"All saved results"}</h2>
       <div class="segs" role="group" aria-label="Filter by tool"><button type="button" data-ws-kind="" aria-pressed="${!kind}">All <span class="mono" style="opacity:.6">${inProject.length}</span></button>${Object.entries(KINDS).map(([k,v])=>`<button type="button" data-ws-kind="${k}" aria-pressed="${kind===k}">${v.plural} <span class="mono" style="opacity:.6">${inProject.filter(i=>i.kind===k).length}</span></button>`).join("")}</div></div>
     ${active?`<div class="banner" style="margin-top:12px"><span>New results you save from any tool go into <strong>${esc(projName(active))}</strong>.</span><button type="button" class="btn sm" data-wsproj="">Show all results</button></div>`:""}
-    ${itemRows(shown)}
+    ${empty ? "" : itemRows(shown)}
     ${shown.length?`<div class="row wsnew"><span class="note">Start something new:</span>${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div>`:""}
   </div>`;
   bindWorkspace();
@@ -11030,26 +11065,13 @@ OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
 OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
     <text x="110" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">gold</text><text x="124" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">got</text></svg>`;
+// The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
+// pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
-  const d = it.data || {};
-  if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
-  if(it.kind==="tabletop"){ const sc = SCENARIOS[d.s]; if(!sc) return ""; const picks = (d.first && d.first.length) ? d.first : (d.picks||[]); const b = picks.filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
-    return `<span class="ov-chip"><span class="sdot" style="background:${b>=3?"var(--good)":b>=2?"var(--high)":"var(--crit)"}"></span>${b}/${sc.steps.length} first try</span>`; }
-  if(it.kind==="metrics"){ const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length; return `<span class="ov-chip">${n} metrics</span>`; }
-  if(it.kind==="maturity" && typeof maScore === "function"){ const sc = maScore(d); if(sc===null) return ""; const g = maGaps(d).length;
-    return `<span class="ov-chip"><span class="sdot" style="background:${g ? "var(--high)" : "var(--good)"}"></span>Level ${sc.toFixed(1)}</span>`; }
-  if(it.kind==="coverage" && typeof cvSummary === "function"){ const s = cvSummary(d); if(!s.rated) return "";
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
-  if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
-    return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
-  if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
-    return `<span class="ov-chip"><span class="sdot" style="background:${m.acc === null ? "var(--faint)" : m.acc >= .9 ? "var(--good)" : m.acc >= .75 ? "var(--high)" : "var(--crit)"}"></span>${m.pct(m.acc)} accurate</span>`; }
-  if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd));
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
-  if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
-  if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
-  return "";
+  const s = typeof itemSummary === "function" ? itemSummary(it) : {};
+  if(!s.chip || !s.chip.label) return "";
+  const {cls, label} = s.chip;
+  return `<span class="ov-chip">${cls ? `<span class="sdot" style="background:var(--${cls})"></span>` : ""}${esc(label)}</span>`;
 }
 /* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
 const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
@@ -11168,7 +11190,6 @@ function asWelcomeHTML(J){
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
-      ${asPictureHTML(true)}
     </section>
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
@@ -11216,6 +11237,7 @@ function renderTools(){
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
+    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
@@ -11404,6 +11426,7 @@ function renderAbout(){
       <span class="ab-by2-m"><span><small>Format</small><b>Single-file web app, no backend</b></span><span><small>Status</small><b>Live and free to use</b></span><span><small>Tools</small><b>${tools}</b></span></span></div>` : ""}
 
     <section class="ab-stats rise" aria-label="By the numbers">${stats.map(([n,l])=>`<div><b class="mono">${n}</b><span>${l}</span></div>`).join("")}</section>
+    <p class="note ab-stats-cap">About the content in this tool, not about your program. Nothing here is a measure of your own trust and safety work.</p>
 
     <section class="ab-sec rise">
       <h2>The problem</h2>
@@ -15671,13 +15694,13 @@ function maPlanHTML(){
   const sc = maScore(ma), pr = maProgress(ma), gaps = maGaps(ma), hist = ma.hist.slice().sort((a, b) => a.t - b.t), prev = hist[hist.length - 1], nx = maNextItem(ma);
   const tabs = MA_TABS.map(([k, n]) => `<button type="button" role="tab" aria-selected="${ma.tab === k}" data-matab="${k}">${n}${k === "roadmap" ? ` <span class="mono">${pr.stepsDone}/${pr.steps.length}</span>` : k === "progress" && hist.length ? ` <span class="mono">${hist.length}</span>` : ""}</button>`).join("");
   return `<section class="card ma-band">
+      ${nx ? `<p class="ma-band-next" style="grid-column:1/-1"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
         <div class="ma-band-t">${maWhy()}</div>
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
-        ${nx ? `<p class="ma-band-next"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
         <div class="ma-band-a"><button type="button" class="btn sm" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button>
           ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
@@ -20819,7 +20842,7 @@ function renderPlan(){
     <div class="pl-head">
       <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
       <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>
-      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : "Start with your program's maturity or a pre-mortem."}`}</p>
+      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : `Start with your program's <a href="#maturity">maturity</a> or a <a href="#premortem">pre-mortem</a>.`}`}</p>
       ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button></div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
     </div>
     ${PLAN_GROUPS.map(([g, n, d]) => { const xs = by(g); if(!xs.length) return ""; const open = xs.filter(x => !x.done), done = xs.filter(x => x.done), all = !!plMore[g], shown = all ? open : open.slice(0, PL_SHOW);

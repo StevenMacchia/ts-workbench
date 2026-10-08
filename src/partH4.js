@@ -63,26 +63,13 @@ OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
 OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
     <text x="110" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">gold</text><text x="124" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">got</text></svg>`;
+// The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
+// pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
-  const d = it.data || {};
-  if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
-  if(it.kind==="tabletop"){ const sc = SCENARIOS[d.s]; if(!sc) return ""; const picks = (d.first && d.first.length) ? d.first : (d.picks||[]); const b = picks.filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
-    return `<span class="ov-chip"><span class="sdot" style="background:${b>=3?"var(--good)":b>=2?"var(--high)":"var(--crit)"}"></span>${b}/${sc.steps.length} first try</span>`; }
-  if(it.kind==="metrics"){ const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length; return `<span class="ov-chip">${n} metrics</span>`; }
-  if(it.kind==="maturity" && typeof maScore === "function"){ const sc = maScore(d); if(sc===null) return ""; const g = maGaps(d).length;
-    return `<span class="ov-chip"><span class="sdot" style="background:${g ? "var(--high)" : "var(--good)"}"></span>Level ${sc.toFixed(1)}</span>`; }
-  if(it.kind==="coverage" && typeof cvSummary === "function"){ const s = cvSummary(d); if(!s.rated) return "";
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
-  if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
-    return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
-  if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
-    return `<span class="ov-chip"><span class="sdot" style="background:${m.acc === null ? "var(--faint)" : m.acc >= .9 ? "var(--good)" : m.acc >= .75 ? "var(--high)" : "var(--crit)"}"></span>${m.pct(m.acc)} accurate</span>`; }
-  if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd));
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
-  if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
-  if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
-  return "";
+  const s = typeof itemSummary === "function" ? itemSummary(it) : {};
+  if(!s.chip || !s.chip.label) return "";
+  const {cls, label} = s.chip;
+  return `<span class="ov-chip">${cls ? `<span class="sdot" style="background:var(--${cls})"></span>` : ""}${esc(label)}</span>`;
 }
 /* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
 const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
@@ -201,7 +188,6 @@ function asWelcomeHTML(J){
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
-      ${asPictureHTML(true)}
     </section>
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
@@ -249,6 +235,7 @@ function renderTools(){
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
+    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">

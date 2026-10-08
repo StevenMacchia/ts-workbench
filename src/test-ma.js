@@ -59,6 +59,7 @@ const body = function(){
   eq(/Level 2 reached/.test(h) && /Head of Trust &amp; Safety Operations/.test(h), true, "reached badge and owner");
   eq((h.match(/<polygon class="ma-cur"/g) || []).length, 1, "one radar"); eq(/stroke-dasharray="1.5 3.5"/.test(h), true, "last snapshot overlaid");
   eq(/Crisis response level 2 of 5, target 3/.test(h), true, "radar describes current levels");
+  eq(h.indexOf('class="ma-band-next"') > 0 && h.indexOf('class="ma-band-next"') < h.indexOf('class="ma-score big"'), true, "Next up leads the band, above the score and radar");
   out.push(`example plan: level ${maScore(ma)}, ${pr.done}/${pr.items} actions, ${pr.gained} level gained, roadmap ${["now", "next", "later"].map(p => road.filter(s => s.phase === p).length).join("/")}`);
   // by area and progress tabs
   ma.tab = "areas"; ma.sel = "compliance"; renderMaturity(); h = view.innerHTML;
@@ -86,8 +87,14 @@ const body = function(){
   eq(MA_AREAS.every(a => MA_FW[a.k] && MA_FW[a.k].note), true, "every area maps to the frameworks");
   const fwh = maFrameworkHTML("wellbeing"); eq(/PE3: Wellness &amp; Resilience/.test(fwh) && /No direct equivalent/.test(fwh) && /dtspartnership\.org/.test(fwh), true, "wellbeing maps to DTSP only, with sources");
   out.push("frameworks: " + MA_AREAS.length + " areas mapped to DTSP and Ofcom, with sources");
+  // the plan page's empty state links straight to maturity and pre-mortem, not just naming them
+  ma = maInit({stage:"growth", lv:{}, done:{}, ex:false}); cv = {src:null, ex:false, r:{}}; pm = blankPM();
+  renderPlan(); h = view.innerHTML; if(bad(h)) throw new Error("blank plan has bad values: " + where(h));
+  eq(/Nothing to plan yet/.test(h), true, "nothing saved yet");
+  eq(/Start with your program's <a href="#maturity">maturity<\/a> or a <a href="#premortem">pre-mortem<\/a>\./.test(h), true, "the empty state links maturity and pre-mortem directly, not just naming them");
+  out.push("plan: empty state links maturity and pre-mortem directly");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partTYPE.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partORG.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partTYPE.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partORG.js"), rd("partRC.js"), rd("partPLAN.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

@@ -41,6 +41,7 @@ function renderAbout(){
       <span class="ab-by2-m"><span><small>Format</small><b>Single-file web app, no backend</b></span><span><small>Status</small><b>Live and free to use</b></span><span><small>Tools</small><b>${tools}</b></span></span></div>` : ""}
 
     <section class="ab-stats rise" aria-label="By the numbers">${stats.map(([n,l])=>`<div><b class="mono">${n}</b><span>${l}</span></div>`).join("")}</section>
+    <p class="note ab-stats-cap">About the content in this tool, not about your program. Nothing here is a measure of your own trust and safety work.</p>
 
     <section class="ab-sec rise">
       <h2>The problem</h2>

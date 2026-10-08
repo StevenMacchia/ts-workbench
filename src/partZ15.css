@@ -14,3 +14,19 @@
 .rt-sb-chat .rt-sb-busy{display:flex;align-items:center;gap:8px;color:var(--muted)}
 .rt-sb-grade{margin-top:16px}
 @media (max-width:760px){.rt-sb-chat p{max-width:92%}}
+
+/* ---------- Pre-mortem report: the four stat tiles move into a disclosure, folded ---------- */
+/* into startHere()'s own summary sentence instead of standing alone as a dashboard. ---------- */
+.pm-kpis-d{margin-top:16px;overflow:hidden}
+.pm-kpis-d > summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:14px 18px;font-weight:600;font-size:14.5px;position:relative}
+.pm-kpis-d > summary::-webkit-details-marker{display:none}
+.pm-kpis-d > summary::after{content:"";position:absolute;right:18px;top:50%;width:8px;height:8px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg)}
+.pm-kpis-d[open] > summary::after{transform:translateY(-30%) rotate(-135deg)}
+.pm-kpis-d[open] > summary{border-bottom:1px solid var(--line)}
+.pm-kpis-d .kpis{margin-top:0;padding:16px 18px}
+
+/* ---------- Workspace empty state: the "New project" nudge before a few results exist ---------- */
+.wsnudge{margin:-6px 0 10px}
+
+/* ---------- About: caption the stat tiles as the tool's own content, not the visitor's program ---------- */
+.ab-stats-cap{margin-top:8px;text-align:center}
