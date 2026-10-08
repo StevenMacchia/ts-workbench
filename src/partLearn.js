@@ -1497,6 +1497,7 @@ function renderGlossary(){
   const due0 = glDueCount();
   const meta = `<button type="button" class="btn sm primary" id="ln-practice">Practice the terms</button>${due0 ? `<button type="button" class="btn sm" id="ln-review-due">${due0} due for review</button>` : ""}<a class="btn sm" href="#redteamllm">LLM guide</a><a class="btn sm" href="#redteamworld">World model guide</a>`;
   view.innerHTML = head("Glossary", `${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
+    <p class="note tsg-xlink">Looking for general Trust and Safety terms? <a href="#tsglossary">T&amp;S glossary</a></p>
     <div class="ln-gl-tools"><label class="ln-search"><svg><use href="#i-search"/></svg><input id="ln-q" type="search" placeholder="Search terms" autocomplete="off" aria-label="Search terms"></label>
       <div class="segs" role="group" aria-label="Filter"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="llm" aria-pressed="false">LLMs</button><button type="button" data-f="world" aria-pressed="false">World models</button></div>
       <span class="note" id="ln-known"></span></div>

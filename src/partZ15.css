@@ -105,3 +105,23 @@
 .mx-tabs-sub{margin:8px 0 0;max-width:70ch}
 /* Overview: the "All tools" stage filter, so the grid stays scannable as it grows */
 .ov-stagef{display:inline-flex;margin:14px 0 4px}
+
+/* tsgloss: the T&S glossary, #tsglossary. All terms as one grid with the definition visible,
+   a group filter and a letter divider, instead of a pager -- the owner wants to see everything at once. */
+.tsg-xlink{margin:-2px 0 14px}
+.tsg-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.tsg-chip{all:unset;cursor:pointer;padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:500;background:var(--sunk);color:var(--muted);border:1px solid transparent}
+.tsg-chip[aria-pressed="true"]{background:color-mix(in oklab, var(--accent) 16%, var(--surface));color:var(--accent);border-color:color-mix(in oklab, var(--accent) 35%, transparent)}
+.tsg-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tsg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;align-items:start}
+.tsg-letter{grid-column:1/-1;font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted);margin:14px 0 -2px;padding-top:4px;border-top:1px solid var(--line)}
+.tsg-grid .tsg-letter:first-child{margin-top:0;border-top:0;padding-top:0}
+.tsg-card{padding:14px 16px;display:grid;gap:6px;align-content:start}
+.tsg-card h4{margin:0;font-size:15px;line-height:1.3}
+.tsg-g{margin:0;display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);background:var(--sunk);border-radius:5px;padding:2px 7px;width:max-content}
+.tsg-d{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink)}
+.tsg-r{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.tsg-tool{margin-top:2px;display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--accent);text-decoration:none}
+.tsg-tool:hover{text-decoration:underline;text-underline-offset:3px}
+.tsg-tool svg{width:13px;height:13px}
+@media (max-width:480px){.tsg-grid{grid-template-columns:1fr}}

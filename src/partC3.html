@@ -83,6 +83,7 @@ const HEAD_META = () => {
     redteamllm:["shield", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.llm.steps.length : 9) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.llm.exercises.length : 11) + " drills", "No attack strings"]],
     redteamworld:["monitor", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.steps.length : 10) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.exercises.length : 12) + " drills", "Uploads, steering, provenance"]],
     glossary:["doc", () => [(typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms", "Flashcards and a quiz", "Tagged by model type"]],
+    tsglossary:["doc", () => [(typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 100) + " terms", "9 groups", "Search and browse A to Z"]],
     workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
