@@ -37,6 +37,12 @@ function ttWhyHTML(sc, type, full){
 }
 
 /* ---------- picker ---------- */
+// The highest-severity scenario not yet completed for this company type, so a newcomer can skip straight in
+const ttSevRank = s => +(String(s.severity || "").match(/\d/) || [9])[0];
+function ttBestFit(all, pOf){
+  const open = all.filter(x => !pOf(x)), pool = open.length ? open : all;
+  return pool.slice().sort((a, b) => ttSevRank(a.s) - ttSevRank(b.s))[0] || null;
+}
 function ttPicker(H){
   const ttMode = typeof ttfNew === "function" ? store.get("tt:mode", "solo") : "solo";
   const ttType = ttCompanyType(), tInfo = TT_TYPES.find(t=>t.k===ttType), prog = ttProgress(), filt = store.get("tt:filter", "all");
@@ -45,8 +51,10 @@ function ttPicker(H){
   const pOf = x => prog[ttKey(x.i, ttType)];
   const completed = all.filter(pOf).length;
   const list = filt==="todo" ? all.filter(x=>!pOf(x)) : filt==="done" ? all.filter(pOf) : all;
+  const bestFit = ttBestFit(all, pOf);
   view.innerHTML = H("Rehearse a crisis before it happens. Each scenario is four timed decisions. Pick a weaker answer and you'll see why, how it compares with the strongest call and the law behind it, and you can try again.") + `
     <p class="mxa-q tt-q">When something goes badly wrong, would your team make the right calls in the right order?</p>
+    ${bestFit ? `<div class="gd-a tt-one"><button type="button" class="btn primary" id="tt-one">Just show me one ${icon("arrow")}</button><span class="note">Starts ${esc(bestFit.s.title)}, the scenario most worth rehearsing right now. Skips the choices below.</span></div>` : ""}
     <div class="mxm-how tt-how"><ol class="mxm-how-s">
       <li><b>1</b><span><em>Pick your company type.</em> Scenarios are written for the risks and regulators you face.</span></li>
       <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as the incident unfolds. About 8 minutes each.</span></li>
@@ -77,6 +85,7 @@ function ttPicker(H){
           ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
+  const one = $("#tt-one"); if(one) one.onclick = () => ttMode === "team" ? ttfNew(bestFit.i, ttType) : ttStart(bestFit.i, ttType);
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
   $$("[data-ttmode]").forEach(b => b.onclick = () => { store.set("tt:mode", b.dataset.ttmode); renderTabletop(); const f = document.querySelector(`[data-ttmode="${b.dataset.ttmode}"]`); if(f) f.focus(); });
   $("#tt-type").onchange = e => { store.set("tt:type", e.target.value); renderTabletop(); };

@@ -107,14 +107,18 @@ function vdWeightsBar(){
 const vdSave = () => store.set("vx", vx);
 function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
-function vdCritHTML(c, seen){ return `<article class="card vd-crit">
+function vdCritHTML(c, seen){
+  // The first criterion's RFP questions open by default, to teach the pattern once; the rest stay closed
+  const first = c === CRITERIA[0];
+  return `<article class="card vd-crit">
             <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
             <p class="vd-cq">${esc(VD_Q[c.k])}</p>
             <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
             <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
               <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
-            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
-          </article>`; }
+            <details class="vd-rfp" ${first ? "open" : ""}><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
+          </article>`;
+}
 // refresh: what to do after a score or a weight changes
 function vdBindShared(refresh){
   const save = vdSave;

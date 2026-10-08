@@ -133,13 +133,16 @@ function cvRailHTML(){
       <button type="button" class="ma-tool ma-start-go" data-cvgo="1">See all gaps<svg><use href="#i-arrow"/></svg></button></div>` : ""}
     <div class="ma-prog"><div class="ma-prog-t"><span>${s.rated} of ${s.total} rated</span></div><div class="vd-bar"><i style="width:${s.rated / s.total * 100}%"></i></div></div>`;
 }
+// A default source, offered when none is set, so "coverage only" isn't the silent default
+const CV_DEFAULT_EX = "ex:teen_social";
 function cvSourceHTML(){
   const {src, s} = cvSrc(cv), rk = cvRisk(cv);
   const opt = ([v, n]) => `<option value="${esc(v)}" ${v === src ? "selected" : ""}>${esc(n)}</option>`;
   return `<div class="card cv-src">
+    ${!src ? `<div class="banner cv-nosrc"><span><strong>See how this works with an example</strong> before rating your own defenses, or run a pre-mortem on your products to compare against real risk.</span><button type="button" class="btn sm primary" data-cvsrc="${CV_DEFAULT_EX}">See it with an example</button></div>` : ""}
     <div class="field"><label for="cv-src">Compare coverage against</label>
       <select class="select" id="cv-src">${src ? "" : `<option value="" selected>No risk yet: coverage only</option>`}${s.list.length ? `<optgroup label="Your products">${s.list.map(opt).join("")}</optgroup>` : ""}<optgroup label="Examples">${s.ex.map(opt).join("")}</optgroup></select></div>
-    <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example to see how the comparison works." :
+    <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example above to see how the comparison works." :
       src === "all" ? "The worst risk in each harm area across every saved pre-mortem." : src.startsWith("ex:") ? "An example product's risk. Run a pre-mortem on your own products for a real comparison." : "This product's risk, from its pre-mortem."}</p>
     ${!s.pms.length ? `<button type="button" class="btn sm" data-ov="new">Start a pre-mortem</button>` : ""}
     ${rk ? `<div class="cv-riskbar">${cvAreas(cv).map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
@@ -147,7 +150,11 @@ function cvSourceHTML(){
 }
 function cvCellHTML(x, l){
   const v = x.r[l.k];
-  return `<div class="cv-seg" role="radiogroup" aria-label="${esc(x.a.n + ": " + l.n)}">${CV_LEVELS.map((n, j) => `<button type="button" role="radio" aria-checked="${v === j}" class="${v === j ? "on" : ""} l${j}" data-cva="${x.a.k}" data-cvl="${l.k}" data-cvn="${j}" title="${esc(n + ": " + l.lv[j])}"><span class="visually-hidden">${n}</span></button>`).join("")}</div>`;
+  // The level's sentence is shown inline, not only as a hover title, so it's visible on touch too
+  return `<div class="cv-cell">
+    <div class="cv-seg" role="radiogroup" aria-label="${esc(x.a.n + ": " + l.n)}">${CV_LEVELS.map((n, j) => `<button type="button" role="radio" aria-checked="${v === j}" class="${v === j ? "on" : ""} l${j}" data-cva="${x.a.k}" data-cvl="${l.k}" data-cvn="${j}" title="${esc(n + ": " + l.lv[j])}"><span class="visually-hidden">${n}</span></button>`).join("")}</div>
+    ${v !== undefined ? `<p class="cv-cell-lv">${esc(l.lv[v])}</p>` : ""}
+  </div>`;
 }
 /* ---------- Start from maturity: one program-wide level per layer, then adjust each harm area ---------- */
 const CV_FROM_MA = {policy:"policy", detect:"detection", enforce:"operations", appeal:"quality", measure:"measurement"};
@@ -464,10 +471,15 @@ function bindCoverage(){
       const row = cv.r[d.cva] = Object.assign({}, cv.r[d.cva]); row[d.cvl] = +d.cvn; cv.ex = false; cvSave();
       if(cvMode() !== "table"){ cvRefresh(true); const again = view.querySelector(`[data-cva="${d.cva}"][data-cvl="${d.cvl}"][data-cvn="${d.cvn}"]`); if(again) again.focus({preventScroll:true}); return; }
       b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
+      const wrap = b.closest && b.closest(".cv-cell");
+      if(wrap){ const lay = CV_LAYERS.find(ly => ly.k === d.cvl), text = lay ? lay.lv[+d.cvn] : "";
+        let p = wrap.querySelector(".cv-cell-lv"); if(!p && wrap.appendChild){ p = document.createElement("p"); p.className = "cv-cell-lv"; wrap.appendChild(p); }
+        if(p) p.textContent = text; }
       const x = cvRows(cv).find(r => r.a.k === d.cva), cell = document.querySelector(`#cv-row-${d.cva} .cv-mv`);
       if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
       return cvRefresh(false);
     }
+    if(d.cvsrc){ cv.src = d.cvsrc; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); return; }
     if(d.cvoff){
       if(b.getAttribute("aria-disabled") === "true") return gsay("Keep at least three harm areas so the radar can compare them");
       const x = cvRows(cv).find(r => r.a.k === d.cvoff);

@@ -4571,6 +4571,16 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 
 /* ---------- About: caption the stat tiles as the tool's own content, not the visitor's program ---------- */
 .ab-stats-cap{margin-top:8px;text-align:center}
+/* Coverage radar: each layer's chosen level, shown inline under its cell, not only as a hover title */
+.cv-cell{display:flex;flex-direction:column;align-items:center;gap:4px;max-width:150px;margin:0 auto}
+.cv-cell-lv{margin:0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center}
+@media (max-width:1100px){.cv-cell{align-items:flex-end;max-width:none}.cv-cell-lv{text-align:right;max-width:220px}}
+
+/* Coverage radar: steer to an example instead of letting "coverage only" be a silent default */
+.cv-nosrc{margin-bottom:14px}
+
+/* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
+.mxm-onramp{margin-bottom:18px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -8353,6 +8363,12 @@ function ttWhyHTML(sc, type, full){
 }
 
 /* ---------- picker ---------- */
+// The highest-severity scenario not yet completed for this company type, so a newcomer can skip straight in
+const ttSevRank = s => +(String(s.severity || "").match(/\d/) || [9])[0];
+function ttBestFit(all, pOf){
+  const open = all.filter(x => !pOf(x)), pool = open.length ? open : all;
+  return pool.slice().sort((a, b) => ttSevRank(a.s) - ttSevRank(b.s))[0] || null;
+}
 function ttPicker(H){
   const ttMode = typeof ttfNew === "function" ? store.get("tt:mode", "solo") : "solo";
   const ttType = ttCompanyType(), tInfo = TT_TYPES.find(t=>t.k===ttType), prog = ttProgress(), filt = store.get("tt:filter", "all");
@@ -8361,8 +8377,10 @@ function ttPicker(H){
   const pOf = x => prog[ttKey(x.i, ttType)];
   const completed = all.filter(pOf).length;
   const list = filt==="todo" ? all.filter(x=>!pOf(x)) : filt==="done" ? all.filter(pOf) : all;
+  const bestFit = ttBestFit(all, pOf);
   view.innerHTML = H("Rehearse a crisis before it happens. Each scenario is four timed decisions. Pick a weaker answer and you'll see why, how it compares with the strongest call and the law behind it, and you can try again.") + `
     <p class="mxa-q tt-q">When something goes badly wrong, would your team make the right calls in the right order?</p>
+    ${bestFit ? `<div class="gd-a tt-one"><button type="button" class="btn primary" id="tt-one">Just show me one ${icon("arrow")}</button><span class="note">Starts ${esc(bestFit.s.title)}, the scenario most worth rehearsing right now. Skips the choices below.</span></div>` : ""}
     <div class="mxm-how tt-how"><ol class="mxm-how-s">
       <li><b>1</b><span><em>Pick your company type.</em> Scenarios are written for the risks and regulators you face.</span></li>
       <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as the incident unfolds. About 8 minutes each.</span></li>
@@ -8393,6 +8411,7 @@ function ttPicker(H){
           ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
+  const one = $("#tt-one"); if(one) one.onclick = () => ttMode === "team" ? ttfNew(bestFit.i, ttType) : ttStart(bestFit.i, ttType);
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
   $$("[data-ttmode]").forEach(b => b.onclick = () => { store.set("tt:mode", b.dataset.ttmode); renderTabletop(); const f = document.querySelector(`[data-ttmode="${b.dataset.ttmode}"]`); if(f) f.focus(); });
   $("#tt-type").onchange = e => { store.set("tt:type", e.target.value); renderTabletop(); };
@@ -9809,21 +9828,23 @@ function mxTrendHTML(m){
   </svg>`;
 }
 
-/* The formula, drawn as a fraction or difference when it has that shape */
-function mxFormulaHTML(f){
+/* The formula, drawn as a fraction or difference when it has that shape. Jargon inside it (e.g. "basis points")
+   is glossed the same way the rest of the article is, so a term isn't only explained if you read past the formula */
+function mxFormulaHTML(f, seen){
+  seen = seen || new Set();
+  const cap = s => mxGloss(s[0].toUpperCase() + s.slice(1), seen), raw = s => mxGloss(s, seen);
   return `<div class="mxf">${f.split("; ").map(part => {
     let label = "", p = part; const eq = p.match(/^(\w+) = (.*)$/); if(eq){ label = eq[1]; p = eq[2]; }
     const op = p.includes(" ÷ ") ? "÷" : p.includes(" − ") ? "−" : null;
-    const lab = label ? `<span class="mxf-lab">${esc(label[0].toUpperCase() + label.slice(1))}</span>` : "";
-    if(!op || p.split(" " + op + " ").length !== 2) return `<div class="mxf-part">${lab}<p class="mxf-text">${esc(p[0].toUpperCase() + p.slice(1))}</p></div>`;
+    const lab = label ? `<span class="mxf-lab">${cap(label)}</span>` : "";
+    if(!op || p.split(" " + op + " ").length !== 2) return `<div class="mxf-part">${lab}<p class="mxf-text">${cap(p)}</p></div>`;
     let [a, b] = p.split(" " + op + " "), mult = "", note = "";
     const ci = b.indexOf(", "); if(ci > -1){ note = b.slice(ci + 2); b = b.slice(0, ci); }
     const mi = b.indexOf(" × "); if(mi > -1){ mult = b.slice(mi + 1); b = b.slice(0, mi); }
-    const cap = s => esc(s[0].toUpperCase() + s.slice(1));
     const body = op === "÷"
       ? `<div class="mxf-frac"><span class="mxf-num">${cap(a)}</span><span class="mxf-den">${cap(b)}</span></div>`
       : `<div class="mxf-diff"><span class="mxf-term">${cap(a)}</span><span class="mxf-op">−</span><span class="mxf-term">${cap(b)}</span></div>`;
-    return `<div class="mxf-part">${lab}<div class="mxf-row">${body}${mult ? `<span class="mxf-mult">${esc(mult)}</span>` : ""}</div>${note ? `<p class="mxf-note">${cap(note)}</p>` : ""}</div>`;
+    return `<div class="mxf-part">${lab}<div class="mxf-row">${body}${mult ? `<span class="mxf-mult">${raw(mult)}</span>` : ""}</div>${note ? `<p class="mxf-note">${cap(note)}</p>` : ""}</div>`;
   }).join("")}</div>`;
 }
 
@@ -9861,6 +9882,22 @@ function mxStatusChip(m){
   if(!st) return mx.have[m.n] ? `<span class="mxm-st">✓ Tracked</span>` : "";
   return `<span class="mxm-st ${MX_STAT[st][1]}"><i></i>${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>`;
 }
+// A metric's tile, as a row (diagnostics) or a card (north star / health). nextUp marks the one the next-up flag goes on
+function mxRowHTML(m, nextUp){
+  const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), up = m === nextUp;
+  const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
+  return `<button type="button" class="mxm-row${up ? " is-next" : ""}" data-open="${i}"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span><span class="mxm-rt"><b>${esc(m.n)}</b><span>${esc(MX_Q[m.n])}</span></span><span class="mxm-rs">${mxStatusChip(m)}${flag}</span><span class="mxm-go">${mxIco("next", "mx-ico sm")}</span></button>`;
+}
+function mxCardHTML(m, nextUp){
+  const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
+  const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
+  return `<button type="button" class="mxm-card${up ? " is-next" : ""}" data-open="${i}">
+      <span class="mxm-top"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span>${flag}</span>
+      <b class="mxm-name">${esc(m.n)}</b>
+      <span class="mxm-q">${esc(MX_Q[m.n])}</span>
+      <span class="mxm-foot"><span class="mxm-dir">${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1]}</span>${mxStatusChip(m)}<span class="mxm-go">${mx.read[m.n] ? "Open" : "Start"} ${mxIco("next", "mx-ico sm")}</span></span>
+    </button>`;
+}
 function mxMap(list){
   const read = list.filter(m => mx.read[m.n]).length, nextUp = list.find(m => !mx.read[m.n]);
   const pct = list.length ? Math.round(100 * read / list.length) : 0;
@@ -9868,24 +9905,29 @@ function mxMap(list){
     <p class="note">A reference to learn from and build with, not part of the assessment. Open any metric for the question it answers, the formula, how to measure it on your platform and starter SQL.</p>
     <div class="mxm-prog"><span><b>${read}</b> of ${list.length} read</span><div class="mxm-bar"><i style="width:${pct}%"></i></div></div>
   </div>`;
-  return how + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + MX_TORD.map((t, bi) => {
+  return how + mxOnrampBannerHTML() + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + MX_TORD.map((t, bi) => {
     const ms = list.filter(m => m.t === t); if(!ms.length) return "";
     const done = ms.filter(m => mx.read[m.n]).length;
-    const card = m => { const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
-      const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
-      return t === "diag"
-        ? `<button type="button" class="mxm-row${up ? " is-next" : ""}" data-open="${i}"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span><span class="mxm-rt"><b>${esc(m.n)}</b><span>${esc(MX_Q[m.n])}</span></span><span class="mxm-rs">${mxStatusChip(m)}${flag}</span><span class="mxm-go">${mxIco("next", "mx-ico sm")}</span></button>`
-        : `<button type="button" class="mxm-card${up ? " is-next" : ""}" data-open="${i}">
-            <span class="mxm-top"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span>${flag}</span>
-            <b class="mxm-name">${esc(m.n)}</b>
-            <span class="mxm-q">${esc(MX_Q[m.n])}</span>
-            <span class="mxm-foot"><span class="mxm-dir">${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1]}</span>${mxStatusChip(m)}<span class="mxm-go">${mx.read[m.n] ? "Open" : "Start"} ${mxIco("next", "mx-ico sm")}</span></span>
-          </button>`; };
+    const card = m => t === "diag" ? mxRowHTML(m, nextUp) : mxCardHTML(m, nextUp);
     return `<section class="mxm-band mxm-${t}">
       <div class="mxm-bh"><span class="mxm-n">${bi + 1}</span><div><h3>${MX_BAND[t][0]} <span class="mxm-count">${done ? `${done} of ${ms.length} read` : ms.length}</span></h3><p>${MX_BAND[t][1]}</p></div></div>
       <div class="${t === "diag" ? "mxm-rows" : "mxm-grid"}">${ms.map(card).join("")}</div>
     </section>`;
   }).join("");
+}
+// A newcomer's landing: just the north-star metrics for their platform and stage, with the full catalog one click away
+function mxNsHTML(list){
+  const ns = list.filter(m => m.t === "ns"), nextUp = ns.find(m => !mx.read[m.n]);
+  return `<div class="banner cvt-b mxm-onramp"><span><strong>Recommended for you:</strong> ${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}. ${ns.length ? `Start with these ${ns.length} north-star metric${ns.length === 1 ? "" : "s"}` : "No north-star metric fits this combination yet"} — everything else is one click away.</span><button type="button" class="btn sm" id="mx-ns-full">See the full catalog (${list.length})</button></div>
+  <section class="mxm-band mxm-ns">
+    <div class="mxm-bh"><span class="mxm-n">1</span><div><h3>${MX_BAND.ns[0]}</h3><p>${MX_BAND.ns[1]}</p></div></div>
+    <div class="mxm-grid">${ns.map(m => mxCardHTML(m, nextUp)).join("")}</div>
+  </section>`;
+}
+// A banner inviting a true newcomer (nothing onramped, filtered or already tracked) to the filtered view
+function mxOnrampBannerHTML(){
+  if(mx.onramped || mx.nsOnly || Object.keys(mx.have || {}).length) return "";
+  return `<div class="banner cvt-b"><span><strong>New here?</strong> See the 3 to 5 metrics most worth starting with for your platform, instead of the full list.</span><button type="button" class="btn sm primary" id="mx-onramp">Show me the few that matter</button></div>`;
 }
 
 /* ----- Metrics tab: one metric, in three parts ----- */
@@ -9912,7 +9954,7 @@ function mxArticle(m, list){
     <div class="mxa-grid">
       <div class="mxa-main">
         <section class="mxa-part" id="mxp-1" data-part="1">${ph(1)}
-          <div class="mxa-blk"><h4>The formula</h4>${mxFormulaHTML(H.f)}</div>
+          <div class="mxa-blk"><h4>The formula</h4>${mxFormulaHTML(H.f, seen)}</div>
           <div class="mxa-duo">
             <div class="mxa-why"><h4>${mxIco("bulb")}Why it matters</h4><p>${why}</p></div>
             <div class="mxa-warn"><h4>${mxIco("warn")}Watch out</h4><p>${trap}</p></div>
@@ -10203,7 +10245,24 @@ function mxBindGloss(){
 let mxView = null;
 // Guided for a fresh scorecard; the framework and the tabs once there are numbers, an example, or a metric opened by link
 // The library is the front door. The guided setup is only for the optional worksheet, from its own button
-function mxMode(){ return mxView === "guide" ? "guide" : "page"; }
+function mxMode(){ return mxView === "guide" ? "guide" : mxView === "onramp" ? "onramp" : "page"; }
+// A short on-ramp for a newcomer: platform and stage, then the north-star metrics for that combination.
+// Distinct from mxSpec()'s guided worksheet, which fills in numbers for every metric you track
+function mxOnrampSpec(){
+  const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
+  const steps = [
+    {id:"platform", eb:"Your platform", title:"What kind of platform is it?", why:"The list of metrics changes with it: a marketplace watches fraud loss, a social app watches prevalence and reach.", kind:"single",
+      opts:() => Object.entries(MX_PLATFORMS).map(([k, v]) => ({k, n:v})), get:() => mx.platformSet || mx.orgSet ? mx.platform : "", set:v => { mx.platformSet = true; setV("platform", v); }},
+    {id:"stage", eb:"Your stage", title:"How far along is your program?", why:"Early programs start with a few metrics they can actually measure. Later stages add more.", kind:"single",
+      opts:() => Object.entries(MX_STAGE).map(([k, v]) => ({k, n:v, h:MX_STAGE_HELP[k]})), get:() => mx.stageSet || mx.orgSet ? mx.stage : "", set:v => { mx.stageSet = true; setV("stage", v); }}
+  ];
+  return {k:"metrics-onramp", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
+    intro:{title:"Start with the few numbers that matter most", lead:"Two quick questions, then the three to five north-star metrics picked for your platform and stage. Every other metric, and the full reference, stays one click away.",
+      facts:[["About 1 minute", "Two questions, then your recommended metrics."], ["North stars first", "The few numbers that show whether users are actually safer."], ["Nothing is final", "Change your platform or stage, or browse the full catalog, any time."]], start:"Start"},
+    alt:[{n:"See the full catalog instead", run:() => { mxView = null; mx.tab = "card"; mx.nsOnly = false; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}],
+    steps, finish:"See my recommended metrics",
+    done:() => { mxView = null; mx.tab = "card"; mx.nsOnly = true; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
 function mxSpec(){
   const list = mxList(), tracked = () => list.filter(m => mx.have[m.n]);
   const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
@@ -10239,6 +10298,7 @@ function renderMetrics(){
   const list = mxList();
   mxFromHash(list);
   if(typeof gdRender === "function" && mxMode() === "guide"){ mxGuideStart(); return gdRender(mxSpec()); }
+  if(typeof gdRender === "function" && mxMode() === "onramp") return gdRender(mxOnrampSpec());
   mxView = null;
   if(typeof gdCur !== "undefined") gdCur = null;
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
@@ -10246,7 +10306,7 @@ function renderMetrics(){
   if(!open) mx.open = null;
   if(open && !mx.read[open.n]) mx.read[open.n] = true;
   store.set("mx", mx);
-  const tabs = {card:() => open ? mxArticle(open, list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
+  const tabs = {card:() => open ? mxArticle(open, list) : mx.nsOnly ? mxNsHTML(list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
@@ -10281,6 +10341,8 @@ function renderMetrics(){
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
+  bind("#mx-onramp", b => b.onclick = () => { mxView = "onramp"; gdReset("metrics-onramp"); renderMetrics(); window.scrollTo(0, 0); });
+  bind("#mx-ns-full", b => b.onclick = () => { mx.nsOnly = false; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();
@@ -10449,14 +10511,18 @@ function vdWeightsBar(){
 const vdSave = () => store.set("vx", vx);
 function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
-function vdCritHTML(c, seen){ return `<article class="card vd-crit">
+function vdCritHTML(c, seen){
+  // The first criterion's RFP questions open by default, to teach the pattern once; the rest stay closed
+  const first = c === CRITERIA[0];
+  return `<article class="card vd-crit">
             <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
             <p class="vd-cq">${esc(VD_Q[c.k])}</p>
             <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
             <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
               <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
-            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
-          </article>`; }
+            <details class="vd-rfp" ${first ? "open" : ""}><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
+          </article>`;
+}
 // refresh: what to do after a score or a weight changes
 function vdBindShared(refresh){
   const save = vdSave;
@@ -16085,13 +16151,16 @@ function cvRailHTML(){
       <button type="button" class="ma-tool ma-start-go" data-cvgo="1">See all gaps<svg><use href="#i-arrow"/></svg></button></div>` : ""}
     <div class="ma-prog"><div class="ma-prog-t"><span>${s.rated} of ${s.total} rated</span></div><div class="vd-bar"><i style="width:${s.rated / s.total * 100}%"></i></div></div>`;
 }
+// A default source, offered when none is set, so "coverage only" isn't the silent default
+const CV_DEFAULT_EX = "ex:teen_social";
 function cvSourceHTML(){
   const {src, s} = cvSrc(cv), rk = cvRisk(cv);
   const opt = ([v, n]) => `<option value="${esc(v)}" ${v === src ? "selected" : ""}>${esc(n)}</option>`;
   return `<div class="card cv-src">
+    ${!src ? `<div class="banner cv-nosrc"><span><strong>See how this works with an example</strong> before rating your own defenses, or run a pre-mortem on your products to compare against real risk.</span><button type="button" class="btn sm primary" data-cvsrc="${CV_DEFAULT_EX}">See it with an example</button></div>` : ""}
     <div class="field"><label for="cv-src">Compare coverage against</label>
       <select class="select" id="cv-src">${src ? "" : `<option value="" selected>No risk yet: coverage only</option>`}${s.list.length ? `<optgroup label="Your products">${s.list.map(opt).join("")}</optgroup>` : ""}<optgroup label="Examples">${s.ex.map(opt).join("")}</optgroup></select></div>
-    <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example to see how the comparison works." :
+    <p class="note">${!src ? "Run a pre-mortem on your products to compare against their real risk, or pick an example above to see how the comparison works." :
       src === "all" ? "The worst risk in each harm area across every saved pre-mortem." : src.startsWith("ex:") ? "An example product's risk. Run a pre-mortem on your own products for a real comparison." : "This product's risk, from its pre-mortem."}</p>
     ${!s.pms.length ? `<button type="button" class="btn sm" data-ov="new">Start a pre-mortem</button>` : ""}
     ${rk ? `<div class="cv-riskbar">${cvAreas(cv).map(a => { const x = rk[a.k]; return `<span class="cv-rb ${x.band || "none"}" title="${esc(a.n + ": " + (x.band ? BANDS[x.band][0] + " risk" : "no risk found"))}"><i></i>${esc(a.l.join(" "))}</span>`; }).join("")}</div>` : ""}
@@ -16099,7 +16168,11 @@ function cvSourceHTML(){
 }
 function cvCellHTML(x, l){
   const v = x.r[l.k];
-  return `<div class="cv-seg" role="radiogroup" aria-label="${esc(x.a.n + ": " + l.n)}">${CV_LEVELS.map((n, j) => `<button type="button" role="radio" aria-checked="${v === j}" class="${v === j ? "on" : ""} l${j}" data-cva="${x.a.k}" data-cvl="${l.k}" data-cvn="${j}" title="${esc(n + ": " + l.lv[j])}"><span class="visually-hidden">${n}</span></button>`).join("")}</div>`;
+  // The level's sentence is shown inline, not only as a hover title, so it's visible on touch too
+  return `<div class="cv-cell">
+    <div class="cv-seg" role="radiogroup" aria-label="${esc(x.a.n + ": " + l.n)}">${CV_LEVELS.map((n, j) => `<button type="button" role="radio" aria-checked="${v === j}" class="${v === j ? "on" : ""} l${j}" data-cva="${x.a.k}" data-cvl="${l.k}" data-cvn="${j}" title="${esc(n + ": " + l.lv[j])}"><span class="visually-hidden">${n}</span></button>`).join("")}</div>
+    ${v !== undefined ? `<p class="cv-cell-lv">${esc(l.lv[v])}</p>` : ""}
+  </div>`;
 }
 /* ---------- Start from maturity: one program-wide level per layer, then adjust each harm area ---------- */
 const CV_FROM_MA = {policy:"policy", detect:"detection", enforce:"operations", appeal:"quality", measure:"measurement"};
@@ -16416,10 +16489,15 @@ function bindCoverage(){
       const row = cv.r[d.cva] = Object.assign({}, cv.r[d.cva]); row[d.cvl] = +d.cvn; cv.ex = false; cvSave();
       if(cvMode() !== "table"){ cvRefresh(true); const again = view.querySelector(`[data-cva="${d.cva}"][data-cvl="${d.cvl}"][data-cvn="${d.cvn}"]`); if(again) again.focus({preventScroll:true}); return; }
       b.parentNode.querySelectorAll("button").forEach(x => { const on = x === b; x.classList.toggle("on", on); x.setAttribute("aria-checked", on); });
+      const wrap = b.closest && b.closest(".cv-cell");
+      if(wrap){ const lay = CV_LAYERS.find(ly => ly.k === d.cvl), text = lay ? lay.lv[+d.cvn] : "";
+        let p = wrap.querySelector(".cv-cell-lv"); if(!p && wrap.appendChild){ p = document.createElement("p"); p.className = "cv-cell-lv"; wrap.appendChild(p); }
+        if(p) p.textContent = text; }
       const x = cvRows(cv).find(r => r.a.k === d.cva), cell = document.querySelector(`#cv-row-${d.cva} .cv-mv`);
       if(cell && x){ cell.className = "cv-mv " + x.status; cell.innerHTML = `<b class="mono">${x.cov}%</b><span class="cv-mb"><i style="width:${x.cov}%"></i>${x.riskPct !== null ? `<em style="left:${x.riskPct}%" title="Risk ${x.riskPct}%"></em>` : ""}</span>`; }
       return cvRefresh(false);
     }
+    if(d.cvsrc){ cv.src = d.cvsrc; cvSave(); cvRefresh(true); const s = document.getElementById("cv-src"); if(s) s.focus(); return; }
     if(d.cvoff){
       if(b.getAttribute("aria-disabled") === "true") return gsay("Keep at least three harm areas so the radar can compare them");
       const x = cvRows(cv).find(r => r.a.k === d.cvoff);
@@ -18946,12 +19024,18 @@ const DS_SRC = [
   ["DSA Transparency Database", "https://transparency.dsa.ec.europa.eu/"]
 ];
 // What kind of service. Each tier carries the duties of the ones before it
+// A worked example per tier (5th item), so a newcomer can match their own service to one without reading legal prose first
 const DS_TIERS = [
-  ["conduit", "Mere conduit or caching", "An internet access provider, a VPN, a DNS service, a CDN. You carry or cache what others send.", 1],
-  ["hosting", "Hosting", "You store content for users but don't share it with the public: cloud storage, web hosting, private file transfer.", 2],
-  ["platform", "Online platform", "You store users' content and share it with the public: social, video, marketplace, app store, dating, forum, review site.", 3],
-  ["vlop", "Very large online platform or search engine", "Designated by the Commission, at 45 million or more monthly EU users. Every duty in the Act applies.", 4]
+  ["conduit", "Mere conduit or caching", "An internet access provider, a VPN, a DNS service, a CDN. You carry or cache what others send.", 1,
+    "Example: an ISP, a VPN provider or a CDN."],
+  ["hosting", "Hosting", "You store content for users but don't share it with the public: cloud storage, web hosting, private file transfer.", 2,
+    "Example: a cloud storage app, a web host or a private file-transfer tool."],
+  ["platform", "Online platform", "You store users' content and share it with the public: social, video, marketplace, app store, dating, forum, review site.", 3,
+    "Example: most apps with public posts or listings, such as a social app, a marketplace or a forum."],
+  ["vlop", "Very large online platform or search engine", "Designated by the Commission, at 45 million or more monthly EU users. Every duty in the Act applies.", 4,
+    "Example: a platform the Commission has named on its public VLOP/VLOSE list."]
 ];
+const dsTierHint = ([k, n, h, rank, ex]) => ex ? `${h} ${ex}` : h;
 const DS_SIZE = [
   ["small", "Micro or small", "Fewer than 50 staff and under €10 million turnover, and the company isn't part of a larger group that exceeds that."],
   ["medium", "Medium or larger", "50 staff or more, or €10 million or more in turnover, or part of a group that is."]
@@ -19246,7 +19330,7 @@ function dsSpec(){
   const steps = [
     {id:"svc", eb:"Your service", title:"What's the service called?", why:"It's named in your plan and in the drafts.", kind:"text", opt:true, placeholder:"For example: Pixelry", max:80, get:() => ds.svc, set:v => setV("svc", v.slice(0, 80))},
     {id:"tier", eb:"What kind of service", title:"Which best describes the service?", why:"The Act stacks duties by tier: every intermediary has some, hosting services more, online platforms more still, and very large platforms all of them.", kind:"single",
-      opts:() => DS_TIERS.map(([k, n, h]) => ({k, n, h})), get:() => ds.tier, set:k => setV("tier", k)},
+      opts:() => DS_TIERS.map(t => ({k:t[0], n:t[1], h:dsTierHint(t)})), get:() => ds.tier, set:k => setV("tier", k)},
     {id:"size", eb:"How big", title:"How big is the company?", why:"Micro and small enterprises are exempt from most platform duties and from transparency reports, until twelve months after they outgrow the thresholds.", kind:"single", skip:() => ds.tier === "vlop",
       opts:() => DS_SIZE.map(([k, n, h]) => ({k, n, h})), get:() => ds.size, set:k => setV("size", k)},
     {id:"est", eb:"Where", title:"Where is the company established?", why:"A provider outside the EU that serves EU users needs a legal representative in a member state.", kind:"single",
@@ -19287,7 +19371,7 @@ function dsSetupHTML(x, ap, s){
   return `<div class="pol-setup cp-setup ds-setup">
     ${typeof gdHas === "function" ? `<div class="banner gd-switch"><span>Prefer one question at a time? <button type="button" class="pol-add" data-ds="guide">Switch to guided</button></span></div>` : ""}
     ${sec(++n, "ds-svc", "Your service", "Optional", `<div class="field"><label for="ds-svc-in">Service or product name</label><input class="input" id="ds-svc-in" value="${esc(ds.svc)}" maxlength="80" placeholder="For example: Pixelry"></div>`)}
-    ${sec(++n, "ds-tier", "What kind of service", "", `<div class="tr-tiers ds-tiers" role="radiogroup" aria-label="Kind of service">${DS_TIERS.map(([k, nm, h]) => tile("dstier", ds.tier, k, nm, h)).join("")}</div>`, "The Act stacks duties by tier. Every intermediary has some, hosting services more, online platforms more still, and very large platforms all of them.")}
+    ${sec(++n, "ds-tier", "What kind of service", "", `<div class="tr-tiers ds-tiers" role="radiogroup" aria-label="Kind of service">${DS_TIERS.map(t => tile("dstier", ds.tier, t[0], t[1], dsTierHint(t))).join("")}</div>`, "The Act stacks duties by tier. Every intermediary has some, hosting services more, online platforms more still, and very large platforms all of them.")}
     ${ds.tier && ds.tier !== "vlop" ? sec(++n, "ds-size", "How big", "", `<div class="tr-tiers" role="radiogroup" aria-label="Company size">${DS_SIZE.map(([k, nm, h]) => tile("dssize", ds.size, k, nm, h)).join("")}</div>`, "Micro and small enterprises are exempt from most platform duties and from transparency reports, until twelve months after they outgrow the thresholds.") : ""}
     ${ds.tier ? sec(++n, "ds-est", "Where", "", `<div class="tr-tiers" role="radiogroup" aria-label="Establishment">${DS_EST.map(([k, nm, h]) => tile("dsest", ds.est, k, nm, h)).join("")}</div>`) : ""}
     ${ds.tier && x.rank >= 3 ? sec(++n, "ds-feat", "Features", "Tick all that apply", `<div class="tr-checks">${DS_FEAT.map(([k, nm, h]) => chk("feat", k, nm, h)).join("")}</div>`, "Ads, recommendations, traders and minors each bring their own articles.") : ""}
@@ -20912,9 +20996,25 @@ function revDiff(a, b){
   if((a.crisis ? a.crisis.runs : 0) !== (b.crisis ? b.crisis.runs : 0)) out.push({k:"tt", t:`Crises rehearsed ${a.crisis ? a.crisis.runs : 0} → ${b.crisis ? b.crisis.runs : 0}`, good:true});
   const PN = {maturity:"Program maturity", coverage:"Harm coverage", launch:"Launch readiness", crisis:"Crisis readiness", policy:"Policy clarity"};
   Object.keys(PN).forEach(k => { const x = a.parts[k], y = b.parts[k]; if(x === null || x === undefined || y === null || y === undefined || x === y) return; out.push({k:"part", t:`${PN[k]} ${x} → ${y} (${sign(y - x)})`, good:y > x}); });
+  // Worse news leads the list; a stable sort keeps each category's own order within the two groups
+  out.sort((x, y) => (x.good ? 1 : 0) - (y.good ? 1 : 0));
   return out;
 }
 const revDays = t => Math.round((Date.now() - t) / 864e5);
+// A synthetic before/after, so a first-time visitor with nothing saved can see what the comparison looks like
+let revEx = false;
+const REV_EX_A = {t:Date.now() - 86400000 * 95, label:"Q2 2026", score:58,
+  parts:{maturity:52, launch:40, coverage:55, crisis:60, policy:64},
+  ma:{lv:{policy:2, detection:2, operations:3, quality:2, crisis:2, compliance:2, measurement:1, wellbeing:2}},
+  cv:{cov:48, exposed:2, gaps:3, rows:{child:{cov:40, st:"exposed"}, sexual:{cov:45, st:"gap"}, harass:{cov:60, st:"covered"}, violent:{cov:50, st:"gap"}, ai:{cov:30, st:"exposed"}, privacy:{cov:55, st:"gap"}, integrity:{cov:65, st:"covered"}, fraud:{cov:50, st:"gap"}}},
+  launch:{products:2, blockers:6, open:4, names:["Resale chat", "Pixelry app"]}, crisis:{runs:1, score:60},
+  find:["Policy: no rule yet for AI-generated nudity", "Coverage: no proactive detection for account takeover"]};
+const REV_EX_B = {t:Date.now(), label:"Q3 2026", score:71,
+  parts:{maturity:68, launch:75, coverage:66, crisis:80, policy:64},
+  ma:{lv:{policy:3, detection:3, operations:3, quality:2, crisis:3, compliance:2, measurement:2, wellbeing:2}},
+  cv:{cov:62, exposed:0, gaps:3, rows:{child:{cov:70, st:"covered"}, sexual:{cov:60, st:"gap"}, harass:{cov:65, st:"covered"}, violent:{cov:70, st:"covered"}, ai:{cov:55, st:"gap"}, privacy:{cov:60, st:"covered"}, integrity:{cov:50, st:"gap"}, fraud:{cov:65, st:"covered"}}},
+  launch:{products:3, blockers:9, open:2, names:["Resale chat", "Pixelry app", "Match chat"]}, crisis:{runs:3, score:80},
+  find:["Policy: added a rule for AI-generated nudity", "Coverage: added hash matching for account-takeover signals"]};
 // The home: what moved since the last saved quarter, or a nudge to save the first one
 function revHomeHTML(){
   const snaps = revSnaps(), now = revNow(); if(now.score === null) return "";
@@ -20935,26 +21035,28 @@ function revRadarHTML(a, b){
 }
 function renderReview(){
   if(typeof gdCur !== "undefined") gdCur = null;
-  const snaps = revSnaps(), now = revNow();
-  const a = snaps.find(s => String(s.t) === String(revPick.a)) || snaps[snaps.length - 1] || null;
+  const snaps = revSnaps(), now = revEx ? REV_EX_B : revNow();
+  const a = revEx ? REV_EX_A : (snaps.find(s => String(s.t) === String(revPick.a)) || snaps[snaps.length - 1] || null);
   const PN = [["maturity", "Program maturity"], ["launch", "Launch readiness"], ["coverage", "Harm coverage"], ["crisis", "Crisis readiness"], ["policy", "Policy clarity"]];
   const cell = v => v === null || v === undefined ? "–" : v, delta = (x, y) => x === null || x === undefined || y === null || y === undefined ? "" : y === x ? `<span class="rv-d same">same</span>` : `<span class="rv-d ${y > x ? "up" : "dn"}">${y > x ? "+" : ""}${y - x}</span>`;
   const d = a ? revDiff(a, now) : [];
+  const sampleBtn = `<button type="button" class="btn" data-rev="example">See a sample comparison</button>`;
   view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each part, every area, the gaps you closed and the ones that opened.", "Assess",
-    `<span class="toast" id="rv-toast" aria-live="polite"></span>${now.score !== null ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
-    ${now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><a class="btn primary" href="#overview">Back to your assessment</a></div>` : !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button></div>` : `
+    `<span class="toast" id="rv-toast" aria-live="polite"></span>${now.score !== null && !revEx ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
+    ${revEx ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a sample program's picture, one quarter to the next.</span><button type="button" class="btn sm" data-rev="exit-example">Back to your review</button></div>` : ""}
+    ${!revEx && now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div><div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
     <div class="rv-top">
-      <label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>
+      ${revEx ? `<div class="field rv-pick"><span class="lbl">Compare now with</span><span class="note">${esc(a.label)} (example)</span></div>` : `<label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>`}
       <div class="rv-score"><div><span class="as-k">${esc(a.label)}</span><b class="mono">${cell(a.score)}</b></div><span class="rv-arrow">${icon("arrow")}</span><div><span class="as-k">Now</span><b class="mono">${cell(now.score)}</b></div>${delta(a.score, now.score)}</div>
     </div>
     <div class="rv-grid">
       <section class="card rv-parts"><h3>Each part</h3><table><thead><tr><th>Part</th><th>${esc(a.label)}</th><th>Now</th><th></th></tr></thead><tbody>${PN.map(([k, n]) => `<tr><td>${n}</td><td class="mono">${cell(a.parts[k])}</td><td class="mono">${cell(now.parts[k])}</td><td>${delta(a.parts[k], now.parts[k])}</td></tr>`).join("")}</tbody></table></section>
       <section class="card rv-what"><h3>What changed</h3>${d.length ? `<ul class="as-rev-l">${d.map(x => `<li class="${x.good ? "up" : "dn"}"><i></i>${esc(x.t)}</li>`).join("")}</ul>` : `<p class="note">Nothing has moved since ${esc(a.label)}. Retake a step and the difference shows here.</p>`}</section>
     </div>
-    ${revRadarHTML(a, now)}
+    ${revEx ? "" : revRadarHTML(a, now)}
     ${a.ma && now.ma ? `<section class="card rv-areas"><h3>Maturity by area</h3><div class="rv-area-g">${MA_AREAS.map(ar => { const x = a.ma.lv[ar.k], y = now.ma.lv[ar.k]; return `<div class="rv-area ${y > x ? "up" : y < x ? "dn" : ""}"><span>${esc(ar.s)}</span><b class="mono">${x} → ${y}</b></div>`; }).join("")}</div></section>` : ""}
     ${a.find && a.find.length ? `<section class="card rv-find"><h3>What we knew in ${esc(a.label)}</h3><ul>${a.find.map(t => `<li>${esc(t)}</li>`).join("")}</ul></section>` : ""}`}
-    ${snaps.length ? `<section class="rv-saved"><div class="as-sec-h"><h2>Saved quarters</h2><span class="note">Saving the same quarter again replaces it</span></div><div class="card"><ul class="rv-list">${snaps.slice().reverse().map(s => `<li><b>${esc(s.label)}</b><span class="note">${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})} · score ${cell(s.score)}</span><button type="button" class="btn sm icon" data-revdel="${s.t}" aria-label="Delete ${esc(s.label)}" title="Delete">${icon("trash")}</button></li>`).join("")}</ul></div></section>` : ""}
+    ${!revEx && snaps.length ? `<section class="rv-saved"><div class="as-sec-h"><h2>Saved quarters</h2><span class="note">Saving the same quarter again replaces it</span></div><div class="card"><ul class="rv-list">${snaps.slice().reverse().map(s => `<li><b>${esc(s.label)}</b><span class="note">${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})} · score ${cell(s.score)}</span><button type="button" class="btn sm icon" data-revdel="${s.t}" aria-label="Delete ${esc(s.label)}" title="Delete">${icon("trash")}</button></li>`).join("")}</ul></div></section>` : ""}
     <p class="note" style="margin-top:18px">Snapshots stay in this browser with the rest of your work, and go into your workspace file when you save one.</p>
   </div>`;
   const sel = $("#rv-a"); if(sel) sel.onchange = () => { revPick.a = sel.value; renderReview(); const s2 = $("#rv-a"); if(s2) s2.focus(); };
@@ -20963,6 +21065,8 @@ function renderReview(){
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-rev]"); if(!b || !view.contains(b)) return;
   if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = (location.hash || "").slice(1).split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
+  else if(b.dataset.rev === "example"){ revEx = true; renderReview(); window.scrollTo(0, 0); }
+  else if(b.dataset.rev === "exit-example"){ revEx = false; renderReview(); window.scrollTo(0, 0); }
 });
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), credits:()=>renderCredits(), learn:renderLearn, redteamllm:()=>renderRedteam("llm"), redteamworld:()=>renderRedteam("world"), glossary:renderGlossary, redteam:renderRedteamStudio, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};

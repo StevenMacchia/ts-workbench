@@ -46,8 +46,26 @@ const body = function(){
   eq(new RegExp(`Grade ${rcGrade(o.score)[1]} · based on 5 of 5 parts`).test(h) && h.includes(`<b class="mono">${o.score}</b>`), true, "the program picture shows the score and grade");
   const md = rcMarkdown(); eq(/\*\*Overall: \d+ \/ 100, grade [A-F]\*\*/.test(md) && !/Measurement/.test(md), true, "markdown report card");
   out.push(`overall: ${o.score} / 100, grade ${rcGrade(o.score)[1]}, ${o.graded} of ${o.total} parts graded; markdown export`);
+
+  // Quarter by quarter (Review): negative changes lead the "what changed" list, and a first-time visitor gets a sample comparison
+  const d19 = revDiff(REV_EX_A, REV_EX_B);
+  eq(d19.some(x => !x.good), true, "the synthetic example carries at least one negative change to sort");
+  eq(d19[0].good, false, "the worst news leads the list"); eq(/New coverage gaps: Platform abuse/.test(d19[0].t), true, "the new coverage gap sorts first");
+  const firstGoodIdx = d19.findIndex(x => x.good), lastBadIdx = d19.map(x => !x.good).lastIndexOf(true);
+  eq(lastBadIdx < firstGoodIdx, true, "every negative change sorts before every positive one");
+  out.push(`review: negative changes first in the diff (worst: "${d19[0].t}")`);
+
+  revPick = {a:null}; revEx = false; store.set("as:snaps", []);
+  renderReview(); let hrv = view.innerHTML; if(bad(hrv)) throw new Error("blank review has bad values");
+  const emptyState = /Nothing to compare yet/.test(hrv) || /No saved quarters yet/.test(hrv);
+  eq(emptyState && /data-rev="example"/.test(hrv), true, "with nothing saved, a first-time visitor is offered a sample comparison");
+  revEx = true; renderReview(); hrv = view.innerHTML; if(bad(hrv)) throw new Error("example review has bad values");
+  eq(/This is an example/.test(hrv) && /Q2 2026/.test(hrv) && />58</.test(hrv) && />71</.test(hrv) && /data-rev="exit-example"/.test(hrv), true, "the sample compares two synthetic quarters, and says it's an example");
+  eq(/New coverage gaps: Platform abuse/.test(hrv), true, "the sample shows the same worst-first ordering");
+  revEx = false; renderReview(); eq(/data-rev="example"/.test(view.innerHTML), true, "exiting the example returns to your own, still-empty review");
+  out.push("review: a one-click sample comparison for a first-time visitor, worst news first in it too");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js")].join("\n")
+const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partREV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

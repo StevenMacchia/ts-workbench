@@ -30,3 +30,13 @@
 
 /* ---------- About: caption the stat tiles as the tool's own content, not the visitor's program ---------- */
 .ab-stats-cap{margin-top:8px;text-align:center}
+/* Coverage radar: each layer's chosen level, shown inline under its cell, not only as a hover title */
+.cv-cell{display:flex;flex-direction:column;align-items:center;gap:4px;max-width:150px;margin:0 auto}
+.cv-cell-lv{margin:0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center}
+@media (max-width:1100px){.cv-cell{align-items:flex-end;max-width:none}.cv-cell-lv{text-align:right;max-width:220px}}
+
+/* Coverage radar: steer to an example instead of letting "coverage only" be a silent default */
+.cv-nosrc{margin-bottom:14px}
+
+/* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
+.mxm-onramp{margin-bottom:18px}
