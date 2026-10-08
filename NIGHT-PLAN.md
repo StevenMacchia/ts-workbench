@@ -44,3 +44,12 @@ Merged agent worktrees for sandbox, review, assist, home, tools, r3a, r3b, r3c r
 - [x] clarity (`enh/clarity`, merged): studio purpose card + walkthrough, hub sentence, eyebrows, one vocabulary, Learn hub three cards, one-week path; then the red-teaming glossary grid restored.
 - [x] tsgloss (`enh/tsgloss`, merged): general T&S glossary at #tsglossary, 103 terms, hover registration.
 - Pattern decision pending: purpose card + walkthrough on every other tool, after Steven looks at the studio.
+
+## Round 7 (2026-10-08, Fable ceiling raised to 80%; goal: a recruiter or exec concludes he knows his stuff)
+- [x] Three hiring-manager audits (scratchpad hm-audit-1/2/3.md): every page A or A- for a Head of T&S except pre-mortem B+ and studio B+; legal facts checked against primary sources and held.
+- [x] intro (`enh/intro`, merged): purpose card + walkthrough on all 16 tools via `partINTRO.js`; then one help button per page (my commit 8a2bd92).
+- [x] fixa (`enh/fixa`, merged): studio fix-direction keyed by move+aim (`RT_FIX_MOVE`), `RT_PLAIN.agentic` renamed, Plan the week time question fix, reading-level badge, COPPA $53,088, "without a Claude account" lines, eval simulated-run note, transparency category table up top.
+- [x] fixb (`enh/fixb`, merged twice): TCO Regulation named, pre-mortem denominators, grade weighting line from `RC_WEIGHTS`, one scenario-count phrasing (43 scenarios, 99 versions, 8 sectors), eight-step clause, home strip from `demoProgram()` (shared with `demoFill`), plan done toggle, "Open workspace", review sample preview, About pointer, card-art text removed, maturity legend caption.
+- [ ] portfolio (`stevenmacchia.github.io` branch `showcase-2026-10`): studio and Learn panels, screenshots, OG card.
+- [ ] qa2 (`enh/qa2`): release-candidate sweep.
+- Then: Steven's go to merge `learn` into `main` and push both repos.
