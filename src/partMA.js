@@ -83,7 +83,10 @@ function maRadar(d, big, prev){
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;
 }
 function maLegend(d, prev){
-  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Now</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span>${prev ? `<span><i class="ma-lg-old"></i>${esc(maDate(prev.t))}</span>` : ""}<span><i class="ma-lg-gap"></i>Below target</span></div>`;
+  // Caption the comparison point so a past date never reads as a stale target: the plan's very first
+  // rating if it's the only snapshot saved, or the most recent snapshot once there's more than one.
+  const prevLabel = prev ? ((d.hist || []).length <= 1 ? "Plan started" : "Last saved") : "";
+  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Now</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span>${prev ? `<span><i class="ma-lg-old"></i>${esc(prevLabel)}, ${esc(maDate(prev.t))}</span>` : ""}<span><i class="ma-lg-gap"></i>Below target</span></div>`;
 }
 // Where the overall score sits on the five-level scale, with the stage target marked
 function maScaleHTML(){

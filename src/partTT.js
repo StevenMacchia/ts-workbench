@@ -19,6 +19,9 @@ const DIM_BLIND = {
   team:"You tended to overload or overlook your own team. Sustainable response needs triage, rotation and support for the people doing the work."
 };
 const ttProgress = () => store.get("tt:progress", {}) || {};
+// Every scenario written once per company type it's tailored for (ALL_TYPES.length versions each); the rest counted once.
+// This is the one count every "scenario version" figure on the site (All tools, inside the tool, About) is built from.
+const ttVersionCount = () => SCENARIOS.reduce((a, s) => a + (s.vars ? ALL_TYPES.length : 1), 0);
 const ttKey = (s, v) => { const sc = SCENARIOS[s]; return sc.id + (sc.vars ? ":" + (v || "all") : ""); };
 const ttSave = () => store.set("tt", tt);
 const sevPill = sev => `<span class="pill ${SEV_BAND[sev]||"crit"}"><span class="dot"></span>${esc(sev)}</span>`;
@@ -66,7 +69,7 @@ function ttPicker(H){
       <div class="ttprog">
         <div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="note mono">${completed} of ${all.length} completed</span></div>
         <div class="bar"><i style="width:${all.length?completed/all.length*100:0}%;background:var(--good)"></i></div>
-        <p class="note">${all.length} scenarios written for ${tInfo.s} companies.</p>
+        <p class="note">${all.length} scenarios written for ${tInfo.s} companies${all.length < SCENARIOS.length ? `, out of ${SCENARIOS.length} in the library` : ""} (${ttVersionCount()} versions in all, across ${ALL_TYPES.length} sectors).</p>
       </div>
     </div>
     <div class="row ttfilters"><div class="segs tt-mode" role="group" aria-label="How to play"><button type="button" data-ttmode="solo" aria-pressed="${ttMode !== "team"}">Play solo</button><button type="button" data-ttmode="team" aria-pressed="${ttMode === "team"}">Run with a team</button></div>

@@ -151,3 +151,18 @@
 .ln-term-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .ln-term>p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
 .ln-term-know{width:fit-content}
+
+/* Hiring-manager audit, round 2: the home page's six-step promise, the quiet pre-demo preview, and a faded
+   sample on the empty quarter-review, so the proof of depth doesn't wait behind a click. */
+.as-six-note{margin:10px 0 0}
+.as-preview{margin:4px 0 8px;padding:14px 16px;border-radius:10px;background:var(--sunk);display:grid;gap:8px}
+.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.as-preview-lines{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.as-preview-lines li{font-size:14px;line-height:1.5;color:var(--ink)}
+.as-preview .btn{width:fit-content}
+.rv-sample-preview{margin-top:14px;padding:14px 16px;opacity:.55;display:grid;gap:8px}
+.rv-sample-preview .pill{width:fit-content}
+.rv-sample-preview table{width:100%;border-collapse:collapse;font-size:13px}
+.rv-sample-preview td{padding:3px 6px}
+.rv-sample-preview td:first-child{color:var(--muted)}
+.rv-sample-arrow svg{width:12px;height:12px;vertical-align:middle;color:var(--muted)}

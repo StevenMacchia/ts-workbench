@@ -23,9 +23,9 @@ const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and reg
   ["cover","var(--t-cv)","Coverage radar","Your defenses against that risk"], ["siren","var(--t-tt)","Incident tabletop","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
-  const versions = SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
+  const versions = typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
   const tools = AB_GROUPS.reduce((a, g) => a + g[1].length, 0);
-  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,"tabletop scenario versions"],[lawSteps,"decisions with law notes"],
+  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,`tabletop scenario versions ${tip(`${SCENARIOS.length} scenarios, each written for up to ${ALL_TYPES.length} sectors`)}`],[lawSteps,"decisions with law notes"],
     [typeof MA_AREAS !== "undefined" ? MA_AREAS.length * 5 : 40,"maturity level descriptions"],[typeof CV_AREAS !== "undefined" ? CV_AREAS.length * CV_LAYERS.length : 40,"coverage checks"]];
   const decisions = [
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
@@ -42,6 +42,7 @@ function renderAbout(){
 
     <section class="ab-stats rise" aria-label="By the numbers">${stats.map(([n,l])=>`<div><b class="mono">${n}</b><span>${l}</span></div>`).join("")}</section>
     <p class="note ab-stats-cap">About the content in this tool, not about your program. Nothing here is a measure of your own trust and safety work.</p>
+    <p class="note ab-scores-ptr">Every score on this site comes from a stated formula, not a gut feeling. <button type="button" class="ov-link" data-ab="scores">See how the scores work ${icon("arrow")}</button></p>
 
     <section class="ab-sec rise">
       <h2>The problem</h2>
@@ -60,7 +61,7 @@ function renderAbout(){
       ${AB_GROUPS.map(([g, list]) => `<h3 class="ab-gh">${g}</h3><div class="ab-tools">${list.map(([c,i,n,d])=>`<div class="ab-tool"><span class="sb-glyph" style="background:var(--${c})"><svg><use href="#i-${i}"/></svg></span><div><h3>${n}</h3><p>${d}</p></div></div>`).join("")}</div>`).join("")}
     </section>
 
-    <section class="ab-sec rise">
+    <section class="ab-sec rise" id="ab-scores" style="scroll-margin-top:16px">
       <h2>How the scores work</h2>
       <div class="ab-dec">
         <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical. Safeguards you tick lower likelihood, so every risk also has a rating after safeguards, and a burn-down shows how far the launch plan takes you.</p></div>
@@ -93,6 +94,7 @@ function renderAbout(){
       <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}. Next: a transparency report drafter and a rebuilt metrics flow.</p>
     </section>
   </article>`;
+  const scores = $("#ab-scores"); if(scores) $$('[data-ab="scores"]').forEach(b => b.onclick = () => scores.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}));
 }
 
 /* =========================================================

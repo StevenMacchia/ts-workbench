@@ -7,6 +7,16 @@ const body = function(){
   const where = h => (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0];
   // a new visitor is offered the demo
   renderOverview(); eq(/data-demo="start"/.test(view.innerHTML), true, "new visitors are offered the demo");
+  // the home page surfaces three real outputs from Pixelry's data before the click, computed live, never hard-coded
+  { const welcomeH = view.innerHTML, preview = demoPreviewHTML(), dp = rcOverall(demoParts()), dgr = rcGrade(dp.score);
+    eq(welcomeH.includes(preview) && preview.length > 0, true, "the welcome page includes the preview strip");
+    eq(/<p class="as-preview-lead">What you get, from the example company:<\/p>/.test(preview), true, "one sentence lead");
+    eq((preview.match(/<li>/g) || []).length, 3, "a quiet three-line strip, not a dashboard of tiles");
+    eq(preview.includes("Pixelry's overall score: <b>" + dp.score + " / 100</b> · Grade " + dgr[1] + " · based on " + dp.graded + " of " + dp.total + " parts."), true, "the overall score line is the real report-card maths on the example data");
+    eq(/Its top "do first" action:/.test(preview) && /required under the/.test(preview), true, "names the top launch action and the law behind it");
+    eq(/Its DSA statement-of-reasons readiness: not yet in place \(Article 17\)\./.test(preview), true, "names Pixelry's real DSA statement-of-reasons gap");
+    eq(/data-demo="start">See it with an example company/.test(preview), true, "links through to the full demo");
+    out.push("home preview: overall " + dp.score + "/100 (" + dgr[1] + "), top action named with its law, DSA statement-of-reasons gap named"); }
   store.set("demo", true); demoFill();
   eq(orgReady() && !!orgGet().confirmed, true, "workspace set up"); eq(wsProfile().org, "Pixelry", "the company is Pixelry");
   const pms = Object.values(wsItems()).filter(i => i.kind === "premortem").map(i => i.title).sort().join(", ");

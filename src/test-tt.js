@@ -62,6 +62,13 @@ TT_TYPES.forEach(t => { store.set("tt:type", t.k); tt = null; renderTabletop(); 
   if(t.k !== "all" && n < 12) throw new Error(t.n + " has only " + n); out.push("  " + t.n.padEnd(26) + n + " scenarios"); });
 // "Just show me one": the highest-severity, not-yet-completed scenario is one click away, skipping the type/mode/filter stack
 store.set("tt:type", "social"); tt = null; renderTabletop();
+// The library's three scenario counts (All tools, inside the tool, About) reconcile: base scenarios, sector versions, and one sector's subset
+{ const h = view.innerHTML, versions = ttVersionCount(), social = SCENARIOS.filter(s => (s.types || []).includes("social")).length;
+  if(versions !== 99) throw new Error("scenario version count drifted: " + versions + " (expected 99 for the current library)");
+  if(social !== 15) throw new Error("social-sector scenario count drifted: " + social + " (expected 15)");
+  const want = social + " scenarios written for social media and video companies, out of " + SCENARIOS.length + " in the library (" + versions + " versions in all, across " + ALL_TYPES.length + " sectors).";
+  if(!h.includes(want)) throw new Error("tool note doesn't reconcile the three counts, wanted: " + want);
+  out.push("scenario counts reconcile: " + SCENARIOS.length + " scenarios, " + versions + " sector versions, " + social + " written for social media and video companies"); }
 {
   const ttType = "social", prog = ttProgress();
   const all = SCENARIOS.map((s,i)=>({s:ttScenario(i, ttType), i})).filter(x => ttType==="all" || (x.s.types||[]).includes(ttType))

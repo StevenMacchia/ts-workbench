@@ -59,6 +59,10 @@ const body = function(){
   eq(/Level 2 reached/.test(h) && /Head of Trust &amp; Safety Operations/.test(h), true, "reached badge and owner");
   eq((h.match(/<polygon class="ma-cur"/g) || []).length, 1, "one radar"); eq(/stroke-dasharray="1.5 3.5"/.test(h), true, "last snapshot overlaid");
   eq(/Crisis response level 2 of 5, target 3/.test(h), true, "radar describes current levels");
+  eq(new RegExp("ma-lg-old\"></i>Plan started, " + esc(maDate(ma.hist[0].t)).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(h), true, "the radar legend's past date is captioned, not a bare date that could read as a stale target");
+  // once there's more than one snapshot, the caption says so, rather than keep calling an older midpoint the start
+  ma.hist = ma.hist.concat([{t:Date.now() - 20 * 864e5, stage:"growth", lv:Object.assign({}, ma.lv)}]); renderMaturity(); h = view.innerHTML;
+  eq(new RegExp("ma-lg-old\"></i>Last saved, " + esc(maDate(ma.hist[1].t)).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(h), true, "with more than one snapshot, the legend says \"Last saved\" instead of \"Plan started\"");
   eq(h.indexOf('class="ma-band-next"') > 0 && h.indexOf('class="ma-band-next"') < h.indexOf('class="ma-score big"'), true, "Next up leads the band, above the score and radar");
   out.push(`example plan: level ${maScore(ma)}, ${pr.done}/${pr.items} actions, ${pr.gained} level gained, roadmap ${["now", "next", "later"].map(p => road.filter(s => s.phase === p).length).join("/")}`);
   // by area and progress tabs
@@ -93,6 +97,22 @@ const body = function(){
   eq(/Nothing to plan yet/.test(h), true, "nothing saved yet");
   eq(/Start with your program's <a href="#maturity">maturity<\/a> or a <a href="#premortem">pre-mortem<\/a>\./.test(h), true, "the empty state links maturity and pre-mortem directly, not just naming them");
   out.push("plan: empty state links maturity and pre-mortem directly");
+  // the header's "already done" count is explained, and a Show-done toggle sits at the top, not only inside "Do first"
+  ma = maExample(); pm = fromPreset("marketplace"); pm.example = false; pm.name = "Resale chat";
+  assess(pm).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(!(i % 2)) pm.done[s.id] = true; });
+  saveToLib(); pm.stage = "start"; savePM();
+  renderPlan(); h = view.innerHTML; if(bad(h)) throw new Error("populated plan has bad values: " + where(h));
+  const items2 = planItems(), doneCount = items2.length - planOpen(items2).length;
+  eq(doneCount > 0, true, "there are done items to show");
+  eq(h.includes(doneCount + " already done, shown inside each group below with Show done."), true, "the header explains where the done items live");
+  eq(h.includes("data-plan=\"showdone\">Show " + doneCount + " done<"), true, "a Show-done toggle sits at the top of the page, not only inside Do first");
+  // the top toggle shows every group's done items at once, the same as ticking each group's own toggle
+  PLAN_GROUPS.forEach(([g]) => { if(planItems().filter(x => x.g === g).some(x => x.done)) plMore[g + ":done"] = true; });
+  renderPlan(); h = view.innerHTML;
+  eq(h.includes("data-plan=\"showdone\">Hide done<"), true, "the top toggle flips to Hide done once everything is shown");
+  eq((h.match(/class="nx-i pl-i done"/g) || []).length, doneCount, "every done item across every group is now shown from the top toggle");
+  PLAN_GROUPS.forEach(([g]) => delete plMore[g + ":done"]);
+  out.push("plan: " + doneCount + " done items explained at the top, with a Show-done toggle that isn't buried inside Do first");
   return out.join("\n");
 };
 const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partTYPE.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partORG.js"), rd("partRC.js"), rd("partPLAN.js")].join("\n")
