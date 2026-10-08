@@ -19,3 +19,5 @@ Orchestration: Sonnet agents, each in its own worktree and branch off `learn`, p
 - [ ] audit: read-only audit of every tool → scratchpad `audit-tools.md` with a top-25 list; then launch implementation agents per tool group from that list (names `enh/<tool>`).
 - [ ] sandbox (branch `enh/sandbox`): WebLLM local model card in Start here, `partRT9.js`, `partZ15.css`.
 - [ ] review (branch `enh/review`): spaced review across days in the judge; `plain` five-step drills in `LN_GUIDES` shown on drill cards.
+
+Checkpoint commit on learn: d615592 (2026-10-08, local only, not pushed) so enhancement branches have the right base. Agents were told to `git merge learn` in their worktrees. When merging their branches back: from this worktree `git merge enh/<name>`, then `npm test`, then browser check on port 8769.
