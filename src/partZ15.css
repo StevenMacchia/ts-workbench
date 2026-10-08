@@ -40,3 +40,25 @@
 
 /* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
 .mxm-onramp{margin-bottom:18px}
+
+/* r3c: AI assistants - a hover/focus preview of what "Use the numbers from my Metrics scorecard" inserts */
+.ai-fill-wrap{position:relative;display:inline-block}
+.ai-fill-prev{position:absolute;left:0;bottom:calc(100% + 8px);max-width:320px;padding:9px 11px;border-radius:10px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-lift);font-family:var(--mono,monospace);font-size:11.5px;line-height:1.5;color:var(--muted);white-space:pre-line;z-index:5;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s ease, transform .12s ease}
+.ai-fill-wrap:hover .ai-fill-prev,.ai-fill-wrap:focus-within .ai-fill-prev{opacity:1;visibility:visible;transform:translateY(0)}
+@media (max-width:600px){.ai-fill-prev{max-width:86vw}}
+
+/* r3c: Works with ROOST - the two "starter, untested" items get their own labeled sub-section */
+/* instead of sitting in the same grid as the four working ones, with only a small tag to tell them apart. */
+.ab-starters{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.ab-starters-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.ab-starters-h .wip-tag{flex:none}
+.ab-starters .ab-tools{margin-top:0}
+
+/* r3c: Overview's "pick up where you left off" pre-mortem card - the four-tile .ov-stats dashboard */
+/* (risks, critical, blockers, laws) said in one line instead, matching how the full report's startHere() */
+/* already turned its own four-tile dashboard into a counted sentence. Cross-tool audit item 4. */
+.ov-stats-sum{margin:2px 0 10px}
+
+/* r3c: All tools - a lightweight stage filter (Assess / Prepare / Measure / AI) so the grid of tool */
+/* cards doesn't just keep growing as one long unfiltered list. Cross-tool audit item 5. */
+.ov-stagef{margin:4px 0 14px;flex-wrap:wrap}

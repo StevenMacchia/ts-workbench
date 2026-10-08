@@ -292,7 +292,7 @@ const aiTier = s => s.depth === "deep" ? "complex" : "default";
 const aiPut = (k, s) => store.set("ai:" + k, s);
 
 function aiField(T, fd, v){
-  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <em class="ai-req">required</em>` : ""}</span>`;
+  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ""}</span>`;
   const help = fd.help ? `<small class="ai-help">${esc(fd.help)}</small>` : "";
   if(fd.type === "select") return `<label class="mxa-y ai-f">${lab}<select class="select" id="${id}" data-fk="${fd.k}">${fd.opts.map(o => `<option ${v === o ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>${help}</label>`;
   if(fd.type === "checks") return `<fieldset class="ai-f ai-checks"><legend>${esc(fd.lab)}</legend><div>${fd.opts.map(([ov, ol]) => `<label class="ai-chk"><input type="checkbox" data-fk="${fd.k}" value="${ov}" ${(v || []).includes(ov) ? "checked" : ""}><span>${esc(ol)}</span></label>`).join("")}</div>${help}</fieldset>`;
@@ -318,23 +318,9 @@ function aiScoreFill(){
 AI_TOOLS.transparency.builder = true;
 AI_TOOLS.transparency.n = "Transparency report";
 AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
-const AI_WIP = {transparency:{
-  plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
-  meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
-function renderAIWip(key){
-  const T = AI_TOOLS[key], w = AI_WIP[key] || {plan:[], meanwhile:[]};
-  view.innerHTML = head(T.n, "This assistant is being rebuilt so it produces reports that hold up in front of regulators. It will be back soon.", "AI assistants", `<span class="pill ai-pill">Under construction</span>`) + `
-    <div class="card wip">
-      <div class="wip-art" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="8" y="30" width="104" height="18" rx="4" fill="var(--sunk)" stroke="var(--line-strong)"/>
-        <path d="M18 30l-10 18M38 30l-12 18M58 30l-12 18M78 30l-12 18M98 30l-12 18M112 36l-8 12" stroke="var(--high)" stroke-width="7" stroke-linecap="square" opacity=".85"/>
-        <rect x="18" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/><rect x="96" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/>
-        <circle cx="21" cy="22" r="6" fill="var(--high)"/><circle cx="99" cy="22" r="6" fill="var(--high)"/><rect x="19" y="24" width="4" height="7" fill="var(--line-strong)"/><rect x="97" y="24" width="4" height="7" fill="var(--line-strong)"/></svg></div>
-      <div class="wip-b"><span class="wip-tag">Under construction</span><h2>${esc(T.n)} is being rebuilt</h2>
-        <p>Transparency reports are read closely by regulators, journalists and researchers, so this tool needs to get the details right. It's offline while that work happens.</p>
-        ${w.plan.length ? `<h4>What it will do</h4><ul>${w.plan.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>
-    </div>
-    ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
-}
+// AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
+// no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
+// above, so the placeholder path was unreachable dead code (audit §12 item 2).
 /* ---------- Guided: each field on its own screen, then the run ---------- */
 const aiView = {};
 function aiSpec(key){
@@ -358,7 +344,6 @@ function aiSpec(key){
 }
 function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
-  if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   // Guided until there is a result or the one-page form was asked for
   if(!st.r && !run.busy && aiView[key] !== "page" && typeof gdRender === "function") return gdRender(aiSpec(key));
@@ -366,6 +351,9 @@ function renderAI(key){
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
+  // A short preview of what the fill button inserts, so it isn't a blind click
+  const fillLines = fill ? fill.split("\n") : [];
+  const fillPreview = fillLines.slice(0, 5).join("\n") + (fillLines.length > 5 ? `\n+${fillLines.length - 5} more` : "");
   const out = run.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ai-stage" aria-live="polite">${AI_PHASE[run.phase || "thinking"]}…</b><span class="note">${st.depth === "deep" ? "A deep review usually takes one to two minutes." : "This usually takes 15 to 40 seconds."} It runs on your own Claude account. The first time, Claude asks you to allow it.</span></div><button type="button" class="btn sm" id="ai-stop">Stop</button></div>`
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
         <div class="ai-out-a"><span class="toast" id="ai-toast" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
@@ -377,7 +365,7 @@ function renderAI(key){
       <form class="card ai-form" id="ai-form" onsubmit="return false">
         ${st.r || run.busy ? "" : `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" id="ai-guide">Switch to guided</button></div>`}
         <div class="ai-fields">${T.fields.map(fd => aiField(T, fd, f[fd.k])).join("")}</div>
-        ${fill ? `<button type="button" class="mx-link ai-fill" id="ai-fill">Use the numbers from my Metrics scorecard</button>` : ""}
+        ${fill ? `<span class="ai-fill-wrap"><button type="button" class="mx-link ai-fill" id="ai-fill" aria-describedby="ai-fill-prev">Use the numbers from my Metrics scorecard</button><span class="ai-fill-prev" id="ai-fill-prev" role="tooltip">${esc(fillPreview)}</span></span>` : ""}
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}

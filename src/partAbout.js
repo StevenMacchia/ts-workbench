@@ -129,8 +129,10 @@ function renderRoost(){
   view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
     <section class="ab-sec rise">
       <h2>What you can do today</h2>
-      <div class="ab-tools">${RO_NOW.map(([t, r, c, ic, d, wip]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a>${wip ? ' <span class="wip-tag">Starter, untested</span>' : ""}</h3><p>${d}</p></div></div>`).join("")}</div>
-      <p class="note" style="margin-top:12px">None of this is a ROOST integration: the workbench makes files and numbers you take to ROOST's tools yourself. Starters have every platform-specific value marked TODO and have never run against a real deployment.</p>
+      <div class="ab-tools">${RO_NOW.filter(x => !x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div>
+      <p class="note" style="margin-top:12px">None of this is a ROOST integration: the workbench makes files and numbers you take to ROOST's tools yourself.</p>
+      ${RO_NOW.some(x => x[5]) ? `<div class="ab-starters"><h3 class="ab-starters-h"><span class="wip-tag">Starter, untested</span> Every platform-specific value marked TODO; never run against a real deployment</h3>
+        <div class="ab-tools">${RO_NOW.filter(x => x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div></div>` : ""}
     </section>
 
     <section class="ab-sec rise">

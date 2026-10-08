@@ -158,7 +158,7 @@ function projectCards(items){
 function itemRows(items){
   const projects = Object.values(wsProjects()).sort((a,b)=>a.name.localeCompare(b.name));
   if(!items.length) return `<div class="card wsempty"><b>Nothing saved here yet</b><p class="note">Run a tool and save the result, or start one now.</p>
-    <div class="row">${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
+    <div class="row">${typeof asInAssessment === "function" && !asInAssessment() ? `<a class="btn sm primary" href="#overview"><svg><use href="#i-arrow"/></svg>Start the guided assessment</a>` : ""}${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
   return `<div class="card wslist">${items.map(it => {
     const s = itemSummary(it), confirming = wsUI.confirm==="item:"+it.id;
     const title = wsUI.rename===it.id

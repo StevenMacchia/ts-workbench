@@ -43,12 +43,7 @@ function pmCurrentHero(){
         ${pm.regions.length ? `<span class="ov-status">${pm.regions.map(k => k.toUpperCase()).join(" · ")}</span>` : ""}
         ${pm.youth ? `<span class="ov-status">${esc(labelOf(YOUTH, pm.youth))}</span>` : ""}
       </div>
-      <div class="ov-stats">
-        <div><b class="mono">${r.risks.length}</b><span>Risks identified</span></div>
-        <div><b class="mono" style="${r.counts.crit ? "color:var(--crit)" : ""}">${r.counts.crit}</b><span>Critical</span></div>
-        <div><b class="mono">${bd}/${bl.length}</b><span>Blockers done</span></div>
-        <div><b class="mono">${laws}</b><span>Laws likely apply</span></div>
-      </div>
+      <p class="note ov-stats-sum">${r.risks.length} risk${r.risks.length === 1 ? "" : "s"} logged, <strong style="${r.counts.crit ? "color:var(--crit)" : ""}">${r.counts.crit} critical</strong>. ${bd} of ${bl.length} launch blockers done, and ${laws} law${laws === 1 ? "" : "s"} likely apply.</p>
       <div>${r.risks.slice(0, 3).map(x => `<div class="ov-risk"><span class="sdot" style="background:var(--${x.band === "low" ? "faint" : x.band})"></span>${esc(x.n)}<span class="mono">${x.score}/16</span></div>`).join("")}</div>
       <div class="row" style="gap:8px"><button type="button" class="btn primary" data-act="report">Open report ${icon("arrow")}</button><button type="button" class="btn" data-act="plan">Launch plan</button><button type="button" class="btn ghost" data-act="new">Start a new one</button></div>
     </div>

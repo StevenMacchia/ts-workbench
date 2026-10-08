@@ -4581,6 +4581,28 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 
 /* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
 .mxm-onramp{margin-bottom:18px}
+
+/* r3c: AI assistants - a hover/focus preview of what "Use the numbers from my Metrics scorecard" inserts */
+.ai-fill-wrap{position:relative;display:inline-block}
+.ai-fill-prev{position:absolute;left:0;bottom:calc(100% + 8px);max-width:320px;padding:9px 11px;border-radius:10px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-lift);font-family:var(--mono,monospace);font-size:11.5px;line-height:1.5;color:var(--muted);white-space:pre-line;z-index:5;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s ease, transform .12s ease}
+.ai-fill-wrap:hover .ai-fill-prev,.ai-fill-wrap:focus-within .ai-fill-prev{opacity:1;visibility:visible;transform:translateY(0)}
+@media (max-width:600px){.ai-fill-prev{max-width:86vw}}
+
+/* r3c: Works with ROOST - the two "starter, untested" items get their own labeled sub-section */
+/* instead of sitting in the same grid as the four working ones, with only a small tag to tell them apart. */
+.ab-starters{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.ab-starters-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.ab-starters-h .wip-tag{flex:none}
+.ab-starters .ab-tools{margin-top:0}
+
+/* r3c: Overview's "pick up where you left off" pre-mortem card - the four-tile .ov-stats dashboard */
+/* (risks, critical, blockers, laws) said in one line instead, matching how the full report's startHere() */
+/* already turned its own four-tile dashboard into a counted sentence. Cross-tool audit item 4. */
+.ov-stats-sum{margin:2px 0 10px}
+
+/* r3c: All tools - a lightweight stage filter (Assess / Prepare / Measure / AI) so the grid of tool */
+/* cards doesn't just keep growing as one long unfiltered list. Cross-tool audit item 5. */
+.ov-stagef{margin:4px 0 14px;flex-wrap:wrap}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -10799,7 +10821,7 @@ function projectCards(items){
 function itemRows(items){
   const projects = Object.values(wsProjects()).sort((a,b)=>a.name.localeCompare(b.name));
   if(!items.length) return `<div class="card wsempty"><b>Nothing saved here yet</b><p class="note">Run a tool and save the result, or start one now.</p>
-    <div class="row">${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
+    <div class="row">${typeof asInAssessment === "function" && !asInAssessment() ? `<a class="btn sm primary" href="#overview"><svg><use href="#i-arrow"/></svg>Start the guided assessment</a>` : ""}${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
   return `<div class="card wslist">${items.map(it => {
     const s = itemSummary(it), confirming = wsUI.confirm==="item:"+it.id;
     const title = wsUI.rename===it.id
@@ -11296,29 +11318,38 @@ function asBind(){
 }
 
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
+// Which stage each tool belongs to, for the filter chips below: resets to "all" on a fresh page load,
+// not saved, since it's a view preference, not program data.
+let toolsStage = "all";
+const TOOLS_STAGES = [["all", "All"], ["assess", "Assess"], ["prepare", "Prepare"], ["measure", "Measure"], ["ai", "AI"]];
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}">
       <div class="ov-art">${OV_ART[key]}</div>
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
+  // Each tool tagged with the stage it belongs to, so the chip row above can filter this grid as it grows
+  const toolCards = [
+    {stage:"assess", html: typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""},
+    {stage:"assess", html: tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)},
+    {stage:"assess", html: typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""},
+    {stage:"prepare", html: tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)},
+    {stage:"prepare", html: tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")},
+    {stage:"prepare", html: typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""},
+    {stage:"prepare", html: typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""},
+    {stage:"prepare", html: tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)},
+    {stage:"ai", html: typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""},
+    {stage:"ai", html: typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""},
+    {stage:"measure", html: tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
+  ].filter(x => x.html);
+  const stageCount = s => s === "all" ? toolCards.length : toolCards.filter(x => x.stage === s).length;
+  const shown = toolCards.filter(x => toolsStage === "all" || x.stage === toolsStage);
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
     ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools">
-        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
-        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
-        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
-        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
-        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
-        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
-        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""}
-        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
-      </div>
+      <div class="segs ov-stagef" role="group" aria-label="Filter tools by stage">${TOOLS_STAGES.map(([k, n]) => `<button type="button" data-toolstage="${k}" aria-pressed="${toolsStage === k}">${n} <span class="mono" style="opacity:.6">${stageCount(k)}</span></button>`).join("")}</div>
+      <div class="ov-tools">${shown.length ? shown.map(x => x.html).join("") : `<p class="note">No tools in this stage yet.</p>`}</div>
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
@@ -11343,6 +11374,7 @@ function renderTools(){
     ${asFootHTML()}
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
+  view.querySelectorAll("[data-toolstage]").forEach(b => b.onclick = () => { toolsStage = b.dataset.toolstage; const y = window.scrollY; renderTools(); window.scrollTo(0, y); });
 }
 
 /* ---------- Guided steps: the strip across the top ---------- */
@@ -11580,8 +11612,10 @@ function renderRoost(){
   view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
     <section class="ab-sec rise">
       <h2>What you can do today</h2>
-      <div class="ab-tools">${RO_NOW.map(([t, r, c, ic, d, wip]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a>${wip ? ' <span class="wip-tag">Starter, untested</span>' : ""}</h3><p>${d}</p></div></div>`).join("")}</div>
-      <p class="note" style="margin-top:12px">None of this is a ROOST integration: the workbench makes files and numbers you take to ROOST's tools yourself. Starters have every platform-specific value marked TODO and have never run against a real deployment.</p>
+      <div class="ab-tools">${RO_NOW.filter(x => !x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div>
+      <p class="note" style="margin-top:12px">None of this is a ROOST integration: the workbench makes files and numbers you take to ROOST's tools yourself.</p>
+      ${RO_NOW.some(x => x[5]) ? `<div class="ab-starters"><h3 class="ab-starters-h"><span class="wip-tag">Starter, untested</span> Every platform-specific value marked TODO; never run against a real deployment</h3>
+        <div class="ab-tools">${RO_NOW.filter(x => x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div></div>` : ""}
     </section>
 
     <section class="ab-sec rise">
@@ -15183,7 +15217,7 @@ const aiTier = s => s.depth === "deep" ? "complex" : "default";
 const aiPut = (k, s) => store.set("ai:" + k, s);
 
 function aiField(T, fd, v){
-  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <em class="ai-req">required</em>` : ""}</span>`;
+  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ""}</span>`;
   const help = fd.help ? `<small class="ai-help">${esc(fd.help)}</small>` : "";
   if(fd.type === "select") return `<label class="mxa-y ai-f">${lab}<select class="select" id="${id}" data-fk="${fd.k}">${fd.opts.map(o => `<option ${v === o ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>${help}</label>`;
   if(fd.type === "checks") return `<fieldset class="ai-f ai-checks"><legend>${esc(fd.lab)}</legend><div>${fd.opts.map(([ov, ol]) => `<label class="ai-chk"><input type="checkbox" data-fk="${fd.k}" value="${ov}" ${(v || []).includes(ov) ? "checked" : ""}><span>${esc(ol)}</span></label>`).join("")}</div>${help}</fieldset>`;
@@ -15209,23 +15243,9 @@ function aiScoreFill(){
 AI_TOOLS.transparency.builder = true;
 AI_TOOLS.transparency.n = "Transparency report";
 AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
-const AI_WIP = {transparency:{
-  plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
-  meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
-function renderAIWip(key){
-  const T = AI_TOOLS[key], w = AI_WIP[key] || {plan:[], meanwhile:[]};
-  view.innerHTML = head(T.n, "This assistant is being rebuilt so it produces reports that hold up in front of regulators. It will be back soon.", "AI assistants", `<span class="pill ai-pill">Under construction</span>`) + `
-    <div class="card wip">
-      <div class="wip-art" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="8" y="30" width="104" height="18" rx="4" fill="var(--sunk)" stroke="var(--line-strong)"/>
-        <path d="M18 30l-10 18M38 30l-12 18M58 30l-12 18M78 30l-12 18M98 30l-12 18M112 36l-8 12" stroke="var(--high)" stroke-width="7" stroke-linecap="square" opacity=".85"/>
-        <rect x="18" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/><rect x="96" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/>
-        <circle cx="21" cy="22" r="6" fill="var(--high)"/><circle cx="99" cy="22" r="6" fill="var(--high)"/><rect x="19" y="24" width="4" height="7" fill="var(--line-strong)"/><rect x="97" y="24" width="4" height="7" fill="var(--line-strong)"/></svg></div>
-      <div class="wip-b"><span class="wip-tag">Under construction</span><h2>${esc(T.n)} is being rebuilt</h2>
-        <p>Transparency reports are read closely by regulators, journalists and researchers, so this tool needs to get the details right. It's offline while that work happens.</p>
-        ${w.plan.length ? `<h4>What it will do</h4><ul>${w.plan.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>
-    </div>
-    ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
-}
+// AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
+// no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
+// above, so the placeholder path was unreachable dead code (audit §12 item 2).
 /* ---------- Guided: each field on its own screen, then the run ---------- */
 const aiView = {};
 function aiSpec(key){
@@ -15249,7 +15269,6 @@ function aiSpec(key){
 }
 function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
-  if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   // Guided until there is a result or the one-page form was asked for
   if(!st.r && !run.busy && aiView[key] !== "page" && typeof gdRender === "function") return gdRender(aiSpec(key));
@@ -15257,6 +15276,9 @@ function renderAI(key){
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
+  // A short preview of what the fill button inserts, so it isn't a blind click
+  const fillLines = fill ? fill.split("\n") : [];
+  const fillPreview = fillLines.slice(0, 5).join("\n") + (fillLines.length > 5 ? `\n+${fillLines.length - 5} more` : "");
   const out = run.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ai-stage" aria-live="polite">${AI_PHASE[run.phase || "thinking"]}…</b><span class="note">${st.depth === "deep" ? "A deep review usually takes one to two minutes." : "This usually takes 15 to 40 seconds."} It runs on your own Claude account. The first time, Claude asks you to allow it.</span></div><button type="button" class="btn sm" id="ai-stop">Stop</button></div>`
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
         <div class="ai-out-a"><span class="toast" id="ai-toast" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
@@ -15268,7 +15290,7 @@ function renderAI(key){
       <form class="card ai-form" id="ai-form" onsubmit="return false">
         ${st.r || run.busy ? "" : `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" id="ai-guide">Switch to guided</button></div>`}
         <div class="ai-fields">${T.fields.map(fd => aiField(T, fd, f[fd.k])).join("")}</div>
-        ${fill ? `<button type="button" class="mx-link ai-fill" id="ai-fill">Use the numbers from my Metrics scorecard</button>` : ""}
+        ${fill ? `<span class="ai-fill-wrap"><button type="button" class="mx-link ai-fill" id="ai-fill" aria-describedby="ai-fill-prev">Use the numbers from my Metrics scorecard</button><span class="ai-fill-prev" id="ai-fill-prev" role="tooltip">${esc(fillPreview)}</span></span>` : ""}
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}
@@ -16578,12 +16600,7 @@ function pmCurrentHero(){
         ${pm.regions.length ? `<span class="ov-status">${pm.regions.map(k => k.toUpperCase()).join(" · ")}</span>` : ""}
         ${pm.youth ? `<span class="ov-status">${esc(labelOf(YOUTH, pm.youth))}</span>` : ""}
       </div>
-      <div class="ov-stats">
-        <div><b class="mono">${r.risks.length}</b><span>Risks identified</span></div>
-        <div><b class="mono" style="${r.counts.crit ? "color:var(--crit)" : ""}">${r.counts.crit}</b><span>Critical</span></div>
-        <div><b class="mono">${bd}/${bl.length}</b><span>Blockers done</span></div>
-        <div><b class="mono">${laws}</b><span>Laws likely apply</span></div>
-      </div>
+      <p class="note ov-stats-sum">${r.risks.length} risk${r.risks.length === 1 ? "" : "s"} logged, <strong style="${r.counts.crit ? "color:var(--crit)" : ""}">${r.counts.crit} critical</strong>. ${bd} of ${bl.length} launch blockers done, and ${laws} law${laws === 1 ? "" : "s"} likely apply.</p>
       <div>${r.risks.slice(0, 3).map(x => `<div class="ov-risk"><span class="sdot" style="background:var(--${x.band === "low" ? "faint" : x.band})"></span>${esc(x.n)}<span class="mono">${x.score}/16</span></div>`).join("")}</div>
       <div class="row" style="gap:8px"><button type="button" class="btn primary" data-act="report">Open report ${icon("arrow")}</button><button type="button" class="btn" data-act="plan">Launch plan</button><button type="button" class="btn ghost" data-act="new">Start a new one</button></div>
     </div>
@@ -20931,8 +20948,8 @@ function renderPlan(){
     </div>
     ${PLAN_GROUPS.map(([g, n, d]) => { const xs = by(g); if(!xs.length) return ""; const open = xs.filter(x => !x.done), done = xs.filter(x => x.done), all = !!plMore[g], shown = all ? open : open.slice(0, PL_SHOW);
       return `<section class="pl-group" aria-labelledby="pl-${g}"><div class="as-sec-h"><h2 id="pl-${g}">${n} <span class="mono note">${open.length}</span></h2><span class="note">${d}</span></div>
+        ${g === "next" ? `<p class="note cvr-note">Coverage gaps are closed in the Coverage radar, so they have no box here. Everything else ticks off in its tool too.</p>` : ""}
         <div class="card nx-card"><ul class="nx-list">${shown.map(planItemHTML).join("")}${open.length > PL_SHOW ? `<li class="pl-more"><button type="button" class="ov-link" data-plmore="${g}">${all ? "Show fewer" : `Show all ${open.length}`}</button></li>` : ""}${done.length ? `<li class="pl-more"><button type="button" class="ov-link" data-pldone="${g}">${plMore[g + ":done"] ? "Hide" : "Show"} ${done.length} done</button></li>` : ""}${plMore[g + ":done"] ? done.map(planItemHTML).join("") : ""}</ul></div></section>`; }).join("")}
-    ${items.length ? `<p class="note cvr-note">Coverage gaps are closed in the Coverage radar, so they have no box here. Everything else ticks off in its tool too.</p>` : ""}
   </div>`;
   view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
   view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });

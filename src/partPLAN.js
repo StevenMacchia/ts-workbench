@@ -38,8 +38,8 @@ function renderPlan(){
     </div>
     ${PLAN_GROUPS.map(([g, n, d]) => { const xs = by(g); if(!xs.length) return ""; const open = xs.filter(x => !x.done), done = xs.filter(x => x.done), all = !!plMore[g], shown = all ? open : open.slice(0, PL_SHOW);
       return `<section class="pl-group" aria-labelledby="pl-${g}"><div class="as-sec-h"><h2 id="pl-${g}">${n} <span class="mono note">${open.length}</span></h2><span class="note">${d}</span></div>
+        ${g === "next" ? `<p class="note cvr-note">Coverage gaps are closed in the Coverage radar, so they have no box here. Everything else ticks off in its tool too.</p>` : ""}
         <div class="card nx-card"><ul class="nx-list">${shown.map(planItemHTML).join("")}${open.length > PL_SHOW ? `<li class="pl-more"><button type="button" class="ov-link" data-plmore="${g}">${all ? "Show fewer" : `Show all ${open.length}`}</button></li>` : ""}${done.length ? `<li class="pl-more"><button type="button" class="ov-link" data-pldone="${g}">${plMore[g + ":done"] ? "Hide" : "Show"} ${done.length} done</button></li>` : ""}${plMore[g + ":done"] ? done.map(planItemHTML).join("") : ""}</ul></div></section>`; }).join("")}
-    ${items.length ? `<p class="note cvr-note">Coverage gaps are closed in the Coverage radar, so they have no box here. Everything else ticks off in its tool too.</p>` : ""}
   </div>`;
   view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
   view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
