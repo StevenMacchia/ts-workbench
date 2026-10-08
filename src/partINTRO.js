@@ -255,7 +255,7 @@ function introWalkHTML(route, i){
   return `<p class="ln-eb">How this works · ${i + 1} of ${spec.walk.length}</p><h2>${esc(sc.title)}</h2><p class="ln-why">${sc.line}</p>
     <div class="ln-body"><div class="rtf-walk-prev" aria-hidden="true">${typeof sc.preview === "function" ? sc.preview() : sc.preview}</div></div>
     <div class="ln-pager"><div class="row">${i > 0 ? `<button type="button" class="btn" data-walk="back">← Back</button>` : "<span></span>"}</div>
-      <div class="row">${i < spec.walk.length - 1 ? `<button type="button" class="btn primary" data-walk="next">Next →</button>` : `<button type="button" class="btn primary" data-walk="start">Start</button>`}</div></div>`;
+      <div class="row">${i < spec.walk.length - 1 ? `<button type="button" class="btn primary" data-walk="next">Next →</button>` : `${typeof PAGE_TOURS !== "undefined" && PAGE_TOURS[route] && introSeen(route) ? `<button type="button" class="btn" data-walk="tour">Point at the parts on this page</button>` : ""}<button type="button" class="btn primary" data-walk="start">Start</button>`}</div></div>`;
 }
 // Opened either from the purpose card itself (onStart lands on the tool's real first screen once the
 // card hasn't been seen yet) or from a tool's own "How this works" link once it has: in the second
@@ -268,6 +268,7 @@ function walkOpen(route, onStart){
     const bg = $("#ln-modal");
     const back = $("[data-walk='back']", bg); if(back) back.onclick = () => { i = Math.max(0, i - 1); draw(); };
     const next = $("[data-walk='next']", bg); if(next) next.onclick = () => { i = Math.min(spec.walk.length - 1, i + 1); draw(); };
+    const tour = $("[data-walk='tour']", bg); if(tour) tour.onclick = () => { lnClose(); if(typeof helpTour === "function") setTimeout(() => helpTour(route), 50); };
     const start = $("[data-walk='start']", bg); if(start) start.onclick = () => {
       const fromCard = !introSeen(route); lnClose();
       if(fromCard) introStart(route, onStart);

@@ -190,15 +190,14 @@ const PAGE_TOURS = {
 const helpRoute = () => (location.hash || "#overview").slice(1).split("/")[0] || "overview";
 // Screenshots and automated checks run without tips
 const helpQuiet = () => /[?&]shot=/.test(location.search || "");
-// Two different jobs, so two buttons: "How this page works" walks the real, current page
-// (PAGE_TOURS, above); "How this works" (added by partINTRO.js, once it has loaded) opens the
-// calmer, fixed walkthrough that also opens from the purpose card on first visit. Neither replaces
-// the other.
+// One button, "How this works". Where the tool has a walkthrough (INTRO_SPECS, partINTRO.js) it opens
+// that, and the walkthrough's last screen offers the live page tour (PAGE_TOURS, above) as a second
+// step. Where there is no walkthrough, the button runs the page tour directly. Two buttons with
+// near-identical labels confused people, so there is only ever one.
 function helpBtn(){
   const r = helpRoute();
-  const tour = PAGE_TOURS[r] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this page works</button>` : "";
-  const intro = (typeof INTRO_SPECS !== "undefined" && INTRO_SPECS[r]) ? `<button type="button" class="ph-help" data-intro="how">${icon("info")}How this works</button>` : "";
-  return tour + intro;
+  if(typeof INTRO_SPECS !== "undefined" && INTRO_SPECS[r]) return `<button type="button" class="ph-help" data-intro="how">${icon("info")}How this works</button>`;
+  return PAGE_TOURS[r] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this works</button>` : "";
 }
 function helpTour(r){
   r = r || helpRoute(); const steps = PAGE_TOURS[r];
@@ -217,7 +216,7 @@ function helpOffer(r){
     <div class="tour-a"><button type="button" class="btn sm" data-help="off">Turn off tips</button><button type="button" class="btn sm primary" data-help="go">Show me ${icon("arrow")}</button></div>`;
 }
 function helpToggle(){ const off = !store.get("help:off", false); store.set("help:off", off); if(off) helpOfferClose();
-  gsay(off ? "Page tips are off. Every page's “How this page works” button still works" : "Page tips are back on"); }
+  gsay(off ? "Page tips are off. Every page's “How this works” button still works" : "Page tips are back on"); }
 
 // Called by the router after every page render
 // Tours are never offered uninvited: each page explains itself, and "How this page works" replays the tour on request

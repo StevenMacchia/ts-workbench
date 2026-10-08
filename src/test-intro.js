@@ -54,14 +54,16 @@ const body = function(){
   store.set("intro:premortem", false);
   out.push("introSeen flips after Start, and Start calls through to the tool's own first screen");
 
-  // 3) helpBtn carries both "How this page works" (the existing, selector-based page tour) and the
-  // new "How this works" link, side by side, for every one of these routes
+  // 3) helpBtn carries exactly one button, "How this works", which opens the walkthrough on these routes
+  // (the live page tour is offered from the walkthrough's last screen instead of as a second button)
   routes.forEach(route => {
     location.hash = "#" + route;
     const hb = helpBtn();
     if(!/data-intro="how"/.test(hb)) throw new Error(route + ": helpBtn is missing the How this works link");
+    if(/data-help="tour"/.test(hb)) throw new Error(route + ": helpBtn still renders a second, page-tour button");
+    if((hb.match(/<button/g) || []).length !== 1) throw new Error(route + ": helpBtn should render exactly one button");
   });
-  out.push("helpBtn carries the How this works link, beside the existing page tour, on all 16 routes");
+  out.push("helpBtn renders exactly one button, How this works, on all 16 routes; the page tour is offered from the walkthrough's last screen");
 
   // 4) Each tool's own render: the card on first visit, its own first screen once introMark has run
   const RENDER = {

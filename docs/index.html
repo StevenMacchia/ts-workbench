@@ -19420,15 +19420,14 @@ const PAGE_TOURS = {
 const helpRoute = () => (location.hash || "#overview").slice(1).split("/")[0] || "overview";
 // Screenshots and automated checks run without tips
 const helpQuiet = () => /[?&]shot=/.test(location.search || "");
-// Two different jobs, so two buttons: "How this page works" walks the real, current page
-// (PAGE_TOURS, above); "How this works" (added by partINTRO.js, once it has loaded) opens the
-// calmer, fixed walkthrough that also opens from the purpose card on first visit. Neither replaces
-// the other.
+// One button, "How this works". Where the tool has a walkthrough (INTRO_SPECS, partINTRO.js) it opens
+// that, and the walkthrough's last screen offers the live page tour (PAGE_TOURS, above) as a second
+// step. Where there is no walkthrough, the button runs the page tour directly. Two buttons with
+// near-identical labels confused people, so there is only ever one.
 function helpBtn(){
   const r = helpRoute();
-  const tour = PAGE_TOURS[r] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this page works</button>` : "";
-  const intro = (typeof INTRO_SPECS !== "undefined" && INTRO_SPECS[r]) ? `<button type="button" class="ph-help" data-intro="how">${icon("info")}How this works</button>` : "";
-  return tour + intro;
+  if(typeof INTRO_SPECS !== "undefined" && INTRO_SPECS[r]) return `<button type="button" class="ph-help" data-intro="how">${icon("info")}How this works</button>`;
+  return PAGE_TOURS[r] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this works</button>` : "";
 }
 function helpTour(r){
   r = r || helpRoute(); const steps = PAGE_TOURS[r];
@@ -19447,7 +19446,7 @@ function helpOffer(r){
     <div class="tour-a"><button type="button" class="btn sm" data-help="off">Turn off tips</button><button type="button" class="btn sm primary" data-help="go">Show me ${icon("arrow")}</button></div>`;
 }
 function helpToggle(){ const off = !store.get("help:off", false); store.set("help:off", off); if(off) helpOfferClose();
-  gsay(off ? "Page tips are off. Every page's “How this page works” button still works" : "Page tips are back on"); }
+  gsay(off ? "Page tips are off. Every page's “How this works” button still works" : "Page tips are back on"); }
 
 // Called by the router after every page render
 // Tours are never offered uninvited: each page explains itself, and "How this page works" replays the tour on request
@@ -19961,7 +19960,7 @@ function introWalkHTML(route, i){
   return `<p class="ln-eb">How this works · ${i + 1} of ${spec.walk.length}</p><h2>${esc(sc.title)}</h2><p class="ln-why">${sc.line}</p>
     <div class="ln-body"><div class="rtf-walk-prev" aria-hidden="true">${typeof sc.preview === "function" ? sc.preview() : sc.preview}</div></div>
     <div class="ln-pager"><div class="row">${i > 0 ? `<button type="button" class="btn" data-walk="back">← Back</button>` : "<span></span>"}</div>
-      <div class="row">${i < spec.walk.length - 1 ? `<button type="button" class="btn primary" data-walk="next">Next →</button>` : `<button type="button" class="btn primary" data-walk="start">Start</button>`}</div></div>`;
+      <div class="row">${i < spec.walk.length - 1 ? `<button type="button" class="btn primary" data-walk="next">Next →</button>` : `${typeof PAGE_TOURS !== "undefined" && PAGE_TOURS[route] && introSeen(route) ? `<button type="button" class="btn" data-walk="tour">Point at the parts on this page</button>` : ""}<button type="button" class="btn primary" data-walk="start">Start</button>`}</div></div>`;
 }
 // Opened either from the purpose card itself (onStart lands on the tool's real first screen once the
 // card hasn't been seen yet) or from a tool's own "How this works" link once it has: in the second
@@ -19974,6 +19973,7 @@ function walkOpen(route, onStart){
     const bg = $("#ln-modal");
     const back = $("[data-walk='back']", bg); if(back) back.onclick = () => { i = Math.max(0, i - 1); draw(); };
     const next = $("[data-walk='next']", bg); if(next) next.onclick = () => { i = Math.min(spec.walk.length - 1, i + 1); draw(); };
+    const tour = $("[data-walk='tour']", bg); if(tour) tour.onclick = () => { lnClose(); if(typeof helpTour === "function") setTimeout(() => helpTour(route), 50); };
     const start = $("[data-walk='start']", bg); if(start) start.onclick = () => {
       const fromCard = !introSeen(route); lnClose();
       if(fromCard) introStart(route, onStart);
