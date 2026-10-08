@@ -391,3 +391,15 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-rowb{padding:10px 14px 12px;font-size:14px;color:var(--muted);line-height:1.55}
 .ln-openall{display:inline-block;margin:0 0 8px;font-size:12.5px}
 @media (prefers-reduced-motion: reduce){.ln-chev{transition:none}}
+
+/* card flow: the "All ..." link that replaces the old chip/grid rows, reused by Practice, Worksheets, Sources
+   and the Glossary; the done tick on a Practice card; the external-link row used by Sources */
+.ln-eb{position:relative}
+.ln-eb .ln-all{margin-left:auto}
+.ln-donetick{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono,ui-monospace,monospace);font-size:11px;color:var(--good);background:color-mix(in oklab, var(--good) 14%, transparent);border-radius:5px;padding:1px 7px}
+.ln-donetick svg{width:11px;height:11px}
+.ln-row summary .ln-rowlink{margin-left:auto;font-size:12.5px;font-weight:500;color:var(--accent);text-decoration:none;flex:none}
+.ln-row summary .ln-rowlink:hover{text-decoration:underline}
+.ln-row .ln-known-mark{color:var(--good)}
+.rtf-next[disabled]{opacity:.5;cursor:not-allowed}
+@media (max-width:760px){.ln-eb{gap:6px 10px}}

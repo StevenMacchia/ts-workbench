@@ -276,3 +276,35 @@ const body7 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body7.toString() + ")();")());
+// The rest of the Learn section matches the card shape too: no count pills on the tabs, Practice/Worksheets/
+// Sources page one item at a time with an "All ..." jump list, and the glossary grouped A-Z with collapsed rows.
+const body8 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const g = LN_GUIDES.llm;
+  location.hash = "#redteamllm/practice"; renderRedteam("llm"); let h = view.innerHTML + els["#ln-view"].innerHTML;
+  eq(/undefined|NaN|\[object/.test(h), false, "tab row and practice card render cleanly");
+  eq(/<i>9<\/i>|<i>11<\/i>|<i>7<\/i>|<i>51<\/i>/.test(h), false, "the tab row no longer carries a count pill");
+  eq(/Exercise 1 of 11/.test(h) && h.includes(g.exercises[0].output), true, "practice opens on exercise 1, lead sentence is what you'll have at the end");
+  eq(/class="rtf-steps"/.test(h) && /data-run/.test(h) && /All exercises/.test(h), true, "plain steps show as the numbered list, with Run it and an All exercises jump link");
+  store.set("learn:llm:epos", 1); renderRedteam("llm"); h = els["#ln-view"].innerHTML;
+  eq(h.includes(g.exercises[1].title) && /Exercise 2 of 11/.test(h), true, "exercise position is remembered under its own key");
+  store.set("learn:llm:epos", 0);
+  location.hash = "#redteamllm/worksheets"; renderRedteam("llm"); h = els["#ln-view"].innerHTML;
+  eq(/Worksheet 1 of 7/.test(h) && /data-copy/.test(h) && /data-dl/.test(h), true, "worksheets open one at a time with copy and download on the card");
+  store.set("learn:llm:wpos", 6); renderRedteam("llm"); h = els["#ln-view"].innerHTML;
+  eq(/The one-page checklist/.test(h) && /data-open-check/.test(h), true, "the checklist is the last worksheet and opens the existing interactive modal");
+  store.set("learn:llm:wpos", 0);
+  location.hash = "#redteamllm/sources"; renderRedteam("llm"); h = els["#ln-view"].innerHTML;
+  const srcGroups = LN_REFS.filter(r => r.k === "both" || r.k === "llm");
+  eq(new RegExp("Topic 1 of " + srcGroups.length).test(h), true, "sources page one topic group at a time, same grouping LN_REFS already has");
+  eq(/class="ln-row"/.test(h) && /ln-rowlink/.test(h), true, "each source is a collapsed row with the link visible");
+  renderGlossary(); h = els["#ln-gl"].innerHTML;
+  eq(/undefined|NaN|\[object/.test(h), false, "glossary group renders cleanly");
+  eq(/group 1 of \d+/.test(h) && /class="ln-row"/.test(h), true, "glossary terms are grouped A-Z, one group per card, each term a collapsed row");
+  renderLearn(); h = view.innerHTML;
+  eq((h.match(/class="card"/g) || []).length, 4, "the learn hub is four cards");
+  eq(/ln-how/.test(h), false, "the hub dropped the three-tip explainer block in favour of one sentence per card");
+  out.push("learn section: tabs lost their count pills, practice/worksheets/sources paginate one item at a time, glossary groups A-Z, hub is four one-sentence cards");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body8.toString() + ")();")());

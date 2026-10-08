@@ -4555,6 +4555,18 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-rowb{padding:10px 14px 12px;font-size:14px;color:var(--muted);line-height:1.55}
 .ln-openall{display:inline-block;margin:0 0 8px;font-size:12.5px}
 @media (prefers-reduced-motion: reduce){.ln-chev{transition:none}}
+
+/* card flow: the "All ..." link that replaces the old chip/grid rows, reused by Practice, Worksheets, Sources
+   and the Glossary; the done tick on a Practice card; the external-link row used by Sources */
+.ln-eb{position:relative}
+.ln-eb .ln-all{margin-left:auto}
+.ln-donetick{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono,ui-monospace,monospace);font-size:11px;color:var(--good);background:color-mix(in oklab, var(--good) 14%, transparent);border-radius:5px;padding:1px 7px}
+.ln-donetick svg{width:11px;height:11px}
+.ln-row summary .ln-rowlink{margin-left:auto;font-size:12.5px;font-weight:500;color:var(--accent);text-decoration:none;flex:none}
+.ln-row summary .ln-rowlink:hover{text-decoration:underline}
+.ln-row .ln-known-mark{color:var(--good)}
+.rtf-next[disabled]{opacity:.5;cursor:not-allowed}
+@media (max-width:760px){.ln-eb{gap:6px 10px}}
 /* =========================================================
    Red team studio: the sandbox, a local model to talk to. Aurora tokens only, light and dark.
    ========================================================= */
@@ -12610,10 +12622,9 @@ const LN_TABS = [["method","Method"],["practice","Practice"],["worksheets","Work
 function lnTab(){ const p = (location.hash || "").slice(1).split("/"); return LN_TABS.some(t => t[0] === p[1]) ? p[1] : "method"; }
 function renderRedteam(k){
   const g = LN_GUIDES[k], tab = lnTab(), doneSteps = g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length, doneEx = g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length;
-  const counts = {method:g.steps.length, practice:g.exercises.length, worksheets:g.worksheets.length + 1, sources:LN_REFS.filter(r => r.k === "both" || r.k === k).reduce((n, r) => n + r.items.length, 0)};
-  const meta = `<a class="btn sm" href="#glossary">Glossary</a><a class="btn sm" href="#${k === "llm" ? "redteamworld" : "redteamllm"}">${k === "llm" ? "World models" : "LLMs"} guide</a>`;
+  const meta =`<a class="btn sm" href="#glossary">Glossary</a><a class="btn sm" href="#${k === "llm" ? "redteamworld" : "redteamllm"}">${k === "llm" ? "World models" : "LLMs"} guide</a>`;
   view.innerHTML = head(g.name, g.desc, "Learn", meta) + `<div class="ln">
-    <div class="ln-tabs"><div class="segs" role="tablist" aria-label="Guide sections">${LN_TABS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${tab === id}" aria-pressed="${tab === id}" data-tab="${id}">${n}<i>${counts[id]}</i></button>`).join("")}</div>
+    <div class="ln-tabs"><div class="segs" role="tablist" aria-label="Guide sections">${LN_TABS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${tab === id}" aria-pressed="${tab === id}" data-tab="${id}">${n}</button>`).join("")}</div>
       <span class="note">${doneSteps} of ${g.steps.length} steps read · ${doneEx} of ${g.exercises.length} exercises done</span></div>
     <div id="ln-view"></div></div>`;
   $$("[data-tab]").forEach(b => b.onclick = () => { location.hash = g.route + "/" + b.dataset.tab; });
@@ -12649,6 +12660,12 @@ function lnCollapseLists(html, uid){
 }
 function lnStepCards(k, s){ return lnSplitBody(s.body).map((sec, i) => ({heading:sec.heading, html:lnCollapseLists(sec.html, k + "-" + s.id + "-" + i)})); }
 function lnMarkRead(id){ const d = lnDone(); if(d.indexOf(id) === -1){ d.push(id); lnStore.set("done", d); } }
+// A jump-to list for a card flow's "All ..." link: the same pill markup the old per-tab chip row used,
+// now reached from a link instead of sitting on screen the whole time. items: [{label, done}]. onPick(i) jumps.
+function lnPickModal(title, items, current, onPick){
+  lnModal(`<p class="ln-eb">${esc(title)}</p><ul class="ln-steps" style="margin-top:10px">${items.map((it, i) => `<li><button type="button" class="${i === current ? "on" : ""} ${it.done ? "done" : ""}" data-pick="${i}" title="${esc(it.label)}"><b>${i + 1}</b><span>${esc(it.label)}</span></button></li>`).join("")}</ul>`);
+  $$("[data-pick]", $("#ln-modal")).forEach(b => b.onclick = () => { lnClose(); onPick(+b.dataset.pick); });
+}
 const LN_M = {}; // holds the active card flow's go(dir) so the global keyboard shortcut can reach it
 function lnMethod(k, g){
   const posKey = k + ":pos", n = g.steps.length; // new key: the old "k:step" position is left untouched
@@ -12674,21 +12691,20 @@ function lnMethod(k, g){
     const s = g.steps[si], card = cards[ci], did = lnIsDone(k + ":s:" + s.id), last = ci === cards.length - 1, hasBack = ci > 0 || si > 0;
     const nextLabel = ci < cards.length - 1 ? "Next" : si < n - 1 ? g.steps[si + 1].title : "Go to the exercises";
     const drillBtn = last && s.ex && g.exercises.some(e => e.id === s.ex) ? `<p><button type="button" class="btn sm" data-ex="${s.ex}">Run the drill: ${esc(g.exercises.find(e => e.id === s.ex).title)}</button></p>` : "";
-    $("#ln-view").innerHTML = `<ul class="ln-steps">${g.steps.map((x, i) => `<li><button type="button" class="${i === si ? "on" : ""} ${lnIsDone(k + ":s:" + x.id) ? "done" : ""}" data-step="${i}" title="${esc(x.title)}"><b>${i + 1}</b><span>${esc(x.title)}</span></button></li>`).join("")}</ul>
-      ${cards.length > 1 ? `<div class="rtf-dots" aria-hidden="true">${cards.map((c, i) => `<span class="${i <= ci ? "on" : ""}"></span>`).join("")}</div>` : ""}
+    $("#ln-view").innerHTML = `${cards.length > 1 ? `<div class="rtf-dots" aria-hidden="true">${cards.map((c, i) => `<span class="${i <= ci ? "on" : ""}"></span>`).join("")}</div>` : ""}
       <div class="card ln-panel">
-        <p class="ln-eb">Step ${si + 1} of ${n} · ${esc(s.title)}${cards.length > 1 ? `<span class="ln-subcount">${ci + 1} of ${cards.length}</span>` : ""}</p>
+        <p class="ln-eb">Step ${si + 1} of ${n} · ${esc(s.title)}${cards.length > 1 ? `<span class="ln-subcount">${ci + 1} of ${cards.length}</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All steps</button></p>
         <h2>${esc(card.heading || s.title)}</h2>
         ${ci === 0 ? `<p class="ln-why">${s.why}</p>` : ""}
         <div class="ln-body">${card.html}${drillBtn}</div>
         <div class="ln-pager rtf-foot">${hasBack ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Step ${si + 1} of ${n}</span><span></span></div>
         <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${esc(nextLabel)} →</button></div>
       </div>`;
-    $$("[data-step]").forEach(b => b.onclick = () => { si = +b.dataset.step; cards = lnStepCards(k, g.steps[si]); ci = 0; save(); draw(); });
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a step · " + g.name, g.steps.map(x => ({label:x.title, done:lnIsDone(k + ":s:" + x.id)})), si, i => { si = i; cards = lnStepCards(k, g.steps[si]); ci = 0; save(); draw(); });
     const back = $("[data-back]"); if(back) back.onclick = () => go(-1);
     const nx = $("[data-next]"); if(nx) nx.onclick = () => go(1);
     $$("[data-ex]").forEach(b => b.onclick = () => lnOpenExercise(k, g, b.dataset.ex));
-    $$("[data-openall]").forEach(b => b.onclick = () => { const ul = $("#" + b.dataset.openall); if(ul) $$("details", ul).forEach(d => d.open = true); });
+    lnBindOpenAll();
   };
   LN_M.go = go;
   draw();
@@ -12698,17 +12714,43 @@ function lnMethod(k, g){
 document.addEventListener("keydown", e => {
   const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
   const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
-  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],input,textarea'))) return;
+  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],input,textarea'))) return;
   if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
   else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
 });
 function lnRefreshCount(k, g){ const el = $(".ln-tabs .note"); if(el) el.textContent = `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps read · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} exercises done`; }
+function lnBindOpenAll(){ $$("[data-openall]").forEach(b => b.onclick = () => { const ul = $("#" + b.dataset.openall); if(ul) $$("details", ul).forEach(d => d.open = true); }); }
+// One exercise per card: the lead sentence is what you'll have at the end (e.output), the plain five-step
+// rewrite is the visible list (already under twenty words a step), and the original "Do this" / "What good
+// looks like" sit behind one "Full version" disclosure -- plain and full steps don't line up 1:1 (e.g. e3 has
+// six full steps but five plain ones) so a per-row pairing isn't possible; "Run it" still opens the existing
+// exercise modal, which is where marking done and the worksheet link live, unchanged.
 function lnPractice(k, g){
+  const posKey = k + ":epos", n = g.exercises.length;
+  let i = Math.min(Math.max(lnStore.get(posKey, 0), 0), n - 1);
+  const save = () => lnStore.set(posKey, i);
   const draw = () => {
-    const done = g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length;
-    $("#ln-view").innerHTML = `<div class="ln-prog"><span>${done} of ${g.exercises.length} done</span><span class="bar"><i style="width:${100 * done / g.exercises.length}%"></i></span><span class="note">Run them in order for a first exercise. Severe harm areas are covered by policy-described probes under the stop rules, never by open drills.</span></div>
-      <div class="ln-grid">${g.exercises.map((e, i) => `<button type="button" class="card ln-ex ${lnIsDone(k + ":e:" + e.id) ? "done" : ""}" data-ex="${e.id}"><span class="tick"><svg><use href="#i-check"/></svg></span><span class="n">Exercise ${i + 1}</span><h4>${esc(e.title)}</h4><p>${esc(e.why)}</p><span class="meta"><span>${esc(e.time)}</span><span>${esc(e.people.split(":")[0].split(",")[0])}</span></span></button>`).join("")}</div>`;
-    $$("[data-ex]").forEach(b => b.onclick = () => lnOpenExercise(k, g, b.dataset.ex, draw));
+    i = Math.min(Math.max(i, 0), n - 1);
+    const e = g.exercises[i], did = lnIsDone(k + ":e:" + e.id), done = g.exercises.filter(x => lnIsDone(k + ":e:" + x.id)).length;
+    $("#ln-view").innerHTML = `<div class="ln-prog"><span>${done} of ${n} done</span><span class="bar"><i style="width:${100 * done / n}%"></i></span><span class="note">Severe harm areas are policy-described probes under the stop rules, never open drills.</span></div>
+      <div class="card ln-panel">
+        <p class="ln-eb">Exercise ${i + 1} of ${n}${did ? `<span class="ln-donetick"><svg><use href="#i-check"/></svg>Done</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All exercises</button></p>
+        <h2>${esc(e.title)}</h2>
+        <p class="ln-why">${esc(e.output)}</p>
+        <div class="ln-chips"><span class="ln-chip">${LN_ICON.clock}<b>${esc(e.time)}</b></span><span class="ln-chip">${LN_ICON.people}${esc(e.people)}</span><span class="ln-chip">${LN_ICON.box}${esc(e.needs)}</span></div>
+        <div class="ln-body">
+          <ol class="rtf-steps">${e.plain.map(st => `<li>${esc(st)}</li>`).join("")}</ol>
+          <details class="rtf-det"><summary>Full version, and what good looks like</summary>
+            <h3>Do this</h3>${lnDo(e.steps.map(esc))}<h3>What good looks like</h3>${lnGood(e.good.map(esc))}</details>
+          <p><button type="button" class="btn sm primary" data-run>Run it${did ? " again" : ""}</button></p>
+        </div>
+        <div class="ln-pager rtf-foot">${i > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Exercise ${i + 1} of ${n}</span><span></span></div>
+        <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${i < n - 1 ? "Next" : "Worksheets"} →</button></div>
+      </div>`;
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to an exercise · " + g.name, g.exercises.map(x => ({label:x.title, done:lnIsDone(k + ":e:" + x.id)})), i, j => { i = j; save(); draw(); });
+    const run = $("[data-run]"); if(run) run.onclick = () => lnOpenExercise(k, g, e.id, draw);
+    const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/worksheets"; };
   };
   draw();
 }
@@ -12728,10 +12770,37 @@ function lnOpenExercise(k, g, id, after){
   $("[data-done]", bg).onclick = () => { lnToggleDone(k + ":e:" + e.id); if(after) after(); lnRefreshCount(k, g); lnOpenExercise(k, g, id, after); };
   const w = $("[data-ws]", bg); if(w) w.onclick = () => lnOpenWorksheet(k, g, ws.id);
 }
+// One worksheet per card, copy/download right on the card; the text itself sits behind "Preview the text" so
+// a long template (the coverage grid, the test log) isn't the first thing on screen. The checklist's own ticks
+// need the existing interactive modal (lnOpenChecklist), so its card just opens that, unchanged underneath.
 function lnWorksheets(k, g){
-  $("#ln-view").innerHTML = `<div class="ln-grid">${g.worksheets.map((w, i) => `<button type="button" class="card ln-ex ln-ws" data-ws="${w.id}"><span class="n">Worksheet ${i + 1}</span><h4><svg><use href="#i-doc"/></svg>${esc(w.title)}</h4><p>${esc(w.why)}</p><span class="meta"><span>Copy</span><span>Download</span></span></button>`).join("")}
-    <button type="button" class="card ln-ex ln-ws" data-ws="check"><span class="n">Worksheet ${g.worksheets.length + 1}</span><h4><svg><use href="#i-check"/></svg>The one-page checklist</h4><p>Everything in the method, as the list you tick through. Ticks are saved in this browser.</p><span class="meta"><span>${g.checklist.length} items</span><span>Copy</span></span></button></div>`;
-  $$("[data-ws]").forEach(b => b.onclick = () => lnOpenWorksheet(k, g, b.dataset.ws));
+  const items = g.worksheets.concat([{id:"check", title:"The one-page checklist", why:"Everything in the method, as the list you tick through. Ticks are saved in this browser.", checklist:true}]);
+  const posKey = k + ":wpos", n = items.length;
+  let i = Math.min(Math.max(lnStore.get(posKey, 0), 0), n - 1);
+  const save = () => lnStore.set(posKey, i);
+  const draw = () => {
+    i = Math.min(Math.max(i, 0), n - 1);
+    const w = items[i];
+    const body = w.checklist
+      ? `<p><button type="button" class="btn sm primary" data-open-check>Open the checklist · ${g.checklist.length} items</button></p>`
+      : `<div class="row" style="gap:8px;margin:0 0 10px"><button type="button" class="btn sm" data-copy><svg><use href="#i-copy"/></svg>Copy</button><button type="button" class="btn sm" data-dl><svg><use href="#i-download"/></svg>Download ${esc(w.file)}</button><span class="ln-toast" id="ln-toast" aria-live="polite"></span></div>
+        <details class="rtf-det"><summary>Preview the text</summary><pre class="ln-pre ${w.wide ? "wide" : ""}">${esc(w.text)}</pre></details>`;
+    $("#ln-view").innerHTML = `<div class="card ln-panel">
+      <p class="ln-eb">Worksheet ${i + 1} of ${n}<button type="button" class="rtf-link ln-all" data-all>All worksheets</button></p>
+      <h2>${esc(w.title)}</h2>
+      <p class="ln-why">${esc(w.why)}</p>
+      <div class="ln-body">${body}</div>
+      <div class="ln-pager rtf-foot">${i > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Worksheet ${i + 1} of ${n}</span><span></span></div>
+      <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${i < n - 1 ? "Next" : "Sources"} →</button></div>
+    </div>`;
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a worksheet · " + g.name, items.map(x => ({label:x.title, done:false})), i, j => { i = j; save(); draw(); });
+    const cp = $("[data-copy]"); if(cp) cp.onclick = () => copyText(w.text, $("#ln-toast"));
+    const dl = $("[data-dl]"); if(dl) dl.onclick = () => offerFile(w.file, w.text, w.text, $("#ln-toast"));
+    const oc = $("[data-open-check]"); if(oc) oc.onclick = () => lnOpenChecklist(k, g);
+    const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/sources"; };
+  };
+  draw();
 }
 function lnOpenWorksheet(k, g, id){
   if(id === "check"){ lnOpenChecklist(k, g); return; }
@@ -12757,9 +12826,31 @@ function lnOpenChecklist(k, g){
   };
   draw();
 }
+// One topic group per card (LN_REFS is already grouped this way; the old page just stacked all of them at
+// once). Each source is a row: title and the link visible, the one-line note behind the tap.
 function lnSources(k, g){
-  $("#ln-view").innerHTML = LN_REFS.filter(r => r.k === "both" || r.k === k).map(r => `<div class="card ln-panel" style="margin-bottom:12px"><h3 style="margin:0;font-size:16px">${esc(r.title)}</h3><p class="ln-why" style="font-size:14px">${esc(r.why)}</p><ul class="ln-refs" style="margin-top:8px">${r.items.map(([u, t, d]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a><span>${d}</span></li>`).join("")}</ul></div>`).join("") +
-    `<p class="note">Every link was checked in October 2026. Open-source projects move; check the licence and the maintenance status before you depend on one. Content on these pages is CC BY 4.0.</p>`;
+  const groups = LN_REFS.filter(r => r.k === "both" || r.k === k);
+  const posKey = k + ":srcpos", n = groups.length;
+  let i = Math.min(Math.max(lnStore.get(posKey, 0), 0), n - 1);
+  const save = () => lnStore.set(posKey, i);
+  const draw = () => {
+    i = Math.min(Math.max(i, 0), n - 1);
+    const r = groups[i];
+    const rows = r.items.map(([u, t, d]) => `<li class="ln-row"><details><summary><b>${esc(t)}</b><a class="ln-rowlink" href="${u}" target="_blank" rel="noopener">Open ↗</a><svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary><div class="ln-rowb">${d}</div></details></li>`).join("");
+    $("#ln-view").innerHTML = `<div class="card ln-panel">
+      <p class="ln-eb">Topic ${i + 1} of ${n}<button type="button" class="rtf-link ln-all" data-all>All topics</button></p>
+      <h2>${esc(r.title)}</h2>
+      <p class="ln-why">${esc(r.why)}</p>
+      <div class="ln-body"><ul class="ln-rows">${rows}</ul></div>
+      <div class="ln-pager rtf-foot">${i > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Topic ${i + 1} of ${n}</span><span></span></div>
+      <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next ${i === n - 1 ? "disabled" : ""}>${i < n - 1 ? "Next" : "That's every topic"} →</button></div>
+    </div>
+    <p class="note">Every link was checked in October 2026. Open-source projects move; check the licence and the maintenance status before you depend on one. Content on these pages is CC BY 4.0.</p>`;
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a topic · " + g.name, groups.map(x => ({label:x.title, done:false})), i, j => { i = j; save(); draw(); });
+    const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } };
+  };
+  draw();
 }
 
 /* ---------- glossary and practice ---------- */
@@ -12772,14 +12863,36 @@ function renderGlossary(){
       <div class="segs" role="group" aria-label="Filter"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="llm" aria-pressed="false">LLMs</button><button type="button" data-f="world" aria-pressed="false">World models</button></div>
       <span class="note" id="ln-known"></span></div>
     <div class="ln-gl" id="ln-gl"></div></div>`;
-  const draw = () => {
+  // Grouped A-Z, one letter group per card, each term a collapsed row (name visible, definition behind the tap)
+  // instead of the old always-expanded grid of 46 term cards.
+  let gi = 0;
+  const groups = () => {
     const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q)));
-    $("#ln-gl").innerHTML = list.length ? list.map(({t, i}) => `<button type="button" class="card ln-term ${kn[i] ? "known" : ""}" data-i="${i}"><b>${esc(t[0])}</b><span>${esc(t[2])}</span><span class="row">${lnTagHtml(t[1])}</span></button>`).join("") : `<div class="ln-empty card">Nothing matches. Try another word.</div>`;
-    $("#ln-known").textContent = `${Object.keys(kn).filter(x => kn[x]).length} of ${LN_GLOSS.length} marked known`;
-    $$("#ln-gl [data-i]").forEach(b => b.onclick = () => lnOpenTerm(+b.dataset.i, draw));
+    const m = {}; list.forEach(x => { const L = x.t[0][0].toUpperCase(); (m[L] = m[L] || []).push(x); });
+    return {kn, gs:Object.keys(m).sort().map(L => ({letter:L, items:m[L]}))};
   };
-  $("#ln-q").oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
-  $$("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; $$("[data-f]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
+  const draw = () => {
+    const {kn, gs} = groups();
+    $("#ln-known").textContent = `${Object.keys(kn).filter(x => kn[x]).length} of ${LN_GLOSS.length} marked known`;
+    if(!gs.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
+    gi = Math.min(Math.max(gi, 0), gs.length - 1);
+    const grp = gs[gi];
+    const rows = grp.items.map(({t, i}) => `<li class="ln-row"><details><summary><b>${esc(t[0])}</b>${kn[i] ? `<svg class="ln-chev ln-known-mark" aria-hidden="true"><use href="#i-check"/></svg>` : `<svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg>`}</summary><div class="ln-rowb"><p style="margin:0 0 8px">${esc(t[2])}</p><p class="row" style="gap:6px;margin:0 0 8px">${lnTagHtml(t[1])}</p><button type="button" class="btn sm" data-know="${i}">${kn[i] ? '<svg><use href="#i-check"/></svg>Known' : "I know this"}</button></div></details></li>`).join("");
+    $("#ln-gl").innerHTML = `<div class="card ln-panel">
+      <p class="ln-eb">${grp.letter} · group ${gi + 1} of ${gs.length}<button type="button" class="rtf-link ln-all" data-all>All groups</button></p>
+      <h2>Terms starting with ${grp.letter}</h2>
+      <p class="ln-why">${grp.items.length} term${grp.items.length === 1 ? "" : "s"} in this group.</p>
+      <div class="ln-body"><ul class="ln-rows">${rows}</ul></div>
+      <div class="ln-pager rtf-foot">${gi > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Group ${gi + 1} of ${gs.length}</span><span></span></div>
+      <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next ${gi === gs.length - 1 ? "disabled" : ""}>${gi < gs.length - 1 ? "Next" : "That's every group"} →</button></div>
+    </div>`;
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a group", gs.map(x => ({label:x.letter + " (" + x.items.length + ")", done:false})), gi, j => { gi = j; draw(); });
+    const back = $("[data-back]"); if(back) back.onclick = () => { gi = Math.max(0, gi - 1); draw(); };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(gi < gs.length - 1){ gi++; draw(); } };
+    $$("[data-know]").forEach(b => b.onclick = () => { const k = known(); const idx = +b.dataset.know; k[idx] = !k[idx]; lnStore.set("gloss:known", k); draw(); });
+  };
+  $("#ln-q").oninput = e => { q = e.target.value.trim().toLowerCase(); gi = 0; draw(); };
+  $$("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; gi = 0; $$("[data-f]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
   $("#ln-practice").onclick = () => lnPracticeTerms(f, draw);
   draw();
 }
@@ -12847,19 +12960,14 @@ function lnPracticeTerms(f, after){
 function renderLearn(){
   const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length;
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
-  view.innerHTML = head("Learn", "Guides you work through, drills you run with your team, and the words you will hear. Everything is free, nothing leaves your browser, and your progress is saved here.", "Learn") + `<div class="ln">
+  view.innerHTML = head("Learn", "Guides, drills and the words you will hear. Free, nothing leaves your browser, your progress is saved here.", "Learn") + `<div class="ln">
     <div class="ln-hub">
-      <a class="card" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><h3>Red teaming LLMs</h3><p>Chat and agent models. Scope, the harm areas, seeds and twins, thirteen techniques, grading, reporting, retesting and QA. Eleven drills, six worksheets.</p><span class="note">${prog("llm")}</span><span class="go">Open the guide →</span></a>
-      <a class="card" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><h3>Red teaming world models</h3><p>Video, image-to-video and interactive worlds. What is different from text, uploads and likeness, scene steering, style laundering, provenance. Twelve drills, six worksheets.</p><span class="note">${prog("world")}</span><span class="go">Open the guide →</span></a>
-      <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Red team studio</h3><p>Test your own AI feature, one calm step at a time: a target card, tries graded beside an expert rubric, findings, a week plan, a one-page summary. The tool these guides stand behind.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
-      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Glossary and practice</h3><p>${LN_GLOSS.length} terms in plain words, tagged by model type. Flashcards and a quiz to make them stick.</p><span class="note">${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
+      <a class="card" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><h3>Red teaming LLMs</h3><p>Chat and agent models: nine steps, eleven drills, six worksheets.</p><span class="note">${prog("llm")}</span><span class="go">Open the guide →</span></a>
+      <a class="card" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><h3>Red teaming world models</h3><p>Video and interactive models: ten steps, twelve drills, six worksheets.</p><span class="note">${prog("world")}</span><span class="go">Open the guide →</span></a>
+      <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Red team studio</h3><p>Test your own AI feature, one calm step at a time.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
+      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Glossary and practice</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
     </div>
-    <div class="ln-how">
-      <div><b>Read the method once</b>One step on screen at a time. Mark each as read and the guide remembers where you were.</div>
-      <div><b>Run the drills with your team</b>Each exercise says how long it takes, who is in the room, what you need and what you have at the end.</div>
-      <div><b>Take the worksheets</b>Coverage grid, seed cards, test log, finding template, a results sheet for the tabletop, and a checklist. Copy or download.</div>
-    </div>
-    <p class="note">Methods and categories only. No attack strings anywhere in these guides. Severe harm areas are covered by policy-described probes under stop rules, never by open drills.</p></div>`;
+    <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
 }
 /* =========================================================
    RED TEAM STUDIO: plan a red team of a language or world model, run the drills, file findings,
