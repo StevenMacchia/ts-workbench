@@ -21,7 +21,13 @@ Orchestration: Sonnet agents, each in its own worktree and branch off `learn`, p
 - [x] review (branch `enh/review`, merged 804e4f7): spaced review across days in the judge; `plain` five-step drills in `LN_GUIDES` shown on drill cards.
 
 Checkpoint commit on learn: d615592 (2026-10-08, local only, not pushed) so enhancement branches have the right base. Agents were told to `git merge learn` in their worktrees. When merging their branches back: from this worktree `git merge enh/<name>`, then `npm test`, then browser check on port 8769.
-- [ ] assist (branch `enh/assist`): audit items 1, 4, 10, 20, 22 (AI assistants fallback, eval defaults, glossary).
-- [ ] home (branch `enh/home`): audit items 2, 5, 7, 11, 13, 14, 18, 23, 24, 25.
-- [ ] tools (branch `enh/tools`): audit items 3, 6, 8, 9, 12, 15, 16, 17, 19.
+- [x] assist (branch `enh/assist`, merged): audit items 1, 4, 10, 20, 22 (AI assistants fallback, eval defaults, glossary).
+- [x] home (branch `enh/home`, merged 164e0e1): audit items 2, 5, 7, 11, 13, 14, 18, 23, 24, 25.
+- [x] tools (branch `enh/tools`, merged 19aedf8; partZ15.css conflict resolved by keeping both sides): audit items 3, 6, 8, 9, 12, 15, 16, 17, 19.
 - Skipped on purpose: item 21 (touches saved data).
+
+## Round 3 (per-tool audit items outside the top-25), started with Fable at 38%
+Three Sonnet agents, same brief, worktrees `_wt/ts-workbench-r3a|b|c`, branches `enh/r3a|b|c` off `learn` at 19aedf8. CSS appended to `partZ15.css` under `/* r3a|b|c */` headers; merge by union.
+- [ ] r3a: audit sections 1 to 5 (Overview, Pre-mortem, Tabletop, Metrics, Vendor) + cross-tool items for them.
+- [ ] r3b: sections 6 to 10 (Maturity, Coverage, Policy, COPPA, DSA). Saved-data shape changes skipped.
+- [x] r3c (merged 83c83b7, fast-forward): sections 11 to 15 (Eval, AI assistants, Workspace, Plan/Review, About) + site-wide cross-tool items.
