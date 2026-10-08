@@ -36,3 +36,6 @@ Three Sonnet agents, same brief, worktrees `_wt/ts-workbench-r3a|b|c`, branches 
 Merged agent worktrees for sandbox, review, assist, home, tools, r3a, r3b, r3c removed; branches kept.
 - [x] qa (branch `enh/qa`, merged; 26 routes × 8 combinations clean; one text bug fixed in rtm1Finding): every route × light/dark × 1280/375, empty and with the example company; fixes genuine defects only.
 - [x] walk (branch `enh/walk`, merged; engineers-view way back, done-card menu link, Plan the week reuses setup, PAIR/TAP explained): plays the small-startup newcomer through the whole studio, logs friction card by card, fixes local issues, ranks the rest.
+
+## Round 5 (Learn section, Steven watching, 2026-10-08)
+- [x] method (branch `enh/method`, five commits, all fast-forwarded into learn, last 05b21e4): Method tab one card per sub-section; the rest of Learn in the same shape; tables and long lists collapsed, one block per card; pass one (check questions, For Pixelry, studio bridges, have/mins); pass two (ticks that prefill worksheets, spaced glossary review, saved exercises as workspace kind `learn`).
