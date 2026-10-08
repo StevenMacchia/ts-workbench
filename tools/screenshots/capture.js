@@ -81,6 +81,15 @@ async function ensureServer() {
 
 // ----------------------------------------------------------------- utils ---
 
+// The daily sync (_build/gen-readmes.js) copies README images and showcase images from _build/; mirror each
+// capture there so the next sync keeps the new image instead of restoring an old one.
+function mirrorToBuild(outPath, t){
+  const B = path.resolve(__dirname, "..", "..", "..", "_build");
+  if(!fs.existsSync(B)) return;
+  const dest = t.dir === "assets" ? path.join(B, "shots", t.name) : path.join(B, "showcase", t.name);
+  try{ fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.copyFileSync(outPath, dest); }catch(e){ console.warn("  (could not mirror to _build: " + e.message + ")"); }
+}
+
 async function settle(page) {
   await page
     .evaluate(() => (document.fonts && document.fonts.ready ? document.fonts.ready : null))
@@ -712,6 +721,7 @@ async function main() {
           await page.screenshot({ path: outPath, type: "jpeg", quality: 82 });
         }
         console.log("Wrote " + outPath);
+        mirrorToBuild(outPath, t);
       } catch (err) {
         console.error("Failed to capture " + t.name + ": " + err.message);
         if (process.env.DEBUG_CAPTURE) {
