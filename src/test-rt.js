@@ -50,6 +50,13 @@ const body = function(){
   eq(RT_PRACTICE.trip.every(x => x.frame <= x.steps.length && x.seq < x.frame), true, "trip points sit inside the sequence, reviewer before the frame check");
   // no attack strings: seeds describe requests, they are not prompts
   eq(Object.values(RT_SEEDS.llm).flat().every(s => s[0].length < 200), true, "seeds are short descriptions");
+  // plain-words drills: every exercise in both guides has a plain rewrite, five steps at most, each under twenty words
+  ["llm", "world"].forEach(k => LN_GUIDES[k].exercises.forEach(e => {
+    eq(Array.isArray(e.plain) && e.plain.length >= 1 && e.plain.length <= 5, true, k + " " + e.id + " has a plain rewrite with 1 to 5 steps");
+    eq(e.plain.every(st => st.trim().split(/\s+/).length < 20), true, k + " " + e.id + " every plain step is under twenty words");
+    eq(typeof e.plainWhy === "string" && e.plainWhy.length > 0, true, k + " " + e.id + " has a plainWhy");
+  }));
+  out.push("plain drills: every exercise in both guides has a 1 to 5 step plain rewrite under twenty words a step, and a plainWhy");
   // solo teams only get drills one or two people can run
   rt.team = "solo"; rt.time = "week"; eq(rtDrills().every(d => !/4 to 6|Whoever signs|3 graders/.test(d.people)), true, "solo plan skips group drills");
   rtAct("reset"); eq(rt.model, "", "reset clears the plan");
@@ -160,6 +167,18 @@ const body4 = function(){
   rt.model = "world"; eq(rtJPool().every(x => x.k !== "llm"), true, "a world model plan filters the bank");
   rtF().path = ""; rtF().i = rtScreens().findIndex(x => x.k === "hub"); renderRedteamStudio(); eq((H().match(/data-hub=/g) || []).length, 6, "the hub offers four paths, the basics and the method"); if(bad(H())) throw new Error("hub bad: " + where(H()));
   rtF().path = "basics"; eq(rtScreens().filter(x => x.k === "basic").length, 5, "basics path shows the five lessons"); rtF().path = "test"; eq(rtScreens().some(x => x.k === "verdict"), true, "test path reaches the verdict");
+  // spaced review across days: a right streak spaces out further than a reset, due items lead the next session, nothing due is silent
+  rt = RT_BLANK(); rt.model = "llm"; const j0 = rtJ();
+  rtJSchedule("grade-0", true); const due1 = j0.due["grade-0"];
+  rtJSchedule("grade-0", true); const due2 = j0.due["grade-0"];
+  eq(due2 > due1, true, "a second right answer in a row spaces out further than the first");
+  rtJSchedule("grade-1", false); const dueWrong = j0.due["grade-1"];
+  eq(due2 > dueWrong, true, "a right answer that has built a streak sets a later due date than a wrong one");
+  eq(rtJDueCount(), 0, "nothing due yet shows no count");
+  j0.due["grade-0"] = Date.now() - 1000; rtJStart();
+  eq(rtJ().cur.ids[0], "grade-0", "a due item leads the next session");
+  eq(rtJDueCount(), 1, "one item due shows a count of one");
+  out.push("spaced review: a right streak spaces out further than a reset, due items lead the next session, nothing due is silent");
   out.push("judge: " + n + " items, sessions of ten interleaved, expert comparison after the call, misses return, breakdown; hub with four paths");
   return out.join("\n");
 };

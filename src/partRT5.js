@@ -93,14 +93,27 @@ const RT_BANK = {
   ]
 };
 const RT_JUDGE_NAMES = {grade:"Grade this", move:"Spot the move", fair:"The fair question"};
-const rtJ = () => rt.judge || (rt.judge = {sessions:0, seen:{}, miss:{}, hist:[], cur:null});
+const RT_DUE_DAYS = [1, 3, 7, 21], RT_DAY_MS = 86400000;
+const rtJ = () => { const j = rt.judge || (rt.judge = {sessions:0, seen:{}, miss:{}, hist:[], cur:null}); if(!j.due) j.due = {}; if(!j.step) j.step = {}; return j; };
 const rtJItems = kind => RT_BANK[kind].map((it, i) => Object.assign({id:kind + "-" + i, kind}, it));
 function rtJPool(){ const want = rt.model === "world" ? ["world", "both"] : rt.model === "llm" ? ["llm", "both"] : ["llm", "world", "both"]; return ["grade", "move", "fair"].flatMap(k => rtJItems(k)).filter(it => want.includes(it.k)); }
+// Spaced review across days: right answers space out 1, 3, 7, then 21 days; any wrong answer resets to 1 day.
+function rtJSchedule(id, right){
+  const j = rtJ(), now = Date.now();
+  if(right){ const idx = Math.min(j.step[id] || 0, RT_DUE_DAYS.length - 1); j.due[id] = now + RT_DUE_DAYS[idx] * RT_DAY_MS; j.step[id] = idx + 1; }
+  else { j.due[id] = now + RT_DUE_DAYS[0] * RT_DAY_MS; j.step[id] = 0; }
+}
+function rtJDueCount(){ const j = rtJ(), now = Date.now(); return rtJPool().filter(it => j.due[it.id] && j.due[it.id] <= now).length; }
 function rtJStart(){
-  const j = rtJ(), pool = rtJPool(), missed = pool.filter(it => j.miss[it.id]), fresh = lnShuffle(pool.filter(it => !j.seen[it.id] && !j.miss[it.id])), seen = lnShuffle(pool.filter(it => j.seen[it.id] && !j.miss[it.id]));
-  // interleave: up to three misses first, then fresh items by kind round-robin, then seen ones if the bank runs low
+  const j = rtJ(), pool = rtJPool(), now = Date.now();
+  const due = lnShuffle(pool.filter(it => j.due[it.id] && j.due[it.id] <= now));
+  const missed = pool.filter(it => j.miss[it.id] && !due.some(x => x.id === it.id));
+  const fresh = lnShuffle(pool.filter(it => !j.seen[it.id] && !j.miss[it.id] && !due.some(x => x.id === it.id)));
+  const seen = lnShuffle(pool.filter(it => j.seen[it.id] && !j.miss[it.id] && !due.some(x => x.id === it.id)));
+  // interleave: due items first (up to five), then up to three misses, then fresh items by kind round-robin, then seen ones if the bank runs low
   const byKind = {grade:[], move:[], fair:[]}; fresh.forEach(it => byKind[it.kind].push(it)); const pick = [];
-  lnShuffle(missed).slice(0, 3).forEach(it => pick.push(it.id));
+  due.slice(0, 5).forEach(it => pick.push(it.id));
+  lnShuffle(missed).slice(0, 3).forEach(it => { if(!pick.includes(it.id)) pick.push(it.id); });
   while(pick.length < 10 && (byKind.grade.length || byKind.move.length || byKind.fair.length)){ ["grade", "move", "fair"].forEach(k => { if(pick.length < 10 && byKind[k].length) pick.push(byKind[k].shift().id); }); }
   seen.forEach(it => { if(pick.length < 10) pick.push(it.id); });
   j.cur = {ids:pick, i:0, picked:null, right:0, gaps:[], retry:[]}; j.sessions++; rtSave();
@@ -111,6 +124,7 @@ function rtJAnswer(v){
   c.picked = v; const right = it.kind === "move" ? v === it.a : v === it.a;
   if(right){ c.right++; if(j.miss[it.id]){ j.miss[it.id].left--; if(j.miss[it.id].left <= 0) delete j.miss[it.id]; } }
   else { j.miss[it.id] = {left:2, n:(j.miss[it.id] ? j.miss[it.id].n : 0) + 1}; if(!c.ids.slice(c.i + 1).includes(it.id) && c.ids.length < 14) c.ids.splice(Math.min(c.ids.length, c.i + 4), 0, it.id); }
+  rtJSchedule(it.id, right);
   j.seen[it.id] = true; if(it.kind === "grade") c.gaps.push({area:it.area, you:v, ex:it.a});
   j.hist.push({id:it.id, kind:it.kind, area:it.area || "", right, you:v, ex:it.a, t:Date.now()}); if(j.hist.length > 400) j.hist = j.hist.slice(-400);
   rtSave();
@@ -127,7 +141,7 @@ function rtfJudge(){
     const s = rtJStats(), rows = Object.entries(s.by).sort((a, b) => b[1].n - a[1].n);
     return `<span class="rtf-eb">Judge · session ${j.sessions} done</span><h2 class="rtf-h2">${c.right} of ${c.ids.length} matched the expert</h2><p class="rtf-lead">${s.n >= 5 ? (s.soft > s.hard ? `Across ${s.n} grading calls you have been softer than the expert ${s.soft} times and harder ${s.hard}. Softer usually means reading the refusal and missing the hint or the specific detail that came with it.` : s.hard > s.soft ? `Across ${s.n} grading calls you have been harder than the expert ${s.hard} times and softer ${s.soft}. Harder is safer than softer, but it inflates the numbers you report.` : `Across ${s.n} grading calls you have been softer ${s.soft} times and harder ${s.hard}. That is balanced.`) : "A few more sessions and the breakdown will show where you drift."}</p>
       <div class="rt-tw"><table class="rt-grid rt-res"><thead><tr><th>Area</th><th>Seen</th><th>Matched</th></tr></thead><tbody>${rows.map(([k, b]) => `<tr><td class="k">${esc(RT_PLAIN[k] || (k === "moves" ? "Spotting the move" : k === "over" ? "Fair questions" : k))}</td><td>${b.n}</td><td>${Math.round(100 * b.right / b.n)}%</td></tr>`).join("")}</tbody></table></div>
-      <p class="note">${s.missed ? `${s.missed} item${s.missed === 1 ? "" : "s"} will come back until you match the expert twice.` : "Nothing waiting to come back."} ${rtJPool().length} items in the bank for this model type. Answers are saved in this browser.</p>
+      <p class="note">${s.missed ? `${s.missed} item${s.missed === 1 ? "" : "s"} will come back until you match the expert twice.` : "Nothing waiting to come back."}${rtJDueCount() ? ` ${rtJDueCount()} item${rtJDueCount() === 1 ? "" : "s"} due for review.` : ""} ${rtJPool().length} items in the bank for this model type. Answers are saved in this browser.</p>
       ${rtfNext("Another ten", `<button type="button" class="btn" data-rtf="hub">Back to the menu</button>`)}`;
   }
   const it = rtJItem(c.ids[c.i]), picked = c.picked, again = rtJ().miss[it.id] && picked === null && c.i > 0 && c.ids.slice(0, c.i).includes(it.id);
@@ -148,12 +162,12 @@ function rtJBind(){
 }
 /* ---------- the hub: what next ---------- */
 function rtfHub(){
-  const m = rtM1(), t = rtTarget(), f = (rt.findings || []).length, s = rtJStats(), drills = rtDrills(), ran = drills.filter(d => rt.flow.drill[d.id] != null).length;
+  const m = rtM1(), t = rtTarget(), f = (rt.findings || []).length, s = rtJStats(), drills = rtDrills(), ran = drills.filter(d => rt.flow.drill[d.id] != null).length, dueN = rtJDueCount();
   const n = t ? t.checklist.filter((c, i) => m.done[i]).length : 0;
   const card = (k, title, sub, meta) => `<button type="button" class="rtf-hubc" data-hub="${k}"><b>${title}</b><span>${sub}</span><small>${meta}</small></button>`;
   return `<span class="rtf-eb">What next</span><h2 class="rtf-h2">${f ? "You have a finding. Pick what to do next." : "Pick what to do next."}</h2><p class="rtf-lead">${t ? `${n} of ${t.checklist.length} things tested on ${esc(rt.svc || t.n.toLowerCase())}. ` : ""}Each path takes ten to twenty minutes and ends with something you keep.</p>
     <div class="rtf-hub">
-      ${card("judge", "Learn to judge", "Grade outcomes, spot the move, pick the fair question. Your call, then the expert's.", s.total ? `${s.right} of ${s.total} matched so far` : `${rtJPool().length} items ready`)}
+      ${card("judge", "Learn to judge", "Grade outcomes, spot the move, pick the fair question. Your call, then the expert's.", dueN ? `${dueN} item${dueN === 1 ? "" : "s"} due for review` : (s.total ? `${s.right} of ${s.total} matched so far` : `${rtJPool().length} items ready`))}
       ${card("plan", "Plan the week", "A half-page scope, the people, the test sheet, the stop rules and the wellbeing floor. The small-team default.", rt.plan && rt.plan.dated ? "Drafted " + rt.plan.dated : "Not drafted yet")}
       ${card("test", "Keep testing", "One drill per card, ending in what did it do. The sheet becomes your regression checklist.", drills.length ? `${ran} of ${drills.length} drills run` : "Set up first")}
       ${card("show", "Show the work", "A one-page summary in the shape a customer or auditor accepts, and the questionnaire answers.", f ? `${f} finding${f === 1 ? "" : "s"} to report` : "Nothing to report yet")}

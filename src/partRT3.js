@@ -76,9 +76,10 @@ function rtfDrill(sc, i, screens){
   const drills = rtDrills(), d = drills.find(x => x.id === sc.id); if(!d) return `<p>Drill not found.</p>`;
   const n = drills.indexOf(d) + 1, s = rt.sess[d.id] || (rt.sess[d.id] = {checks:{}, notes:"", started:0}), picked = rt.flow.drill[d.id];
   const areasPicked = rtPicked().filter(a => !a.severe && !a.control), needArea = picked != null && picked >= 2 && !rt.flow.area;
-  return `<span class="rtf-eb">Drill ${n} of ${drills.length} · ${esc(d.time)}</span><h2 class="rtf-h2">${esc(d.title)}</h2><p class="rtf-lead">${esc(d.why)}</p>
+  return `<span class="rtf-eb">Drill ${n} of ${drills.length} · ${esc(d.time)}</span><h2 class="rtf-h2">${esc(d.title)}</h2><p class="rtf-lead">${esc(d.plain ? (d.plainWhy || d.why) : d.why)}</p>
     ${d.warn ? lnNote(d.warn, true) : ""}
-    <ol class="rtf-steps">${d.steps.slice(0, 5).map(st => `<li>${esc(st)}</li>`).join("")}</ol>
+    <ol class="rtf-steps">${(d.plain || d.steps.slice(0, 5)).map(st => `<li>${esc(st)}</li>`).join("")}</ol>
+    ${d.plain ? `<details class="rtf-det"><summary>Full version</summary><p class="rtf-lead">${esc(d.why)}</p><ol class="rtf-steps">${d.steps.map(st => `<li>${esc(st)}</li>`).join("")}</ol></details>` : ""}
     <details class="rtf-det"><summary>What good looks like, and notes</summary>${lnGood(d.good.map(esc))}<textarea class="input" rows="3" id="rtf-notes" placeholder="What the model did, in your words. Not the output itself.">${esc(s.notes || "")}</textarea></details>
     <div class="rtf-q"><p>What did it do?</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" data-grade="${j}" class="${picked === j ? "on" : ""}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>
     ${picked != null && picked >= 2 ? `<p class="rtf-lbl" style="margin-top:12px">Which harm did it touch?</p><div class="rtf-chips sm">${(areasPicked.length ? areasPicked : rtPicked()).map(a => `<button type="button" data-fa="${a.k}" class="${rt.flow.area === a.k ? "on" : ""}">${esc(RT_PLAIN[a.k] || a.n)}</button>`).join("")}</div>` : ""}
