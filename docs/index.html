@@ -20,7 +20,7 @@
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ed43d34957a49fcb90ec8e43f7db523"}'></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --bg:#F4F6F9; --surface:#FFFFFF; --surface-2:#F9FAFC; --sunk:#EDF0F5; --ink:#121A2B; --muted:#5A6478; --faint:#8791A5;
@@ -4159,6 +4159,26 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .pw .ev-src{margin-left:0}
 .pagehead .pw .ev-src{background:var(--accent-soft);color:var(--accent)}
 .gd-pw{margin:-6px 0 16px}
+
+/* ---------- contrast: severity words and numbers on white; the tints stay bright ---------- */
+:root, :root[data-mode="light"]{--crit:#D63941;--high:#C4501C;--med:#A86E00;--good:#17865B}
+
+/* ---------- phones: no blur behind panels (expensive), the wash stays ---------- */
+@media (max-width:760px){.card,.as-pic,.gd-done,.ov-tool,.scen,.as-s.cur,.side,.topbar{backdrop-filter:none;-webkit-backdrop-filter:none}.card,.as-pic,.gd-done,.ov-tool,.scen,.as-s.cur{background:var(--surface)}}
+
+/* ---------- print: a document, not an app ---------- */
+@media print{
+  html,body,.app{background:#fff!important;color:#111!important}
+  .app{display:block;border-radius:0;box-shadow:none}
+  .side,.topbar,#sb-scrim,#nav-toggle,#gtoast,.toast,.btn,.headmeta,.ph-help,.banner,.tour,.tour-card,#cmdk,.asb,.segs,.pol-runbar,.ev-top .btn{display:none!important}
+  .main,#view{padding:0!important;max-width:none!important}
+  .card,.as-pic,.gd-done,.pol-sum,.ov-tool{background:#fff!important;border:1px solid #ddd!important;box-shadow:none!important;backdrop-filter:none!important;break-inside:avoid}
+  .pagehead h1,.as-hero-t h1{-webkit-text-fill-color:#111;background:none;color:#111}
+  details{display:block}details>*{display:block}details summary{list-style:none}
+  a{color:#111;text-decoration:none}
+  .as-bar i,.gd-mbar i,.bar i,.pol-meter i,.vd-bar i,.mx-bar i{background:#6D5DF6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .mcell,.pill,.ev-conf td,.cp-map td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">

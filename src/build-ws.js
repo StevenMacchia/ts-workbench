@@ -195,7 +195,7 @@ console.log("v8 assembled");
 {
   const A9 = patch(rd("partA.html"), [[
     `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Public+Sans:wght@400;500;600;700&family=Schibsted+Grotesk:wght@600;700&display=swap">`,
-    `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap">`
+    `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap">`
   ]], "partA fonts");
   const C3 = rd("partC3.html"), a = C3.indexOf('<div class="app">'), b = C3.indexOf("\n<script>\n(function(){");
   if(a < 0 || b < 0) throw new Error("partC3 split points not found");
