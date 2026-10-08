@@ -165,7 +165,7 @@
 .as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .as-preview-lines{margin:0;padding:0;list-style:none;display:grid;gap:5px}
 .as-preview-lines li{font-size:14px;line-height:1.5;color:var(--ink)}
-.as-preview .btn{width:fit-content}
+.as-preview .ov-link{width:fit-content}
 .rv-sample-preview{margin-top:14px;padding:14px 16px;opacity:.55;display:grid;gap:8px}
 .rv-sample-preview .pill{width:fit-content}
 .rv-sample-preview table{width:100%;border-collapse:collapse;font-size:13px}
