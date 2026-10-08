@@ -320,7 +320,7 @@ const body8 = function(){
   eq((h.match(/class="card"/g) || []).length, 3, "the learn hub is three cards: do it, read why, look up a word");
   eq(/ln-how/.test(h), false, "the hub dropped the three-tip explainer block in favour of one sentence per card");
   eq(/Start in the studio\. Read the guide when you want the reasons\. Look up a word when one stops you\./.test(h), true, "the orientation line sits above the three cards");
-  eq(/Do it: the studio/.test(h) && /Read why: the two guides/.test(h) && /Look up a word: the glossary/.test(h), true, "the three cards are do it, read why and look up a word");
+  eq(/Do it: the studio/.test(h) && /Read why: the two guides/.test(h) && /Look up a word: two glossaries/.test(h) && /#tsglossary/.test(h), true, "the three cards are do it, read why and look up a word, with both glossaries linked");
   out.push("learn section: tabs lost their count pills, practice/worksheets/sources paginate one item at a time, glossary is a one-page A-Z grid of term cards, hub is three cards (do it, read why, look up a word) with one orientation line above them");
   return out.join("\n");
 };
