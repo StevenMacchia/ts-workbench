@@ -449,6 +449,3 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-savedwhen{font-weight:500;color:var(--good)}
 .ln-save textarea{width:100%;margin:0 0 8px;font:inherit;font-size:14px;resize:vertical}
 
-/* glossary: one card per letter group, so the old multi-column term grid must not shrink it to one column */
-.ln-gl{display:block}
-.ln-gl>.ln-panel{width:100%;max-width:none}
