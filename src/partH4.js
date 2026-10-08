@@ -237,14 +237,20 @@ function asBind(){
 }
 
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
+// Which stage each tool card belongs to, for the filter chips below. A tool keeps growing this
+// grid (Red Team Studio's modules among them), so the chips are a cheap way to keep it scannable
+const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
+const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI"};
+let ovStage = "all";
 function renderTools(){
-  const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}">
+  const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
       <div class="ov-art">${OV_ART[key]}</div>
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
     ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
+    <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
@@ -263,7 +269,7 @@ function renderTools(){
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
@@ -284,6 +290,10 @@ function renderTools(){
     ${asFootHTML()}
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
+  const ovApplyStage = () => view.querySelectorAll("[data-stage]").forEach(el => { el.hidden = ovStage !== "all" && el.dataset.stage !== ovStage; });
+  ovApplyStage();
+  view.querySelectorAll("[data-ovstage]").forEach(b => b.onclick = () => { ovStage = b.dataset.ovstage;
+    view.querySelectorAll("[data-ovstage]").forEach(x => x.setAttribute("aria-pressed", x === b)); ovApplyStage(); });
 }
 
 /* ---------- Guided steps: the strip across the top ---------- */
