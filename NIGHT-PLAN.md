@@ -39,3 +39,8 @@ Merged agent worktrees for sandbox, review, assist, home, tools, r3a, r3b, r3c r
 
 ## Round 5 (Learn section, Steven watching, 2026-10-08)
 - [x] method (branch `enh/method`, five commits, all fast-forwarded into learn, last 05b21e4): Method tab one card per sub-section; the rest of Learn in the same shape; tables and long lists collapsed, one block per card; pass one (check questions, For Pixelry, studio bridges, have/mins); pass two (ticks that prefill worksheets, spaced glossary review, saved exercises as workspace kind `learn`).
+
+## Round 6 (2026-10-08, Steven watching)
+- [x] clarity (`enh/clarity`, merged): studio purpose card + walkthrough, hub sentence, eyebrows, one vocabulary, Learn hub three cards, one-week path; then the red-teaming glossary grid restored.
+- [x] tsgloss (`enh/tsgloss`, merged): general T&S glossary at #tsglossary, 103 terms, hover registration.
+- Pattern decision pending: purpose card + walkthrough on every other tool, after Steven looks at the studio.
