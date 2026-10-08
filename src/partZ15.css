@@ -1,0 +1,16 @@
+/* =========================================================
+   Red team studio: the sandbox, a local model to talk to. Aurora tokens only, light and dark.
+   ========================================================= */
+.rt-sb-teaser{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.rt-sb-teaser p{margin:0 0 10px}
+.rt-sb-card{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;gap:4px}
+.rt-sb-card p{margin:0;font-size:13.5px}
+.rt-sb-card b{color:var(--muted);font-weight:600}
+.rt-sb-chat{display:grid;gap:8px;margin:18px 0 0;max-height:46vh;overflow:auto;padding:4px 2px}
+.rt-sb-chat p{margin:0;max-width:78%;padding:9px 13px;border-radius:12px;font-size:14.5px;line-height:1.45}
+.rt-sb-chat p b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;font-weight:600}
+.rt-sb-chat .rt-sb-user{justify-self:end;background:var(--accent-soft);color:var(--ink);border-radius:12px 12px 2px 12px}
+.rt-sb-chat .rt-sb-bot{justify-self:start;background:var(--surface);border:1px solid var(--line);border-radius:12px 12px 12px 2px}
+.rt-sb-chat .rt-sb-busy{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.rt-sb-grade{margin-top:16px}
+@media (max-width:760px){.rt-sb-chat p{max-width:92%}}

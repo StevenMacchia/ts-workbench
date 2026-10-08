@@ -84,7 +84,7 @@ const body = function(){
   out.push("regression exports and sequence log in place; Claude grading gated on the sampler");
   return out.join("\n");
 };
-const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partLOOP.js")].join("\n")
+const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());
 // The flow: one card at a time, from the sixty-second try to the verdict and the fixes
@@ -114,7 +114,7 @@ const body2 = function(){
   out.push("flow: try, 5 lessons, 3 setup cards, drills with what-did-it-do, verdict, fix, done; engineers' view intact");
   return out.join("\n");
 };
-console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body2.toString() + ")();")());
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body2.toString() + ")();")());
 // Module 1: the target card, three tries against your own feature with the rubric beside your grade, the first finding
 const body3 = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
@@ -138,7 +138,7 @@ const body3 = function(){
   out.push("module 1: target, card, 3 tries with rubric and gap, finding filed, checklist ticks");
   return out.join("\n");
 };
-console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body3.toString() + ")();")());
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body3.toString() + ")();")());
 // Module 2: the judge bank, sessions, the expert comparison, misses that come back, the breakdown; and the hub
 const body4 = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
@@ -163,7 +163,7 @@ const body4 = function(){
   out.push("judge: " + n + " items, sessions of ten interleaved, expert comparison after the call, misses return, breakdown; hub with four paths");
   return out.join("\n");
 };
-console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body4.toString() + ")();")());
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body4.toString() + ")();")());
 // Modules 6 and 3: the summary and the answers say only what was done; the plan drafts scope, people, the sheet and the rules
 const body5 = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
@@ -188,4 +188,37 @@ const body5 = function(){
   out.push("plan the week: scope, " + pers.length + " personas, " + rows.length + "-row sheet, invite, 7 rules, dated");
   return out.join("\n");
 };
-console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body5.toString() + ")();")());
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body5.toString() + ")();")());
+// Module 1 extra: the local-model sandbox. No navigator at all in this stub, so this doubles as the no-WebGPU case.
+const body6 = function(){
+  const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
+  rt = RT_BLANK(); renderRedteamStudio(); rtF().openPick = 1; renderRedteamStudio(); rtGo(1);
+  rtM1().target = "support"; rt.model = "llm"; rt.areas = {privacy:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtSave(); rtGo(2);
+  rtM1().card = Object.assign({}, RT_TARGETS[0].card); renderRedteamStudio();
+  if(bad(H())) throw new Error("target card without webgpu bad: " + where(H()));
+  eq(/WebGPU/.test(H()) && /does not support WebGPU/.test(H()), true, "the card says plainly that this browser can't run a local model");
+  eq(/data-rtf="sbopen"/.test(H()), false, "no download button offered without WebGPU");
+  eq(/What is out of scope/.test(H()), true, "the normal path, the target card itself, still renders");
+  out.push("sandbox teaser: no WebGPU here, so no button, and the ordinary card renders clean");
+  // the sandbox screen only exists once the flag is set, right after the target card
+  eq(rtScreens().some(s => s.k === "sandbox"), false, "no sandbox screen before the flag is set");
+  rtM1().sbOn = true; rtSave();
+  const screens = rtScreens(), ci = screens.findIndex(s => s.k === "card");
+  eq(screens[ci + 1] && screens[ci + 1].k, "sandbox", "the sandbox screen appears right after the target card once the flag is set");
+  rtM1().sbOn = false; eq(rtScreens().some(s => s.k === "sandbox"), false, "clearing the flag removes it again"); rtM1().sbOn = true;
+  out.push("sandbox screen: absent until the flag is set, then spliced in right after the target card");
+  // grading a sandbox exchange files a try the same way module 1's own tries do
+  eq(rtM1().tries.length, 0, "no tries logged yet");
+  RT_SB.pick = {move:"story", aim:"privacy", obs:1, grade:0, layer:"", notes:"it only confirmed another account existed"};
+  rtSbFile();
+  eq(rtM1().tries.length, 1, "the sandbox try is recorded in rtM1().tries");
+  const tr = rtM1().tries[0];
+  eq(tr.source, "sandbox", "tagged with where it came from"); eq(tr.move === "story" && tr.aim === "privacy" && tr.grade === 0, true, "the try carries the move, the aim and the grade");
+  eq(rtM1().done[1] && rtM1().done[6], true, "it ticks the same checklist items a normal try for this move and aim would");
+  eq(rtWorstTry().t === tr, true, "the sandbox try counts toward the worst try, same as any other");
+  RT_SB.pick = rtSbBlankPick(); eq(rtSbStage(), "move", "an empty pick is at the first stage"); const before = rtM1().tries.length; rtSbFile(); eq(rtM1().tries.length, before, "nothing files without a move, an aim, an observation and a grade");
+  out.push("sandbox try: filed in rtM1().tries with source \"sandbox\", same checklist and worst-try logic as any other try");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body6.toString() + ")();")());
