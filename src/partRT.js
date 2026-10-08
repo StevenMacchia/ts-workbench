@@ -138,7 +138,7 @@ function rtSpec(){
   return {k:"redteam", tool:{name:"Red team studio", icon:"shield", color:"var(--t-rt)"},
     intro:{title:"Plan a red team, run it, and learn the craft on the way", lead:"Ten plain questions about where you are coming from, what you are testing and who you have. Then you get a plan: a coverage grid, seed cards with benign twins, the drills that fit your team and your time, findings you can file as you go, and exports for open-source harnesses. Methods and categories only. No attack strings.",
       facts:[["About 5 minutes", "One question at a time, with the idea behind each one."], ["Drills in modals", "A timer, the steps, a scribe log and a grade. File a finding from the drill."], ["Learn as you go", "Grade real outputs, spot the technique, find the trip point."]], start:"Start"},
-    alt:[{n:"See a finished example", run:() => rtAct("example")}, {n:"Read the method first", run:() => { location.hash = rt.model === "world" ? "redteamworld" : "redteamllm"; }}],
+    alt:[{n:"See a finished example", run:() => rtAct("example")}, {n:"Read the method first", run:() => { location.hash = rt.model === "world" ? "redteamworld" : "redteamllm"; }}].concat(rt.mode === "full" ? [{n:"Back to the guided flow", run:() => rtAct("flow")}] : []),
     steps, finish:"Build my plan",
     done:() => { rt.view = "report"; rt.tab = "plan"; rtSave(); renderRedteamStudio(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); },
     bind:() => { $$("[data-rtg]").forEach(i => i.oninput = () => { rt.gates[i.dataset.rtg] = Math.max(0, Math.min(100, +i.value || 0)); rtSave(); }); }};
@@ -151,7 +151,7 @@ function renderRedteamStudio(){
   gdCur = null;
   const f = rt.findings || [], open = f.filter(x => x.status !== "closed").length;
   view.innerHTML = headCompact("Red team studio", `${esc(rt.svc || "Your product")} · ${rtKinds().map(rtModelName).join(" and ")}`,
-    `<button type="button" class="btn sm" data-rt="edit">Edit answers</button><button type="button" class="btn sm" data-rt="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("redteam", rt)}</span></button>${f.length && rt.who !== "learner" ? `<button type="button" class="btn sm" data-rt="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-rt="finding"><svg><use href="#i-plus"/></svg>File a finding</button>`) + rtReportHTML(open);
+    `${rt.mode === "full" ? `<button type="button" class="btn sm" data-rt="flow">← Back to the guided flow</button>` : ""}<button type="button" class="btn sm" data-rt="edit">Edit answers</button><button type="button" class="btn sm" data-rt="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("redteam", rt)}</span></button>${f.length && rt.who !== "learner" ? `<button type="button" class="btn sm" data-rt="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-rt="finding"><svg><use href="#i-plus"/></svg>File a finding</button>`) + rtReportHTML(open);
   $$("[data-rt]").forEach(b => b.onclick = () => rtAct(b.dataset.rt, b));
   $$("[data-rttab]").forEach(b => b.onclick = () => { rt.tab = b.dataset.rttab; rtSave(); renderRedteamStudio(); });
   $$("[data-drill]").forEach(b => b.onclick = () => rtOpenDrill(b.dataset.drill));
