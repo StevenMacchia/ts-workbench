@@ -31,7 +31,7 @@ const body = function(){
   cvGo("table"); eq(cvMode(), "table", "switch to the table any time"); eq(/Switch to guided/.test(view.innerHTML), true, "and back");
   cvGo("guide"); eq(cvG.scr + cvG.a + cvG.l, "q11", "guided resumes at the first open question");
   CV_AREAS.forEach(a => { cv.r[a.k] = Object.assign({policy:1, detect:1, enforce:1, appeal:1, measure:1}, cv.r[a.k]); }); cvG = null; cvView = null; renderCoverage(); h = view.innerHTML;
-  eq(cvMode(), "results", "every answer given: results"); eq(/Your coverage is \d+%/.test(h) && /data-cvtab="answers"/.test(h), true, "results with the detail in tabs");
+  eq(cvMode(), "results", "every answer given: results"); eq(/Your coverage is <b>\d+%<\/b>/.test(h) && /data-cvtab="answers"/.test(h), true, "results with the detail in tabs");
   cvTab = "answers"; renderCoverage(); eq((view.innerHTML.match(/class="cv-mr"/g) || []).length, 8, "answers editable in the results");
   eq(view.innerHTML.includes('class="cv-cell-lv">Tested against edge cases, reviewed on a schedule, and shaped by appeals data.'), true, "a rated layer's level sentence shows inline, not only on hover");
   cvTab = "gaps";

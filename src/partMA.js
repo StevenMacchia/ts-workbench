@@ -12,6 +12,9 @@ const maSave = () => store.set("ma", ma);
 const maStage = d => MA_STAGES.find(s => s.k === (d || ma).stage) || MA_STAGES[1];
 const maArea = k => MA_AREAS.find(a => a.k === k);
 const maDate = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
+// The built-in example's own level, for a benchmark line under the verdict
+function maBenchScore(){ try{ return maScore(MA_EXAMPLE); }catch(e){ return null; } }
+shareRegister("maturity", d => { ma = maInit(Object.assign({stage:"growth", lv:{}, done:{}, ex:false, open:null}, d, {shared:true})); maG = null; maView = "page"; maSave(); });
 // The example opens as a plan in progress: a few steps done, owners and last quarter's snapshot
 function maExample(){
   const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5;
@@ -245,23 +248,28 @@ function maProgressTabHTML(){
 function maPlanHTML(){
   const sc = maScore(ma), pr = maProgress(ma), gaps = maGaps(ma), hist = ma.hist.slice().sort((a, b) => a.t - b.t), prev = hist[hist.length - 1], nx = maNextItem(ma);
   const tabs = MA_TABS.map(([k, n]) => `<button type="button" role="tab" aria-selected="${ma.tab === k}" data-matab="${k}">${n}${k === "roadmap" ? ` <span class="mono">${pr.stepsDone}/${pr.steps.length}</span>` : k === "progress" && hist.length ? ` <span class="mono">${hist.length}</span>` : ""}</button>`).join("");
+  const topGaps = gaps.slice(0, 3).map(g => ({t:g.a.n, sub:`Level ${g.cur} of ${g.tgt} target: ${(nx && nx.s.a.k === g.a.k ? nx.text : g.a.next[g.cur - 1][0])}`}));
   return `<section class="card ma-band">
       ${nx ? `<p class="ma-band-next" style="grid-column:1/-1"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
-        <div class="ma-band-t">${maWhy()}</div>
+        <div class="ma-band-t verdict-row">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
+        ${maBenchScore() !== null && !ma.ex ? `<p class="bench-line">Typical for a growing company like the built-in example: level ${maBenchScore().toFixed(1)} of 5</p>` : ""}
+        ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
         <div class="ma-band-a"><button type="button" class="btn sm" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button>
           ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
-      <div class="ma-band-r">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     </section>
     ${maAllRated(ma) && !hist.length && !ma.ex ? `<div class="banner ma-snapq"><span><strong>All ${MA_AREAS.length} areas rated.</strong> Save a snapshot now, so the next time you check in you can show how far you've come.</span><button type="button" class="btn sm primary" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button></div>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
+    <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
     <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
+    </details>
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
@@ -309,6 +317,18 @@ function maNextOpen(i){
   const order = MA_AREAS.map((a, j) => j).slice(i + 1).concat(MA_AREAS.map((a, j) => j).slice(0, i));
   const nx = order.find(j => !ma.lv[MA_AREAS[j].k]); return nx === undefined ? null : nx;
 }
+// A non-interactive peek at the finished example plan, below the intro card. Builds the example in a
+// throwaway copy of the module's state, renders the real plan markup from it, then puts the visitor's
+// own state back exactly as it was
+function maPreviewHTML(){
+  const saved = ma;
+  try{
+    ma = maExample();
+    return `<div class="gd-preview"><div class="gd-preview-frame" inert aria-hidden="true"><div class="ma-plan">${maPlanHTML()}</div></div>
+      <div class="gd-preview-fade"><div class="gd-preview-cta"><button type="button" class="btn primary sm" data-ma="example">See the full example</button><span class="note">Or start yours above</span></div></div></div>`;
+  }catch(e){ return ""; }
+  finally{ ma = saved; }
+}
 function maIntroHTML(){
   const rated = MA_AREAS.filter(a => ma.lv[a.k]).length, o = typeof orgGet === "function" ? orgGet() : {};
   return `<div class="gd-w gd-intro">
@@ -319,7 +339,7 @@ function maIntroHTML(){
       <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Rate them all on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
-  </div>`;
+  </div>${maPreviewHTML()}`;
 }
 function maStageStepHTML(){
   const o = typeof orgGet === "function" ? orgGet() : {}, fromOrg = !ma.stageSet && o.stage === ma.stage;
@@ -398,16 +418,17 @@ document.addEventListener("keydown", e => {
 function maHeadMeta(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
-      ${ma.ex ? `<button class="btn sm" data-ma="clear">Clear example</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
-      ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>` : ""}`;
+      ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
+      ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
+      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
+      <button class="btn sm" data-ma="sharelink">Copy link</button>` : ""}`;
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
   if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
-  const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
+  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
@@ -471,7 +492,9 @@ function bindMaturity(){
     }
     switch(d.ma){
       case "example": ma = maExample(); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
-      case "clear": case "reset": ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
+      case "clear": case "reset": { const snap = JSON.parse(JSON.stringify(ma)); ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ma = maInit(s2); maSave(); renderMaturity(); }); return; }
+      case "sharelink": return shareCopy("maturity", ma, {stage:ma.stage, score:maScore(ma)}, $("#ma-toast"));
+      case "unshare": { ma.shared = false; maSave(); const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
       case "edit": ma.edit = true; ma.open = null; maSave(); renderMaturity(); return window.scrollTo(0, 0);
       case "snapshot": { const lv = Object.fromEntries(MA_AREAS.map(a => [a.k, maLevelOf(ma, a.k)])), today = new Date().toDateString();
         ma.hist = ma.hist.filter(h => new Date(h.t).toDateString() !== today).concat([{t:Date.now(), stage:ma.stage, lv}]); maSave(); maRefresh([]);

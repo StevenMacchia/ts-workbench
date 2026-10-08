@@ -55,6 +55,11 @@ const QS = [
 ];
 
 let pm = store.get("pm3", null) || Object.assign(fromPreset("teen_social"), {stage:"start"});
+// A rough 0-100 so the exposure band can show a grade: Low/Moderate/High/Severe mapped to a representative percentage
+const PM_BAND_PCT = {Low:92, Moderate:76, High:50, Severe:20};
+// The built-in teen social example's own exposure band, for a benchmark line under the verdict
+function pmBenchBand(){ try{ return assess(fromPreset("teen_social")).posture[0]; }catch(e){ return null; } }
+shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
 const savePM = () => { if(pm.saved){ pm.updated = Date.now(); const lib = libLoad(); lib[pm.id] = recordOf(pm); libSave(lib); } store.set("pm3", pm); };
 const visibleQs = () => QS.filter(q => !(q.skip && q.skip(pm)));
 const applySkips = () => QS.forEach(q => { if(q.skip && q.skip(pm)) pm[q.k] = q.skipVal; });
@@ -224,9 +229,10 @@ function renderPremortem(){
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
-    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
-    actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
+    actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
+    actions += `<button type="button" class="btn sm" data-act="sharelink">Copy link</button>`;
+    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
   }
   view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
@@ -286,7 +292,9 @@ function bindPremortem(){
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
-      case "new": pm = orgPrefillPM(blankPM()); return rerender();
+      case "new": { const snap = JSON.parse(JSON.stringify(pm)); pm = orgPrefillPM(blankPM()); rerender(); withUndo("Cleared", snap, s2 => { pm = s2; savePM(); renderPremortem(); }); return; }
+      case "sharelink": return shareCopy("premortem", pm, {name:pm.name, type:pm.type, posture:assess(pm).posture[0]}, $("#pm-toast"));
+      case "unshare": { pm.shared = false; savePM(); pm.flash = "Saved. It's yours to edit now."; return rerender(); }
       case "report": pm.stage = "report";
         // Leaving the questions early still keeps the work, so a later New never drops it
         if(!pm.example && !pm.saved){ if(!pm.name) pm.name = (labelOf(PLATFORMS, pm.type) || "Product") + " (draft)"; saveToLib(); pm.flash = "Saved to your workspace. Click any answer to change it"; }

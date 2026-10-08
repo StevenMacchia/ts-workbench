@@ -277,6 +277,10 @@ function renderTools(){
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
       <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
+    ${typeof templateItems === "function" ? `<section class="rise">
+      <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
+      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></button>`).join("")}</div>
+    </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
@@ -301,6 +305,7 @@ function renderTools(){
   ovApplyStage();
   view.querySelectorAll("[data-ovstage]").forEach(b => b.onclick = () => { ovStage = b.dataset.ovstage;
     view.querySelectorAll("[data-ovstage]").forEach(x => x.setAttribute("aria-pressed", x === b)); ovApplyStage(); });
+  view.querySelectorAll("[data-tplgo]").forEach(b => b.onclick = () => templateItems()[+b.dataset.tplgo].run());
 }
 
 /* ---------- Guided steps: the strip across the top ---------- */

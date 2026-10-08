@@ -1,6 +1,16 @@
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
+  // A shared result link: "#<route>?s=<data>". Decode it, apply it, then route normally on the clean hash.
+  const shareHit = typeof shareParseHash === "function" ? shareParseHash() : null;
+  if(shareHit && typeof SHARE_APPLY !== "undefined" && SHARE_APPLY[shareHit.route]){
+    shareDecode(shareHit.s).then(data => {
+      if(data) SHARE_APPLY[shareHit.route](data);
+      history.replaceState(null, "", location.pathname + "#" + shareHit.route);
+      route();
+    });
+    return;
+  }
   const h = (location.hash || '').slice(1);
   // A shareable link straight into the demo company
   if(h === "demo" && typeof demoStart === "function"){ demoStart(); return; }

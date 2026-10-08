@@ -2,6 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     { "name": "site", "runtimeExecutable": "npx", "runtimeArgs": ["--yes", "serve", "docs", "-l", "8765", "--no-clipboard"], "port": 8765 },
+    { "name": "site-alt", "runtimeExecutable": "npx", "runtimeArgs": ["--yes", "serve", "docs", "-l", "8831", "--no-clipboard"], "port": 8831 },
     { "name": "portfolio", "runtimeExecutable": "npx", "runtimeArgs": ["--yes", "serve", "../stevenmacchia.github.io", "-l", "8767", "--no-clipboard"], "port": 8767 }
   ]
 }

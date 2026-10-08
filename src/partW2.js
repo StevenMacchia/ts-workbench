@@ -6,7 +6,7 @@ const KINDS = {
   tabletop:{n:"Incident tabletop", plural:"Tabletops", icon:"i-siren", route:"tabletop", prefix:"TT"},
   metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
-  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
+  policy:{n:"Policy stress-tester", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
   maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
   coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
   coppa:{n:"COPPA readiness", plural:"COPPA checks", icon:"i-coppa", route:"coppa", prefix:"CP"},

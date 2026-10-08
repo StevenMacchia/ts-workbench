@@ -60,17 +60,21 @@ function answerChips(){
 function startHere(r){
   const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
   const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
-  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
-  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, allDone = r.safeguards.filter(s=>pm.done[s.id]).length;
+  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
+  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, firstBlocker = blockers.find(s=>!pm.done[s.id]);
+  const blockerClause = firstBlocker ? ` Start with: ${gloss(firstBlocker.t.split(",")[0].split("(")[0].trim())}.` : blockers.length ? " Every launch blocker is done." : "";
   const applies = r.obligations.filter(o=>o.status==="applies").length;
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
-    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
+    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}${blockerClause}`;
   // The numbers used to sit in their own four-tile dashboard; said in one line instead, each one naming what it counts
   const counted = `You've logged <strong>${r.risks.length} risk${r.risks.length===1?"":"s"}</strong>, each scored severity × likelihood. ${bDone} of ${blockers.length} launch blockers are done, and ${applies} of ${r.obligations.length} legal duties apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"} you named.`;
+  const bandPct = PM_BAND_PCT[r.posture[0]], benchBand = !pm.example ? pmBenchBand() : null;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p><p class="note">${counted}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
+        <div class="verdict-row"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}<p class="note">${counted}</p></div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -123,6 +127,7 @@ function renderReport(r){
   const tabs = [["plan","Launch plan",r.safeguards.length],["register","Risk register",total],["obligations","Legal obligations",r.obligations.length],["decisions","Decisions to make",r.decisions.length]];
   const body = pm.tab==="register" ? tabRegister(r) : pm.tab==="obligations" ? tabObligations(r) : pm.tab==="decisions" ? tabDecisions(r) : tabPlan(r);
   return `
+    ${pm.shared ? shareBannerHTML('data-act="unshare"') : ""}
     ${pm.example?`<div class="banner"><span>You're looking at an example with pre-filled answers.</span><span class="row" style="gap:8px"><button type="button" class="btn sm" data-act="save">Save a copy</button><button type="button" class="btn sm primary" data-act="new">Assess your own product</button></span></div>`:""}
     <div class="card"><div class="card-b" style="display:grid;gap:10px">
       <div class="row" style="justify-content:space-between"><div><h2 style="font-size:20px">${esc(pm.name||"Untitled assessment")}</h2><span class="note">${pm.id?`<span class="mono">${esc(pm.id)}</span> · `:""}${pm.created?`Created ${fmtDate(pm.created)} · Updated ${fmtDate(pm.updated)}`:(pm.example?"Example":"Not saved yet")}</span></div><span class="note">Click any answer to change it</span></div>
@@ -130,6 +135,7 @@ function renderReport(r){
     </div></div>
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
+    <details class="ev-details" style="margin-top:20px"><summary>Details <span class="note">Exposure numbers, the risk matrix, risks by harm area, burn-down</span></summary>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <details class="card pm-kpis-d"><summary>See the numbers<span class="note">Overall exposure, risk count, launch blockers and legal obligations</span></summary>
     <div class="kpis">
@@ -150,6 +156,7 @@ function renderReport(r){
         <div class="card-b catbars">${catbars}</div></div>
     </div>
     ${pmBurnHTML(r)}
+    </details>
     <div class="card" style="margin-top:16px;scroll-margin-top:16px" id="pm-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>

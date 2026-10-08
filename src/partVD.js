@@ -105,6 +105,13 @@ function vdWeightsBar(){
 
 /* ---------- pieces both the one-page scorecard and the guided flow use ---------- */
 const vdSave = () => store.set("vx", vx);
+// The three built-in example vendors' own scores, for a benchmark line under the headline
+function vdBenchRange(){
+  try{ const tw = CRITERIA.reduce((a, c) => a + (+DEFAULT_V.weights[c.k] || 0), 0) || 1;
+    const scores = DEFAULT_V.vendors.map(v => CRITERIA.reduce((a, c) => a + (+DEFAULT_V.weights[c.k] || 0) * (v.s[c.k] || 0), 0) / tw);
+    return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
+}
+shareRegister("vendors", d => { vx = Object.assign({weights:{}, vendors:[], open:null}, d, {shared:true}); vdView = "results"; vdSave(); });
 function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}. Click a name to rename it.</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" placeholder="Vendor name" title="Click to rename" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
 function vdCritHTML(c, seen){
@@ -189,22 +196,30 @@ function vdMarkdown(){
     ``, `Weighted score, out of 5: ${sorted.map(x => `${x.v.name} ${x.done ? x.score.toFixed(2) : "not finished"}`).join(", ")}.`);
   return lines.join("\n");
 }
-function vdOwn(){ vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); }
+function vdOwn(){ const snap = JSON.parse(JSON.stringify(vx)); vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { vx = s2; vdSave(); renderVendors(); }); }
 // The result: who wins and why, the heat map, and the ways back in
 function vdResultsRender(){
-  const {sorted, top} = vdRank(), all = sorted.every(x => x.done);
+  const {sorted, top} = vdRank(), all = sorted.every(x => x.done), bench = vdBenchRange();
   const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
+  const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
   view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
+    ${vx.shared ? shareBannerHTML('id="vx-unshare"') : ""}
     <div class="cvr">
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
-      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><h1>${esc(headline)}</h1><div class="cvr-sum vd-why">${vdWhy()}</div>
-        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-copy">${icon("copy")}Copy result</button>${DL ? `<button type="button" class="btn" id="vx-dl"><svg><use href="#i-download"/></svg>Download result</button>` : ""}</div>
+      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
+        ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
+        ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-copy">${icon("copy")}Copy result</button>${DL ? `<button type="button" class="btn" id="vx-dl"><svg><use href="#i-download"/></svg>Download result</button>` : ""}<button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
+    <details class="ev-details"><summary>Details <span class="note">Every criterion, scored for every vendor</span></summary>
     <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
+    </details>
     <p class="note cvr-note">Compare any two to four vendors. Scores are yours; the rubric only says what each number should mean.</p>
   </div>`;
   $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
+  $("#vx-sharelink").onclick = () => shareCopy("vendors", vx, {vendors:vx.vendors.map(v => ({name:v.name})), top:top ? top.v.name : null, score:top ? top.score : null}, $("#vx-toast"));
+  const us = document.getElementById("vx-unshare"); if(us) us.onclick = () => { vx.shared = false; vdSave(); const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
   $("#vx-own").onclick = vdOwn; $("#vx-reset").onclick = vdExample;
   const vdl = $("#vx-dl"); if(vdl) vdl.onclick = () => offerFile("ts-vendor-scorecard.md", vdMarkdown(), vdMarkdown(), $("#vx-toast"));
   const vcp = $("#vx-copy"); if(vcp) vcp.onclick = () => copyText(vdMarkdown(), $("#vx-toast"));
@@ -220,7 +235,7 @@ function renderVendors(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
-    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-own">Start your own</button><button class="btn sm" id="vx-reset">See the example</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
+    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>

@@ -228,3 +228,99 @@ const PRESETS = {
   delivery:{name:"Delivery platform (example)", type:"gig", youth:"adult_verified", aud:["creators"], adult:"none", identity:"verified", contact:"limited", money:["p2p","payouts"], regions:["us","ca"], scale:"large", team:"mature", features:["signup","login","profiles","dm","location","meetups","reviews","referrals"]},
   creator:{name:"Creator subscription site (example)", type:"creator", youth:"adult_verified", aud:["creators"], adult:"explicit", identity:"verified", contact:"strangers", money:["subs","payouts","p2p"], regions:["us","uk","eu"], scale:"mid", team:"dedicated", features:["signup","login","profiles","dm","posts","media","live","discovery"]}
 };
+
+/* =========================================================
+   SHARED: letter grades, undo-able resets, shareable result links
+   ========================================================= */
+// A-F from a 0-100 value. Used wherever a report has (or can honestly derive) a score.
+function gradeOf(pct){
+  const p = Math.round(pct);
+  return p >= 90 ? "A" : p >= 75 ? "B" : p >= 60 ? "C" : p >= 45 ? "D" : "F";
+}
+function gradeBadge(pct, title){
+  if(pct === null || pct === undefined || isNaN(pct)) return "";
+  const g = gradeOf(pct);
+  return `<span class="grade grade-${g}" title="${esc(title || "")}">${g}</span>`;
+}
+
+// Toast with an Undo action, shared by every "Start over" handler.
+// label: what happened. snapshot: a deep copy taken before clearing. restore(snapshot): puts it back.
+function withUndo(label, snapshot, restore){
+  let el = document.getElementById("wb-undo");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "wb-undo"; el.className = "wb-undo";
+    el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
+    document.body.appendChild(el);
+  }
+  clearTimeout(el._t);
+  el.innerHTML = `<span>${esc(label)}</span><button type="button" data-wb-undo>Undo</button>`;
+  el.classList.add("show");
+  el.querySelector("[data-wb-undo]").onclick = () => {
+    el.classList.remove("show"); clearTimeout(el._t);
+    restore(snapshot);
+  };
+  el._t = setTimeout(() => el.classList.remove("show"), 8000);
+}
+
+// ---------- Shareable result links: #<route>?s=<base64url of deflated JSON> ----------
+function b64urlEncode(bytes){
+  let bin = ""; for(let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64urlDecode(str){
+  str = str.replace(/-/g, "+").replace(/_/g, "/"); while(str.length % 4) str += "=";
+  const bin = atob(str), bytes = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+async function shareEncode(obj){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  try{
+    if(typeof CompressionStream === "function"){
+      const cs = new CompressionStream("deflate-raw"), w = cs.writable.getWriter();
+      w.write(bytes); w.close();
+      const buf = await new Response(cs.readable).arrayBuffer();
+      return b64urlEncode(new Uint8Array(buf));
+    }
+  }catch(e){}
+  return b64urlEncode(bytes);
+}
+async function shareDecode(s){
+  const bytes = b64urlDecode(s);
+  if(typeof DecompressionStream === "function"){
+    try{
+      const ds = new DecompressionStream("deflate-raw"), w = ds.writable.getWriter();
+      w.write(bytes); w.close();
+      const buf = await new Response(ds.readable).arrayBuffer();
+      return JSON.parse(new TextDecoder().decode(buf));
+    }catch(e){}
+  }
+  try{ return JSON.parse(new TextDecoder().decode(bytes)); }catch(e){ return null; }
+}
+// Copies a link that carries `state`. If it would be too big (roughly 8KB), carries `summary` instead and says so.
+function shareCopy(route, state, summary, toastEl){
+  shareEncode(state).then(s => {
+    if(s.length > 8000 && summary) return shareEncode(summary).then(s2 => ({s:s2, big:true}));
+    return {s, big:false};
+  }).then(({s, big}) => {
+    const url = location.origin + location.pathname + "#" + route + "?s=" + s;
+    const say = msg => flashIn(toastEl, msg);
+    try{
+      navigator.clipboard.writeText(url).then(
+        () => say(big ? "Link copied — only the summary numbers fit, not every answer" : "Link copied"),
+        () => say("Copy was blocked in this view"));
+    }catch(e){ say("Copy was blocked in this view"); }
+  }).catch(() => flashIn(toastEl, "Could not build a link in this view"));
+}
+// Each report tool registers how to apply shared data into its own state.
+const SHARE_APPLY = {};
+function shareRegister(route, apply){ SHARE_APPLY[route] = apply; }
+// The hash's "?s=" part, read straight off location.hash so the router can strip it before normal routing.
+function shareParseHash(){
+  const h = (location.hash || "").slice(1), qi = h.indexOf("?s=");
+  return qi < 0 ? null : {route: h.slice(0, qi), s: h.slice(qi + 3)};
+}
+function shareBannerHTML(saveAttr){
+  return `<div class="card share-banner" role="note"><div><b>You're viewing a shared result.</b><span class="note">Save a copy to edit it.</span></div><button type="button" class="btn primary sm" ${saveAttr}>Save a copy</button></div>`;
+}

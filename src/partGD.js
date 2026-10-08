@@ -20,6 +20,22 @@ function gdHas(s){
 }
 const gdFirstOpen = spec => { const i = gdLive(spec).findIndex(s => !gdHas(s) && !s.opt || !gdAnswered(s)); return i < 0 ? null : i; };
 const gdPct = spec => { const st = gdLive(spec), n = st.filter(gdHas).length; return st.length ? Math.round(n / st.length * 100) : 0; };
+// A non-interactive peek at the tool's finished example, below the intro card: a button runs the real
+// example (the alt entry whose name mentions "example"); the preview itself is inert, so it can't be
+// clicked, focused or read by a screen reader, and sits behind a fade so it never looks finished on its own
+function gdPreviewHTML(spec){
+  if(!spec.preview) return "";
+  let html = ""; try{ html = spec.preview(); }catch(e){ html = ""; }
+  if(!html) return "";
+  const exIdx = spec.alt ? spec.alt.findIndex(a => /example/i.test(a.n)) : -1;
+  return `<div class="gd-preview">
+    <div class="gd-preview-frame" inert aria-hidden="true">${html}</div>
+    <div class="gd-preview-fade"><div class="gd-preview-cta">
+      ${exIdx >= 0 ? `<button type="button" class="btn primary sm" data-gd="alt${exIdx}">See the full example</button>` : ""}
+      <span class="note">Or start yours above</span>
+    </div></div>
+  </div>`;
+}
 function gdIntroHTML(spec){
   const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
   const resume = n > 0 && n < st.length && gdHas(st[0]);
@@ -32,7 +48,7 @@ function gdIntroHTML(spec){
     ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
-  </div>`;
+  </div>${gdPreviewHTML(spec)}`;
 }
 function gdOptHTML(s, o, j, on){
   return `<button type="button" class="gd-opt ${on ? "on" : ""} ${o.off ? "off" : ""}" data-gdpick="${esc(o.k)}" aria-pressed="${on}" ${o.off ? 'aria-disabled="true"' : ""}>

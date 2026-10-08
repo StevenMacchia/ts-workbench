@@ -10,6 +10,15 @@
  *   node capture.js overview.png # regenerate just one target (by output filename)
  *   node capture.js overview.png vendors.jpg   # or a few
  *
+ * Review passes (not part of the regular README/portfolio targets above):
+ *   node capture.js --phone      # every tool at a phone viewport, full-page,
+ *                                # into assets/review/phone/<route>.png
+ *   node capture.js --dark       # every tool at 1440x900 in dark mode, into
+ *                                # assets/review/dark/<route>.png
+ *   node capture.js --phone --dark   # both passes, one after another
+ * With neither flag, the script behaves exactly as before (the targets
+ * list above). See README.md for more on the review passes.
+ *
  * Requires: puppeteer-core (installed in this folder) and a local Chrome at
  * the path in CHROME_PATH below. Does not download Chromium.
  */
@@ -20,11 +29,16 @@ const puppeteer = require("puppeteer-core");
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const ASSETS_DIR = path.join(ROOT, "assets");
+const REVIEW_DIR = path.join(ASSETS_DIR, "review");
 const PORTFOLIO_IMG_DIR =
   process.env.PORTFOLIO_IMG_DIR ||
   path.join(ROOT, "..", "stevenmacchia.github.io", "img");
 
-const BASE_URL = "http://localhost:8765";
+// CAPTURE_PORT/CAPTURE_BASE_URL exist only so this script can be pointed at
+// a throwaway server during development without touching the port (8765)
+// the README and other tooling assume; normal use needs neither.
+const PORT = process.env.CAPTURE_PORT || 8765;
+const BASE_URL = process.env.CAPTURE_BASE_URL || "http://localhost:" + PORT;
 const CHROME_PATH =
   process.env.CHROME_PATH ||
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
@@ -50,11 +64,11 @@ async function ensureServer() {
     console.log("Reusing the static server already running at " + BASE_URL);
     return null;
   }
-  console.log("Starting `npx --yes serve docs -l 8765 --no-clipboard`...");
+  console.log("Starting `npx --yes serve docs -l " + PORT + " --no-clipboard`...");
   const { spawn } = require("child_process");
   const child = spawn(
     process.platform === "win32" ? "npx.cmd" : "npx",
-    ["--yes", "serve", "docs", "-l", "8765", "--no-clipboard"],
+    ["--yes", "serve", "docs", "-l", String(PORT), "--no-clipboard"],
     { cwd: ROOT, stdio: "ignore", shell: false }
   );
   for (let i = 0; i < 40; i++) {
@@ -66,6 +80,15 @@ async function ensureServer() {
 }
 
 // ----------------------------------------------------------------- utils ---
+
+// The daily sync (_build/gen-readmes.js) copies README images and showcase images from _build/; mirror each
+// capture there so the next sync keeps the new image instead of restoring an old one.
+function mirrorToBuild(outPath, t){
+  const B = path.resolve(__dirname, "..", "..", "..", "_build");
+  if(!fs.existsSync(B)) return;
+  const dest = t.dir === "assets" ? path.join(B, "shots", t.name) : path.join(B, "showcase", t.name);
+  try{ fs.mkdirSync(path.dirname(dest), {recursive:true}); fs.copyFileSync(outPath, dest); }catch(e){ console.warn("  (could not mirror to _build: " + e.message + ")"); }
+}
 
 async function settle(page) {
   await page
@@ -96,12 +119,70 @@ async function waitForReload(page) {
 
 async function clickSel(page, sel, waitMs = 300) {
   await page.waitForSelector(sel, { timeout: 5000 });
-  await page.click(sel);
+  // A toast from a previous action (e.g. "Complete example loaded...") can
+  // sit directly over the next control to click, especially on a phone
+  // viewport where there's less room -- the click then silently lands on
+  // the toast instead of the real target (no exception thrown). Clear it
+  // first, the same way settle() does for the screenshot itself.
+  await page.evaluate(() => {
+    document.querySelectorAll(".toast, #gtoast").forEach((el) => {
+      el.style.visibility = "hidden";
+    });
+  });
+  // Puppeteer's click() scrolls the element to a viewport edge before
+  // clicking, which on a phone viewport can tuck it right under the fixed
+  // bottom nav -- the click then silently lands on the nav instead (no
+  // exception, just the wrong element). Centering it first avoids that.
+  await page.evaluate((s) => {
+    const el = document.querySelector(s);
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "center" });
+  }, sel);
+  try {
+    await page.click(sel);
+  } catch (err) {
+    // Belt and suspenders: if it's still not "clickable" by Puppeteer's
+    // visibility check (e.g. an off-canvas element that exists in the DOM
+    // but isn't shown), a plain DOM click() has no such requirement and
+    // fires the same listeners.
+    const clicked = await page.evaluate((s) => {
+      const el = document.querySelector(s);
+      if (el) { el.click(); return true; }
+      return false;
+    }, sel);
+    if (!clicked) throw err;
+  }
   await sleep(waitMs);
 }
 
 async function exists(page, sel) {
   return (await page.$(sel)) !== null;
+}
+
+// Walks one of the shared guided-flow wizards (coppa/dsa/policy/transparency
+// all use the same engine: gdRender/gdQHTML) from wherever it's standing to
+// the end, so an "example" that only pre-fills answers (rather than jumping
+// straight to a finished report) still reaches one. On each step it prefers
+// the enabled "Continue" button; a single-choice step has no such button and
+// auto-advances when its already-picked option is clicked again, so that's
+// the fallback; an unanswered step (no pre-filled default) falls back to
+// just clicking the first choice, since getting *a* report matters here,
+// not which one. Stops as soon as the wizard's "question" screen is gone.
+async function gdAdvanceAll(page, maxSteps = 30) {
+  for (let i = 0; i < maxSteps; i++) {
+    const state = await page.evaluate(() => {
+      if (!document.querySelector(".gd-s-q")) return "done";
+      const next = document.querySelector('[data-gd="next"]');
+      if (next && !next.disabled) return "next";
+      if (document.querySelector(".gd-opt.on")) return "pick-on";
+      if (document.querySelector(".gd-opt")) return "pick-any";
+      return "stuck";
+    });
+    if (state === "done" || state === "stuck") return state;
+    if (state === "next") await clickSel(page, '[data-gd="next"]', 150);
+    else if (state === "pick-on") await clickSel(page, ".gd-opt.on", 400);
+    else await clickSel(page, ".gd-opt", 400);
+  }
+  return "maxed";
 }
 
 // Clicks the first element matching `tag` whose exact trimmed text matches.
@@ -358,6 +439,117 @@ const builders = {
     await page.reload({ waitUntil: "load" });
     await gotoHash(page, "learn");
   },
+
+  // -------------------------------------------------- review-pass builders
+  // Used only by --phone/--dark (see REVIEW_ROUTES below), not by the
+  // regular README/portfolio targets. Each is self-contained the same way
+  // the builders above are.
+  async toolsRoute(page) {
+    await ensureDemoOff(page);
+    await gotoHash(page, "tools");
+  },
+  async workspaceRoute(page) {
+    await ensureDemoOff(page);
+    await gotoHash(page, "workspace");
+  },
+  async planRoute(page) {
+    await ensureDemoOff(page);
+    await gotoHash(page, "plan");
+  },
+  async reviewRoute(page) {
+    await ensureDemoOff(page);
+    await gotoHash(page, "review");
+  },
+  // The scenario list, not a scenario's play-through (that's builders.tabletop).
+  async tabletopList(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => localStorage.removeItem("tswb:tt"));
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "tabletop");
+    await page.waitForSelector('.scen[data-i="0"]', { timeout: 8000 });
+  },
+  // Coverage's "See a finished example" sets cv.ex, which short-circuits
+  // straight to the finished radar/report regardless of which screen (the
+  // guided intro or the one-page form) the click came from.
+  async coverageExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:cv");
+      localStorage.removeItem("tswb:ws:cur:coverage");
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "coverage");
+    await page.waitForSelector('[data-cv="example"]', { timeout: 8000 });
+    await clickSel(page, '[data-cv="example"]', 400);
+  },
+  // Policy has no example flag that jumps straight to a report: "Load a
+  // complete example" only pre-fills the wizard's answers. Switching to the
+  // one-page form first gets to the same pre-fill via #pol-full, then
+  // #pol-run scores it locally (no Claude account needed) into a report.
+  async policyExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:pol");
+      localStorage.removeItem("tswb:ws:cur:policy");
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "policy");
+    await page.waitForSelector(".gd-intro, #pol-full", { timeout: 8000 });
+    if (await exists(page, ".gd-intro")) {
+      await clickByText(page, "button", "Fill everything in on one page", 300);
+    }
+    await page.waitForSelector("#pol-full", { timeout: 8000 });
+    await clickSel(page, "#pol-full", 300);
+    await page.waitForSelector("#pol-run", { timeout: 8000 });
+    await clickSel(page, "#pol-run", 500);
+  },
+  // Coppa and dsa's "See a finished example" both set an .ex flag that
+  // jumps straight to the finished report (no wizard to walk).
+  async coppaExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:cp");
+      localStorage.removeItem("tswb:ws:cur:coppa");
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "coppa");
+    await clickByText(page, "button", "See a finished example", 400);
+  },
+  async dsaExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:ds");
+      localStorage.removeItem("tswb:ws:cur:dsa");
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "dsa");
+    await clickByText(page, "button", "See a finished example", 400);
+  },
+  // Transparency's "See an example" (unlike coppa/dsa) only pre-fills the
+  // wizard and drops back to its intro, with no one-page shortcut either
+  // (its "data-tr=example" button there resets the same way). So: load the
+  // example, then walk the wizard to the end with gdAdvanceAll.
+  async transparencyExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:tr");
+      localStorage.removeItem("tswb:ws:cur:transparency");
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "transparency");
+    await page.waitForSelector(".gd-intro", { timeout: 8000 });
+    await clickByText(page, "button", "See an example", 400);
+    await sleep(200);
+    if (await exists(page, '[data-gd="resume"]')) {
+      await clickSel(page, '[data-gd="resume"]', 300);
+    } else if (await exists(page, '[data-gd="start"]')) {
+      await clickSel(page, '[data-gd="start"]', 300);
+    }
+    const result = await gdAdvanceAll(page);
+    if (result !== "done") {
+      console.warn('  (note: transparency wizard walk ended in state "' + result + '", not "done" -- the screenshot may still show the wizard rather than the report)');
+    }
+  },
 };
 
 // ------------------------------------------------------------- targets ---
@@ -392,10 +584,115 @@ const targets = [
   { name: "learn.jpg", kind: "jpeg", dir: "portfolio", build: builders.learn },
 ];
 
+// -------------------------------------------------------- review passes ---
+// Every tool, one screenshot each, at a phone viewport (--phone, full-page)
+// and/or in dark mode (--dark, viewport only). Order matches how they sit
+// in the nav, with the cross-tool pages (workspace/plan/review) last since
+// by then other routes in the same pass may have left data behind for them
+// to summarize -- that's a feature here, not a bug to route around.
+// `lightBuild`/`darkBuild` let a route use a different builder per pass;
+// plain `build` is used for both. Only "overview" needs the split: the demo
+// company should be loaded either way, but only the dark pass should also
+// force dark mode (builders.overviewDark does both; builders.overview just
+// the demo).
+const REVIEW_ROUTES = [
+  { name: "overview", lightBuild: builders.overview, darkBuild: builders.overviewDark },
+  { name: "tools", build: builders.toolsRoute },
+  { name: "premortem", build: builders.premortem },
+  { name: "tabletop", build: builders.tabletopList },
+  { name: "metrics", build: builders.metricsMap },
+  { name: "vendors", build: builders.vendors },
+  { name: "maturity", build: builders.maturity },
+  { name: "coverage", build: builders.coverageExample },
+  { name: "policy", build: builders.policyExample },
+  { name: "coppa", build: builders.coppaExample },
+  { name: "dsa", build: builders.dsaExample },
+  { name: "eval", build: builders.evalReport },
+  { name: "transparency", build: builders.transparencyExample },
+  { name: "workspace", build: builders.workspaceRoute },
+  { name: "plan", build: builders.planRoute },
+  { name: "review", build: builders.reviewRoute },
+];
+
+const PHONE_VIEWPORT = { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
+const PHONE_UA =
+  "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+const DARK_VIEWPORT = { width: 1440, height: 900, deviceScaleFactor: 1 };
+
+async function runReviewPass(browser, kind) {
+  const outDir = path.join(REVIEW_DIR, kind);
+  fs.mkdirSync(outDir, { recursive: true });
+  const page = await browser.newPage();
+  if (kind === "phone") {
+    await page.emulate({ viewport: PHONE_VIEWPORT, userAgent: PHONE_UA });
+  } else {
+    await page.setViewport(DARK_VIEWPORT);
+  }
+  await page.evaluateOnNewDocument(() => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const style = document.createElement("style");
+      style.textContent =
+        "::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}" +
+        "html{scrollbar-width:none!important}";
+      document.head.appendChild(style);
+    });
+  });
+  await page.goto(BASE_URL + "/", { waitUntil: "load" });
+  if (kind === "dark") {
+    await page.evaluate(() => localStorage.setItem("tswb:theme", JSON.stringify("dark")));
+    await page.reload({ waitUntil: "load" });
+  }
+  await settle(page);
+
+  let count = 0;
+  for (const r of REVIEW_ROUTES) {
+    const build = kind === "dark" ? r.darkBuild || r.build : r.lightBuild || r.build;
+    const outPath = path.join(outDir, r.name + ".png");
+    try {
+      await build(page);
+      await settle(page);
+      await page.screenshot({ path: outPath, type: "png", fullPage: kind === "phone" });
+      console.log("Wrote " + outPath);
+      count++;
+    } catch (err) {
+      console.error("Failed to capture review/" + kind + "/" + r.name + ": " + err.message);
+    }
+  }
+  await page.close();
+  console.log(
+    kind[0].toUpperCase() + kind.slice(1) + " pass: wrote " + count + " of " + REVIEW_ROUTES.length + " images to " + outDir
+  );
+  return count;
+}
+
 // -------------------------------------------------------------- main ------
 
 async function main() {
-  const wanted = process.argv.slice(2).map((s) => s.toLowerCase());
+  const rawArgs = process.argv.slice(2);
+  const wantPhone = rawArgs.includes("--phone");
+  const wantDark = rawArgs.includes("--dark");
+
+  // --phone/--dark are a separate mode: every tool, into assets/review/,
+  // not the README/portfolio targets below. With neither flag, everything
+  // from here to the end of this function is unchanged from before.
+  if (wantPhone || wantDark) {
+    const serverChild = await ensureServer();
+    const browser = await puppeteer.launch({
+      executablePath: CHROME_PATH,
+      headless: "new",
+      defaultViewport: null,
+    });
+    try {
+      if (wantPhone) await runReviewPass(browser, "phone");
+      if (wantDark) await runReviewPass(browser, "dark");
+    } finally {
+      await browser.close();
+      if (serverChild) serverChild.kill();
+    }
+    return;
+  }
+
+  const wanted = rawArgs.map((s) => s.toLowerCase());
   const list = wanted.length
     ? targets.filter((t) => wanted.includes(t.name.toLowerCase()))
     : targets;
@@ -454,6 +751,7 @@ async function main() {
           await page.screenshot({ path: outPath, type: "jpeg", quality: 82 });
         }
         console.log("Wrote " + outPath);
+        mirrorToBuild(outPath, t);
       } catch (err) {
         console.error("Failed to capture " + t.name + ": " + err.message);
         if (process.env.DEBUG_CAPTURE) {

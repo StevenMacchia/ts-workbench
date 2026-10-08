@@ -32,6 +32,9 @@ const CV_EXAMPLE = {src:"ex:teen_social", ex:true, r:{
 let cv = store.get("cv", null) || {src:null, ex:false, r:{}};
 if(!cv.r) cv.r = {};
 const cvSave = () => store.set("cv", cv);
+// The built-in example's own coverage %, for a benchmark line under the verdict
+function cvBenchPct(){ try{ return cvSummary(CV_EXAMPLE).cov; }catch(e){ return null; } }
+shareRegister("coverage", d => { cv = Object.assign({src:null, ex:false, r:{}}, d, {shared:true}); cvG = null; cvView = null; cvTab = "gaps"; cvSave(); });
 const cvHarm = a => a.n.replace(" & ", " and ").split(" ").map(w => /^[A-Z]{2,}$/.test(w) ? w : w.toLowerCase()).join(" ");
 const cvRiskWords = x => x.band ? `${BANDS[x.band][0].toLowerCase()} risk (${x.score} of 16)` : "no risk found";
 
@@ -245,8 +248,8 @@ function cvResultHTML(){
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
   return `<span class="toast" id="cv-toast" aria-live="polite"></span>
-    ${cv.ex ? `<button class="btn sm" data-cv="clear">Clear example</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button>` : ""}`;
+    ${cv.ex ? `<button class="btn sm" data-cv="clear">Start over</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
+    ${any ? `<button class="btn sm" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button><button class="btn sm primary" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
@@ -304,6 +307,28 @@ function cvNextPos(){
 }
 const cvInAssessment = () => asInAssessment();
 const cvStepBar = pct => asStepBar("coverage", pct, true);
+// A non-interactive peek at the finished example result, below the intro card. Builds the example in a
+// throwaway copy of the module's state, renders the real result markup from it, then puts the visitor's
+// own state back exactly as it was
+function cvPreviewHTML(){
+  const saved = cv;
+  try{
+    cv = JSON.parse(JSON.stringify(CV_EXAMPLE));
+    const acts = cvActions(cv), top = acts.slice(0, 3);
+    return `<div class="gd-preview"><div class="gd-preview-frame" inert aria-hidden="true">
+        <div class="cvr-page">
+          <div class="card cvr-side">
+            <span class="as-eb">Example</span>
+            <div class="pol-verdict">${cvWhy()}</div>
+            ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+          </div>
+          <div class="cvr"><div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div></div>
+        </div>
+      </div>
+      <div class="gd-preview-fade"><div class="gd-preview-cta"><button type="button" class="btn primary sm" data-cv="example">See the full example</button><span class="note">Or start yours above</span></div></div></div>`;
+  }catch(e){ return ""; }
+  finally{ cv = saved; }
+}
 function cvIntroHTML(){
   const s = cvSummary(cv), n = cvAreas(cv).length, {src, s:srcs} = cvSrc(cv), rk = cvRisk(cv);
   const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
@@ -316,7 +341,7 @@ function cvIntroHTML(){
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
       ${!src ? `<button type="button" class="btn gd-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
-  </div>`;
+  </div>${cvPreviewHTML()}`;
 }
 function cvApplyHTML(){
   const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
@@ -377,29 +402,31 @@ function cvGuideRender(){
 }
 function cvResultsRender(){
   const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
-  const headline = !rk ? `Your coverage is ${s.cov}%` : `Your defenses cover about ${s.cov}% of your risk`;
-  const sum = !rk ? "Choose a product to compare against, under Compare against, to see where risk outruns your coverage."
-    : s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? " is" : "s are"} exposed: serious risk with less than half the coverage it needs. Close these first.`
-    : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " carries" : "s carry"} more risk than your coverage. Close these first.`
-    : "Your coverage keeps pace with your risk in every harm area. Keep it current as your products change.";
   const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
+  const bench = cvBenchPct();
   view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
+    ${cv.shared ? shareBannerHTML('data-cv="unshare"') : ""}
     ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    <div class="card cvr-side">
+      <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
+      <h1 class="visually-hidden">Coverage radar results</h1>
+      <div class="verdict-row"><div class="pol-verdict">${cvWhy()}</div>${gradeBadge(s.cov, "Weighted coverage against risk, across your rated harm areas")}</div>
+      ${bench !== null && !cv.ex ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${bench}% coverage</p>` : ""}
+      ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+        ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+        <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+        <button type="button" class="btn" data-cv="sharelink">Copy link</button>
+        ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
+      ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+    </div>
+    <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
-      <div class="cvr-side">
-        <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
-        <h1>${esc(headline)}</h1><p class="cvr-sum">${esc(sum)}</p>
-        ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
-        <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
-          ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
-          <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
-          ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
-        ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
-      </div>
     </div>
     <div class="segs cvr-tabs" role="tablist" aria-label="Coverage detail">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${cvTab === k}" class="${cvTab === k ? "on" : ""}" data-cvtab="${k}">${n}</button>`).join("")}</div>
     <div class="cvr-tab" role="tabpanel">${cvTab === "answers" ? `<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div>` : cvTab === "source" ? `<div id="cv-src-wrap">${cvSourceHTML()}</div>` : cvGapsHTML()}</div>
+    </details>
     <p class="note cvr-note">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
   </div>`;
 }
@@ -499,7 +526,9 @@ function bindCoverage(){
     if(d.ov === "new") return newAssessment();
     switch(d.cv){
       case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
-      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
+      case "clear": case "reset": { const snap = JSON.parse(JSON.stringify(cv)); cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cv = s2; if(!cv.r) cv.r = {}; cvSave(); renderCoverage(); }); return; }
+      case "sharelink": return shareCopy("coverage", cv, {src:cv.src, cov:cvSummary(cv).cov}, $("#cv-toast"));
+      case "unshare": { cv.shared = false; cvSave(); const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(true); return flashIn($("#cv-toast"), msg); }
       case "download": { const md = cvMarkdown(cv); return offerFile(`ts-coverage-radar-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#cv-toast")); }
       case "tasks": return tkOpen("coverage");
       case "fillma": { const n = cvFillFromMaturity(); cvG = null; cvView = "table"; renderCoverage(true); window.scrollTo(0, 0); return flashIn($("#cv-toast"), `Filled ${n} answers from your maturity ratings. Adjust any that differ, then confirm`); }

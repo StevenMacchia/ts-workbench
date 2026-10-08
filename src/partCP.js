@@ -221,6 +221,11 @@ const CP_EXAMPLE = {svc:"Brightbeam", aud:"primary", ex:true, fac:{subject:true,
 let cp = Object.assign(CP_BLANK(), store.get("cp", null) || {});
 const cpSave = () => store.set("cp", cp);
 const cpTitle = d => "COPPA readiness: " + (d.svc || "Untitled service");
+// The example's own readiness score, for a benchmark line under the verdict
+function cpBenchPct(){
+  try{ const d = Object.assign(CP_BLANK(), CP_EXAMPLE), x = cpCtx(d), ap = cpApplies(d); return cpScore(d, x, ap).pct; }catch(e){ return null; }
+}
+shareRegister("coppa", d => { cp = Object.assign(CP_BLANK(), d, {shared:true}); cpView = "page"; cpSave(); });
 
 /* ---------- working it out ---------- */
 function cpCtx(d){
@@ -408,6 +413,17 @@ function cpPiRow([k, n, h, isNew]){
       <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
     </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`;
 }
+// A preview of the finished example report (Brightbeam), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function cpPreviewHTML(){
+  const saved = cp;
+  try{
+    cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE)));
+    const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap);
+    return cpReportHTML(x, ap, s);
+  }catch(e){ return ""; }
+  finally{ cp = saved; }
+}
 function cpSpec(){
   const X = () => cpCtx(cp), AP = () => cpApplies(cp);
   const notPrimary = () => !!cp.aud && cp.aud !== "primary", live = () => { const ap = AP(); return !!ap.lvl && ap.lvl !== "watch"; };
@@ -442,6 +458,7 @@ function cpSpec(){
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
     steps, finish:"Build my plan",
+    preview:cpPreviewHTML,
     done:() => { cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function renderCoppa(){
@@ -450,9 +467,9 @@ function renderCoppa(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
-        `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
+        `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-cp="sharelink">Copy link</button>`)
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="cp-toast" aria-live="polite"></span>${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-cp="example">See an example</button>`))
+        `<span class="toast" id="cp-toast" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
 function cpSetupHTML(x, ap, s){
@@ -496,14 +513,22 @@ function cpSetupHTML(x, ap, s){
 }
 function cpReportHTML(x, ap, s){
   const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
+  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
+  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
+  const bench = cpBenchPct();
   return `<div class="pol-report cp-report">
+    ${cp.shared ? shareBannerHTML('data-cp="unshare"') : ""}
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
+      ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
         <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">Your plan, data map, drafts and requirements</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
+    </details>
     <p class="note">Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Civil penalties can run to $53,088 per violation (the FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98). A starting point for your legal team, not legal advice.</p>
   </div>`;
 }
@@ -550,7 +575,9 @@ function cpAct(a){
   switch(a){
     case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
     case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); gdReset("coppa"); cpView = "page"; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
-    case "reset": cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "reset": { const snap = JSON.parse(JSON.stringify(cp)); cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cp = s2; cpSave(); renderCoppa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": return shareCopy("coppa", cp, {svc:cp.svc, aud:cp.aud, pct:s.pct, crit:s.crit}, $("#cp-toast"));
+    case "unshare": cp.shared = false; cpSave(); return cpAct("save");
     case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": cpView = null; gdReset("coppa"); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": cp.view = "setup"; cpView = "page"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

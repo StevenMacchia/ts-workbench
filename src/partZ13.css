@@ -139,7 +139,7 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .ov-art-ring{stroke:var(--accent);stroke-opacity:.4}
 .gd-radio{border-color:var(--line-strong);color:var(--muted)}
 .gd-opt.on .gd-radio{border-color:var(--accent);color:#fff}
-.pagehead h1{display:inline-block}
+.pagehead h1{display:block;width:fit-content;max-width:100%}
 
 /* ---------- pre-mortem rail, "What this answer changed": one quiet list instead of three heading colors ---------- */
 .impact{border-top:1px solid var(--line);padding-top:12px}
@@ -170,3 +170,74 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .pw .ev-src{margin-left:0}
 .pagehead .pw .ev-src{background:var(--accent-soft);color:var(--accent)}
 .gd-pw{margin:-6px 0 16px}
+
+/* ---------- contrast: severity words and numbers on white; the tints stay bright ---------- */
+:root, :root[data-mode="light"]{--crit:#D63941;--high:#C4501C;--med:#A86E00;--good:#17865B}
+
+/* ---------- phones: no blur behind panels (expensive), the wash stays ---------- */
+@media (max-width:760px){.card,.as-pic,.gd-done,.ov-tool,.scen,.as-s.cur,.side,.topbar{backdrop-filter:none;-webkit-backdrop-filter:none}.card,.as-pic,.gd-done,.ov-tool,.scen,.as-s.cur{background:var(--surface)}}
+
+/* ---------- print: a document, not an app ---------- */
+@media print{
+  html,body,.app{background:#fff!important;color:#111!important}
+  .app{display:block;border-radius:0;box-shadow:none}
+  .side,.topbar,#sb-scrim,#nav-toggle,#gtoast,.toast,.btn,.headmeta,.ph-help,.banner,.tour,.tour-card,#cmdk,.asb,.segs,.pol-runbar,.ev-top .btn{display:none!important}
+  .main,#view{padding:0!important;max-width:none!important}
+  .card,.as-pic,.gd-done,.pol-sum,.ov-tool{background:#fff!important;border:1px solid #ddd!important;box-shadow:none!important;backdrop-filter:none!important;break-inside:avoid}
+  .pagehead h1,.as-hero-t h1{-webkit-text-fill-color:#111;background:none;color:#111}
+  details{display:block}details>*{display:block}details summary{list-style:none}
+  a{color:#111;text-decoration:none}
+  .as-bar i,.gd-mbar i,.bar i,.pol-meter i,.vd-bar i,.mx-bar i{background:#6D5DF6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .mcell,.pill,.ev-conf td,.cp-map td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* ---------- verdict-first reports: the "two or three things to do" list that follows the lead sentence ---------- */
+.gd-vacts,.ma-band-acts{padding-left:18px;display:grid;gap:8px;font-size:14px;margin:10px 0 0;line-height:1.5}
+.gd-vacts li b,.ma-band-acts li b{color:var(--ink)}
+
+/* maturity: the plan band is one column now that the radar sits under Details */
+.ma-band{grid-template-columns:minmax(0,1fr)}
+.ma-band-l{max-width:78ch}
+
+/* ---------- guided intro: a locked, non-interactive peek at the finished example, below the intro card ---------- */
+.gd-preview{position:relative;margin-top:26px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.gd-preview-frame{pointer-events:none;user-select:none;max-height:520px;overflow:hidden}
+.gd-preview-frame>*:first-child{margin-top:0}
+.gd-preview-fade{position:absolute;left:0;right:0;bottom:0;height:170px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;
+  background:linear-gradient(to bottom, transparent, var(--bg) 70%)}
+.gd-preview-cta{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+@media (max-width:640px){.gd-preview{display:none}}
+
+.gd-preview-frame{padding:18px 22px 0;background:var(--panel)}
+
+/* ---------- Letter grade beside a verdict ---------- */
+.grade{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;font-family:var(--display);font-weight:700;font-size:21px;flex:none;margin-left:10px;vertical-align:middle}
+.grade-A,.grade-B{background:var(--good-soft);color:var(--good)}
+.grade-C{background:var(--med-soft);color:var(--med)}
+.grade-D{background:var(--high-soft);color:var(--high)}
+.grade-F{background:var(--crit-soft);color:var(--crit)}
+.verdict-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.bench-line{margin:2px 0 0;font-size:13px;color:var(--muted)}
+
+/* ---------- Shared "shared result" banner ---------- */
+.share-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 18px;margin-bottom:14px;border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.share-banner .note{display:block;margin-top:2px}
+
+/* ---------- Undo toast, shared by every "Start over" ---------- */
+.wb-undo{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(14px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
+  background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;display:flex;align-items:center;gap:16px;font-size:13.5px;box-shadow:var(--shadow);z-index:9999}
+.wb-undo.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.wb-undo button{background:none;border:none;color:#fff;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;font-size:13.5px}
+
+/* ---------- "+ New" menu: template section ---------- */
+.tb-newsep{padding:10px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
+
+/* ---------- Template gallery on All tools ---------- */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tpl-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.tpl-card:hover,.tpl-card:focus-visible{border-color:var(--line-strong);box-shadow:var(--shadow);outline:none}
+.tpl-card b{font-size:14px}
+.tpl-card small{color:var(--muted);font-size:12.5px;line-height:1.4}
+
+/* grade mark: top-right of the verdict, large enough to read as a grade */
+.grade{float:right;margin:-4px 0 10px 18px;width:54px;height:54px;border-radius:14px;font-size:25px;font-weight:700;display:grid;place-items:center}
