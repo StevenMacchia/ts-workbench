@@ -16,6 +16,7 @@ const body = function(){
   eq((h.match(/data-evmode="[a-z]+" disabled/g) || []).length, 3, "the three ways to get labels wait for cases"); eq(/Add cases in step 1 first/.test(h), true, "and say so");
   eq(/data-evkind="media"/.test(h) && /data-evkind="text" aria-pressed="true"/.test(h), true, "the Text | Images & video switch"); eq(/data-ev="reset"/.test(h), false, "nothing to start over from yet");
   eq(/data-ev="gen"/.test(h), evAI(), "writing cases with Claude is offered only where Claude runs"); eq(/Claude version only/.test(h), !evAI(), "and the Claude tile says so otherwise");
+  eq(/data-evmode="baseline"[^>]*><b>Free model in your browser <span class="pill accent">Start here if you don.t have a classifier<\/span>/.test(h), true, "the free in-browser model is visually promoted as the default for someone with no classifier");
   // the example cases alone: step 1 done, step 2 current, the free model the default way in
   evAct("excases"); h = view.innerHTML; eq(ev.cases.length === 24 && ev.policy === EV_EXAMPLE.policy && !ev.preds, true, "example rule and cases, no labels yet");
   eq(/class="card ev-step done" id="ev-s1"/.test(h) && /class="card ev-step now" id="ev-s2"/.test(h) && /data-evgold="c1"/.test(h), true, "step 1 done, step 2 current, right answers editable");
@@ -36,6 +37,9 @@ const body = function(){
   eq(/67%/.test(h) && /What it got wrong/.test(h) && /What to change/.test(h) && /This is the example/.test(h) && /class="card ev-step done" id="ev-s3"/.test(h), true, "results in step 3, with the example banner");
   eq(/Since the last run/.test(h) && (h.match(/class="ev-flip fixed"/g) || []).length === 3 && (h.match(/class="ev-flip broke"/g) || []).length === 1, true, "the earlier run compared automatically: three fixed, one broke");
   eq((h.match(/class="cp-gap"/g) || []).length, 12, "eight wrong cases and four flips as cards"); eq(/Right answer <b>allowed<\/b>; it said <b>violates<\/b>/.test(h), true, "in plain words");
+  // the worst kind of case leads the per-case failures, instead of only being a click away under Details
+  eq(/class="note ev-worst">Worst at <b>Counter-speech<\/b>: 2 of 2 wrong \(100%\)\. Case by case, below\.<\/p>/.test(h), true, "a one-line worst-category summary");
+  { const wrongAt = h.indexOf("What it got wrong"); eq(wrongAt >= 0 && h.indexOf("ev-worst", wrongAt) < h.indexOf("cp-gap", wrongAt), true, "the worst-category line comes before the per-case failure cards"); }
   eq(/data-evtab="kinds"/.test(h) && /data-evtab="scores"/.test(h) && /Counter-speech<br>/.test(h), true, "details folded under the results, by kind first");
   ev.tab = "all"; renderEval(); h = view.innerHTML; eq((h.slice(h.indexOf("class=\"cp-map ev-table\"")).match(/<tr class="bad">/g) || []).length, 8, "every case, failures marked"); eq(/<small>Contains 'you're worthless'\.<\/small>/.test(h), true, "with the classifier's one-line reason");
   ev.tab = "runs"; renderEval(); h = view.innerHTML; eq(/v1 prompt/.test(h) && /v0: no offensive content/.test(h), true, "both runs in the runs table");
@@ -58,6 +62,9 @@ const body = function(){
   // your own classifier: the paste panel works without AI, with the policy file and the runner script
   ev.mode = "paste"; ev.preds = null; renderEval(); h = view.innerHTML; eq(/data-ev="score"/.test(h) && /id="ev-paste"/.test(h) && /Add your own cases/.test(h) && /data-evgold="c1"/.test(h), true, "the paste panel and editable right answers");
   eq(/data-ev="dlpol"/.test(h) && /data-ev="dlpoljson"/.test(h) && /PolicyLM/.test(h) && /tools\/open-model-eval/.test(h) && /gpt-oss-safeguard/.test(h) && /data-ev="dlcsv"/.test(h), true, "the cases, both policy files and the runner script");
+  // running a model locally is pulled out of the "paste your own labels" instructions into its own disclosure
+  eq(/<details class="ev-local"[^>]*data-evd="local"[^>]*><summary>No classifier of your own\? Run a free open model on your own computer<\/summary>/.test(h), true, "the local-model setup has its own disclosure, separate from the basic case-sharing step");
+  eq(h.indexOf('data-ev="csv"') < h.indexOf('<details class="ev-local"') && h.indexOf('<details class="ev-local"') < h.indexOf('<label for="ev-paste">'), true, "get-the-cases comes first, then the local-model disclosure, then pasting labels back");
   ev.mode = "policy"; renderEval(); h = view.innerHTML; eq(/data-ev="dlpol"/.test(h), false, "the policy file is for the paste route"); eq(/data-evsub="prompt"/.test(h), true, "Claude: with the rule or with a system prompt");
   eq(evAI() ? /data-ev="run"/.test(h) : /Open in Claude/.test(h) && !/data-ev="run"/.test(h), true, "without Claude the Claude panel links out instead of a dead button"); ev.mode = "paste";
   view.querySelector = () => null; // no DOM for the textarea; add through the data path instead
@@ -139,6 +146,9 @@ const body = function(){
   const md3 = evMarkdown(ev); eq(/items from your own labeled set/.test(md3) && /Never build a test set containing CSAM/.test(md3) && /## Since the previous run/.test(md3), true, "the media results' markdown carries the guide and the comparison");
   ev.view = "text"; renderEval(); h = view.innerHTML; eq(/data-evkind="text" aria-pressed="true"/.test(h) && /data-ev="excases"/.test(h) && !/Every item/.test(h) && !bad(h), true, "switching back to Text shows an empty text eval, not the media items");
   out.push(`media: list parsed (${mf.items.length} good, ${mf.bad.length} bad), ${mm.n} items scored through evMetrics, successive lists compared, guide present`);
+  // PolicyLM and Ollama, named in the local-model instructions, are in the shared hover glossary like every other acronym here
+  eq(typeof GT_MORE.PolicyLM === "string" && GT_MORE.PolicyLM.length > 0, true, "PolicyLM is in the shared glossary"); eq(typeof GT_MORE.Ollama === "string" && GT_MORE.Ollama.length > 0, true, "Ollama is in the shared glossary");
+  out.push("glossary: PolicyLM and Ollama added to the shared hover dictionary");
   return out.join("\n");
 };
 const parts = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partCP.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js")].join("\n");

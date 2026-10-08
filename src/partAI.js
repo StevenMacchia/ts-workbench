@@ -65,6 +65,16 @@ The checklist must cover: the action and what it means, the facts, the rule reli
     checklist:AI_ARR(r.checklist).filter(c => c && c.item).map(c => ({item:AI_STR(c.item), present:!!c.present, note:AI_STR(c.note)})),
     risks:AI_ARR(r.risks).map(AI_STR).filter(Boolean), reading_level:AI_STR(r.reading_level), assumptions:AI_ARR(r.assumptions).map(AI_STR).filter(Boolean)};
     return o.notice ? o : null; },
+  // No-Claude fallback: a plain substitution of the visitor's own answers into a letter shape, so the public site
+  // never returns nothing. Not scored or reviewed - the visitor edits it themselves before sending.
+  tmpl:f => { const act = AI_STR(f.action) || "[say what action you took]", prod = AI_STR(f.product);
+    const regionNote = (f.regions || []).length ? ` If you're in ${f.regions.map(r => ({eu:"the EU", uk:"the UK", us:"the US", other:"your region"}[r] || r)).join(" or ")}, check whether local law requires you to mention a specific appeal route or dispute body.` : "";
+    return [`Subject: Action on your ${prod ? prod.split(",")[0].trim() + " " : ""}account`, "", "Hi,", "",
+      `Action taken: ${act}.`, `Reason: this didn't follow ${AI_STR(f.policy) || "[name the exact rule or policy section]"}.`, "",
+      `What happened: ${AI_STR(f.facts) || "[say what happened, when, and how often]"}`, "",
+      `How this was decided: ${AI_STR(f.auto) || "[say whether automation, a person, or both made this decision]"}`, "",
+      `How to appeal: ${AI_STR(f.appeal) || "[say where, and by what deadline, the user can appeal]"}`, "",
+      "[This is a plain template built only from the answers above - edit every bracket, and the rest, before you send it.]" + regionNote].join("\n"); },
   render:r => `
     <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy notice</button></div>
       <div class="ai-letter"><div class="ai-subj"><span>Subject</span><b>${esc(r.subject)}</b></div><div class="ai-body">${esc(r.notice)}</div></div></div>
@@ -146,6 +156,17 @@ Return ONLY a JSON object with exactly these keys:
     suggested_action:AI_STR(r.suggested_action), reply_to_user:AI_STR(r.reply_to_user), note_for_record:AI_STR(r.note_for_record), policy_feedback:AI_STR(r.policy_feedback),
     steering_attempts:AI_ARR(r.steering_attempts).map(AI_STR).filter(Boolean)};
     return o.summary && o.elements.length ? o : null; },
+  // No-Claude fallback: lays out the same facts as a worksheet with the questions a reviewer would ask themselves,
+  // instead of Claude's structured opinion. Not a review - the visitor decides and fills in their own reasoning.
+  tmpl:f => [`Case worksheet (template - work through this yourself; not Claude's review)`, "",
+    `Rule applied: ${AI_STR(f.policy) || "[paste the rule, including exceptions]"}`,
+    `Original decision: ${AI_STR(f.action) || "[the action taken]"}${AI_STR(f.reason) ? ` - reviewer's reason: ${AI_STR(f.reason)}` : ""}`, "",
+    `The content or behavior: ${AI_STR(f.content) || "[describe the content]"}`, "",
+    `The user's appeal: ${AI_STR(f.appeal) || "[what the user said]"}`,
+    ...(AI_STR(f.context) ? ["", `Other context: ${AI_STR(f.context)}`] : []), "",
+    "Work through each part of the rule:", "- Does every element of the rule apply to these facts?", "- Does any exception in the rule apply?",
+    "- Is the user's explanation credible given the context you have?", "- What's missing before you could decide confidently?", "",
+    "Decision: [uphold / overturn / change to a lesser action / escalate to a specialist]", "Reply to the user: [write your reply here]"].join("\n"),
   render:r => { const R = AI_REC[r.recommendation], met = {yes:["Met","crit"], no:["Not met","good"], unclear:["Unclear","med"]};
     return `
     <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
@@ -360,12 +381,16 @@ function renderAI(key){
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}
+          ${!ai && STANDALONE && T.tmpl ? `<button type="button" class="btn" id="ai-tmpl">Build a template without Claude</button>` : ""}
           ${ai ? `<div class="segs" role="group" aria-label="Review depth"><button type="button" data-aidepth="default" aria-pressed="${st.depth !== "deep"}">Standard</button><button type="button" data-aidepth="deep" aria-pressed="${st.depth === "deep"}">Deep</button></div>` : ""}
           <button type="button" class="btn" id="ai-ex">Fill in an example</button>
           <button type="button" class="btn" id="ai-sample">See an example result</button>
           <button type="button" class="btn ghost" id="ai-clear">Clear</button>
         </div>
-        ${!ai ? `<p class="note ai-off">${STANDALONE ? `This is the free public version. To run the AI step on your own case, open the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>, where it uses your own Claude account. The example result shows what you'll get.` : "The AI step runs inside Claude, on the viewer's own account. You can still explore the example result."}</p>` : missing.length ? `<p class="note">Fill in ${missing.map(fd => fd.lab.toLowerCase()).join(", ")} to get the best result.</p>` : ""}
+        ${!ai ? `<p class="note ai-off">${STANDALONE ? `This is the free public version. To run the AI step on your own case, open the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>, where it uses your own Claude account.${T.tmpl ? " Or build a plain template below from your own answers right now." : " The example result shows what you'll get."}` : "The AI step runs inside Claude, on the viewer's own account. You can still explore the example result."}</p>` : missing.length ? `<p class="note">Fill in ${missing.map(fd => fd.lab.toLowerCase()).join(", ")} to get the best result.</p>` : ""}
+        ${st.tmplText ? `<div class="ai-sec ai-tmpl-out"><div class="ai-sec-h"><h3>Template draft</h3><span class="pill">Template, not an AI review</span><span class="toast" id="ai-tmpl-toast" aria-live="polite"></span><button type="button" class="btn sm" id="ai-tmpl-copy">${icon("copy")}Copy</button></div>
+          <p class="note">Built only by filling your own answers into a letter shape - no AI wrote or checked this. Edit the brackets, and anything else, before you use it.</p>
+          <textarea class="input ai-tmpl-ta" id="ai-tmpl-ta" rows="12">${esc(st.tmplText)}</textarea></div>` : ""}
       </form>
       <aside class="ai-rail">
         <div class="card ai-about"><h4>How this works</h4>
@@ -386,6 +411,9 @@ function renderAI(key){
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
   const stop = $("#ai-stop"); if(stop) stop.onclick = () => { if(run.ctl) run.ctl.abort(); };
   const rb = $("#ai-run"); if(rb) rb.onclick = () => aiRun(key);
+  const tb = $("#ai-tmpl"); if(tb) tb.onclick = () => { if(document.getElementById("ai-form")) persist(); const s = aiGet(key); s.tmplText = T.tmpl(s.f); aiPut(key, s); renderAI(key); setTimeout(() => { const ta = $("#ai-tmpl-ta"); if(ta && ta.scrollIntoView) ta.scrollIntoView({behavior:"smooth", block:"nearest"}); }, 30); };
+  const tta = $("#ai-tmpl-ta"); if(tta) tta.oninput = () => { const s = aiGet(key); s.tmplText = tta.value; aiPut(key, s); };
+  const tcp = $("#ai-tmpl-copy"); if(tcp) tcp.onclick = () => { const ta2 = $("#ai-tmpl-ta"); copyText(ta2 ? ta2.value : st.tmplText, $("#ai-tmpl-toast")); };
   if(st.r){
     const md = T.md(st.r, st.f);
     view.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copyText(b.dataset.copy === "__md" ? md : st.r[b.dataset.copy], $("#ai-toast")));
