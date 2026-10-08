@@ -277,6 +277,7 @@ function renderTools(){
         <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs</h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models</h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>Glossary and practice</h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
       </div>
     </section>
     <section class="rise">
