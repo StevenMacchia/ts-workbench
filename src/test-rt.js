@@ -196,6 +196,8 @@ const body5 = function(){
   rt.surf = {chat:1}; eq(/No. The feature answers and summarises/.test(RT_QS.find(q => q.k === "autonomy").d()), true, "no tools means no autonomy claim"); rt.surf = {chat:1, tools:1}; eq(/Yes, within limits/.test(RT_QS.find(q => q.k === "autonomy").d()), true, "tools means limits are described");
   out.push("show the work: summary with " + sum.split("\n").length + " lines, " + RT_QS.length + " questionnaire drafts");
   rt.flow.path = "plan"; rtGo(rtScreens().findIndex(x => x.k === "plan1")); if(bad(H())) throw new Error("plan1 bad: " + where(H()));
+  eq(/Using your setup from Start here/.test(H()) && /A team of four or more/.test(H()) && /data-rtf="editsetup"/.test(H()), true, "plan1 recaps the setup already answered instead of re-asking it");
+  eq(rtScreens().filter(x => ["model", "harms", "team"].includes(x.k)).length, 0, "setup already answered, so plan does not insert the model, harms or team cards again");
   const sc = rtScopeDraft(); eq(/SCOPE · Pixelry assistant/.test(sc) && /no open S4; S3-or-above under 2%/.test(sc) && /Not this round/.test(sc), true, "scope carries the gates and the honest line");
   rtGo(rtScreens().findIndex(x => x.k === "plan2")); if(bad(H())) throw new Error("plan2 bad: " + where(H()));
   const pers = rtP().personas; eq(pers.filter(x => x.kind === "bad").length === 3 && pers.filter(x => x.kind === "good").length === 3, true, "three bad actors from setup and three well-meaning users");
@@ -205,6 +207,16 @@ const body5 = function(){
   rtGo(rtScreens().findIndex(x => x.k === "plan3")); if(bad(H())) throw new Error("plan3 bad: " + where(H())); eq((H().match(/data-ack=/g) || []).length, 7, "seven rules to acknowledge");
   RT_RULES.forEach((r, i) => rtP().ack[i] = true); rtP().dated = "2026-10-08"; renderRedteamStudio(); eq(/Plan done/.test(H()), true, "all seven ticked and dated finishes the plan"); eq(/Acknowledged by: 7 of 7/.test(rtPlanText()), true, "the plan export records the acknowledgement");
   out.push("plan the week: scope, " + pers.length + " personas, " + rows.length + "-row sheet, invite, 7 rules, dated");
+  // Partial setup: the model and the harm areas are already answered from Start here, only who-and-time is not,
+  // so only the team card should be re-asked; Change reopens all three existing setup cards, nothing new is built
+  rt = RT_BLANK(); rt.model = "llm"; rt.areas = {fraud:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtM1().target = "support"; rtM1().card = Object.assign({}, RT_TARGETS[0].card); rt.flow = {i:0, basics:{}, drill:{}, fix:{}, skipBasics:true, path:"plan"}; rtSave();
+  eq(rtScreens().some(x => x.k === "model"), false, "model already answered, not re-asked"); eq(rtScreens().some(x => x.k === "harms"), false, "harm areas already answered, not re-asked"); eq(rtScreens().some(x => x.k === "team"), true, "who-and-time still asked, since it was never answered");
+  rt.team = "pair"; rt.time = "afternoon"; rtSave();
+  rtGo(rtScreens().findIndex(x => x.k === "plan1")); if(bad(H())) throw new Error("plan1 (partial setup) bad: " + where(H()));
+  eq(/Using your setup from Start here/.test(H()) && /Two of us/.test(H()) && /data-rtf="editsetup"/.test(H()), true, "plan1 recaps the setup, including what was just answered, with a way to change it");
+  eq(rtScreens().some(x => ["model", "harms", "team"].includes(x.k)), false, "nothing left to ask now that all three are answered");
+  rtF().editSetup = true; rtSave(); eq(["model", "harms", "team"].every(k => rtScreens().some(x => x.k === k)), true, "Change reopens the existing model, harms and team cards rather than building a new editor");
+  out.push("plan the week recap: the setup already answered is not re-asked, and Change reuses the existing cards");
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body5.toString() + ")();")());
