@@ -60,6 +60,19 @@ out.push("tailored variants played through: " + variants);
 TT_TYPES.forEach(t => { store.set("tt:type", t.k); tt = null; renderTabletop(); const n = (view.innerHTML.match(/class="card scen[ "]/g)||[]).length;
   if(/\{[a-z]+\}/.test(view.innerHTML)) throw new Error("unfilled placeholder in list for " + t.k);
   if(t.k !== "all" && n < 12) throw new Error(t.n + " has only " + n); out.push("  " + t.n.padEnd(26) + n + " scenarios"); });
+// "Just show me one": the highest-severity, not-yet-completed scenario is one click away, skipping the type/mode/filter stack
+store.set("tt:type", "social"); tt = null; renderTabletop();
+{
+  const ttType = "social", prog = ttProgress();
+  const all = SCENARIOS.map((s,i)=>({s:ttScenario(i, ttType), i})).filter(x => ttType==="all" || (x.s.types||[]).includes(ttType))
+    .sort((a,b) => (a.s.tailored?1:0) - (b.s.tailored?1:0));
+  const pOf = x => prog[ttKey(x.i, ttType)];
+  const bestFit = ttBestFit(all, pOf);
+  if(!bestFit) throw new Error("no best-fit scenario found for social");
+  if(!view.innerHTML.includes('id="tt-one"')) throw new Error("no just-show-me-one button for social");
+  if(!view.innerHTML.includes(esc(bestFit.s.title))) throw new Error("just-show-me-one doesn't name the highest-severity scenario: wanted " + bestFit.s.title);
+  out.push('just show me one: starts "' + bestFit.s.title + '" (' + bestFit.s.severity + '), skipping the type, mode and filter choices');
+}
 mem["tt:type"] = undefined; delete mem["tt:type"]; pm.type = "fintech"; out.push("default for a fintech pre-mortem: " + ttCompanyType());
 // saved runs still summarize in the workspace
 tt = {s:10, step:4, scores:{safety:70,trust:60,reg:65,team:55}, picks:[2,0,1,2], answered:false}; wsSaveTabletop();

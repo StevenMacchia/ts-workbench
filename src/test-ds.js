@@ -12,6 +12,7 @@ const body = function(){
   eq(/Which parts of the Digital Services Act apply/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
   gdGo(gdCur, "start"); h = view.innerHTML; eq(/What's the service called/.test(h) && /Question 1 of 4/.test(h), true, "the name first, four questions before a tier is known");
   gdCur.steps[0].set("Pixelry"); gdGo(gdCur, "next"); h = view.innerHTML; eq(/Which best describes the service/.test(h) && (h.match(/data-gdpick=/g) || []).length, 4, "four tiers");
+  eq(/Example: most apps with public posts or listings/.test(h) && /Example: an ISP, a VPN provider or a CDN\./.test(h), true, "each service tier has a worked example under it");
   gdPick(gdCur, "platform"); gdGo(gdCur, "next"); h = view.innerHTML; eq(/How big is the company/.test(h), true, "size next");
   gdPick(gdCur, "medium"); gdGo(gdCur, "next"); gdPick(gdCur, "outside"); gdGo(gdCur, "next"); h = view.innerHTML;
   eq(/Which of these are true of the service/.test(h) && (h.match(/data-gdpick=/g) || []).length >= 5, true, "features for a platform");
@@ -57,6 +58,7 @@ const body = function(){
   orgSet({type:"marketplace", stage:"growth", regions:["us", "eu"], youth:"teens", confirmed:true}); dsAct("fromorg"); eq(ds.tier === "platform" && ds.size === "medium" && ds.feat.traders && ds.feat.minors && ds.feat.rec, true, "profile fills tier, size and features");
   eq(dsView, "page", "and opens the one-page form to check"); renderDsa(); h = view.innerHTML; if(bad(h)) throw new Error("page form bad: " + where(h));
   eq(/Traders and products/.test(h) && /Build my plan/.test(h) && /Switch to guided/.test(h), true, "one-page form shows the trader duties and a way back to guided");
+  eq(/Example: an ISP, a VPN provider or a CDN\./.test(h), true, "the one-page tier tiles carry the same worked examples");
   // the assessment step appears for EU profiles, and the plan carries the gaps
   eq(JOURNEY.some(z => z.k === "dsa"), true, "an EU profile gets the DSA step"); orgSet({regions:["us"]}); eq(JOURNEY.some(z => z.k === "dsa"), false, "a US-only one doesn't"); orgSet({regions:["us", "eu"]});
   ds.view = "report"; ds.ex = false; dsSave(); const pl = planItems().filter(z => z.kind === "dsa"); eq(pl.length, gaps().length, "the plan lists every DSA gap"); eq(pl.some(z => z.g === "do") && /^ds:/.test(pl[0].fix), true, "critical gaps go first and tick through the DSA check");

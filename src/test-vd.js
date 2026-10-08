@@ -11,6 +11,9 @@ const body = function(){
   vdView = "page"; renderVendors(); h = view.innerHTML;
   if(bad(h)) throw new Error("bad vendor html");
   eq((h.match(/class="card vd-crit"/g)||[]).length, CRITERIA.length, "one card per criterion");
+  const rfpOpenAt = h.indexOf('<details class="vd-rfp" open>');
+  eq((h.match(/<details class="vd-rfp" open>/g) || []).length, 1, "exactly one criterion's RFP opens by default");
+  eq(rfpOpenAt > -1 && rfpOpenAt < h.indexOf(esc(VD_Q[CRITERIA[1].k])), true, "it's the first criterion that opens, to teach the pattern once");
   eq((h.match(/role="radio"/g)||[]).length, CRITERIA.length * vx.vendors.length * 5, "1-5 buttons per vendor per criterion");
   eq((h.match(/aria-checked="true"/g)||[]).length, CRITERIA.length * vx.vendors.length, "one selected score each");
   const r = vdRank(); eq(r.top.v.name, "Vendor B", "example winner");
