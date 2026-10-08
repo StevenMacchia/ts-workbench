@@ -10,14 +10,20 @@ const body = function(){
   ma = {stage:"growth", lv:{}, done:{}, ex:false, open:"policy"}; pm = blankPM(); renderOverview(); let h = view.innerHTML;
   if(bad(h)) throw new Error("first visit has bad values: " + where(h));
   eq(/See where your Trust &amp; Safety program stands/.test(h) && /data-as="start"/.test(h), true, "first visit invites you to start");
-  eq((h.match(/<li style="--c:/g) || []).length, JOURNEY.length, "the six steps with what each gives you"); eq(/Appears after step 2/.test(h) && waits(h), 3, "empty picture waits for its steps");
+  eq((h.match(/<li style="--c:/g) || []).length, JOURNEY.length, "the six steps with what each gives you");
+  eq(/id="as-pic-h"/.test(h), false, "no empty 'Your program picture' ghost card on a first fresh visit"); eq(waits(h), 0, "and no ghost radars either");
   eq(/href="#tools"/.test(h), true, "every tool is still one click away");
-  out.push("first visit: six steps, an empty picture, start or see an example");
+  out.push("first visit: calm hero and six steps, no empty picture card, start or see an example");
+  // All tools: before the assessment has started, a banner steers a cold visitor back to it
+  renderTools(); h = view.innerHTML;
+  eq(/New here\?/.test(h) && /href="#overview"/.test(h), true, "banner steers a cold visitor to the guided assessment");
+  out.push("all tools: a banner back to the guided assessment for a non-assessment visitor");
   // starting shows the steps, with the setup form as the first one up
   store.set("as:start", true); renderOverview(); h = view.innerHTML;
   if(bad(h)) throw new Error("started has bad values: " + where(h));
   eq(/Your program assessment/.test(h) && /0 of 6 steps done/.test(h), true, "progress header"); eq(/class="as-s cur"/.test(h) && /data-orgdone/.test(h), true, "setup form is the first step up");
   eq((h.match(/class="as-s todo"/g) || []).length, 5, "the rest can be started in any order"); eq(/Coming up/.test(h), true, "says what comes next");
+  renderTools(); eq(/New here\?/.test(view.innerHTML), false, "and the banner drops once they're in the assessment");
   // partway: setup done, maturity rated, one product assessed
   orgSet({type:"social", stage:"growth", regions:["us", "eu"], confirmed:true}); MA_AREAS.forEach(a => ma.lv[a.k] = 2); ma.lv.policy = 4;
   pm = fromPreset("marketplace"); pm.example = false; pm.name = "Resale chat"; saveToLib(); store.set("as:seen", null); renderOverview(); h = view.innerHTML;
@@ -73,6 +79,14 @@ const body = function(){
   pm.stage = "start"; const land = pmCurrentHero() + libraryBlock(); eq(/aria-label="Current assessment"/.test(land), true, "landing hero");
   eq((land.match(/class="mini-radar"/g) || []).length, 2, "mini radar per saved pre-mortem"); if(bad(land)) throw new Error("landing has bad values");
   out.push("pre-mortem landing: current assessment hero and a mini radar on each saved assessment");
+  // Jump back in: the chip is not its own logic, it reuses itemSummary()'s pill text and color
+  const chipIt = Object.values(wsItems()).find(i => i.kind === "premortem");
+  const chipSum = itemSummary(chipIt), chip = ovChip(chipIt);
+  if(bad(chip)) throw new Error("overview chip has bad values");
+  eq(!!chipSum.chip, true, "itemSummary exposes a chip for ovChip to reuse");
+  eq(chip.includes(esc(chipSum.chip.label)), true, "overview chip shows the same label as the workspace summary's pill");
+  eq(chipSum.chip.cls ? chip.includes(`var(--${chipSum.chip.cls})`) : true, true, "and the same color");
+  out.push("overview chip: reuses itemSummary()'s pill text and color, one source of truth");
   return out.join("\n");
 };
 const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partORG.js"), rd("partJN.js"), rd("partREV.js"), rd("partGD.js"), rd("partDSA.js")].join("\n")

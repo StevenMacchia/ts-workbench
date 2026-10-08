@@ -61,12 +61,16 @@ function startHere(r){
   const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
   const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
   const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
+  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, allDone = r.safeguards.filter(s=>pm.done[s.id]).length;
+  const applies = r.obligations.filter(o=>o.status==="applies").length;
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
     : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
+  // The numbers used to sit in their own four-tile dashboard; said in one line instead, each one naming what it counts
+  const counted = `You've logged <strong>${r.risks.length} risk${r.risks.length===1?"":"s"}</strong>, each scored severity × likelihood. ${bDone} of ${blockers.length} launch blockers are done, and ${applies} of ${r.obligations.length} legal duties apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"} you named.`;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p><p class="note">${counted}</p></div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -126,6 +130,7 @@ function renderReport(r){
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
+    <details class="card pm-kpis-d"><summary>See the numbers<span class="note">Overall exposure, risk count, launch blockers and legal obligations</span></summary>
     <div class="kpis">
       <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
       <div class="card kpi"><span class="eyebrow">Risks identified ${tip("Each risk is scored severity (1–4) × likelihood (1–4). 12 or more is critical, 8–11 high, 4–7 medium and below 4 low.")}</span><span class="v">${total}</span>
@@ -133,7 +138,7 @@ function renderReport(r){
         <span class="s">${r.counts.crit} critical · ${r.counts.high} high · ${r.counts.med} medium · ${r.counts.low} low</span></div>
       <div class="card kpi"><span class="eyebrow">Launch blockers done ${tip("The core controls for critical risks, plus anything the law likely requires where you operate. Don't ship without these.","tip-r")}</span><span class="v">${bDone}<small> / ${blockers.length}</small></span><div class="bar"><i style="width:${blockers.length?bDone/blockers.length*100:0}%;background:${blockers.length&&bDone===blockers.length?"var(--good)":"var(--crit)"}"></i></div><span class="s">${allDone} of ${r.safeguards.length} safeguards in place overall</span></div>
       <div class="card kpi"><span class="eyebrow">Legal obligations ${tip("Laws matched to your answers and jurisdictions. A starting map for your legal team, not legal advice.","tip-r")}</span><span class="v">${applies}<small> apply</small></span><span class="s">${r.obligations.length-applies} more may apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"}</span></div>
-    </div>
+    </div></details>
     <div class="viz">
       <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent. After safeguards counts the safeguards you've ticked in the launch plan.")}</h3>
           <div class="segs" role="group" aria-label="Which ratings to show"><button type="button" data-mview="inh" aria-pressed="${!resView}">Before safeguards</button><button type="button" data-mview="res" aria-pressed="${resView}">After safeguards</button></div></div>

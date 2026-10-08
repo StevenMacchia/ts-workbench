@@ -46,56 +46,69 @@ function vendorResult(d){
   const rows = d.vendors.map(v=>({v, score:CRITERIA.reduce((a,c)=>a+(+d.weights[c.k]||0)*v.s[c.k],0)/tw, bad:CRITERIA.some(c=>c.deal && v.s[c.k]<=2)}));
   return rows.filter(x=>!x.bad).sort((a,b)=>b.score-a.score)[0] || null;
 }
+// One source of truth for "how do we summarize a saved result": used for the fuller workspace
+// row (pill + note) and reused, via the `chip` field, for the compact one-line chip the
+// overview's "Jump back in" list shows (ovChip() below). Every number here says what it counts.
 function itemSummary(it){
   const d = it.data || {};
   if(it.kind==="redteam" && typeof rtDrills === "function"){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
-    return {html:`<span class="pill ${s4 ? "crit" : open ? "high" : "good"}">${s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s")}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`}; }
+    const cls = s4 ? "crit" : open ? "high" : "good", label = s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s");
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
-    return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
+    const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
-    return {html:`<span class="pill ${m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit"}">${m.pct(m.acc)} accurate</span><span class="note">${dd.cases.length} cases${m.main ? ` · P ${m.pct(m.main.pr)} · R ${m.pct(m.main.rc)}` : ""}</span>`}; }
+    const cls = m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit";
+    return {html:`<span class="pill ${cls}">${m.pct(m.acc)} accurate</span><span class="note">${dd.cases.length} case${dd.cases.length === 1 ? "" : "s"}${m.main ? ` · P ${m.pct(m.main.pr)} · R ${m.pct(m.main.rc)}` : ""}</span>`,
+      chip:{cls, label:`${m.pct(m.acc)} accurate (of ${dd.cases.length} case${dd.cases.length === 1 ? "" : "s"})`}}; }
   if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd)), ap = dsApplies(dd);
-    return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
+    const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="transparency" && typeof trProgress === "function"){
     const keep = tr, dd = Object.assign(TR_BLANK(), d); tr = dd; const p = trProgress(); tr = keep;
-    return {html:`<span class="pill ${p.pct >= 90 ? "good" : "high"}">${p.pct}% complete</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`};
+    const cls = p.pct >= 90 ? "good" : "high", label = `${p.pct}% complete`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(TR_TIERS[trRank(dd.tier)][1])} · ${esc(String(dd.year))}</span>`, chip:{cls, label}};
   }
   if(it.kind==="premortem"){
     const r = assess(openRecord(d)), bl = r.safeguards.filter(s=>s.rank===3), bd = bl.filter(s=>d.done&&d.done[s.id]).length;
-    return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd};
+    const cls = r.posture[1] || "faint";
+    return {html:`<span class="pill ${r.posture[1]}">${r.posture[0]}</span><span class="note">${r.risks.length} risks · ${bd}/${bl.length} blockers done</span>`, open:bl.length-bd, chip:{cls, label:r.posture[0]}};
   }
   if(it.kind==="tabletop"){
     const sc = SCENARIOS[d.s]; if(!sc) return {html:""};
     const best = ((d.first && d.first.length) ? d.first : (d.picks||[])).filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
     const avg = Math.round(DIMS.reduce((a,x)=>a+(d.scores?d.scores[x.k]:0),0)/DIMS.length);
     const cls = best===sc.steps.length ? "good" : best>=2 ? "high" : "crit";
-    return {html:`<span class="pill ${cls}">${best} of ${sc.steps.length} strong calls</span><span class="note">Average score ${avg}/100</span>`};
+    return {html:`<span class="pill ${cls}">${best} of ${sc.steps.length} strong calls</span><span class="note">Average score ${avg}/100</span>`, chip:{cls, label:`${best}/${sc.steps.length} first try`}};
   }
   if(it.kind==="metrics"){
     const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length;
     const c = typeof mxStatusCounts === "function" ? mxStatusCounts(d) : {on:0, watch:0, off:0};
     const st = c.on + c.watch + c.off ? `<span class="pill good">${c.on} on track</span>${c.watch ? `<span class="pill med">${c.watch} watch</span>` : ""}${c.off ? `<span class="pill crit">${c.off} off track</span>` : ""}` : "";
-    return {html:`<span class="pill">${n} metrics</span>${st}<span class="note">${esc(MX_PLATFORMS[d.platform]||"")}${d.reg?" · regulated":""}${d.period ? " · " + esc(d.period) : ""}</span>`};
+    return {html:`<span class="pill">${n} metrics</span>${st}<span class="note">${esc(MX_PLATFORMS[d.platform]||"")}${d.reg?" · regulated":""}${d.period ? " · " + esc(d.period) : ""}</span>`, chip:{cls:"", label:`${n} metrics`}};
   }
   if(it.kind==="vendors"){
     const top = vendorResult(d);
     return {html: top ? `<span class="pill accent">Recommended: ${esc(top.v.name)}</span><span class="note">Score ${top.score.toFixed(2)} / 5 · ${d.vendors.length} vendors</span>`
-                      : `<span class="pill crit">No vendor meets the minimums</span>`};
+                      : `<span class="pill crit">No vendor meets the minimums</span>`,
+      chip: top ? {cls:"accent", label:top.v.name.split(" (")[0]} : {cls:"crit", label:"None qualify"}};
   }
   if(it.kind==="maturity" && typeof maScore === "function"){
     const sc = maScore(d), g = maGaps(d).length, n = MA_AREAS.filter(a => d.lv && d.lv[a.k]).length;
     if(sc === null) return {html:`<span class="note">Not rated yet</span>`};
-    return {html:`<span class="pill ${g ? "high" : "good"}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`};
+    const cls = g ? "high" : "good";
+    return {html:`<span class="pill ${cls}">Level ${sc.toFixed(1)} · ${maLevelName(sc)}</span><span class="note">${g ? g + " below target" : "On target"} · ${n} of ${MA_AREAS.length} areas rated</span>`, chip:{cls, label:`Level ${sc.toFixed(1)}`}};
   }
   if(it.kind==="coverage" && typeof cvSummary === "function"){
     const s = cvSummary(d); if(!s.rated) return {html:`<span class="note">Not rated yet</span>`};
-    return {html:`<span class="pill ${s.exposed.length ? "crit" : s.gaps.length ? "high" : "good"}">${s.cov}% coverage</span><span class="note">${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "No gaps"} · ${s.rated} of ${s.total} rated</span>`};
+    const cls = s.exposed.length ? "crit" : s.gaps.length ? "high" : "good";
+    return {html:`<span class="pill ${cls}">${s.cov}% coverage</span><span class="note">${s.exposed.length ? s.exposed.length + " exposed" : s.gaps.length ? s.gaps.length + " gaps" : "No gaps"} · ${s.rated} of ${s.total} rated</span>`, chip:{cls, label:`${s.cov}% covered`}};
   }
   if(it.kind==="policy"){
     const s = d.result ? d.result.score : d.heur ? d.heur.score : null;
     if(s===null) return {html:`<span class="note">Not tested yet</span>`};
     const cls = s>=75 ? "good" : s>=50 ? "high" : "crit";
-    return {html:`<span class="pill ${cls}">Clarity ${s}/100</span><span class="note">${d.result ? d.result.edge_cases.length + " edge cases" : "Instant checks"}</span>`};
+    return {html:`<span class="pill ${cls}">Clarity ${s}/100</span><span class="note">${d.result ? d.result.edge_cases.length + " edge cases" : "Instant checks"}</span>`, chip:{cls, label:`Clarity ${s}`}};
   }
   return {html:""};
 }
@@ -171,7 +184,7 @@ function renderWorkspace(){
   const inProject = active ? all.filter(i=>(i.projectId||null)===active) : all;
   const shown = kind ? inProject.filter(i=>i.kind===kind) : inProject;
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
-  const p = wsProfile();
+  const p = wsProfile(), empty = all.length === 0, projCount = Object.keys(wsProjects()).length;
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
     `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
     `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
@@ -181,19 +194,20 @@ function renderWorkspace(){
       ${profileCard()}
       ${typeof orgCardHTML === "function" ? orgCardHTML() : ""}
     </div>
-    <div class="wsstats">
-        <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${Object.keys(wsProjects()).length}</span></div>
+    ${empty ? itemRows([]) : `<div class="wsstats">
+        <div class="card kpi"><span class="eyebrow">Projects</span><span class="v">${projCount}</span></div>
         <div class="card kpi"><span class="eyebrow">Saved results</span><span class="v">${all.length}</span></div>
         <div class="card kpi"><span class="eyebrow">Pre-mortems</span><span class="v">${all.filter(i=>i.kind==="premortem").length}</span></div>
         <div class="card kpi"><span class="eyebrow">Open launch blockers ${tip("Launch blockers not yet ticked off, added up across every saved pre-mortem.","tip-r")}</span><span class="v" style="${openBlockers?"color:var(--crit)":""}">${openBlockers}</span></div>
-    </div>
+    </div>`}
     <div class="section-title"><h2>Projects ${tip("Group results by launch, product area or client. Click a project to see its results; anything you save while it's selected goes into it.")}</h2>
       <button type="button" class="btn sm" data-ws="newproj"><svg><use href="#i-plus"/></svg>New project</button></div>
+    ${!projCount && all.length < 3 ? `<p class="note wsnudge">Projects help once you have a few results to group. With ${all.length} saved so far, you probably don't need one yet.</p>` : ""}
     ${projectCards(all)}
     <div class="section-title"><h2>${active?`Results in ${esc(projName(active))}`:"All saved results"}</h2>
       <div class="segs" role="group" aria-label="Filter by tool"><button type="button" data-ws-kind="" aria-pressed="${!kind}">All <span class="mono" style="opacity:.6">${inProject.length}</span></button>${Object.entries(KINDS).map(([k,v])=>`<button type="button" data-ws-kind="${k}" aria-pressed="${kind===k}">${v.plural} <span class="mono" style="opacity:.6">${inProject.filter(i=>i.kind===k).length}</span></button>`).join("")}</div></div>
     ${active?`<div class="banner" style="margin-top:12px"><span>New results you save from any tool go into <strong>${esc(projName(active))}</strong>.</span><button type="button" class="btn sm" data-wsproj="">Show all results</button></div>`:""}
-    ${itemRows(shown)}
+    ${empty ? "" : itemRows(shown)}
     ${shown.length?`<div class="row wsnew"><span class="note">Start something new:</span>${Object.entries(KINDS).map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div>`:""}
   </div>`;
   bindWorkspace();

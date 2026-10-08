@@ -243,13 +243,13 @@ function maPlanHTML(){
   const sc = maScore(ma), pr = maProgress(ma), gaps = maGaps(ma), hist = ma.hist.slice().sort((a, b) => a.t - b.t), prev = hist[hist.length - 1], nx = maNextItem(ma);
   const tabs = MA_TABS.map(([k, n]) => `<button type="button" role="tab" aria-selected="${ma.tab === k}" data-matab="${k}">${n}${k === "roadmap" ? ` <span class="mono">${pr.stepsDone}/${pr.steps.length}</span>` : k === "progress" && hist.length ? ` <span class="mono">${hist.length}</span>` : ""}</button>`).join("");
   return `<section class="card ma-band">
+      ${nx ? `<p class="ma-band-next" style="grid-column:1/-1"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
         <div class="ma-band-t">${maWhy()}</div>
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
-        ${nx ? `<p class="ma-band-next"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
         <div class="ma-band-a"><button type="button" class="btn sm" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button>
           ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>

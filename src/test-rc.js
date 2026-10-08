@@ -8,8 +8,11 @@ const body = function(){
   // nothing done: no grade, every part invites
   ma = maInit({stage:"growth", lv:{}, done:{}, ex:false}); cv = {src:null, ex:false, r:{}}; mx = {platform:"social", stage:"2", reg:true, vals:{}};
   let o = rcOverall(rcParts()); eq(o.score, null, "no grade yet"); eq(o.total, 5, "five parts"); eq(rcParts().some(p => p.k === "metrics"), false, "measurement is left out for now");
-  renderOverview(); let h = view.innerHTML; if(bad(h)) throw new Error("blank report card has bad values");
+  // the picture itself (not the welcome screen, which now skips it on a first fresh visit) waits on every part
+  let h = asPictureHTML(false); if(bad(h)) throw new Error("blank report card has bad values");
   eq(/Appears after step 2/.test(h) && (h.match(/class="as-part open"/g) || []).length, 5, "every part waits for its step");
+  renderOverview(); const welcome = view.innerHTML; if(bad(welcome)) throw new Error("welcome screen has bad values");
+  eq(/id="as-pic-h"/.test(welcome), false, "a first fresh visit skips the empty program-picture card entirely");
   // examples never count as your own
   ma = maExample(); cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); eq(part("maturity").score, null, "maturity example is not graded"); eq(part("coverage").score, null, "coverage example is not graded");
   out.push("blank and examples: no grade, five parts to complete");
@@ -39,7 +42,7 @@ const body = function(){
   const ps = rcParts(); o = rcOverall(ps); const g = ps.filter(p => p.score !== null), w = g.reduce((s, p) => s + RC_WEIGHTS[p.k], 0);
   eq(o.score, Math.round(g.reduce((s, p) => s + p.score * RC_WEIGHTS[p.k], 0) / w), "weighted average"); eq(o.graded, 5, "all five parts graded");
   eq(rcGrade(85)[1], "A", "A from 85"); eq(rcGrade(84)[1], "B", "B below 85"); eq(rcGrade(39)[1], "F", "F below 40");
-  renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("report card has bad values: " + (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0]);
+  h = asPictureHTML(false); if(bad(h)) throw new Error("report card has bad values: " + (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0]);
   eq(new RegExp(`Grade ${rcGrade(o.score)[1]} · based on 5 of 5 parts`).test(h) && h.includes(`<b class="mono">${o.score}</b>`), true, "the program picture shows the score and grade");
   const md = rcMarkdown(); eq(/\*\*Overall: \d+ \/ 100, grade [A-F]\*\*/.test(md) && !/Measurement/.test(md), true, "markdown report card");
   out.push(`overall: ${o.score} / 100, grade ${rcGrade(o.score)[1]}, ${o.graded} of ${o.total} parts graded; markdown export`);
