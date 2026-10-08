@@ -4187,6 +4187,17 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 /* maturity: the plan band is one column now that the radar sits under Details */
 .ma-band{grid-template-columns:minmax(0,1fr)}
 .ma-band-l{max-width:78ch}
+
+/* ---------- guided intro: a locked, non-interactive peek at the finished example, below the intro card ---------- */
+.gd-preview{position:relative;margin-top:26px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.gd-preview-frame{pointer-events:none;user-select:none;max-height:520px;overflow:hidden}
+.gd-preview-frame>*:first-child{margin-top:0}
+.gd-preview-fade{position:absolute;left:0;right:0;bottom:0;height:170px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;
+  background:linear-gradient(to bottom, transparent, var(--bg) 70%)}
+.gd-preview-cta{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+@media (max-width:640px){.gd-preview{display:none}}
+
+.gd-preview-frame{padding:18px 22px 0;background:var(--panel)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4284,14 +4295,17 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
         <a class="navlink" href="#coverage" data-route="coverage" data-step="4"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</a>
         <a class="navlink" href="#tabletop" data-route="tabletop" data-step="5"><span class="sb-glyph" style="background:var(--t-tt)"><svg><use href="#i-siren"/></svg></span>Incident tabletop<span class="sb-cnt" id="sb-cnt-tt"></span></a>
       </div>
-      <div class="sb-h">More tools</div>
+      <div class="sb-h">Assess and prepare</div>
       <div class="sb-more">
       <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
       <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness</a>
       <a class="navlink" href="#dsa" data-route="dsa"><span class="sb-glyph" style="background:var(--t-ds)"><svg><use href="#i-dsa"/></svg></span>DSA readiness</a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#metrics" data-route="metrics"><span class="sb-glyph" style="background:var(--t-mx)"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
-      <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Notice writer</a>
+      </div>
+      <div class="sb-h">AI assistants</div>
+      <div class="sb-more">
+      <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Enforcement notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
       </div>
@@ -10186,7 +10200,7 @@ const KINDS = {
   tabletop:{n:"Incident tabletop", plural:"Tabletops", icon:"i-siren", route:"tabletop", prefix:"TT"},
   metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
-  policy:{n:"Policy stress test", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
+  policy:{n:"Policy stress-tester", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
   maturity:{n:"Program maturity", plural:"Maturity", icon:"i-steps", route:"maturity", prefix:"MA"},
   coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
   coppa:{n:"COPPA readiness", plural:"COPPA checks", icon:"i-coppa", route:"coppa", prefix:"CP"},
@@ -11488,6 +11502,18 @@ function polInfoHTML(){
 }
 /* ---------- Guided: the rule, then your platform, then what worries you ---------- */
 let polView = null;
+// A preview of the finished example: the instant checks on the full example rule, computed locally
+// (no Claude call, so nothing to show mid-run), with the module's real state swapped back after
+function polPreviewHTML(){
+  const savedPol = pol, savedRun = polRun;
+  try{
+    pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)));
+    pol.heur = polHeuristics(pol.rule); pol.result = null; pol.filter = "all";
+    polRun = {busy:false, ctl:null, stage:0, timer:null, err:"", aiOff:false, looking:false};
+    return polReportHTML(false);
+  }catch(e){ return ""; }
+  finally{ pol = savedPol; polRun = savedRun; }
+}
 function polSpec(){
   const ai = !!SAMPLER && !polRun.aiOff, setV = (k, v) => { pol[k] = v; savePol(); };
   const multi = (k, list) => ({kind:"multi", opt:true, opts:() => list.map(([v, n]) => ({k:v, n})), get:() => pol[k] || [], toggle:v => setV(k, (pol[k] || []).includes(v) ? pol[k].filter(x => x !== v) : (pol[k] || []).concat(v))});
@@ -11513,6 +11539,7 @@ function polSpec(){
       facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
     steps, finish:ai ? "Run the test" : "Run the instant checks",
+    preview:polPreviewHTML,
     bind:() => { $$("[data-polex]").forEach(b => b.onclick = () => { pol.rule = POL_EXAMPLES[+b.dataset.polex][1]; pol.heur = null; pol.result = null; savePol(); renderPolicy(); const t = view.querySelector(".gd-text .input"); if(t) t.focus(); });
       const lk = view.querySelector && view.querySelector("[data-pollookup]"); if(lk) lk.onclick = polLookup; },
     done:() => { gdCur = null; polAnalyze(); }};
@@ -11879,7 +11906,7 @@ Return ONLY a JSON object with exactly these keys:
 
 /* ----- 3. Transparency report drafter ----- */
 AI_TOOLS.transparency = {
-  n:"Transparency report drafter", icon:"i-chart", slug:"transparency",
+  n:"Transparency report", icon:"i-chart", slug:"transparency",
   desc:"Turn your enforcement numbers into a clear, factual transparency report section, with what each number means and what a regulator would say is missing.",
   q:"Can the public understand what you did to keep people safe, and does the report hold up to scrutiny?",
   steps:[["Add your numbers","Paste them, or pull them from your Metrics scorecard."], ["Let Claude draft","Highlights, sections, and the gaps a regulator would spot."], ["Check every figure","Nothing is published until your team verifies it."]],
@@ -11994,7 +12021,6 @@ function aiScoreFill(){
 // Tools still being rebuilt show a placeholder page instead of the form
 // The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
 AI_TOOLS.transparency.builder = true;
-AI_TOOLS.transparency.n = "Transparency report";
 AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
 const AI_WIP = {transparency:{
   plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
@@ -12606,6 +12632,18 @@ function maNextOpen(i){
   const order = MA_AREAS.map((a, j) => j).slice(i + 1).concat(MA_AREAS.map((a, j) => j).slice(0, i));
   const nx = order.find(j => !ma.lv[MA_AREAS[j].k]); return nx === undefined ? null : nx;
 }
+// A non-interactive peek at the finished example plan, below the intro card. Builds the example in a
+// throwaway copy of the module's state, renders the real plan markup from it, then puts the visitor's
+// own state back exactly as it was
+function maPreviewHTML(){
+  const saved = ma;
+  try{
+    ma = maExample();
+    return `<div class="gd-preview"><div class="gd-preview-frame" inert aria-hidden="true"><div class="ma-plan">${maPlanHTML()}</div></div>
+      <div class="gd-preview-fade"><div class="gd-preview-cta"><button type="button" class="btn primary sm" data-ma="example">See the full example</button><span class="note">Or start yours above</span></div></div></div>`;
+  }catch(e){ return ""; }
+  finally{ ma = saved; }
+}
 function maIntroHTML(){
   const rated = MA_AREAS.filter(a => ma.lv[a.k]).length, o = typeof orgGet === "function" ? orgGet() : {};
   return `<div class="gd-w gd-intro">
@@ -12616,7 +12654,7 @@ function maIntroHTML(){
       <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Rate them all on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
-  </div>`;
+  </div>${maPreviewHTML()}`;
 }
 function maStageStepHTML(){
   const o = typeof orgGet === "function" ? orgGet() : {}, fromOrg = !ma.stageSet && o.stage === ma.stage;
@@ -13093,6 +13131,28 @@ function cvNextPos(){
 }
 const cvInAssessment = () => asInAssessment();
 const cvStepBar = pct => asStepBar("coverage", pct, true);
+// A non-interactive peek at the finished example result, below the intro card. Builds the example in a
+// throwaway copy of the module's state, renders the real result markup from it, then puts the visitor's
+// own state back exactly as it was
+function cvPreviewHTML(){
+  const saved = cv;
+  try{
+    cv = JSON.parse(JSON.stringify(CV_EXAMPLE));
+    const acts = cvActions(cv), top = acts.slice(0, 3);
+    return `<div class="gd-preview"><div class="gd-preview-frame" inert aria-hidden="true">
+        <div class="cvr-page">
+          <div class="card cvr-side">
+            <span class="as-eb">Example</span>
+            <div class="pol-verdict">${cvWhy()}</div>
+            ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+          </div>
+          <div class="cvr"><div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div></div>
+        </div>
+      </div>
+      <div class="gd-preview-fade"><div class="gd-preview-cta"><button type="button" class="btn primary sm" data-cv="example">See the full example</button><span class="note">Or start yours above</span></div></div></div>`;
+  }catch(e){ return ""; }
+  finally{ cv = saved; }
+}
 function cvIntroHTML(){
   const s = cvSummary(cv), n = cvAreas(cv).length, {src, s:srcs} = cvSrc(cv), rk = cvRisk(cv);
   const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
@@ -13105,7 +13165,7 @@ function cvIntroHTML(){
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
       ${!src ? `<button type="button" class="btn gd-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
-  </div>`;
+  </div>${cvPreviewHTML()}`;
 }
 function cvApplyHTML(){
   const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
@@ -14384,6 +14444,16 @@ async function trWrite(){
 /* ---------- page ---------- */
 /* ---------- Guided: your service, then one section of the report per screen ---------- */
 let trView = null;
+// A preview of the finished example report (Pixelry, 2025), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function trIntroPreviewHTML(){
+  const saved = tr;
+  try{
+    tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)));
+    return trReportHTML(false);
+  }catch(e){ return ""; }
+  finally{ tr = saved; }
+}
 function trSpec(){
   const yn = (k, title, why, on, set) => ({id:k, eb:title.replace(/\?$/, ""), title, why, kind:"single", opts:() => [{k:"no", n:"No"}, {k:"yes", n:"Yes"}], get:() => tr[k + "Set"] ? (on() ? "yes" : "no") : "", set:v => { set(v === "yes"); tr[k + "Set"] = true; trSave(); }});
   const steps = [
@@ -14401,6 +14471,7 @@ function trSpec(){
       facts:[["About 15 minutes", "Numbers you can look up as you go. Come back any time."], ["Only your sections", "Hosting services, platforms and very large platforms have different duties."], ["Checked against the DSA", `Articles 15, 24 and 42 and the EU templates, reviewed ${TR_REVIEWED}.`]], start:p.got ? "Continue" : "Start"},
     alt:[{n:"Fill everything in on one page", run:() => { trView = "page"; renderTransparency(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See an example", run:() => trAct("example")}],
     steps, finish:"Build the report",
+    preview:trIntroPreviewHTML,
     done:() => { trView = null; trAct("build"); }};
 }
 function renderTransparency(){
@@ -15094,6 +15165,22 @@ function gdHas(s){
 }
 const gdFirstOpen = spec => { const i = gdLive(spec).findIndex(s => !gdHas(s) && !s.opt || !gdAnswered(s)); return i < 0 ? null : i; };
 const gdPct = spec => { const st = gdLive(spec), n = st.filter(gdHas).length; return st.length ? Math.round(n / st.length * 100) : 0; };
+// A non-interactive peek at the tool's finished example, below the intro card: a button runs the real
+// example (the alt entry whose name mentions "example"); the preview itself is inert, so it can't be
+// clicked, focused or read by a screen reader, and sits behind a fade so it never looks finished on its own
+function gdPreviewHTML(spec){
+  if(!spec.preview) return "";
+  let html = ""; try{ html = spec.preview(); }catch(e){ html = ""; }
+  if(!html) return "";
+  const exIdx = spec.alt ? spec.alt.findIndex(a => /example/i.test(a.n)) : -1;
+  return `<div class="gd-preview">
+    <div class="gd-preview-frame" inert aria-hidden="true">${html}</div>
+    <div class="gd-preview-fade"><div class="gd-preview-cta">
+      ${exIdx >= 0 ? `<button type="button" class="btn primary sm" data-gd="alt${exIdx}">See the full example</button>` : ""}
+      <span class="note">Or start yours above</span>
+    </div></div>
+  </div>`;
+}
 function gdIntroHTML(spec){
   const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
   const resume = n > 0 && n < st.length && gdHas(st[0]);
@@ -15105,7 +15192,7 @@ function gdIntroHTML(spec){
     ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
-  </div>`;
+  </div>${gdPreviewHTML(spec)}`;
 }
 function gdOptHTML(s, o, j, on){
   return `<button type="button" class="gd-opt ${on ? "on" : ""} ${o.off ? "off" : ""}" data-gdpick="${esc(o.k)}" aria-pressed="${on}" ${o.off ? 'aria-disabled="true"' : ""}>
@@ -15593,6 +15680,17 @@ function cpPiRow([k, n, h, isNew]){
       <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
     </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`;
 }
+// A preview of the finished example report (Brightbeam), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function cpPreviewHTML(){
+  const saved = cp;
+  try{
+    cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE)));
+    const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap);
+    return cpReportHTML(x, ap, s);
+  }catch(e){ return ""; }
+  finally{ cp = saved; }
+}
 function cpSpec(){
   const X = () => cpCtx(cp), AP = () => cpApplies(cp);
   const notPrimary = () => !!cp.aud && cp.aud !== "primary", live = () => { const ap = AP(); return !!ap.lvl && ap.lvl !== "watch"; };
@@ -15625,6 +15723,7 @@ function cpSpec(){
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
     steps, finish:"Build my plan",
+    preview:cpPreviewHTML,
     done:() => { cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function renderCoppa(){
@@ -16094,6 +16193,17 @@ const dsDraftMd = k => k === "notice" ? dsNoticeMd() : k === "complaints" ? dsCo
 
 /* ---------- guided: one question per screen, then the plan ---------- */
 let dsView = null;
+// A preview of the finished example report (Pixelry), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function dsPreviewHTML(){
+  const saved = ds;
+  try{
+    ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE)));
+    const x = dsCtx(ds), ap = dsApplies(ds), s = dsScore(ds, x);
+    return dsReportHTML(x, ap, s);
+  }catch(e){ return ""; }
+  finally{ ds = saved; }
+}
 function dsSpec(){
   const X = () => dsCtx(ds), setV = (k, v) => { ds[k] = v; ds.ex = false; dsSave(); };
   const steps = [
@@ -16118,6 +16228,7 @@ function dsSpec(){
     alt:[{n:"Answer everything on one page", run:() => { dsView = "page"; renderDsa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(typeof orgGet === "function" && orgGet().confirmed ? [{n:"Start from your profile", run:() => dsAct("fromorg")}] : []).concat([{n:"See a finished example", run:() => dsAct("example")}]),
     steps, finish:"Build my plan",
+    preview:dsPreviewHTML,
     done:() => { ds.view = "report"; ds.tab = "plan"; dsSave(); renderDsa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function renderDsa(){

@@ -180,7 +180,7 @@ Return ONLY a JSON object with exactly these keys:
 
 /* ----- 3. Transparency report drafter ----- */
 AI_TOOLS.transparency = {
-  n:"Transparency report drafter", icon:"i-chart", slug:"transparency",
+  n:"Transparency report", icon:"i-chart", slug:"transparency",
   desc:"Turn your enforcement numbers into a clear, factual transparency report section, with what each number means and what a regulator would say is missing.",
   q:"Can the public understand what you did to keep people safe, and does the report hold up to scrutiny?",
   steps:[["Add your numbers","Paste them, or pull them from your Metrics scorecard."], ["Let Claude draft","Highlights, sections, and the gaps a regulator would spot."], ["Check every figure","Nothing is published until your team verifies it."]],
@@ -295,7 +295,6 @@ function aiScoreFill(){
 // Tools still being rebuilt show a placeholder page instead of the form
 // The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
 AI_TOOLS.transparency.builder = true;
-AI_TOOLS.transparency.n = "Transparency report";
 AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
 const AI_WIP = {transparency:{
   plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],

@@ -309,6 +309,18 @@ function maNextOpen(i){
   const order = MA_AREAS.map((a, j) => j).slice(i + 1).concat(MA_AREAS.map((a, j) => j).slice(0, i));
   const nx = order.find(j => !ma.lv[MA_AREAS[j].k]); return nx === undefined ? null : nx;
 }
+// A non-interactive peek at the finished example plan, below the intro card. Builds the example in a
+// throwaway copy of the module's state, renders the real plan markup from it, then puts the visitor's
+// own state back exactly as it was
+function maPreviewHTML(){
+  const saved = ma;
+  try{
+    ma = maExample();
+    return `<div class="gd-preview"><div class="gd-preview-frame" inert aria-hidden="true"><div class="ma-plan">${maPlanHTML()}</div></div>
+      <div class="gd-preview-fade"><div class="gd-preview-cta"><button type="button" class="btn primary sm" data-ma="example">See the full example</button><span class="note">Or start yours above</span></div></div></div>`;
+  }catch(e){ return ""; }
+  finally{ ma = saved; }
+}
 function maIntroHTML(){
   const rated = MA_AREAS.filter(a => ma.lv[a.k]).length, o = typeof orgGet === "function" ? orgGet() : {};
   return `<div class="gd-w gd-intro">
@@ -319,7 +331,7 @@ function maIntroHTML(){
       <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Rate them all on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
-  </div>`;
+  </div>${maPreviewHTML()}`;
 }
 function maStageStepHTML(){
   const o = typeof orgGet === "function" ? orgGet() : {}, fromOrg = !ma.stageSet && o.stage === ma.stage;

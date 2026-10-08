@@ -198,3 +198,14 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 /* maturity: the plan band is one column now that the radar sits under Details */
 .ma-band{grid-template-columns:minmax(0,1fr)}
 .ma-band-l{max-width:78ch}
+
+/* ---------- guided intro: a locked, non-interactive peek at the finished example, below the intro card ---------- */
+.gd-preview{position:relative;margin-top:26px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.gd-preview-frame{pointer-events:none;user-select:none;max-height:520px;overflow:hidden}
+.gd-preview-frame>*:first-child{margin-top:0}
+.gd-preview-fade{position:absolute;left:0;right:0;bottom:0;height:170px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;
+  background:linear-gradient(to bottom, transparent, var(--bg) 70%)}
+.gd-preview-cta{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+@media (max-width:640px){.gd-preview{display:none}}
+
+.gd-preview-frame{padding:18px 22px 0;background:var(--panel)}

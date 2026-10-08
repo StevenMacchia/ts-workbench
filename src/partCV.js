@@ -291,6 +291,28 @@ function cvNextPos(){
 }
 const cvInAssessment = () => asInAssessment();
 const cvStepBar = pct => asStepBar("coverage", pct, true);
+// A non-interactive peek at the finished example result, below the intro card. Builds the example in a
+// throwaway copy of the module's state, renders the real result markup from it, then puts the visitor's
+// own state back exactly as it was
+function cvPreviewHTML(){
+  const saved = cv;
+  try{
+    cv = JSON.parse(JSON.stringify(CV_EXAMPLE));
+    const acts = cvActions(cv), top = acts.slice(0, 3);
+    return `<div class="gd-preview"><div class="gd-preview-frame" inert aria-hidden="true">
+        <div class="cvr-page">
+          <div class="card cvr-side">
+            <span class="as-eb">Example</span>
+            <div class="pol-verdict">${cvWhy()}</div>
+            ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+          </div>
+          <div class="cvr"><div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div></div>
+        </div>
+      </div>
+      <div class="gd-preview-fade"><div class="gd-preview-cta"><button type="button" class="btn primary sm" data-cv="example">See the full example</button><span class="note">Or start yours above</span></div></div></div>`;
+  }catch(e){ return ""; }
+  finally{ cv = saved; }
+}
 function cvIntroHTML(){
   const s = cvSummary(cv), n = cvAreas(cv).length, {src, s:srcs} = cvSrc(cv), rk = cvRisk(cv);
   const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
@@ -303,7 +325,7 @@ function cvIntroHTML(){
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
       ${!src ? `<button type="button" class="btn gd-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
-  </div>`;
+  </div>${cvPreviewHTML()}`;
 }
 function cvApplyHTML(){
   const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;

@@ -33,6 +33,18 @@ function polInfoHTML(){
 }
 /* ---------- Guided: the rule, then your platform, then what worries you ---------- */
 let polView = null;
+// A preview of the finished example: the instant checks on the full example rule, computed locally
+// (no Claude call, so nothing to show mid-run), with the module's real state swapped back after
+function polPreviewHTML(){
+  const savedPol = pol, savedRun = polRun;
+  try{
+    pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)));
+    pol.heur = polHeuristics(pol.rule); pol.result = null; pol.filter = "all";
+    polRun = {busy:false, ctl:null, stage:0, timer:null, err:"", aiOff:false, looking:false};
+    return polReportHTML(false);
+  }catch(e){ return ""; }
+  finally{ pol = savedPol; polRun = savedRun; }
+}
 function polSpec(){
   const ai = !!SAMPLER && !polRun.aiOff, setV = (k, v) => { pol[k] = v; savePol(); };
   const multi = (k, list) => ({kind:"multi", opt:true, opts:() => list.map(([v, n]) => ({k:v, n})), get:() => pol[k] || [], toggle:v => setV(k, (pol[k] || []).includes(v) ? pol[k].filter(x => x !== v) : (pol[k] || []).concat(v))});
@@ -58,6 +70,7 @@ function polSpec(){
       facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
     steps, finish:ai ? "Run the test" : "Run the instant checks",
+    preview:polPreviewHTML,
     bind:() => { $$("[data-polex]").forEach(b => b.onclick = () => { pol.rule = POL_EXAMPLES[+b.dataset.polex][1]; pol.heur = null; pol.result = null; savePol(); renderPolicy(); const t = view.querySelector(".gd-text .input"); if(t) t.focus(); });
       const lk = view.querySelector && view.querySelector("[data-pollookup]"); if(lk) lk.onclick = polLookup; },
     done:() => { gdCur = null; polAnalyze(); }};

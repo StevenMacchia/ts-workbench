@@ -307,6 +307,17 @@ const dsDraftMd = k => k === "notice" ? dsNoticeMd() : k === "complaints" ? dsCo
 
 /* ---------- guided: one question per screen, then the plan ---------- */
 let dsView = null;
+// A preview of the finished example report (Pixelry), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function dsPreviewHTML(){
+  const saved = ds;
+  try{
+    ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE)));
+    const x = dsCtx(ds), ap = dsApplies(ds), s = dsScore(ds, x);
+    return dsReportHTML(x, ap, s);
+  }catch(e){ return ""; }
+  finally{ ds = saved; }
+}
 function dsSpec(){
   const X = () => dsCtx(ds), setV = (k, v) => { ds[k] = v; ds.ex = false; dsSave(); };
   const steps = [
@@ -331,6 +342,7 @@ function dsSpec(){
     alt:[{n:"Answer everything on one page", run:() => { dsView = "page"; renderDsa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(typeof orgGet === "function" && orgGet().confirmed ? [{n:"Start from your profile", run:() => dsAct("fromorg")}] : []).concat([{n:"See a finished example", run:() => dsAct("example")}]),
     steps, finish:"Build my plan",
+    preview:dsPreviewHTML,
     done:() => { ds.view = "report"; ds.tab = "plan"; dsSave(); renderDsa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function renderDsa(){

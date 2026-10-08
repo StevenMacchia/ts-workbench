@@ -405,6 +405,17 @@ function cpPiRow([k, n, h, isNew]){
       <div class="field"><label for="cp-keep-${k}">Kept for</label><select class="select" id="cp-keep-${k}" data-cpkeep="${k}"><option value="">Choose</option>${CP_KEEP.map(([v, t]) => `<option value="${v}" ${r.keep === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
     </div>${cpRowFlags(Object.assign({k, share:[], keep:"", use:"feature"}, r)).map(f => `<p class="cp-flag ${f[0]}">${esc(f[1])}</p>`).join("")}` : ""}</div>`;
 }
+// A preview of the finished example report (Brightbeam), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function cpPreviewHTML(){
+  const saved = cp;
+  try{
+    cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE)));
+    const x = cpCtx(cp), ap = cpApplies(cp), s = cpScore(cp, x, ap);
+    return cpReportHTML(x, ap, s);
+  }catch(e){ return ""; }
+  finally{ cp = saved; }
+}
 function cpSpec(){
   const X = () => cpCtx(cp), AP = () => cpApplies(cp);
   const notPrimary = () => !!cp.aud && cp.aud !== "primary", live = () => { const ap = AP(); return !!ap.lvl && ap.lvl !== "watch"; };
@@ -437,6 +448,7 @@ function cpSpec(){
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
     steps, finish:"Build my plan",
+    preview:cpPreviewHTML,
     done:() => { cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function renderCoppa(){

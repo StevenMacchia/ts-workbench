@@ -139,6 +139,16 @@ async function trWrite(){
 /* ---------- page ---------- */
 /* ---------- Guided: your service, then one section of the report per screen ---------- */
 let trView = null;
+// A preview of the finished example report (Pixelry, 2025), built by swapping in the example data,
+// calling the real report renderer, then restoring whatever the visitor had in progress
+function trIntroPreviewHTML(){
+  const saved = tr;
+  try{
+    tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)));
+    return trReportHTML(false);
+  }catch(e){ return ""; }
+  finally{ tr = saved; }
+}
 function trSpec(){
   const yn = (k, title, why, on, set) => ({id:k, eb:title.replace(/\?$/, ""), title, why, kind:"single", opts:() => [{k:"no", n:"No"}, {k:"yes", n:"Yes"}], get:() => tr[k + "Set"] ? (on() ? "yes" : "no") : "", set:v => { set(v === "yes"); tr[k + "Set"] = true; trSave(); }});
   const steps = [
@@ -156,6 +166,7 @@ function trSpec(){
       facts:[["About 15 minutes", "Numbers you can look up as you go. Come back any time."], ["Only your sections", "Hosting services, platforms and very large platforms have different duties."], ["Checked against the DSA", `Articles 15, 24 and 42 and the EU templates, reviewed ${TR_REVIEWED}.`]], start:p.got ? "Continue" : "Start"},
     alt:[{n:"Fill everything in on one page", run:() => { trView = "page"; renderTransparency(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See an example", run:() => trAct("example")}],
     steps, finish:"Build the report",
+    preview:trIntroPreviewHTML,
     done:() => { trView = null; trAct("build"); }};
 }
 function renderTransparency(){
