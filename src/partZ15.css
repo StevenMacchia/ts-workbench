@@ -40,3 +40,30 @@
 
 /* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
 .mxm-onramp{margin-bottom:18px}
+
+/* r3b: Coverage radar: the rail's "Start here" step, promoted above the rating grid so it isn't missed below the fold */
+.cv-start-promo{margin-bottom:14px}
+
+/* r3b: Maturity: prompt a snapshot right after all areas are rated, instead of leaving Progress to be found by accident */
+.ma-snapq{margin-top:14px}
+
+/* r3b: Policy stress-tester: sticky progress dots for the one-page setup, since it has no guided crumb trail */
+.pol-dots{position:sticky;top:8px;z-index:5;display:flex;justify-content:center;gap:10px;padding:8px 0;margin:-4px 0 10px}
+.pol-dot{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--line);position:relative;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.pol-dot span{font-size:12px;font-weight:600;color:var(--muted);font-family:var(--mono)}
+.pol-dot.on{border-color:color-mix(in oklab, var(--t-pol) 45%, var(--line));background:color-mix(in oklab, var(--t-pol) 10%, var(--surface))}
+.pol-dot.on span{color:var(--t-pol)}
+.pol-dot:focus-visible{outline:2px solid var(--t-pol);outline-offset:2px}
+@media (max-width:640px){.pol-dots{position:static}}
+
+/* r3b: Policy stress-tester: repeat the "can't browse the web" caveat next to fields Claude filled in, not only by the lookup button */
+.pol-fromai{display:block;margin-top:4px;font-style:italic}
+
+/* r3b: COPPA readiness: the audience choice is the highest-leverage decision, framed before the tiles */
+.cp-aud-note{margin:0 0 8px}
+
+/* r3b: COPPA readiness: a plain cost/friction hint on each consent method, since the Rule doesn't say which need a vendor */
+.cp-cost{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:500;letter-spacing:.02em;color:var(--muted);background:var(--sunk);vertical-align:middle}
+
+/* r3b: DSA readiness: a one-line note when the size or features section is left out, so fewer questions isn't a silent gap */
+.ds-skipnote{margin:-4px 0 2px}

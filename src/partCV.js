@@ -122,6 +122,12 @@ function cvRadar(d, big, prev){
     ${!anyRated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="cv-rl none">Rate a defense to start</text>` : ""}</svg>`;
 }
 const cvLegend = d => `<div class="ma-legend cv-legend"><span><i class="cv-lg-cov"></i>Your coverage</span>${cvRisk(d) ? `<span><i class="cv-lg-risk"></i>Risk</span>` : ""}<span><i class="ma-lg-gap"></i>Risk outruns coverage</span></div>`;
+// The rail's "Start here" step, promoted above the 40-cell rating grid so it isn't missed below the fold while you're still rating
+function cvStartPromoHTML(){
+  if(cv.est || cvRatedAll()) return "";
+  const a = cvActions(cv, 1)[0]; if(!a) return "";
+  return `<div class="ma-start cv-start cv-start-promo"><span class="ma-start-k">Start here</span><b>${esc(a.row.a.n)} <span class="ma-lvl">${esc(a.layer.n)}</span></b><span>${esc(a.text)}</span></div>`;
+}
 
 /* ---------- page parts ---------- */
 function cvRailHTML(){
@@ -407,7 +413,7 @@ function cvTableRender(){
     <div class="vd-grid ma-grid cv-grid">
       <div class="vd-main">
         <section class="mxa-part">${step(1)}<div id="cv-src-wrap">${cvSourceHTML()}</div></section>
-        <section class="mxa-part">${step(2)}<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div></section>
+        <section class="mxa-part">${step(2)}<div id="cv-start-promo">${cvStartPromoHTML()}</div><div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div></section>
         <section class="mxa-part" id="cv-p3">${step(3)}<div id="cv-result">${cvResultHTML()}</div></section>
       </div>
       <aside class="vd-rail"><div class="card vd-railc" id="cv-rail">${cvRailHTML()}</div></aside>
@@ -425,7 +431,7 @@ function cvRefresh(all){
   if(cvMode() !== "table"){ const y = window.scrollY; renderCoverage(true); window.scrollTo(0, y); return; }
   const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
   if(all){ set("cv-src-wrap", cvSourceHTML()); set("cv-matrix", cvMatrixHTML()); }
-  set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML()); set("cv-est", cvEstHTML());
+  set("cv-rail", cvRailHTML()); set("cv-result", cvResultHTML()); set("cv-est", cvEstHTML()); set("cv-start-promo", cvStartPromoHTML());
   const hm = view.querySelector && view.querySelector(".pagehead .headmeta"); if(hm) hm.innerHTML = cvHeadMeta();
 }
 // Answer the current question, then move on after a beat so the choice registers
