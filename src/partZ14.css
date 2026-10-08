@@ -422,3 +422,10 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-body ol.do li.ln-row-ol summary,.ln-body ul.good li.ln-row-ul summary{padding:0}
 .ln-body ol.do li.ln-row-ol details[open] summary,.ln-body ul.good li.ln-row-ul details[open] summary{border-bottom:0}
 .ln-body ol.do li.ln-row-ol .ln-rowb,.ln-body ul.good li.ln-row-ul .ln-rowb{padding:6px 0 0}
+
+/* learning pass: a check question, a "For Pixelry" row, a what-you'll-have line, a bridge into the studio */
+.ln-have{margin-top:6px}
+.ln-eg{margin-top:4px}
+.ln-cardacts{gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.ln-checkmark{width:12px;height:12px;color:var(--good);flex:none;margin-left:2px}
+@media (max-width:760px){.ln-cardacts{flex-direction:column;align-items:stretch}}

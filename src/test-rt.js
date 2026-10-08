@@ -266,13 +266,18 @@ const body7 = function(){
   eq(/class="ln-row"/.test(cards[0].html) && /<summary><b>The model and version\.<\/b>/.test(cards[0].html), true, "a bold-lead item collapses into a row with the lead visible");
   eq(/data-openall="ln-ul-llm-scope-0-0"/.test(cards[0].html), true, "an Open all control is added for the collapsed list");
   const noH3 = lnStepCards("llm", LN_GUIDES.llm.steps.find(s => s.id === "harms")); eq(noH3.length, 1, "a step with no <h3> renders as a single card");
-  // rendering the step's last card also carries the drill button, ahead of a Next that would move to the next step
+  // rendering the step's last content card also carries the drill button; with a check question added this
+  // round, Next from there leads into the check slot (the step's fourth card) before the next step
   store.set("learn:llm:pos", {s:0, c:2}); lnMethod("llm", LN_GUIDES.llm); const h = els["#ln-view"].innerHTML;
-  eq(/undefined|NaN|\[object/.test(h), false, "last card renders cleanly");
-  eq(/Agree the rules before results exist/.test(h) && /3 of 3/.test(h), true, "the last sub-section card shows its heading and position");
-  eq(/data-ex="e1"/.test(h), true, "the drill button for the step stays on its last card");
-  eq(/data-next[^>]*>What to test for/.test(h), true, "Next on the step's last card is labelled with the next step");
-  out.push("method cards: step 1 splits into 3 cards in order, the note and the drill button carry to the last");
+  eq(/undefined|NaN|\[object/.test(h), false, "last content card renders cleanly");
+  eq(/Agree the rules before results exist/.test(h) && /3 of 4/.test(h), true, "the last content card shows its heading and position, counting the step's check slot too");
+  eq(/data-ex="e1"/.test(h), true, "the drill button for the step stays on its last content card");
+  eq(/data-next[^>]*>Next/.test(h), true, "Next from the last content card leads into the check question, not straight past it");
+  store.set("learn:llm:pos", {s:0, c:3}); lnMethod("llm", LN_GUIDES.llm); const hc = els["#ln-view"].innerHTML;
+  eq(/undefined|NaN|\[object/.test(hc), false, "the check slot renders cleanly");
+  eq(/4 of 4/.test(hc) && /class="rtf-opts"/.test(hc) && hc.includes(LN_GUIDES.llm.steps[0].check.q), true, "the check slot is the step's fourth card, with the question and its options");
+  eq(/data-next[^>]*>What to test for/.test(hc), true, "Next on the check card is labelled with the next step");
+  out.push("method cards: step 1 splits into 3 content cards plus a check question, the note and the drill button carry to the last content card");
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body7.toString() + ")();")());
@@ -342,3 +347,57 @@ const body9 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body9.toString() + ")();")());
+// The learning pass: a check question per step, a "For Pixelry" line per card, what-you'll-have-and-how-long
+// on the first card, and a bridge into the studio from the last content card of the nine shared steps.
+const body10 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  ["llm", "world"].forEach(k => {
+    LN_GUIDES[k].steps.forEach(s => {
+      const c = s.check;
+      eq(!!c && typeof c.q === "string" && c.q.length > 0, true, k + " " + s.id + " has a check question");
+      eq(Array.isArray(c.options) && c.options.length === 3, true, k + " " + s.id + " check has three options");
+      eq(Number.isInteger(c.a) && c.a >= 0 && c.a < 3, true, k + " " + s.id + " check answer index is valid");
+      eq(typeof c.why === "string" && c.why.length > 0, true, k + " " + s.id + " check has a why");
+      eq(typeof s.have === "string" && s.have.split(/\s+/).length <= 12, true, k + " " + s.id + " have-line is under twelve words");
+      eq(typeof s.mins === "number" && s.mins > 0, true, k + " " + s.id + " has a minutes estimate");
+      const n = lnStepCards(k, s).length;
+      eq(Array.isArray(s.eg) && s.eg.length === n, true, k + " " + s.id + " eg length (" + (s.eg ? s.eg.length : "none") + ") matches its card count (" + n + ")");
+    });
+  });
+  out.push("every step in both guides has a check question, an eg line per card, and a have/mins line under twelve words");
+  // the check result store: a fresh key, read against with lnCheckPassed, the existing read-progress store untouched
+  eq(lnStore.get(lnCheckKey("llm", "scope"), null), null, "no check result recorded before an answer");
+  eq(lnCheckPassed("llm", "scope"), false, "an unanswered check is not counted as passed");
+  lnStore.set(lnCheckKey("llm", "scope"), {ok:true, at:Date.now()});
+  eq(lnCheckPassed("llm", "scope"), true, "a passed check is recorded under its own new learn:<guide>:check:<stepId> key");
+  eq(lnDone().includes("llm:s:scope"), false, "recording a check result does not touch the existing read-progress store");
+  out.push("a check result is recorded under its own new key and leaves the read-progress store untouched");
+  // bridges: every one of the nine shared step ids lands rtF().i on a real, in-bounds studio screen (or, for
+  // "report", opens the real new-finding modal) -- through the studio's own rt.flow/rtScreens machinery
+  const expect = {scope:"target", harms:"harms", testset:"plan2", techniques:"drill", grade:"judge", qa:"method"};
+  ["llm", "world"].forEach(k => {
+    Object.keys(expect).forEach(id => {
+      rt = RT_BLANK();
+      lnToStudio(k, id);
+      const screens = rtScreens(), i = rtF().i;
+      eq(i >= 0 && i < screens.length, true, k + "/" + id + " bridge lands on an in-bounds screen");
+      eq(screens[i].k, expect[id], k + "/" + id + " bridge lands on the " + expect[id] + " screen");
+    });
+    // report lands by opening the real new-finding modal (rtOpenFinding) rather than a flow screen; the modal's
+    // own DOM work needs a browser, so here just confirm the bridge reaches and calls it with the right state
+    rt = RT_BLANK(); const origOpenFinding = rtOpenFinding; let openedWith = null;
+    rtOpenFinding = id2 => { openedWith = {id:id2, mode:rt.mode, tab:rt.tab, model:rt.model}; };
+    lnToStudio(k, "report"); rtOpenFinding = origOpenFinding;
+    eq(!!openedWith, true, k + "/report bridge calls rtOpenFinding");
+    eq(openedWith && openedWith.mode === "full" && openedWith.tab === "findings" && openedWith.model === k, true, k + "/report bridge opens the findings tab in the engineers' view for the right model");
+    rt = RT_BLANK(); lnToStudio(k, "check");
+    let screens = rtScreens(), i = rtF().i;
+    eq(i >= 0 && i < screens.length && (screens[i].k === "fix" || screens[i].k === "verdict"), true, k + "/check bridge lands on the fix card or the verdict");
+    rt = RT_BLANK(); lnToStudio(k, "law");
+    screens = rtScreens(); i = rtF().i;
+    eq(i >= 0 && i < screens.length && screens[i].k === "show", true, k + "/law bridge lands on Show the work");
+  });
+  out.push("all nine bridge ids resolve to a real, in-bounds studio screen for both guides");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body10.toString() + ")();")());

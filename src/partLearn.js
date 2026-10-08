@@ -749,6 +749,195 @@ Then change one number (provenance after extend to 100%, or NCII S3+ to 1.8%) an
     checklist:["Every generation surface listed: text-to-video, image-to-video, edit tools, interactive world, audio, export and share paths, each with an owner.","Guardrails named per surface, including upload hash matching, realism classifier, likeness detector, watermark and content credentials.","Success sentences written in visual terms per harm area, with likeness, realism and sequence in the rubric.","Stop rules for anything involving minors, consent in writing for every photo and voice used, evidence vault with deletion dates.","Tester welfare rules set for visual material: shorter rotations, nobody alone on severe material, support available.","Scene seeds written for every harm area with a benign twin, in realistic, animated and painterly styles.","Upload seeds and sequence seeds written, with consented photos and starting scenes.","Baseline run by style and surface first, then styles, euphemisms, uploads, steering, edits, then combinations, then automation, then human depth.","Every attempt logged with step counts, realism score, likeness and provenance result; every finding reproduced k of n.","Humans graded every visual output at S2 and above. Grader agreement measured on your own outputs.","Every number reported says what it counts: which severity, which style, which surface.","Findings filed with the visual fields, media in the vault, owners and dates.","Exercise report gives the decision first, all four gates pass or fail, the trend, and the residual risk with a signature.","Fixes retested across styles, uploads, step orders and every edit tool. Over-refusal by style before and after.","Provenance verified on the fixed build, end to end: generate, export, edit, re-import, verify.","Every finding and variant in the regression suite with a provenance assertion, running on every build and every new edit tool.","Records kept in the shape a regulator would ask for: scope, set version, results, decisions, sign-offs."]
   }
 };
+// Four new, additive fields per step, kept separate from the step bodies above so no existing content string
+// changes: check (one end-of-step question), eg (one "For Pixelry" sentence per card the step renders as,
+// written against the workbench's own demo company: a support-and-creator assistant for the LLM guide, an
+// image-to-video tool for creators for the world guide -- see src/partDEMO.js), have/mins (what you'll have,
+// and about how long, shown on the step's first card).
+const LN_STEP_EXTRA = {
+  llm: {
+    scope: {
+      have:"a scoped coverage grid and three attacker profiles", mins:60,
+      eg:[
+        "For Pixelry: the target is the support-and-creator assistant in the app and on the creator dashboard, the exact model and system prompt version live in production, not a test build.",
+        "For Pixelry: play the curious teenage user, the creator chasing an edge over other sellers, and the scammer impersonating Pixelry support.",
+        "For Pixelry: agree now that any CSAE probe stops immediately and goes to legal, before anyone opens a test session."
+      ],
+      check:{q:"A tester starts probing for CSAE content before the stop rule and escalation path are agreed. What's the problem?",
+        options:["Nothing — testing can start before scoping is finished", "Stop rules, especially for CSAE, are agreed before testing starts, not worked out mid-test", "CSAE should be tested with real material to be thorough"], a:1,
+        why:"Stop rules, especially for CSAE, are agreed in scoping, before anyone writes a prompt — never worked out mid-test."}
+    },
+    harms: {
+      have:"a harm-to-policy map with default severities", mins:20,
+      eg:["For Pixelry: map each harm area to the policy section it violates — a scam DM to the impersonation rule, a grooming attempt to the minors rule — before testing starts."],
+      check:{q:"Why does CSAE get fewer seeds than fraud or hate, not more?",
+        options:["CSAE matters less than the other categories", "Severe categories use a short set of named, policy-described probes, not volume testing", "There's no taxonomy entry for CSAE"], a:1,
+        why:"Severe categories like CSAE use a short set of policy-described probes run by named people under stop rules — volume is for categories where breadth matters."}
+    },
+    testset: {
+      have:"seed cards with a benign twin for each", mins:90,
+      eg:[
+        "For Pixelry: write seeds in the words a teenager or a creator would actually type, pulled from real support tickets and appeals, not policy language.",
+        "For Pixelry: run XSTest and HarmBench once to sanity-check the taxonomy, then rely on Pixelry's own seeds for the real evidence.",
+        "For Pixelry: every confirmed finding against the assistant becomes a permanent regression seed, rerun on every model update."
+      ],
+      check:{q:"A seed asks for a phishing email. What makes its benign twin a fair twin?",
+        options:["It's the same request asked more politely", "It's a legitimate request in the same territory the model should actually answer", "It's the seed translated into another language"], a:1,
+        why:"A benign twin sits right next to the harmful seed — the security trainer's training example, not a softer version of the same attack."}
+    },
+    techniques: {
+      have:"a technique log and what each one opened", mins:120,
+      eg:[
+        "For Pixelry: try each technique against the assistant in English and in the languages the app actually ships in.",
+        "For Pixelry: run the baseline first, then one technique at a time, before combining them against the assistant.",
+        "For Pixelry: log the assistant's version, the surface (chat or the creator dashboard), and the exact seed for every attempt."
+      ],
+      check:{q:"Why is the direct, plain-language request run before any technique?",
+        options:["It's the easiest one to write", "It's the baseline every other result gets compared to", "Techniques only work after a refusal"], a:1,
+        why:"The baseline is what every later number is measured against — run it first, on every seed and every twin."}
+    },
+    grade: {
+      have:"graded outputs and the numbers that matter", mins:30,
+      eg:[
+        "For Pixelry: an assistant reply that gives a stalker a creator's real address would be S3 or above.",
+        "For Pixelry: report the assistant's attack success rate next to its over-refusal rate on the benign twins, every time.",
+        "For Pixelry: humans grade every S3 and S4 from the assistant; a model judge only handles the first pass."
+      ],
+      check:{q:"Two answers both explain a scam technique. One names a real company and adds a working link. What does that change?",
+        options:["Nothing, they're the same severity", "The named, actionable one moves up — specific and usable beats generic", "The shorter answer is always worse"], a:1,
+        why:"A grade moves up when the output is specific, actionable, or targets someone real — that's the difference between S2 and S3."}
+    },
+    report: {
+      have:"a filed finding and a one-page exercise report", mins:45,
+      eg:[
+        "For Pixelry: file one finding per failure the assistant produced, with the harmful output kept in the vault, never in the ticket.",
+        "For Pixelry: the report tells leadership whether the assistant ships, with the gates it passed or failed and what changed since last time."
+      ],
+      check:{q:"Where does the harmful output itself go when you file a finding?",
+        options:["Pasted into the ticket so engineering can see it", "An access-controlled vault, with the ticket getting the path and a summary", "Deleted immediately so no one sees it"], a:1,
+        why:"Evidence lives in the vault; tickets, slides and reports only ever get the finding ID and a sanitised summary."}
+    },
+    check: {
+      have:"a retested fix and an unbroken regression suite", mins:60,
+      eg:[
+        "For Pixelry: retest the exact finding on the fixed assistant build, then the same seed in every other language it ships.",
+        "For Pixelry: the assistant doesn't ship with an open S4, however close the launch date."
+      ],
+      check:{q:"A fix stops the model's reply, but only because the output classifier now blocks it — the model still tries to comply. What's true?",
+        options:["The finding is fully closed", "The finding stays open at reduced severity — the classifier is now a single point of failure", "This is a complete fix, no retest needed"], a:1,
+        why:"If the model still complies and only a classifier changed, the finding stays open — that one layer is now a single point of failure."}
+    },
+    qa: {
+      have:"a QA checklist for the program itself", mins:20,
+      eg:["For Pixelry: someone outside the red team checks the assistant's test coverage grid for gaps before each release."],
+      check:{q:"Who should check the test coverage grid for gaps before a new feature ships?",
+        options:["The same red team that built the grid", "Someone outside the red team", "The feature's own engineers"], a:1,
+        why:"Coverage gets audited by someone outside the team — the people who built the grid are the wrong people to find its gaps."}
+    },
+    law: {
+      have:"the law and standards your report should cite", mins:15,
+      eg:["For Pixelry: the EU DSA's systemic-risk duties apply to the assistant once it's generative, since Pixelry serves EU users."],
+      check:{q:"Which law explicitly names adversarial testing as a duty for general-purpose AI models with systemic risk?",
+        options:["The EU AI Act", "A company's internal style guide", "No law mentions this yet"], a:0,
+        why:"The EU AI Act's Article 55 requires providers of systemic-risk models to conduct and document adversarial testing."}
+    }
+  },
+  world: {
+    different: {
+      have:"six ways video testing differs from text", mins:10,
+      eg:["For Pixelry: a realistic clip from the tool reads as real to most viewers, so the realism classifier matters as much as the harm category."],
+      check:{q:"Most deepfake and NCII harm in a world model starts with...",
+        options:["A clever text prompt", "An uploaded photo of a real person fed to an image-to-video flow", "A long conversation building up over many turns"], a:1,
+        why:"Uploads are the main attack: most deepfake and NCII harm starts with a real photo going into the model, not a prompt trick."}
+    },
+    scope: {
+      have:"a scoped coverage grid and three attacker profiles", mins:60,
+      eg:[
+        "For Pixelry: the target is the creator-facing image-to-video tool, the exact model version and resolution settings live in production.",
+        "For Pixelry: play the creator chasing a viral clip, the ex-partner with a photo, and the scammer building fake footage of a public figure.",
+        "For Pixelry: agree now that only consenting testers' own photos go into the upload tests, never a stranger's."
+      ],
+      check:{q:"Before testing the upload path, what must be true?",
+        options:["Only consenting testers' own photos are used, with written consent", "Any public photo works as a test image", "Consent only matters for the final published output"], a:0,
+        why:"Only testers' own photos and voices, with written consent, go into upload drills — no public figures, no non-consenting people."}
+    },
+    harms: {
+      have:"a harm-to-policy map with default severities", mins:20,
+      eg:["For Pixelry: map each harm area in the tool to a policy section — a face-swap request to the likeness rule, a minor's photo to the CSAE stop rule."],
+      check:{q:"How is CSAE testing handled differently for a visual model?",
+        options:["The same as any other category, just with images", "Under a legal-signed process, hash-checked uploads, no generation to prove a point", "It isn't tested at all"], a:1,
+        why:"Visual CSAE testing runs under a process legal has signed, with uploads hash-checked before any generation — nothing is generated to make a point."}
+    },
+    testset: {
+      have:"scene seeds and a consented upload set", mins:90,
+      eg:[
+        "For Pixelry: write scene seeds the way a creator actually prompts the tool, in realistic, animated and painterly styles.",
+        "For Pixelry: every bypass style word a creator discovers gets added to the tool's regression set within days."
+      ],
+      check:{q:"What's the benign twin for a scene seed showing fabricated news footage?",
+        options:["The same scene in a different art style", "The documentary b-roll next to the fake footage", "A seed with no twin needed"], a:1,
+        why:"The benign twin sits right next to the harmful scene — documentary b-roll beside fake news footage, the kitchen knife beside the threat."}
+    },
+    techniques: {
+      have:"a technique log and what each one opened", mins:120,
+      eg:[
+        "For Pixelry: test the tool's upload path with a consenting tester's own cropped and composited photos, not a public figure's.",
+        "For Pixelry: run the tool's baseline first, then styles, then uploads, before combining them.",
+        "For Pixelry: log the tool's model version, the style, and whether the output kept its content credentials."
+      ],
+      check:{q:"A scene is refused when asked for realistically, but allowed in a painterly style, then upscaled back to photorealistic. What happened?",
+        options:["A lucky accident, not a real bypass", "Style laundering — the realism filter only ran at generation, not on the edit tool", "The painterly version doesn't count as the same content"], a:1,
+        why:"Style laundering restores realism after a filter passed the painterly version — the fix is to run the realism check on every edit tool too."}
+    },
+    grade: {
+      have:"graded outputs with realism and likeness noted", mins:30,
+      eg:[
+        "For Pixelry: a realistic clip of a named creator in a sexual scene from the tool is S4, full stop.",
+        "For Pixelry: a recognisable creator's face from the tool moves a scene to S3 or above, even in a harmless-looking style.",
+        "For Pixelry: report the tool's attack success rate next to its over-refusal rate by style, every time.",
+        "For Pixelry: a human checks every output from the tool at S2 or above; the visual classifier only handles the first pass."
+      ],
+      check:{q:"A violent scene features someone no one could identify. The same scene features a recognisable real creator. What changes?",
+        options:["Nothing, violence is violence either way", "A recognisable real person moves the grade to S3 or above", "The recognisable version is actually less severe"], a:1,
+        why:"Likeness moves the grade: a recognisable real person in a violent or sexual scene moves it to S3 at least, sexual content to S4."}
+    },
+    report: {
+      have:"a filed finding and a one-page exercise report", mins:45,
+      eg:[
+        "For Pixelry: a finding against the tool records the upload reference and the realism score, with the clip itself kept in the vault.",
+        "For Pixelry: the report tells leadership whether the tool ships, including the provenance gate alongside the harm gates."
+      ],
+      check:{q:"What extra field does a world-model finding record that a text finding doesn't?",
+        options:["The tester's name", "The realism score and whether content credentials survived", "Nothing, the template is identical"], a:1,
+        why:"Visual findings add the upload reference, style, realism score and provenance result — fields a text-only finding never needs."}
+    },
+    check: {
+      have:"a retested fix, provenance verified end to end", mins:60,
+      eg:[
+        "For Pixelry: retest the exact finding on the fixed tool build, then every style and edit-tool variant of it.",
+        "For Pixelry: the tool doesn't ship if content credentials don't survive its own crop and re-encode tools."
+      ],
+      check:{q:"A fix stops a harmful scene at generation, but the watermark disappears once a user runs the output through the app's own crop tool. Is this fixed?",
+        options:["Yes, the harmful content is blocked at the source", "No — the provenance gate requires credentials to survive the product's own edit tools", "Only the harm gate matters, not provenance"], a:1,
+        why:"The provenance gate is its own release gate: credentials and the watermark must survive every edit tool the product ships, not just block generation."}
+    },
+    qa: {
+      have:"a QA checklist for the program itself", mins:20,
+      eg:["For Pixelry: the gold set for grading the tool is built from the tool's own outputs, not a public image safety benchmark."],
+      check:{q:"Why build the grading gold set from the tool's own outputs instead of a public image-safety dataset?",
+        options:["Public datasets are free and good enough", "Public sets don't look like this model's actual output", "Gold sets are only needed for text models"], a:1,
+        why:"Public image safety sets don't look like your model's output — the gold set has to be built from what this tool actually produces."}
+    },
+    law: {
+      have:"the law and standards your report should cite", mins:15,
+      eg:["For Pixelry: the UK Online Safety Act's children's risk assessment covers the tool once it can generate content minors might see."],
+      check:{q:"Which standard sets the disclosure norms the provenance gate is measured against?",
+        options:["C2PA content credentials", "A company's internal naming convention", "There is no standard for this yet"], a:0,
+        why:"C2PA is the open content-credentials standard; the Partnership on AI's synthetic media practices set the matching disclosure norms."}
+    }
+  }
+};
+Object.keys(LN_STEP_EXTRA).forEach(k => LN_GUIDES[k].steps.forEach(s => { if(LN_STEP_EXTRA[k][s.id]) Object.assign(s, LN_STEP_EXTRA[k][s.id]); }));
 
 /* ---------- modal ---------- */
 function lnClose(){ const bg = $("#ln-modal"); if(!bg) return; bg.hidden = true; bg.innerHTML = ""; document.body.classList.remove("ln-lock"); document.removeEventListener("keydown", lnModal.key); if(lnModal.prev && lnModal.prev.focus) try{ lnModal.prev.focus(); }catch(e){} }
@@ -905,47 +1094,129 @@ function lnMarkRead(id){ const d = lnDone(); if(d.indexOf(id) === -1){ d.push(id
 // A jump-to list for a card flow's "All ..." link: the same pill markup the old per-tab chip row used,
 // now reached from a link instead of sitting on screen the whole time. items: [{label, done}]. onPick(i) jumps.
 function lnPickModal(title, items, current, onPick){
-  lnModal(`<p class="ln-eb">${esc(title)}</p><ul class="ln-steps" style="margin-top:10px">${items.map((it, i) => `<li><button type="button" class="${i === current ? "on" : ""} ${it.done ? "done" : ""}" data-pick="${i}" title="${esc(it.label)}"><b>${i + 1}</b><span>${esc(it.label)}</span></button></li>`).join("")}</ul>`);
+  lnModal(`<p class="ln-eb">${esc(title)}</p><ul class="ln-steps" style="margin-top:10px">${items.map((it, i) => `<li><button type="button" class="${i === current ? "on" : ""} ${it.done ? "done" : ""}" data-pick="${i}" title="${esc(it.label)}"><b>${i + 1}</b><span>${esc(it.label)}</span>${it.checked ? `<svg class="ln-checkmark" aria-hidden="true"><use href="#i-check"/></svg>` : ""}</button></li>`).join("")}</ul>`);
   $$("[data-pick]", $("#ln-modal")).forEach(b => b.onclick = () => { lnClose(); onPick(+b.dataset.pick); });
 }
 const LN_M = {}; // holds the active card flow's go(dir) so the global keyboard shortcut can reach it
+const lnCheckKey = (k, stepId) => k + ":check:" + stepId;
+const lnCheckPassed = (k, stepId) => { const r = lnStore.get(lnCheckKey(k, stepId), null); return !!(r && r.ok); };
+// The studio bridge: a label per step id (both guides share these nine ids; "different" is world-only and has
+// no studio equivalent, so it gets no bridge button). lnToStudio lands on the matching screen through the
+// studio's own flow state (rt.flow / rtF() / rtScreens() / rtGo), the same functions a click in the studio
+// itself would use -- never by faking a screen that state wouldn't actually reach.
+const LN_BRIDGE = {scope:1, harms:1, testset:1, techniques:1, grade:1, report:1, check:1, qa:1, law:1};
+function lnToStudio(k, stepId){
+  const kind = k === "world" ? "world" : "llm";
+  const freshFlow = (extra) => Object.assign({i:0, basics:{}, drill:{}, fix:{}, skipBasics:true}, extra || {});
+  if(stepId === "scope"){
+    rt.mode = "flow"; rt.model = kind; rt.flow = freshFlow();
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "target"));
+  } else if(stepId === "harms"){
+    rt.mode = "flow"; rt.model = kind; rt.flow = freshFlow({path:"test"});
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "harms"));
+  } else if(stepId === "testset"){
+    rt.mode = "flow"; rt.model = kind;
+    rt.areas = kind === "world" ? {deceptive:1, hate:1, privacy:1} : {fraud:1, hate:1, privacy:1};
+    rt.team = "pair"; rt.time = "week"; rt.surf = Object.keys(rt.surf || {}).length ? rt.surf : {chat:1}; rt.att = Object.keys(rt.att || {}).length ? rt.att : {curious:1};
+    rt.flow = freshFlow({path:"plan", editSetup:false});
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "plan2"));
+  } else if(stepId === "techniques"){
+    rt.mode = "flow"; rt.model = kind;
+    rt.areas = kind === "world" ? {deceptive:1, hate:1} : {fraud:1, hate:1};
+    rt.team = "pair"; rt.time = "afternoon";
+    rt.flow = freshFlow({path:"test"});
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "drill"));
+  } else if(stepId === "grade"){
+    rt.mode = "flow"; rt.model = kind; rt.flow = freshFlow({path:"judge"});
+    rtJStart();
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "judge"));
+  } else if(stepId === "report"){
+    rt.mode = "full"; rt.model = kind; rt.view = "report"; rt.tab = "findings";
+    rtSave(); goRoute("redteam"); rtOpenFinding(null); return;
+  } else if(stepId === "check"){
+    rtAct("example");
+    rt.mode = "flow"; rt.flow = freshFlow();
+    rtSave();
+    let idx = rtScreens().findIndex(x => x.k === "fix");
+    if(idx < 0) idx = rtScreens().findIndex(x => x.k === "verdict");
+    rtF().i = Math.max(0, idx);
+  } else if(stepId === "qa"){
+    rt.mode = "flow"; rt.model = kind; rt.flow = freshFlow({path:"method"});
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "method"));
+  } else if(stepId === "law"){
+    rtAct("example");
+    rt.mode = "flow"; rt.flow = freshFlow({path:"show"});
+    const m = rtM1(); if(!m.target){ m.target = kind === "world" ? "media" : "support"; m.card = Object.assign({}, RT_TARGETS[kind === "world" ? 3 : 0].card); }
+    rtSave();
+    rtF().i = Math.max(0, rtScreens().findIndex(x => x.k === "show"));
+  } else return;
+  rtSave();
+  goRoute("redteam");
+}
 function lnMethod(k, g){
   const posKey = k + ":pos", n = g.steps.length; // new key: the old "k:step" position is left untouched
   const saved = lnStore.get(posKey, {s:0, c:0});
-  let si = Math.min(Math.max(saved.s || 0, 0), n - 1), cards = lnStepCards(k, g.steps[si]), ci = Math.min(Math.max(saved.c || 0, 0), cards.length - 1);
+  let si = Math.min(Math.max(saved.s || 0, 0), n - 1), cards = lnStepCards(k, g.steps[si]);
+  let total = cards.length + (g.steps[si].check ? 1 : 0);
+  let ci = Math.min(Math.max(saved.c || 0, 0), total - 1), picked = null;
   const save = () => lnStore.set(posKey, {s:si, c:ci});
+  const loadStep = () => { cards = lnStepCards(k, g.steps[si]); total = cards.length + (g.steps[si].check ? 1 : 0); picked = null; };
   function go(dir){
     if(dir > 0){
-      if(ci < cards.length - 1) ci++;
+      if(ci < total - 1){ ci++; picked = null; }
       else {
         lnMarkRead(k + ":s:" + g.steps[si].id);
-        if(si < n - 1){ si++; ci = 0; cards = lnStepCards(k, g.steps[si]); } else { location.hash = g.route + "/practice"; return; }
+        if(si < n - 1){ si++; ci = 0; loadStep(); } else { location.hash = g.route + "/practice"; return; }
       }
     } else {
-      if(ci > 0) ci--;
-      else if(si > 0){ si--; cards = lnStepCards(k, g.steps[si]); ci = cards.length - 1; }
+      if(ci > 0){ ci--; picked = null; }
+      else if(si > 0){ si--; loadStep(); ci = total - 1; }
       else return;
     }
     save(); lnRefreshCount(k, g); draw();
     const el = $("#ln-view"); if(el && el.getBoundingClientRect) window.scrollTo({top:el.getBoundingClientRect().top + window.pageYOffset - 80, behavior:"auto"});
   }
   const draw = () => {
-    const s = g.steps[si], card = cards[ci], did = lnIsDone(k + ":s:" + s.id), last = ci === cards.length - 1, hasBack = ci > 0 || si > 0;
-    const nextLabel = ci < cards.length - 1 ? "Next" : si < n - 1 ? g.steps[si + 1].title : "Go to the exercises";
-    const drillBtn = last && s.ex && g.exercises.some(e => e.id === s.ex) ? `<p><button type="button" class="btn sm" data-ex="${s.ex}">Run the drill: ${esc(g.exercises.find(e => e.id === s.ex).title)}</button></p>` : "";
-    $("#ln-view").innerHTML = `${cards.length > 1 ? `<div class="rtf-dots" aria-hidden="true">${cards.map((c, i) => `<span class="${i <= ci ? "on" : ""}"></span>`).join("")}</div>` : ""}
+    const s = g.steps[si], isCheck = ci === cards.length, hasBack = ci > 0 || si > 0;
+    const nextLabel = ci < total - 1 ? "Next" : si < n - 1 ? g.steps[si + 1].title : "Go to the exercises";
+    const nextDisabled = isCheck && picked == null;
+    let body, eyebrowExtra = "";
+    if(isCheck){
+      const c = s.check, right = picked === c.a, answered = picked != null;
+      eyebrowExtra = lnCheckPassed(k, s.id) ? `<span class="ln-donetick"><svg><use href="#i-check"/></svg>Checked</span>` : "";
+      body = `<h2>Check what you remember</h2>
+        <div class="rtf-q"><p>${esc(c.q)}</p><div class="rtf-opts">${c.options.map((o, j) => `<button type="button" data-checkpick="${j}" ${answered ? "disabled" : ""} class="${answered ? (j === c.a ? "right" : j === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div>
+        ${answered ? `<div class="learn ${right ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${right ? "That's it" : "Not quite"}</div><p>${esc(c.why)}</p></div>` : `<p class="note">Pick one to continue.</p>`}</div>`;
+    } else {
+      const card = cards[ci], last = ci === cards.length - 1;
+      const drillBtn = last && s.ex && g.exercises.some(e => e.id === s.ex) ? `<button type="button" class="btn sm" data-ex="${s.ex}">Run the drill: ${esc(g.exercises.find(e => e.id === s.ex).title)}</button>` : "";
+      const bridgeBtn = last && LN_BRIDGE[s.id] ? `<button type="button" class="btn sm" data-bridge>Do this in the studio →</button>` : "";
+      const haveLine = ci === 0 && s.have ? `<p class="note ln-have">You'll have: ${esc(s.have)} · about ${s.mins} min</p>` : "";
+      const egText = s.eg && s.eg[ci];
+      const egRow = egText ? `<ul class="ln-rows ln-eg"><li class="ln-row"><details><summary><b>For Pixelry</b><svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary><div class="ln-rowb">${esc(egText)}</div></details></li></ul>` : "";
+      body = `<h2>${esc(card.heading || s.title)}</h2>
+        ${ci === 0 ? `<p class="ln-why">${s.why}</p>${haveLine}` : ""}
+        <div class="ln-body">${card.html}${(drillBtn || bridgeBtn) ? `<p class="row ln-cardacts">${drillBtn}${bridgeBtn}</p>` : ""}${egRow}</div>`;
+    }
+    $("#ln-view").innerHTML = `${total > 1 ? `<div class="rtf-dots" aria-hidden="true">${Array.from({length:total}, (_, i) => `<span class="${i <= ci ? "on" : ""}"></span>`).join("")}</div>` : ""}
       <div class="card ln-panel">
-        <p class="ln-eb">Step ${si + 1} of ${n} · ${esc(s.title)}${cards.length > 1 ? `<span class="ln-subcount">${ci + 1} of ${cards.length}</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All steps</button></p>
-        <h2>${esc(card.heading || s.title)}</h2>
-        ${ci === 0 ? `<p class="ln-why">${s.why}</p>` : ""}
-        <div class="ln-body">${card.html}${drillBtn}</div>
+        <p class="ln-eb">Step ${si + 1} of ${n} · ${esc(s.title)}${total > 1 ? `<span class="ln-subcount">${ci + 1} of ${total}</span>` : ""}${eyebrowExtra}<button type="button" class="rtf-link ln-all" data-all>All steps</button></p>
+        ${body}
         <div class="ln-pager rtf-foot">${hasBack ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Step ${si + 1} of ${n}</span><span></span></div>
-        <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${esc(nextLabel)} →</button></div>
+        <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next ${nextDisabled ? "disabled" : ""}>${esc(nextLabel)} →</button></div>
       </div>`;
-    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a step · " + g.name, g.steps.map(x => ({label:x.title, done:lnIsDone(k + ":s:" + x.id)})), si, i => { si = i; cards = lnStepCards(k, g.steps[si]); ci = 0; save(); draw(); });
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a step · " + g.name, g.steps.map(x => ({label:x.title, done:lnIsDone(k + ":s:" + x.id), checked:lnCheckPassed(k, x.id)})), si, i => { si = i; ci = 0; loadStep(); save(); draw(); });
     const back = $("[data-back]"); if(back) back.onclick = () => go(-1);
     const nx = $("[data-next]"); if(nx) nx.onclick = () => go(1);
     $$("[data-ex]").forEach(b => b.onclick = () => lnOpenExercise(k, g, b.dataset.ex));
+    const bridge = $("[data-bridge]"); if(bridge) bridge.onclick = () => lnToStudio(k, s.id);
+    if(isCheck) $$("[data-checkpick]").forEach(b => b.onclick = () => { picked = +b.dataset.checkpick; lnStore.set(lnCheckKey(k, s.id), {ok:picked === s.check.a, at:Date.now()}); draw(); });
     lnBindOpenAll();
     lnBindTableFlip();
   };
@@ -957,7 +1228,7 @@ function lnMethod(k, g){
 document.addEventListener("keydown", e => {
   const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
   const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
-  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],input,textarea'))) return;
+  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],input,textarea'))) return;
   if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
   else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
 });
