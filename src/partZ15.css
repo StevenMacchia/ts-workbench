@@ -138,3 +138,16 @@
 .tsg-tool:hover{text-decoration:underline;text-underline-offset:3px}
 .tsg-tool svg{width:13px;height:13px}
 @media (max-width:480px){.tsg-grid{grid-template-columns:1fr}}
+
+/* clarity: glossary restored to one page, a grid of cards (removed the A-Z letter-group pager this */
+/* replaced); .ln-gl's own display:grid (partZ14.css) is back in effect now that the display:block */
+/* override that card shape needed has been removed. A full-width letter divider between cards, and */
+/* the per-card "I know this" toggle sitting beside the now-unclamped definition text. */
+.ln-gl-div{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 2px 0;margin:0}
+.ln-gl-div:first-child{padding-top:0}
+.ln-term{cursor:default}
+.ln-term-name{all:unset;cursor:pointer;display:block}
+.ln-term-name:hover b,.ln-term-name:focus-visible b{text-decoration:underline;text-underline-offset:3px}
+.ln-term-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.ln-term>p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.ln-term-know{width:fit-content}

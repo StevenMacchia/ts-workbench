@@ -1519,36 +1519,25 @@ function renderGlossary(){
       <span class="note" id="ln-known"></span></div>
     <div class="ln-gl" id="ln-gl"></div></div>`;
   const rd = $("#ln-review-due"); if(rd) rd.onclick = () => lnPracticeTerms(f, draw, true);
-  // Grouped A-Z, one letter group per card, each term a collapsed row (name visible, definition behind the tap)
-  // instead of the old always-expanded grid of 46 term cards.
-  let gi = 0;
-  const groups = () => {
-    const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q)));
-    const m = {}; list.forEach(x => { const L = x.t[0][0].toUpperCase(); (m[L] = m[L] || []).push(x); });
-    return {kn, gs:Object.keys(m).sort().map(L => ({letter:L, items:m[L]}))};
-  };
+  // All terms on one page: a grid of cards, definition visible on each, sorted A-Z with a small letter
+  // divider when the letter changes. Restored after the owner said he missed the old one-page grid; the
+  // search box, the All/LLMs/World filter, the due-for-review line, flashcards and quiz, and the "I know
+  // this" toggle (now right on the card instead of behind a tap) all carry over from the in-between version.
   const draw = () => {
-    const {kn, gs} = groups();
+    const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q))).sort((a, b) => a.t[0].localeCompare(b.t[0]));
     $("#ln-known").textContent = `${Object.keys(kn).filter(x => kn[x]).length} of ${LN_GLOSS.length} marked known`;
-    if(!gs.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
-    gi = Math.min(Math.max(gi, 0), gs.length - 1);
-    const grp = gs[gi];
-    const rows = grp.items.map(({t, i}) => `<li class="ln-row"><details><summary><b>${esc(t[0])}</b>${kn[i] ? `<svg class="ln-chev ln-known-mark" aria-hidden="true"><use href="#i-check"/></svg>` : `<svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg>`}</summary><div class="ln-rowb"><p style="margin:0 0 8px">${esc(t[2])}</p><p class="row" style="gap:6px;margin:0 0 8px">${lnTagHtml(t[1])}</p><button type="button" class="btn sm" data-know="${i}">${kn[i] ? '<svg><use href="#i-check"/></svg>Known' : "I know this"}</button></div></details></li>`).join("");
-    $("#ln-gl").innerHTML = `<div class="card ln-panel">
-      <p class="ln-eb">${grp.letter} · group ${gi + 1} of ${gs.length}<button type="button" class="rtf-link ln-all" data-all>All groups</button></p>
-      <h2>Terms starting with ${grp.letter}</h2>
-      <p class="ln-why">${grp.items.length} term${grp.items.length === 1 ? "" : "s"} in this group.</p>
-      <div class="ln-body"><ul class="ln-rows">${rows}</ul></div>
-      <div class="ln-pager rtf-foot">${gi > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Group ${gi + 1} of ${gs.length}</span><span></span></div>
-      <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next ${gi === gs.length - 1 ? "disabled" : ""}>${gi < gs.length - 1 ? "Next" : "That's every group"} →</button></div>
-    </div>`;
-    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to a group", gs.map(x => ({label:x.letter + " (" + x.items.length + ")", done:false})), gi, j => { gi = j; draw(); });
-    const back = $("[data-back]"); if(back) back.onclick = () => { gi = Math.max(0, gi - 1); draw(); };
-    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(gi < gs.length - 1){ gi++; draw(); } };
+    if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
+    let lastLetter = "";
+    $("#ln-gl").innerHTML = list.map(({t, i}) => {
+      const L = t[0][0].toUpperCase(), div = L !== lastLetter ? `<div class="ln-gl-div" aria-hidden="true">${esc(L)}</div>` : "";
+      lastLetter = L;
+      return div + `<div class="card ln-term ${kn[i] ? "known" : ""}"><button type="button" class="ln-term-name" data-open="${i}"><b>${esc(t[0])}</b></button><p>${esc(t[2])}</p><span class="row" style="gap:6px">${lnTagHtml(t[1])}</span><button type="button" class="btn sm ln-term-know" data-know="${i}">${kn[i] ? '<svg><use href="#i-check"/></svg>Known' : "I know this"}</button></div>`;
+    }).join("");
+    $$("[data-open]").forEach(b => b.onclick = () => lnOpenTerm(+b.dataset.open, draw));
     $$("[data-know]").forEach(b => b.onclick = () => { const k = known(); const idx = +b.dataset.know; k[idx] = !k[idx]; lnStore.set("gloss:known", k); draw(); });
   };
-  $("#ln-q").oninput = e => { q = e.target.value.trim().toLowerCase(); gi = 0; draw(); };
-  $$("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; gi = 0; $$("[data-f]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
+  $("#ln-q").oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
+  $$("[data-f]").forEach(b => b.onclick = () => { f = b.dataset.f; $$("[data-f]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); draw(); });
   $("#ln-practice").onclick = () => lnPracticeTerms(f, draw);
   draw();
 }
