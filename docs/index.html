@@ -4773,6 +4773,20 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 /* and the walkthrough modal reuses .ln-eb/.ln-why/.ln-body/.ln-pager/.rtf-walk-prev the same way. */
 /* .ph-help (partZ8.css) already spaces a second button of its own kind with margin-left, so the */
 /* new "How this works" link sits cleanly beside the existing "How this page works" button. */
+/* Hiring-manager audit, round 2: the home page's six-step promise, the quiet pre-demo preview, and a faded
+   sample on the empty quarter-review, so the proof of depth doesn't wait behind a click. */
+.as-six-note{margin:10px 0 0}
+.as-preview{margin:4px 0 8px;padding:14px 16px;border-radius:10px;background:var(--sunk);display:grid;gap:8px}
+.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.as-preview-lines{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.as-preview-lines li{font-size:14px;line-height:1.5;color:var(--ink)}
+.as-preview .btn{width:fit-content}
+.rv-sample-preview{margin-top:14px;padding:14px 16px;opacity:.55;display:grid;gap:8px}
+.rv-sample-preview .pill{width:fit-content}
+.rv-sample-preview table{width:100%;border-collapse:collapse;font-size:13px}
+.rv-sample-preview td{padding:3px 6px}
+.rv-sample-preview td:first-child{color:var(--muted)}
+.rv-sample-arrow svg{width:12px;height:12px;vertical-align:middle;color:var(--muted)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5194,7 +5208,7 @@ const SG = {
   pii_policy:{t:"A private-information policy with fast removal of doxxing, and detection of posted addresses and phone numbers", o:"policy", e:"S"},
   threat_escalation:{t:"An escalation path for credible threats, including emergency disclosure to law enforcement", o:"legal", e:"M"},
   terror_hash:{t:"Hash-sharing for terrorist content (e.g. GIFCT) and a crisis protocol for live attacks", o:"eng", e:"M"},
-  tco_removal:{t:"Ability to remove terrorist content within one hour of an EU removal order", o:"ops", e:"M"},
+  tco_removal:{t:"Ability to remove terrorist content within one hour of a removal order under the EU Terrorist Content Online Regulation (Regulation (EU) 2021/784)", o:"ops", e:"M"},
   live_controls:{t:"Eligibility rules for going live, instant stream shutdown and 24/7 on-call coverage", o:"ops", e:"M"},
   crisis_resources:{t:"Crisis resources and helplines shown when self-harm content, searches or messages are detected", o:"product", e:"S"},
   search_interventions:{t:"Block or add warning screens to searches linked to self-harm, eating disorders, child abuse and extremism", o:"product", e:"S"},
@@ -6436,6 +6450,7 @@ function pmBurnHTML(r){
   return `<div class="card pm-burn" id="pm-burn" style="scroll-margin-top:16px">
     <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
       <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
+      <p class="note">${r.total} of ${r.risks.length * 16} possible (${r.risks.length} risk${r.risks.length === 1 ? "" : "s"}, each scored severity × likelihood out of 16).</p>
       <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>
       <div class="pm-bbars"><div class="pm-bbar"><span>Before</span>${strip(r.counts)}</div><div class="pm-bbar"><span>Now</span>${strip(r.rcounts)}</div></div>
       <p class="note">With all ${N} safeguards in place, ${floor} of ${r.total} remains. Safeguards make severe harms rarer, not impossible, so detection and response still matter.</p></div>
@@ -8541,6 +8556,9 @@ const DIM_BLIND = {
   team:"You tended to overload or overlook your own team. Sustainable response needs triage, rotation and support for the people doing the work."
 };
 const ttProgress = () => store.get("tt:progress", {}) || {};
+// Every scenario written once per company type it's tailored for (ALL_TYPES.length versions each); the rest counted once.
+// This is the one count every "scenario version" figure on the site (All tools, inside the tool, About) is built from.
+const ttVersionCount = () => SCENARIOS.reduce((a, s) => a + (s.vars ? ALL_TYPES.length : 1), 0);
 const ttKey = (s, v) => { const sc = SCENARIOS[s]; return sc.id + (sc.vars ? ":" + (v || "all") : ""); };
 const ttSave = () => store.set("tt", tt);
 const sevPill = sev => `<span class="pill ${SEV_BAND[sev]||"crit"}"><span class="dot"></span>${esc(sev)}</span>`;
@@ -8588,7 +8606,7 @@ function ttPicker(H){
       <div class="ttprog">
         <div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="note mono">${completed} of ${all.length} completed</span></div>
         <div class="bar"><i style="width:${all.length?completed/all.length*100:0}%;background:var(--good)"></i></div>
-        <p class="note">${all.length} scenarios written for ${tInfo.s} companies.</p>
+        <p class="note">${all.length} scenarios written for ${tInfo.s} companies${all.length < SCENARIOS.length ? `, out of ${SCENARIOS.length} in the library` : ""} (${ttVersionCount()} versions in all, across ${ALL_TYPES.length} sectors).</p>
       </div>
     </div>
     <div class="row ttfilters"><div class="segs tt-mode" role="group" aria-label="How to play"><button type="button" data-ttmode="solo" aria-pressed="${ttMode !== "team"}">Play solo</button><button type="button" data-ttmode="team" aria-pressed="${ttMode === "team"}">Run with a team</button></div>
@@ -11394,7 +11412,7 @@ OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <path d="M112 62l6 6 11-12" fill="none" stroke="var(--t-ds)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
-    <text x="110" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">gold</text><text x="124" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">got</text></svg>`;
+    <rect x="104" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/><rect x="122" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/></svg>`;
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -11486,7 +11504,8 @@ function asPictureHTML(empty){
   const plain = p => { const d = p.detail || "";
     if(p.k === "coverage") return asSum("coverage");
     if(p.k === "policy"){ const n = (d.match(/\d+/) || ["1"])[0]; return `${n} polic${n === "1" ? "y" : "ies"} tested`; }
-    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/ \(.*\)$/, "").replace(/practiced/, "rehearsed") : d; };
+    // Crisis readiness keeps its "(4 for full credit)" aside: it's what explains why a perfect run can still score under 100
+    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/practiced/, "rehearsed") : d; };
   // In step order, with the optional part last
   const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
   const rows = parts.slice().sort((a, b) => order(a) - order(b));
@@ -11500,6 +11519,7 @@ function asPictureHTML(empty){
       <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
         <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
+    ${o.score === null ? "" : `<p class="note as-pic-weight">${typeof rcWeightLine === "function" ? rcWeightLine() : ""}</p>`}
     ${asRadarsHTML()}
   </section>`;
 }
@@ -11511,7 +11531,9 @@ function asKnowHTML(){
 function asStepHTML(s, i, next){
   const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
   if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
-    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`; }
+    // "About your platform" is done on the workspace page itself, not its own report, so the button says where it actually goes
+    const label = s.k === "setup" ? "Open workspace" : "Review";
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
     <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
@@ -11530,9 +11552,11 @@ function asWelcomeHTML(J){
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
     </section>
+    ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+      <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
     </section>
     ${asFootHTML()}
   </div>`;
@@ -11589,7 +11613,7 @@ function renderTools(){
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios, ${typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.length} versions across ${typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8} sectors`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
@@ -11758,9 +11782,9 @@ const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and reg
   ["cover","var(--t-cv)","Coverage radar","Your defenses against that risk"], ["siren","var(--t-tt)","Incident tabletop","Four decisions per scenario"], ["send","var(--accent)","Act on it","Report card, roadmap and your tracker"]];
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
-  const versions = SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
+  const versions = typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
   const tools = AB_GROUPS.reduce((a, g) => a + g[1].length, 0);
-  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,"tabletop scenario versions"],[lawSteps,"decisions with law notes"],
+  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,`tabletop scenario versions ${tip(`${SCENARIOS.length} scenarios, each written for up to ${ALL_TYPES.length} sectors`)}`],[lawSteps,"decisions with law notes"],
     [typeof MA_AREAS !== "undefined" ? MA_AREAS.length * 5 : 40,"maturity level descriptions"],[typeof CV_AREAS !== "undefined" ? CV_AREAS.length * CV_LAYERS.length : 40,"coverage checks"]];
   const decisions = [
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
@@ -11777,6 +11801,7 @@ function renderAbout(){
 
     <section class="ab-stats rise" aria-label="By the numbers">${stats.map(([n,l])=>`<div><b class="mono">${n}</b><span>${l}</span></div>`).join("")}</section>
     <p class="note ab-stats-cap">About the content in this tool, not about your program. Nothing here is a measure of your own trust and safety work.</p>
+    <p class="note ab-scores-ptr">Every score on this site comes from a stated formula, not a gut feeling. <button type="button" class="ov-link" data-ab="scores">See how the scores work ${icon("arrow")}</button></p>
 
     <section class="ab-sec rise">
       <h2>The problem</h2>
@@ -11795,7 +11820,7 @@ function renderAbout(){
       ${AB_GROUPS.map(([g, list]) => `<h3 class="ab-gh">${g}</h3><div class="ab-tools">${list.map(([c,i,n,d])=>`<div class="ab-tool"><span class="sb-glyph" style="background:var(--${c})"><svg><use href="#i-${i}"/></svg></span><div><h3>${n}</h3><p>${d}</p></div></div>`).join("")}</div>`).join("")}
     </section>
 
-    <section class="ab-sec rise">
+    <section class="ab-sec rise" id="ab-scores" style="scroll-margin-top:16px">
       <h2>How the scores work</h2>
       <div class="ab-dec">
         <div><h3>Risk</h3><p>Each of the ${HARMS.length} harms has a severity and a baseline likelihood. A product's answers move them: stranger contact raises grooming and scam likelihood, verified identity lowers it. Severity × likelihood gives a score out of 16; 12 and up is critical. Safeguards you tick lower likelihood, so every risk also has a rating after safeguards, and a burn-down shows how far the launch plan takes you.</p></div>
@@ -11828,6 +11853,7 @@ function renderAbout(){
       <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}. Next: a transparency report drafter and a rebuilt metrics flow.</p>
     </section>
   </article>`;
+  const scores = $("#ab-scores"); if(scores) $$('[data-ab="scores"]').forEach(b => b.onclick = () => scores.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}));
 }
 
 /* =========================================================
@@ -16894,7 +16920,10 @@ function maRadar(d, big, prev){
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;
 }
 function maLegend(d, prev){
-  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Now</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span>${prev ? `<span><i class="ma-lg-old"></i>${esc(maDate(prev.t))}</span>` : ""}<span><i class="ma-lg-gap"></i>Below target</span></div>`;
+  // Caption the comparison point so a past date never reads as a stale target: the plan's very first
+  // rating if it's the only snapshot saved, or the most recent snapshot once there's more than one.
+  const prevLabel = prev ? ((d.hist || []).length <= 1 ? "Plan started" : "Last saved") : "";
+  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Now</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span>${prev ? `<span><i class="ma-lg-old"></i>${esc(prevLabel)}, ${esc(maDate(prev.t))}</span>` : ""}<span><i class="ma-lg-gap"></i>Below target</span></div>`;
 }
 // Where the overall score sits on the five-level scale, with the stage target marked
 function maScaleHTML(){
@@ -17893,6 +17922,9 @@ function pmCurrentHero(){
 const RC_GRADES = [[85, "A", "good"], [70, "B", "good"], [55, "C", "med"], [40, "D", "high"], [0, "F", "crit"]];
 const rcGrade = s => RC_GRADES.find(g => s >= g[0]);
 const RC_WEIGHTS = {maturity:30, coverage:25, launch:20, crisis:15, policy:10};
+// Plain-English weighting line, built from RC_WEIGHTS so it can never drift from the real maths
+const RC_WEIGHT_LABEL = {maturity:"Maturity", coverage:"harm coverage", launch:"launch readiness", crisis:"crisis readiness", policy:"policy clarity"};
+const rcWeightLine = () => `${Object.keys(RC_WEIGHTS).map(k => `${RC_WEIGHT_LABEL[k]} ${RC_WEIGHTS[k]}`).join(", ")}. Parts you haven't done yet count as missing, so the grade rises as you finish them.`;
 // Each part: {k, n, icon, color, route, score (0 to 100, or null when not graded), detail, todo}
 function rcParts(){
   const out = [], items = Object.values(wsItems());
@@ -19112,6 +19144,11 @@ function demoExit(){
   }catch(e){ return gsay("This browser blocked restoring your work"); }
   demoReload();
 }
+// Pixelry's three products, and how far each is through its launch plan: [preset, display name, every nth safeguard left undone]
+const DEMO_PRODUCTS = [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]];
+// The four social-sector tabletop scenarios Pixelry has rehearsed, and its best "strong calls on first try" count out of four for each
+const DEMO_CRISIS_BEST = [4, 3, 3, 2];
+const DEMO_POLICY_RULE = "Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.";
 // Pixelry's program: a quarter into its maturity plan, three products partway through launch, coverage mapped, crises rehearsed
 function demoFill(){
   const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
@@ -19119,7 +19156,7 @@ function demoFill(){
   store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
   ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; maSave();
   wsSaveTool("maturity", ma, "Pixelry program maturity");
-  [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
+  DEMO_PRODUCTS.forEach(([k, name, every], n) => {
     pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
     assess(pm).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) pm.done[s.id] = true; });
     saveToLib();
@@ -19130,11 +19167,11 @@ function demoFill(){
   wsSaveTool("coverage", cv, "Pixelry coverage");
   mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[]}; mxLoadDemo(mxList());
   mx.read = {"Violating-content prevalence":true, "Unsafe-contact rate for minors":true, "Harmful reach before action":true}; store.set("mx", mx);
-  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, 4);
-  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:[4, 3, 3, 2][j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
+  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, DEMO_CRISIS_BEST.length);
+  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:DEMO_CRISIS_BEST[j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
   store.set("tt:progress", prog);
   pol = Object.assign(POL_BLANK(), {company:"Pixelry", type:"social", youth:"teens", regions:["us", "eu", "uk"], enforce:["reports", "auto", "humans"], actions:["remove", "warn", "suspend", "ban"],
-    rule:"Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.",
+    rule:DEMO_POLICY_RULE,
     product:"Pixelry is a photo and short-video app for 13 to 25-year-olds, with public profiles, comments, DMs and live streams. Creators sell subscriptions and items through Pixelry Market.",
     concerns:"Pile-ons in the comments when a creator's post goes viral. 'Rate me' posts that invite insults about appearance. Whether repeated one-word insults count as harassment."});
   pol.heur = polHeuristics(pol.rule); pol.ts = Date.now(); pol.view = "report"; savePol();
@@ -19144,6 +19181,47 @@ function demoFill(){
   if(typeof DS_EXAMPLE !== "undefined"){ ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE)), {ex:false, view:"report"}); dsSave(); wsSaveTool("dsa", ds, "DSA readiness: Pixelry"); }
   // Last year's DSA transparency report, ready to review
   if(typeof TR_EXAMPLE !== "undefined"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)), {view:"report"}); trSave(); wsSaveTool("transparency", tr, "Transparency report: Pixelry 2025"); }
+}
+
+/* ---------- Home page preview: real outputs from Pixelry's example data, read-only, never saved to your workspace ---------- */
+// The same five report-card parts demoFill() would produce, computed directly from the example data so nothing has to be typed
+function demoParts(){
+  const out = [];
+  { const d = maExample(), t = maStage(d).t;
+    out.push({k:"maturity", score:Math.round(MA_AREAS.reduce((s, a) => s + Math.min(maLevelOf(d, a.k), t[a.k]) / t[a.k], 0) / MA_AREAS.length * 100)}); }
+  out.push({k:"coverage", score:cvSummary(CV_EXAMPLE).cov});
+  { let want = 0, got = 0;
+    DEMO_PRODUCTS.forEach(([k, , every]) => { assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(PRESETS[k])))).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { const w = s.rank === 3 ? 2 : 1; want += w; if(i % every) got += w; }); });
+    out.push({k:"launch", score:want ? Math.round(got / want * 100) : null}); }
+  { const soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, DEMO_CRISIS_BEST.length);
+    const runs = soc.map((i, j) => DEMO_CRISIS_BEST[j] / SCENARIOS[i].steps.length), perf = runs.reduce((s, x) => s + x, 0) / runs.length;
+    out.push({k:"crisis", score:Math.round(perf * (0.7 + 0.3 * Math.min(1, runs.length / 4)) * 100)}); }
+  out.push({k:"policy", score:polHeuristics(DEMO_POLICY_RULE).score});
+  return out;
+}
+// Pixelry app's top "do first" safeguard, with the same partial progress the demo shows
+function demoTopAction(){
+  const [k, , every] = DEMO_PRODUCTS[0], r = assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(PRESETS[k]))));
+  const done = {}; r.safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) done[s.id] = true; });
+  return r.safeguards.filter(s => !done[s.id]).sort((a, b) => b.rank - a.rank || b.critCovers - a.critCovers || b.covers.length - a.covers.length)[0];
+}
+// Three real outputs a visitor would see after running the demo, computed live from the example data: never hard-coded, never saved
+function demoPreviewHTML(){
+  if(typeof rcOverall !== "function" || typeof dsScore !== "function" || typeof dsCtx !== "function" || typeof DS_EXAMPLE === "undefined") return "";
+  const o = rcOverall(demoParts()), gr = rcGrade(o.score), top = demoTopAction();
+  const law = top && top.legal === "applies" && top.laws && top.laws[0];
+  const sor = dsScore(DS_EXAMPLE, dsCtx(DS_EXAMPLE)).reqs.find(req => req.k === "n_sor");
+  const lines = [
+    `Pixelry's overall score: <b>${o.score} / 100</b> · Grade ${esc(gr[1])} · based on ${o.graded} of ${o.total} parts.`,
+    top ? `Its top "do first" action: ${esc(asLow(top.t.replace(/\.$/, "")))}${law ? `, required under the ${esc(law)}` : ""}.` : "",
+    sor ? `Its DSA statement-of-reasons readiness: ${sor.met ? "in place" : "not yet in place"} (Article 17).` : ""
+  ].filter(Boolean);
+  if(!lines.length) return "";
+  return `<section class="as-preview rise" aria-label="What you get, from the example company">
+    <p class="as-preview-lead">What you get, from the example company:</p>
+    <ul class="as-preview-lines">${lines.map(l => `<li>${l}</li>`).join("")}</ul>
+    <button type="button" class="btn ghost sm" data-demo="start">See it with an example company ${icon("arrow")}</button>
+  </section>`;
 }
 if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
 
@@ -22586,12 +22664,14 @@ function renderPlan(){
   const sent = !!store.get("tk:used", false), demo = typeof demoOn === "function" && demoOn();
   const by = g => items.filter(x => x.g === g).sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
   const srcs = [...new Set(items.map(x => PLAN_KIND[x.kind]))];
+  const doneGroups = PLAN_GROUPS.filter(([g]) => by(g).some(x => x.done));
+  const doneHidden = doneGroups.some(([g]) => !plMore[g + ":done"]);
   view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" aria-live="polite"></span>
     <div class="pl-head">
       <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
       <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>
-      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : `Start with your program's <a href="#maturity">maturity</a> or a <a href="#premortem">pre-mortem</a>.`}`}</p>
-      ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button></div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
+      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done, shown inside each group below with Show done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : `Start with your program's <a href="#maturity">maturity</a> or a <a href="#premortem">pre-mortem</a>.`}`}</p>
+      ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button>${doneGroups.length ? `<button type="button" class="btn" data-plan="showdone">${doneHidden ? `Show ${items.length - open.length} done` : "Hide done"}</button>` : ""}</div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
     </div>
     ${PLAN_GROUPS.map(([g, n, d]) => { const xs = by(g); if(!xs.length) return ""; const open = xs.filter(x => !x.done), done = xs.filter(x => x.done), all = !!plMore[g], shown = all ? open : open.slice(0, PL_SHOW);
       return `<section class="pl-group" aria-labelledby="pl-${g}"><div class="as-sec-h"><h2 id="pl-${g}">${n} <span class="mono note">${open.length}</span></h2><span class="note">${d}</span></div>
@@ -22601,7 +22681,11 @@ function renderPlan(){
   view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
   view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
   view.querySelectorAll("[data-plmore],[data-pldone]").forEach(b => b.onclick = () => { const k = b.dataset.plmore || (b.dataset.pldone + ":done"); plMore[k] = !plMore[k]; const y = window.scrollY; renderPlan(); window.scrollTo(0, y); });
-  view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => { if(b.dataset.plan === "tracker") return tkOpen("plan"); const md = planMarkdown(); offerFile(`ts-plan-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#pl-toast")); });
+  view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => {
+    if(b.dataset.plan === "tracker") return tkOpen("plan");
+    if(b.dataset.plan === "showdone"){ const show = doneHidden; PLAN_GROUPS.forEach(([g]) => { if(by(g).some(x => x.done)) plMore[g + ":done"] = show; }); return renderPlan(); }
+    const md = planMarkdown(); offerFile(`ts-plan-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#pl-toast"));
+  });
 }
 function planMarkdown(){
   const items = planItems(), p = typeof wsProfile === "function" ? wsProfile() : null;
@@ -22705,10 +22789,12 @@ function renderReview(){
   const cell = v => v === null || v === undefined ? "–" : v, delta = (x, y) => x === null || x === undefined || y === null || y === undefined ? "" : y === x ? `<span class="rv-d same">same</span>` : `<span class="rv-d ${y > x ? "up" : "dn"}">${y > x ? "+" : ""}${y - x}</span>`;
   const d = a ? revDiff(a, now) : [];
   const sampleBtn = `<button type="button" class="btn" data-rev="example">See a sample comparison</button>`;
+  // The empty state shows the shape of the comparison, faded, instead of hiding it behind a click
+  const samplePreview = `<div class="card rv-sample-preview" aria-hidden="true"><span class="pill">Sample</span><table><tbody>${PN.map(([k, n]) => `<tr><td>${n}</td><td class="mono">${REV_EX_A.parts[k]}</td><td class="rv-sample-arrow">${icon("arrow")}</td><td class="mono">${REV_EX_B.parts[k]}</td></tr>`).join("")}</tbody></table></div>`;
   view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each part, every area, the gaps you closed and the ones that opened.", "Assess",
     `<span class="toast" id="rv-toast" aria-live="polite"></span>${now.score !== null && !revEx ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
     ${revEx ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a sample program's picture, one quarter to the next.</span><button type="button" class="btn sm" data-rev="exit-example">Back to your review</button></div>` : ""}
-    ${!revEx && now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div><div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
+    ${!revEx && now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div>${samplePreview}<div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
     <div class="rv-top">
       ${revEx ? `<div class="field rv-pick"><span class="lbl">Compare now with</span><span class="note">${esc(a.label)} (example)</span></div>` : `<label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>`}
       <div class="rv-score"><div><span class="as-k">${esc(a.label)}</span><b class="mono">${cell(a.score)}</b></div><span class="rv-arrow">${icon("arrow")}</span><div><span class="as-k">Now</span><b class="mono">${cell(now.score)}</b></div>${delta(a.score, now.score)}</div>

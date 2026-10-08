@@ -11,6 +11,7 @@ const body = function(){
   if(bad(h)) throw new Error("first visit has bad values: " + where(h));
   eq(/See where your Trust &amp; Safety program stands/.test(h) && /data-as="start"/.test(h), true, "first visit invites you to start");
   eq((h.match(/<li style="--c:/g) || []).length, JOURNEY.length, "the six steps with what each gives you");
+  eq(/a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you/.test(h), true, "warns the six steps can grow, naming the true conditions from JOURNEY");
   eq(/id="as-pic-h"/.test(h), false, "no empty 'Your program picture' ghost card on a first fresh visit"); eq(waits(h), 0, "and no ghost radars either");
   eq(/href="#tools"/.test(h), true, "every tool is still one click away");
   out.push("first visit: calm hero and six steps, no empty picture card, start or see an example");
@@ -29,10 +30,13 @@ const body = function(){
   pm = fromPreset("marketplace"); pm.example = false; pm.name = "Resale chat"; saveToLib(); store.set("as:seen", null); renderOverview(); h = view.innerHTML;
   if(bad(h)) throw new Error("partway has bad values: " + where(h));
   eq((h.match(/class="as-s ok"/g) || []).length, 3, "three steps done"); eq(/Social media[^<]* · Growing · US, EU/.test(h), true, "setup summary");
+  eq(/aria-label="Open workspace About your platform">Open workspace<\/button>/.test(h), true, "the done setup step says where its button goes, instead of an ambiguous Review");
+  eq((h.match(/>Review</g) || []).length, 2, "the other two finished steps still say Review, since they do open a review");
   eq(/7 of 8 areas below target/.test(h), true, "maturity summary"); eq(/1 product · \d+ launch blockers? open/.test(h), true, "pre-mortem summary");
   eq(/Up next · about 5 minutes/.test(h) && /data-jgo="coverage"/.test(h), true, "coverage is up next"); eq(waits(h), 1, "coverage radar waits for its step");
   eq(/levels? below your target of/.test(h) && /Before launch, Resale chat still needs/.test(h), true, "what we know so far");
   const o1 = rcOverall(rcParts()).score; eq(/based on 2 of 5 parts so far/.test(h), true, "score so far");
+  eq(/Maturity 30, harm coverage 25, launch readiness 20, crisis readiness 15, policy clarity 10\. Parts you haven't done yet count as missing, so the grade rises as you finish them\./.test(h), true, "the grade explains how it's weighted, with the real weights from the code");
   out.push(`partway: 3 of 6 done, score ${o1} from 2 parts, findings from maturity and the pre-mortem`);
   // finishing coverage moves the score, and the home says why
   CV_AREAS.forEach(a => { cv.r[a.k] = {policy:1, detect:0, enforce:1, appeal:0, measure:0}; }); cv.ex = false; cv.est = false; cvSave();
@@ -49,7 +53,9 @@ const body = function(){
   ds = Object.assign(DS_BLANK(), {svc:"Test", tier:"platform", size:"medium", est:"eu", view:"report"}); dsSave();
   eq(JOURNEY.every(s => s.done()), true, "every step done"); renderOverview(); h = view.innerHTML; if(bad(h)) throw new Error("complete has bad values: " + where(h));
   eq(/All 8 steps done/.test(h) && /class="card as-complete"/.test(h) && /href="#plan"/.test(h), true, "complete offers the plan and the leadership pack");
-  eq(/Across 1 rehearsal, \d+% of your first calls were strong/.test(h), true, "crisis finding"); out.push("complete: leadership pack up front, a finding from every step");
+  eq(/Across 1 rehearsal, \d+% of your first calls were strong/.test(h), true, "crisis finding");
+  eq(/1 scenario rehearsed \(4 for full credit\)/.test(h), true, "the crisis-readiness row keeps its explanation for why one rehearsal isn't full marks");
+  out.push("complete: leadership pack up front, a finding from every step");
   // quarter by quarter: save the picture, change things, and the home and review page say what moved
   eq(/data-rev="save"/.test(h), true, "the picture offers to save the quarter"); eq(/class="card as-rev"/.test(h), false, "no comparison until a quarter is saved");
   const snap = revSave(); eq(!!snap && snap.label === REV_LABEL(Date.now()) && snap.score === rcOverall(rcParts()).score, true, "the snapshot holds the score");
@@ -68,11 +74,15 @@ const body = function(){
   eq(new RegExp(`<option value="${old.t}" selected>Q1 2026`).test(h) && /class="card rv-parts"/.test(h) && /class="card rv-what"/.test(h), true, "review compares the saved quarter with now");
   eq(/class="cv-prev"/.test(h) && /class="ma-prev"|stroke-dasharray/.test(h), true, "both radars overlay the saved quarter"); eq(/Maturity by area/.test(h) && /2 → 4/.test(h), true, "levels by area");
   eq(/What we knew in Q1 2026/.test(h) && new RegExp(`data-revdel="${old.t}"`).test(h), true, "the old findings and a way to delete the snapshot");
-  revDelete(old.t); eq(revSnaps().length, 0, "deleted"); renderReview(); eq(/No saved quarters yet/.test(view.innerHTML), true, "empty review invites the first save");
+  revDelete(old.t); eq(revSnaps().length, 0, "deleted"); renderReview(); h = view.innerHTML; eq(/No saved quarters yet/.test(h), true, "empty review invites the first save");
+  eq(/class="card rv-sample-preview" aria-hidden="true"><span class="pill">Sample<\/span><table>/.test(h), true, "the sample comparison's shape shows by default, faded, not only behind a click");
+  eq((h.match(/<tr><td>(Program maturity|Launch readiness|Harm coverage|Crisis readiness|Policy clarity)<\/td><td class="mono">\d+<\/td><td class="rv-sample-arrow">/g) || []).length, 5, "all five parts shown, before and after");
   out.push("quarter by quarter: save, compare (score, parts, areas, gaps, radars), nudge after a quarter, delete");
   // All tools: every tool on its own, plus recent work
   renderTools(); h = view.innerHTML; if(bad(h)) throw new Error("all tools has bad values: " + where(h));
   eq((h.match(/class="ov-tool"/g) || []).length >= 7, true, "every tool listed"); eq(/Jump back in/.test(h) && /data-open=/.test(h), true, "recent work");
+  eq(h.includes(`${SCENARIOS.length} scenarios, ${ttVersionCount()} versions across ${ALL_TYPES.length} sectors`), true, "the tabletop card names scenarios and versions, matching About and the tool itself");
+  Object.entries(OV_ART).forEach(([k, svg]) => { if(/<text[\s>]/.test(svg)) throw new Error("decorative card art for " + k + " still has a stray <text> label a screen reader or text-scrape would read"); });
   out.push("all tools: " + (h.match(/class="ov-tool"/g) || []).length + " tools and recent work");
   // pre-mortem landing shows the current assessment and a radar per saved one
   pm = fromPreset("dating"); pm.example = false; pm.name = "Match chat"; pm.id = null; pm.saved = false; saveToLib();

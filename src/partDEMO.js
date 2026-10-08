@@ -28,6 +28,11 @@ function demoExit(){
   }catch(e){ return gsay("This browser blocked restoring your work"); }
   demoReload();
 }
+// Pixelry's three products, and how far each is through its launch plan: [preset, display name, every nth safeguard left undone]
+const DEMO_PRODUCTS = [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]];
+// The four social-sector tabletop scenarios Pixelry has rehearsed, and its best "strong calls on first try" count out of four for each
+const DEMO_CRISIS_BEST = [4, 3, 3, 2];
+const DEMO_POLICY_RULE = "Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.";
 // Pixelry's program: a quarter into its maturity plan, three products partway through launch, coverage mapped, crises rehearsed
 function demoFill(){
   const day = 864e5, iso = n => new Date(Date.now() + n * day).toISOString().slice(0, 10);
@@ -35,7 +40,7 @@ function demoFill(){
   store.set("ws:profile", {name:"Alex Rivera", role:"Head of Trust & Safety", org:"Pixelry"});
   ma = maExample(); ma.ex = false; ma.stage = "growth"; ma.stageSet = true; maSave();
   wsSaveTool("maturity", ma, "Pixelry program maturity");
-  [["teen_social", "Pixelry app", 3], ["creator", "Pixelry Creator Subscriptions", 2], ["marketplace", "Pixelry Market", 4]].forEach(([k, name, every], n) => {
+  DEMO_PRODUCTS.forEach(([k, name, every], n) => {
     pm = fromPreset(k); Object.assign(pm, {example:false, name, id:null, saved:false, regions:["us", "eu", "uk"]});
     assess(pm).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) pm.done[s.id] = true; });
     saveToLib();
@@ -46,11 +51,11 @@ function demoFill(){
   wsSaveTool("coverage", cv, "Pixelry coverage");
   mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[]}; mxLoadDemo(mxList());
   mx.read = {"Violating-content prevalence":true, "Unsafe-contact rate for minors":true, "Harmful reach before action":true}; store.set("mx", mx);
-  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, 4);
-  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:[4, 3, 3, 2][j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
+  const prog = {}, soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, DEMO_CRISIS_BEST.length);
+  soc.forEach((i, j) => prog[ttKey(i, "social")] = {best:DEMO_CRISIS_BEST[j], runs:[2, 1, 1, 1][j], last:Date.now() - [9, 23, 41, 64][j] * day});
   store.set("tt:progress", prog);
   pol = Object.assign(POL_BLANK(), {company:"Pixelry", type:"social", youth:"teens", regions:["us", "eu", "uk"], enforce:["reports", "auto", "humans"], actions:["remove", "warn", "suspend", "ban"],
-    rule:"Users must not harass, bully or intimidate other users. Content that is abusive or offensive will be removed.",
+    rule:DEMO_POLICY_RULE,
     product:"Pixelry is a photo and short-video app for 13 to 25-year-olds, with public profiles, comments, DMs and live streams. Creators sell subscriptions and items through Pixelry Market.",
     concerns:"Pile-ons in the comments when a creator's post goes viral. 'Rate me' posts that invite insults about appearance. Whether repeated one-word insults count as harassment."});
   pol.heur = polHeuristics(pol.rule); pol.ts = Date.now(); pol.view = "report"; savePol();
@@ -60,6 +65,47 @@ function demoFill(){
   if(typeof DS_EXAMPLE !== "undefined"){ ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE)), {ex:false, view:"report"}); dsSave(); wsSaveTool("dsa", ds, "DSA readiness: Pixelry"); }
   // Last year's DSA transparency report, ready to review
   if(typeof TR_EXAMPLE !== "undefined"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)), {view:"report"}); trSave(); wsSaveTool("transparency", tr, "Transparency report: Pixelry 2025"); }
+}
+
+/* ---------- Home page preview: real outputs from Pixelry's example data, read-only, never saved to your workspace ---------- */
+// The same five report-card parts demoFill() would produce, computed directly from the example data so nothing has to be typed
+function demoParts(){
+  const out = [];
+  { const d = maExample(), t = maStage(d).t;
+    out.push({k:"maturity", score:Math.round(MA_AREAS.reduce((s, a) => s + Math.min(maLevelOf(d, a.k), t[a.k]) / t[a.k], 0) / MA_AREAS.length * 100)}); }
+  out.push({k:"coverage", score:cvSummary(CV_EXAMPLE).cov});
+  { let want = 0, got = 0;
+    DEMO_PRODUCTS.forEach(([k, , every]) => { assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(PRESETS[k])))).safeguards.filter(s => s.rank >= 2).forEach((s, i) => { const w = s.rank === 3 ? 2 : 1; want += w; if(i % every) got += w; }); });
+    out.push({k:"launch", score:want ? Math.round(got / want * 100) : null}); }
+  { const soc = SCENARIOS.map((s, i) => i).filter(i => (SCENARIOS[i].types || []).includes("social")).slice(0, DEMO_CRISIS_BEST.length);
+    const runs = soc.map((i, j) => DEMO_CRISIS_BEST[j] / SCENARIOS[i].steps.length), perf = runs.reduce((s, x) => s + x, 0) / runs.length;
+    out.push({k:"crisis", score:Math.round(perf * (0.7 + 0.3 * Math.min(1, runs.length / 4)) * 100)}); }
+  out.push({k:"policy", score:polHeuristics(DEMO_POLICY_RULE).score});
+  return out;
+}
+// Pixelry app's top "do first" safeguard, with the same partial progress the demo shows
+function demoTopAction(){
+  const [k, , every] = DEMO_PRODUCTS[0], r = assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(PRESETS[k]))));
+  const done = {}; r.safeguards.filter(s => s.rank >= 2).forEach((s, i) => { if(i % every) done[s.id] = true; });
+  return r.safeguards.filter(s => !done[s.id]).sort((a, b) => b.rank - a.rank || b.critCovers - a.critCovers || b.covers.length - a.covers.length)[0];
+}
+// Three real outputs a visitor would see after running the demo, computed live from the example data: never hard-coded, never saved
+function demoPreviewHTML(){
+  if(typeof rcOverall !== "function" || typeof dsScore !== "function" || typeof dsCtx !== "function" || typeof DS_EXAMPLE === "undefined") return "";
+  const o = rcOverall(demoParts()), gr = rcGrade(o.score), top = demoTopAction();
+  const law = top && top.legal === "applies" && top.laws && top.laws[0];
+  const sor = dsScore(DS_EXAMPLE, dsCtx(DS_EXAMPLE)).reqs.find(req => req.k === "n_sor");
+  const lines = [
+    `Pixelry's overall score: <b>${o.score} / 100</b> · Grade ${esc(gr[1])} · based on ${o.graded} of ${o.total} parts.`,
+    top ? `Its top "do first" action: ${esc(asLow(top.t.replace(/\.$/, "")))}${law ? `, required under the ${esc(law)}` : ""}.` : "",
+    sor ? `Its DSA statement-of-reasons readiness: ${sor.met ? "in place" : "not yet in place"} (Article 17).` : ""
+  ].filter(Boolean);
+  if(!lines.length) return "";
+  return `<section class="as-preview rise" aria-label="What you get, from the example company">
+    <p class="as-preview-lead">What you get, from the example company:</p>
+    <ul class="as-preview-lines">${lines.map(l => `<li>${l}</li>`).join("")}</ul>
+    <button type="button" class="btn ghost sm" data-demo="start">See it with an example company ${icon("arrow")}</button>
+  </section>`;
 }
 if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
 

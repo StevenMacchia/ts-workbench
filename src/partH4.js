@@ -62,7 +62,7 @@ OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <path d="M112 62l6 6 11-12" fill="none" stroke="var(--t-ds)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
-    <text x="110" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">gold</text><text x="124" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">got</text></svg>`;
+    <rect x="104" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/><rect x="122" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/></svg>`;
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -154,7 +154,8 @@ function asPictureHTML(empty){
   const plain = p => { const d = p.detail || "";
     if(p.k === "coverage") return asSum("coverage");
     if(p.k === "policy"){ const n = (d.match(/\d+/) || ["1"])[0]; return `${n} polic${n === "1" ? "y" : "ies"} tested`; }
-    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/ \(.*\)$/, "").replace(/practiced/, "rehearsed") : d; };
+    // Crisis readiness keeps its "(4 for full credit)" aside: it's what explains why a perfect run can still score under 100
+    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/practiced/, "rehearsed") : d; };
   // In step order, with the optional part last
   const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
   const rows = parts.slice().sort((a, b) => order(a) - order(b));
@@ -168,6 +169,7 @@ function asPictureHTML(empty){
       <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
         <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
+    ${o.score === null ? "" : `<p class="note as-pic-weight">${typeof rcWeightLine === "function" ? rcWeightLine() : ""}</p>`}
     ${asRadarsHTML()}
   </section>`;
 }
@@ -179,7 +181,9 @@ function asKnowHTML(){
 function asStepHTML(s, i, next){
   const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
   if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
-    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`; }
+    // "About your platform" is done on the workspace page itself, not its own report, so the button says where it actually goes
+    const label = s.k === "setup" ? "Open workspace" : "Review";
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
     <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
@@ -198,9 +202,11 @@ function asWelcomeHTML(J){
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
     </section>
+    ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+      <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
     </section>
     ${asFootHTML()}
   </div>`;
@@ -257,7 +263,7 @@ function renderTools(){
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios, ${typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.length} versions across ${typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8} sectors`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}

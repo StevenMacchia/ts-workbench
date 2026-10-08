@@ -181,6 +181,7 @@ function pmBurnHTML(r){
   return `<div class="card pm-burn" id="pm-burn" style="scroll-margin-top:16px">
     <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
       <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
+      <p class="note">${r.total} of ${r.risks.length * 16} possible (${r.risks.length} risk${r.risks.length === 1 ? "" : "s"}, each scored severity × likelihood out of 16).</p>
       <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>
       <div class="pm-bbars"><div class="pm-bbar"><span>Before</span>${strip(r.counts)}</div><div class="pm-bbar"><span>Now</span>${strip(r.rcounts)}</div></div>
       <p class="note">With all ${N} safeguards in place, ${floor} of ${r.total} remains. Safeguards make severe harms rarer, not impossible, so detection and response still matter.</p></div>

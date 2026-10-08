@@ -60,6 +60,10 @@ const body = function(){
   // UI: the Build it panel in the report, the button in the rewrite tab, and the generator registry
   pm = fromPreset("dating"); const rep = renderReport(assess(pm)); if(bad(rep)) throw new Error("report bad: " + where(rep));
   has(rep, /class="card rx-build"/, "build panel"); has(rep, /class="wip-tag">Starter, untested</, "wip tag"); has(rep, /data-rx="osprey"/, "osprey button"); has(rep, /data-rx="coop"/, "coop button"); has(rep, /osprey-starter-dating-app-example\.sml/, "file name shown");
+  // every legal line names its actual law, and the total-risk number shows its basis the moment it appears
+  has(rep, /EU Terrorist Content Online Regulation \(Regulation \(EU\) 2021\/784\)/, "the terrorist-content safeguard names the regulation, not a vague \"EU removal order\"");
+  eq(/an? EU removal order/i.test(rep), false, "no vague removal-order phrasing left");
+  has(rep, /\d+ of \d+ possible \(\d+ risks?, each scored severity × likelihood out of 16\)\./, "total risk shows its denominator at first sight");
   eq(rxBuildHTML({risks:[]}), "", "no panel without risks");
   pol = Object.assign(POL_BLANK(), {rule:poY.rule, result:Object.assign({score:50, summary:"s", strengths:[], assumptions:[], reviewer_checklist:[], open_questions:[], enforcement_risks:[], legal:[]}, poY.result), heur:polHeuristics(poY.rule)});
   const tab = polTabHTML("rewrite"); if(bad(tab)) throw new Error("rewrite tab bad: " + where(tab)); has(tab, /data-rx="policy"/, "policy file button"); has(tab, /as policy file</, "button label"); has(tab, /class="wip-chip">starter</, "starter chip");

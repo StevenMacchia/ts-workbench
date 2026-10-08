@@ -29,12 +29,14 @@ function renderPlan(){
   const sent = !!store.get("tk:used", false), demo = typeof demoOn === "function" && demoOn();
   const by = g => items.filter(x => x.g === g).sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
   const srcs = [...new Set(items.map(x => PLAN_KIND[x.kind]))];
+  const doneGroups = PLAN_GROUPS.filter(([g]) => by(g).some(x => x.done));
+  const doneHidden = doneGroups.some(([g]) => !plMore[g + ":done"]);
   view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" aria-live="polite"></span>
     <div class="pl-head">
       <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
       <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>
-      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : `Start with your program's <a href="#maturity">maturity</a> or a <a href="#premortem">pre-mortem</a>.`}`}</p>
-      ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button></div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
+      <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done, shown inside each group below with Show done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : `Start with your program's <a href="#maturity">maturity</a> or a <a href="#premortem">pre-mortem</a>.`}`}</p>
+      ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button>${doneGroups.length ? `<button type="button" class="btn" data-plan="showdone">${doneHidden ? `Show ${items.length - open.length} done` : "Hide done"}</button>` : ""}</div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
     </div>
     ${PLAN_GROUPS.map(([g, n, d]) => { const xs = by(g); if(!xs.length) return ""; const open = xs.filter(x => !x.done), done = xs.filter(x => x.done), all = !!plMore[g], shown = all ? open : open.slice(0, PL_SHOW);
       return `<section class="pl-group" aria-labelledby="pl-${g}"><div class="as-sec-h"><h2 id="pl-${g}">${n} <span class="mono note">${open.length}</span></h2><span class="note">${d}</span></div>
@@ -44,7 +46,11 @@ function renderPlan(){
   view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
   view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
   view.querySelectorAll("[data-plmore],[data-pldone]").forEach(b => b.onclick = () => { const k = b.dataset.plmore || (b.dataset.pldone + ":done"); plMore[k] = !plMore[k]; const y = window.scrollY; renderPlan(); window.scrollTo(0, y); });
-  view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => { if(b.dataset.plan === "tracker") return tkOpen("plan"); const md = planMarkdown(); offerFile(`ts-plan-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#pl-toast")); });
+  view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => {
+    if(b.dataset.plan === "tracker") return tkOpen("plan");
+    if(b.dataset.plan === "showdone"){ const show = doneHidden; PLAN_GROUPS.forEach(([g]) => { if(by(g).some(x => x.done)) plMore[g + ":done"] = show; }); return renderPlan(); }
+    const md = planMarkdown(); offerFile(`ts-plan-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#pl-toast"));
+  });
 }
 function planMarkdown(){
   const items = planItems(), p = typeof wsProfile === "function" ? wsProfile() : null;
