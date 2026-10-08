@@ -308,3 +308,37 @@ const body8 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body8.toString() + ")();")());
+// A table or a long list sharing a card with another heavy block made the same kind of wall the Method cards
+// were built to fix; a heavy leading block now gets its own card, a table collapses to rows with a way back
+// to the table, and a long do/good list collapses its bold-lead items the same way a plain <ul> already did.
+const body9 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  // world step 5, "How to test" (the techniques step): a leading 12-row table used to be crammed into the
+  // same card as the six-item "run it in this order" list; now the table is its own card.
+  const wSteps = LN_GUIDES.world.steps, wTech = wSteps[4]; eq(wTech.id, "techniques", "world step 5 is the techniques step");
+  const wCards = lnStepCards("world", wTech);
+  eq(wCards.length >= 3, true, "world step 5 splits into at least three cards: got " + wCards.length);
+  eq(/class="ln-tblflip"/.test(wCards[0].html) && /data-astable=/.test(wCards[0].html), true, "the table lands on its own card, as rows with an As a table toggle");
+  eq(/<ol class="do"/.test(wCards[0].html), false, "the run-it-in-this-order list is not on the table's card");
+  eq(wCards.some(c => /<ol class="do"/.test(c.html)), true, "the run-it-in-this-order list is on a card of its own");
+  // the table itself: rows by default, the original table behind the toggle, hidden until asked for
+  eq(/<ul class="ln-rows" id="[^"]+-rows">/.test(wCards[0].html), true, "rows render by default");
+  eq(/<div class="ln-tw" id="[^"]+-table" hidden>/.test(wCards[0].html), true, "the original table sits behind the toggle, hidden by default");
+  eq(/<div class="ln-tw" id="[^"]+-table" hidden><div class="ln-tw"/.test(wCards[0].html), false, "the table wrapper isn't nested inside itself");
+  // llm step 2, "What to test for": the sixteen-row harm table, with a severity pill in the Default column
+  const lHarms = LN_GUIDES.llm.steps.find(s => s.id === "harms");
+  const lCards = lnStepCards("llm", lHarms);
+  eq(lCards.length, 1, "llm step 2 is a single card: a table alone isn't split further");
+  eq(/<b>Child sexual abuse and exploitation<\/b><span class="rtf-term">CSAE, CSAM, grooming<\/span><span class="ln-rowpill"><span class="pill s4">S4<\/span><\/span>/.test(lCards[0].html), true, "the lead, its term tag and the severity pill sit on the row's lead line");
+  // a long ol.do collapses its bold-lead items (six items, "Run it in this order") but a short one (five items
+  // or fewer, none of them long) is left exactly as it rendered before
+  eq(/class="ln-row ln-row-ol"/.test(wCards.find(c => /<ol class="do"/.test(c.html)).html), true, "the six-item do-list collapses its items");
+  // a short do-list (four items, none long) is well under the threshold and is left exactly as it rendered before
+  const shortDo = `<ol class="do"><li><b>One.</b> short</li><li><b>Two.</b> short</li><li><b>Three.</b> short</li><li><b>Four.</b> short</li></ol>`;
+  eq(lnCollapseDoList(shortDo, "test"), shortDo, "a four-item do-list with short items is untouched");
+  const longDo = `<ol class="do"><li><b>One.</b> short</li><li><b>Two.</b> short</li><li><b>Three.</b> short</li><li><b>Four.</b> short</li><li><b>Five.</b> short</li></ol>`;
+  eq(/class="ln-row ln-row-ol"/.test(lnCollapseDoList(longDo, "test")), true, "a fifth item is enough to collapse the list");
+  out.push("tables and long lists: world step 5 (How to test) splits into " + wCards.length + " cards with the table as rows and a toggle back to the table, llm step 2's harm table collapses with the severity pill on the lead, a long do-list collapses its items too");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body9.toString() + ")();")());

@@ -382,10 +382,11 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-body ul.ln-rows li{margin:0}
 .ln-body li.ln-row{padding:0}
 .ln-row details{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
-.ln-row summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:10px 14px;font-size:14.5px}
+.ln-row summary{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;list-style:none;cursor:pointer;padding:10px 14px;font-size:14.5px}
 .ln-row summary::-webkit-details-marker{display:none}
 .ln-row summary b{font-weight:600;color:var(--ink)}
-.ln-chev{width:15px;height:15px;color:var(--muted);flex:none;transition:transform .15s}
+.ln-row summary .rtf-term{flex:none}
+.ln-chev{width:15px;height:15px;color:var(--muted);flex:none;margin-left:auto;transition:transform .15s}
 .ln-row details[open] .ln-chev{transform:rotate(90deg)}
 .ln-row details[open] summary{border-bottom:1px solid var(--line)}
 .ln-rowb{padding:10px 14px 12px;font-size:14px;color:var(--muted);line-height:1.55}
@@ -403,3 +404,21 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-row .ln-known-mark{color:var(--good)}
 .rtf-next[disabled]{opacity:.5;cursor:not-allowed}
 @media (max-width:760px){.ln-eb{gap:6px 10px}}
+
+/* tables and long do/good lists inside a method card: collapsed rows by default, with a way back to the table */
+.ln-tblflip{margin:0 0 14px}
+.ln-tblflip .ln-tw{margin:0}
+.ln-tblflip .ln-rows[hidden]{display:none} /* .ln-body ul.ln-rows sets display:grid, which otherwise out-specifies the [hidden] UA rule */
+.ln-tblflip .ln-tw[hidden]{display:none}
+.ln-rowpill{margin-left:auto;flex:none;display:inline-flex}
+.ln-rowb .ln-rowb-f{margin:0 0 8px}
+.ln-rowb .ln-rowb-f:last-child{margin-bottom:0}
+.ln-rowb .ln-rowb-f b{font-weight:600;color:var(--ink)}
+/* a collapsed <ol class="do">/<ul class="good"> item keeps the list's own numbered circle or tick, so the row
+   itself doesn't need its own card-like border -- just a clickable lead line and the chevron */
+.ln-body ol.do li.ln-row-ol{padding:9px 0 9px 38px}
+.ln-body ul.good li.ln-row-ul{padding-left:22px}
+.ln-body ol.do li.ln-row-ol details,.ln-body ul.good li.ln-row-ul details{border:0;border-radius:0;background:none}
+.ln-body ol.do li.ln-row-ol summary,.ln-body ul.good li.ln-row-ul summary{padding:0}
+.ln-body ol.do li.ln-row-ol details[open] summary,.ln-body ul.good li.ln-row-ul details[open] summary{border-bottom:0}
+.ln-body ol.do li.ln-row-ol .ln-rowb,.ln-body ul.good li.ln-row-ul .ln-rowb{padding:6px 0 0}

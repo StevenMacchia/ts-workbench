@@ -780,19 +780,106 @@ function renderRedteam(k){
   $$("[data-tab]").forEach(b => b.onclick = () => { location.hash = g.route + "/" + b.dataset.tab; });
   ({method:lnMethod, practice:lnPractice, worksheets:lnWorksheets, sources:lnSources})[tab](k, g);
 }
-/* ---------- method: split each step's body on its <h3> headings into calm, one-at-a-time cards ---------- */
+/* ---------- method: split each step's body on its <h3> headings, and on heavy blocks within a heading,
+   into calm, one-at-a-time cards ---------- */
 // Pure string split, no DOM: the test harness runs these functions without a real document.
+const lnWordCount = s => s.replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length;
+// Walk a chunk of body HTML and pull out its top-level blocks: a table, a do-list or a plain/good list (each
+// flagged heavy once it has 5+ <li>, a table is always heavy), and a callout, which is never heavy on its own.
+// Everything else (prose, headings-less panels) rides along as light "text" between them.
+function lnTopBlocks(html){
+  const re = /(<div class="ln-tw">[\s\S]*?<\/div>)|(<ol class="do">[\s\S]*?<\/ol>)|(<ul(?: class="good")?>[\s\S]*?<\/ul>)|(<div class="ln-note[^"]*">[\s\S]*?<\/div>)/g;
+  const blocks = []; let last = 0, m;
+  while((m = re.exec(html))){
+    if(m.index > last) blocks.push({html:html.slice(last, m.index), heavy:false});
+    const whole = m[0];
+    const heavy = m[1] ? true : (m[2] || m[3]) ? (whole.match(/<li>/g) || []).length >= 5 : false;
+    blocks.push({html:whole, heavy});
+    last = re.lastIndex;
+  }
+  if(last < html.length) blocks.push({html:html.slice(last), heavy:false});
+  return blocks;
+}
+const lnIsHeavy = html => lnTopBlocks(html).some(b => b.heavy);
+// One block per card: a new piece starts only when a SECOND heavy block (a table, or a list of 5+) would
+// otherwise land in the same piece. Light content, and a callout right after a list, always ride along with
+// the piece they follow -- a short list with its closing note stays one card; a table does not share a card
+// with the list that comes after it.
+function lnGroupHeavy(html){
+  const blocks = lnTopBlocks(html), pieces = [];
+  let cur = "", curHeavy = false;
+  blocks.forEach(b => {
+    if(b.heavy && curHeavy){ if(cur.trim()) pieces.push(cur); cur = ""; curHeavy = false; }
+    cur += b.html;
+    if(b.heavy) curHeavy = true;
+  });
+  if(cur.trim()) pieces.push(cur);
+  return pieces.length ? pieces : [html];
+}
 function lnSplitBody(body){
   const re = /<h3>([\s\S]*?)<\/h3>/g, marks = [];
   let m; while((m = re.exec(body))) marks.push({start:m.index, end:re.lastIndex, heading:m[1]});
-  if(!marks.length) return [{heading:null, html:body}];
-  const sections = marks.map((mk, i) => ({heading:mk.heading, html:body.slice(mk.end, i + 1 < marks.length ? marks[i + 1].start : body.length)}));
-  const lead = body.slice(0, marks[0].start); // content before the first <h3>, incl. a leading <p>, belongs with the first real card
-  if(lead.trim()) sections[0].html = lead + sections[0].html;
+  if(!marks.length) return lnGroupHeavy(body).map(html => ({heading:null, html}));
+  const rawSections = marks.map((mk, i) => ({heading:mk.heading, html:body.slice(mk.end, i + 1 < marks.length ? marks[i + 1].start : body.length)}));
+  const lead = body.slice(0, marks[0].start); // content before the first <h3>
+  const sections = [];
+  if(lead.trim()){
+    // A light leading <p> still belongs with the first real card; a heavy leading block (a table, mainly)
+    // gets its own card instead of being buried under whatever the first <h3> introduces.
+    if(lnIsHeavy(lead)) lnGroupHeavy(lead).forEach(html => sections.push({heading:null, html}));
+    else rawSections[0].html = lead + rawSections[0].html;
+  }
+  rawSections.forEach(sec => lnGroupHeavy(sec.html).forEach(html => sections.push({heading:sec.heading, html})));
   return sections;
 }
+// A <div class="ln-tw"><table class="ln-t">...</table></div> becomes collapsed rows: first cell is the lead
+// (its <small> becomes the small industry-term tag), an lnSev pill anywhere in the row stays on the lead line,
+// the rest of the cells go in the detail labelled by their data-l (or the <thead> text). "As a table" swaps
+// in the original table, inside its own scrolling wrapper; rows are the default.
+function lnCollapseTable(html, uid){
+  let tblN = 0;
+  return html.replace(/<div class="ln-tw">([\s\S]*?)<\/div>/g, (whole, inner) => {
+    const theadM = inner.match(/<thead>([\s\S]*?)<\/thead>/), tbodyM = inner.match(/<tbody>([\s\S]*?)<\/tbody>/);
+    if(!tbodyM) return whole;
+    const headers = theadM ? Array.from(theadM[1].matchAll(/<th>([\s\S]*?)<\/th>/g)).map(h => h[1].replace(/<[^>]+>/g, "").trim()) : [];
+    const rows = Array.from(tbodyM[1].matchAll(/<tr>([\s\S]*?)<\/tr>/g)).map(r => Array.from(r[1].matchAll(/<td([^>]*)>([\s\S]*?)<\/td>/g)).map(c => ({label:(c[1].match(/data-l="([^"]*)"/) || [])[1], content:c[2]})));
+    const liRows = rows.map(cells => {
+      if(!cells.length) return "";
+      let pillHtml = "";
+      cells.forEach(c => { if(!pillHtml){ const pm = c.content.match(/<span class="pill[^"]*">[\s\S]*?<\/span>/); if(pm){ pillHtml = pm[0]; c.content = c.content.replace(pm[0], "").trim(); } } });
+      let leadContent = cells[0].content;
+      const smallM = leadContent.match(/<small>([\s\S]*?)<\/small>/);
+      leadContent = leadContent.replace(/<small>[\s\S]*?<\/small>/, "").trim();
+      const leadIsPill = !leadContent && pillHtml;
+      const leadHtml = leadIsPill ? pillHtml : `<b>${leadContent}</b>`;
+      const pillOnRight = leadIsPill ? "" : pillHtml;
+      const termTag = smallM ? `<span class="rtf-term">${smallM[1]}</span>` : "";
+      const detail = cells.slice(1).filter(c => c.content.trim()).map((c, i) => `<div class="ln-rowb-f">${(c.label || headers[i + 1]) ? `<b>${c.label || headers[i + 1]}</b> ` : ""}${c.content}</div>`).join("");
+      return `<li class="ln-row"><details><summary>${leadHtml}${termTag}${pillOnRight ? `<span class="ln-rowpill">${pillOnRight}</span>` : ""}<svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary><div class="ln-rowb">${detail}</div></details></li>`;
+    }).join("");
+    const id = `ln-tbl-${uid}-${tblN++}`;
+    return `<div class="ln-tblflip"><button type="button" class="rtf-link ln-astable" data-astable="${id}">As a table</button><ul class="ln-rows" id="${id}-rows">${liRows}</ul><div class="ln-tw" id="${id}-table" hidden>${inner}</div></div>`;
+  });
+}
+// <ol class="do"> and <ul class="good"> keep their own numbered/tick styling for a short list; once a list
+// has more than four items, or any item runs past about twenty-five words, its bold-lead items collapse the
+// same way a plain <ul>'s do, so the numbered steps are still there but not all open at once.
+function lnCollapseDoList(html, uid){
+  let n = 0;
+  const pass = (h, tag, cls) => h.replace(new RegExp(`<${tag} class="${cls}">([\\s\\S]*?)<\\/${tag}>`, "g"), (whole, inner) => {
+    const items = Array.from(inner.matchAll(/<li>([\s\S]*?)<\/li>/g)).map(x => x[1]);
+    if(!(items.length > 4 || items.some(it => lnWordCount(it) > 25))) return whole;
+    const liHtml = items.map(content => {
+      const m = content.match(/^<b>([\s\S]*?)<\/b>([\s\S]*)$/);
+      if(!m) return `<li>${content}</li>`;
+      return `<li class="ln-row ln-row-${tag}"><details><summary><b>${m[1]}</b><svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary><div class="ln-rowb">${m[2]}</div></details></li>`;
+    }).join("");
+    const id = `ln-dl-${uid}-${n++}`;
+    return `<button type="button" class="rtf-link ln-openall" data-openall="${id}">Open all</button><${tag} class="${cls}" id="${id}">${liHtml}</${tag}>`;
+  });
+  return pass(pass(html, "ol", "do"), "ul", "good");
+}
 // Each plain <li><b>Lead.</b> detail</li> becomes a collapsed row: the lead visible, the detail behind a tap.
-// <ol class="do"> and <ul class="good"> keep their own numbered/tick styling and are left alone.
 function lnCollapseLists(html, uid){
   let ulN = 0;
   return html.replace(/<ul>([\s\S]*?)<\/ul>/g, (whole, inner) => {
@@ -808,7 +895,12 @@ function lnCollapseLists(html, uid){
     return `<button type="button" class="rtf-link ln-openall" data-openall="${id}">Open all</button><ul class="ln-rows" id="${id}">${items}</ul>`;
   });
 }
-function lnStepCards(k, s){ return lnSplitBody(s.body).map((sec, i) => ({heading:sec.heading, html:lnCollapseLists(sec.html, k + "-" + s.id + "-" + i)})); }
+function lnStepCards(k, s){
+  return lnSplitBody(s.body).map((sec, i) => {
+    const uid = k + "-" + s.id + "-" + i;
+    return {heading:sec.heading, html:lnCollapseLists(lnCollapseDoList(lnCollapseTable(sec.html, uid), uid), uid)};
+  });
+}
 function lnMarkRead(id){ const d = lnDone(); if(d.indexOf(id) === -1){ d.push(id); lnStore.set("done", d); } }
 // A jump-to list for a card flow's "All ..." link: the same pill markup the old per-tab chip row used,
 // now reached from a link instead of sitting on screen the whole time. items: [{label, done}]. onPick(i) jumps.
@@ -855,6 +947,7 @@ function lnMethod(k, g){
     const nx = $("[data-next]"); if(nx) nx.onclick = () => go(1);
     $$("[data-ex]").forEach(b => b.onclick = () => lnOpenExercise(k, g, b.dataset.ex));
     lnBindOpenAll();
+    lnBindTableFlip();
   };
   LN_M.go = go;
   draw();
@@ -870,6 +963,7 @@ document.addEventListener("keydown", e => {
 });
 function lnRefreshCount(k, g){ const el = $(".ln-tabs .note"); if(el) el.textContent = `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps read · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} exercises done`; }
 function lnBindOpenAll(){ $$("[data-openall]").forEach(b => b.onclick = () => { const ul = $("#" + b.dataset.openall); if(ul) $$("details", ul).forEach(d => d.open = true); }); }
+function lnBindTableFlip(){ $$("[data-astable]").forEach(b => b.onclick = () => { const id = b.dataset.astable, rows = $("#" + id + "-rows"), table = $("#" + id + "-table"); const toTable = table && table.hidden; if(table) table.hidden = !toTable; if(rows) rows.hidden = toTable; b.textContent = toTable ? "As rows" : "As a table"; }); }
 // One exercise per card: the lead sentence is what you'll have at the end (e.output), the plain five-step
 // rewrite is the visible list (already under twenty words a step), and the original "Do this" / "What good
 // looks like" sit behind one "Full version" disclosure -- plain and full steps don't line up 1:1 (e.g. e3 has
