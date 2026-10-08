@@ -145,6 +145,20 @@ const body3 = function(){
   rtM1().target = "media"; rt.model = "world"; rtGo(3); eq((H().match(/data-move=/g) || []).length === 6 && /cartoon/.test(H()), true, "world model moves");
   const s = rtScreens(); eq(s[1].k === "target" && s[2].k === "card" && s[6].k === "finding1" && s[7].k === "hub", true, "module one leads to the hub");
   out.push("module 1: target, card, 3 tries with rubric and gap, finding filed, checklist ticks");
+  // Fix direction follows the move used, not only the aim: a persona claim and a hidden instruction are
+  // different root causes even when aimed at the same harm, "make it act when it should not" (RT_PLAIN.agentic
+  // names the harm, not a technique). The title and the "Show the work" line must say what happened, not
+  // borrow the aim's forward-looking wording or a different move's fix.
+  eq(RT_PLAIN.agentic, "Acting when it should not", "the agentic harm bucket is named as a harm, not the injection technique");
+  rt = RT_BLANK(); rt.svc = "Pixelry assistant"; rtM1().target = "support"; rt.model = "llm"; rt.areas = {agentic:1}; rt.surf = {tools:1}; rt.att = {curious:1}; rtM1().card = Object.assign({}, RT_TARGETS[0].card); rtSave();
+  rtM1().tries[0] = {move:"staff", aim:"agentic", obs:3, grade:4, layer:"tool", notes:""}; rtm1Finding(); rtM1File();
+  eq(rt.findings[0].title, "Claim to be staff got through: it acted when it should not", "the title names the move and the achieved harm, not borrowed aim phrasing");
+  eq(rt.findings[0].fix, "Check identity and authorisation on the action itself, never on what the conversation claims; log and rate-limit privileged actions.", "a persona claim gets an identity-check fix, not the document-injection template");
+  eq(/Claim to be staff got through: it acted when it should not/.test(rtSummaryText()), true, "the show-the-work summary line matches the fixed finding title");
+  rt.findings = []; rtM1().filed = null; rtM1().finding = null; rtM1().tries = [{move:"doc", aim:"agentic", obs:3, grade:4, layer:"doc", notes:""}]; rtm1Finding(); rtM1File();
+  eq(rt.findings[0].title, "Hide an instruction in a document got through: it acted when it should not", "the doc move keeps the injection-shaped title");
+  eq(rt.findings[0].fix, "Never act on instructions found in documents or pages; strip and flag them.", "a hidden instruction keeps the document-injection fix");
+  out.push("fix wiring: the fix direction and the finding title follow the move (staff vs. doc), not just the aim");
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body3.toString() + ")();")());
@@ -219,6 +233,16 @@ const body5 = function(){
   eq(rtScreens().some(x => ["model", "harms", "team"].includes(x.k)), false, "nothing left to ask now that all three are answered");
   rtF().editSetup = true; rtSave(); eq(["model", "harms", "team"].every(k => rtScreens().some(x => x.k === k)), true, "Change reopens the existing model, harms and team cards rather than building a new editor");
   out.push("plan the week recap: the setup already answered is not re-asked, and Change reuses the existing cards");
+  // Flow glitch: the team card asks People and Time together. Picking "Just me" must not drop the card (and
+  // the Time question with it) before Time is answered, and the scope must not default to "a week" unchosen.
+  rt = RT_BLANK(); rt.model = "llm"; rt.areas = {fraud:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtM1().target = "support"; rtM1().card = Object.assign({}, RT_TARGETS[0].card); rt.flow = {i:0, basics:{}, drill:{}, fix:{}, skipBasics:true, path:"plan"}; rtSave();
+  eq(rtScreens().some(x => x.k === "team"), true, "the team card is asked before anything is picked");
+  rt.team = "solo"; rtSave();
+  eq(rtScreens().some(x => x.k === "team"), true, "picking Just me alone keeps the card, since Time is still unanswered");
+  rt.time = "afternoon"; rtSave();
+  eq(rtScreens().some(x => x.k === "team"), false, "once People and Time are both answered, the card is done");
+  eq(/Time: an afternoon/.test(rtScopeDraft()), true, "the scope reflects the time actually chosen, not a default of a week");
+  out.push("plan the week glitch: picking Just me no longer skips the Time question or defaults the scope to an unchosen week");
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body5.toString() + ")();")());

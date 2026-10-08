@@ -368,7 +368,7 @@ function cpMemoMd(){
   L.push("", "## Questions for counsel", ...q.map(v => "- " + v));
   const cases = [...new Set(s.gaps.map(r => r.kase).filter(Boolean))];
   if(cases.length) L.push("", "## Enforcement to know", ...cases.map(v => "- " + v));
-  L.push("", "## Sources", ...CP_SRC.map(([n, u]) => `- ${n}: ${u}`), "", `Civil penalties can exceed $53,000 per violation, adjusted for inflation each year. Requirements checked in ${CP_REVIEWED}.`);
+  L.push("", "## Sources", ...CP_SRC.map(([n, u]) => `- ${n}: ${u}`), "", `Civil penalties can run to $53,088 per violation (the FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98), adjusted for inflation each year. Requirements checked in ${CP_REVIEWED}.`);
   return L.join("\n");
 }
 const CP_DRAFTS = [["notice", "Notice to parents", "notice-to-parents"], ["retention", "Retention policy", "data-retention-policy"], ["security", "Security program", "security-program"], ["memo", "Memo for Legal", "coppa-memo"]];
@@ -437,7 +437,7 @@ function cpSpec(){
     clear:() => { const c = Object.assign({}, cp.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   const src = typeof loopSource === "function" ? loopSource() : null;
   return {k:"coppa", tool:{name:"COPPA readiness", icon:"coppa", color:"var(--t-cp)"},
-    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal. Getting this right matters: civil penalties can run over $53,000 per violation, and each child can count separately.",
+    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal. Getting this right matters: civil penalties can run to $53,088 per violation (the FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98), and each child can count separately.",
       facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
@@ -504,7 +504,7 @@ function cpReportHTML(x, ap, s){
         <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
-    <p class="note">Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Civil penalties can exceed $53,000 per violation. A starting point for your legal team, not legal advice.</p>
+    <p class="note">Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Civil penalties can run to $53,088 per violation (the FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98). A starting point for your legal team, not legal advice.</p>
   </div>`;
 }
 function cpPlanHTML(x, s){

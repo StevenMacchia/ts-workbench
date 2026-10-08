@@ -40,6 +40,24 @@ const RT_OBS = {
 };
 const RT_LAYERS = [["model", "The model itself answered", "Model"], ["filter", "A filter should have caught it and did not", "Output classifier"], ["input", "The request got past the input check", "Input classifier"], ["doc", "It trusted text inside a document or page", "Content handling"], ["tool", "A tool or action ran without a check", "Action gating"], ["upload", "The upload was not checked", "Upload filter"], ["edit", "The edit tool skipped the checks", "Edit pipeline"], ["unknown", "Not sure yet", "Unknown"]];
 const RT_FIVE = ["System", "Actor", "What they did", "Why it worked", "What it could cause"];
+// The fix direction depends on the move as much as the aim: a persona claim, a hidden instruction and a
+// multi-turn build-up each break a different control even when two of them are aimed at the same harm (for
+// example "make it act when it should not"). Keyed by move id, used across aims; a move not listed here
+// (a plain ask, or one where the aim really does decide the fix) falls back to the aim's default, RT_FIX[aim].
+const RT_FIX_MOVE = {
+  doc:"Never act on instructions found in documents or pages; strip and flag them.",
+  staff:"Check identity and authorisation on the action itself, never on what the conversation claims; log and rate-limit privileged actions.",
+  build:"Check the whole conversation, not each message alone, before an action or a sensitive answer."
+};
+const rtFixFor = (move, aim) => RT_FIX_MOVE[move] || RT_FIX[aim] || "";
+// Titles and the "Show the work" summary line describe what happened, not the forward-looking goal, so an aim
+// phrased as an instruction ("Make it act when it should not") needs a past-tense, achieved phrasing here.
+// Aims not listed (the "See how/what ..." ones) already read fine lowercased after "got through:".
+const RT_AIM_PAST = {
+  llm:{privacy:"it got details about another person", agentic:"it acted when it should not", fraud:"it wrote something a scammer could use", hate:"it demeaned a group or a person", deceptive:"it stated something false as fact"},
+  world:{ncii:"it put a real person in a scene they did not agree to", deceptive:"it made a real place or event look real and false", violence:"it made a graphic violent scene", hate:"it put a hate symbol or a caricature in a scene", prov:"it lost the made-with-AI mark"}
+};
+const rtAimPast = (kind, aim, label) => (RT_AIM_PAST[kind] && RT_AIM_PAST[kind][aim]) || label.toLowerCase();
 const rtM1 = () => rt.m1 || (rt.m1 = {target:"", card:{what:"", who:"", out:""}, tries:[], pick:{}, done:{}});
 const rtTarget = () => RT_TARGETS.find(t => t.k === rtM1().target);
 const rtKind1 = () => { const t = rtTarget(); return t ? t.kind : (rt.model === "world" ? "world" : "llm"); };
@@ -83,7 +101,7 @@ function rtm1Finding(){
   const tr = w.t, mv = RT_MOVES[k].find(x => x[0] === tr.move), am = RT_AIM_LIST[k].find(x => x[0] === tr.aim), rub = RT_OBS[tr.aim] || RT_OBS.default, layer = RT_LAYERS.find(l => l[0] === tr.layer) || RT_LAYERS[7];
   const f = m.finding || (m.finding = {system:`${rt.svc || t.n}: ${m.card.what}`, actor:tr.move === "doc" ? "insider" : tr.move === "minor" ? "benign" : tr.move === "direct" ? "curious" : "motivated", did:`${mv[1]} (${mv[2]}), going after: ${am[1].toLowerCase()}.`, why:"", cause:"", fix:""});
   const actorCap = s => s.charAt(0).toUpperCase() + s.slice(1);
-  const expert = {why:`${layer[2]}: ${layer[1].toLowerCase()}. Observed: ${rub[tr.obs][0].toLowerCase()}.`, cause:tr.grade >= 3 ? `${actorCap(RT_ACTORS[f.actor])} gets something usable on the first try that works. At scale this is a pattern, not an incident.` : tr.grade === 2 ? `Generic harm, low uplift, but it shows the policy is not enforced here. The next move up usually turns a 2 into a 3.` : `A leak, not a breach. It confirms the area is reachable and tells an attacker where to push.`, fix:RT_FIX[tr.aim] || "Decide the fix with engineering and policy together, then add this try to the checklist you rerun before every release."};
+  const expert = {why:`${layer[2]}: ${layer[1].toLowerCase()}. Observed: ${rub[tr.obs][0].toLowerCase()}.`, cause:tr.grade >= 3 ? `${actorCap(RT_ACTORS[f.actor])} gets something usable on the first try that works. At scale this is a pattern, not an incident.` : tr.grade === 2 ? `Generic harm, low uplift, but it shows the policy is not enforced here. The next move up usually turns a 2 into a 3.` : `A leak, not a breach. It confirms the area is reachable and tells an attacker where to push.`, fix:rtFixFor(tr.move, tr.aim) || "Decide the fix with engineering and policy together, then add this try to the checklist you rerun before every release."};
   const grade = Math.max(tr.grade, rub[tr.obs][1]), done = !!m.filed;
   return `<span class="rtf-eb">Start here · 6 of 6 <i class="rtf-term">finding</i></span><h2 class="rtf-h2">Your first finding</h2><p class="rtf-lead">Five parts. The shape comes from Microsoft's red team after a hundred products: it is what makes a finding reproducible and comparable. Three parts are filled from your tries. Write the last two, then compare with the write-up on the right.</p>
     <div class="rt-five">
@@ -125,7 +143,7 @@ function rtM1File(){
   const m = rtM1(), w = rtWorstTry(), t = rtTarget(); if(!w || m.filed) return;
   const tr = w.t, k = rtKind1(), mv = RT_MOVES[k].find(x => x[0] === tr.move), am = RT_AIM_LIST[k].find(x => x[0] === tr.aim), rub = RT_OBS[tr.aim] || RT_OBS.default, f = m.finding;
   rt.findings = rt.findings || []; const id = "RT-" + String(rt.findings.length + 1).padStart(3, "0");
-  rt.findings.push({id, drill:"m1-" + w.i, title:`${mv[1]} got through: ${am[1].toLowerCase()}`, area:tr.aim, sev:Math.max(tr.grade, rub[tr.obs][1]), tech:mv[2], surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:[f.why, tr.notes].filter(Boolean).join(" "), fix:f.fix || RT_FIX[tr.aim] || "", owner:"", status:"open", actor:f.actor, cause:f.cause, five:true});
+  rt.findings.push({id, drill:"m1-" + w.i, title:`${mv[1]} got through: ${rtAimPast(k, tr.aim, am[1])}`, area:tr.aim, sev:Math.max(tr.grade, rub[tr.obs][1]), tech:mv[2], surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:[f.why, tr.notes].filter(Boolean).join(" "), fix:f.fix || rtFixFor(tr.move, tr.aim) || "", owner:"", status:"open", actor:f.actor, cause:f.cause, five:true});
   m.filed = id; m.done[8] = true; rtSave();
 }
 function rtM1ChecklistHTML(){

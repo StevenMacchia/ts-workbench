@@ -116,7 +116,9 @@ const rtScreens3 = rtScreens;
 // Only re-ask the setup fields that are still blank. "Change" (rtF().editSetup) forces all three back in so
 // the existing model/harms/team cards can be reused as an editor, without building a separate one.
 rtScreens = function(){ const s = rtScreens3(); if((rtF().path || "") !== "plan") return s; const i = s.findIndex(x => x.k === "hub"), f = rtF();
-  const setup = f.editSetup ? s.filter(x => ["model", "harms", "team"].includes(x.k)) : s.filter(x => (x.k === "model" && !rt.model) || (x.k === "harms" && !Object.keys(rt.areas).length) || (x.k === "team" && !rt.team));
+  // The "team" card covers two questions, People (rt.team) and Time (rt.time); keep it in the list until
+  // both are answered, or picking "Just me" removes the card mid-flow and skips the Time question entirely.
+  const setup = f.editSetup ? s.filter(x => ["model", "harms", "team"].includes(x.k)) : s.filter(x => (x.k === "model" && !rt.model) || (x.k === "harms" && !Object.keys(rt.areas).length) || (x.k === "team" && (!rt.team || !rt.time)));
   return s.slice(0, i + 1).concat(setup, [{k:"plan1"}, {k:"plan2"}, {k:"plan3"}]); };
 const rtFlowHTML3 = rtFlowHTML;
 rtFlowHTML = function(){
