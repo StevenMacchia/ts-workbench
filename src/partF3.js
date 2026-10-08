@@ -76,7 +76,8 @@ function startHere(r){
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
           ${s.covers.length?`<span class="covers">Protects against: ${s.covers.slice(0,3).map(esc).join(" · ")}${s.covers.length>3?` and ${s.covers.length-3} more`:""}</span>`:""}</span></label></li>`).join("")}</ol></div>`
         : `<p class="note">Every priority action is ticked off. Review the full plan below for anything left.</p>`}
-      <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.</span></div>
+      <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.${r.risks.length>r.risks.filter(x=>x.band==="crit"||x.band==="high").length?" The risk register only shows critical and high risks by default; medium and low ones are there too, one click away.":""}</span></div>
+      ${r.safeguards.length?`<button type="button" class="pm-burnlink" data-act="burn">See how far your launch plan gets you ${icon("arrow")}</button>`:""}
     </div></div>`;
 }
 /* ---------- what changed since the assessment was last saved ---------- */
@@ -177,7 +178,7 @@ function pmBurnHTML(r){
   const hits = pts.map((v, i) => `<circle class="bd-hit" cx="${f(X(i))}" cy="${f(Y(v))}" r="7"><title>${esc(i ? `After ${i} safeguard${i === 1 ? "" : "s"} (latest: ${order[i - 1].t.split(",")[0].slice(0, 80)})` : "Before any safeguards")}: risk ${v}, down ${pct(v)}%</title></circle>`).join("");
   const right = done > N * .65, you = `<circle class="bd-you" cx="${f(X(done))}" cy="${f(Y(r.rtotal))}" r="6"/><text class="bd-youl" x="${f(X(done) + (right ? -11 : 11))}" y="${f(Y(r.rtotal) + (Y(r.rtotal) < T + 24 ? 18 : -10))}" text-anchor="${right ? "end" : "start"}">You are here: ${r.rtotal}</text>`;
   const strip = c => `<div class="sevstrip">${["crit","high","med","low"].map(b => `<i style="width:${c[b] / r.risks.length * 100}%;background:var(--${b === "low" ? "line-strong" : b})"></i>`).join("")}</div>`;
-  return `<div class="card pm-burn">
+  return `<div class="card pm-burn" id="pm-burn" style="scroll-margin-top:16px">
     <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
       <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
       <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>

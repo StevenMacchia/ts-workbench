@@ -140,7 +140,7 @@ function startScreen(){
 function optCard(Q, o, i, pressed, multi){
   const ic = Q.k==="type";
   return `<button type="button" class="gd-opt opt-key ${pressed?"on":""} ${ic?"gd-icon":""}" ${multi?`data-toggle="${Q.k}"`:`data-set="${Q.k}"`} data-v="${o.k}" aria-pressed="${pressed}">
-    <span class="gd-radio ${multi?"sq":""}" aria-hidden="true"></span>${ic?`<svg class="gd-oi" aria-hidden="true"><use href="#p-${o.k}"/></svg>`:""}<span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b></span>${o.h?`<span>${esc(o.h)}</span>`:""}</span>${i<9?`<kbd aria-hidden="true">${i+1}</kbd>`:""}</button>`;
+    <span class="gd-radio ${multi?"sq":""}" aria-hidden="true"></span>${ic?`<svg class="gd-oi" aria-hidden="true"><use href="#p-${o.k}"/></svg>`:""}<span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b></span>${o.h?`<span>${gloss(o.h)}</span>`:""}</span>${i<9?`<kbd aria-hidden="true">${i+1}</kbd>`:""}</button>`;
 }
 // One question per screen, in the same shape as every other guided tool; the live panel shows what each answer changes
 function askScreen(){
@@ -168,7 +168,7 @@ function askScreen(){
     <div class="gd-q"><div class="gd-main">
       <div class="gd-crumb"><span class="gd-area">${esc(Q.sec)}</span><span aria-hidden="true">/</span><span>Question ${pm.qi+1} of ${qs.length}</span></div>
       <h1>${Q.t} ${Q.tip?tip(Q.tip):""}</h1>
-      <p class="gd-why">${Q.h}</p>
+      <p class="gd-why">${gloss(Q.h)}</p>
       ${body}
       <div class="gd-foot">
         ${pm.qi>0?`<button type="button" class="btn" data-back="1">Back</button>`:`<button type="button" class="btn" data-act="home">Cancel</button>`}
@@ -299,6 +299,7 @@ function bindPremortem(){
       case "typical": { const t = PLATFORMS.find(x=>x.k===pm.type); if(t){ withImpact(() => { pm.features = t.f.slice(); }); } return rerender(); }
       case "clearfilter": pm.filter = {cell:"",cat:"",band:""}; pm.search = ""; return rerender();
       case "fullplan": pm.tab = "plan"; rerender(); { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); } return;
+      case "burn": { const el = $("#pm-burn"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); } return;
       case "copy": return copyText(reportMarkdown(assess(pm)), $("#pm-toast"));
       case "download": { const md = reportMarkdown(assess(pm)); return offerFile(slug(pm.name)+"-abuse-premortem.md", md, md, $("#pm-toast")); }
       case "export": return exportLibrary($("#pm-toast"));

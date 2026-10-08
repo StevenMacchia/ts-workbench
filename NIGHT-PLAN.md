@@ -28,6 +28,6 @@ Checkpoint commit on learn: d615592 (2026-10-08, local only, not pushed) so enha
 
 ## Round 3 (per-tool audit items outside the top-25), started with Fable at 38%
 Three Sonnet agents, same brief, worktrees `_wt/ts-workbench-r3a|b|c`, branches `enh/r3a|b|c` off `learn` at 19aedf8. CSS appended to `partZ15.css` under `/* r3a|b|c */` headers; merge by union.
-- [ ] r3a: audit sections 1 to 5 (Overview, Pre-mortem, Tabletop, Metrics, Vendor) + cross-tool items for them.
+- [x] r3a (merged; partH4.js: kept r3a's stage filter over r3c's duplicate, dropped r3c's .ov-stagef CSS; partZ15.css union; docs rebuilt): audit sections 1 to 5 (Overview, Pre-mortem, Tabletop, Metrics, Vendor) + cross-tool items for them.
 - [x] r3b (merged; partZ15.css union, docs rebuilt): sections 6 to 10 (Maturity, Coverage, Policy, COPPA, DSA). Saved-data shape changes skipped.
 - [x] r3c (merged 83c83b7, fast-forward): sections 11 to 15 (Eval, AI assistants, Workspace, Plan/Review, About) + site-wide cross-tool items.

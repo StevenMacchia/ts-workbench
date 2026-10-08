@@ -83,6 +83,7 @@ function ttPicker(H){
         <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p>
         <span class="scen-foot"><span class="note">${esc(s.platform)} · ${s.steps.length} decisions</span>
           ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
+        ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<small class="scen-src-cap">Sourced: backed by public data on how common this problem is</small>` : ""}
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
   const one = $("#tt-one"); if(one) one.onclick = () => ttMode === "team" ? ttfNew(bestFit.i, ttType) : ttStart(bestFit.i, ttType);
@@ -96,7 +97,7 @@ function ttPicker(H){
 function ttMeters(sc){
   const answered = tt.first.filter(x=>x!==undefined).length, strong = sc.steps.filter((_,i)=>firstWasBest(sc,i)).length;
   return `<aside class="card meters" aria-label="Incident scorecard">
-    <span class="eyebrow">${esc(sc.title)}</span>
+    <span class="eyebrow">${esc(sc.title)} ${tip("Four scores, 0 to 100, that move with each decision you make: user safety, public trust, regulatory standing and team capacity. The debrief shows the average across all four.")}</span>
     ${DIMS.map(d=>`<div class="meter"><div class="top"><span>${d.n}</span><span class="mono">${tt.scores[d.k]}</span></div><div class="bar"><i style="width:${tt.scores[d.k]}%;background:${scoreColor(tt.scores[d.k])}"></i></div></div>`).join("")}
     <div class="firsttry"><span class="eyebrow">Strong calls on first try</span><span class="mono">${strong} / ${answered}</span></div>
     <button class="btn sm" id="tt-quit">Choose another scenario</button>
@@ -179,7 +180,7 @@ function ttDebrief(H, sc){
       <div class="card verdict">
         <div class="row" style="gap:8px"><span class="pill ${v[1]}">${firstStrong} of ${n} strongest calls on first try</span>${corrected?`<span class="pill accent">${corrected} corrected on retry</span>`:""}</div>
         <h3>${v[0]}</h3>
-        <p class="muted">Average across the four scores: <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
+        <p class="muted">Average across the four scores (user safety, public trust, regulatory standing and team capacity): <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
       </div>
       <div class="learnsum">
         <div class="card learnbox"><span class="eyebrow">Your blind spot in this run</span>

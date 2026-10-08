@@ -4600,9 +4600,6 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 /* already turned its own four-tile dashboard into a counted sentence. Cross-tool audit item 4. */
 .ov-stats-sum{margin:2px 0 10px}
 
-/* r3c: All tools - a lightweight stage filter (Assess / Prepare / Measure / AI) so the grid of tool */
-/* cards doesn't just keep growing as one long unfiltered list. Cross-tool audit item 5. */
-.ov-stagef{margin:4px 0 14px;flex-wrap:wrap}
 /* r3b: Coverage radar: the rail's "Start here" step, promoted above the rating grid so it isn't missed below the fold */
 .cv-start-promo{margin-bottom:14px}
 
@@ -4629,6 +4626,26 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 
 /* r3b: DSA readiness: a one-line note when the size or features section is left out, so fewer questions isn't a silent gap */
 .ds-skipnote{margin:-4px 0 2px}
+/* r3a: remaining per-tool UX-audit items for Overview, Pre-mortem, Tabletop, Metrics, Vendors */
+/* Overview: the eval tool card's foot text, plain words with the industry term kept as a tag */
+.ov-term{display:inline-block;font-style:normal;font-weight:500;font-size:10.5px;color:var(--muted);background:var(--sunk);border-radius:5px;padding:1px 6px;margin-left:2px;white-space:nowrap}
+/* Pre-mortem: a plain-text link from Start Here into the risk burn-down chart below */
+.pm-burnlink{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--t-pm);margin-top:4px}
+.pm-burnlink:hover{text-decoration:underline;text-underline-offset:3px}
+.pm-burnlink:focus-visible{outline:2px solid var(--t-pm);outline-offset:2px;border-radius:3px}
+.pm-burnlink svg{width:14px;height:14px}
+/* Tabletop: a visible caption for "Sourced", so the reason isn't hover/focus only on touch */
+.scen-src-cap{display:none}
+@media (max-width:760px){.scen-src-cap{display:block;margin-top:2px;font-size:11px;line-height:1.4;color:var(--muted);text-align:left}}
+/* Vendor scorecard: the consequence of a hard minimum, spelled out once on the one-page view */
+.vd-dealnote{margin:2px 0 0;color:var(--crit)}
+/* Metrics: the no-tooling-team line surfaced in the compact list for north-star metrics, and a */
+/* one-line "what's in this tab" subtitle that reuses copy already written for the bands and reviews */
+.mxm-mvp{font-size:12.5px;line-height:1.45;color:var(--muted);background:var(--sunk);border-radius:8px;padding:8px 10px}
+.mxm-mvp b{color:var(--ink);font-weight:600}
+.mx-tabs-sub{margin:8px 0 0;max-width:70ch}
+/* Overview: the "All tools" stage filter, so the grid stays scannable as it grows */
+.ov-stagef{display:inline-flex;margin:14px 0 4px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5816,7 +5833,7 @@ function startScreen(){
 function optCard(Q, o, i, pressed, multi){
   const ic = Q.k==="type";
   return `<button type="button" class="gd-opt opt-key ${pressed?"on":""} ${ic?"gd-icon":""}" ${multi?`data-toggle="${Q.k}"`:`data-set="${Q.k}"`} data-v="${o.k}" aria-pressed="${pressed}">
-    <span class="gd-radio ${multi?"sq":""}" aria-hidden="true"></span>${ic?`<svg class="gd-oi" aria-hidden="true"><use href="#p-${o.k}"/></svg>`:""}<span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b></span>${o.h?`<span>${esc(o.h)}</span>`:""}</span>${i<9?`<kbd aria-hidden="true">${i+1}</kbd>`:""}</button>`;
+    <span class="gd-radio ${multi?"sq":""}" aria-hidden="true"></span>${ic?`<svg class="gd-oi" aria-hidden="true"><use href="#p-${o.k}"/></svg>`:""}<span class="gd-ot"><span class="gd-oh"><b>${esc(o.n)}</b></span>${o.h?`<span>${gloss(o.h)}</span>`:""}</span>${i<9?`<kbd aria-hidden="true">${i+1}</kbd>`:""}</button>`;
 }
 // One question per screen, in the same shape as every other guided tool; the live panel shows what each answer changes
 function askScreen(){
@@ -5844,7 +5861,7 @@ function askScreen(){
     <div class="gd-q"><div class="gd-main">
       <div class="gd-crumb"><span class="gd-area">${esc(Q.sec)}</span><span aria-hidden="true">/</span><span>Question ${pm.qi+1} of ${qs.length}</span></div>
       <h1>${Q.t} ${Q.tip?tip(Q.tip):""}</h1>
-      <p class="gd-why">${Q.h}</p>
+      <p class="gd-why">${gloss(Q.h)}</p>
       ${body}
       <div class="gd-foot">
         ${pm.qi>0?`<button type="button" class="btn" data-back="1">Back</button>`:`<button type="button" class="btn" data-act="home">Cancel</button>`}
@@ -5975,6 +5992,7 @@ function bindPremortem(){
       case "typical": { const t = PLATFORMS.find(x=>x.k===pm.type); if(t){ withImpact(() => { pm.features = t.f.slice(); }); } return rerender(); }
       case "clearfilter": pm.filter = {cell:"",cat:"",band:""}; pm.search = ""; return rerender();
       case "fullplan": pm.tab = "plan"; rerender(); { const el = $("#pm-tabs"); if(el) el.scrollIntoView({behavior:"smooth", block:"start"}); } return;
+      case "burn": { const el = $("#pm-burn"); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); } return;
       case "copy": return copyText(reportMarkdown(assess(pm)), $("#pm-toast"));
       case "download": { const md = reportMarkdown(assess(pm)); return offerFile(slug(pm.name)+"-abuse-premortem.md", md, md, $("#pm-toast")); }
       case "export": return exportLibrary($("#pm-toast"));
@@ -6184,7 +6202,8 @@ function startHere(r){
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
           ${s.covers.length?`<span class="covers">Protects against: ${s.covers.slice(0,3).map(esc).join(" · ")}${s.covers.length>3?` and ${s.covers.length-3} more`:""}</span>`:""}</span></label></li>`).join("")}</ol></div>`
         : `<p class="note">Every priority action is ticked off. Review the full plan below for anything left.</p>`}
-      <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.</span></div>
+      <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.${r.risks.length>r.risks.filter(x=>x.band==="crit"||x.band==="high").length?" The risk register only shows critical and high risks by default; medium and low ones are there too, one click away.":""}</span></div>
+      ${r.safeguards.length?`<button type="button" class="pm-burnlink" data-act="burn">See how far your launch plan gets you ${icon("arrow")}</button>`:""}
     </div></div>`;
 }
 /* ---------- what changed since the assessment was last saved ---------- */
@@ -6285,7 +6304,7 @@ function pmBurnHTML(r){
   const hits = pts.map((v, i) => `<circle class="bd-hit" cx="${f(X(i))}" cy="${f(Y(v))}" r="7"><title>${esc(i ? `After ${i} safeguard${i === 1 ? "" : "s"} (latest: ${order[i - 1].t.split(",")[0].slice(0, 80)})` : "Before any safeguards")}: risk ${v}, down ${pct(v)}%</title></circle>`).join("");
   const right = done > N * .65, you = `<circle class="bd-you" cx="${f(X(done))}" cy="${f(Y(r.rtotal))}" r="6"/><text class="bd-youl" x="${f(X(done) + (right ? -11 : 11))}" y="${f(Y(r.rtotal) + (Y(r.rtotal) < T + 24 ? 18 : -10))}" text-anchor="${right ? "end" : "start"}">You are here: ${r.rtotal}</text>`;
   const strip = c => `<div class="sevstrip">${["crit","high","med","low"].map(b => `<i style="width:${c[b] / r.risks.length * 100}%;background:var(--${b === "low" ? "line-strong" : b})"></i>`).join("")}</div>`;
-  return `<div class="card pm-burn">
+  return `<div class="card pm-burn" id="pm-burn" style="scroll-margin-top:16px">
     <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
       <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
       <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>
@@ -8457,6 +8476,7 @@ function ttPicker(H){
         <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p>
         <span class="scen-foot"><span class="note">${esc(s.platform)} · ${s.steps.length} decisions</span>
           ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
+        ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<small class="scen-src-cap">Sourced: backed by public data on how common this problem is</small>` : ""}
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
   const one = $("#tt-one"); if(one) one.onclick = () => ttMode === "team" ? ttfNew(bestFit.i, ttType) : ttStart(bestFit.i, ttType);
@@ -8470,7 +8490,7 @@ function ttPicker(H){
 function ttMeters(sc){
   const answered = tt.first.filter(x=>x!==undefined).length, strong = sc.steps.filter((_,i)=>firstWasBest(sc,i)).length;
   return `<aside class="card meters" aria-label="Incident scorecard">
-    <span class="eyebrow">${esc(sc.title)}</span>
+    <span class="eyebrow">${esc(sc.title)} ${tip("Four scores, 0 to 100, that move with each decision you make: user safety, public trust, regulatory standing and team capacity. The debrief shows the average across all four.")}</span>
     ${DIMS.map(d=>`<div class="meter"><div class="top"><span>${d.n}</span><span class="mono">${tt.scores[d.k]}</span></div><div class="bar"><i style="width:${tt.scores[d.k]}%;background:${scoreColor(tt.scores[d.k])}"></i></div></div>`).join("")}
     <div class="firsttry"><span class="eyebrow">Strong calls on first try</span><span class="mono">${strong} / ${answered}</span></div>
     <button class="btn sm" id="tt-quit">Choose another scenario</button>
@@ -8553,7 +8573,7 @@ function ttDebrief(H, sc){
       <div class="card verdict">
         <div class="row" style="gap:8px"><span class="pill ${v[1]}">${firstStrong} of ${n} strongest calls on first try</span>${corrected?`<span class="pill accent">${corrected} corrected on retry</span>`:""}</div>
         <h3>${v[0]}</h3>
-        <p class="muted">Average across the four scores: <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
+        <p class="muted">Average across the four scores (user safety, public trust, regulatory standing and team capacity): <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
       </div>
       <div class="learnsum">
         <div class="card learnbox"><span class="eyebrow">Your blind spot in this run</span>
@@ -9795,6 +9815,14 @@ const MX_BAND = {
   health:["Health metrics", "Show whether your safety operation is working. Review them every month with your leads."],
   diag:["Diagnostics", "Explain why the numbers above moved. Your team uses them day to day."]
 };
+// One line per tab, so what's behind it is known before clicking. Reuses the band and review-cadence
+// copy already written for MX_BAND and MX_RV instead of writing new explanations
+const MX_TAB_SUB = {
+  card:`${MX_BAND.ns[1]} Then health metrics and diagnostics, in that order.`,
+  data:"The event types every metric above is built from, and what one row of each should hold.",
+  run:`${MX_RV.w[0]}, ${MX_RV.m[0].toLowerCase()}, ${MX_RV.q[0].toLowerCase()} and ${MX_RV.r[0].toLowerCase()} — who looks at which numbers, and how often.`,
+  mine:"Enter this period's numbers against your targets and see where you stand."
+};
 const MX_TARGETS = [
   ["Baseline first.","Measure for 6 to 8 weeks before you commit to any number. Early targets are guesses."],
   ["Set a band, not a point.","Say \"prevalence below 0.10%, off track above 0.15%\". The gap between the two is your early warning."],
@@ -9939,10 +9967,14 @@ function mxRowHTML(m, nextUp){
 function mxCardHTML(m, nextUp){
   const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
   const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
+  // North-star metrics show the no-tooling-team version right in the list: the line most useful
+  // to the audience least likely to open the full article first
+  const mvp = m.t === "ns" && H.mvp ? `<span class="mxm-mvp"><b>No data team yet?</b> ${esc(H.mvp)}</span>` : "";
   return `<button type="button" class="mxm-card${up ? " is-next" : ""}" data-open="${i}">
       <span class="mxm-top"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span>${flag}</span>
       <b class="mxm-name">${esc(m.n)}</b>
       <span class="mxm-q">${esc(MX_Q[m.n])}</span>
+      ${mvp}
       <span class="mxm-foot"><span class="mxm-dir">${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1]}</span>${mxStatusChip(m)}<span class="mxm-go">${mx.read[m.n] ? "Open" : "Start"} ${mxIco("next", "mx-ico sm")}</span></span>
     </button>`;
 }
@@ -10078,6 +10110,18 @@ function mxHistHTML(){
   return h.length ? `<span class="mxs-hl">Saved periods</span>${h.map((x, j) => `<span class="mxs-chip">${esc(x.p)}<button type="button" data-unsave="${j}" aria-label="Remove ${esc(x.p)} from history">×</button></span>`).join("")}`
     : `<span class="mxs-hl">No saved periods yet. Save one to start building trend lines.</span>`;
 }
+// Which of the five target-setting rules matters most for this metric right now, or null once it's
+// not tracked. No target yet: baseline first. A band metric: set a band. Sample-based: show
+// uncertainty. North-star: thresholds by severity. Otherwise: pair it with its guardrail.
+function mxTargetRuleIdx(m){
+  if(!(mx.have[m.n] || mxStatus(m, mx.vals))) return null;
+  const H = MX_HOW[m.n], v = mx.vals[m.n] || {};
+  if(!v.t && !v.a) return 0;
+  if(H.dir === "band") return 1;
+  if(typeof MX_SAMPLE !== "undefined" && MX_SAMPLE[m.n]) return 4;
+  if(m.t === "ns") return 3;
+  return 2;
+}
 function mxTabMine(list){
   const lab = (f, t) => `<span class="mx-sc-lab">${t}</span>`;
   return `<div class="mx-intro"><h3>Your numbers</h3>
@@ -10100,10 +10144,11 @@ function mxTabMine(list){
     ${MX_TORD.map(t => { const ms = list.filter(m => m.t === t); if(!ms.length) return "";
       return `<div class="mx-sc-grp mxm-${t}">${MX_TIER_NAME[t]}</div>` + ms.map(m => {
         const i = METRICS.indexOf(m), H = MX_HOW[m.n], u = mxUnit(m), band = H.dir === "band", al = f => ` aria-label="${esc(m.n)}: ${f}"`;
+        const ri = mxTargetRuleIdx(m);
         return `<div class="mx-sc-row">
           <div class="mx-sc-name"><button type="button" class="mx-link" data-open="${i}">${esc(m.n)}</button><small>${esc(MX_SC[m.n][0])}${u ? " (" + esc(u) + ")" : ""} · ${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1].toLowerCase()}</small></div>
           <label class="mx-sc-in">${lab("v", "Value")}${mxInput(m, "v", al("your value"))}</label>
-          <label class="mx-sc-in">${lab("t", band ? "From" : "Target")}${mxInput(m, "t", al(band ? "healthy from" : "target"))}</label>
+          <label class="mx-sc-in">${lab("t", band ? "From" : "Target")}${ri !== null ? tip(`${MX_TARGETS[ri][0]} ${MX_TARGETS[ri][1]}`) : ""}${mxInput(m, "t", al(band ? "healthy from" : "target"))}</label>
           <label class="mx-sc-in">${lab("a", band ? "To" : "Off track at")}${mxInput(m, "a", al(band ? "healthy to" : "off track at"))}</label>
           <div class="mx-sc-tr" data-spark="${i}">${mxSpark(m)}</div>
           <div class="mx-sc-st" data-st="${i}">${mxPill(mxStatus(m, mx.vals))}</div>
@@ -10371,7 +10416,8 @@ function renderMetrics(){
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>
-    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>`;
+    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>
+    <p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab] || "")}</p>`;
   view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
 
   const save = () => { store.set("mx", mx); renderMetrics(); };
@@ -10557,13 +10603,14 @@ function vdWeightsBar(){
 
 /* ---------- pieces both the one-page scorecard and the guided flow use ---------- */
 const vdSave = () => store.set("vx", vx);
-function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
+function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}. Click a name to rename it.</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" placeholder="Vendor name" title="Click to rename" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
 function vdCritHTML(c, seen){
   // The first criterion's RFP questions open by default, to teach the pattern once; the rest stay closed
   const first = c === CRITERIA[0];
   return `<article class="card vd-crit">
             <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
+            ${c.deal ? `<p class="note vd-dealnote">A vendor scoring 2 or lower here can't win, no matter how it scores on everything else.</p>` : ""}
             <p class="vd-cq">${esc(VD_Q[c.k])}</p>
             <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
             <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
@@ -10617,6 +10664,29 @@ function vdSpec(){
     done:() => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function vdExample(){ vx = JSON.parse(JSON.stringify(DEFAULT_V)); vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); gsay("Example loaded: three vendors, already scored"); }
+// Plain-text version of the ranking and the full score table, so it can be handed to leadership
+function vdMarkdown(){
+  const {sorted, top} = vdRank(), tw = vdTotal() || 1, names = vx.vendors.map(v => v.name);
+  const lines = [`# Vendor scorecard`, ``, names.join(" vs. "), ``];
+  if(!sorted.some(x => x.done)) lines.push(`Score each vendor on all ${CRITERIA.length} criteria to see who comes out ahead, and why.`);
+  else if(!top) lines.push(`No vendor meets the minimums on wellness and security. Go back to the shortlist, or ask the weakest vendors what it would take to fix those gaps.`);
+  else{
+    const other = sorted.find(x => x !== top && x.done), pending = sorted.filter(x => !x.done);
+    if(!other) lines.push(pending.length ? `${top.v.name} scores ${top.score.toFixed(2)} out of 5. Finish scoring ${pending.map(x => x.v.name).join(" and ")} to compare.` : `${top.v.name} is your only vendor.`);
+    else{
+      const diffs = CRITERIA.map(c => ({c, d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - other.v.s[c.k]), raw:top.v.s[c.k] - other.v.s[c.k]})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
+      const plus = diffs.filter(x => x.d > 0).slice(0, 2), minus = diffs.filter(x => x.d < 0).slice(-1);
+      const list = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
+      lines.push(`${top.v.name} ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and ${other.v.name} is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of ${other.v.name} at ${other.score.toFixed(2)}`}.`);
+      if(plus.length) lines.push(`It wins mainly on ${list(plus)}${minus.length ? `, while ${other.v.name} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}.`);
+    }
+  }
+  lines.push(``, `## Every score`, ``, `Each vendor rated 1 to 5 against the rubric. Weight is out of 100.`, ``,
+    `| Criterion | Weight | ${names.join(" | ")} |`, `|---|---|${names.map(() => "---").join("|")}|`,
+    ...CRITERIA.map(c => `| ${c.n}${c.deal ? " (minimum 3)" : ""} | ${+vx.weights[c.k] || 0} | ${vx.vendors.map(v => v.s[c.k] || "–").join(" | ")} |`),
+    ``, `Weighted score, out of 5: ${sorted.map(x => `${x.v.name} ${x.done ? x.score.toFixed(2) : "not finished"}`).join(", ")}.`);
+  return lines.join("\n");
+}
 function vdOwn(){ vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); }
 // The result: who wins and why, the heat map, and the ways back in
 function vdResultsRender(){
@@ -10626,7 +10696,7 @@ function vdResultsRender(){
     <div class="cvr">
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
       <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><h1>${esc(headline)}</h1><div class="cvr-sum vd-why">${vdWhy()}</div>
-        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button></div>
+        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-copy">${icon("copy")}Copy result</button>${DL ? `<button type="button" class="btn" id="vx-dl"><svg><use href="#i-download"/></svg>Download result</button>` : ""}</div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
     <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
@@ -10634,6 +10704,8 @@ function vdResultsRender(){
   </div>`;
   $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
   $("#vx-own").onclick = vdOwn; $("#vx-reset").onclick = vdExample;
+  const vdl = $("#vx-dl"); if(vdl) vdl.onclick = () => offerFile("ts-vendor-scorecard.md", vdMarkdown(), vdMarkdown(), $("#vx-toast"));
+  const vcp = $("#vx-copy"); if(vcp) vcp.onclick = () => copyText(vdMarkdown(), $("#vx-toast"));
   const pb = view.querySelector && view.querySelector('[data-vd="page"]'); if(pb) pb.onclick = () => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
   const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); };
 }
@@ -11209,6 +11281,14 @@ function asSum(k){
   }catch(e){}
   return "";
 }
+// When a step's own summary changes, stamp the time, so a completed step can show how stale it
+// is before the combined score is trusted. A new key, not a change to any tool's saved shape.
+function asTouch(k, sum){
+  const t = store.get("as:touch", {});
+  if(t[k] && t[k].sum === sum) return t[k].at;
+  t[k] = {sum, at:Date.now()}; store.set("as:touch", t);
+  return t[k].at;
+}
 // The most important thing each finished step found, plus a line on what comes next
 function asKnow(){
   const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [], isDone = k => { const s = J.find(x => x.k === k); return !!(s && s.done()); };
@@ -11286,7 +11366,8 @@ function asKnowHTML(){
 }
 function asStepHTML(s, i, next){
   const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
-  if(ok) return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(asSum(s.k))}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`;
+  if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
     <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
@@ -11344,42 +11425,39 @@ function asBind(){
 }
 
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
-// Which stage each tool belongs to, for the filter chips below: resets to "all" on a fresh page load,
-// not saved, since it's a view preference, not program data.
-let toolsStage = "all";
-const TOOLS_STAGES = [["all", "All"], ["assess", "Assess"], ["prepare", "Prepare"], ["measure", "Measure"], ["ai", "AI"]];
+// Which stage each tool card belongs to, for the filter chips below. A tool keeps growing this
+// grid (Red Team Studio's modules among them), so the chips are a cheap way to keep it scannable
+const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
+const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI"};
+let ovStage = "all";
 function renderTools(){
-  const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}">
+  const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
       <div class="ov-art">${OV_ART[key]}</div>
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
-  // Each tool tagged with the stage it belongs to, so the chip row above can filter this grid as it grows
-  const toolCards = [
-    {stage:"assess", html: typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""},
-    {stage:"assess", html: tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)},
-    {stage:"assess", html: typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""},
-    {stage:"prepare", html: tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)},
-    {stage:"prepare", html: tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")},
-    {stage:"prepare", html: typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""},
-    {stage:"prepare", html: typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""},
-    {stage:"prepare", html: tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)},
-    {stage:"ai", html: typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""},
-    {stage:"ai", html: typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""},
-    {stage:"measure", html: tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
-  ].filter(x => x.html);
-  const stageCount = s => s === "all" ? toolCards.length : toolCards.filter(x => x.stage === s).length;
-  const shown = toolCards.filter(x => toolsStage === "all" || x.stage === toolsStage);
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
     ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
+    <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="segs ov-stagef" role="group" aria-label="Filter tools by stage">${TOOLS_STAGES.map(([k, n]) => `<button type="button" data-toolstage="${k}" aria-pressed="${toolsStage === k}">${n} <span class="mono" style="opacity:.6">${stageCount(k)}</span></button>`).join("")}</div>
-      <div class="ov-tools">${shown.length ? shown.map(x => x.html).join("") : `<p class="note">No tools in this stage yet.</p>`}</div>
+      <div class="ov-tools">
+        ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
+        ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
+        ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
+        ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
+        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
+        ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong <span class="ov-term">precision and recall</span>`) : ""}
+        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
+      </div>
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
@@ -11400,7 +11478,10 @@ function renderTools(){
     ${asFootHTML()}
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
-  view.querySelectorAll("[data-toolstage]").forEach(b => b.onclick = () => { toolsStage = b.dataset.toolstage; const y = window.scrollY; renderTools(); window.scrollTo(0, y); });
+  const ovApplyStage = () => view.querySelectorAll("[data-stage]").forEach(el => { el.hidden = ovStage !== "all" && el.dataset.stage !== ovStage; });
+  ovApplyStage();
+  view.querySelectorAll("[data-ovstage]").forEach(b => b.onclick = () => { ovStage = b.dataset.ovstage;
+    view.querySelectorAll("[data-ovstage]").forEach(x => x.setAttribute("aria-pressed", x === b)); ovApplyStage(); });
 }
 
 /* ---------- Guided steps: the strip across the top ---------- */
@@ -18438,7 +18519,11 @@ function gdRender(spec){
   view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
   if(spec.bind) spec.bind();
 }
-const gdFocus = () => { const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };
+// A step whose first field is still its own placeholder gets the cursor put right in it, the same
+// way a typed "name" question does, so the field reads as yours to change rather than as a label
+const gdAutoFill = () => { const f = view.querySelector && view.querySelector(".vd-names input.vname"); return f && /^Vendor [A-D]$/.test(f.value) ? f : null; };
+const gdFocus = () => { const fill = gdAutoFill(); if(fill) return (fill.focus(), fill.select());
+  const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };
 function gdShow(spec){ gdRender(spec); if(window.scrollY > 120) window.scrollTo(0, 0); gdFocus(); }
 function gdGo(spec, act){
   clearTimeout(gdGo.t); const p = gdPos(spec.k), st = gdLive(spec);
