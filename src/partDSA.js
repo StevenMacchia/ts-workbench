@@ -341,7 +341,7 @@ function renderDsa(){
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="ds-toast" aria-live="polite"></span>${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-ds="example">See an example</button>`))
+        `<span class="toast" id="ds-toast" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }
 function dsSetupHTML(x, ap, s){
@@ -365,14 +365,19 @@ function dsSetupHTML(x, ap, s){
 function dsReportHTML(x, ap, s){
   const tab = ["plan", "duties", "drafts"].includes(ds.tab) ? ds.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
   const feats = DS_FEAT.filter(f => ds.feat[f[0]]).map(f => f[3]);
+  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
+  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
   return `<div class="pol-report cp-report ds-report">
     ${ds.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a social video platform with EU users, established in the US, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-ds="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ds-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
         <span class="toast" id="ds-toast" aria-live="polite"></span></div></div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">Your plan, duties and drafts</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["duties", "Duties", s.total], ["drafts", "Drafts", DS_DRAFTS.length]].map(([k, nm, c]) => `<button type="button" data-dstab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "duties" ? dsReqsHTML(x, s) : tab === "drafts" ? dsDraftsHTML() : dsPlanHTML(x, s)}</div></div>
+    </details>
     <p class="note">Checked against Regulation (EU) 2022/2065 in ${DS_REVIEWED}. Fines can reach 6% of worldwide annual turnover. A starting point for your legal team, not legal advice.</p>
   </div>`;
 }

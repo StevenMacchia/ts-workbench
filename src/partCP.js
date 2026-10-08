@@ -447,7 +447,7 @@ function renderCoppa(){
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="cp-toast" aria-live="polite"></span>${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-cp="example">See an example</button>`))
+        `<span class="toast" id="cp-toast" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
 function cpSetupHTML(x, ap, s){
@@ -491,14 +491,19 @@ function cpSetupHTML(x, ap, s){
 }
 function cpReportHTML(x, ap, s){
   const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
+  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
+  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
   return `<div class="pol-report cp-report">
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
         <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">Your plan, data map, drafts and requirements</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
+    </details>
     <p class="note">Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Civil penalties can exceed $53,000 per violation. A starting point for your legal team, not legal advice.</p>
   </div>`;
 }

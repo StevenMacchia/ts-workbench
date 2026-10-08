@@ -139,7 +139,7 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .ov-art-ring{stroke:var(--accent);stroke-opacity:.4}
 .gd-radio{border-color:var(--line-strong);color:var(--muted)}
 .gd-opt.on .gd-radio{border-color:var(--accent);color:#fff}
-.pagehead h1{display:inline-block}
+.pagehead h1{display:block;width:fit-content;max-width:100%}
 
 /* ---------- pre-mortem rail, "What this answer changed": one quiet list instead of three heading colors ---------- */
 .impact{border-top:1px solid var(--line);padding-top:12px}
@@ -190,3 +190,11 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
   .as-bar i,.gd-mbar i,.bar i,.pol-meter i,.vd-bar i,.mx-bar i{background:#6D5DF6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .mcell,.pill,.ev-conf td,.cp-map td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* ---------- verdict-first reports: the "two or three things to do" list that follows the lead sentence ---------- */
+.gd-vacts,.ma-band-acts{padding-left:18px;display:grid;gap:8px;font-size:14px;margin:10px 0 0;line-height:1.5}
+.gd-vacts li b,.ma-band-acts li b{color:var(--ink)}
+
+/* maturity: the plan band is one column now that the radar sits under Details */
+.ma-band{grid-template-columns:minmax(0,1fr)}
+.ma-band-l{max-width:78ch}

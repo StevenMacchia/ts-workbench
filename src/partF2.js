@@ -224,9 +224,9 @@ function renderPremortem(){
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
-    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
-    actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
+    actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
+    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
   }
   view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",

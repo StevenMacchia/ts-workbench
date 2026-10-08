@@ -242,11 +242,13 @@ function maProgressTabHTML(){
 function maPlanHTML(){
   const sc = maScore(ma), pr = maProgress(ma), gaps = maGaps(ma), hist = ma.hist.slice().sort((a, b) => a.t - b.t), prev = hist[hist.length - 1], nx = maNextItem(ma);
   const tabs = MA_TABS.map(([k, n]) => `<button type="button" role="tab" aria-selected="${ma.tab === k}" data-matab="${k}">${n}${k === "roadmap" ? ` <span class="mono">${pr.stepsDone}/${pr.steps.length}</span>` : k === "progress" && hist.length ? ` <span class="mono">${hist.length}</span>` : ""}</button>`).join("");
+  const topGaps = gaps.slice(0, 3).map(g => ({t:g.a.n, sub:`Level ${g.cur} of ${g.tgt} target: ${(nx && nx.s.a.k === g.a.k ? nx.text : g.a.next[g.cur - 1][0])}`}));
   return `<section class="card ma-band">
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
         <div class="ma-band-t">${maWhy()}</div>
+        ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
         ${nx ? `<p class="ma-band-next"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
@@ -254,10 +256,12 @@ function maPlanHTML(){
           ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
-      <div class="ma-band-r">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     </section>
+    <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
+    <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
     <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
+    </details>
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
@@ -394,9 +398,9 @@ document.addEventListener("keydown", e => {
 function maHeadMeta(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
-      ${ma.ex ? `<button class="btn sm" data-ma="clear">Clear example</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
-      ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>` : ""}`;
+      ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
+      ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
+      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){

@@ -165,7 +165,7 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit numbers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button><button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -217,20 +217,23 @@ function trCatsHTML(){
 function trReportHTML(ai){
   const p = trProgress(), secs = trSections(), tab = ["report", "checklist", "summary"].includes(tr.tab) ? tr.tab : "report";
   const catOver = ["n", "o"].map(k => { const sum = TR_CATS.reduce((a, c) => a + (+((tr.cat[c] || {})[k]) || 0), 0), tot = +tr.v[k === "n" ? "notices" : "own_total"] || 0; return sum > tot && tot ? (k === "n" ? "notices" : "own-initiative measures") : null; }).filter(Boolean);
+  const actions = p.missing.slice(0, 3).map(s => ({t:s.n, sub:`${s.ref}: ${s.f.filter(f => !trHas(f)).length} field${s.f.filter(f => !trHas(f)).length === 1 ? "" : "s"} still need${s.f.filter(f => !trHas(f)).length === 1 ? "s" : ""} numbers.`}));
   return `<div class="pol-report tr-report">
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
-        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}</h2>
-        <p class="note">${trDue()}</p>
+        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
         ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
         <span class="toast" id="tr-toast" aria-live="polite"></span></div>
     </div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
       ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>
       <div class="card-b">${tab === "checklist" ? trChecklistHTML() : tab === "summary" ? trSummaryHTML(ai) : trPreviewHTML()}</div></div>
     ${tr.uk ? "" : `<p class="note tr-uk"><b>In the UK,</b> categorised services publish transparency reports when Ofcom sends them a notice, with the content Ofcom specifies (<a href="${TR_SRC.uk[1]}" target="_blank" rel="noopener">${TR_SRC.uk[0]}</a>).</p>`}
+    </details>
   </div>`;
 }
 function trPreviewHTML(){

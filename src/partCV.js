@@ -232,8 +232,8 @@ function cvResultHTML(){
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
   return `<span class="toast" id="cv-toast" aria-live="polite"></span>
-    ${cv.ex ? `<button class="btn sm" data-cv="clear">Clear example</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button>` : ""}`;
+    ${cv.ex ? `<button class="btn sm" data-cv="clear">Start over</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
+    ${any ? `<button class="btn sm" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button><button class="btn sm primary" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
@@ -364,29 +364,27 @@ function cvGuideRender(){
 }
 function cvResultsRender(){
   const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
-  const headline = !rk ? `Your coverage is ${s.cov}%` : `Your defenses cover about ${s.cov}% of your risk`;
-  const sum = !rk ? "Choose a product to compare against, under Compare against, to see where risk outruns your coverage."
-    : s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? " is" : "s are"} exposed: serious risk with less than half the coverage it needs. Close these first.`
-    : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " carries" : "s carry"} more risk than your coverage. Close these first.`
-    : "Your coverage keeps pace with your risk in every harm area. Keep it current as your products change.";
   const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
   view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
     ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    <div class="card cvr-side">
+      <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
+      <h1 class="visually-hidden">Coverage radar results</h1>
+      <div class="pol-verdict">${cvWhy()}</div>
+      ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+        ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+        <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+        ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
+      ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+    </div>
+    <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
-      <div class="cvr-side">
-        <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
-        <h1>${esc(headline)}</h1><p class="cvr-sum">${esc(sum)}</p>
-        ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
-        <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
-          ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
-          <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
-          ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
-        ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
-      </div>
     </div>
     <div class="segs cvr-tabs" role="tablist" aria-label="Coverage detail">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${cvTab === k}" class="${cvTab === k ? "on" : ""}" data-cvtab="${k}">${n}</button>`).join("")}</div>
     <div class="cvr-tab" role="tabpanel">${cvTab === "answers" ? `<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div>` : cvTab === "source" ? `<div id="cv-src-wrap">${cvSourceHTML()}</div>` : cvGapsHTML()}</div>
+    </details>
     <p class="note cvr-note">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
   </div>`;
 }

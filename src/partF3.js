@@ -58,15 +58,15 @@ function answerChips(){
   return `<div class="achips">${items.map(([k,l,v])=>`<button type="button" class="achip" data-goq="${k}" title="Change this answer"><span>${l}</span><b>${esc(v)}</b></button>`).join("")}</div>`;
 }
 function startHere(r){
-  const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
-  const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
-  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
+  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
+  const blockers = r.safeguards.filter(s=>s.rank===3), firstBlocker = blockers.find(s=>!pm.done[s.id]);
+  const blockerClause = firstBlocker ? ` Start with: ${gloss(firstBlocker.t.split(",")[0].split("(")[0].trim())}.` : blockers.length ? " Every launch blocker is done." : "";
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
-    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
+    : `<strong>${r.posture[0]} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks.${blockerClause}`;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -125,6 +125,7 @@ function renderReport(r){
     </div></div>
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
+    <details class="ev-details" style="margin-top:20px"><summary>Details <span class="note">Exposure numbers, the risk matrix, risks by harm area, burn-down</span></summary>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">
       <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
@@ -144,6 +145,7 @@ function renderReport(r){
         <div class="card-b catbars">${catbars}</div></div>
     </div>
     ${pmBurnHTML(r)}
+    </details>
     <div class="card" style="margin-top:16px;scroll-margin-top:16px" id="pm-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>

@@ -4128,7 +4128,7 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .ov-art-ring{stroke:var(--accent);stroke-opacity:.4}
 .gd-radio{border-color:var(--line-strong);color:var(--muted)}
 .gd-opt.on .gd-radio{border-color:var(--accent);color:#fff}
-.pagehead h1{display:inline-block}
+.pagehead h1{display:block;width:fit-content;max-width:100%}
 
 /* ---------- pre-mortem rail, "What this answer changed": one quiet list instead of three heading colors ---------- */
 .impact{border-top:1px solid var(--line);padding-top:12px}
@@ -4179,6 +4179,14 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
   .as-bar i,.gd-mbar i,.bar i,.pol-meter i,.vd-bar i,.mx-bar i{background:#6D5DF6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .mcell,.pill,.ev-conf td,.cp-map td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* ---------- verdict-first reports: the "two or three things to do" list that follows the lead sentence ---------- */
+.gd-vacts,.ma-band-acts{padding-left:18px;display:grid;gap:8px;font-size:14px;margin:10px 0 0;line-height:1.5}
+.gd-vacts li b,.ma-band-acts li b{color:var(--ink)}
+
+/* maturity: the plan band is one column now that the radar sits under Details */
+.ma-band{grid-template-columns:minmax(0,1fr)}
+.ma-band-l{max-width:78ch}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5438,9 +5446,9 @@ function renderPremortem(){
   if(pm.stage==="report"){
     actions += `<button type="button" class="btn sm" data-act="new"><svg><use href="#i-plus"/></svg>New</button>`;
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
-    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
-    actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download report</button>`
+    actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
+    actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
   }
   view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
@@ -5704,15 +5712,15 @@ function answerChips(){
   return `<div class="achips">${items.map(([k,l,v])=>`<button type="button" class="achip" data-goq="${k}" title="Change this answer"><span>${l}</span><b>${esc(v)}</b></button>`).join("")}</div>`;
 }
 function startHere(r){
-  const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
-  const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
-  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,5);
+  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
+  const blockers = r.safeguards.filter(s=>s.rank===3), firstBlocker = blockers.find(s=>!pm.done[s.id]);
+  const blockerClause = firstBlocker ? ` Start with: ${gloss(firstBlocker.t.split(",")[0].split("(")[0].trim())}.` : blockers.length ? " Every launch blocker is done." : "";
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
-    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}`;
+    : `<strong>${r.posture[0]} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks.${blockerClause}`;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The five open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -5771,6 +5779,7 @@ function renderReport(r){
     </div></div>
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
+    <details class="ev-details" style="margin-top:20px"><summary>Details <span class="note">Exposure numbers, the risk matrix, risks by harm area, burn-down</span></summary>
     <div class="section-title rep-detail"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">
       <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
@@ -5790,6 +5799,7 @@ function renderReport(r){
         <div class="card-b catbars">${catbars}</div></div>
     </div>
     ${pmBurnHTML(r)}
+    </details>
     <div class="card" style="margin-top:16px;scroll-margin-top:16px" id="pm-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k,n,c])=>`<button type="button" data-tab="${k}" aria-pressed="${pm.tab===k}">${n} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${body}</div>
@@ -9839,7 +9849,7 @@ function renderMetrics(){
   store.set("mx", mx);
   const tabs = {card:() => open ? mxArticle(open, list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
   const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
-  const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm" id="mx-dl"><svg><use href="#i-download"/></svg>Download plan</button>` : ""}<button class="btn sm primary" id="mx-copy">${icon("copy")}Copy plan</button>`;
+  const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm primary" id="mx-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button class="btn sm ${DL ? "" : "primary"}" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
     ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
     : head("Metrics framework",
@@ -10099,14 +10109,18 @@ function vdOwn(){ vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendo
 function vdResultsRender(){
   const {sorted, top} = vdRank(), all = sorted.every(x => x.done);
   const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
+  const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
   view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
     <div class="cvr">
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
       <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><h1>${esc(headline)}</h1><div class="cvr-sum vd-why">${vdWhy()}</div>
+        ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
+    <details class="ev-details"><summary>Details <span class="note">Every criterion, scored for every vendor</span></summary>
     <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
+    </details>
     <p class="note cvr-note">Compare any two to four vendors. Scores are yours; the rubric only says what each number should mean.</p>
   </div>`;
   $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
@@ -10123,7 +10137,7 @@ function renderVendors(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
-    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-own">Start your own</button><button class="btn sm" id="vx-reset">See the example</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
+    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
@@ -11514,13 +11528,13 @@ function renderPolicy(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("Policy stress-tester", (pol.company ? esc(pol.company.trim()) + " · " : "") + (pol.result ? "Claude's review" : "Instant checks"),
-        `<button type="button" class="btn sm" data-poledit="1">Edit inputs</button>
+        `<button type="button" class="btn sm" data-poledit="1">Edit answers</button>
          <button type="button" class="btn sm" id="pol-reset">Start over</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
-         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
-         ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
+         ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}
+         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
-        `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}<button type="button" class="btn sm" id="pol-full">See an example</button>`))
+        `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
   polBind();
 }
@@ -12525,11 +12539,13 @@ function maProgressTabHTML(){
 function maPlanHTML(){
   const sc = maScore(ma), pr = maProgress(ma), gaps = maGaps(ma), hist = ma.hist.slice().sort((a, b) => a.t - b.t), prev = hist[hist.length - 1], nx = maNextItem(ma);
   const tabs = MA_TABS.map(([k, n]) => `<button type="button" role="tab" aria-selected="${ma.tab === k}" data-matab="${k}">${n}${k === "roadmap" ? ` <span class="mono">${pr.stepsDone}/${pr.steps.length}</span>` : k === "progress" && hist.length ? ` <span class="mono">${hist.length}</span>` : ""}</button>`).join("");
+  const topGaps = gaps.slice(0, 3).map(g => ({t:g.a.n, sub:`Level ${g.cur} of ${g.tgt} target: ${(nx && nx.s.a.k === g.a.k ? nx.text : g.a.next[g.cur - 1][0])}`}));
   return `<section class="card ma-band">
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
         <div class="ma-band-t">${maWhy()}</div>
+        ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
         ${nx ? `<p class="ma-band-next"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
@@ -12537,10 +12553,12 @@ function maPlanHTML(){
           ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
-      <div class="ma-band-r">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     </section>
+    <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
+    <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
     <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
+    </details>
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
@@ -12677,9 +12695,9 @@ document.addEventListener("keydown", e => {
 function maHeadMeta(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
-      ${ma.ex ? `<button class="btn sm" data-ma="clear">Clear example</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
-      ${any ? `<button class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>` : ""}`;
+      ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
+      ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
+      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
@@ -13016,8 +13034,8 @@ function cvResultHTML(){
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
   return `<span class="toast" id="cv-toast" aria-live="polite"></span>
-    ${cv.ex ? `<button class="btn sm" data-cv="clear">Clear example</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="download"><svg><use href="#i-download"/></svg>Download</button><button class="btn sm primary" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button>` : ""}`;
+    ${cv.ex ? `<button class="btn sm" data-cv="clear">Start over</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
+    ${any ? `<button class="btn sm" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button><button class="btn sm primary" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
@@ -13148,29 +13166,27 @@ function cvGuideRender(){
 }
 function cvResultsRender(){
   const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
-  const headline = !rk ? `Your coverage is ${s.cov}%` : `Your defenses cover about ${s.cov}% of your risk`;
-  const sum = !rk ? "Choose a product to compare against, under Compare against, to see where risk outruns your coverage."
-    : s.exposed.length ? `${s.exposed.length} harm area${s.exposed.length === 1 ? " is" : "s are"} exposed: serious risk with less than half the coverage it needs. Close these first.`
-    : s.gaps.length ? `${s.gaps.length} harm area${s.gaps.length === 1 ? " carries" : "s carry"} more risk than your coverage. Close these first.`
-    : "Your coverage keeps pace with your risk in every harm area. Keep it current as your products change.";
   const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
   view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
     ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    <div class="card cvr-side">
+      <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
+      <h1 class="visually-hidden">Coverage radar results</h1>
+      <div class="pol-verdict">${cvWhy()}</div>
+      ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
+      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+        ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+        <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+        ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
+      ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+    </div>
+    <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
-      <div class="cvr-side">
-        <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
-        <h1>${esc(headline)}</h1><p class="cvr-sum">${esc(sum)}</p>
-        ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
-        <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
-          ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
-          <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
-          ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
-        ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
-      </div>
     </div>
     <div class="segs cvr-tabs" role="tablist" aria-label="Coverage detail">${tabs.map(([k, n]) => `<button type="button" role="tab" aria-selected="${cvTab === k}" class="${cvTab === k ? "on" : ""}" data-cvtab="${k}">${n}</button>`).join("")}</div>
     <div class="cvr-tab" role="tabpanel">${cvTab === "answers" ? `<div id="cv-est">${cvEstHTML()}</div><div id="cv-matrix">${cvMatrixHTML()}</div>` : cvTab === "source" ? `<div id="cv-src-wrap">${cvSourceHTML()}</div>` : cvGapsHTML()}</div>
+    </details>
     <p class="note cvr-note">Your ratings stay in your browser. A self-assessment to guide planning, not an audit or legal advice. Coverage counts each layer equally; risk comes from the pre-mortem's scores.</p>
   </div>`;
 }
@@ -14394,7 +14410,7 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit numbers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button><button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -14446,20 +14462,23 @@ function trCatsHTML(){
 function trReportHTML(ai){
   const p = trProgress(), secs = trSections(), tab = ["report", "checklist", "summary"].includes(tr.tab) ? tr.tab : "report";
   const catOver = ["n", "o"].map(k => { const sum = TR_CATS.reduce((a, c) => a + (+((tr.cat[c] || {})[k]) || 0), 0), tot = +tr.v[k === "n" ? "notices" : "own_total"] || 0; return sum > tot && tot ? (k === "n" ? "notices" : "own-initiative measures") : null; }).filter(Boolean);
+  const actions = p.missing.slice(0, 3).map(s => ({t:s.n, sub:`${s.ref}: ${s.f.filter(f => !trHas(f)).length} field${s.f.filter(f => !trHas(f)).length === 1 ? "" : "s"} still need${s.f.filter(f => !trHas(f)).length === 1 ? "s" : ""} numbers.`}));
   return `<div class="pol-report tr-report">
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
-        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}</h2>
-        <p class="note">${trDue()}</p>
+        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
         ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
         <span class="toast" id="tr-toast" aria-live="polite"></span></div>
     </div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
       ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>
       <div class="card-b">${tab === "checklist" ? trChecklistHTML() : tab === "summary" ? trSummaryHTML(ai) : trPreviewHTML()}</div></div>
     ${tr.uk ? "" : `<p class="note tr-uk"><b>In the UK,</b> categorised services publish transparency reports when Ofcom sends them a notice, with the content Ofcom specifies (<a href="${TR_SRC.uk[1]}" target="_blank" rel="noopener">${TR_SRC.uk[0]}</a>).</p>`}
+    </details>
   </div>`;
 }
 function trPreviewHTML(){
@@ -15616,7 +15635,7 @@ function renderCoppa(){
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="cp-toast" aria-live="polite"></span>${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-cp="example">See an example</button>`))
+        `<span class="toast" id="cp-toast" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
 function cpSetupHTML(x, ap, s){
@@ -15660,14 +15679,19 @@ function cpSetupHTML(x, ap, s){
 }
 function cpReportHTML(x, ap, s){
   const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
+  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
+  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
   return `<div class="pol-report cp-report">
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
         <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">Your plan, data map, drafts and requirements</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
+    </details>
     <p class="note">Checked against the COPPA Rule as amended in 2025, in ${CP_REVIEWED}. Civil penalties can exceed $53,000 per violation. A starting point for your legal team, not legal advice.</p>
   </div>`;
 }
@@ -16104,7 +16128,7 @@ function renderDsa(){
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="ds-toast" aria-live="polite"></span>${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}<button type="button" class="btn sm" data-ds="example">See an example</button>`))
+        `<span class="toast" id="ds-toast" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }
 function dsSetupHTML(x, ap, s){
@@ -16128,14 +16152,19 @@ function dsSetupHTML(x, ap, s){
 function dsReportHTML(x, ap, s){
   const tab = ["plan", "duties", "drafts"].includes(ds.tab) ? ds.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
   const feats = DS_FEAT.filter(f => ds.feat[f[0]]).map(f => f[3]);
+  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
+  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
   return `<div class="pol-report cp-report ds-report">
     ${ds.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a social video platform with EU users, established in the US, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-ds="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ds-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
         <span class="toast" id="ds-toast" aria-live="polite"></span></div></div>
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    <details class="ev-details"><summary>Details <span class="note">Your plan, duties and drafts</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["duties", "Duties", s.total], ["drafts", "Drafts", DS_DRAFTS.length]].map(([k, nm, c]) => `<button type="button" data-dstab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "duties" ? dsReqsHTML(x, s) : tab === "drafts" ? dsDraftsHTML() : dsPlanHTML(x, s)}</div></div>
+    </details>
     <p class="note">Checked against Regulation (EU) 2022/2065 in ${DS_REVIEWED}. Fines can reach 6% of worldwide annual turnover. A starting point for your legal team, not legal advice.</p>
   </div>`;
 }
@@ -16573,7 +16602,7 @@ function renderEval(){
   const m = n && ev.preds ? evMetrics(ev, ev.preds) : null, fresh = !ev.policy && !ev.cases.length && !ev.preds && !media;
   const steps = evSteps(media, n, m);
   view.innerHTML = head("Classifier eval", "Does your classifier apply your rule the way you meant it? Paste the rule and some cases, get labels from a classifier, and see what it gets wrong and what to change.", "Measure",
-      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download report</button>` : ""}`)
+      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
     + `<div class="ev-root cp-root">
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
