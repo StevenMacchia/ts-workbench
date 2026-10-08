@@ -34,5 +34,5 @@ Three Sonnet agents, same brief, worktrees `_wt/ts-workbench-r3a|b|c`, branches 
 
 ## Round 4 (verification), started with Fable at 39%, all three round-3 branches merged (learn at 8309717)
 Merged agent worktrees for sandbox, review, assist, home, tools, r3a, r3b, r3c removed; branches kept.
-- [ ] qa (branch `enh/qa`): every route × light/dark × 1280/375, empty and with the example company; fixes genuine defects only.
+- [x] qa (branch `enh/qa`, merged; 26 routes × 8 combinations clean; one text bug fixed in rtm1Finding): every route × light/dark × 1280/375, empty and with the example company; fixes genuine defects only.
 - [ ] walk (branch `enh/walk`): plays the small-startup newcomer through the whole studio, logs friction card by card, fixes local issues, ranks the rest.
