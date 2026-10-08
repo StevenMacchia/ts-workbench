@@ -77,6 +77,9 @@ const CP_VPC = [
   ["emailplus", "Email plus", "An email to the parent, then a confirming step later. Only when you never share children's data.", 0],
   ["none", "No consent step yet", "", 1]
 ];
+// Plain cost and friction hint for each method, since the Rule doesn't say which ones need a vendor and which are free
+const CP_VPC_COST = {card:"Usually needs a payment vendor", id:"Usually needs an ID-check vendor", face:"Needs a vendor and trained staff", kba:"Usually needs a vendor",
+  call:"Needs staff time, no vendor required", form:"Free, but slower to process", textplus:"Free", emailplus:"Free", none:""};
 const CP_OWNERS = {product:"Product", eng:"Engineering", legal:"Legal & Privacy", ops:"T&S Ops"};
 const CP_SEV = {crit:3, high:2, med:1};
 const CP_SEVN = {crit:["Critical", "crit"], high:["High", "high"], med:["Medium", "med"]};
@@ -411,7 +414,7 @@ function cpSpec(){
   const setV = (k, v) => { cp[k] = v; cp.ex = false; cpSave(); };
   const steps = [
     {id:"svc", eb:"Your service", title:"What's the service or product called?", why:"It's named in your plan and in the drafts for parents and for Legal.", kind:"text", opt:true, placeholder:"For example: Brightbeam", max:80, get:() => cp.svc, set:v => setV("svc", v.slice(0, 80))},
-    {id:"aud", eb:"Who it's for", title:"Who is the service for?", why:"This decides whether COPPA applies to every user, to users under 13, or only to the children you know about.", kind:"single",
+    {id:"aud", eb:"Who it's for", title:"Who is the service for?", why:"This one decision changes everything else the tool asks: it decides whether COPPA applies to every user, to users under 13, or only to the children you know about.", kind:"single",
       opts:() => CP_AUD.map(([k, n, h]) => ({k, n, h})), get:() => cp.aud, set:k => setV("aud", k)},
     {id:"fac", eb:"Signs of a child audience", title:"Which of these are true of the service?", why:"Even a service built for teens and adults can count as aimed at children if enough of these are true. The FTC weighs them together, and three or more is a warning sign.", kind:"multi", opt:true, none:"None of these", skip:() => !notPrimary(),
       opts:() => CP_FACTORS.map(([k, t, nw]) => ({k, n:t, tag:nw ? CP_NEW_TAG : ""})), get:() => Object.keys(cp.fac || {}).filter(k => cp.fac[k]),
@@ -423,7 +426,9 @@ function cpSpec(){
     {id:"data", eb:"Children's data", title:"What personal information do you collect from children?", why:"Tick each kind you collect, then say what it's for, who gets it and how long you keep it. Include what third-party SDKs collect through your app or site: under COPPA, that counts as yours.", kind:"custom", opt:true, skip:() => !cp.aud,
       html:() => `<div class="cp-pi gd-pi">${CP_PI.map(cpPiRow).join("")}</div>`, next:"Continue"},
     {id:"vpc", eb:"Parental consent", title:"How do parents give consent?", why:"The FTC accepts specific methods. Knowledge-based questions, a photo ID with a face match, and text plus were added in 2025.", kind:"single", skip:() => !(live() && X().needsConsent),
-      opts:() => { const x = X(); return CP_VPC.map(([k, n, h, sh, nw]) => { const bad = x.disclose && !sh; return {k, n, h:bad ? h + " You share children's data, so this method isn't allowed." : h, off:bad, offMsg:"You share children's data, so this method isn't allowed", tag:nw ? CP_NEW_TAG : ""}; }); },
+      opts:() => { const x = X(); return CP_VPC.map(([k, n, h, sh, nw]) => { const bad = x.disclose && !sh, cost = CP_VPC_COST[k];
+        return {k, n, h:bad ? h + " You share children's data, so this method isn't allowed." : h, off:bad, offMsg:"You share children's data, so this method isn't allowed",
+          tag:(nw ? CP_NEW_TAG : "") + (cost ? `<span class="cp-cost">${esc(cost)}</span>` : "")}; }); },
       get:() => cp.vpc, set:k => setV("vpc", k)}
   ].concat(CP_CTRL.map(g => ({id:"ctrl-" + g.k, eb:g.n, title:`${esc(g.n)}: what do you have in place today?`, why:g.h ? esc(g.h) + " Tick what's true today." : "Tick what's true today.", kind:"multi", opt:true, none:"None of these yet",
     skip:() => { const x = X(), ap = AP(); return !ap.lvl || !g.items.some(it => cpItemOn(it, cp, x, ap)); },
@@ -432,7 +437,7 @@ function cpSpec(){
     clear:() => { const c = Object.assign({}, cp.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   const src = typeof loopSource === "function" ? loopSource() : null;
   return {k:"coppa", tool:{name:"COPPA readiness", icon:"coppa", color:"var(--t-cp)"},
-    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal.",
+    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal. Getting this right matters: civil penalties can run over $53,000 per violation, and each child can count separately.",
       facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
@@ -465,7 +470,7 @@ function cpSetupHTML(x, ap, s){
   const notPrimary = !!cp.aud && cp.aud !== "primary", live = !!ap.lvl && ap.lvl !== "watch";
   let n = 1, out = `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, and only what applies to your answers.</span><button type="button" class="btn sm" data-cp="guide">Switch to guided</button></div>`;
   out += sec(n++, "cp-s-svc", "Your service", "", `<div class="field"><label for="cp-svc">Service or product name</label><input class="input" id="cp-svc" value="${esc(cp.svc)}" placeholder="For example: Brightbeam" maxlength="80" autocomplete="off"></div>
-    <div class="field"><span class="lbl">Who is it for?</span><div class="tr-tiers cp-aud" role="radiogroup" aria-label="Who it's for">${CP_AUD.map(([k, nm, h]) => tile("cpaud", cp.aud, k, nm, h)).join("")}</div></div>
+    <div class="field"><span class="lbl">Who is it for?</span><p class="note cp-aud-note">This one decision changes everything else the tool asks.</p><div class="tr-tiers cp-aud" role="radiogroup" aria-label="Who it's for">${CP_AUD.map(([k, nm, h]) => tile("cpaud", cp.aud, k, nm, h)).join("")}</div></div>
     ${cp.aud ? `<div class="banner cp-ap ${ap.tone}"><span><strong>${esc(ap.h)}.</strong> ${esc(ap.t)}</span></div>` : ""}`);
   if(notPrimary){
     out += sec(n++, "cp-s-fac", "Signs of a child audience", "The FTC weighs these together", `<div class="cp-checks">${CP_FACTORS.map(([k, t, nw]) => chk("fac", k, t, nw)).join("")}</div>`,
@@ -475,8 +480,8 @@ function cpSetupHTML(x, ap, s){
   }
   if(cp.aud) out += sec(n++, "cp-s-data", "Children's data you collect", `${x.rows.length} selected`, `<div class="cp-pi">${CP_PI.map(piRow).join("")}</div>`,
     "Include what third-party SDKs collect through your app or site. Under COPPA, what they collect through your service counts as yours.");
-  if(live && x.needsConsent) out += sec(n++, "cp-s-vpc", "How parents give consent", "", `<div class="tr-tiers cp-two" role="radiogroup" aria-label="Consent method">${CP_VPC.map(([k, nm, h, sh, nw]) => { const bad = x.disclose && !sh;
-      return tile("cpvpc", cp.vpc, k, nm, bad ? h + " You share children's data, so this method isn't allowed." : h, bad ? "off" : "", nw ? newTag : ""); }).join("")}</div>`,
+  if(live && x.needsConsent) out += sec(n++, "cp-s-vpc", "How parents give consent", "", `<div class="tr-tiers cp-two" role="radiogroup" aria-label="Consent method">${CP_VPC.map(([k, nm, h, sh, nw]) => { const bad = x.disclose && !sh, cost = CP_VPC_COST[k];
+      return tile("cpvpc", cp.vpc, k, nm, bad ? h + " You share children's data, so this method isn't allowed." : h, bad ? "off" : "", (nw ? newTag : "") + (cost ? `<span class="cp-cost">${esc(cost)}</span>` : "")); }).join("")}</div>`,
     "The FTC accepts specific methods. Knowledge-based questions, a photo ID with a face match, and text plus were added in 2025.");
   if(ap.lvl){ const grps = CP_CTRL.map(g => ({g, its:g.items.filter(it => cpItemOn(it, cp, x, ap))})).filter(z => z.its.length);
     if(grps.length) out += sec(n++, "cp-s-ctrl", "What you have in place", "Tick what's true today", `<div class="cp-grps">${grps.map(({g, its}) => `<div class="cp-grp"><h4>${esc(g.n)}</h4>${g.h ? `<p class="note">${esc(g.h)}</p>` : ""}${its.map(it => chk("ctrl", it.k, it.t, it.isNew, it.opt ? "Optional" : "")).join("")}</div>`).join("")}</div>`); }
