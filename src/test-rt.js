@@ -253,3 +253,26 @@ const body6 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body6.toString() + ")();")());
+// Method tab: each step's body splits into one-at-a-time cards on its <h3> headings, with a row-collapsed list
+// (bold lead visible, detail behind a tap) and the note and the drill button carried on the step's last card.
+const body7 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const s1 = LN_GUIDES.llm.steps[0]; eq(s1.id, "scope", "step 1 of the llm guide is Scope the exercise");
+  const cards = lnStepCards("llm", s1);
+  eq(cards.length, 3, "step 1 splits into three cards on its three <h3> headings");
+  eq(cards.map(c => c.heading).join(" | "), "Write down the target | Pick the attackers you will play | Agree the rules before results exist", "headings carry over in order");
+  eq(/ln-note/.test(cards[2].html) && /Out of scope is a sentence, not a shrug/.test(cards[2].html), true, "the step's note lands on the last card");
+  // a plain <li><b>Lead.</b> detail</li> becomes a collapsed row; "Open all" expands the list; a step with no <h3> is one card
+  eq(/class="ln-row"/.test(cards[0].html) && /<summary><b>The model and version\.<\/b>/.test(cards[0].html), true, "a bold-lead item collapses into a row with the lead visible");
+  eq(/data-openall="ln-ul-llm-scope-0-0"/.test(cards[0].html), true, "an Open all control is added for the collapsed list");
+  const noH3 = lnStepCards("llm", LN_GUIDES.llm.steps.find(s => s.id === "harms")); eq(noH3.length, 1, "a step with no <h3> renders as a single card");
+  // rendering the step's last card also carries the drill button, ahead of a Next that would move to the next step
+  store.set("learn:llm:pos", {s:0, c:2}); lnMethod("llm", LN_GUIDES.llm); const h = els["#ln-view"].innerHTML;
+  eq(/undefined|NaN|\[object/.test(h), false, "last card renders cleanly");
+  eq(/Agree the rules before results exist/.test(h) && /3 of 3/.test(h), true, "the last sub-section card shows its heading and position");
+  eq(/data-ex="e1"/.test(h), true, "the drill button for the step stays on its last card");
+  eq(/data-next[^>]*>What to test for/.test(h), true, "Next on the step's last card is labelled with the next step");
+  out.push("method cards: step 1 splits into 3 cards in order, the note and the drill button carry to the last");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body7.toString() + ")();")());

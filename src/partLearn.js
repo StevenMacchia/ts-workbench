@@ -781,26 +781,89 @@ function renderRedteam(k){
   $$("[data-tab]").forEach(b => b.onclick = () => { location.hash = g.route + "/" + b.dataset.tab; });
   ({method:lnMethod, practice:lnPractice, worksheets:lnWorksheets, sources:lnSources})[tab](k, g);
 }
+/* ---------- method: split each step's body on its <h3> headings into calm, one-at-a-time cards ---------- */
+// Pure string split, no DOM: the test harness runs these functions without a real document.
+function lnSplitBody(body){
+  const re = /<h3>([\s\S]*?)<\/h3>/g, marks = [];
+  let m; while((m = re.exec(body))) marks.push({start:m.index, end:re.lastIndex, heading:m[1]});
+  if(!marks.length) return [{heading:null, html:body}];
+  const sections = marks.map((mk, i) => ({heading:mk.heading, html:body.slice(mk.end, i + 1 < marks.length ? marks[i + 1].start : body.length)}));
+  const lead = body.slice(0, marks[0].start); // content before the first <h3>, incl. a leading <p>, belongs with the first real card
+  if(lead.trim()) sections[0].html = lead + sections[0].html;
+  return sections;
+}
+// Each plain <li><b>Lead.</b> detail</li> becomes a collapsed row: the lead visible, the detail behind a tap.
+// <ol class="do"> and <ul class="good"> keep their own numbered/tick styling and are left alone.
+function lnCollapseLists(html, uid){
+  let ulN = 0;
+  return html.replace(/<ul>([\s\S]*?)<\/ul>/g, (whole, inner) => {
+    let any = false;
+    const items = inner.replace(/<li>([\s\S]*?)<\/li>/g, (li, content) => {
+      const m = content.match(/^<b>([\s\S]*?)<\/b>([\s\S]*)$/);
+      if(!m) return `<li>${content}</li>`;
+      any = true;
+      return `<li class="ln-row"><details><summary><b>${m[1]}</b><svg class="ln-chev" aria-hidden="true"><use href="#i-chev"/></svg></summary><div class="ln-rowb">${m[2]}</div></details></li>`;
+    });
+    if(!any) return `<ul>${items}</ul>`;
+    const id = `ln-ul-${uid}-${ulN++}`;
+    return `<button type="button" class="rtf-link ln-openall" data-openall="${id}">Open all</button><ul class="ln-rows" id="${id}">${items}</ul>`;
+  });
+}
+function lnStepCards(k, s){ return lnSplitBody(s.body).map((sec, i) => ({heading:sec.heading, html:lnCollapseLists(sec.html, k + "-" + s.id + "-" + i)})); }
+function lnMarkRead(id){ const d = lnDone(); if(d.indexOf(id) === -1){ d.push(id); lnStore.set("done", d); } }
+const LN_M = {}; // holds the active card flow's go(dir) so the global keyboard shortcut can reach it
 function lnMethod(k, g){
-  const key = k + ":step", n = g.steps.length;
-  let cur = Math.min(Math.max(lnStore.get(key, 0), 0), n - 1);
+  const posKey = k + ":pos", n = g.steps.length; // new key: the old "k:step" position is left untouched
+  const saved = lnStore.get(posKey, {s:0, c:0});
+  let si = Math.min(Math.max(saved.s || 0, 0), n - 1), cards = lnStepCards(k, g.steps[si]), ci = Math.min(Math.max(saved.c || 0, 0), cards.length - 1);
+  const save = () => lnStore.set(posKey, {s:si, c:ci});
+  function go(dir){
+    if(dir > 0){
+      if(ci < cards.length - 1) ci++;
+      else {
+        lnMarkRead(k + ":s:" + g.steps[si].id);
+        if(si < n - 1){ si++; ci = 0; cards = lnStepCards(k, g.steps[si]); } else { location.hash = g.route + "/practice"; return; }
+      }
+    } else {
+      if(ci > 0) ci--;
+      else if(si > 0){ si--; cards = lnStepCards(k, g.steps[si]); ci = cards.length - 1; }
+      else return;
+    }
+    save(); lnRefreshCount(k, g); draw();
+    const el = $("#ln-view"); if(el && el.getBoundingClientRect) window.scrollTo({top:el.getBoundingClientRect().top + window.pageYOffset - 80, behavior:"auto"});
+  }
   const draw = () => {
-    const s = g.steps[cur], did = lnIsDone(k + ":s:" + s.id);
-    $("#ln-view").innerHTML = `<ul class="ln-steps">${g.steps.map((x, i) => `<li><button type="button" class="${i === cur ? "on" : ""} ${lnIsDone(k + ":s:" + x.id) ? "done" : ""}" data-step="${i}" title="${esc(x.title)}"><b>${i + 1}</b><span>${esc(x.title)}</span></button></li>`).join("")}</ul>
+    const s = g.steps[si], card = cards[ci], did = lnIsDone(k + ":s:" + s.id), last = ci === cards.length - 1, hasBack = ci > 0 || si > 0;
+    const nextLabel = ci < cards.length - 1 ? "Next" : si < n - 1 ? g.steps[si + 1].title : "Go to the exercises";
+    const drillBtn = last && s.ex && g.exercises.some(e => e.id === s.ex) ? `<p><button type="button" class="btn sm" data-ex="${s.ex}">Run the drill: ${esc(g.exercises.find(e => e.id === s.ex).title)}</button></p>` : "";
+    $("#ln-view").innerHTML = `<ul class="ln-steps">${g.steps.map((x, i) => `<li><button type="button" class="${i === si ? "on" : ""} ${lnIsDone(k + ":s:" + x.id) ? "done" : ""}" data-step="${i}" title="${esc(x.title)}"><b>${i + 1}</b><span>${esc(x.title)}</span></button></li>`).join("")}</ul>
+      ${cards.length > 1 ? `<div class="rtf-dots" aria-hidden="true">${cards.map((c, i) => `<span class="${i <= ci ? "on" : ""}"></span>`).join("")}</div>` : ""}
       <div class="card ln-panel">
-        <p class="ln-eb">Step ${cur + 1} of ${n}</p><h2>${esc(s.title)}</h2><p class="ln-why">${s.why}</p>
-        <div class="ln-body">${s.body}${s.ex && g.exercises.some(e => e.id === s.ex) ? `<p><button type="button" class="btn sm" data-ex="${s.ex}">Run the drill: ${esc(g.exercises.find(e => e.id === s.ex).title)}</button></p>` : ""}</div>
-        <div class="ln-pager"><div class="row">${cur > 0 ? `<button type="button" class="btn" data-go="${cur - 1}">← ${esc(g.steps[cur - 1].title)}</button>` : ""}</div>
-          <div class="row"><button type="button" class="btn ${did ? "" : ""}" data-done aria-pressed="${did}">${did ? '<svg><use href="#i-check"/></svg>Read' : "Mark as read"}</button>${cur < n - 1 ? `<button type="button" class="btn primary" data-go="${cur + 1}">${esc(g.steps[cur + 1].title)} →</button>` : `<button type="button" class="btn primary" data-tab2="practice">Go to the exercises →</button>`}</div></div>
+        <p class="ln-eb">Step ${si + 1} of ${n} · ${esc(s.title)}${cards.length > 1 ? `<span class="ln-subcount">${ci + 1} of ${cards.length}</span>` : ""}</p>
+        <h2>${esc(card.heading || s.title)}</h2>
+        ${ci === 0 ? `<p class="ln-why">${s.why}</p>` : ""}
+        <div class="ln-body">${card.html}${drillBtn}</div>
+        <div class="ln-pager rtf-foot">${hasBack ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Step ${si + 1} of ${n}</span><span></span></div>
+        <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${esc(nextLabel)} →</button></div>
       </div>`;
-    $$("[data-step]").forEach(b => b.onclick = () => { cur = +b.dataset.step; lnStore.set(key, cur); draw(); });
-    $$("[data-go]").forEach(b => b.onclick = () => { cur = +b.dataset.go; lnStore.set(key, cur); draw(); window.scrollTo({top:$("#ln-view").getBoundingClientRect().top + window.pageYOffset - 80, behavior:"auto"}); });
-    const d = $("[data-done]"); if(d) d.onclick = () => { lnToggleDone(k + ":s:" + s.id); draw(); lnRefreshCount(k, g); };
-    const t2 = $("[data-tab2]"); if(t2) t2.onclick = () => { location.hash = g.route + "/practice"; };
+    $$("[data-step]").forEach(b => b.onclick = () => { si = +b.dataset.step; cards = lnStepCards(k, g.steps[si]); ci = 0; save(); draw(); });
+    const back = $("[data-back]"); if(back) back.onclick = () => go(-1);
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => go(1);
     $$("[data-ex]").forEach(b => b.onclick = () => lnOpenExercise(k, g, b.dataset.ex));
+    $$("[data-openall]").forEach(b => b.onclick = () => { const ul = $("#" + b.dataset.openall); if(ul) $$("details", ul).forEach(d => d.open = true); });
   };
+  LN_M.go = go;
   draw();
 }
+// Enter/→ advances, ← goes back, matching the one-card flow's keyboard support, but only on the Method tab and
+// only when focus isn't already on one of its own controls (so a focused button's own Enter/Space isn't doubled).
+document.addEventListener("keydown", e => {
+  const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
+  const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
+  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],input,textarea'))) return;
+  if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
+  else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
+});
 function lnRefreshCount(k, g){ const el = $(".ln-tabs .note"); if(el) el.textContent = `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps read · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} exercises done`; }
 function lnPractice(k, g){
   const draw = () => {

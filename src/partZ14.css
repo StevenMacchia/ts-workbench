@@ -2,7 +2,7 @@
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
    ========================================================= */
-.ln{display:grid;gap:16px}
+.ln{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)} /* an explicit minmax(0,1fr) column, not the default auto one, so a wrapping row inside (step pills, a collapsed list) can't report its unwrapped max-content width and push the track past the viewport at phone width */
 .ln-tabs{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .ln-tabs .segs{display:inline-flex}
 .ln-tabs .segs button{display:inline-flex;align-items:center;gap:6px;color:var(--muted);border:0;background:none;cursor:pointer;font:inherit}
@@ -375,3 +375,19 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .rt-art{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;flex:none;color:var(--good)}
 .rt-art.on{background:color-mix(in oklab, var(--good) 16%, transparent);border-color:transparent}
 .rt-art svg{width:11px;height:11px}
+
+/* method cards */
+.ln-eb .ln-subcount{font-family:var(--mono,ui-monospace,monospace);font-size:11px;color:var(--muted);background:var(--sunk);border-radius:5px;padding:1px 6px;margin-left:4px}
+.ln-body ul.ln-rows{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:6px;max-width:70ch}
+.ln-body ul.ln-rows li{margin:0}
+.ln-body li.ln-row{padding:0}
+.ln-row details{border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.ln-row summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:10px 14px;font-size:14.5px}
+.ln-row summary::-webkit-details-marker{display:none}
+.ln-row summary b{font-weight:600;color:var(--ink)}
+.ln-chev{width:15px;height:15px;color:var(--muted);flex:none;transition:transform .15s}
+.ln-row details[open] .ln-chev{transform:rotate(90deg)}
+.ln-row details[open] summary{border-bottom:1px solid var(--line)}
+.ln-rowb{padding:10px 14px 12px;font-size:14px;color:var(--muted);line-height:1.55}
+.ln-openall{display:inline-block;margin:0 0 8px;font-size:12.5px}
+@media (prefers-reduced-motion: reduce){.ln-chev{transition:none}}
