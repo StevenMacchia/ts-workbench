@@ -93,6 +93,14 @@ function asSum(k){
   }catch(e){}
   return "";
 }
+// When a step's own summary changes, stamp the time, so a completed step can show how stale it
+// is before the combined score is trusted. A new key, not a change to any tool's saved shape.
+function asTouch(k, sum){
+  const t = store.get("as:touch", {});
+  if(t[k] && t[k].sum === sum) return t[k].at;
+  t[k] = {sum, at:Date.now()}; store.set("as:touch", t);
+  return t[k].at;
+}
 // The most important thing each finished step found, plus a line on what comes next
 function asKnow(){
   const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [], isDone = k => { const s = J.find(x => x.k === k); return !!(s && s.done()); };
@@ -170,7 +178,8 @@ function asKnowHTML(){
 }
 function asStepHTML(s, i, next){
   const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
-  if(ok) return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(asSum(s.k))}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`;
+  if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
     <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
@@ -247,7 +256,7 @@ function renderTools(){
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong <span class="ov-term">precision and recall</span>`) : ""}
         ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>

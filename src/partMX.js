@@ -16,6 +16,14 @@ const MX_BAND = {
   health:["Health metrics", "Show whether your safety operation is working. Review them every month with your leads."],
   diag:["Diagnostics", "Explain why the numbers above moved. Your team uses them day to day."]
 };
+// One line per tab, so what's behind it is known before clicking. Reuses the band and review-cadence
+// copy already written for MX_BAND and MX_RV instead of writing new explanations
+const MX_TAB_SUB = {
+  card:`${MX_BAND.ns[1]} Then health metrics and diagnostics, in that order.`,
+  data:"The event types every metric above is built from, and what one row of each should hold.",
+  run:`${MX_RV.w[0]}, ${MX_RV.m[0].toLowerCase()}, ${MX_RV.q[0].toLowerCase()} and ${MX_RV.r[0].toLowerCase()} — who looks at which numbers, and how often.`,
+  mine:"Enter this period's numbers against your targets and see where you stand."
+};
 const MX_TARGETS = [
   ["Baseline first.","Measure for 6 to 8 weeks before you commit to any number. Early targets are guesses."],
   ["Set a band, not a point.","Say \"prevalence below 0.10%, off track above 0.15%\". The gap between the two is your early warning."],
@@ -160,10 +168,14 @@ function mxRowHTML(m, nextUp){
 function mxCardHTML(m, nextUp){
   const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
   const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
+  // North-star metrics show the no-tooling-team version right in the list: the line most useful
+  // to the audience least likely to open the full article first
+  const mvp = m.t === "ns" && H.mvp ? `<span class="mxm-mvp"><b>No data team yet?</b> ${esc(H.mvp)}</span>` : "";
   return `<button type="button" class="mxm-card${up ? " is-next" : ""}" data-open="${i}">
       <span class="mxm-top"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span>${flag}</span>
       <b class="mxm-name">${esc(m.n)}</b>
       <span class="mxm-q">${esc(MX_Q[m.n])}</span>
+      ${mvp}
       <span class="mxm-foot"><span class="mxm-dir">${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1]}</span>${mxStatusChip(m)}<span class="mxm-go">${mx.read[m.n] ? "Open" : "Start"} ${mxIco("next", "mx-ico sm")}</span></span>
     </button>`;
 }
@@ -299,6 +311,18 @@ function mxHistHTML(){
   return h.length ? `<span class="mxs-hl">Saved periods</span>${h.map((x, j) => `<span class="mxs-chip">${esc(x.p)}<button type="button" data-unsave="${j}" aria-label="Remove ${esc(x.p)} from history">×</button></span>`).join("")}`
     : `<span class="mxs-hl">No saved periods yet. Save one to start building trend lines.</span>`;
 }
+// Which of the five target-setting rules matters most for this metric right now, or null once it's
+// not tracked. No target yet: baseline first. A band metric: set a band. Sample-based: show
+// uncertainty. North-star: thresholds by severity. Otherwise: pair it with its guardrail.
+function mxTargetRuleIdx(m){
+  if(!(mx.have[m.n] || mxStatus(m, mx.vals))) return null;
+  const H = MX_HOW[m.n], v = mx.vals[m.n] || {};
+  if(!v.t && !v.a) return 0;
+  if(H.dir === "band") return 1;
+  if(typeof MX_SAMPLE !== "undefined" && MX_SAMPLE[m.n]) return 4;
+  if(m.t === "ns") return 3;
+  return 2;
+}
 function mxTabMine(list){
   const lab = (f, t) => `<span class="mx-sc-lab">${t}</span>`;
   return `<div class="mx-intro"><h3>Your numbers</h3>
@@ -321,10 +345,11 @@ function mxTabMine(list){
     ${MX_TORD.map(t => { const ms = list.filter(m => m.t === t); if(!ms.length) return "";
       return `<div class="mx-sc-grp mxm-${t}">${MX_TIER_NAME[t]}</div>` + ms.map(m => {
         const i = METRICS.indexOf(m), H = MX_HOW[m.n], u = mxUnit(m), band = H.dir === "band", al = f => ` aria-label="${esc(m.n)}: ${f}"`;
+        const ri = mxTargetRuleIdx(m);
         return `<div class="mx-sc-row">
           <div class="mx-sc-name"><button type="button" class="mx-link" data-open="${i}">${esc(m.n)}</button><small>${esc(MX_SC[m.n][0])}${u ? " (" + esc(u) + ")" : ""} · ${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1].toLowerCase()}</small></div>
           <label class="mx-sc-in">${lab("v", "Value")}${mxInput(m, "v", al("your value"))}</label>
-          <label class="mx-sc-in">${lab("t", band ? "From" : "Target")}${mxInput(m, "t", al(band ? "healthy from" : "target"))}</label>
+          <label class="mx-sc-in">${lab("t", band ? "From" : "Target")}${ri !== null ? tip(`${MX_TARGETS[ri][0]} ${MX_TARGETS[ri][1]}`) : ""}${mxInput(m, "t", al(band ? "healthy from" : "target"))}</label>
           <label class="mx-sc-in">${lab("a", band ? "To" : "Off track at")}${mxInput(m, "a", al(band ? "healthy to" : "off track at"))}</label>
           <div class="mx-sc-tr" data-spark="${i}">${mxSpark(m)}</div>
           <div class="mx-sc-st" data-st="${i}">${mxPill(mxStatus(m, mx.vals))}</div>
@@ -592,7 +617,8 @@ function renderMetrics(){
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>
-    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>`;
+    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>
+    <p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab] || "")}</p>`;
   view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
 
   const save = () => { store.set("mx", mx); renderMetrics(); };

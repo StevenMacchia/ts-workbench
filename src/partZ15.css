@@ -40,3 +40,22 @@
 
 /* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
 .mxm-onramp{margin-bottom:18px}
+
+/* r3a: remaining per-tool UX-audit items for Overview, Pre-mortem, Tabletop, Metrics, Vendors */
+/* Overview: the eval tool card's foot text, plain words with the industry term kept as a tag */
+.ov-term{display:inline-block;font-style:normal;font-weight:500;font-size:10.5px;color:var(--muted);background:var(--sunk);border-radius:5px;padding:1px 6px;margin-left:2px;white-space:nowrap}
+/* Pre-mortem: a plain-text link from Start Here into the risk burn-down chart below */
+.pm-burnlink{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--t-pm);margin-top:4px}
+.pm-burnlink:hover{text-decoration:underline;text-underline-offset:3px}
+.pm-burnlink:focus-visible{outline:2px solid var(--t-pm);outline-offset:2px;border-radius:3px}
+.pm-burnlink svg{width:14px;height:14px}
+/* Tabletop: a visible caption for "Sourced", so the reason isn't hover/focus only on touch */
+.scen-src-cap{display:none}
+@media (max-width:760px){.scen-src-cap{display:block;margin-top:2px;font-size:11px;line-height:1.4;color:var(--muted);text-align:left}}
+/* Vendor scorecard: the consequence of a hard minimum, spelled out once on the one-page view */
+.vd-dealnote{margin:2px 0 0;color:var(--crit)}
+/* Metrics: the no-tooling-team line surfaced in the compact list for north-star metrics, and a */
+/* one-line "what's in this tab" subtitle that reuses copy already written for the bands and reviews */
+.mxm-mvp{font-size:12.5px;line-height:1.45;color:var(--muted);background:var(--sunk);border-radius:8px;padding:8px 10px}
+.mxm-mvp b{color:var(--ink);font-weight:600}
+.mx-tabs-sub{margin:8px 0 0;max-width:70ch}
