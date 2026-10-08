@@ -4612,6 +4612,10 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .ln-savelbl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 8px;font-size:13px;font-weight:600;color:var(--muted)}
 .ln-savedwhen{font-weight:500;color:var(--good)}
 .ln-save textarea{width:100%;margin:0 0 8px;font:inherit;font-size:14px;resize:vertical}
+
+/* glossary: one card per letter group, so the old multi-column term grid must not shrink it to one column */
+.ln-gl{display:block}
+.ln-gl>.ln-panel{width:100%;max-width:none}
 /* =========================================================
    Red team studio: the sandbox, a local model to talk to. Aurora tokens only, light and dark.
    ========================================================= */
