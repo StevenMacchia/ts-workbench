@@ -50,6 +50,6 @@ Merged agent worktrees for sandbox, review, assist, home, tools, r3a, r3b, r3c r
 - [x] intro (`enh/intro`, merged): purpose card + walkthrough on all 16 tools via `partINTRO.js`; then one help button per page (my commit 8a2bd92).
 - [x] fixa (`enh/fixa`, merged): studio fix-direction keyed by move+aim (`RT_FIX_MOVE`), `RT_PLAIN.agentic` renamed, Plan the week time question fix, reading-level badge, COPPA $53,088, "without a Claude account" lines, eval simulated-run note, transparency category table up top.
 - [x] fixb (`enh/fixb`, merged twice): TCO Regulation named, pre-mortem denominators, grade weighting line from `RC_WEIGHTS`, one scenario-count phrasing (43 scenarios, 99 versions, 8 sectors), eight-step clause, home strip from `demoProgram()` (shared with `demoFill`), plan done toggle, "Open workspace", review sample preview, About pointer, card-art text removed, maturity legend caption.
-- [ ] portfolio (`stevenmacchia.github.io` branch `showcase-2026-10`): studio and Learn panels, screenshots, OG card.
-- [ ] qa2 (`enh/qa2`): release-candidate sweep.
+- [x] portfolio (`stevenmacchia.github.io` branch `showcase-2026-10`, commit 395fcd8, not merged to main): studio and Learn panels, screenshots, OG card.
+- [x] qa2 (`enh/qa2`, merged; one checklist-mapping bug fixed in partRT4.js): release-candidate sweep.
 - Then: Steven's go to merge `learn` into `main` and push both repos.
