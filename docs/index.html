@@ -4198,6 +4198,38 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 @media (max-width:640px){.gd-preview{display:none}}
 
 .gd-preview-frame{padding:18px 22px 0;background:var(--panel)}
+
+/* ---------- Letter grade beside a verdict ---------- */
+.grade{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;font-family:var(--display);font-weight:700;font-size:21px;flex:none;margin-left:10px;vertical-align:middle}
+.grade-A,.grade-B{background:var(--good-soft);color:var(--good)}
+.grade-C{background:var(--med-soft);color:var(--med)}
+.grade-D{background:var(--high-soft);color:var(--high)}
+.grade-F{background:var(--crit-soft);color:var(--crit)}
+.verdict-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.bench-line{margin:2px 0 0;font-size:13px;color:var(--muted)}
+
+/* ---------- Shared "shared result" banner ---------- */
+.share-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 18px;margin-bottom:14px;border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.share-banner .note{display:block;margin-top:2px}
+
+/* ---------- Undo toast, shared by every "Start over" ---------- */
+.wb-undo{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(14px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
+  background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;display:flex;align-items:center;gap:16px;font-size:13.5px;box-shadow:var(--shadow);z-index:9999}
+.wb-undo.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.wb-undo button{background:none;border:none;color:#fff;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;font-size:13.5px}
+
+/* ---------- "+ New" menu: template section ---------- */
+.tb-newsep{padding:10px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
+
+/* ---------- Template gallery on All tools ---------- */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tpl-card{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.tpl-card:hover,.tpl-card:focus-visible{border-color:var(--line-strong);box-shadow:var(--shadow);outline:none}
+.tpl-card b{font-size:14px}
+.tpl-card small{color:var(--muted);font-size:12.5px;line-height:1.4}
+
+/* grade mark: top-right of the verdict, large enough to read as a grade */
+.grade{float:right;margin:-4px 0 10px 18px;width:54px;height:54px;border-radius:14px;font-size:25px;font-weight:700;display:grid;place-items:center}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4659,6 +4691,102 @@ const PRESETS = {
   delivery:{name:"Delivery platform (example)", type:"gig", youth:"adult_verified", aud:["creators"], adult:"none", identity:"verified", contact:"limited", money:["p2p","payouts"], regions:["us","ca"], scale:"large", team:"mature", features:["signup","login","profiles","dm","location","meetups","reviews","referrals"]},
   creator:{name:"Creator subscription site (example)", type:"creator", youth:"adult_verified", aud:["creators"], adult:"explicit", identity:"verified", contact:"strangers", money:["subs","payouts","p2p"], regions:["us","uk","eu"], scale:"mid", team:"dedicated", features:["signup","login","profiles","dm","posts","media","live","discovery"]}
 };
+
+/* =========================================================
+   SHARED: letter grades, undo-able resets, shareable result links
+   ========================================================= */
+// A-F from a 0-100 value. Used wherever a report has (or can honestly derive) a score.
+function gradeOf(pct){
+  const p = Math.round(pct);
+  return p >= 90 ? "A" : p >= 75 ? "B" : p >= 60 ? "C" : p >= 45 ? "D" : "F";
+}
+function gradeBadge(pct, title){
+  if(pct === null || pct === undefined || isNaN(pct)) return "";
+  const g = gradeOf(pct);
+  return `<span class="grade grade-${g}" title="${esc(title || "")}">${g}</span>`;
+}
+
+// Toast with an Undo action, shared by every "Start over" handler.
+// label: what happened. snapshot: a deep copy taken before clearing. restore(snapshot): puts it back.
+function withUndo(label, snapshot, restore){
+  let el = document.getElementById("wb-undo");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "wb-undo"; el.className = "wb-undo";
+    el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
+    document.body.appendChild(el);
+  }
+  clearTimeout(el._t);
+  el.innerHTML = `<span>${esc(label)}</span><button type="button" data-wb-undo>Undo</button>`;
+  el.classList.add("show");
+  el.querySelector("[data-wb-undo]").onclick = () => {
+    el.classList.remove("show"); clearTimeout(el._t);
+    restore(snapshot);
+  };
+  el._t = setTimeout(() => el.classList.remove("show"), 8000);
+}
+
+// ---------- Shareable result links: #<route>?s=<base64url of deflated JSON> ----------
+function b64urlEncode(bytes){
+  let bin = ""; for(let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64urlDecode(str){
+  str = str.replace(/-/g, "+").replace(/_/g, "/"); while(str.length % 4) str += "=";
+  const bin = atob(str), bytes = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+async function shareEncode(obj){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  try{
+    if(typeof CompressionStream === "function"){
+      const cs = new CompressionStream("deflate-raw"), w = cs.writable.getWriter();
+      w.write(bytes); w.close();
+      const buf = await new Response(cs.readable).arrayBuffer();
+      return b64urlEncode(new Uint8Array(buf));
+    }
+  }catch(e){}
+  return b64urlEncode(bytes);
+}
+async function shareDecode(s){
+  const bytes = b64urlDecode(s);
+  if(typeof DecompressionStream === "function"){
+    try{
+      const ds = new DecompressionStream("deflate-raw"), w = ds.writable.getWriter();
+      w.write(bytes); w.close();
+      const buf = await new Response(ds.readable).arrayBuffer();
+      return JSON.parse(new TextDecoder().decode(buf));
+    }catch(e){}
+  }
+  try{ return JSON.parse(new TextDecoder().decode(bytes)); }catch(e){ return null; }
+}
+// Copies a link that carries `state`. If it would be too big (roughly 8KB), carries `summary` instead and says so.
+function shareCopy(route, state, summary, toastEl){
+  shareEncode(state).then(s => {
+    if(s.length > 8000 && summary) return shareEncode(summary).then(s2 => ({s:s2, big:true}));
+    return {s, big:false};
+  }).then(({s, big}) => {
+    const url = location.origin + location.pathname + "#" + route + "?s=" + s;
+    const say = msg => flashIn(toastEl, msg);
+    try{
+      navigator.clipboard.writeText(url).then(
+        () => say(big ? "Link copied — only the summary numbers fit, not every answer" : "Link copied"),
+        () => say("Copy was blocked in this view"));
+    }catch(e){ say("Copy was blocked in this view"); }
+  }).catch(() => flashIn(toastEl, "Could not build a link in this view"));
+}
+// Each report tool registers how to apply shared data into its own state.
+const SHARE_APPLY = {};
+function shareRegister(route, apply){ SHARE_APPLY[route] = apply; }
+// The hash's "?s=" part, read straight off location.hash so the router can strip it before normal routing.
+function shareParseHash(){
+  const h = (location.hash || "").slice(1), qi = h.indexOf("?s=");
+  return qi < 0 ? null : {route: h.slice(0, qi), s: h.slice(qi + 3)};
+}
+function shareBannerHTML(saveAttr){
+  return `<div class="card share-banner" role="note"><div><b>You're viewing a shared result.</b><span class="note">Save a copy to edit it.</span></div><button type="button" class="btn primary sm" ${saveAttr}>Save a copy</button></div>`;
+}
 /* =========================================================
    ABUSE PRE-MORTEM: HARM LIBRARY
    sev: 1 Limited, 2 Serious, 3 Severe, 4 Critical (inherent harm)
@@ -5291,6 +5419,11 @@ const QS = [
 ];
 
 let pm = store.get("pm3", null) || Object.assign(fromPreset("teen_social"), {stage:"start"});
+// A rough 0-100 so the exposure band can show a grade: Low/Moderate/High/Severe mapped to a representative percentage
+const PM_BAND_PCT = {Low:92, Moderate:76, High:50, Severe:20};
+// The built-in teen social example's own exposure band, for a benchmark line under the verdict
+function pmBenchBand(){ try{ return assess(fromPreset("teen_social")).posture[0]; }catch(e){ return null; } }
+shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
 const savePM = () => { if(pm.saved){ pm.updated = Date.now(); const lib = libLoad(); lib[pm.id] = recordOf(pm); libSave(lib); } store.set("pm3", pm); };
 const visibleQs = () => QS.filter(q => !(q.skip && q.skip(pm)));
 const applySkips = () => QS.forEach(q => { if(q.skip && q.skip(pm)) pm[q.k] = q.skipVal; });
@@ -5462,6 +5595,7 @@ function renderPremortem(){
     actions += pm.saved ? `<span class="savedtag"><svg><use href="#i-check"/></svg>Saved</span>` : `<button type="button" class="btn sm" data-act="save"><svg><use href="#i-save"/></svg>${pm.example?"Save a copy":"Save"}</button>`;
     actions += DL ? `<button type="button" class="btn sm primary" data-act="download"><svg><use href="#i-download"/></svg>Download</button>`
                   : `<button type="button" class="btn sm primary" data-act="copy">${icon("copy")}Copy report</button>`;
+    actions += `<button type="button" class="btn sm" data-act="sharelink">Copy link</button>`;
     actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
   }
   view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
@@ -5522,7 +5656,9 @@ function bindPremortem(){
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
-      case "new": pm = orgPrefillPM(blankPM()); return rerender();
+      case "new": { const snap = JSON.parse(JSON.stringify(pm)); pm = orgPrefillPM(blankPM()); rerender(); withUndo("Cleared", snap, s2 => { pm = s2; savePM(); renderPremortem(); }); return; }
+      case "sharelink": return shareCopy("premortem", pm, {name:pm.name, type:pm.type, posture:assess(pm).posture[0]}, $("#pm-toast"));
+      case "unshare": { pm.shared = false; savePM(); pm.flash = "Saved. It's yours to edit now."; return rerender(); }
       case "report": pm.stage = "report";
         // Leaving the questions early still keeps the work, so a later New never drops it
         if(!pm.example && !pm.saved){ if(!pm.name) pm.name = (labelOf(PLATFORMS, pm.type) || "Product") + " (draft)"; saveToLib(); pm.flash = "Saved to your workspace. Click any answer to change it"; }
@@ -5732,9 +5868,12 @@ function startHere(r){
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
     : `<strong>${r.posture[0]} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks.${blockerClause}`;
+  const bandPct = PM_BAND_PCT[r.posture[0]], benchBand = !pm.example ? pmBenchBand() : null;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
+        <div class="verdict-row"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}</div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -5786,6 +5925,7 @@ function renderReport(r){
   const tabs = [["plan","Launch plan",r.safeguards.length],["register","Risk register",total],["obligations","Legal obligations",r.obligations.length],["decisions","Decisions to make",r.decisions.length]];
   const body = pm.tab==="register" ? tabRegister(r) : pm.tab==="obligations" ? tabObligations(r) : pm.tab==="decisions" ? tabDecisions(r) : tabPlan(r);
   return `
+    ${pm.shared ? shareBannerHTML('data-act="unshare"') : ""}
     ${pm.example?`<div class="banner"><span>You're looking at an example with pre-filled answers.</span><span class="row" style="gap:8px"><button type="button" class="btn sm" data-act="save">Save a copy</button><button type="button" class="btn sm primary" data-act="new">Assess your own product</button></span></div>`:""}
     <div class="rephead"><div class="rephead-b">
       <div class="row" style="justify-content:space-between;align-items:flex-end"><div><span class="rep-kicker"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem report</span><h2 class="rep-title">${esc(pm.name||"Untitled assessment")}</h2><span class="note">${pm.id?`<span class="mono">${esc(pm.id)}</span> · `:""}${pm.created?`Created ${fmtDate(pm.created)} · Updated ${fmtDate(pm.updated)}`:(pm.example?"Example":"Not saved yet")}</span></div><span class="row" style="gap:12px">${pmProjectSelect()}<span class="note">Click any answer to change it</span></span></div>
@@ -10062,6 +10202,13 @@ function vdWeightsBar(){
 
 /* ---------- pieces both the one-page scorecard and the guided flow use ---------- */
 const vdSave = () => store.set("vx", vx);
+// The three built-in example vendors' own scores, for a benchmark line under the headline
+function vdBenchRange(){
+  try{ const tw = CRITERIA.reduce((a, c) => a + (+DEFAULT_V.weights[c.k] || 0), 0) || 1;
+    const scores = DEFAULT_V.vendors.map(v => CRITERIA.reduce((a, c) => a + (+DEFAULT_V.weights[c.k] || 0) * (v.s[c.k] || 0), 0) / tw);
+    return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
+}
+shareRegister("vendors", d => { vx = Object.assign({weights:{}, vendors:[], open:null}, d, {shared:true}); vdView = "results"; vdSave(); });
 function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
 function vdCritHTML(c, seen){ return `<article class="card vd-crit">
@@ -10118,18 +10265,20 @@ function vdSpec(){
     done:() => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function vdExample(){ vx = JSON.parse(JSON.stringify(DEFAULT_V)); vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); gsay("Example loaded: three vendors, already scored"); }
-function vdOwn(){ vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); }
+function vdOwn(){ const snap = JSON.parse(JSON.stringify(vx)); vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { vx = s2; vdSave(); renderVendors(); }); }
 // The result: who wins and why, the heat map, and the ways back in
 function vdResultsRender(){
-  const {sorted, top} = vdRank(), all = sorted.every(x => x.done);
+  const {sorted, top} = vdRank(), all = sorted.every(x => x.done), bench = vdBenchRange();
   const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
   const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
   view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
+    ${vx.shared ? shareBannerHTML('id="vx-unshare"') : ""}
     <div class="cvr">
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
-      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><h1>${esc(headline)}</h1><div class="cvr-sum vd-why">${vdWhy()}</div>
+      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
+        ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
         ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
-        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button></div>
+        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
     <details class="ev-details"><summary>Details <span class="note">Every criterion, scored for every vendor</span></summary>
@@ -10138,6 +10287,8 @@ function vdResultsRender(){
     <p class="note cvr-note">Compare any two to four vendors. Scores are yours; the rubric only says what each number should mean.</p>
   </div>`;
   $("#vx-save").onclick = () => { const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
+  $("#vx-sharelink").onclick = () => shareCopy("vendors", vx, {vendors:vx.vendors.map(v => ({name:v.name})), top:top ? top.v.name : null, score:top ? top.score : null}, $("#vx-toast"));
+  const us = document.getElementById("vx-unshare"); if(us) us.onclick = () => { vx.shared = false; vdSave(); const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
   $("#vx-own").onclick = vdOwn; $("#vx-reset").onclick = vdExample;
   const pb = view.querySelector && view.querySelector('[data-vd="page"]'); if(pb) pb.onclick = () => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
   const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); };
@@ -10863,6 +11014,10 @@ function renderTools(){
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
       <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
+    ${typeof templateItems === "function" ? `<section class="rise">
+      <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
+      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></button>`).join("")}</div>
+    </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
       <div class="ov-list">${items.length ? items.map(it => `<button type="button" class="ov-row" data-open="${esc(it.id)}">
@@ -10874,6 +11029,7 @@ function renderTools(){
     ${asFootHTML()}
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
+  view.querySelectorAll("[data-tplgo]").forEach(b => b.onclick = () => templateItems()[+b.dataset.tplgo].run());
 }
 
 /* ---------- Guided steps: the strip across the top ---------- */
@@ -11223,6 +11379,11 @@ const POL_BLANK = () => ({rule:"", company:"", look:null, type:"social", product
 let pol = Object.assign(POL_BLANK(), store.get("pol", null) || {});
 let polRun = {busy:false, ctl:null, stage:0, timer:null, err:"", aiOff:false, looking:false};
 const savePol = () => store.set("pol", pol);
+// The built-in example rules' own clarity scores, for a benchmark line under the verdict
+function polBenchRange(){
+  try{ const scores = POL_EXAMPLES.map(([, t]) => polHeuristics(t).score); return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
+}
+shareRegister("policy", d => { pol = Object.assign(POL_BLANK(), d, {shared:true}); polView = "page"; savePol(); });
 const POL_ENF = [["reports","User reports"],["humans","Human reviewers"],["auto","Automated detection"],["vendor","Outsourced moderation vendor"],["community","Community moderators"]];
 const POL_ACT = [["remove","Remove content"],["label","Warning label or blur"],["limit","Reduce reach"],["warn","Warn the user"],["suspend","Temporary suspension"],["ban","Permanent ban"]];
 const POL_EXAMPLES = [
@@ -11559,7 +11720,8 @@ function renderPolicy(){
          <button type="button" class="btn sm" id="pol-reset">Start over</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}
-         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>`)
+         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
+         <button type="button" class="btn sm" id="pol-sharelink">Copy link</button>`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
         `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
@@ -11633,12 +11795,15 @@ function polReportHTML(ai){
     : k === "team" ? r.reviewer_checklist.length + r.open_questions.length + r.enforcement_risks.length : k === "laws" ? r.legal.length : h.findings.length;
   const tabs = r ? POL_TABS.filter(([k]) => k === "checks" || count(k)) : [];
   const tab = tabs.some(([k]) => k === pol.rtab) ? pol.rtab : tabs.length ? tabs[0][0] : "checks";
+  const score = r ? r.score : h.score, bench = polBenchRange();
   return `<div class="pol-report" aria-live="polite">
+    ${pol.shared ? shareBannerHTML('data-polunshare="1"') : ""}
     <div class="card pol-sum">
-      ${polRing(r ? r.score : h.score, 96)}
+      ${polRing(score, 96)}
       <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
-        <h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>
+        <div class="verdict-row"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
         <p class="note">${h.words} words · instant score ${h.score}/100${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
+        ${bench ? `<p class="bench-line">Typical range among the built-in example rules: ${bench.min}–${bench.max}</p>` : ""}
         ${r && r.strengths.length ? `<div class="pol-strengths">${r.strengths.map(s=>`<span><svg><use href="#i-check"/></svg>${esc(s)}</span>`).join("")}</div>` : ""}
         <span class="toast" id="pol-toast" aria-live="polite"></span></div>
     </div>
@@ -11704,7 +11869,9 @@ function polBind(){
   const loadFull = () => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); renderPolicy(); gsay("Complete example loaded. Run the test at the bottom to see the full report."); };
   const full = $("#pol-full"); if(full) full.onclick = loadFull;
   // Start over: a blank test, back at the guided intro. A running Claude review is stopped first.
-  const reset = $("#pol-reset"); if(reset) reset.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); pol = Object.assign(POL_BLANK(), {depth:pol.depth}); polRun.err = ""; polView = null; store.set("ws:cur:policy", null); gdReset("policy"); savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
+  const reset = $("#pol-reset"); if(reset) reset.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); const snap = JSON.parse(JSON.stringify(pol)); pol = Object.assign(POL_BLANK(), {depth:pol.depth}); polRun.err = ""; polView = null; store.set("ws:cur:policy", null); gdReset("policy"); savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); withUndo("Cleared", snap, s2 => { pol = s2; savePol(); renderPolicy(); }); };
+  const shl = $("#pol-sharelink"); if(shl) shl.onclick = () => shareCopy("policy", pol, {rule:pol.rule.slice(0, 120), type:pol.type, score:pol.heur ? pol.heur.score : null}, $("#pol-toast"));
+  const uns = $$("[data-polunshare]"); uns.forEach(b => b.onclick = () => { pol.shared = false; savePol(); const msg = wsSaveTool("policy", pol, "Policy: " + pol.rule.slice(0, 48) + (pol.rule.length > 48 ? "…" : "")); renderPolicy(); flashIn($("#pol-toast"), msg); });
   const info = $("#pol-info"); if(info && info.addEventListener) info.addEventListener("toggle", () => store.set("pol:info", info.open));
   const run = $("#pol-run"); if(run) run.onclick = polAnalyze;
   const stop = $("#pol-stop"); if(stop) stop.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); };
@@ -12335,6 +12502,9 @@ const maSave = () => store.set("ma", ma);
 const maStage = d => MA_STAGES.find(s => s.k === (d || ma).stage) || MA_STAGES[1];
 const maArea = k => MA_AREAS.find(a => a.k === k);
 const maDate = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
+// The built-in example's own level, for a benchmark line under the verdict
+function maBenchScore(){ try{ return maScore(MA_EXAMPLE); }catch(e){ return null; } }
+shareRegister("maturity", d => { ma = maInit(Object.assign({stage:"growth", lv:{}, done:{}, ex:false, open:null}, d, {shared:true})); maG = null; maView = "page"; maSave(); });
 // The example opens as a plan in progress: a few steps done, owners and last quarter's snapshot
 function maExample(){
   const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5;
@@ -12570,7 +12740,8 @@ function maPlanHTML(){
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
-        <div class="ma-band-t">${maWhy()}</div>
+        <div class="ma-band-t verdict-row">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
+        ${maBenchScore() !== null && !ma.ex ? `<p class="bench-line">Typical for a growing company like the built-in example: level ${maBenchScore().toFixed(1)} of 5</p>` : ""}
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
@@ -12735,14 +12906,15 @@ function maHeadMeta(){
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
       ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
       ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
-      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
+      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
+      <button class="btn sm" data-ma="sharelink">Copy link</button>` : ""}`;
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
   if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
-  const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
+  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
@@ -12806,7 +12978,9 @@ function bindMaturity(){
     }
     switch(d.ma){
       case "example": ma = maExample(); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
-      case "clear": case "reset": ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
+      case "clear": case "reset": { const snap = JSON.parse(JSON.stringify(ma)); ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ma = maInit(s2); maSave(); renderMaturity(); }); return; }
+      case "sharelink": return shareCopy("maturity", ma, {stage:ma.stage, score:maScore(ma)}, $("#ma-toast"));
+      case "unshare": { ma.shared = false; maSave(); const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
       case "edit": ma.edit = true; ma.open = null; maSave(); renderMaturity(); return window.scrollTo(0, 0);
       case "snapshot": { const lv = Object.fromEntries(MA_AREAS.map(a => [a.k, maLevelOf(ma, a.k)])), today = new Date().toDateString();
         ma.hist = ma.hist.filter(h => new Date(h.t).toDateString() !== today).concat([{t:Date.now(), stage:ma.stage, lv}]); maSave(); maRefresh([]);
@@ -12872,6 +13046,9 @@ const CV_EXAMPLE = {src:"ex:teen_social", ex:true, r:{
 let cv = store.get("cv", null) || {src:null, ex:false, r:{}};
 if(!cv.r) cv.r = {};
 const cvSave = () => store.set("cv", cv);
+// The built-in example's own coverage %, for a benchmark line under the verdict
+function cvBenchPct(){ try{ return cvSummary(CV_EXAMPLE).cov; }catch(e){ return null; } }
+shareRegister("coverage", d => { cv = Object.assign({src:null, ex:false, r:{}}, d, {shared:true}); cvG = null; cvView = null; cvTab = "gaps"; cvSave(); });
 const cvHarm = a => a.n.replace(" & ", " and ").split(" ").map(w => /^[A-Z]{2,}$/.test(w) ? w : w.toLowerCase()).join(" ");
 const cvRiskWords = x => x.band ? `${BANDS[x.band][0].toLowerCase()} risk (${x.score} of 16)` : "no risk found";
 
@@ -13227,16 +13404,20 @@ function cvGuideRender(){
 function cvResultsRender(){
   const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
   const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
+  const bench = cvBenchPct();
   view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
+    ${cv.shared ? shareBannerHTML('data-cv="unshare"') : ""}
     ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
     <div class="card cvr-side">
       <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
       <h1 class="visually-hidden">Coverage radar results</h1>
-      <div class="pol-verdict">${cvWhy()}</div>
+      <div class="verdict-row"><div class="pol-verdict">${cvWhy()}</div>${gradeBadge(s.cov, "Weighted coverage against risk, across your rated harm areas")}</div>
+      ${bench !== null && !cv.ex ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${bench}% coverage</p>` : ""}
       ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
       <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
         ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
         <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+        <button type="button" class="btn" data-cv="sharelink">Copy link</button>
         ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
       ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
     </div>
@@ -13341,7 +13522,9 @@ function bindCoverage(){
     if(d.ov === "new") return newAssessment();
     switch(d.cv){
       case "example": cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
-      case "clear": case "reset": cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); return;
+      case "clear": case "reset": { const snap = JSON.parse(JSON.stringify(cv)); cv = {src:cv.ex ? null : cv.src, ex:false, r:{}}; cvG = null; cvView = null; cvTab = "gaps"; store.set("ws:cur:coverage", null); cvSave(); renderCoverage(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cv = s2; if(!cv.r) cv.r = {}; cvSave(); renderCoverage(); }); return; }
+      case "sharelink": return shareCopy("coverage", cv, {src:cv.src, cov:cvSummary(cv).cov}, $("#cv-toast"));
+      case "unshare": { cv.shared = false; cvSave(); const msg = wsSaveTool("coverage", cv, cvTitle(cv)); renderCoverage(true); return flashIn($("#cv-toast"), msg); }
       case "download": { const md = cvMarkdown(cv); return offerFile(`ts-coverage-radar-${new Date().toISOString().slice(0, 10)}.md`, md, md, $("#cv-toast")); }
       case "tasks": return tkOpen("coverage");
       case "fillma": { const n = cvFillFromMaturity(); cvG = null; cvView = "table"; renderCoverage(true); window.scrollTo(0, 0); return flashIn($("#cv-toast"), `Filled ${n} answers from your maturity ratings. Adjust any that differ, then confirm`); }
@@ -13859,6 +14042,21 @@ const NEW_ITEMS = [
   ["eval", "eval", "var(--t-ai)", "Classifier eval", "Test a moderation classifier against your rule", () => { if(ev.ex){ ev = EV_BLANK(); evSave(); store.set("ws:cur:eval", null); } goRoute("eval"); }],
   ["vendors", "scale", "var(--t-vd)", "Vendor scorecard", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
+// Starter templates: the full Pixelry demo, plus one lightweight starter per company type the tabletop defines.
+// A starter only pre-fills the workspace profile (type, audience, regions) via orgSet; it never loads the full demo data.
+const TEMPLATE_YOUTH = {social:"teens", marketplace:"adult_self", fintech:"adult_verified", gaming:"teens", dating:"adult_self", genai:"adult_self", gig:"adult_verified", kids:"kids"};
+function templateItems(){
+  return [{k:"demo", n:"Pixelry (full demo)", d:"Every tool filled in for a fictional social app, ready to explore", icon:"layers", run:() => demoStart()}]
+    .concat(TT_TYPES.filter(t => t.k !== "all").map(t => ({k:t.k, n:t.n, d:`Set your workspace up for a ${t.s} company and start your assessment`, icon:"shield", run:() => templateStart(t.k)})));
+}
+function templateStart(k){
+  const t = TT_TYPES.find(x => x.k === k); if(!t) return;
+  const o = orgGet();
+  orgSet({type:k, youth:TEMPLATE_YOUTH[k] || null, stage:o.stage || "growth", regions:(o.regions && o.regions.length) ? o.regions : ["us"], confirmed:true});
+  store.set("as:start", true);
+  goRoute("overview");
+  gsay("Workspace set up for a " + t.s + " company");
+}
 function newMenuToggle(open){
   const m = $("#tb-menu"), b = $("#tb-new"); if(!m || !b) return;
   const show = open === undefined ? m.hidden : open;
@@ -13868,8 +14066,12 @@ function newMenuToggle(open){
 {
   const m = $("#tb-menu");
   if(m && m.innerHTML !== undefined){
-    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><small>${d}</small></span></button>`).join("");
-    m.addEventListener("click", e => { const b = e.target.closest("[data-new]"); if(!b) return; newMenuToggle(false); NEW_ITEMS[+b.dataset.new][5](); });
+    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><small>${d}</small></span></button>`).join("")
+      + `<div class="tb-newsep" role="separator">Start from a template</div>`
+      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}"><span class="sb-glyph" style="background:var(--faint)"><svg><use href="#i-${t.icon}"/></svg></span><span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
+    m.addEventListener("click", e => { const nb = e.target.closest("[data-new]"); const tb = e.target.closest("[data-tpl]");
+      if(nb){ newMenuToggle(false); NEW_ITEMS[+nb.dataset.new][5](); return; }
+      if(tb){ newMenuToggle(false); templateItems()[+tb.dataset.tpl].run(); return; } });
     m.addEventListener("keydown", e => {
       const items = [...m.querySelectorAll("[role=menuitem]")], i = items.indexOf(document.activeElement);
       if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); }
@@ -14377,6 +14579,11 @@ const TR_EXAMPLE = {org:"Pixelry", year:2025, tier:"platform", sme:false, uk:fal
   cat:{"Illegal or harmful speech":{n:6200, o:60000}, "Scams and/or fraud":{n:9800, o:870000}, "Protection of minors":{n:3100, o:41000}, "Other violation of provider’s terms and conditions":{n:5600, o:190000}, "Cyber violence":{n:4200, o:70000}}, view:"setup", tab:"report", ai:null};
 let tr = Object.assign(TR_BLANK(), store.get("tr", null) || {});
 const trSave = () => store.set("tr", tr);
+// Pixelry's own completeness, for a benchmark line under the verdict
+function trBenchPct(){
+  const saved = tr; try{ tr = Object.assign(TR_BLANK(), TR_EXAMPLE); return trProgress().pct; }catch(e){ return null; }finally{ tr = saved; }
+}
+shareRegister("transparency", d => { tr = Object.assign(TR_BLANK(), d, {shared:true}); trView = "page"; trSave(); });
 const trSections = () => TR_SECTIONS.filter(s => trRank(s.tier) <= trRank(tr.tier));
 const trHas = f => { const v = tr.v[f[0]]; return f[2] === "chk" ? !!v : f[2] === "txt" ? !!(v && String(v).trim()) : v !== undefined && v !== null && v !== "" && !isNaN(+v); };
 function trProgress(){ const fs = trSections().flatMap(s => s.f); const got = fs.filter(trHas).length; return {got, total:fs.length, pct:fs.length ? Math.round(got / fs.length * 100) : 0, missing:trSections().filter(s => s.f.some(f => !trHas(f)))}; }
@@ -14481,7 +14688,7 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -14534,11 +14741,14 @@ function trReportHTML(ai){
   const p = trProgress(), secs = trSections(), tab = ["report", "checklist", "summary"].includes(tr.tab) ? tr.tab : "report";
   const catOver = ["n", "o"].map(k => { const sum = TR_CATS.reduce((a, c) => a + (+((tr.cat[c] || {})[k]) || 0), 0), tot = +tr.v[k === "n" ? "notices" : "own_total"] || 0; return sum > tot && tot ? (k === "n" ? "notices" : "own-initiative measures") : null; }).filter(Boolean);
   const actions = p.missing.slice(0, 3).map(s => ({t:s.n, sub:`${s.ref}: ${s.f.filter(f => !trHas(f)).length} field${s.f.filter(f => !trHas(f)).length === 1 ? "" : "s"} still need${s.f.filter(f => !trHas(f)).length === 1 ? "s" : ""} numbers.`}));
+  const bench = trBenchPct();
   return `<div class="pol-report tr-report">
+    ${tr.shared ? shareBannerHTML('data-tr="unshare"') : ""}
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
-        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>
+        <div class="verdict-row"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
+        ${bench !== null ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% complete</p>` : ""}
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
         ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
         <span class="toast" id="tr-toast" aria-live="polite"></span></div>
@@ -14596,6 +14806,8 @@ function trAct(a, arg){
     case "copy": return copyText(trMarkdown(), $("#tr-toast"));
     case "download": { const md = trMarkdown(); return offerFile(`transparency-report-${slug(tr.org || "service")}-${tr.year}.md`, md, md, $("#tr-toast")); }
     case "save": { const msg = wsSaveTool("transparency", tr, `Transparency report: ${tr.org || "Service"} ${tr.year}`); renderTransparency(); return flashIn($("#tr-toast"), msg); }
+    case "sharelink": return shareCopy("transparency", tr, {org:tr.org, year:tr.year, tier:tr.tier, pct:trProgress().pct}, $("#tr-toast"));
+    case "unshare": { tr.shared = false; trSave(); const msg = wsSaveTool("transparency", tr, `Transparency report: ${tr.org || "Service"} ${tr.year}`); renderTransparency(); return flashIn($("#tr-toast"), msg); }
   }
 }
 document.addEventListener("click", e => {
@@ -15493,6 +15705,11 @@ const CP_EXAMPLE = {svc:"Brightbeam", aud:"primary", ex:true, fac:{subject:true,
 let cp = Object.assign(CP_BLANK(), store.get("cp", null) || {});
 const cpSave = () => store.set("cp", cp);
 const cpTitle = d => "COPPA readiness: " + (d.svc || "Untitled service");
+// The example's own readiness score, for a benchmark line under the verdict
+function cpBenchPct(){
+  try{ const d = Object.assign(CP_BLANK(), CP_EXAMPLE), x = cpCtx(d), ap = cpApplies(d); return cpScore(d, x, ap).pct; }catch(e){ return null; }
+}
+shareRegister("coppa", d => { cp = Object.assign(CP_BLANK(), d, {shared:true}); cpView = "page"; cpSave(); });
 
 /* ---------- working it out ---------- */
 function cpCtx(d){
@@ -15732,7 +15949,7 @@ function renderCoppa(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
-        `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
+        `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-cp="sharelink">Copy link</button>`)
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
         `<span class="toast" id="cp-toast" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
@@ -15780,10 +15997,13 @@ function cpReportHTML(x, ap, s){
   const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
   const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
   const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
+  const bench = cpBenchPct();
   return `<div class="pol-report cp-report">
+    ${cp.shared ? shareBannerHTML('data-cp="unshare"') : ""}
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
+      ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
         <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
@@ -15837,7 +16057,9 @@ function cpAct(a){
   switch(a){
     case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
     case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); gdReset("coppa"); cpView = "page"; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
-    case "reset": cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "reset": { const snap = JSON.parse(JSON.stringify(cp)); cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cp = s2; cpSave(); renderCoppa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": return shareCopy("coppa", cp, {svc:cp.svc, aud:cp.aud, pct:s.pct, crit:s.crit}, $("#cp-toast"));
+    case "unshare": cp.shared = false; cpSave(); return cpAct("save");
     case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": cpView = null; gdReset("coppa"); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": cp.view = "setup"; cpView = "page"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -16090,6 +16312,11 @@ const DS_EXAMPLE = {svc:"Pixelry", tier:"platform", size:"medium", est:"outside"
 let ds = Object.assign(DS_BLANK(), store.get("ds", null) || {});
 const dsSave = () => store.set("ds", ds);
 const dsTitle = d => "DSA readiness: " + (d.svc || "Untitled service");
+// Pixelry's own readiness score, for a benchmark line under the verdict
+function dsBenchPct(){
+  try{ const d = Object.assign(DS_BLANK(), DS_EXAMPLE), x = dsCtx(d); return dsScore(d, x).pct; }catch(e){ return null; }
+}
+shareRegister("dsa", d => { ds = Object.assign(DS_BLANK(), d, {shared:true}); dsView = "page"; dsSave(); });
 
 /* ---------- working it out ---------- */
 function dsCtx(d){
@@ -16237,7 +16464,7 @@ function renderDsa(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
-        `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
+        `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-ds="sharelink">Copy link</button>`)
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
         `<span class="toast" id="ds-toast" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
@@ -16265,10 +16492,13 @@ function dsReportHTML(x, ap, s){
   const feats = DS_FEAT.filter(f => ds.feat[f[0]]).map(f => f[3]);
   const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
   const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
+  const bench = dsBenchPct();
   return `<div class="pol-report cp-report ds-report">
+    ${ds.shared ? shareBannerHTML('data-ds="unshare"') : ""}
     ${ds.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a social video platform with EU users, established in the US, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-ds="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ds-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable DSA duties in place")}</div><p class="note">${esc(ap.t)}</p>
+      ${bench !== null && !ds.ex ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
         <span class="toast" id="ds-toast" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
@@ -16318,7 +16548,9 @@ function dsAct(a){
   switch(a){
     case "example": ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE))); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, a social video platform with EU users");
     case "fromorg": ds = Object.assign(DS_BLANK(), dsFromOrg()); gdReset("dsa"); dsView = "page"; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Filled in from your profile. Check each answer");
-    case "reset": ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "reset": { const snap = JSON.parse(JSON.stringify(ds)); ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ds = s2; dsSave(); renderDsa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": return shareCopy("dsa", ds, {svc:ds.svc, tier:ds.tier, pct:s.pct, crit:s.crit}, $("#ds-toast"));
+    case "unshare": ds.shared = false; dsSave(); return dsAct("save");
     case "build": ds.view = "report"; ds.tab = "plan"; dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": dsView = null; gdReset("dsa"); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": ds.view = "setup"; dsView = "page"; dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -16400,6 +16632,9 @@ const EV_BLANK = () => ({name:"", policy:"", content:"", labels:"", n:0, mode:""
 let ev = Object.assign(EV_BLANK(), store.get("ev", null) || {});
 const evSave = () => store.set("ev", ev);
 const evTitle = d => "Classifier eval: " + (d.name || "Untitled classifier");
+// The built-in example's own accuracy, for a benchmark line under the verdict
+function evBenchPct(){ try{ const m = evMetrics(EV_EXAMPLE, EV_EXAMPLE.preds); return m.acc === null ? null : Math.round(m.acc * 100); }catch(e){ return null; } }
+shareRegister("eval", d => { ev = Object.assign(EV_BLANK(), d, {shared:true}); evView = "page"; evSave(); });
 const EVRUN = {busy:false, phase:"", done:0, total:0, err:"", ctl:null, off:false};
 const evLabels = d => (EV_LABELS[d.labels] || EV_LABELS.binary).labels;
 const evPos = d => (EV_LABELS[d.labels] || EV_LABELS.binary).pos;
@@ -16713,7 +16948,7 @@ function renderEval(){
   const m = n && ev.preds ? evMetrics(ev, ev.preds) : null, fresh = !ev.policy && !ev.cases.length && !ev.preds && !media;
   const steps = evSteps(media, n, m);
   view.innerHTML = head("Classifier eval", "Does your classifier apply your rule the way you meant it? Paste the rule and some cases, get labels from a classifier, and see what it gets wrong and what to change.", "Measure",
-      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
+      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-ev="sharelink">Copy link</button>` : ""}`)
     + `<div class="ev-root cp-root">
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
@@ -16794,8 +17029,11 @@ function evResultsHTML(m, media){
   const adv = evAdvice(ev, m), pos = evPos(ev), base = ev.mode === "baseline", last = evLastRun(), loop = typeof evCompareHTML === "function" && ev.prev && ev.prev.preds;
   const tone = m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit", tab = ["kinds", "scores", "all", "runs"].includes(ev.tab) ? ev.tab : "kinds";
   const body = tab === "scores" ? evScoresHTML(m) : tab === "all" ? evAllHTML(m) : tab === "runs" ? evRunsHTML() : evKindsHTML(m);
-  return `<div class="ev-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>right</span></div>
-      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>
+  const bench = evBenchPct();
+  return `${ev.shared ? shareBannerHTML('data-ev="unshare"') : ""}
+    <div class="ev-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>right</span></div>
+      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<div class="verdict-row"><h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>${m.acc === null ? "" : gradeBadge(m.acc * 100, "Accuracy against your right answers, across every case")}</div>
+        ${bench !== null && !ev.ex ? `<p class="bench-line">Typical for the built-in example (a harassment rule, judged by Claude with the rule alone): ${bench}% accurate</p>` : ""}
         <p class="note">${base ? "A general toxicity model scores words and tone, not your rule: it can't be told that reporting abuse is allowed, or that two people are friends. Where it disagrees with your right answers is where a fixed-category model stops being enough." : media ? "Scored against the labels your reviewers gave. The list named the items; the images and videos were never part of this." : m.main ? `Precision on "${esc(pos)}" ${m.pct(m.main.pr)}${evTip("precision")}, recall ${m.pct(m.main.rc)}${evTip("recall")}. The numbers by kind of case are under Details.` : ""}</p></div></div>
     ${loop ? `<div class="ev-sec ev-since"><h4>Since the last run</h4>${evCompareHTML()}</div>` : ""}
     <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evFailsHTML(m)}</div>
@@ -16837,7 +17075,7 @@ function evAct(a){
   switch(a){
     case "example": ev = Object.assign(EV_BLANK(), JSON.parse(JSON.stringify(EV_EXAMPLE))); gdReset("eval"); evView = "page"; EVU.all = false; EVRUN.err = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); window.scrollTo(0, 0); return gsay("Example loaded: a harassment rule, labeled by Claude prompted with the rule alone");
     case "quick": { const X = JSON.parse(JSON.stringify(EV_EXAMPLE)); ev = Object.assign(EV_BLANK(), {name:"Harassment rule", policy:X.policy, content:X.content, labels:X.labels, n:X.n, cases:X.cases, mode:"baseline", ex:true}); gdReset("eval"); evView = "page"; EVU.all = false; EVRUN.err = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); evGoStep("ev-s2"); return typeof evbRun === "function" ? evbRun() : undefined; }
-    case "reset": ev = EV_BLANK(); gdReset("eval"); evView = null; EVRUN.err = ""; EVU.all = EVU.own = EVU.opts = EVU.details = false; EVL.own = EVL.paste = EVL.manifest = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "reset": { const snap = JSON.parse(JSON.stringify(ev)); ev = EV_BLANK(); gdReset("eval"); evView = null; EVRUN.err = ""; EVU.all = EVU.own = EVU.opts = EVU.details = false; EVL.own = EVL.paste = EVL.manifest = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ev = s2; evSave(); renderEval(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "usepol": ev.policy = evPolRule(); ev.ex = false; evSave(); { const t = $("#ev-policy-in"); if(t) t.value = ev.policy; } evPaint(); return gsay("Rule copied from the policy stress-tester");
     case "useex": ev.policy = EV_EXAMPLE.policy; ev.ex = false; evSave(); { const t = $("#ev-policy-in"); if(t) t.value = ev.policy; } evPaint(); return gsay("The example harassment rule is in");
     case "excases": { const X = JSON.parse(JSON.stringify(EV_EXAMPLE)), own = ev.policy.trim() && ev.policy.trim() !== X.policy; if(typeof evLeaveMedia === "function") evLeaveMedia();
@@ -16866,6 +17104,8 @@ function evAct(a){
     case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
+    case "sharelink": { const m = ev.preds ? evMetrics(ev, ev.preds) : null; return shareCopy("eval", ev, {name:ev.name, mode:ev.mode, n:ev.cases.length, acc:m ? m.acc : null}, $("#ev-toast")); }
+    case "unshare": { ev.shared = false; evSave(); const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
     default: if(typeof evAct2 === "function") return evAct2(a); // the loop and the image/video list, in partEV2
   }
 }
@@ -17915,6 +18155,16 @@ document.addEventListener("click", e => {
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), credits:()=>renderCredits(), policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
 function route(){
+  // A shared result link: "#<route>?s=<data>". Decode it, apply it, then route normally on the clean hash.
+  const shareHit = typeof shareParseHash === "function" ? shareParseHash() : null;
+  if(shareHit && typeof SHARE_APPLY !== "undefined" && SHARE_APPLY[shareHit.route]){
+    shareDecode(shareHit.s).then(data => {
+      if(data) SHARE_APPLY[shareHit.route](data);
+      history.replaceState(null, "", location.pathname + "#" + shareHit.route);
+      route();
+    });
+    return;
+  }
   const h = (location.hash || '').slice(1).split('/')[0];
   // A shareable link straight into the demo company
   if(h === "demo" && typeof demoStart === "function"){ demoStart(); return; }

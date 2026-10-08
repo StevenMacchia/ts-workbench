@@ -64,9 +64,12 @@ function startHere(r){
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
     : `<strong>${r.posture[0]} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks.${blockerClause}`;
+  const bandPct = PM_BAND_PCT[r.posture[0]], benchBand = !pm.example ? pmBenchBand() : null;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
-      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span><p class="lead">${summary}</p></div>
+      <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
+        <div class="verdict-row"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}</div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
@@ -118,6 +121,7 @@ function renderReport(r){
   const tabs = [["plan","Launch plan",r.safeguards.length],["register","Risk register",total],["obligations","Legal obligations",r.obligations.length],["decisions","Decisions to make",r.decisions.length]];
   const body = pm.tab==="register" ? tabRegister(r) : pm.tab==="obligations" ? tabObligations(r) : pm.tab==="decisions" ? tabDecisions(r) : tabPlan(r);
   return `
+    ${pm.shared ? shareBannerHTML('data-act="unshare"') : ""}
     ${pm.example?`<div class="banner"><span>You're looking at an example with pre-filled answers.</span><span class="row" style="gap:8px"><button type="button" class="btn sm" data-act="save">Save a copy</button><button type="button" class="btn sm primary" data-act="new">Assess your own product</button></span></div>`:""}
     <div class="card"><div class="card-b" style="display:grid;gap:10px">
       <div class="row" style="justify-content:space-between"><div><h2 style="font-size:20px">${esc(pm.name||"Untitled assessment")}</h2><span class="note">${pm.id?`<span class="mono">${esc(pm.id)}</span> · `:""}${pm.created?`Created ${fmtDate(pm.created)} · Updated ${fmtDate(pm.updated)}`:(pm.example?"Example":"Not saved yet")}</span></div><span class="note">Click any answer to change it</span></div>

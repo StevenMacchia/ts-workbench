@@ -90,7 +90,8 @@ function renderPolicy(){
          <button type="button" class="btn sm" id="pol-reset">Start over</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}
-         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>`)
+         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
+         <button type="button" class="btn sm" id="pol-sharelink">Copy link</button>`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
         `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
@@ -164,12 +165,15 @@ function polReportHTML(ai){
     : k === "team" ? r.reviewer_checklist.length + r.open_questions.length + r.enforcement_risks.length : k === "laws" ? r.legal.length : h.findings.length;
   const tabs = r ? POL_TABS.filter(([k]) => k === "checks" || count(k)) : [];
   const tab = tabs.some(([k]) => k === pol.rtab) ? pol.rtab : tabs.length ? tabs[0][0] : "checks";
+  const score = r ? r.score : h.score, bench = polBenchRange();
   return `<div class="pol-report" aria-live="polite">
+    ${pol.shared ? shareBannerHTML('data-polunshare="1"') : ""}
     <div class="card pol-sum">
-      ${polRing(r ? r.score : h.score, 96)}
+      ${polRing(score, 96)}
       <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
-        <h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>
+        <div class="verdict-row"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
         <p class="note">${h.words} words · instant score ${h.score}/100${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
+        ${bench ? `<p class="bench-line">Typical range among the built-in example rules: ${bench.min}–${bench.max}</p>` : ""}
         ${r && r.strengths.length ? `<div class="pol-strengths">${r.strengths.map(s=>`<span><svg><use href="#i-check"/></svg>${esc(s)}</span>`).join("")}</div>` : ""}
         <span class="toast" id="pol-toast" aria-live="polite"></span></div>
     </div>
@@ -235,7 +239,9 @@ function polBind(){
   const loadFull = () => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); renderPolicy(); gsay("Complete example loaded. Run the test at the bottom to see the full report."); };
   const full = $("#pol-full"); if(full) full.onclick = loadFull;
   // Start over: a blank test, back at the guided intro. A running Claude review is stopped first.
-  const reset = $("#pol-reset"); if(reset) reset.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); pol = Object.assign(POL_BLANK(), {depth:pol.depth}); polRun.err = ""; polView = null; store.set("ws:cur:policy", null); gdReset("policy"); savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
+  const reset = $("#pol-reset"); if(reset) reset.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); const snap = JSON.parse(JSON.stringify(pol)); pol = Object.assign(POL_BLANK(), {depth:pol.depth}); polRun.err = ""; polView = null; store.set("ws:cur:policy", null); gdReset("policy"); savePol(); renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); withUndo("Cleared", snap, s2 => { pol = s2; savePol(); renderPolicy(); }); };
+  const shl = $("#pol-sharelink"); if(shl) shl.onclick = () => shareCopy("policy", pol, {rule:pol.rule.slice(0, 120), type:pol.type, score:pol.heur ? pol.heur.score : null}, $("#pol-toast"));
+  const uns = $$("[data-polunshare]"); uns.forEach(b => b.onclick = () => { pol.shared = false; savePol(); const msg = wsSaveTool("policy", pol, "Policy: " + pol.rule.slice(0, 48) + (pol.rule.length > 48 ? "…" : "")); renderPolicy(); flashIn($("#pol-toast"), msg); });
   const info = $("#pol-info"); if(info && info.addEventListener) info.addEventListener("toggle", () => store.set("pol:info", info.open));
   const run = $("#pol-run"); if(run) run.onclick = polAnalyze;
   const stop = $("#pol-stop"); if(stop) stop.onclick = () => { if(polRun.ctl) polRun.ctl.abort(); };

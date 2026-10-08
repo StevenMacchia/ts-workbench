@@ -42,6 +42,9 @@ const EV_BLANK = () => ({name:"", policy:"", content:"", labels:"", n:0, mode:""
 let ev = Object.assign(EV_BLANK(), store.get("ev", null) || {});
 const evSave = () => store.set("ev", ev);
 const evTitle = d => "Classifier eval: " + (d.name || "Untitled classifier");
+// The built-in example's own accuracy, for a benchmark line under the verdict
+function evBenchPct(){ try{ const m = evMetrics(EV_EXAMPLE, EV_EXAMPLE.preds); return m.acc === null ? null : Math.round(m.acc * 100); }catch(e){ return null; } }
+shareRegister("eval", d => { ev = Object.assign(EV_BLANK(), d, {shared:true}); evView = "page"; evSave(); });
 const EVRUN = {busy:false, phase:"", done:0, total:0, err:"", ctl:null, off:false};
 const evLabels = d => (EV_LABELS[d.labels] || EV_LABELS.binary).labels;
 const evPos = d => (EV_LABELS[d.labels] || EV_LABELS.binary).pos;
@@ -355,7 +358,7 @@ function renderEval(){
   const m = n && ev.preds ? evMetrics(ev, ev.preds) : null, fresh = !ev.policy && !ev.cases.length && !ev.preds && !media;
   const steps = evSteps(media, n, m);
   view.innerHTML = head("Classifier eval", "Does your classifier apply your rule the way you meant it? Paste the rule and some cases, get labels from a classifier, and see what it gets wrong and what to change.", "Measure",
-      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}`)
+      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-ev="sharelink">Copy link</button>` : ""}`)
     + `<div class="ev-root cp-root">
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
@@ -436,8 +439,11 @@ function evResultsHTML(m, media){
   const adv = evAdvice(ev, m), pos = evPos(ev), base = ev.mode === "baseline", last = evLastRun(), loop = typeof evCompareHTML === "function" && ev.prev && ev.prev.preds;
   const tone = m.acc === null ? "" : m.acc >= .9 ? "good" : m.acc >= .75 ? "high" : "crit", tab = ["kinds", "scores", "all", "runs"].includes(ev.tab) ? ev.tab : "kinds";
   const body = tab === "scores" ? evScoresHTML(m) : tab === "all" ? evAllHTML(m) : tab === "runs" ? evRunsHTML() : evKindsHTML(m);
-  return `<div class="ev-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>right</span></div>
-      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>
+  const bench = evBenchPct();
+  return `${ev.shared ? shareBannerHTML('data-ev="unshare"') : ""}
+    <div class="ev-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>right</span></div>
+      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<div class="verdict-row"><h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>${m.acc === null ? "" : gradeBadge(m.acc * 100, "Accuracy against your right answers, across every case")}</div>
+        ${bench !== null && !ev.ex ? `<p class="bench-line">Typical for the built-in example (a harassment rule, judged by Claude with the rule alone): ${bench}% accurate</p>` : ""}
         <p class="note">${base ? "A general toxicity model scores words and tone, not your rule: it can't be told that reporting abuse is allowed, or that two people are friends. Where it disagrees with your right answers is where a fixed-category model stops being enough." : media ? "Scored against the labels your reviewers gave. The list named the items; the images and videos were never part of this." : m.main ? `Precision on "${esc(pos)}" ${m.pct(m.main.pr)}${evTip("precision")}, recall ${m.pct(m.main.rc)}${evTip("recall")}. The numbers by kind of case are under Details.` : ""}</p></div></div>
     ${loop ? `<div class="ev-sec ev-since"><h4>Since the last run</h4>${evCompareHTML()}</div>` : ""}
     <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evFailsHTML(m)}</div>
@@ -479,7 +485,7 @@ function evAct(a){
   switch(a){
     case "example": ev = Object.assign(EV_BLANK(), JSON.parse(JSON.stringify(EV_EXAMPLE))); gdReset("eval"); evView = "page"; EVU.all = false; EVRUN.err = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); window.scrollTo(0, 0); return gsay("Example loaded: a harassment rule, labeled by Claude prompted with the rule alone");
     case "quick": { const X = JSON.parse(JSON.stringify(EV_EXAMPLE)); ev = Object.assign(EV_BLANK(), {name:"Harassment rule", policy:X.policy, content:X.content, labels:X.labels, n:X.n, cases:X.cases, mode:"baseline", ex:true}); gdReset("eval"); evView = "page"; EVU.all = false; EVRUN.err = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); evGoStep("ev-s2"); return typeof evbRun === "function" ? evbRun() : undefined; }
-    case "reset": ev = EV_BLANK(); gdReset("eval"); evView = null; EVRUN.err = ""; EVU.all = EVU.own = EVU.opts = EVU.details = false; EVL.own = EVL.paste = EVL.manifest = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "reset": { const snap = JSON.parse(JSON.stringify(ev)); ev = EV_BLANK(); gdReset("eval"); evView = null; EVRUN.err = ""; EVU.all = EVU.own = EVU.opts = EVU.details = false; EVL.own = EVL.paste = EVL.manifest = ""; store.set("ws:cur:eval", null); evSave(); renderEval(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ev = s2; evSave(); renderEval(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "usepol": ev.policy = evPolRule(); ev.ex = false; evSave(); { const t = $("#ev-policy-in"); if(t) t.value = ev.policy; } evPaint(); return gsay("Rule copied from the policy stress-tester");
     case "useex": ev.policy = EV_EXAMPLE.policy; ev.ex = false; evSave(); { const t = $("#ev-policy-in"); if(t) t.value = ev.policy; } evPaint(); return gsay("The example harassment rule is in");
     case "excases": { const X = JSON.parse(JSON.stringify(EV_EXAMPLE)), own = ev.policy.trim() && ev.policy.trim() !== X.policy; if(typeof evLeaveMedia === "function") evLeaveMedia();
@@ -508,6 +514,8 @@ function evAct(a){
     case "dlpol": { const p = evPolicyDoc(ev); return offerFile(`policy-${slug(ev.name || "classifier")}.md`, p, p, $("#ev-toast")); }
     case "dl": { const md = evMarkdown(ev); return offerFile(`classifier-eval-${slug(ev.name || "classifier")}.md`, md, md, $("#ev-toast")); }
     case "save": { const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
+    case "sharelink": { const m = ev.preds ? evMetrics(ev, ev.preds) : null; return shareCopy("eval", ev, {name:ev.name, mode:ev.mode, n:ev.cases.length, acc:m ? m.acc : null}, $("#ev-toast")); }
+    case "unshare": { ev.shared = false; evSave(); const msg = wsSaveTool("eval", ev, evTitle(ev)); renderEval(); return flashIn($("#ev-toast"), msg); }
     default: if(typeof evAct2 === "function") return evAct2(a); // the loop and the image/video list, in partEV2
   }
 }

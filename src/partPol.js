@@ -13,6 +13,11 @@ const POL_BLANK = () => ({rule:"", company:"", look:null, type:"social", product
 let pol = Object.assign(POL_BLANK(), store.get("pol", null) || {});
 let polRun = {busy:false, ctl:null, stage:0, timer:null, err:"", aiOff:false, looking:false};
 const savePol = () => store.set("pol", pol);
+// The built-in example rules' own clarity scores, for a benchmark line under the verdict
+function polBenchRange(){
+  try{ const scores = POL_EXAMPLES.map(([, t]) => polHeuristics(t).score); return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
+}
+shareRegister("policy", d => { pol = Object.assign(POL_BLANK(), d, {shared:true}); polView = "page"; savePol(); });
 const POL_ENF = [["reports","User reports"],["humans","Human reviewers"],["auto","Automated detection"],["vendor","Outsourced moderation vendor"],["community","Community moderators"]];
 const POL_ACT = [["remove","Remove content"],["label","Warning label or blur"],["limit","Reduce reach"],["warn","Warn the user"],["suspend","Temporary suspension"],["ban","Permanent ban"]];
 const POL_EXAMPLES = [

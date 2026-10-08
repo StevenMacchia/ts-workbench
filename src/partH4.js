@@ -263,6 +263,10 @@ function renderTools(){
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
       <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
+    ${typeof templateItems === "function" ? `<section class="rise">
+      <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
+      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></button>`).join("")}</div>
+    </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
       <div class="ov-list">${items.length ? items.map(it => `<button type="button" class="ov-row" data-open="${esc(it.id)}">
@@ -274,6 +278,7 @@ function renderTools(){
     ${asFootHTML()}
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
+  view.querySelectorAll("[data-tplgo]").forEach(b => b.onclick = () => templateItems()[+b.dataset.tplgo].run());
 }
 
 /* ---------- Guided steps: the strip across the top ---------- */

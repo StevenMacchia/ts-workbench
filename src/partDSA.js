@@ -204,6 +204,11 @@ const DS_EXAMPLE = {svc:"Pixelry", tier:"platform", size:"medium", est:"outside"
 let ds = Object.assign(DS_BLANK(), store.get("ds", null) || {});
 const dsSave = () => store.set("ds", ds);
 const dsTitle = d => "DSA readiness: " + (d.svc || "Untitled service");
+// Pixelry's own readiness score, for a benchmark line under the verdict
+function dsBenchPct(){
+  try{ const d = Object.assign(DS_BLANK(), DS_EXAMPLE), x = dsCtx(d); return dsScore(d, x).pct; }catch(e){ return null; }
+}
+shareRegister("dsa", d => { ds = Object.assign(DS_BLANK(), d, {shared:true}); dsView = "page"; dsSave(); });
 
 /* ---------- working it out ---------- */
 function dsCtx(d){
@@ -351,7 +356,7 @@ function renderDsa(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
-        `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button>`)
+        `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-ds="sharelink">Copy link</button>`)
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
         `<span class="toast" id="ds-toast" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
@@ -379,10 +384,13 @@ function dsReportHTML(x, ap, s){
   const feats = DS_FEAT.filter(f => ds.feat[f[0]]).map(f => f[3]);
   const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
   const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
+  const bench = dsBenchPct();
   return `<div class="pol-report cp-report ds-report">
+    ${ds.shared ? shareBannerHTML('data-ds="unshare"') : ""}
     ${ds.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a social video platform with EU users, established in the US, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-ds="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ds-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><h2 class="pol-verdict">${sentence}</h2><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable DSA duties in place")}</div><p class="note">${esc(ap.t)}</p>
+      ${bench !== null && !ds.ex ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
         <span class="toast" id="ds-toast" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
@@ -432,7 +440,9 @@ function dsAct(a){
   switch(a){
     case "example": ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE))); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, a social video platform with EU users");
     case "fromorg": ds = Object.assign(DS_BLANK(), dsFromOrg()); gdReset("dsa"); dsView = "page"; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Filled in from your profile. Check each answer");
-    case "reset": ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "reset": { const snap = JSON.parse(JSON.stringify(ds)); ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ds = s2; dsSave(); renderDsa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": return shareCopy("dsa", ds, {svc:ds.svc, tier:ds.tier, pct:s.pct, crit:s.crit}, $("#ds-toast"));
+    case "unshare": ds.shared = false; dsSave(); return dsAct("save");
     case "build": ds.view = "report"; ds.tab = "plan"; dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": dsView = null; gdReset("dsa"); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": ds.view = "setup"; dsView = "page"; dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

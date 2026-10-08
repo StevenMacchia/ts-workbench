@@ -72,6 +72,11 @@ const TR_EXAMPLE = {org:"Pixelry", year:2025, tier:"platform", sme:false, uk:fal
   cat:{"Illegal or harmful speech":{n:6200, o:60000}, "Scams and/or fraud":{n:9800, o:870000}, "Protection of minors":{n:3100, o:41000}, "Other violation of provider’s terms and conditions":{n:5600, o:190000}, "Cyber violence":{n:4200, o:70000}}, view:"setup", tab:"report", ai:null};
 let tr = Object.assign(TR_BLANK(), store.get("tr", null) || {});
 const trSave = () => store.set("tr", tr);
+// Pixelry's own completeness, for a benchmark line under the verdict
+function trBenchPct(){
+  const saved = tr; try{ tr = Object.assign(TR_BLANK(), TR_EXAMPLE); return trProgress().pct; }catch(e){ return null; }finally{ tr = saved; }
+}
+shareRegister("transparency", d => { tr = Object.assign(TR_BLANK(), d, {shared:true}); trView = "page"; trSave(); });
 const trSections = () => TR_SECTIONS.filter(s => trRank(s.tier) <= trRank(tr.tier));
 const trHas = f => { const v = tr.v[f[0]]; return f[2] === "chk" ? !!v : f[2] === "txt" ? !!(v && String(v).trim()) : v !== undefined && v !== null && v !== "" && !isNaN(+v); };
 function trProgress(){ const fs = trSections().flatMap(s => s.f); const got = fs.filter(trHas).length; return {got, total:fs.length, pct:fs.length ? Math.round(got / fs.length * 100) : 0, missing:trSections().filter(s => s.f.some(f => !trHas(f)))}; }
@@ -176,7 +181,7 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button>`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -229,11 +234,14 @@ function trReportHTML(ai){
   const p = trProgress(), secs = trSections(), tab = ["report", "checklist", "summary"].includes(tr.tab) ? tr.tab : "report";
   const catOver = ["n", "o"].map(k => { const sum = TR_CATS.reduce((a, c) => a + (+((tr.cat[c] || {})[k]) || 0), 0), tot = +tr.v[k === "n" ? "notices" : "own_total"] || 0; return sum > tot && tot ? (k === "n" ? "notices" : "own-initiative measures") : null; }).filter(Boolean);
   const actions = p.missing.slice(0, 3).map(s => ({t:s.n, sub:`${s.ref}: ${s.f.filter(f => !trHas(f)).length} field${s.f.filter(f => !trHas(f)).length === 1 ? "" : "s"} still need${s.f.filter(f => !trHas(f)).length === 1 ? "s" : ""} numbers.`}));
+  const bench = trBenchPct();
   return `<div class="pol-report tr-report">
+    ${tr.shared ? shareBannerHTML('data-tr="unshare"') : ""}
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
-        <h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>
+        <div class="verdict-row"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
+        ${bench !== null ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% complete</p>` : ""}
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
         ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
         <span class="toast" id="tr-toast" aria-live="polite"></span></div>
@@ -291,6 +299,8 @@ function trAct(a, arg){
     case "copy": return copyText(trMarkdown(), $("#tr-toast"));
     case "download": { const md = trMarkdown(); return offerFile(`transparency-report-${slug(tr.org || "service")}-${tr.year}.md`, md, md, $("#tr-toast")); }
     case "save": { const msg = wsSaveTool("transparency", tr, `Transparency report: ${tr.org || "Service"} ${tr.year}`); renderTransparency(); return flashIn($("#tr-toast"), msg); }
+    case "sharelink": return shareCopy("transparency", tr, {org:tr.org, year:tr.year, tier:tr.tier, pct:trProgress().pct}, $("#tr-toast"));
+    case "unshare": { tr.shared = false; trSave(); const msg = wsSaveTool("transparency", tr, `Transparency report: ${tr.org || "Service"} ${tr.year}`); renderTransparency(); return flashIn($("#tr-toast"), msg); }
   }
 }
 document.addEventListener("click", e => {

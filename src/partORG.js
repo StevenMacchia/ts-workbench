@@ -69,6 +69,21 @@ const NEW_ITEMS = [
   ["eval", "eval", "var(--t-ai)", "Classifier eval", "Test a moderation classifier against your rule", () => { if(ev.ex){ ev = EV_BLANK(); evSave(); store.set("ws:cur:eval", null); } goRoute("eval"); }],
   ["vendors", "scale", "var(--t-vd)", "Vendor scorecard", "Score moderation vendors on evidence", () => goRoute("vendors")]
 ];
+// Starter templates: the full Pixelry demo, plus one lightweight starter per company type the tabletop defines.
+// A starter only pre-fills the workspace profile (type, audience, regions) via orgSet; it never loads the full demo data.
+const TEMPLATE_YOUTH = {social:"teens", marketplace:"adult_self", fintech:"adult_verified", gaming:"teens", dating:"adult_self", genai:"adult_self", gig:"adult_verified", kids:"kids"};
+function templateItems(){
+  return [{k:"demo", n:"Pixelry (full demo)", d:"Every tool filled in for a fictional social app, ready to explore", icon:"layers", run:() => demoStart()}]
+    .concat(TT_TYPES.filter(t => t.k !== "all").map(t => ({k:t.k, n:t.n, d:`Set your workspace up for a ${t.s} company and start your assessment`, icon:"shield", run:() => templateStart(t.k)})));
+}
+function templateStart(k){
+  const t = TT_TYPES.find(x => x.k === k); if(!t) return;
+  const o = orgGet();
+  orgSet({type:k, youth:TEMPLATE_YOUTH[k] || null, stage:o.stage || "growth", regions:(o.regions && o.regions.length) ? o.regions : ["us"], confirmed:true});
+  store.set("as:start", true);
+  goRoute("overview");
+  gsay("Workspace set up for a " + t.s + " company");
+}
 function newMenuToggle(open){
   const m = $("#tb-menu"), b = $("#tb-new"); if(!m || !b) return;
   const show = open === undefined ? m.hidden : open;
@@ -78,8 +93,12 @@ function newMenuToggle(open){
 {
   const m = $("#tb-menu");
   if(m && m.innerHTML !== undefined){
-    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><small>${d}</small></span></button>`).join("");
-    m.addEventListener("click", e => { const b = e.target.closest("[data-new]"); if(!b) return; newMenuToggle(false); NEW_ITEMS[+b.dataset.new][5](); });
+    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><small>${d}</small></span></button>`).join("")
+      + `<div class="tb-newsep" role="separator">Start from a template</div>`
+      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}"><span class="sb-glyph" style="background:var(--faint)"><svg><use href="#i-${t.icon}"/></svg></span><span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
+    m.addEventListener("click", e => { const nb = e.target.closest("[data-new]"); const tb = e.target.closest("[data-tpl]");
+      if(nb){ newMenuToggle(false); NEW_ITEMS[+nb.dataset.new][5](); return; }
+      if(tb){ newMenuToggle(false); templateItems()[+tb.dataset.tpl].run(); return; } });
     m.addEventListener("keydown", e => {
       const items = [...m.querySelectorAll("[role=menuitem]")], i = items.indexOf(document.activeElement);
       if(e.key === "ArrowDown" || e.key === "ArrowUp"){ e.preventDefault(); items[(i + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length].focus(); }

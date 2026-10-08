@@ -12,6 +12,9 @@ const maSave = () => store.set("ma", ma);
 const maStage = d => MA_STAGES.find(s => s.k === (d || ma).stage) || MA_STAGES[1];
 const maArea = k => MA_AREAS.find(a => a.k === k);
 const maDate = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
+// The built-in example's own level, for a benchmark line under the verdict
+function maBenchScore(){ try{ return maScore(MA_EXAMPLE); }catch(e){ return null; } }
+shareRegister("maturity", d => { ma = maInit(Object.assign({stage:"growth", lv:{}, done:{}, ex:false, open:null}, d, {shared:true})); maG = null; maView = "page"; maSave(); });
 // The example opens as a plan in progress: a few steps done, owners and last quarter's snapshot
 function maExample(){
   const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5;
@@ -247,7 +250,8 @@ function maPlanHTML(){
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
-        <div class="ma-band-t">${maWhy()}</div>
+        <div class="ma-band-t verdict-row">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
+        ${maBenchScore() !== null && !ma.ex ? `<p class="bench-line">Typical for a growing company like the built-in example: level ${maBenchScore().toFixed(1)} of 5</p>` : ""}
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
@@ -412,14 +416,15 @@ function maHeadMeta(){
   return `<span class="toast" id="ma-toast" aria-live="polite"></span>
       ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
       ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
-      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
+      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
+      <button class="btn sm" data-ma="sharelink">Copy link</button>` : ""}`;
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
   if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
-  const exBanner = ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "";
+  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
@@ -483,7 +488,9 @@ function bindMaturity(){
     }
     switch(d.ma){
       case "example": ma = maExample(); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
-      case "clear": case "reset": ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); return window.scrollTo(0, 0);
+      case "clear": case "reset": { const snap = JSON.parse(JSON.stringify(ma)); ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; store.set("ws:cur:maturity", null); maSave(); renderMaturity(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ma = maInit(s2); maSave(); renderMaturity(); }); return; }
+      case "sharelink": return shareCopy("maturity", ma, {stage:ma.stage, score:maScore(ma)}, $("#ma-toast"));
+      case "unshare": { ma.shared = false; maSave(); const msg = wsSaveTool("maturity", ma, maTitle(ma)); renderMaturity(); return flashIn($("#ma-toast"), msg); }
       case "edit": ma.edit = true; ma.open = null; maSave(); renderMaturity(); return window.scrollTo(0, 0);
       case "snapshot": { const lv = Object.fromEntries(MA_AREAS.map(a => [a.k, maLevelOf(ma, a.k)])), today = new Date().toDateString();
         ma.hist = ma.hist.filter(h => new Date(h.t).toDateString() !== today).concat([{t:Date.now(), stage:ma.stage, lv}]); maSave(); maRefresh([]);
