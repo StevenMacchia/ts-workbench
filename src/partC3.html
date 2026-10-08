@@ -78,6 +78,11 @@ const HEAD_META = () => {
     dsa:["dsa", () => ["Every duty, article by article", "4 ready-to-edit drafts", "Enforcement to learn from"]],
     eval:["eval", () => [EV_CATS.length + " kinds of hard case", "Precision and recall by kind", "Works with any classifier"]],
     tools:["layers", () => ["Use any tool on its own", "Free and private", "No sign-up"]],
+    redteam:["shield", () => ["Plan, drills, findings, exports", "Learn as you go", "No attack strings"]],
+    learn:["steps", () => ["2 guides", "23 drills", (typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms"]],
+    redteamllm:["shield", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.llm.steps.length : 9) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.llm.exercises.length : 11) + " drills", "No attack strings"]],
+    redteamworld:["monitor", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.steps.length : 10) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.exercises.length : 12) + " drills", "Uploads, steering, provenance"]],
+    glossary:["doc", () => [(typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms", "Flashcards and a quiz", "Tagged by model type"]],
     workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
@@ -85,7 +90,7 @@ const HEAD_META = () => {
   return {icon:m[0], stats};
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
-const HEAD_GROUP = {plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
 const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };

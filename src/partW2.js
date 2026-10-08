@@ -11,6 +11,7 @@ const KINDS = {
   coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
   coppa:{n:"COPPA readiness", plural:"COPPA checks", icon:"i-coppa", route:"coppa", prefix:"CP"},
   dsa:{n:"DSA readiness", plural:"DSA checks", icon:"i-dsa", route:"dsa", prefix:"DS"},
+  redteam:{n:"Red team studio", plural:"Red teams", icon:"i-shield", route:"redteam", prefix:"RT"},
   eval:{n:"Classifier eval", plural:"Classifier evals", icon:"i-eval", route:"eval", prefix:"EV"},
   transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"}
 };
@@ -47,6 +48,8 @@ function vendorResult(d){
 }
 function itemSummary(it){
   const d = it.data || {};
+  if(it.kind==="redteam" && typeof rtDrills === "function"){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
+    return {html:`<span class="pill ${s4 ? "crit" : open ? "high" : "good"}">${s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s")}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`}; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
     return {html:`<span class="pill ${s.crit ? "crit" : s.pct >= 80 ? "good" : "high"}">${s.pct}% ready</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`}; }
   if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
@@ -224,6 +227,7 @@ function bindWorkspace(){
       if(k==="transparency"){ store.set("ws:cur:transparency", null); tr = TR_BLANK(); store.set("tr", tr); }
       if(k==="coppa"){ store.set("ws:cur:coppa", null); cp = CP_BLANK(); cpSave(); }
       if(k==="dsa"){ store.set("ws:cur:dsa", null); ds = DS_BLANK(); dsSave(); }
+      if(k==="redteam"){ store.set("ws:cur:redteam", null); rt = RT_BLANK(); rtSave(); }
       if(k==="eval"){ store.set("ws:cur:eval", null); ev = EV_BLANK(); evSave(); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));

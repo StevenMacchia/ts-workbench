@@ -11,6 +11,7 @@ const AB_GROUPS = [
     ["t-ds","dsa","DSA readiness","Works out which duties under the EU Digital Services Act apply to a service, article by article, and turns the gaps into a plan and four drafts: a statement of reasons, a notice-and-action procedure, a complaints process and a memo for Legal."]]],
   ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
+    ["t-rt","shield","Red team studio","Plans a red team of a language or world model from nine questions: a coverage grid, seed cards with benign twins, drills that fit the team, findings, and exports for open-source harnesses."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
   ["Measure", [["t-ai","eval","Classifier eval","Builds a labeled test set of hard cases from a rule (counter-speech, sarcasm, obfuscation, other languages), runs a moderation classifier against it, and shows precision, recall and where it fails, with what to change."],
     ["t-mx","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, tailored to platform, stage and regulation, with how to measure each one."]]],

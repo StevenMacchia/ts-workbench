@@ -43,6 +43,11 @@ OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <polygon points="80,22 114,35 112,68 96,98 70,90 44,69 50,36" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3"/>
     <polygon points="80,30 108,39 118,70 86,82 66,92 48,68 58,44" fill="var(--t-cv)" fill-opacity=".25" stroke="var(--t-cv)" stroke-width="2" stroke-linejoin="round"/>
     <circle cx="86" cy="82" r="4" fill="var(--crit)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
+OV_ART.rt = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="22" y="22" width="80" height="80" rx="10" fill="var(--surface)" stroke="var(--line-strong)"/>
+    ${[0,1,2,3].map(r => [0,1,2,3].map(c => `<rect x="${32 + c * 16}" y="${32 + r * 16}" width="12" height="12" rx="3" fill="${(r + c) % 3 === 0 ? "var(--t-rt)" : (r * 4 + c) % 5 === 0 ? "var(--high)" : "var(--sunk)"}" opacity="${(r + c) % 3 === 0 ? ".85" : "1"}"/>`).join("")).join("")}
+    <circle cx="124" cy="62" r="24" fill="var(--surface)" stroke="var(--t-rt)" stroke-width="3"/><circle cx="124" cy="62" r="14" fill="none" stroke="var(--t-rt)" stroke-width="2" opacity=".6"/><circle cx="124" cy="62" r="5" fill="var(--t-rt)"/>
+    <path d="M124 30v8M124 86v8M92 62h8M148 62h8" stroke="var(--t-rt)" stroke-width="2.5" stroke-linecap="round"/></svg>`;
 OV_ART.cp = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <rect x="28" y="18" width="72" height="90" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
     <rect x="40" y="31" width="34" height="6" rx="3" fill="var(--t-cp)" opacity=".85"/>
@@ -256,6 +261,7 @@ function renderTools(){
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""}
+        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
@@ -263,6 +269,14 @@ function renderTools(){
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
       <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
+    <section class="rise">
+      <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
+      <div class="ov-ai">
+        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs</h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models</h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>Glossary and practice</h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+      </div>
+    </section>
     <section class="rise">
       <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
       <div class="ov-list">${items.length ? items.map(it => `<button type="button" class="ov-row" data-open="${esc(it.id)}">
