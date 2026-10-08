@@ -222,7 +222,9 @@ const LN_GLOSS = [
   ["Jailbreak","llm","A prompt or sequence that gets a model past its safety training. Persona prompts, roleplay and encoded requests are all jailbreaks."],
   ["Prompt injection","llm","Instructions hidden in content the model reads. Direct: in the user's message. Indirect: in a document, web page, image or tool result the model is given."],
   ["Seed prompt","both","One test request in the set. Each seed is written against a harm category and then run through techniques."],
-  ["Benign twin","both","A legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow."],
+  ["Benign twin","both","A legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow. Called a fair twin in the studio."],
+  ["Fair twin","both","The studio's plain name for a benign twin: a legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow."],
+  ["Technique","both","The specific way an attacker tries to get past a refusal: framing, multi-turn, persona, obfuscation, scene steering and style laundering are all techniques. Called a move in the studio."],
   ["Attack success rate (ASR)","both","The share of attempts that produced an output at or above the severity you count as a success. Always say which severity."],
   ["Over-refusal","both","Refusing a benign request. Also called false refusal. A safety fix that raises this is not free."],
   ["Multi-turn attack","llm","An attack built over several messages, each one harmless on its own. Crescendo is the common name for the slow-escalation version."],
@@ -1357,16 +1359,29 @@ function lnBindSave(k, e, onSaved){
     if(onSaved) onSaved();
   };
 }
+// The shortest path to a first finding in each guide: a target, seeds, a baseline, the cheapest drill that
+// gives a result worth filing, then the finding itself. Checked against each exercise's own needs/output so
+// the path never points at a step whose input (e.g. "the best result from the crescendo or injection drill")
+// was never produced: the LLM path runs the crescendo drill (e5) before filing (e9); the world path already
+// had its drill (e5, upload) before filing (e10).
+const LN_MIN_PATH = {llm:["e1", "e3", "e4", "e5", "e9"], world:["e1", "e3", "e4", "e5", "e10"]};
 function lnPractice(k, g){
-  const posKey = k + ":epos", n = g.exercises.length;
+  const posKey = k + ":epos", onlyKey = k + ":minonly";
+  const minIds = LN_MIN_PATH[k] || [], minNums = minIds.map(id => g.exercises.findIndex(e => e.id === id) + 1);
+  let onlyMin = lnStore.get(onlyKey, false);
+  const list = () => onlyMin ? g.exercises.filter(e => minIds.includes(e.id)) : g.exercises;
+  let n = list().length;
   let i = Math.min(Math.max(lnStore.get(posKey, 0), 0), n - 1);
   const save = () => lnStore.set(posKey, i);
   const draw = () => {
+    const items = list(); n = items.length;
     i = Math.min(Math.max(i, 0), n - 1);
-    const e = g.exercises[i], did = lnIsDone(k + ":e:" + e.id), done = g.exercises.filter(x => lnIsDone(k + ":e:" + x.id)).length;
-    $("#ln-view").innerHTML = `<div class="ln-prog"><span>${done} of ${n} done</span><span class="bar"><i style="width:${100 * done / n}%"></i></span><span class="note">Severe harm areas are policy-described probes under the stop rules, never open drills.</span></div>
+    const e = items[i], did = lnIsDone(k + ":e:" + e.id), done = g.exercises.filter(x => lnIsDone(k + ":e:" + x.id)).length, full = g.exercises.length;
+    const banner = `<div class="ln-note ln-minpath">One week? Do exercises ${minNums.slice(0, -1).join(", ")} and ${minNums[minNums.length - 1]} and skip the rest for now. <button type="button" class="rtf-link" data-minonly aria-pressed="${onlyMin}">${onlyMin ? "Show all exercises" : "Show only those"}</button></div>`;
+    $("#ln-view").innerHTML = `<div class="ln-prog"><span>${done} of ${full} done</span><span class="bar"><i style="width:${100 * done / full}%"></i></span><span class="note">Severe harm areas are policy-described probes under the stop rules, never open drills.</span></div>
+      ${i === 0 ? banner : ""}
       <div class="card ln-panel">
-        <p class="ln-eb">Exercise ${i + 1} of ${n}${did ? `<span class="ln-donetick"><svg><use href="#i-check"/></svg>Done</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All exercises</button></p>
+        <p class="ln-eb">Exercise ${i + 1} of ${n}${onlyMin ? ` <i class="rtf-term">minimum path</i>` : ""}${did ? `<span class="ln-donetick"><svg><use href="#i-check"/></svg>Done</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All exercises</button></p>
         <h2>${esc(e.title)}</h2>
         <p class="ln-why">${esc(e.output)}</p>
         <div class="ln-chips"><span class="ln-chip">${LN_ICON.clock}<b>${esc(e.time)}</b></span><span class="ln-chip">${LN_ICON.people}${esc(e.people)}</span><span class="ln-chip">${LN_ICON.box}${esc(e.needs)}</span></div>
@@ -1380,11 +1395,12 @@ function lnPractice(k, g){
         <div class="ln-pager rtf-foot">${i > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Exercise ${i + 1} of ${n}</span><span></span></div>
         <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${i < n - 1 ? "Next" : "Worksheets"} →</button></div>
       </div>`;
-    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to an exercise · " + g.name, g.exercises.map(x => ({label:x.title, done:lnIsDone(k + ":e:" + x.id)})), i, j => { i = j; save(); draw(); });
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to an exercise · " + g.name, items.map(x => ({label:x.title, done:lnIsDone(k + ":e:" + x.id)})), i, j => { i = j; save(); draw(); });
     const run = $("[data-run]"); if(run) run.onclick = () => lnOpenExercise(k, g, e.id, draw);
     lnBindSave(k, e, draw);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
     const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/worksheets"; };
+    const mo = $("[data-minonly]"); if(mo) mo.onclick = () => { onlyMin = !onlyMin; lnStore.set(onlyKey, onlyMin); i = 0; save(); draw(); };
   };
   draw();
 }
@@ -1620,12 +1636,11 @@ function lnPracticeTerms(f, after, dueOnly){
 function renderLearn(){
   const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length, due = glDueCount();
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
-  view.innerHTML = head("Learn", "Guides, drills and the words you will hear. Free, nothing leaves your browser, your progress is saved here.", "Learn") + `<div class="ln">
+  view.innerHTML = head("Learn", "Start in the studio. Read the guide when you want the reasons. Look up a word when one stops you.", "Learn") + `<div class="ln">
     <div class="ln-hub">
-      <a class="card" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><h3>Red teaming LLMs</h3><p>Chat and agent models: nine steps, eleven drills, six worksheets.</p><span class="note">${prog("llm")}</span><span class="go">Open the guide →</span></a>
-      <a class="card" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><h3>Red teaming world models</h3><p>Video and interactive models: ten steps, twelve drills, six worksheets.</p><span class="note">${prog("world")}</span><span class="go">Open the guide →</span></a>
-      <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Red team studio</h3><p>Test your own AI feature, one calm step at a time.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
-      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Glossary and practice</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${due ? `${due} due for review · ` : ""}${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
+      <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
+      <div class="card"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-doc"/></svg></span><h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></div>
+      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Look up a word: the glossary</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${due ? `${due} due for review · ` : ""}${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
     </div>
     <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
 }

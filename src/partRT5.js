@@ -92,7 +92,7 @@ const RT_BANK = {
     {k:"both", area:"over", q:"A user asks where a named public official's office is. Should the model answer?", opts:["Yes, public offices are public", "No, it is personal information", "Only for elected officials"], a:0, why:"Public, by design. The home address would be the harmful twin."}
   ]
 };
-const RT_JUDGE_NAMES = {grade:"Grade this", move:"Spot the move", fair:"The fair question"};
+const RT_JUDGE_NAMES = {grade:"Grade this", move:"Spot the move", fair:"Pick the fair twin"};
 const RT_DUE_DAYS = [1, 3, 7, 21], RT_DAY_MS = 86400000;
 const rtJ = () => { const j = rt.judge || (rt.judge = {sessions:0, seen:{}, miss:{}, hist:[], cur:null}); if(!j.due) j.due = {}; if(!j.step) j.step = {}; return j; };
 const rtJItems = kind => RT_BANK[kind].map((it, i) => Object.assign({id:kind + "-" + i, kind}, it));
@@ -167,7 +167,7 @@ function rtfHub(){
   const card = (k, title, sub, meta) => `<button type="button" class="rtf-hubc" data-hub="${k}"><b>${title}</b><span>${sub}</span><small>${meta}</small></button>`;
   return `<span class="rtf-eb">What next</span><h2 class="rtf-h2">${f ? "You have a finding. Pick what to do next." : "Pick what to do next."}</h2><p class="rtf-lead">${t ? `${n} of ${t.checklist.length} things tested on ${esc(rt.svc || t.n.toLowerCase())}. ` : ""}Each path takes ten to twenty minutes and ends with something you keep.</p>
     <div class="rtf-hub">
-      ${card("judge", "Learn to judge", "Grade outcomes, spot the move, pick the fair question. Your call, then the expert's.", dueN ? `${dueN} item${dueN === 1 ? "" : "s"} due for review` : (s.total ? `${s.right} of ${s.total} matched so far` : `${rtJPool().length} items ready`))}
+      ${card("judge", "Learn to judge", "Grade outcomes, spot the move, pick the fair twin <i class=\"rtf-term\">benign twin</i>. Your call, then the expert's.", dueN ? `${dueN} item${dueN === 1 ? "" : "s"} due for review` : (s.total ? `${s.right} of ${s.total} matched so far` : `${rtJPool().length} items ready`))}
       ${card("plan", "Plan the week", "A half-page scope, the people, the test sheet, the stop rules and the wellbeing floor. The small-team default.", rt.plan && rt.plan.dated ? "Drafted " + rt.plan.dated : "Not drafted yet")}
       ${card("test", "Keep testing", "One drill per card, ending in what did it do. The sheet becomes your regression checklist.", drills.length ? `${ran} of ${drills.length} drills run` : "Set up first")}
       ${card("show", "Show the work", "A one-page summary in the shape a customer or auditor accepts, and the questionnaire answers.", f ? `${f} finding${f === 1 ? "" : "s"} to report` : "Nothing to report yet")}

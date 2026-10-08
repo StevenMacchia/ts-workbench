@@ -98,6 +98,7 @@ console.log(new Function(src)());
 const body2 = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
+  store.set("rt:seen-intro", true); // the purpose card itself is covered in body12; this body starts past it
   rt = RT_BLANK(); renderRedteamStudio(); if(bad(H())) throw new Error("open card bad: " + where(H()));
   eq(/Find out what your AI model does/.test(H()) && /data-pick="1"/.test(H()), true, "opens on a sixty-second try, not a form");
   eq(/data-rtf="next"/.test(H()), false, "no next button until you try");
@@ -126,6 +127,7 @@ console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("p
 const body3 = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
+  store.set("rt:seen-intro", true);
   rt = RT_BLANK(); renderRedteamStudio(); rtF().openPick = 1; renderRedteamStudio(); eq(/one finding in 20 minutes/.test(H()), true, "after the try, the primary action is your own feature");
   rtGo(1); if(bad(H())) throw new Error("target bad: " + where(H())); eq(/What are you building/.test(H()) && (H().match(/data-target=/g) || []).length === 4, true, "four starter targets");
   rtM1().target = "support"; rt.model = "llm"; rt.areas = {privacy:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtSave(); rtGo(2); eq(/target card/.test(H()) && /What is out of scope/.test(H()), true, "the card asks for scope");
@@ -224,6 +226,7 @@ console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("p
 const body6 = function(){
   const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
+  store.set("rt:seen-intro", true);
   rt = RT_BLANK(); renderRedteamStudio(); rtF().openPick = 1; renderRedteamStudio(); rtGo(1);
   rtM1().target = "support"; rt.model = "llm"; rt.areas = {privacy:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtSave(); rtGo(2);
   rtM1().card = Object.assign({}, RT_TARGETS[0].card); renderRedteamStudio();
@@ -307,9 +310,11 @@ const body8 = function(){
   eq(/undefined|NaN|\[object/.test(h), false, "glossary group renders cleanly");
   eq(/group 1 of \d+/.test(h) && /class="ln-row"/.test(h), true, "glossary terms are grouped A-Z, one group per card, each term a collapsed row");
   renderLearn(); h = view.innerHTML;
-  eq((h.match(/class="card"/g) || []).length, 4, "the learn hub is four cards");
+  eq((h.match(/class="card"/g) || []).length, 3, "the learn hub is three cards: do it, read why, look up a word");
   eq(/ln-how/.test(h), false, "the hub dropped the three-tip explainer block in favour of one sentence per card");
-  out.push("learn section: tabs lost their count pills, practice/worksheets/sources paginate one item at a time, glossary groups A-Z, hub is four one-sentence cards");
+  eq(/Start in the studio\. Read the guide when you want the reasons\. Look up a word when one stops you\./.test(h), true, "the orientation line sits above the three cards");
+  eq(/Do it: the studio/.test(h) && /Read why: the two guides/.test(h) && /Look up a word: the glossary/.test(h), true, "the three cards are do it, read why and look up a word");
+  out.push("learn section: tabs lost their count pills, practice/worksheets/sources paginate one item at a time, glossary groups A-Z, hub is three cards (do it, read why, look up a word) with one orientation line above them");
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body8.toString() + ")();")());
@@ -457,3 +462,75 @@ const body11 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body11.toString() + ")();")());
+// clarity: the purpose card (shown once, Start/Skip, every other card's "How this works"), the five-screen
+// walkthrough, the hub's one orientation sentence and plain engineers'-view label, every card's path-and-
+// position eyebrow, and the move/fair twin/grade vocabulary resolving through both glossaries.
+const body12 = function(){
+  const out = [], bad = h => /undefined|NaN|\[object/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
+  // first visit: the purpose card, before anything else, exactly three lines, two buttons and a skip line
+  rt = RT_BLANK(); renderRedteamStudio(); if(bad(H())) throw new Error("intro bad: " + where(H()));
+  eq(/<span class="rtf-eb">Red team studio<\/span>/.test(H()) && /Find out what your AI feature does when someone tries to misuse it, before a customer does/.test(H()), true, "the purpose card opens with its eyebrow and heading");
+  eq((H().match(/<li>/g) || []).length, 3, "exactly three lines on the purpose card");
+  eq(/Who it's for: a small team with no safety person and a deadline\./.test(H()), true, "who it's for");
+  eq(/What you leave with: a target card, graded tries, a finding, and a one-page summary you can send a customer\./.test(H()), true, "what you leave with");
+  eq(/How long: your first finding in about 20 minutes\./.test(H()), true, "how long");
+  eq(/data-rtf="introstart"/.test(H()) && /data-rtf="introhow"/.test(H()), true, "a Start button and a Show me how it works button");
+  eq(/Already know this\? .*Skip to the menu/.test(H()), true, "a quiet skip-to-menu line");
+  eq(/data-rtf="how"/.test(H()), false, "the purpose card doesn't need its own how-this-works footer link, it already offers the walkthrough");
+  // it shows once: Start marks it seen and lands on the existing first card; a fresh blank plan after that skips it
+  rtIntroMark(); rtSave(); rtGo(0); if(bad(H())) throw new Error("after start bad: " + where(H()));
+  eq(/Find out what your AI model does/.test(H()), true, "Start lands on the existing first card, the sixty-second try");
+  rt = RT_BLANK(); renderRedteamStudio();
+  eq(/<span class="rtf-eb">Red team studio<\/span>/.test(H()), false, "seen once, the purpose card does not show again on a fresh blank plan");
+  // skip-to-menu jumps straight to the hub, and every other card carries the how-this-works link, including
+  // the one card with no footer of its own (the minimal footer added just for the link)
+  store.set("rt:seen-intro", false); rt = RT_BLANK(); renderRedteamStudio();
+  rtIntroMark(); rtSave(); rtGo(rtScreens().findIndex(x => x.k === "hub"));
+  eq(/Pick what to do next/.test(H()), true, "skip to the menu lands on the hub");
+  eq(/data-rtf="how"/.test(H()), true, "the hub card's footer carries the how-this-works link");
+  rtGo(0); eq(/data-rtf="how"/.test(H()) && /class="rtf-foot rtf-foot-min"/.test(H()), true, "the sixty-second try, which has no footer of its own, gets a minimal one just for the link");
+  out.push("intro: the purpose card shows once, with three lines, Start and Show me how it works, and Skip to the menu; How this works lives on every other card's footer");
+  // the walkthrough: five screens, one idea each, static previews built from the studio's own classes, Next/Back and Start only on the last
+  eq(RT_WALK.length, 5, "five walkthrough screens");
+  const heads = RT_WALK.map(s => s.h);
+  eq(heads[0], "You pick what you're testing", "screen 1");
+  eq(heads[1], "You try a move and say what happened", "screen 2");
+  eq(heads[2], "Your call, then the expert's", "screen 3");
+  eq(heads[3], "A finding is a fixed shape anyone can act on", "screen 4");
+  eq(/Then four paths/.test(heads[4]) && /Judge/.test(heads[4]) && /Plan the week/.test(heads[4]) && /Keep testing/.test(heads[4]) && /Show the work/.test(heads[4]), true, "screen 5 names all four paths");
+  for(let i = 0; i < RT_WALK.length; i++){
+    const h = rtWalkHTML(i);
+    if(bad(h)) throw new Error("walkthrough screen " + i + " bad: " + where(h));
+    eq(h.includes(RT_WALK[i].h), true, "screen " + i + " shows its own heading");
+    eq(/data-walk="back"/.test(h), i > 0, "screen " + i + " has a Back button except the first");
+    eq(/data-walk="next"/.test(h), i < RT_WALK.length - 1, "screen " + i + " has a Next button except the last");
+    eq(/data-walk="start"/.test(h), i === RT_WALK.length - 1, "only the last screen offers Start");
+  }
+  out.push("walkthrough: five screens, one idea each, Next/Back, the last one offering Start");
+  // the hub: one orientation sentence naming where you are and the four paths with their time, and a plain, tooltip-free label on the engineers' view link
+  rt = RT_BLANK(); store.set("rt:seen-intro", true); rt.model = "llm"; rt.svc = "Pixelry"; rtM1().target = "support"; rtF(); rtSave();
+  const hub = rtfHub();
+  eq(/You're at the menu/.test(hub), true, "the hub states where the user is");
+  eq(/Judge \(10 minutes\)/.test(hub) && /plan the week \(20 minutes\)/.test(hub) && /keep testing \(15 minutes\)/.test(hub) && /show the work \(10 minutes\)/.test(hub), true, "each of the four paths gets its own time");
+  eq(/Engineers' view \(the same plan as tabs and exports\)/.test(hub), true, "the engineers' view link has a plain, tooltip-free label");
+  eq(/>engineers' view</.test(hub), false, "the old lowercase, tooltip-reliant label is gone");
+  out.push("hub: one orientation sentence naming the four paths and their time, and a plain label on the engineers' view link");
+  // every studio card's eyebrow says which path it belongs to and where in it
+  rt = RT_BLANK(); store.set("rt:seen-intro", true); rtF().skipBasics = true; rtM1().target = "support"; rt.model = "llm"; rt.areas = {fraud:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rt.team = "pair"; rt.time = "afternoon"; rtSave();
+  rtGo(rtScreens().findIndex(x => x.k === "drill")); eq(/Keep testing · Drill 1 of/.test(H()), true, "a drill card's eyebrow names its path");
+  const d1 = rtDrills()[0].id; rt.sess[d1] = {checks:{}, notes:"", started:0}; rtF().drill[d1] = 3; rtFindingFromDrill(d1, 3, "fraud");
+  rtGo(rtScreens().findIndex(x => x.k === "verdict")); eq(/Keep testing · Verdict/.test(H()), true, "the verdict card's eyebrow names its path");
+  rtGo(rtScreens().findIndex(x => x.k === "fix")); eq(/Keep testing · Fix 1 of/.test(H()), true, "a fix card's eyebrow names its path");
+  rtF().path = "method"; rtSave(); rtGo(rtScreens().findIndex(x => x.k === "method")); eq(/The method · 1 of 1/.test(H()), true, "the method card's eyebrow has a path and a position");
+  out.push("every studio card's eyebrow names its path and its position in it");
+  // vocabulary: "move" (tag technique), "fair twin" (tag benign twin) and "grade" (tag severity) resolve through both glossaries
+  eq(RT_TERMS["technique"], "A move: the specific way an attacker tries to get past a refusal, such as framing, multi-turn or obfuscation.", "the hover glossary glosses technique as a move");
+  eq(/^The fair twin:/.test(RT_TERMS["benign twin"]), true, "the hover glossary glosses benign twin as the fair twin");
+  eq(LN_GLOSS.some(t => t[0] === "Fair twin"), true, "a Fair twin alias row resolves to the same entry as Benign twin");
+  eq(LN_GLOSS.some(t => t[0] === "Technique"), true, "a Technique row exists for the studio's move to resolve against");
+  eq(RT_JUDGE_NAMES.fair, "Pick the fair twin", "the judge drill's fair-question kind is labelled with the plain word");
+  out.push("vocabulary: move/technique, fair twin/benign twin and grade/severity resolve together across the hover glossary and the full glossary");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body12.toString() + ")();")());

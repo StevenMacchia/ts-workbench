@@ -183,3 +183,100 @@ rtFlowBind = function(){
   $$("[data-sbgrade]").forEach(b => b.onclick = () => { RT_SB.pick.grade = +b.dataset.sbgrade; renderRedteamStudio(); });
   if(RT_SB.state === "chat" && rtSbStage() === "done") $$("[data-rtf='next']").forEach(b => b.onclick = () => { rtSbFile(); rtGo(rtF().i + 1); });
 };
+/* =========================================================
+   CLARITY: a purpose card the first time anyone opens the studio, a five-screen walkthrough one click away
+   from every card's footer ("How this works"), one orientation sentence on the hub naming where you are and
+   what the four paths are for with the time each takes, and the plain-label fix on the engineers'-view link.
+   No saved-data shape changes: one new store key, tswb:rt:seen-intro, a plain boolean.
+   ========================================================= */
+const rtIntroSeen = () => store.get("rt:seen-intro", false);
+const rtIntroMark = () => store.set("rt:seen-intro", true);
+function rtfIntro(){
+  return `<span class="rtf-eb">Red team studio</span><h1 class="rtf-h1">Find out what your AI feature does when someone tries to misuse it, before a customer does</h1>
+    <ul class="rtf-list rtf-intro-list">
+      <li>Who it's for: a small team with no safety person and a deadline.</li>
+      <li>What you leave with: a target card, graded tries, a finding, and a one-page summary you can send a customer.</li>
+      <li>How long: your first finding in about 20 minutes.</li>
+    </ul>
+    <div class="rtf-act"><button type="button" class="btn primary" data-rtf="introstart">Start</button><button type="button" class="btn" data-rtf="introhow">Show me how it works</button></div>
+    <p class="note">Already know this? <button type="button" class="rtf-link" data-rtf="introskip">Skip to the menu</button>.</p>`;
+}
+// Five screens, one idea each: small, non-interactive previews built from the real UI's own classes (no
+// screenshots). Next/Back move through them; the last screen's button starts the studio, same as the
+// purpose card's own "Start". The demo tour (partDEMO.js, grep "tour") highlights live selectors on a fixed
+// page; the studio is one route with dozens of internal card states, so a selector-based tour would need a
+// selector registered per card rather than per page, which does not fit this round. Skipped; said here.
+const RT_WALK = [
+  {h:"You pick what you're testing", blurb:"Pick the nearest match to what you're building. Everything after this, the moves, the checklist and the first finding, is shaped around it.",
+    prev:() => `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>A support assistant</b><span>Answers customers, reads your help docs and can open tickets or issue refunds.</span></button><button type="button" tabindex="-1"><b>An agent that acts</b><span>Can browse, send, buy, book or change things on the user's behalf.</span></button></div>`},
+  {h:"You try a move and say what happened", blurb:"No typed attacks. You choose a move from a list, try it on your own feature, and say in plain words what happened.",
+    prev:() => `<p class="rtf-lead">Pick a move, run it on your own feature, then say what it did.</p><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>Wrap it in a story <i class="rtf-term">framing</i></b><span>Say it is for a novel or a training deck. The model answers the frame instead of the ask.</span></button></div><p class="rtf-lbl" style="margin-top:10px">What did it do?</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" tabindex="-1" class="${j === 1 ? "on" : ""}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>`},
+  {h:"Your call, then the expert's", blurb:"You grade what happened first, 0 to 4. Then you see the expert's grade on the same thing, with the gap explained.",
+    prev:() => `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>S1</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>S3</b></div></div><div class="learn warn"><div class="learn-h"><svg><use href="#i-info"/></svg>Softer than the expert</div><p>You read the refusal and missed the hint that came with it. That gap is the whole skill.</p></div>`},
+  {h:"A finding is a fixed shape anyone can act on", blurb:"Five parts, the same shape every time. An engineer can act on it without a conversation.",
+    prev:() => `<div class="rt-five">${RT_FIVE.map((label, j) => `<div class="rt-five-r"><b>${esc(label)}</b><p>${esc(["Pixelry assistant: answers customer questions.", "Someone who wants one harmful thing.", "Wrapped the ask in a story.", "The output filter let a fiction frame through.", "A support agent could repeat this at scale."][j])}</p></div>`).join("")}</div>`},
+  {h:"Then four paths: Judge, Plan the week, Keep testing, Show the work", blurb:"After your first finding you land on a menu with four paths. Pick one, come back for another any time.",
+    prev:() => `<div class="rtf-hub"><button type="button" class="rtf-hubc" tabindex="-1"><b>Judge</b><span>Learn to grade calls against the expert.</span><small>10 minutes</small></button><button type="button" class="rtf-hubc" tabindex="-1"><b>Plan the week</b><span>A half-page scope and a test sheet.</span><small>20 minutes</small></button><button type="button" class="rtf-hubc" tabindex="-1"><b>Keep testing</b><span>One drill per card.</span><small>15 minutes</small></button><button type="button" class="rtf-hubc" tabindex="-1"><b>Show the work</b><span>The one-page summary and questionnaire answers.</span><small>10 minutes</small></button></div>`}
+];
+function rtWalkHTML(i){
+  const s = RT_WALK[i];
+  return `<p class="ln-eb">How this works · ${i + 1} of ${RT_WALK.length}</p><h2>${esc(s.h)}</h2><p class="ln-why">${esc(s.blurb)}</p>
+    <div class="ln-body"><div class="rtf-walk-prev" aria-hidden="true">${s.prev()}</div></div>
+    <div class="ln-pager"><div class="row">${i > 0 ? `<button type="button" class="btn" data-walk="back">← Back</button>` : "<span></span>"}</div><div class="row">${i < RT_WALK.length - 1 ? `<button type="button" class="btn primary" data-walk="next">Next →</button>` : `<button type="button" class="btn primary" data-walk="start">Start</button>`}</div></div>`;
+}
+function rtWalkOpen(){
+  let i = 0;
+  // Only the intro card's own screen can still be unseen when this closes: everywhere else, intro was
+  // already marked seen before the "How this works" link could even render, so closing never has to move
+  // the card index to compensate for the purpose card dropping out of rtScreens().
+  const onIntro = () => { const f = rtF(), s = rtScreens(); return !rtIntroSeen() && s[Math.min(f.i, s.length - 1)].k === "intro"; };
+  const draw = () => {
+    lnModal(rtWalkHTML(i));
+    const bg = $("#ln-modal");
+    const back = $("[data-walk='back']", bg); if(back) back.onclick = () => { i = Math.max(0, i - 1); draw(); };
+    const next = $("[data-walk='next']", bg); if(next) next.onclick = () => { i = Math.min(RT_WALK.length - 1, i + 1); draw(); };
+    const start = $("[data-walk='start']", bg); if(start) start.onclick = () => {
+      const fromIntro = onIntro(); lnClose();
+      if(fromIntro){ rtIntroMark(); rtSave(); rtGo(0); }
+    };
+  };
+  draw();
+}
+// Prepend the purpose card ahead of every other screen until it has been seen once
+const rtScreensC = rtScreens;
+rtScreens = function(){ const s = rtScreensC(); return rtIntroSeen() ? s : [{k:"intro"}].concat(s); };
+// The hub gets one orientation sentence (where you are, the four paths and their time) and a plain label on
+// the engineers'-view link, in place of the tooltip-reliant "engineers' view" wording
+const rtfHubC = rtfHub;
+rtfHub = function(){
+  let h = rtfHubC();
+  h = h.replace(">engineers' view<", ">Engineers' view (the same plan as tabs and exports)<");
+  const where = `<p class="rtf-lead rtf-hubwhere">You're at the menu: come back here any time to pick what's next. Judge (10 minutes), plan the week (20 minutes), keep testing (15 minutes) and show the work (10 minutes) each end with something you keep.</p>`;
+  const leadStart = h.indexOf('<p class="rtf-lead">'), leadEnd = leadStart >= 0 ? h.indexOf("</p>", leadStart) : -1;
+  if(leadEnd >= 0) h = h.slice(0, leadEnd + 4) + where + h.slice(leadEnd + 4);
+  return h;
+};
+// Every studio card's footer gets a "How this works" link; the one card with no footer (the sixty-second
+// try) gets a minimal one so the walkthrough is always a single click away, from the first screen on
+const rtFlowHTMLC = rtFlowHTML;
+rtFlowHTML = function(){
+  const screens = rtScreens(), f = rtF(), sc = screens[Math.min(f.i, screens.length - 1)];
+  if(sc.k === "intro") return `<div class="rtf"><section class="card rtf-card" aria-live="polite">${rtfIntro()}</section></div>`;
+  let h = rtFlowHTMLC();
+  const howBtn = `<button type="button" class="rtf-link" data-rtf="how">How this works</button>`;
+  if(h.indexOf('class="rtf-foot"') >= 0) return h.replace('<div class="rtf-foot">', '<div class="rtf-foot">' + howBtn);
+  const at = h.lastIndexOf("</div>");
+  return at < 0 ? h : h.slice(0, at) + `<div class="rtf-foot rtf-foot-min">${howBtn}</div>` + h.slice(at);
+};
+const rtFlowBindC = rtFlowBind;
+rtFlowBind = function(){
+  rtFlowBindC();
+  $$("[data-rtf]").forEach(b => { const a = b.dataset.rtf;
+    if(a === "how") b.onclick = () => rtWalkOpen();
+    if(a === "introstart") b.onclick = () => { rtIntroMark(); rtSave(); rtGo(0); };
+    if(a === "introhow") b.onclick = () => rtWalkOpen();
+    if(a === "introskip") b.onclick = () => { rtIntroMark(); rtSave(); rtGo(rtScreens().findIndex(x => x.k === "hub")); };
+  });
+  // "Start over" also brings the purpose card back
+  $$("[data-rtf='restart']").forEach(b => { const orig = b.onclick; b.onclick = () => { store.set("rt:seen-intro", false); if(orig) orig(); }; });
+};

@@ -105,3 +105,17 @@
 .mx-tabs-sub{margin:8px 0 0;max-width:70ch}
 /* Overview: the "All tools" stage filter, so the grid stays scannable as it grows */
 .ov-stagef{display:inline-flex;margin:14px 0 4px}
+
+/* clarity: Red team studio purpose card, walkthrough previews and the always-there "How this works" link */
+.rtf-intro-list li{margin-bottom:4px}
+.rtf-foot-min{justify-content:flex-start}
+/* A small, non-interactive preview built from the studio's own card classes: scaled down and dimmed, with */
+/* clicks disabled, so a walkthrough screen shows the real UI without a screenshot. */
+.rtf-walk-prev{position:relative;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);pointer-events:none;user-select:none}
+.rtf-walk-prev::after{content:"";position:absolute;inset:0;border-radius:14px;background:transparent}
+.rtf-walk-prev .rtf-opts,.rtf-walk-prev .rtf-hub{margin-top:10px}
+.rtf-walk-prev button{cursor:default}
+/* The hub's one-sentence orientation line sits just under the lead paragraph, in the same muted tone */
+.rtf-hubwhere{margin-top:8px}
+/* Learn guides: the minimum-path banner on the first Practice card */
+.ln-minpath{display:flex;flex-wrap:wrap;align-items:center;gap:8px}

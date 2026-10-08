@@ -476,7 +476,8 @@ function rtPractice(kind){
 }
 // Plain-English terms this tool uses, explained on hover (registered on first render; the glossary helper loads later in the bundle)
 const RT_TERMS = ({
-  "benign twin":"A legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow.",
+  "benign twin":"The fair twin: a legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow.",
+  "technique":"A move: the specific way an attacker tries to get past a refusal, such as framing, multi-turn or obfuscation.",
   "coverage grid":"Harm areas down the side, techniques and surfaces across the top. A blank cell is an untested cell.",
   "release gate":"A condition that must be true to ship, agreed in writing before testing starts.",
   "over-refusal":"Refusing a benign request. A safety fix that raises this is not free.",

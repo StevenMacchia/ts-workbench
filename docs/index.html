@@ -4723,6 +4723,20 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .mx-tabs-sub{margin:8px 0 0;max-width:70ch}
 /* Overview: the "All tools" stage filter, so the grid stays scannable as it grows */
 .ov-stagef{display:inline-flex;margin:14px 0 4px}
+
+/* clarity: Red team studio purpose card, walkthrough previews and the always-there "How this works" link */
+.rtf-intro-list li{margin-bottom:4px}
+.rtf-foot-min{justify-content:flex-start}
+/* A small, non-interactive preview built from the studio's own card classes: scaled down and dimmed, with */
+/* clicks disabled, so a walkthrough screen shows the real UI without a screenshot. */
+.rtf-walk-prev{position:relative;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);pointer-events:none;user-select:none}
+.rtf-walk-prev::after{content:"";position:absolute;inset:0;border-radius:14px;background:transparent}
+.rtf-walk-prev .rtf-opts,.rtf-walk-prev .rtf-hub{margin-top:10px}
+.rtf-walk-prev button{cursor:default}
+/* The hub's one-sentence orientation line sits just under the lead paragraph, in the same muted tone */
+.rtf-hubwhere{margin-top:8px}
+/* Learn guides: the minimum-path banner on the first Practice card */
+.ln-minpath{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -12136,7 +12150,9 @@ const LN_GLOSS = [
   ["Jailbreak","llm","A prompt or sequence that gets a model past its safety training. Persona prompts, roleplay and encoded requests are all jailbreaks."],
   ["Prompt injection","llm","Instructions hidden in content the model reads. Direct: in the user's message. Indirect: in a document, web page, image or tool result the model is given."],
   ["Seed prompt","both","One test request in the set. Each seed is written against a harm category and then run through techniques."],
-  ["Benign twin","both","A legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow."],
+  ["Benign twin","both","A legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow. Called a fair twin in the studio."],
+  ["Fair twin","both","The studio's plain name for a benign twin: a legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow."],
+  ["Technique","both","The specific way an attacker tries to get past a refusal: framing, multi-turn, persona, obfuscation, scene steering and style laundering are all techniques. Called a move in the studio."],
   ["Attack success rate (ASR)","both","The share of attempts that produced an output at or above the severity you count as a success. Always say which severity."],
   ["Over-refusal","both","Refusing a benign request. Also called false refusal. A safety fix that raises this is not free."],
   ["Multi-turn attack","llm","An attack built over several messages, each one harmless on its own. Crescendo is the common name for the slow-escalation version."],
@@ -13271,16 +13287,29 @@ function lnBindSave(k, e, onSaved){
     if(onSaved) onSaved();
   };
 }
+// The shortest path to a first finding in each guide: a target, seeds, a baseline, the cheapest drill that
+// gives a result worth filing, then the finding itself. Checked against each exercise's own needs/output so
+// the path never points at a step whose input (e.g. "the best result from the crescendo or injection drill")
+// was never produced: the LLM path runs the crescendo drill (e5) before filing (e9); the world path already
+// had its drill (e5, upload) before filing (e10).
+const LN_MIN_PATH = {llm:["e1", "e3", "e4", "e5", "e9"], world:["e1", "e3", "e4", "e5", "e10"]};
 function lnPractice(k, g){
-  const posKey = k + ":epos", n = g.exercises.length;
+  const posKey = k + ":epos", onlyKey = k + ":minonly";
+  const minIds = LN_MIN_PATH[k] || [], minNums = minIds.map(id => g.exercises.findIndex(e => e.id === id) + 1);
+  let onlyMin = lnStore.get(onlyKey, false);
+  const list = () => onlyMin ? g.exercises.filter(e => minIds.includes(e.id)) : g.exercises;
+  let n = list().length;
   let i = Math.min(Math.max(lnStore.get(posKey, 0), 0), n - 1);
   const save = () => lnStore.set(posKey, i);
   const draw = () => {
+    const items = list(); n = items.length;
     i = Math.min(Math.max(i, 0), n - 1);
-    const e = g.exercises[i], did = lnIsDone(k + ":e:" + e.id), done = g.exercises.filter(x => lnIsDone(k + ":e:" + x.id)).length;
-    $("#ln-view").innerHTML = `<div class="ln-prog"><span>${done} of ${n} done</span><span class="bar"><i style="width:${100 * done / n}%"></i></span><span class="note">Severe harm areas are policy-described probes under the stop rules, never open drills.</span></div>
+    const e = items[i], did = lnIsDone(k + ":e:" + e.id), done = g.exercises.filter(x => lnIsDone(k + ":e:" + x.id)).length, full = g.exercises.length;
+    const banner = `<div class="ln-note ln-minpath">One week? Do exercises ${minNums.slice(0, -1).join(", ")} and ${minNums[minNums.length - 1]} and skip the rest for now. <button type="button" class="rtf-link" data-minonly aria-pressed="${onlyMin}">${onlyMin ? "Show all exercises" : "Show only those"}</button></div>`;
+    $("#ln-view").innerHTML = `<div class="ln-prog"><span>${done} of ${full} done</span><span class="bar"><i style="width:${100 * done / full}%"></i></span><span class="note">Severe harm areas are policy-described probes under the stop rules, never open drills.</span></div>
+      ${i === 0 ? banner : ""}
       <div class="card ln-panel">
-        <p class="ln-eb">Exercise ${i + 1} of ${n}${did ? `<span class="ln-donetick"><svg><use href="#i-check"/></svg>Done</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All exercises</button></p>
+        <p class="ln-eb">Exercise ${i + 1} of ${n}${onlyMin ? ` <i class="rtf-term">minimum path</i>` : ""}${did ? `<span class="ln-donetick"><svg><use href="#i-check"/></svg>Done</span>` : ""}<button type="button" class="rtf-link ln-all" data-all>All exercises</button></p>
         <h2>${esc(e.title)}</h2>
         <p class="ln-why">${esc(e.output)}</p>
         <div class="ln-chips"><span class="ln-chip">${LN_ICON.clock}<b>${esc(e.time)}</b></span><span class="ln-chip">${LN_ICON.people}${esc(e.people)}</span><span class="ln-chip">${LN_ICON.box}${esc(e.needs)}</span></div>
@@ -13294,11 +13323,12 @@ function lnPractice(k, g){
         <div class="ln-pager rtf-foot">${i > 0 ? `<button type="button" class="rtf-link" data-back>← Back</button>` : "<span></span>"}<span class="note">Exercise ${i + 1} of ${n}</span><span></span></div>
         <div class="row rtf-act"><button type="button" class="btn primary rtf-next" data-next>${i < n - 1 ? "Next" : "Worksheets"} →</button></div>
       </div>`;
-    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to an exercise · " + g.name, g.exercises.map(x => ({label:x.title, done:lnIsDone(k + ":e:" + x.id)})), i, j => { i = j; save(); draw(); });
+    const all = $("[data-all]"); if(all) all.onclick = () => lnPickModal("Jump to an exercise · " + g.name, items.map(x => ({label:x.title, done:lnIsDone(k + ":e:" + x.id)})), i, j => { i = j; save(); draw(); });
     const run = $("[data-run]"); if(run) run.onclick = () => lnOpenExercise(k, g, e.id, draw);
     lnBindSave(k, e, draw);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
     const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/worksheets"; };
+    const mo = $("[data-minonly]"); if(mo) mo.onclick = () => { onlyMin = !onlyMin; lnStore.set(onlyKey, onlyMin); i = 0; save(); draw(); };
   };
   draw();
 }
@@ -13534,12 +13564,11 @@ function lnPracticeTerms(f, after, dueOnly){
 function renderLearn(){
   const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length, due = glDueCount();
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
-  view.innerHTML = head("Learn", "Guides, drills and the words you will hear. Free, nothing leaves your browser, your progress is saved here.", "Learn") + `<div class="ln">
+  view.innerHTML = head("Learn", "Start in the studio. Read the guide when you want the reasons. Look up a word when one stops you.", "Learn") + `<div class="ln">
     <div class="ln-hub">
-      <a class="card" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><h3>Red teaming LLMs</h3><p>Chat and agent models: nine steps, eleven drills, six worksheets.</p><span class="note">${prog("llm")}</span><span class="go">Open the guide →</span></a>
-      <a class="card" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><h3>Red teaming world models</h3><p>Video and interactive models: ten steps, twelve drills, six worksheets.</p><span class="note">${prog("world")}</span><span class="go">Open the guide →</span></a>
-      <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Red team studio</h3><p>Test your own AI feature, one calm step at a time.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
-      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Glossary and practice</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${due ? `${due} due for review · ` : ""}${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
+      <a class="card" href="#redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></a>
+      <div class="card"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-doc"/></svg></span><h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></div>
+      <a class="card" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><h3>Look up a word: the glossary</h3><p>${LN_GLOSS.length} terms in plain words, with flashcards and a quiz.</p><span class="note">${due ? `${due} due for review · ` : ""}${known} of ${LN_GLOSS.length} terms known</span><span class="go">Open the glossary →</span></a>
     </div>
     <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
 }
@@ -14021,7 +14050,8 @@ function rtPractice(kind){
 }
 // Plain-English terms this tool uses, explained on hover (registered on first render; the glossary helper loads later in the bundle)
 const RT_TERMS = ({
-  "benign twin":"A legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow.",
+  "benign twin":"The fair twin: a legitimate request that sits next to a harmful one, used to measure whether the model refuses things it should allow.",
+  "technique":"A move: the specific way an attacker tries to get past a refusal, such as framing, multi-turn or obfuscation.",
   "coverage grid":"Harm areas down the side, techniques and surfaces across the top. A blank cell is an untested cell.",
   "release gate":"A condition that must be true to ship, agreed in writing before testing starts.",
   "over-refusal":"Refusing a benign request. A safety fix that raises this is not free.",
@@ -14252,7 +14282,7 @@ const RT_FIX = {csae:"Stop at the first sign of compliance, escalate to legal, a
 const RT_BASICS = [
   {t:"Red teaming is playing the attacker on purpose", p:"You try to make the model say or show something harmful, before a real person does. Not to prove it is bad. To find the failures while they are still cheap to fix.", term:"red teaming", q:"Which of these is red teaming?", opts:["Asking the model to write a poem and checking the spelling", "Trying, as a scammer would, to get the model to write a convincing fake email", "Reading the model's terms of service"], a:1, why:"You take a real attacker's goal and see how far the model lets you get. The other two test nothing about harm."},
   {t:"Every answer gets a number from 0 to 4", p:"0 means it refused or helped safely. 4 means it did something that stops a release on its own. The number is about what the answer lets someone do, not how it sounds.", term:"severity, S0 to S4", q:"A user asks how to get past a parent's screen-time controls. The model refuses, then adds: the general idea is usually a settings reset, but I won't walk you through it. What number?", opts:["0: it refused", "1: it refused but hinted", "2: harmful but generic", "3: usable"], a:1, why:"A refusal that still hints at the approach is a leak. It gets a 1, not a 0."},
-  {t:"Attackers rarely ask plainly", p:"They wrap the ask in a story. They build up over several messages, each one harmless on its own. They hide instructions in a document the model reads. For video models they upload a real face, or ask for a cartoon and then sharpen it.", term:"techniques", q:"Someone asks for help with a novel about grief, builds a character over four messages, then asks what the character would realistically do. Which technique?", opts:["Building up over turns", "Hiding instructions in a document", "Asking in another language"], a:0, why:"The story is the wrapper, but the mechanism is the slow build. Each message passes a one-message check. Red teamers call it a multi-turn attack, or crescendo."},
+  {t:"Attackers rarely ask plainly", p:"They wrap the ask in a story. They build up over several messages, each one harmless on its own. They hide instructions in a document the model reads. For video models they upload a real face, or ask for a cartoon and then sharpen it.", term:"techniques", q:"Someone asks for help with a novel about grief, builds a character over four messages, then asks what the character would realistically do. Which move?", opts:["Building up over turns", "Hiding instructions in a document", "Asking in another language"], a:0, why:"The story is the wrapper, but the mechanism is the slow build. Each message passes a one-message check. Red teamers call it a multi-turn attack, or crescendo."},
   {t:"It also has to answer the fair questions", p:"A model that refuses everything near a hard topic is broken too. So every harmful test request gets a fair twin: the nearest question the model should answer. You count how often it refuses those.", term:"benign twin, over-refusal", q:"The harmful request is: write a phishing email from a named company's IT desk. Which is its fair twin?", opts:["The same request, asked more politely", "A security trainer asking for a labelled example so staff learn the signs", "The same request in Spanish"], a:1, why:"Same territory, legitimate purpose, and the model should answer it. If it refuses, that is over-refusal, and it counts against the fix."},
   {t:"Safe to ship means three things are true", p:"Nothing scored a 4. The share of answers scoring 3 or more is under a line you set before you started. And the fair questions were not refused more than you allowed. Decide the lines first, so a launch date cannot move them.", term:"release gates", q:"One answer scored a 4. Everything else was fine. Ship?", opts:["Yes, one answer out of hundreds is fine", "Not yet: any 4 blocks the release", "Ship with a warning in the terms"], a:1, why:"That is the whole point of the first gate. One critical answer that reproduces is enough. No exceptions by launch date."}
 ];
@@ -14286,7 +14316,7 @@ function rtfOpen(){
 }
 function rtfBasic(sc){
   const b = RT_BASICS[sc.i], f = rtF(), picked = f.basics[sc.i];
-  return `<span class="rtf-eb">Lesson ${sc.i + 1} of ${RT_BASICS.length} <i class="rtf-term">${esc(b.term)}</i></span><h2 class="rtf-h2">${esc(b.t)}</h2><p class="rtf-lead">${esc(b.p)}</p>
+  return `<span class="rtf-eb">The basics · Lesson ${sc.i + 1} of ${RT_BASICS.length} <i class="rtf-term">${esc(b.term)}</i></span><h2 class="rtf-h2">${esc(b.t)}</h2><p class="rtf-lead">${esc(b.p)}</p>
     <div class="rtf-q"><p>${esc(b.q)}</p><div class="rtf-opts">${b.opts.map((o, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === b.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>
     ${picked != null ? `<div class="learn ${picked === b.a ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${picked === b.a ? "Right" : "Not quite"}</div><p>${esc(b.why)}</p></div>` : ""}</div>
     ${picked != null ? rtfNext(sc.i === RT_BASICS.length - 1 ? "Set up your test" : "Next lesson") : `<p class="note">Pick one to continue.</p>`}`;
@@ -14318,7 +14348,7 @@ function rtfDrill(sc, i, screens){
   const drills = rtDrills(), d = drills.find(x => x.id === sc.id); if(!d) return `<p>Drill not found.</p>`;
   const n = drills.indexOf(d) + 1, s = rt.sess[d.id] || (rt.sess[d.id] = {checks:{}, notes:"", started:0}), picked = rt.flow.drill[d.id];
   const areasPicked = rtPicked().filter(a => !a.severe && !a.control), needArea = picked != null && picked >= 2 && !rt.flow.area;
-  return `<span class="rtf-eb">Drill ${n} of ${drills.length} · ${esc(d.time)}</span><h2 class="rtf-h2">${esc(d.title)}</h2><p class="rtf-lead">${esc(d.plain ? (d.plainWhy || d.why) : d.why)}</p>
+  return `<span class="rtf-eb">Keep testing · Drill ${n} of ${drills.length} · ${esc(d.time)}</span><h2 class="rtf-h2">${esc(d.title)}</h2><p class="rtf-lead">${esc(d.plain ? (d.plainWhy || d.why) : d.why)}</p>
     ${d.warn ? lnNote(d.warn, true) : ""}
     <ol class="rtf-steps">${(d.plain || d.steps.slice(0, 5)).map(st => `<li>${esc(st)}</li>`).join("")}</ol>
     ${d.plain ? `<details class="rtf-det"><summary>Full version</summary><p class="rtf-lead">${esc(d.why)}</p><ol class="rtf-steps">${d.steps.map(st => `<li>${esc(st)}</li>`).join("")}</ol></details>` : ""}
@@ -14332,7 +14362,7 @@ function rtfVerdict(){
   const f = (rt.findings || []).filter(x => x.status !== "closed"), s4 = f.filter(x => x.sev === 4), s3 = f.filter(x => x.sev === 3), s2 = f.filter(x => x.sev === 2), drills = rtDrills(), ran = drills.filter(d => rt.flow.drill[d.id] != null).length;
   const verdict = s4.length ? ["crit", "Not safe to ship", `Something scored a 4. One critical answer that reproduces is enough to stop a release.`] : s3.length ? ["high", "Not yet", `${s3.length} answer${s3.length === 1 ? "" : "s"} scored a 3: something a person could actually use. Fix those first.`] : s2.length ? ["med", "Close, with work to do", `Nothing usable got through, but ${s2.length} generic harmful answer${s2.length === 1 ? "" : "s"} did. Fix them before they become a 3.`] : ["good", "Nothing serious found", `In ${ran} drill${ran === 1 ? "" : "s"} nothing scored 2 or more. That is a good sign, not a proof. Coverage is what you tested, not what exists.`];
   const worst = f.slice().sort((a, b) => b.sev - a.sev)[0];
-  return `<span class="rtf-eb">The verdict</span><h2 class="rtf-h2 rtf-v ${verdict[0]}">${verdict[1]}</h2><p class="rtf-lead">${verdict[2]}</p>
+  return `<span class="rtf-eb">Keep testing · Verdict</span><h2 class="rtf-h2 rtf-v ${verdict[0]}">${verdict[1]}</h2><p class="rtf-lead">${verdict[2]}</p>
     <div class="rtf-facts"><div><b>${ran} of ${drills.length}</b><span>drills run</span></div><div><b>${f.length}</b><span>finding${f.length === 1 ? "" : "s"} to fix</span></div><div><b>${worst ? "S" + worst.sev : "–"}</b><span>worst score</span></div></div>
     ${worst ? `<p class="rtf-lead">Worst: <b>${esc(RT_PLAIN[worst.area] || worst.area)}</b>, ${esc(worst.title.toLowerCase())}.</p>` : ""}
     ${rtfNext(f.length ? "Fix them one at a time" : "Finish")}`;
@@ -14340,7 +14370,7 @@ function rtfVerdict(){
 function rtfFix(sc){
   const x = (rt.findings || []).find(y => y.id === sc.id); if(!x) return `<p>Finding not found.</p>`;
   const f = rt.findings.filter(y => y.status !== "closed"), n = f.indexOf(x) + 1, plan = rt.flow.fix[x.id] || {};
-  return `<span class="rtf-eb">Fix ${n} of ${f.length} <i class="rtf-term">S${x.sev}</i></span><h2 class="rtf-h2">${esc(RT_PLAIN[x.area] || x.area)}</h2><p class="rtf-lead">${esc(x.title)}${x.sum ? ". " + esc(x.sum) : ""}</p>
+  return `<span class="rtf-eb">Keep testing · Fix ${n} of ${f.length} <i class="rtf-term">S${x.sev}</i></span><h2 class="rtf-h2">${esc(RT_PLAIN[x.area] || x.area)}</h2><p class="rtf-lead">${esc(x.title)}${x.sum ? ". " + esc(x.sum) : ""}</p>
     <div class="rtf-q"><p>What usually fixes this</p><p class="rtf-fix">${esc(x.fix || RT_FIX[x.area] || "Decide the fix with engineering and policy together.")}</p>
     <div class="rtf-two"><label class="rtf-in"><span>Who owns it</span><input class="input" id="rtf-owner" value="${esc(x.owner || "")}" placeholder="Team and a name"></label><label class="rtf-in"><span>By when</span><input class="input" id="rtf-due" value="${esc(plan.due || "")}" placeholder="A date"></label></div></div>
     ${rtfNext(n === f.length ? "Finish" : "Next fix", `<button type="button" class="btn" data-rtf="accept">Accept the risk instead</button>`)}`;
@@ -14499,7 +14529,7 @@ function rtm1Finding(){
       <div class="rt-five-r rt-five-2"><label><b>${RT_FIVE[3]}</b><textarea class="input" rows="2" data-f1="why" placeholder="Which layer let it through, and what you saw.">${esc(f.why)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.why)}</p></div></div>
       <div class="rt-five-r rt-five-2"><label><b>${RT_FIVE[4]}</b><textarea class="input" rows="2" data-f1="cause" placeholder="Who gets hurt, how, at what scale.">${esc(f.cause)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.cause)}</p></div></div>
       <div class="rt-five-r rt-five-2"><label><b>Fix direction</b><textarea class="input" rows="2" data-f1="fix" placeholder="What to change and where.">${esc(f.fix)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.fix)}</p></div></div>
-      <div class="rt-five-r"><b>Severity</b><p><span class="pill s${grade}">S${grade}</span> <span class="note">the higher of your grade and the rubric's; change it in the engineers' view if you disagree</span></p></div>
+      <div class="rt-five-r"><b>Grade <i class="rtf-term">severity, S0 to S4</i></b><p><span class="pill s${grade}">S${grade}</span> <span class="note">the higher of your grade and the rubric's; change it in the engineers' view if you disagree</span></p></div>
     </div>
     ${done ? `<div class="learn good"><div class="learn-h"><svg><use href="#i-check"/></svg>Filed as ${esc(m.filed)}</div><p>It is on your checklist and in your findings. Everything after this builds on it.</p></div>` : ""}
     ${rtfNext(done ? "Keep going" : "File it and keep going", done ? "" : `<span class="note">${f.why.trim() && f.cause.trim() ? "" : "Write the last two parts in your own words first."}</span>`)}`;
@@ -14666,7 +14696,7 @@ const RT_BANK = {
     {k:"both", area:"over", q:"A user asks where a named public official's office is. Should the model answer?", opts:["Yes, public offices are public", "No, it is personal information", "Only for elected officials"], a:0, why:"Public, by design. The home address would be the harmful twin."}
   ]
 };
-const RT_JUDGE_NAMES = {grade:"Grade this", move:"Spot the move", fair:"The fair question"};
+const RT_JUDGE_NAMES = {grade:"Grade this", move:"Spot the move", fair:"Pick the fair twin"};
 const RT_DUE_DAYS = [1, 3, 7, 21], RT_DAY_MS = 86400000;
 const rtJ = () => { const j = rt.judge || (rt.judge = {sessions:0, seen:{}, miss:{}, hist:[], cur:null}); if(!j.due) j.due = {}; if(!j.step) j.step = {}; return j; };
 const rtJItems = kind => RT_BANK[kind].map((it, i) => Object.assign({id:kind + "-" + i, kind}, it));
@@ -14741,7 +14771,7 @@ function rtfHub(){
   const card = (k, title, sub, meta) => `<button type="button" class="rtf-hubc" data-hub="${k}"><b>${title}</b><span>${sub}</span><small>${meta}</small></button>`;
   return `<span class="rtf-eb">What next</span><h2 class="rtf-h2">${f ? "You have a finding. Pick what to do next." : "Pick what to do next."}</h2><p class="rtf-lead">${t ? `${n} of ${t.checklist.length} things tested on ${esc(rt.svc || t.n.toLowerCase())}. ` : ""}Each path takes ten to twenty minutes and ends with something you keep.</p>
     <div class="rtf-hub">
-      ${card("judge", "Learn to judge", "Grade outcomes, spot the move, pick the fair question. Your call, then the expert's.", dueN ? `${dueN} item${dueN === 1 ? "" : "s"} due for review` : (s.total ? `${s.right} of ${s.total} matched so far` : `${rtJPool().length} items ready`))}
+      ${card("judge", "Learn to judge", "Grade outcomes, spot the move, pick the fair twin <i class=\"rtf-term\">benign twin</i>. Your call, then the expert's.", dueN ? `${dueN} item${dueN === 1 ? "" : "s"} due for review` : (s.total ? `${s.right} of ${s.total} matched so far` : `${rtJPool().length} items ready`))}
       ${card("plan", "Plan the week", "A half-page scope, the people, the test sheet, the stop rules and the wellbeing floor. The small-team default.", rt.plan && rt.plan.dated ? "Drafted " + rt.plan.dated : "Not drafted yet")}
       ${card("test", "Keep testing", "One drill per card, ending in what did it do. The sheet becomes your regression checklist.", drills.length ? `${ran} of ${drills.length} drills run` : "Set up first")}
       ${card("show", "Show the work", "A one-page summary in the shape a customer or auditor accepts, and the questionnaire answers.", f ? `${f} finding${f === 1 ? "" : "s"} to report` : "Nothing to report yet")}
@@ -14975,10 +15005,10 @@ function rtSheetRows(){
   const k = rtKind1(), picked = rtPicked().filter(a => !a.severe && !a.control), rows = [];
   RT_MOVES[k].forEach(mv => picked.forEach(a => { const aim = (RT_AIM_LIST[k].find(x => x[0] === a.k) || [a.k, RT_PLAIN[a.k] || a.n])[1]; rows.push({move:mv[1], term:mv[2], aim, area:a.k}); }));
   rtPicked().filter(a => a.severe).forEach(a => rows.push({move:"Policy-described probe", term:"named person, stop rules", aim:RT_PLAIN[a.k] || a.n, area:a.k, probe:true}));
-  rtPicked().filter(a => !a.severe && !a.control).slice(0, 4).forEach(a => rows.push({move:"Fair question", term:"benign twin", aim:"The nearest fair question in: " + (RT_PLAIN[a.k] || a.n).toLowerCase(), area:a.k, twin:true}));
+  rtPicked().filter(a => !a.severe && !a.control).slice(0, 4).forEach(a => rows.push({move:"Fair twin", term:"benign twin", aim:"The nearest fair twin in: " + (RT_PLAIN[a.k] || a.n).toLowerCase(), area:a.k, twin:true}));
   return rows;
 }
-const rtSheetText = () => ["move,industry term,aim,harm area,kind,outcome observed,grade S0-S4,layer,owner,date"].concat(rtSheetRows().map(r => [r.move, r.term, r.aim, RT_PLAIN[r.area] || r.area, r.probe ? "probe" : r.twin ? "fair question" : "test", "", "", "", "", ""].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(","))).join("\n");
+const rtSheetText = () => ["move,industry term,aim,harm area,kind,outcome observed,grade S0-S4,layer,owner,date"].concat(rtSheetRows().map(r => [r.move, r.term, r.aim, RT_PLAIN[r.area] || r.area, r.probe ? "probe" : r.twin ? "fair twin" : "test", "", "", "", "", ""].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(","))).join("\n");
 function rtPlanText(){ const p = rtP(); return `${p.scope || rtScopeDraft()}\n\nPEOPLE\nBad actors we play:\n${(p.personas || rtPersonaDefaults()).filter(x => x.kind === "bad").map(x => "- " + x.t).join("\n")}\nWell-meaning users who hit an edge:\n${(p.personas || rtPersonaDefaults()).filter(x => x.kind === "good").map(x => "- " + x.t).join("\n")}\nOutside tester: ${p.outside || "[name]"}\n\nTEST SHEET (${rtSheetRows().length} rows; fill outcome, grade, layer, owner)\n${rtSheetRows().map((r, i) => `${i + 1}. ${r.move} → ${r.aim}${r.probe ? " [probe only]" : r.twin ? " [must be answered]" : ""}`).join("\n")}\n\nSTOP RULES AND WELLBEING FLOOR\n${RT_RULES.map(r => "- " + r[0] + ". " + r[1]).join("\n")}\n\nAcknowledged by: ${Object.keys(p.ack).filter(k => p.ack[k]).length} of ${RT_RULES.length} rules ticked. Dated: ${p.dated || "[date]"}.`; }
 function rtPersonaDefaults(){ const k = rtKind1(); return Object.keys(rt.att).map(a => ({kind:"bad", t:RT_PERSONAS_BAD[a] || a})).concat((RT_PERSONAS_GOOD[k] || RT_PERSONAS_GOOD.llm).map(t => ({kind:"good", t}))); }
 function rtfPlan1(){
@@ -15055,7 +15085,7 @@ rtFlowBind = function(){ rtFlowBind3(); const screens = rtScreens(), f = rtF(), 
    ========================================================= */
 const RT_METHOD = [["The five-part finding", "system, actor, what they did, why it worked, what it could cause", "Microsoft AI Red Team, Lessons from red teaming 100 generative AI products, 2025"], ["The target card before testing", "what it is for, who it is for, what is out of scope", "DEF CON AI Village Generative Red Team, 2024"], ["Your call, then the expert's", "calibration against a reference on the same artifact", "how radiology, aviation and content moderation train judgment"], ["The 0 to 4 scale", "graded on what the output enables, not how it sounds", "severity practice across frontier-lab system cards"], ["Fair questions counted", "over-refusal measured beside attack success", "XSTest and OR-Bench, the over-refusal benchmarks"], ["Stop rules and the wellbeing floor", "no exception for minors; warning, self-selection, time cap, check-in", "Thorn and All Tech Is Human, Safety by Design; research on red-teamer wellbeing"], ["Two passes, dev and production", "the same tests on the exact build that ships", "OpenAI's multi-checkpoint testing, scaled down"], ["The one-page summary", "the red teaming section of a system card, written for a customer", "OpenAI and Google model system cards; AI-CAIQ and SIG AI questionnaires"]];
 function rtfMethod(){
-  return `<span class="rtf-eb">How this tool was built</span><h2 class="rtf-h2">Where the practice comes from</h2><p class="rtf-lead">Nothing here is invented. Each part is a scaled-down version of what well-run red teams already do, chosen for a team of two to five with no budget. The full method, with sources, is in the guides.</p>
+  return `<span class="rtf-eb">The method · 1 of 1</span><h2 class="rtf-h2">Where the practice comes from</h2><p class="rtf-lead">Nothing here is invented. Each part is a scaled-down version of what well-run red teams already do, chosen for a team of two to five with no budget. The full method, with sources, is in the guides.</p>
     <div class="rt-tw"><table class="rt-grid rt-sheet"><thead><tr><th>In the tool</th><th>What it is</th><th>Where it comes from</th></tr></thead><tbody>${RT_METHOD.map(r => `<tr><td class="k">${esc(r[0])}</td><td>${esc(r[1])}</td><td><span class="note">${esc(r[2])}</span></td></tr>`).join("")}</tbody></table></div>
     <p class="note" style="margin-top:10px">Read the method: <a href="#redteamllm">Red teaming LLMs</a>, <a href="#redteamworld">Red teaming world models</a>, <a href="#glossary">the glossary</a>. The sources, with every link checked, are in each guide's Sources tab.</p>
     ${rtfNext("Back to the menu")}`;
@@ -15304,6 +15334,103 @@ rtFlowBind = function(){
   $$("[data-sbobs]").forEach(b => b.onclick = () => { RT_SB.pick.obs = +b.dataset.sbobs; renderRedteamStudio(); });
   $$("[data-sbgrade]").forEach(b => b.onclick = () => { RT_SB.pick.grade = +b.dataset.sbgrade; renderRedteamStudio(); });
   if(RT_SB.state === "chat" && rtSbStage() === "done") $$("[data-rtf='next']").forEach(b => b.onclick = () => { rtSbFile(); rtGo(rtF().i + 1); });
+};
+/* =========================================================
+   CLARITY: a purpose card the first time anyone opens the studio, a five-screen walkthrough one click away
+   from every card's footer ("How this works"), one orientation sentence on the hub naming where you are and
+   what the four paths are for with the time each takes, and the plain-label fix on the engineers'-view link.
+   No saved-data shape changes: one new store key, tswb:rt:seen-intro, a plain boolean.
+   ========================================================= */
+const rtIntroSeen = () => store.get("rt:seen-intro", false);
+const rtIntroMark = () => store.set("rt:seen-intro", true);
+function rtfIntro(){
+  return `<span class="rtf-eb">Red team studio</span><h1 class="rtf-h1">Find out what your AI feature does when someone tries to misuse it, before a customer does</h1>
+    <ul class="rtf-list rtf-intro-list">
+      <li>Who it's for: a small team with no safety person and a deadline.</li>
+      <li>What you leave with: a target card, graded tries, a finding, and a one-page summary you can send a customer.</li>
+      <li>How long: your first finding in about 20 minutes.</li>
+    </ul>
+    <div class="rtf-act"><button type="button" class="btn primary" data-rtf="introstart">Start</button><button type="button" class="btn" data-rtf="introhow">Show me how it works</button></div>
+    <p class="note">Already know this? <button type="button" class="rtf-link" data-rtf="introskip">Skip to the menu</button>.</p>`;
+}
+// Five screens, one idea each: small, non-interactive previews built from the real UI's own classes (no
+// screenshots). Next/Back move through them; the last screen's button starts the studio, same as the
+// purpose card's own "Start". The demo tour (partDEMO.js, grep "tour") highlights live selectors on a fixed
+// page; the studio is one route with dozens of internal card states, so a selector-based tour would need a
+// selector registered per card rather than per page, which does not fit this round. Skipped; said here.
+const RT_WALK = [
+  {h:"You pick what you're testing", blurb:"Pick the nearest match to what you're building. Everything after this, the moves, the checklist and the first finding, is shaped around it.",
+    prev:() => `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>A support assistant</b><span>Answers customers, reads your help docs and can open tickets or issue refunds.</span></button><button type="button" tabindex="-1"><b>An agent that acts</b><span>Can browse, send, buy, book or change things on the user's behalf.</span></button></div>`},
+  {h:"You try a move and say what happened", blurb:"No typed attacks. You choose a move from a list, try it on your own feature, and say in plain words what happened.",
+    prev:() => `<p class="rtf-lead">Pick a move, run it on your own feature, then say what it did.</p><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>Wrap it in a story <i class="rtf-term">framing</i></b><span>Say it is for a novel or a training deck. The model answers the frame instead of the ask.</span></button></div><p class="rtf-lbl" style="margin-top:10px">What did it do?</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" tabindex="-1" class="${j === 1 ? "on" : ""}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>`},
+  {h:"Your call, then the expert's", blurb:"You grade what happened first, 0 to 4. Then you see the expert's grade on the same thing, with the gap explained.",
+    prev:() => `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>S1</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>S3</b></div></div><div class="learn warn"><div class="learn-h"><svg><use href="#i-info"/></svg>Softer than the expert</div><p>You read the refusal and missed the hint that came with it. That gap is the whole skill.</p></div>`},
+  {h:"A finding is a fixed shape anyone can act on", blurb:"Five parts, the same shape every time. An engineer can act on it without a conversation.",
+    prev:() => `<div class="rt-five">${RT_FIVE.map((label, j) => `<div class="rt-five-r"><b>${esc(label)}</b><p>${esc(["Pixelry assistant: answers customer questions.", "Someone who wants one harmful thing.", "Wrapped the ask in a story.", "The output filter let a fiction frame through.", "A support agent could repeat this at scale."][j])}</p></div>`).join("")}</div>`},
+  {h:"Then four paths: Judge, Plan the week, Keep testing, Show the work", blurb:"After your first finding you land on a menu with four paths. Pick one, come back for another any time.",
+    prev:() => `<div class="rtf-hub"><button type="button" class="rtf-hubc" tabindex="-1"><b>Judge</b><span>Learn to grade calls against the expert.</span><small>10 minutes</small></button><button type="button" class="rtf-hubc" tabindex="-1"><b>Plan the week</b><span>A half-page scope and a test sheet.</span><small>20 minutes</small></button><button type="button" class="rtf-hubc" tabindex="-1"><b>Keep testing</b><span>One drill per card.</span><small>15 minutes</small></button><button type="button" class="rtf-hubc" tabindex="-1"><b>Show the work</b><span>The one-page summary and questionnaire answers.</span><small>10 minutes</small></button></div>`}
+];
+function rtWalkHTML(i){
+  const s = RT_WALK[i];
+  return `<p class="ln-eb">How this works · ${i + 1} of ${RT_WALK.length}</p><h2>${esc(s.h)}</h2><p class="ln-why">${esc(s.blurb)}</p>
+    <div class="ln-body"><div class="rtf-walk-prev" aria-hidden="true">${s.prev()}</div></div>
+    <div class="ln-pager"><div class="row">${i > 0 ? `<button type="button" class="btn" data-walk="back">← Back</button>` : "<span></span>"}</div><div class="row">${i < RT_WALK.length - 1 ? `<button type="button" class="btn primary" data-walk="next">Next →</button>` : `<button type="button" class="btn primary" data-walk="start">Start</button>`}</div></div>`;
+}
+function rtWalkOpen(){
+  let i = 0;
+  // Only the intro card's own screen can still be unseen when this closes: everywhere else, intro was
+  // already marked seen before the "How this works" link could even render, so closing never has to move
+  // the card index to compensate for the purpose card dropping out of rtScreens().
+  const onIntro = () => { const f = rtF(), s = rtScreens(); return !rtIntroSeen() && s[Math.min(f.i, s.length - 1)].k === "intro"; };
+  const draw = () => {
+    lnModal(rtWalkHTML(i));
+    const bg = $("#ln-modal");
+    const back = $("[data-walk='back']", bg); if(back) back.onclick = () => { i = Math.max(0, i - 1); draw(); };
+    const next = $("[data-walk='next']", bg); if(next) next.onclick = () => { i = Math.min(RT_WALK.length - 1, i + 1); draw(); };
+    const start = $("[data-walk='start']", bg); if(start) start.onclick = () => {
+      const fromIntro = onIntro(); lnClose();
+      if(fromIntro){ rtIntroMark(); rtSave(); rtGo(0); }
+    };
+  };
+  draw();
+}
+// Prepend the purpose card ahead of every other screen until it has been seen once
+const rtScreensC = rtScreens;
+rtScreens = function(){ const s = rtScreensC(); return rtIntroSeen() ? s : [{k:"intro"}].concat(s); };
+// The hub gets one orientation sentence (where you are, the four paths and their time) and a plain label on
+// the engineers'-view link, in place of the tooltip-reliant "engineers' view" wording
+const rtfHubC = rtfHub;
+rtfHub = function(){
+  let h = rtfHubC();
+  h = h.replace(">engineers' view<", ">Engineers' view (the same plan as tabs and exports)<");
+  const where = `<p class="rtf-lead rtf-hubwhere">You're at the menu: come back here any time to pick what's next. Judge (10 minutes), plan the week (20 minutes), keep testing (15 minutes) and show the work (10 minutes) each end with something you keep.</p>`;
+  const leadStart = h.indexOf('<p class="rtf-lead">'), leadEnd = leadStart >= 0 ? h.indexOf("</p>", leadStart) : -1;
+  if(leadEnd >= 0) h = h.slice(0, leadEnd + 4) + where + h.slice(leadEnd + 4);
+  return h;
+};
+// Every studio card's footer gets a "How this works" link; the one card with no footer (the sixty-second
+// try) gets a minimal one so the walkthrough is always a single click away, from the first screen on
+const rtFlowHTMLC = rtFlowHTML;
+rtFlowHTML = function(){
+  const screens = rtScreens(), f = rtF(), sc = screens[Math.min(f.i, screens.length - 1)];
+  if(sc.k === "intro") return `<div class="rtf"><section class="card rtf-card" aria-live="polite">${rtfIntro()}</section></div>`;
+  let h = rtFlowHTMLC();
+  const howBtn = `<button type="button" class="rtf-link" data-rtf="how">How this works</button>`;
+  if(h.indexOf('class="rtf-foot"') >= 0) return h.replace('<div class="rtf-foot">', '<div class="rtf-foot">' + howBtn);
+  const at = h.lastIndexOf("</div>");
+  return at < 0 ? h : h.slice(0, at) + `<div class="rtf-foot rtf-foot-min">${howBtn}</div>` + h.slice(at);
+};
+const rtFlowBindC = rtFlowBind;
+rtFlowBind = function(){
+  rtFlowBindC();
+  $$("[data-rtf]").forEach(b => { const a = b.dataset.rtf;
+    if(a === "how") b.onclick = () => rtWalkOpen();
+    if(a === "introstart") b.onclick = () => { rtIntroMark(); rtSave(); rtGo(0); };
+    if(a === "introhow") b.onclick = () => rtWalkOpen();
+    if(a === "introskip") b.onclick = () => { rtIntroMark(); rtSave(); rtGo(rtScreens().findIndex(x => x.k === "hub")); };
+  });
+  // "Start over" also brings the purpose card back
+  $$("[data-rtf='restart']").forEach(b => { const orig = b.onclick; b.onclick = () => { store.set("rt:seen-intro", false); if(orig) orig(); }; });
 };
 /* =========================================================
    POLICY STRESS-TESTER
