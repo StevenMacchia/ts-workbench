@@ -565,3 +565,50 @@ const body12 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body12.toString() + ")();")());
+// World guide research refresh (2026-10): embodiment and real-time generation in "What is different", a
+// same-person voice/face check in the audio callout, impersonation and physical-safety rows in the harms
+// table, the four synthetic-media laws now in force, provenance framed as a moving-adversary measurement,
+// and the matching LN_REFS groups and LN_GLOSS entries.
+const body13 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const wSteps = LN_GUIDES.world.steps;
+  const diff = wSteps.find(s => s.id === "different");
+  eq(/embodiment/.test(diff.body) && /20 to 40 milliseconds/.test(diff.body) && /persistent world|A world can be a place you keep/.test(diff.body), true, "the different step names embodiment, real-time generation and persistent 3D worlds");
+  eq(/same consenting person/.test(diff.body), true, "the audio callout adds the same-person voice/face test");
+  const diffCards = lnStepCards("world", diff);
+  eq(diffCards.length, 1, "the different step is still a single card after the new bullets");
+  eq(diff.eg.length, diffCards.length, "the different step's eg array still matches its card count");
+  const harms = wSteps.find(s => s.id === "harms");
+  eq(/Impersonation with voice and face/.test(harms.body), true, "the harms table gets an impersonation-with-voice-and-face row");
+  eq(/Physical-safety risk in embodied use/.test(harms.body) && /out of scope/.test(harms.body), true, "the harms table gets a physical-safety row marked out of scope for this guide's drills");
+  const harmsCards = lnStepCards("world", harms);
+  eq(harms.eg.length, harmsCards.length, "the harms step's eg array still matches its card count after the new rows");
+  const law = wSteps.find(s => s.id === "law");
+  eq(/Article 50/.test(law.body) && /2 August 2026/.test(law.body), true, "the law step cites EU AI Act Article 50 and its in-force date");
+  eq(/TAKE IT DOWN Act/.test(law.body) && /19 May 2026/.test(law.body), true, "the law step cites the US TAKE IT DOWN Act and the platform deadline");
+  eq(/Data \(Use and Access\) Act 2025/.test(law.body) && /6 February 2026/.test(law.body), true, "the law step cites the UK Data (Use and Access) Act 2025 and its in-force date");
+  eq(/hash-match/.test(law.body), false, "the UK clause drops the hash-matching claim, which did not verify against the cited source");
+  eq(/SB 942/.test(law.body) && /AB 2839/.test(law.body) && /permanently enjoined/.test(law.body), true, "the law step cites California SB 942 and notes AB 2839/2655 were enjoined");
+  const lawCards = lnStepCards("world", law);
+  eq(law.eg.length, lawCards.length, "the law step's eg array matches its (possibly new) card count");
+  const grade = wSteps.find(s => s.id === "grade"), techniques = wSteps.find(s => s.id === "techniques"), check = wSteps.find(s => s.id === "check");
+  eq(/moving adversary/.test(grade.body) && /no watermark was found, not that the content is authentic/.test(grade.body), true, "the grade step frames provenance as a measurement against a moving adversary");
+  eq(/strip a watermark/.test(techniques.body), true, "the techniques step notes public tools already strip watermarks and metadata");
+  eq(/next month's removal tool/.test(check.body), true, "the check-the-fixes step frames a provenance pass as temporary, not permanent");
+  const worldRefs = LN_REFS.filter(r => r.k === "world");
+  eq(worldRefs.some(g => g.items.some(it => it[0] === "https://synthid.com")), true, "LN_REFS gains the public SynthID Detector link");
+  const vidGroup = worldRefs.find(g => g.title === "Video and embodiment red-teaming research");
+  eq(!!vidGroup, true, "a new LN_REFS group covers video and embodiment red-teaming research");
+  eq(vidGroup.items.map(it => it[1]).join(","), "TEAR,JailWAM,Security of World-Model-Based Embodied AI", "the group lists TEAR, JailWAM and the embodied-AI security survey");
+  const cardGroup = worldRefs.find(g => g.title === "Vendor system cards");
+  eq(!!cardGroup && cardGroup.items.some(it => it[0] === "https://openai.com/index/sora-2-system-card/"), true, "a new LN_REFS group links the Sora 2 system card");
+  ["Same-person check", "Embodied world model", "Real-time generation"].forEach(term => {
+    const row = LN_GLOSS.find(t => t[0] === term);
+    eq(!!row, true, "LN_GLOSS gains a \"" + term + "\" entry");
+    eq(row[1], "world", "\"" + term + "\" is tagged world");
+    eq(lnWordCount(row[2]) <= 40, true, "\"" + term + "\"'s definition is at or under 40 words");
+  });
+  out.push("world guide research refresh: embodiment, real-time generation and persistent worlds in What is different; the same-person audio test; impersonation and physical-safety harm rows; the four in-force synthetic-media laws with the unverified UK hash-matching clause dropped; provenance framed against a moving adversary in grade, techniques and check; new SynthID Detector, video/embodiment research and vendor system card sources; three new glossary entries");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body13.toString() + ")();")());
