@@ -82,6 +82,7 @@ function rtfDrill(sc, i, screens){
     ${d.plain ? `<details class="rtf-det"><summary>Full version</summary><p class="rtf-lead">${esc(d.why)}</p><ol class="rtf-steps">${d.steps.map(st => `<li>${esc(st)}</li>`).join("")}</ol></details>` : ""}
     <details class="rtf-det"><summary>What good looks like, and notes</summary>${lnGood(d.good.map(esc))}<textarea class="input" rows="3" id="rtf-notes" placeholder="What the model did, in your words. Not the output itself.">${esc(s.notes || "")}</textarea></details>
     <div class="rtf-q"><p>What did it do?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-grade="${j}" class="${picked === j ? "on" : ""}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>
+    ${rtEvFieldHTML("drill:" + d.id, rtEvDraftGet("drill:" + d.id))}
     ${picked != null && picked >= 2 ? `<p class="rtf-lbl" style="margin-top:12px">Which harm did it touch?</p><div class="rtf-chips sm">${(areasPicked.length ? areasPicked : rtPicked()).map(a => `<button type="button" data-fa="${a.k}" class="${rt.flow.area === a.k ? "on" : ""}">${esc(RT_PLAIN[a.k] || a.n)}</button>`).join("")}</div>` : ""}
     ${picked != null && picked >= 2 && rt.flow.area ? `<p class="note">Noted as a finding. You will get a fix card for it at the end.</p>` : ""}</div>
     ${picked == null ? `<p class="note">Run the drill, then pick what happened. You can also <button type="button" class="rtf-link" data-rtf="skipdrill">skip this one</button>.</p>` : needArea ? `<p class="note">Pick the harm it touched to continue.</p>` : rtfNext(n === drills.length ? "See the verdict" : "Next drill")}`;
@@ -138,6 +139,7 @@ function rtFlowBind(){
   const langs = $("#rtf-langs"); if(langs) langs.oninput = e => { rt.langs = e.target.value.slice(0, 80); rtSave(); };
   const s3 = $("#rtf-s3"); if(s3) s3.oninput = e => { rt.gates.s3 = Math.max(0, Math.min(100, +e.target.value || 0)); rtSave(); };
   const notes = $("#rtf-notes"); if(notes) notes.oninput = e => { const s = rt.sess[sc.id]; if(s){ s.notes = e.target.value; rtSave(); } };
+  $$("[data-ev]").forEach(a => a.oninput = e => rtEvDraftSet(a.dataset.ev, e.target.value));
   $$("[data-grade]").forEach(b => b.onclick = () => { const g = +b.dataset.grade, s = rt.sess[sc.id]; f.drill[sc.id] = g; s.grade = g; s.done = true; f.area = ""; rtFindingFromDrill(sc.id, g, ""); rtSave(); renderRedteamStudio(); });
   $$("[data-fa]").forEach(b => b.onclick = () => { f.area = b.dataset.fa; rtFindingFromDrill(sc.id, f.drill[sc.id], f.area); rtSave(); renderRedteamStudio(); });
   const owner = $("#rtf-owner"); if(owner) owner.oninput = e => { const x = rt.findings.find(y => y.id === sc.id); if(x){ x.owner = e.target.value; rtSave(); } };
@@ -148,7 +150,9 @@ function rtFindingFromDrill(id, g, area){
   const d = rtDrills().find(x => x.id === id), s = rt.sess[id] || {}, cur = rt.findings.find(x => x.drill === id);
   if(g < 2){ if(cur) rt.findings = rt.findings.filter(x => x.drill !== id); return; }
   if(!area) return;
-  const o = {id:cur ? cur.id : "RT-" + String(rt.findings.length + 1).padStart(3, "0"), drill:id, title:(d ? d.title : "Drill") + " got through", area, sev:g, tech:d ? d.title : "", surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:(s.notes || "").slice(0, 300), fix:RT_FIX[area] || "", owner:cur ? cur.owner : "", status:cur ? cur.status : "open"};
+  const fid = cur ? cur.id : "RT-" + String(rt.findings.length + 1).padStart(3, "0");
+  const evNote = rtEvAttach("drill:" + id, fid);
+  const o = {id:fid, drill:id, title:(d ? d.title : "Drill") + " got through", area, sev:g, tech:d ? d.title : "", surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:((s.notes || "").slice(0, 300) + evNote).trim(), fix:RT_FIX[area] || "", owner:cur ? cur.owner : "", status:cur ? cur.status : "open"};
   if(cur) Object.assign(cur, o); else rt.findings.push(o);
 }
 // The flow is the default; the six-tab plan is the engineers' view
