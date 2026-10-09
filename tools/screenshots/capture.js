@@ -103,6 +103,22 @@ async function settle(page) {
   await sleep(SETTLE_MS);
 }
 
+// Main's per-route intro cards (src/partINTRO.js) and the overview's first-run
+// choice (src/partH4.js) each gate a tool's real first screen behind a one-time
+// card ("tswb:intro:<route>" / "tswb:firstrun:seen"). None of the builders below
+// know about them, so mark every one seen up front; each builder's own
+// localStorage.removeItem calls only ever target their own tool's keys.
+const INTRO_ROUTES = [
+  "premortem", "tabletop", "maturity", "coverage", "metrics", "vendors", "policy",
+  "coppa", "dsa", "eval", "notice", "appeal", "transparency", "plan", "review", "workspace",
+];
+async function markIntrosSeen(page) {
+  await page.evaluate((routes) => {
+    routes.forEach((r) => localStorage.setItem("tswb:intro:" + r, "true"));
+    localStorage.setItem("tswb:firstrun:seen", "true");
+  }, INTRO_ROUTES);
+}
+
 async function gotoHash(page, hash) {
   await page.evaluate((h) => {
     location.hash = h;
@@ -638,6 +654,7 @@ async function runReviewPass(browser, kind) {
     });
   });
   await page.goto(BASE_URL + "/", { waitUntil: "load" });
+  await markIntrosSeen(page);
   if (kind === "dark") {
     await page.evaluate(() => localStorage.setItem("tswb:theme", JSON.stringify("dark")));
     await page.reload({ waitUntil: "load" });
@@ -733,6 +750,7 @@ async function main() {
       });
     });
     await page.goto(BASE_URL + "/", { waitUntil: "load" });
+    await markIntrosSeen(page);
     await settle(page);
 
     for (const t of list) {
