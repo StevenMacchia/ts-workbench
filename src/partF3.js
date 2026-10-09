@@ -58,24 +58,30 @@ function answerChips(){
   return `<div class="achips">${items.map(([k,l,v])=>`<button type="button" class="achip" data-goq="${k}" title="Change this answer"><span>${l}</span><b>${esc(v)}</b></button>`).join("")}</div>`;
 }
 function startHere(r){
+  const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
+  const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
   const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
-  const blockers = r.safeguards.filter(s=>s.rank===3), firstBlocker = blockers.find(s=>!pm.done[s.id]);
+  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, firstBlocker = blockers.find(s=>!pm.done[s.id]);
   const blockerClause = firstBlocker ? ` Start with: ${gloss(firstBlocker.t.split(",")[0].split("(")[0].trim())}.` : blockers.length ? " Every launch blocker is done." : "";
+  const applies = r.obligations.filter(o=>o.status==="applies").length;
   const summary = r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
-    : `<strong>${r.posture[0]} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks.${blockerClause}`;
+    : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}${blockerClause}`;
+  // The numbers used to sit in their own four-tile dashboard; said in one line instead, each one naming what it counts
+  const counted = `You've logged <strong>${r.risks.length} risk${r.risks.length===1?"":"s"}</strong>, each scored severity × likelihood. ${bDone} of ${blockers.length} launch blockers are done, and ${applies} of ${r.obligations.length} legal duties apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"} you named.`;
   const bandPct = PM_BAND_PCT[r.posture[0]], benchBand = !pm.example ? pmBenchBand() : null;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
         <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
-        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}</div>
+        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}<p class="note">${counted}</p></div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
           ${s.covers.length?`<span class="covers">Protects against: ${s.covers.slice(0,3).map(esc).join(" · ")}${s.covers.length>3?` and ${s.covers.length-3} more`:""}</span>`:""}</span></label></li>`).join("")}</ol></div>`
         : `<p class="note">Every priority action is ticked off. Review the full plan below for anything left.</p>`}
-      <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.</span></div>
+      <div class="row"><button type="button" class="btn" data-act="fullplan">See all ${r.safeguards.length} actions</button><span class="note">Tick items off as you go. Progress is saved in this browser.${r.risks.length>r.risks.filter(x=>x.band==="crit"||x.band==="high").length?" The risk register only shows critical and high risks by default; medium and low ones are there too, one click away.":""}</span></div>
+      ${r.safeguards.length?`<button type="button" class="pm-burnlink" data-act="burn">See how far your launch plan gets you ${icon("arrow")}</button>`:""}
     </div></div>`;
 }
 /* ---------- what changed since the assessment was last saved ---------- */
@@ -132,6 +138,7 @@ function renderReport(r){
     ${chapterLinkHTML("premortem")}
     <details class="ev-details" style="margin-top:20px"><summary>Details <span class="note">Exposure numbers, the risk matrix, risks by harm area, burn-down</span></summary>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
+    <details class="card pm-kpis-d"><summary>See the numbers<span class="note">Overall exposure, risk count, launch blockers and legal obligations</span></summary>
     <div class="kpis">
       <div class="card kpi"><span class="eyebrow">Overall exposure ${tip("Severe: four or more critical risks. High: at least one critical, or five or more high. Moderate: at least one high. Low: everything else.")}</span><span class="v" style="color:${r.posture[1]?`var(--${r.posture[1]})`:"inherit"}">${r.posture[0]}</span><span class="s">${r.counts.crit} critical and ${r.counts.high} high-rated risks</span><span class="s pm-resid">After safeguards: <b style="color:${r.rposture[1]?`var(--${r.rposture[1]})`:"inherit"}">${r.rposture[0]}</b>${allDone ? ` · ${r.rcounts.crit} critical` : " · tick safeguards to lower it"}</span></div>
       <div class="card kpi"><span class="eyebrow">Risks identified ${tip("Each risk is scored severity (1–4) × likelihood (1–4). 12 or more is critical, 8–11 high, 4–7 medium and below 4 low.")}</span><span class="v">${total}</span>
@@ -139,7 +146,7 @@ function renderReport(r){
         <span class="s">${r.counts.crit} critical · ${r.counts.high} high · ${r.counts.med} medium · ${r.counts.low} low</span></div>
       <div class="card kpi"><span class="eyebrow">Launch blockers done ${tip("The core controls for critical risks, plus anything the law likely requires where you operate. Don't ship without these.","tip-r")}</span><span class="v">${bDone}<small> / ${blockers.length}</small></span><div class="bar"><i style="width:${blockers.length?bDone/blockers.length*100:0}%;background:${blockers.length&&bDone===blockers.length?"var(--good)":"var(--crit)"}"></i></div><span class="s">${allDone} of ${r.safeguards.length} safeguards in place overall</span></div>
       <div class="card kpi"><span class="eyebrow">Legal obligations ${tip("Laws matched to your answers and jurisdictions. A starting map for your legal team, not legal advice.","tip-r")}</span><span class="v">${applies}<small> apply</small></span><span class="s">${r.obligations.length-applies} more may apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"}</span></div>
-    </div>
+    </div></details>
     <div class="viz">
       <div class="card"><div class="card-h"><h3>Risk matrix ${tip("Severity is how bad the harm is if it happens. Likelihood is how probable it is on your product, given your answers. The top right is most urgent. After safeguards counts the safeguards you've ticked in the launch plan.")}</h3>
           <div class="segs" role="group" aria-label="Which ratings to show"><button type="button" data-mview="inh" aria-pressed="${!resView}">Before safeguards</button><button type="button" data-mview="res" aria-pressed="${resView}">After safeguards</button></div></div>
@@ -179,9 +186,10 @@ function pmBurnHTML(r){
   const hits = pts.map((v, i) => `<circle class="bd-hit" cx="${f(X(i))}" cy="${f(Y(v))}" r="7"><title>${esc(i ? `After ${i} safeguard${i === 1 ? "" : "s"} (latest: ${order[i - 1].t.split(",")[0].slice(0, 80)})` : "Before any safeguards")}: risk ${v}, down ${pct(v)}%</title></circle>`).join("");
   const right = done > N * .65, you = `<circle class="bd-you" cx="${f(X(done))}" cy="${f(Y(r.rtotal))}" r="6"/><text class="bd-youl" x="${f(X(done) + (right ? -11 : 11))}" y="${f(Y(r.rtotal) + (Y(r.rtotal) < T + 24 ? 18 : -10))}" text-anchor="${right ? "end" : "start"}">You are here: ${r.rtotal}</text>`;
   const strip = c => `<div class="sevstrip">${["crit","high","med","low"].map(b => `<i style="width:${c[b] / r.risks.length * 100}%;background:var(--${b === "low" ? "line-strong" : b})"></i>`).join("")}</div>`;
-  return `<div class="card pm-burn">
+  return `<div class="card pm-burn" id="pm-burn" style="scroll-margin-top:16px">
     <div class="pm-bl"><h3>Risk burn-down ${tip("Total risk adds up every risk's severity × likelihood. Each safeguard you tick lowers the likelihood of the risks it covers: one step once half of a risk's safeguards are done, two steps when all are. Severity never changes.")}</h3>
       <div class="pm-bnums"><b class="mono">${r.rtotal}</b>${r.rtotal < r.total ? `<s class="mono">${r.total}</s><span class="pill good">−${pct(r.rtotal)}%</span>` : `<span class="note">total risk, before any safeguards</span>`}</div>
+      <p class="note">${r.total} of ${r.risks.length * 16} possible (${r.risks.length} risk${r.risks.length === 1 ? "" : "s"}, each scored severity × likelihood out of 16).</p>
       <p class="note">${done ? `The ${done} safeguard${done === 1 ? "" : "s"} you've ticked cut total risk by ${pct(r.rtotal)}%.` : "Nothing is ticked yet."}${bl ? ` The ${bl} launch blocker${bl === 1 ? "" : "s"} alone would cut it by ${pct(pts[bl])}%.` : ""}</p>
       <div class="pm-bbars"><div class="pm-bbar"><span>Before</span>${strip(r.counts)}</div><div class="pm-bbar"><span>Now</span>${strip(r.rcounts)}</div></div>
       <p class="note">With all ${N} safeguards in place, ${floor} of ${r.total} remains. Safeguards make severe harms rarer, not impossible, so detection and response still matter.</p></div>

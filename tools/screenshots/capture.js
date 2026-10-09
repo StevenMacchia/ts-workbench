@@ -411,6 +411,34 @@ const builders = {
       await clickByText(page, "button", "See a finished example", 300);
     }
   },
+  async redteam(page) {
+    await ensureDemoOff(page);
+    // Red team studio gates its own first screen behind a purpose card the first
+    // time anyone opens it (tswb:rt:seen-intro). Mark it seen so the shot shows
+    // the tool's real first screen (the 60-second graded try), not the card.
+    // tswb:rt holds the whole saved flow state; clear it for a clean, repeatable run.
+    await page.evaluate(() => {
+      localStorage.setItem("tswb:rt:seen-intro", "true");
+      localStorage.removeItem("tswb:rt");
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "redteam");
+    // The correct grade for the first practice item (RT_PRACTICE.grade[0].a) is 1.
+    await page.waitForSelector('[data-pick="1"]', { timeout: 8000 });
+    await clickSel(page, '[data-pick="1"]', 400);
+  },
+  async learn(page) {
+    await ensureDemoOff(page);
+    // The hub itself has no purpose-card gate; just start from a clean progress
+    // state (tswb:learn:*) so the counts shown are the fresh-visitor ones.
+    await page.evaluate(() => {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("tswb:learn:"))
+        .forEach((k) => localStorage.removeItem(k));
+    });
+    await page.reload({ waitUntil: "load" });
+    await gotoHash(page, "learn");
+  },
 
   // -------------------------------------------------- review-pass builders
   // Used only by --phone/--dark (see REVIEW_ROUTES below), not by the
@@ -552,6 +580,8 @@ const targets = [
   { name: "eval.jpg", kind: "jpeg", dir: "portfolio", build: builders.evalReport },
   { name: "compliance.jpg", kind: "jpeg", dir: "portfolio", build: builders.compliance },
   { name: "ai.jpg", kind: "jpeg", dir: "portfolio", build: builders.appeal },
+  { name: "redteam.jpg", kind: "jpeg", dir: "portfolio", build: builders.redteam },
+  { name: "learn.jpg", kind: "jpeg", dir: "portfolio", build: builders.learn },
 ];
 
 // -------------------------------------------------------- review passes ---

@@ -7,7 +7,22 @@ const body = function(){
   const where = h => (h.match(/.{60}(undefined|NaN|null).{30}/) || [""])[0];
   // a new visitor is offered the demo
   renderOverview(); eq(/data-demo="start"/.test(view.innerHTML), true, "new visitors are offered the demo");
+  // the home page surfaces three real outputs from Pixelry's data before the click, computed live, never hard-coded,
+  // in the exact copy asked for, from the exact same demoProgram() demoFill() itself writes to the workspace
+  const welcomeH = view.innerHTML, preview = demoPreviewHTML(), prog = demoProgram(), o = rcOverall(prog.parts), gr = rcGrade(o.score), law = demoLawLabel(prog.topAction.laws[0]);
+  eq(welcomeH.includes(preview) && preview.length > 0, true, "the welcome page includes the preview strip");
+  eq(/<p class="as-preview-lead">From the example company, Pixelry:<\/p>/.test(preview), true, "one sentence lead, small caps");
+  eq((preview.match(/<li>/g) || []).length, 3, "a quiet three-line strip, not a dashboard of tiles");
+  eq(preview.includes("<li>Overall <b>" + o.score + "</b> / 100, grade " + gr[1] + ", all " + o.total + " parts done.</li>"), true, "line 1: overall score, grade and parts done, computed, not typed: " + o.score + "/100 " + gr[1]);
+  eq(preview.includes("<li>First thing to fix: in-product reporting on every user, message, post and listing (" + law + ").</li>"), true, "line 2: the top action trimmed to the what, with its law (" + law + ")");
+  eq(preview.includes("<li>DSA statement of reasons: not yet in place (Article 17).</li>"), true, "line 3: Pixelry's real DSA statement-of-reasons gap");
+  eq(/data-demo="start">See the whole picture/.test(preview), true, "one link through to the full demo");
+  eq(/See it with an example company/.test(preview), false, "the second demo button is gone from inside the strip; the hero keeps its own");
+  out.push("home preview, verbatim: \"" + preview.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() + "\"");
+  // the strip can never drift from the demo by a point: both are built from the one pure demoProgram()
   store.set("demo", true); demoFill();
+  { const live = rcOverall(rcParts());
+    eq(live.score, o.score, "the strip's score equals the score the demo produces after demoFill(): preview " + o.score + ", live " + live.score); }
   eq(orgReady() && !!orgGet().confirmed, true, "workspace set up"); eq(wsProfile().org, "Pixelry", "the company is Pixelry");
   const pms = Object.values(wsItems()).filter(i => i.kind === "premortem").map(i => i.title).sort().join(", ");
   eq(pms, "Pixelry Creator Subscriptions, Pixelry Market, Pixelry app", "three Pixelry products");

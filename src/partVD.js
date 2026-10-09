@@ -112,16 +112,21 @@ function vdBenchRange(){
     return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
 }
 shareRegister("vendors", d => { vx = Object.assign({weights:{}, vendors:[], open:null}, d, {shared:true}); vdView = "results"; vdSave(); });
-function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
+function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}. Click a name to rename it.</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" placeholder="Vendor name" title="Click to rename" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
-function vdCritHTML(c, seen){ return `<article class="card vd-crit">
+function vdCritHTML(c, seen){
+  // The first criterion's RFP questions open by default, to teach the pattern once; the rest stay closed
+  const first = c === CRITERIA[0];
+  return `<article class="card vd-crit">
             <div class="vd-ch"><h4>${esc(c.n)}</h4>${c.deal ? `<span class="pill crit">Minimum 3</span>` : ""}<span class="vd-cw">Weight <b id="vd-cw-${c.k}">${+vx.weights[c.k] || 0}</b></span></div>
+            ${c.deal ? `<p class="note vd-dealnote">A vendor scoring 2 or lower here can't win, no matter how it scores on everything else.</p>` : ""}
             <p class="vd-cq">${esc(VD_Q[c.k])}</p>
             <div class="vd-rub">${[1, 3, 5].map((n, j) => `<div><b class="vd-cell ${VD_HEAT[n]}">${n}</b><span>${mxGloss(VD_RUBRIC[c.k][j], seen)}</span></div>`).join("")}</div>
             <div class="vd-sc">${vx.vendors.map((v, i) => `<div class="vd-row"><span class="vd-vn">${esc(v.name)}</span>
               <div class="vd-seg" role="radiogroup" aria-label="${esc(v.name)}: ${esc(c.n)}">${[1, 2, 3, 4, 5].map(n => `<button type="button" role="radio" aria-checked="${v.s[c.k] === n}" class="${v.s[c.k] === n ? "on" : ""} ${c.deal && n <= 2 ? "lo" : ""}" data-i="${i}" data-k="${c.k}" data-n="${n}">${n}</button>`).join("")}</div></div>`).join("")}</div>
-            <details class="vd-rfp"><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
-          </article>`; }
+            <details class="vd-rfp" ${first ? "open" : ""}><summary>Questions to ask in your RFP <span class="note">${c.q.length}</span></summary><ul>${c.q.map(q => `<li>${mxGloss(q, seen)}</li>`).join("")}</ul></details>
+          </article>`;
+}
 // refresh: what to do after a score or a weight changes
 function vdBindShared(refresh){
   const save = vdSave;
@@ -168,6 +173,29 @@ function vdSpec(){
     done:() => { vdView = "results"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
 }
 function vdExample(){ vx = JSON.parse(JSON.stringify(DEFAULT_V)); vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); gsay("Example loaded: three vendors, already scored"); }
+// Plain-text version of the ranking and the full score table, so it can be handed to leadership
+function vdMarkdown(){
+  const {sorted, top} = vdRank(), tw = vdTotal() || 1, names = vx.vendors.map(v => v.name);
+  const lines = [`# Vendor scorecard`, ``, names.join(" vs. "), ``];
+  if(!sorted.some(x => x.done)) lines.push(`Score each vendor on all ${CRITERIA.length} criteria to see who comes out ahead, and why.`);
+  else if(!top) lines.push(`No vendor meets the minimums on wellness and security. Go back to the shortlist, or ask the weakest vendors what it would take to fix those gaps.`);
+  else{
+    const other = sorted.find(x => x !== top && x.done), pending = sorted.filter(x => !x.done);
+    if(!other) lines.push(pending.length ? `${top.v.name} scores ${top.score.toFixed(2)} out of 5. Finish scoring ${pending.map(x => x.v.name).join(" and ")} to compare.` : `${top.v.name} is your only vendor.`);
+    else{
+      const diffs = CRITERIA.map(c => ({c, d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - other.v.s[c.k]), raw:top.v.s[c.k] - other.v.s[c.k]})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
+      const plus = diffs.filter(x => x.d > 0).slice(0, 2), minus = diffs.filter(x => x.d < 0).slice(-1);
+      const list = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
+      lines.push(`${top.v.name} ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and ${other.v.name} is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of ${other.v.name} at ${other.score.toFixed(2)}`}.`);
+      if(plus.length) lines.push(`It wins mainly on ${list(plus)}${minus.length ? `, while ${other.v.name} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}.`);
+    }
+  }
+  lines.push(``, `## Every score`, ``, `Each vendor rated 1 to 5 against the rubric. Weight is out of 100.`, ``,
+    `| Criterion | Weight | ${names.join(" | ")} |`, `|---|---|${names.map(() => "---").join("|")}|`,
+    ...CRITERIA.map(c => `| ${c.n}${c.deal ? " (minimum 3)" : ""} | ${+vx.weights[c.k] || 0} | ${vx.vendors.map(v => v.s[c.k] || "–").join(" | ")} |`),
+    ``, `Weighted score, out of 5: ${sorted.map(x => `${x.v.name} ${x.done ? x.score.toFixed(2) : "not finished"}`).join(", ")}.`);
+  return lines.join("\n");
+}
 function vdOwn(){ const snap = JSON.parse(JSON.stringify(vx)); vx = {weights:{}, vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; vdView = null; gdReset("vendors"); store.set("ws:cur:vendors", null); vdSave(); renderVendors(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { vx = s2; vdSave(); renderVendors(); }); }
 // The result: who wins and why, the heat map, and the ways back in
 function vdResultsRender(){
@@ -181,7 +209,7 @@ function vdResultsRender(){
       <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row" aria-live="polite"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
         ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
         ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
-        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
+        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-copy">${icon("copy")}Copy result</button>${DL ? `<button type="button" class="btn" id="vx-dl"><svg><use href="#i-download"/></svg>Download result</button>` : ""}<button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
     ${chapterLinkHTML("vendors")}
@@ -194,6 +222,8 @@ function vdResultsRender(){
   $("#vx-sharelink").onclick = () => shareCopy("vendors", vx, {vendors:vx.vendors.map(v => ({name:v.name})), top:top ? top.v.name : null, score:top ? top.score : null}, $("#vx-toast"));
   const us = document.getElementById("vx-unshare"); if(us) us.onclick = () => { vx.shared = false; vdSave(); const msg = wsSaveTool("vendors", vx, vendorsTitle(vx)); renderVendors(); flashIn($("#vx-toast"), msg); };
   $("#vx-own").onclick = vdOwn; $("#vx-reset").onclick = vdExample;
+  const vdl = $("#vx-dl"); if(vdl) vdl.onclick = () => offerFile("ts-vendor-scorecard.md", vdMarkdown(), vdMarkdown(), $("#vx-toast"));
+  const vcp = $("#vx-copy"); if(vcp) vcp.onclick = () => copyText(vdMarkdown(), $("#vx-toast"));
   const pb = view.querySelector && view.querySelector('[data-vd="page"]'); if(pb) pb.onclick = () => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); };
   const nm = $("#vx-norm"); if(nm) nm.onclick = () => { vdNormalize(); vdSave(); renderVendors(); };
 }

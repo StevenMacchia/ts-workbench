@@ -67,6 +67,7 @@ function polSpec(){
   ];
   return {k:"policy", tool:{name:"Policy stress-tester", icon:"doc", color:"var(--t-pol)"},
     intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule, tell the test about your platform and what worries you, and it finds the words reviewers would read differently, the cases the rule forgets, and how it holds up against real edge cases.",
+      note:"Without a Claude account: instant checks against a public rubric. Open this page in Claude to add edge cases, a rewrite, a reviewer checklist and matching laws.",
       facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
     steps, finish:ai ? "Run the test" : "Run the instant checks",
@@ -99,19 +100,28 @@ function renderPolicy(){
 }
 
 /* ---------- step one: set up the test, top to bottom, ending with the run button ---------- */
+// A sticky dot per section of the one-page setup, filled in as each is answered, since there's no guided crumb trail here
+function polProgressDotsHTML(){
+  const secs = [["pol-s1", "Your rule", !!polWords(pol.rule)], ["pol-s2", "Your platform", !!(pol.company || "").trim() || !!polWords(pol.product)],
+    ["pol-s3", "How it's enforced", pol.enforce.length > 0 || pol.actions.length > 0], ["pol-s4", "What worries you", !!polWords(pol.concerns)]];
+  return `<div class="pol-dots" role="navigation" aria-label="Jump to a section">${secs.map(([id, n, done], i) =>
+    `<button type="button" class="pol-dot ${done ? "on" : ""}" data-poldot="${id}" title="${esc(n)}" aria-label="${esc(n)}${done ? ", filled in" : ""}"><i></i><span>${i + 1}</span></button>`).join("")}</div>`;
+}
 function polSetupHTML(ai){
   const chips = (list, key) => list.map(([k,n])=>`<button type="button" class="pol-chip" data-multi="${key}" data-v="${k}" aria-pressed="${pol[key].includes(k)}">${esc(n)}</button>`).join("");
+  const lookedUp = pol.look && pol.look.known;
   return `<div class="pol-setup">
     <div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" data-polguide="1">Switch to guided</button></div>
     ${polInfoHTML()}
-    <section class="card pol-card">
+    <div id="pol-dots-wrap">${polProgressDotsHTML()}</div>
+    <section class="card pol-card" id="pol-s1">
       <div class="pol-h"><span class="pol-num">1</span><div><label for="pol-rule">Your rule</label><span class="note">Required</span></div><span class="note mono pol-wc" id="pol-wc">${polWords(pol.rule)} words</span></div>
       <textarea id="pol-rule" rows="6" placeholder="Paste the rule exactly as users would see it. For example: “Harassment means repeatedly targeting someone with insults, threats or unwanted sexual comments…”">${esc(pol.rule)}</textarea>
       <p class="pol-tip">Include any definitions, examples and exceptions you already have. The more of the real rule you paste, the more precise the review.</p>
       <div class="pol-ex"><span class="note">Start from an example:</span>${POL_EXAMPLES.map(([n],i)=>`<button type="button" class="pol-chip" data-ex="${i}">${n}</button>`).join("")}</div>
     </section>
 
-    <section class="card pol-card">
+    <section class="card pol-card" id="pol-s2">
       <div class="pol-h"><span class="pol-num">2</span><div><label for="pol-company">Your platform</label><span class="note">Recommended</span></div>${typeof orgFromTag === "function" ? orgFromTag(!!pol.orgSet && ORG_MAP.pm[orgGet().type] === pol.type) : ""}</div>
       <div class="pol-co">
         <div class="field"><label for="pol-company">Company or product name</label>
@@ -121,15 +131,16 @@ function polSetupHTML(ai){
         <div id="pol-look" tabindex="-1">${polLookHTML()}</div>
       </div>
       <div class="pol-ctx">
-        <div class="field"><label for="pol-type">Platform type</label><select class="select" id="pol-type">${PLATFORMS.map(p=>`<option value="${p.k}" ${p.k===pol.type?"selected":""}>${esc(p.n)}</option>`).join("")}</select></div>
+        <div class="field"><label for="pol-type">Platform type</label><select class="select" id="pol-type">${PLATFORMS.map(p=>`<option value="${p.k}" ${p.k===pol.type?"selected":""}>${esc(p.n)}</option>`).join("")}</select>${lookedUp ? `<span class="note pol-fromai">From Claude's knowledge, which can't browse the web. Check it.</span>` : ""}</div>
         <div class="field"><label for="pol-youth">Can under-18s use it?</label><select class="select" id="pol-youth"><option value="">Not sure</option>${YOUTH.map(y=>`<option value="${y.k}" ${y.k===pol.youth?"selected":""}>${esc(y.n)}</option>`).join("")}</select></div>
       </div>
       <div class="field"><label for="pol-product">Describe your product</label>
-        <textarea id="pol-product" rows="${(pol.product || "").length > 160 ? 6 : 3}" placeholder="What people do on it, who uses it and anything unusual. For example: “A photo app for 18 to 25-year-olds with public profiles, DMs and group chats. ‘Rate me’ posts are popular.”">${esc(pol.product)}</textarea></div>
-      <div class="field"><span class="lbl">Regions you operate in</span><div class="pol-regions" id="pol-regions">${chips(REGIONS.map(g=>[g.k,g.k.toUpperCase()]), "regions")}</div></div>
+        <textarea id="pol-product" rows="${(pol.product || "").length > 160 ? 6 : 3}" placeholder="What people do on it, who uses it and anything unusual. For example: “A photo app for 18 to 25-year-olds with public profiles, DMs and group chats. ‘Rate me’ posts are popular.”">${esc(pol.product)}</textarea>
+        ${lookedUp ? `<span class="note pol-fromai">From Claude's knowledge of ${esc(pol.look.name)}, which can't browse the web. Check it, and add anything recent.</span>` : ""}</div>
+      <div class="field"><span class="lbl">Regions you operate in</span><div class="pol-regions" id="pol-regions">${chips(REGIONS.map(g=>[g.k,g.k.toUpperCase()]), "regions")}</div>${lookedUp ? `<span class="note pol-fromai">From Claude's knowledge, which can't browse the web. Check it.</span>` : ""}</div>
     </section>
 
-    <section class="card pol-card">
+    <section class="card pol-card" id="pol-s3">
       <div class="pol-h"><span class="pol-num">3</span><div><span class="pol-lbl">How it's enforced</span><span class="note">Optional</span></div></div>
       <div class="pol-two">
         <div class="field"><span class="lbl">Who finds violations</span><div class="pol-chips" id="pol-enforce">${chips(POL_ENF, "enforce")}</div></div>
@@ -137,7 +148,7 @@ function polSetupHTML(ai){
       </div>
     </section>
 
-    <section class="card pol-card">
+    <section class="card pol-card" id="pol-s4">
       <div class="pol-h"><span class="pol-num">4</span><div><label for="pol-concerns">What worries you</label><span class="note">Recommended</span></div></div>
       <textarea id="pol-concerns" rows="4" placeholder="Gray areas, recent incidents or cases your team argues about. For example: “Rival fans' trash talk keeps getting reported as harassment. We're unsure about jokes about someone's appearance.”">${esc(pol.concerns)}</textarea>
       <p class="pol-tip">Claude turns these into edge cases, so describe real situations rather than categories.</p>
@@ -172,7 +183,7 @@ function polReportHTML(ai){
       ${polRing(score, 96)}
       <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
         <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
-        <p class="note">${h.words} words · instant score ${h.score}/100${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
+        <p class="note">${h.words} words · instant score ${h.score}/100 on ${h.findings.length} checks${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
         ${bench ? `<p class="bench-line">Typical range among the built-in example rules: ${bench.min}–${bench.max}</p>` : ""}
         ${r && r.strengths.length ? `<div class="pol-strengths">${r.strengths.map(s=>`<span><svg><use href="#i-check"/></svg>${esc(s)}</span>`).join("")}</div>` : ""}
         <span class="toast" id="pol-toast" role="status" aria-live="polite"></span>
@@ -188,8 +199,8 @@ function polReportHTML(ai){
 
     ${polRun.busy ? `<div class="card pol-sec pol-busy"><div class="pol-spin" aria-hidden="true"></div><div><b id="pol-stage" aria-live="polite">${POL_PHASE[polRun.phase || "thinking"]}…</b><p class="note">${pol.depth==="deep" ? "A deep review usually takes one to two minutes." : "Claude's review usually takes 20 to 60 seconds."} The instant checks are below while you wait.</p></div><button type="button" class="btn sm" id="pol-stop">Stop</button></div>` : ""}
     ${polRun.err ? `<div class="pol-err" role="alert">${esc(polRun.err)}${ai ? ` <button type="button" class="btn sm" id="pol-run">Try again</button>` : ""}</div>` : ""}
-    ${!r && !polRun.busy && !polRun.err ? (ai ? `<div class="banner pol-more"><span><strong>These are the instant checks.</strong> Claude's review adds edge cases for your platform, a clearer rewrite, a reviewer checklist and relevant laws.</span><button type="button" class="btn sm primary" id="pol-run">Stress-test with Claude ${icon("arrow")}</button></div>`
-      : `<p class="note pol-more-n">Open this page in Claude while signed in to add Claude's review: edge cases for your platform, a clearer rewrite and a reviewer checklist.</p>`) : ""}
+    ${!r && !polRun.busy && !polRun.err ? (ai ? `<div class="banner pol-more"><span><strong>These are the instant checks.</strong> Claude's review adds edge cases for your platform, a clearer rewrite, a reviewer checklist and matching laws.</span><button type="button" class="btn sm primary" id="pol-run">Stress-test with Claude ${icon("arrow")}</button></div>`
+      : `<p class="note pol-more-n">These are the instant checks, and they can't give you edge cases for your platform, a clearer rewrite, a reviewer checklist or matching laws. Open this page in Claude while signed in to add Claude's review.</p>`) : ""}
 
     ${r ? `<div class="card pol-tabs" id="pol-tabs">
       <div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k, n]) => `<button type="button" data-poltab="${k}" aria-pressed="${tab === k}">${n} <span class="mono" style="opacity:.6">${k === "rewrite" ? "" : count(k)}</span></button>`).join("")}</div></div>
@@ -218,7 +229,8 @@ function polTabHTML(tab){
   return "";
 }
 function polBind(){
-  const refreshMeter = () => { const m = $("#pol-strength"); if(m){ m.innerHTML = polStrengthHTML(); polBindMeter(); } const pp = $("#pol-prompt-pre"); if(pp) pp.textContent = polPrompt(); };
+  const refreshMeter = () => { const m = $("#pol-strength"); if(m){ m.innerHTML = polStrengthHTML(); polBindMeter(); } const pp = $("#pol-prompt-pre"); if(pp) pp.textContent = polPrompt();
+    const dw = $("#pol-dots-wrap"); if(dw){ dw.innerHTML = polProgressDotsHTML(); polBindDots(); } };
   const co = $("#pol-company");
   if(co){ co.addEventListener("input", () => { pol.company = co.value; savePol(); });
     co.addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); polLookup(); } }); }
@@ -251,9 +263,11 @@ function polBind(){
   const dl = $("#pol-dl"); if(dl) dl.onclick = () => { const md = polMarkdown(); offerFile("policy-stress-test.md", md, md, $("#pol-toast")); };
   const cp = $("#pol-copy"); if(cp) cp.onclick = () => copyText(pol.result.rewrite, $("#pol-rwtoast"));
   const rt = $("#pol-retest"); if(rt) rt.onclick = () => { pol.rule = pol.result.rewrite; savePol(); window.scrollTo(0,0); polAnalyze(); };
-  polBindMeter();
+  polBindMeter(); polBindDots();
 }
-
+function polBindDots(){
+  $$("[data-poldot]").forEach(b => b.onclick = () => { const el = document.getElementById(b.dataset.poldot); if(el && el.scrollIntoView) el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); });
+}
 function polBindMeter(){
   $$("[data-goto]").forEach(b => b.onclick = () => {
     const id = {rule:"pol-rule", product:"pol-product", youth:"pol-youth", regions:"pol-regions", enforce:"pol-enforce", actions:"pol-actions", concerns:"pol-concerns"}[b.dataset.goto];

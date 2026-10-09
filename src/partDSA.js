@@ -12,12 +12,18 @@ const DS_SRC = [
   ["DSA Transparency Database", "https://transparency.dsa.ec.europa.eu/"]
 ];
 // What kind of service. Each tier carries the duties of the ones before it
+// A worked example per tier (5th item), so a newcomer can match their own service to one without reading legal prose first
 const DS_TIERS = [
-  ["conduit", "Mere conduit or caching", "An internet access provider, a VPN, a DNS service, a CDN. You carry or cache what others send.", 1],
-  ["hosting", "Hosting", "You store content for users but don't share it with the public: cloud storage, web hosting, private file transfer.", 2],
-  ["platform", "Online platform", "You store users' content and share it with the public: social, video, marketplace, app store, dating, forum, review site.", 3],
-  ["vlop", "Very large online platform or search engine", "Designated by the Commission, at 45 million or more monthly EU users. Every duty in the Act applies.", 4]
+  ["conduit", "Mere conduit or caching", "An internet access provider, a VPN, a DNS service, a CDN. You carry or cache what others send.", 1,
+    "Example: an ISP, a VPN provider or a CDN."],
+  ["hosting", "Hosting", "You store content for users but don't share it with the public: cloud storage, web hosting, private file transfer.", 2,
+    "Example: a cloud storage app, a web host or a private file-transfer tool."],
+  ["platform", "Online platform", "You store users' content and share it with the public: social, video, marketplace, app store, dating, forum, review site.", 3,
+    "Example: most apps with public posts or listings, such as a social app, a marketplace or a forum."],
+  ["vlop", "Very large online platform or search engine", "Designated by the Commission, at 45 million or more monthly EU users. Every duty in the Act applies.", 4,
+    "Example: a platform the Commission has named on its public VLOP/VLOSE list."]
 ];
+const dsTierHint = ([k, n, h, rank, ex]) => ex ? `${h} ${ex}` : h;
 const DS_SIZE = [
   ["small", "Micro or small", "Fewer than 50 staff and under €10 million turnover, and the company isn't part of a larger group that exceeds that."],
   ["medium", "Medium or larger", "50 staff or more, or €10 million or more in turnover, or part of a group that is."]
@@ -328,7 +334,7 @@ function dsSpec(){
   const steps = [
     {id:"svc", eb:"Your service", title:"What's the service called?", why:"It's named in your plan and in the drafts.", kind:"text", opt:true, placeholder:"For example: Pixelry", max:80, get:() => ds.svc, set:v => setV("svc", v.slice(0, 80))},
     {id:"tier", eb:"What kind of service", title:"Which best describes the service?", why:"The Act stacks duties by tier: every intermediary has some, hosting services more, online platforms more still, and very large platforms all of them.", kind:"single",
-      opts:() => DS_TIERS.map(([k, n, h]) => ({k, n, h})), get:() => ds.tier, set:k => setV("tier", k)},
+      opts:() => DS_TIERS.map(t => ({k:t[0], n:t[1], h:dsTierHint(t)})), get:() => ds.tier, set:k => setV("tier", k)},
     {id:"size", eb:"How big", title:"How big is the company?", why:"Micro and small enterprises are exempt from most platform duties and from transparency reports, until twelve months after they outgrow the thresholds.", kind:"single", skip:() => ds.tier === "vlop",
       opts:() => DS_SIZE.map(([k, n, h]) => ({k, n, h})), get:() => ds.size, set:k => setV("size", k)},
     {id:"est", eb:"Where", title:"Where is the company established?", why:"A provider outside the EU that serves EU users needs a legal representative in a member state.", kind:"single",
@@ -370,10 +376,12 @@ function dsSetupHTML(x, ap, s){
   return `<div class="pol-setup cp-setup ds-setup">
     ${typeof gdHas === "function" ? `<div class="banner gd-switch"><span>Prefer one question at a time? <button type="button" class="pol-add" data-ds="guide">Switch to guided</button></span></div>` : ""}
     ${sec(++n, "ds-svc", "Your service", "Optional", `<div class="field"><label for="ds-svc-in">Service or product name</label><input class="input" id="ds-svc-in" value="${esc(ds.svc)}" maxlength="80" placeholder="For example: Pixelry"></div>`)}
-    ${sec(++n, "ds-tier", "What kind of service", "", `<div class="tr-tiers ds-tiers" role="radiogroup" aria-label="Kind of service">${DS_TIERS.map(([k, nm, h]) => tile("dstier", ds.tier, k, nm, h)).join("")}</div>`, "The Act stacks duties by tier. Every intermediary has some, hosting services more, online platforms more still, and very large platforms all of them.")}
+    ${sec(++n, "ds-tier", "What kind of service", "", `<div class="tr-tiers ds-tiers" role="radiogroup" aria-label="Kind of service">${DS_TIERS.map(t => tile("dstier", ds.tier, t[0], t[1], dsTierHint(t))).join("")}</div>`, "The Act stacks duties by tier. Every intermediary has some, hosting services more, online platforms more still, and very large platforms all of them.")}
     ${ds.tier && ds.tier !== "vlop" ? sec(++n, "ds-size", "How big", "", `<div class="tr-tiers" role="radiogroup" aria-label="Company size">${DS_SIZE.map(([k, nm, h]) => tile("dssize", ds.size, k, nm, h)).join("")}</div>`, "Micro and small enterprises are exempt from most platform duties and from transparency reports, until twelve months after they outgrow the thresholds.") : ""}
+    ${ds.tier === "vlop" ? `<p class="note ds-skipnote">Very large platforms carry every duty in the Act regardless of size, so there's no size question to answer.</p>` : ""}
     ${ds.tier ? sec(++n, "ds-est", "Where", "", `<div class="tr-tiers" role="radiogroup" aria-label="Establishment">${DS_EST.map(([k, nm, h]) => tile("dsest", ds.est, k, nm, h)).join("")}</div>`) : ""}
-    ${ds.tier && x.rank >= 3 ? sec(++n, "ds-feat", "Features", "Tick all that apply", `<div class="tr-checks">${DS_FEAT.map(([k, nm, h]) => chk("feat", k, nm, h)).join("")}</div>`, "Ads, recommendations, traders and minors each bring their own articles.") : ""}
+    ${ds.tier && x.rank >= 3 ? sec(++n, "ds-feat", "Features", "Tick all that apply", `<div class="tr-checks">${DS_FEAT.map(([k, nm, h]) => chk("feat", k, nm, h)).join("")}</div>`, "Ads, recommendations, traders and minors each bring their own articles.") :
+      ds.tier ? `<p class="note ds-skipnote">${esc(dsLabel(DS_TIERS, ds.tier))} doesn't carry the platform-only duties, like ads, recommendations or minors' protections, that bring the Features questions with them, so there's none to answer here.</p>` : ""}
     ${ds.tier ? `<div class="card pol-sum tr-sum ds-sum ${ap.tone}"><div><span class="eyebrow">What applies</span><h2 class="pol-verdict">${esc(ap.h)}</h2><p class="note">${esc(ap.t)}</p></div></div>` : ""}
     ${groups.map(({g, items}) => sec(++n, "ds-g-" + g.k, g.n, `${items.filter(it => ds.ctrl[it.k]).length} of ${items.length} in place`, `<div class="tr-checks">${items.map(it => chk("ctrl", it.k, it.t, it.cite)).join("")}</div>`, g.h ? esc(g.h) + " Tick what's true today." : "Tick what's true today.")).join("")}
     ${ds.tier ? `<div class="pol-run"><button type="button" class="btn primary" data-ds="build">Build my plan</button><span class="note">${s.total} dut${s.total === 1 ? "y" : "ies"} apply · ${s.met} in place</span></div>` : ""}

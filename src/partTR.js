@@ -230,6 +230,11 @@ function trCatsHTML(){
       return `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td><input class="input mono" data-trc="${esc(c)}" data-trk="n" value="${esc(String(r.n || ""))}" inputmode="numeric" aria-label="${esc(c)}: notices"></td>` : ""}<td><input class="input mono" data-trc="${esc(c)}" data-trk="o" value="${esc(String(r.o || ""))}" inputmode="numeric" aria-label="${esc(c)}: own-initiative measures"></td></tr>`; }).join("")}</tbody></table>
     <p class="note">The category list is exhaustive: you can't add new top-level categories, only sub-categories within them.</p></details>`;
 }
+// Shared by the above-the-fold summary and the full report body, so the two never disagree.
+function trCatTableHTML(){
+  if(!TR_CATS.some(c => tr.cat[c] && (tr.cat[c].n || tr.cat[c].o))) return "";
+  return `<table class="tr-ct"><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.filter(c => tr.cat[c] && (tr.cat[c].n || tr.cat[c].o)).map(c => `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td class="mono">${tr.cat[c].n ? Number(tr.cat[c].n).toLocaleString("en-US") : "–"}</td>` : ""}<td class="mono">${tr.cat[c].o ? Number(tr.cat[c].o).toLocaleString("en-US") : "–"}</td></tr>`).join("")}</tbody></table>`;
+}
 function trReportHTML(ai){
   const p = trProgress(), secs = trSections(), tab = ["report", "checklist", "summary"].includes(tr.tab) ? tr.tab : "report";
   const catOver = ["n", "o"].map(k => { const sum = TR_CATS.reduce((a, c) => a + (+((tr.cat[c] || {})[k]) || 0), 0), tot = +tr.v[k === "n" ? "notices" : "own_total"] || 0; return sum > tot && tot ? (k === "n" ? "notices" : "own-initiative measures") : null; }).filter(Boolean);
@@ -248,6 +253,7 @@ function trReportHTML(ai){
     </div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
     ${chapterLinkHTML("transparency")}
+    ${trCatTableHTML() ? `<div class="card tr-cat-top"><span class="eyebrow">By category</span><h3 class="pol-lbl" style="margin:2px 0 10px">Notices and own-initiative measures</h3>${trCatTableHTML()}<p class="note">The DSA's own breakdown, straight from your numbers. The full report, in article order, is in the tabs below.</p></div>` : ""}
     <details class="ev-details"><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
       ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>
@@ -263,7 +269,7 @@ function trPreviewHTML(){
         return `<div><dt>${esc(f[1])}</dt><dd class="${has ? "" : "miss"}">${has ? esc(trFmt(f, tr.v[f[0]])) : "Not provided"}${ch !== null ? `<small class="${ch >= 0 ? "up" : "dn"}">${ch >= 0 ? "+" : ""}${ch}% on the previous period</small>` : ""}</dd></div>`; }).join("")}</dl>` : ""}
       ${s.f.filter(f => f[2] === "txt").map(f => `<p><b>${esc(f[1])}.</b> ${trHas(f) ? esc(String(tr.v[f[0]]).trim()) : `<span class="miss">Not provided.</span>`}</p>`).join("")}
       ${s.f.filter(f => f[2] === "chk").length ? `<ul class="tr-docs">${s.f.filter(f => f[2] === "chk").map(f => `<li class="${tr.v[f[0]] ? "ok" : "miss"}">${tr.v[f[0]] ? "✓" : "○"} ${esc(f[1])}</li>`).join("")}</ul>` : ""}
-      ${s.k === "own" && TR_CATS.some(c => tr.cat[c] && (tr.cat[c].n || tr.cat[c].o)) ? `<table class="tr-ct"><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.filter(c => tr.cat[c] && (tr.cat[c].n || tr.cat[c].o)).map(c => `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td class="mono">${tr.cat[c].n ? Number(tr.cat[c].n).toLocaleString("en-US") : "–"}</td>` : ""}<td class="mono">${tr.cat[c].o ? Number(tr.cat[c].o).toLocaleString("en-US") : "–"}</td></tr>`).join("")}</tbody></table>` : ""}
+      ${s.k === "own" ? trCatTableHTML() : ""}
     </section>`).join("")}
     <p class="note">When you file, use the Commission's own <a href="${TR_SRC.download[1]}" target="_blank" rel="noopener">CSV and XLSX templates</a>: counts as whole numbers, shares between 0 and 1, and median times in hours. This page helps you gather and explain the numbers; it isn't the official template.</p></article>`;
 }

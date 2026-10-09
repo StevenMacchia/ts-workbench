@@ -190,7 +190,15 @@ const PAGE_TOURS = {
 const helpRoute = () => (location.hash || "#overview").slice(1).split("/")[0] || "overview";
 // Screenshots and automated checks run without tips
 const helpQuiet = () => /[?&]shot=/.test(location.search || "");
-function helpBtn(){ return PAGE_TOURS[helpRoute()] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this page works</button>` : ""; }
+// One button, "How this works". Where the tool has a walkthrough (INTRO_SPECS, partINTRO.js) it opens
+// that, and the walkthrough's last screen offers the live page tour (PAGE_TOURS, above) as a second
+// step. Where there is no walkthrough, the button runs the page tour directly. Two buttons with
+// near-identical labels confused people, so there is only ever one.
+function helpBtn(){
+  const r = helpRoute();
+  if(typeof INTRO_SPECS !== "undefined" && INTRO_SPECS[r]) return `<button type="button" class="ph-help" data-intro="how">${icon("info")}How this works</button>`;
+  return PAGE_TOURS[r] ? `<button type="button" class="ph-help" data-help="tour">${icon("info")}How this works</button>` : "";
+}
 function helpTour(r){
   r = r || helpRoute(); const steps = PAGE_TOURS[r];
   if(!steps || !steps.some(([s]) => document.querySelector(s))) return gsay("This page doesn't have a tour");
@@ -208,7 +216,7 @@ function helpOffer(r){
     <div class="tour-a"><button type="button" class="btn sm" data-help="off">Turn off tips</button><button type="button" class="btn sm primary" data-help="go">Show me ${icon("arrow")}</button></div>`;
 }
 function helpToggle(){ const off = !store.get("help:off", false); store.set("help:off", off); if(off) helpOfferClose();
-  gsay(off ? "Page tips are off. Every page's “How this page works” button still works" : "Page tips are back on"); }
+  gsay(off ? "Page tips are off. Every page's “How this works” button still works" : "Page tips are back on"); }
 
 // Called by the router after every page render
 // Tours are never offered uninvited: each page explains itself, and "How this page works" replays the tour on request
@@ -232,6 +240,8 @@ const GT_MORE = {
   "gpt-oss-safeguard":"An open model from OpenAI that labels content against a policy you write. Free to download; you run it on your own hardware.",
   "RFP":"Request for proposal: the document you send vendors asking how they would meet your requirements, and at what price.",
   "DTSP":"The Digital Trust & Safety Partnership, an industry group whose Safe Framework sets out Trust & Safety good practice.",
+  "ICU":"Ofcom's code prefix for its Illegal Content Code of Practice for user-to-user services, under the UK Online Safety Act.",
+  "PCU":"Ofcom's code prefix for its Protection of Children Code of Practice for user-to-user services, under the UK Online Safety Act.",
   "sextortion":"Threatening to share someone's intimate images unless they pay or send more. Teenagers are frequent targets.",
   "grooming":"When an adult builds a child's trust over time in order to sexually abuse or exploit them.",
   "incident command":"A clear structure for running a crisis: one person in charge, defined roles and a regular rhythm of updates.",

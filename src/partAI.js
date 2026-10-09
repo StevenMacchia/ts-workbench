@@ -65,8 +65,18 @@ The checklist must cover: the action and what it means, the facts, the rule reli
     checklist:AI_ARR(r.checklist).filter(c => c && c.item).map(c => ({item:AI_STR(c.item), present:!!c.present, note:AI_STR(c.note)})),
     risks:AI_ARR(r.risks).map(AI_STR).filter(Boolean), reading_level:AI_STR(r.reading_level), assumptions:AI_ARR(r.assumptions).map(AI_STR).filter(Boolean)};
     return o.notice ? o : null; },
+  // No-Claude fallback: a plain substitution of the visitor's own answers into a letter shape, so the public site
+  // never returns nothing. Not scored or reviewed - the visitor edits it themselves before sending.
+  tmpl:f => { const act = AI_STR(f.action) || "[say what action you took]", prod = AI_STR(f.product);
+    const regionNote = (f.regions || []).length ? ` If you're in ${f.regions.map(r => ({eu:"the EU", uk:"the UK", us:"the US", other:"your region"}[r] || r)).join(" or ")}, check whether local law requires you to mention a specific appeal route or dispute body.` : "";
+    return [`Subject: Action on your ${prod ? prod.split(",")[0].trim() + " " : ""}account`, "", "Hi,", "",
+      `Action taken: ${act}.`, `Reason: this didn't follow ${AI_STR(f.policy) || "[name the exact rule or policy section]"}.`, "",
+      `What happened: ${AI_STR(f.facts) || "[say what happened, when, and how often]"}`, "",
+      `How this was decided: ${AI_STR(f.auto) || "[say whether automation, a person, or both made this decision]"}`, "",
+      `How to appeal: ${AI_STR(f.appeal) || "[say where, and by what deadline, the user can appeal]"}`, "",
+      "[This is a plain template built only from the answers above - edit every bracket, and the rest, before you send it.]" + regionNote].join("\n"); },
   render:r => `
-    <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy notice</button></div>
+    <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">Reading level: ${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy notice</button></div>
       <div class="ai-letter"><div class="ai-subj"><span>Subject</span><b>${esc(r.subject)}</b></div><div class="ai-body">${esc(r.notice)}</div></div></div>
     ${r.short_version ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Short version</h3><span class="note">For a push notification or text message</span><button type="button" class="btn sm" data-copy="short_version">${icon("copy")}Copy</button></div><div class="ai-short">${esc(r.short_version)}</div></div>` : ""}
     ${r.checklist.length ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Statement-of-reasons check</h3><span class="note">${r.checklist.filter(c => c.present).length} of ${r.checklist.length} covered</span></div>
@@ -146,6 +156,17 @@ Return ONLY a JSON object with exactly these keys:
     suggested_action:AI_STR(r.suggested_action), reply_to_user:AI_STR(r.reply_to_user), note_for_record:AI_STR(r.note_for_record), policy_feedback:AI_STR(r.policy_feedback),
     steering_attempts:AI_ARR(r.steering_attempts).map(AI_STR).filter(Boolean)};
     return o.summary && o.elements.length ? o : null; },
+  // No-Claude fallback: lays out the same facts as a worksheet with the questions a reviewer would ask themselves,
+  // instead of Claude's structured opinion. Not a review - the visitor decides and fills in their own reasoning.
+  tmpl:f => [`Case worksheet (template - work through this yourself; not Claude's review)`, "",
+    `Rule applied: ${AI_STR(f.policy) || "[paste the rule, including exceptions]"}`,
+    `Original decision: ${AI_STR(f.action) || "[the action taken]"}${AI_STR(f.reason) ? ` - reviewer's reason: ${AI_STR(f.reason)}` : ""}`, "",
+    `The content or behavior: ${AI_STR(f.content) || "[describe the content]"}`, "",
+    `The user's appeal: ${AI_STR(f.appeal) || "[what the user said]"}`,
+    ...(AI_STR(f.context) ? ["", `Other context: ${AI_STR(f.context)}`] : []), "",
+    "Work through each part of the rule:", "- Does every element of the rule apply to these facts?", "- Does any exception in the rule apply?",
+    "- Is the user's explanation credible given the context you have?", "- What's missing before you could decide confidently?", "",
+    "Decision: [uphold / overturn / change to a lesser action / escalate to a specialist]", "Reply to the user: [write your reply here]"].join("\n"),
   render:r => { const R = AI_REC[r.recommendation], met = {yes:["Met","crit"], no:["Not met","good"], unclear:["Unclear","med"]};
     return `
     <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
@@ -271,7 +292,7 @@ const aiTier = s => s.depth === "deep" ? "complex" : "default";
 const aiPut = (k, s) => store.set("ai:" + k, s);
 
 function aiField(T, fd, v){
-  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <em class="ai-req">required</em>` : ""}</span>`;
+  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ""}</span>`;
   const help = fd.help ? `<small class="ai-help">${esc(fd.help)}</small>` : "";
   if(fd.type === "select") return `<label class="mxa-y ai-f">${lab}<select class="select" id="${id}" data-fk="${fd.k}">${fd.opts.map(o => `<option ${v === o ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>${help}</label>`;
   if(fd.type === "checks") return `<fieldset class="ai-f ai-checks"><legend>${esc(fd.lab)}</legend><div>${fd.opts.map(([ov, ol]) => `<label class="ai-chk"><input type="checkbox" data-fk="${fd.k}" value="${ov}" ${(v || []).includes(ov) ? "checked" : ""}><span>${esc(ol)}</span></label>`).join("")}</div>${help}</fieldset>`;
@@ -296,23 +317,9 @@ function aiScoreFill(){
 // The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
 AI_TOOLS.transparency.builder = true;
 AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
-const AI_WIP = {transparency:{
-  plan:["Report sections built from your Metrics scorecard, with what each number means", "A checklist of what the EU Digital Services Act expects in each report, and what's missing", "Comparisons with the previous period, written for regulators, press and users"],
-  meanwhile:[["metrics/scorecard", "gauge", "var(--t-mx)", "Track the numbers now", "Record enforcement numbers in the Metrics scorecard, so they're ready when the drafter returns."], ["notice", "mail", "var(--t-ai)", "Write enforcement notices", "Draft clear notices to users, checked against what an EU statement of reasons must include."], ["premortem", "radar", "var(--t-pm)", "Map the laws that apply", "See which online safety laws, including reporting duties, likely apply where you operate."]]}};
-function renderAIWip(key){
-  const T = AI_TOOLS[key], w = AI_WIP[key] || {plan:[], meanwhile:[]};
-  view.innerHTML = head(T.n, "This assistant is being rebuilt so it produces reports that hold up in front of regulators. It will be back soon.", "AI assistants", `<span class="pill ai-pill">Under construction</span>`) + `
-    <div class="card wip">
-      <div class="wip-art" aria-hidden="true"><svg viewBox="0 0 120 80"><rect x="8" y="30" width="104" height="18" rx="4" fill="var(--sunk)" stroke="var(--line-strong)"/>
-        <path d="M18 30l-10 18M38 30l-12 18M58 30l-12 18M78 30l-12 18M98 30l-12 18M112 36l-8 12" stroke="var(--high)" stroke-width="7" stroke-linecap="square" opacity=".85"/>
-        <rect x="18" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/><rect x="96" y="48" width="6" height="24" rx="2" fill="var(--line-strong)"/>
-        <circle cx="21" cy="22" r="6" fill="var(--high)"/><circle cx="99" cy="22" r="6" fill="var(--high)"/><rect x="19" y="24" width="4" height="7" fill="var(--line-strong)"/><rect x="97" y="24" width="4" height="7" fill="var(--line-strong)"/></svg></div>
-      <div class="wip-b"><span class="wip-tag">Under construction</span><h2>${esc(T.n)} is being rebuilt</h2>
-        <p>Transparency reports are read closely by regulators, journalists and researchers, so this tool needs to get the details right. It's offline while that work happens.</p>
-        ${w.plan.length ? `<h4>What it will do</h4><ul>${w.plan.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div>
-    </div>
-    ${w.meanwhile.length ? `<h3 class="wip-h">In the meantime</h3><div class="wip-links">${w.meanwhile.map(([h, ic, c, n, d]) => `<a class="card wip-l" href="#${h}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><span class="note">${d}</span></span><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>` : ""}`;
-}
+// AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
+// no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
+// above, so the placeholder path was unreachable dead code (audit §12 item 2).
 /* ---------- Guided: each field on its own screen, then the run ---------- */
 const aiView = {};
 function aiSpec(key){
@@ -327,7 +334,7 @@ function aiSpec(key){
     return Object.assign(base, {kind:"text", rows:fd.type === "area" ? (fd.rows || 4) + 1 : 1, placeholder:fd.ph || "", get:() => F()[fd.k] || "", set:v => setV(fd.k, v)});
   });
   return {k:key, tool:{name:T.n, icon:T.icon.replace(/^i-/, ""), color:"var(--t-ai)"},
-    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
+    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], note:"Without a Claude account: an example result, plus a plain template you fill in yourself. Open in Claude to run the real AI review on your own case.", facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { aiView[key] = "page"; renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }},
       {n:"Fill in an example", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; gdReset(key); renderAI(key); window.scrollTo(0, 0); }},
       {n:"See an example result", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; aiView[key] = "page"; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); }}],
@@ -336,7 +343,6 @@ function aiSpec(key){
 }
 function renderAI(key){
   if(key === "transparency" && typeof renderTransparency === "function") return renderTransparency();
-  if(AI_TOOLS[key].wip) return renderAIWip(key);
   const T = AI_TOOLS[key], st = aiGet(key), run = AIRUN[key] = AIRUN[key] || {};
   // Guided until there is a result or the one-page form was asked for
   if(!st.r && !run.busy && aiView[key] !== "page" && typeof gdRender === "function") return gdRender(aiSpec(key));
@@ -344,6 +350,9 @@ function renderAI(key){
   const f = Object.assign(Object.fromEntries(T.fields.map(fd => [fd.k, fd.type === "select" ? fd.opts[0] : fd.type === "checks" ? [] : ""])), typeof aiOrgDefaults === "function" ? aiOrgDefaults(T, st) : {}, st.f);
   const ai = !!SAMPLER && !run.off, missing = T.fields.filter(fd => fd.req && !String(f[fd.k] || "").trim());
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
+  // A short preview of what the fill button inserts, so it isn't a blind click
+  const fillLines = fill ? fill.split("\n") : [];
+  const fillPreview = fillLines.slice(0, 5).join("\n") + (fillLines.length > 5 ? `\n+${fillLines.length - 5} more` : "");
   const out = run.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ai-stage" aria-live="polite">${AI_PHASE[run.phase || "thinking"]}…</b><span class="note">${st.depth === "deep" ? "A deep review usually takes one to two minutes." : "This usually takes 15 to 40 seconds."} It runs on your own Claude account. The first time, Claude asks you to allow it.</span></div><button type="button" class="btn sm" id="ai-stop">Stop</button></div>`
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
         <div class="ai-out-a"><span class="toast" id="ai-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
@@ -355,16 +364,20 @@ function renderAI(key){
       <form class="card ai-form" id="ai-form" onsubmit="return false">
         ${st.r || run.busy ? "" : `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" id="ai-guide">Switch to guided</button></div>`}
         <div class="ai-fields">${T.fields.map(fd => aiField(T, fd, f[fd.k])).join("")}</div>
-        ${fill ? `<button type="button" class="mx-link ai-fill" id="ai-fill">Use the numbers from my Metrics scorecard</button>` : ""}
+        ${fill ? `<span class="ai-fill-wrap"><button type="button" class="mx-link ai-fill" id="ai-fill" aria-describedby="ai-fill-prev">Use the numbers from my Metrics scorecard</button><span class="ai-fill-prev" id="ai-fill-prev" role="tooltip">${esc(fillPreview)}</span></span>` : ""}
         ${run.err ? `<p class="ai-err" role="alert">${esc(run.err)}</p>` : ""}
         <div class="ai-act">
           ${!ai && STANDALONE ? `<a class="btn primary" href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Run it in Claude</a>` : `<button type="button" class="btn primary" id="ai-run" ${!ai || run.busy ? "disabled" : ""}>${ai ? "Run with Claude" : "Open in Claude to run"}</button>`}
+          ${!ai && STANDALONE && T.tmpl ? `<button type="button" class="btn" id="ai-tmpl">Build a template without Claude</button>` : ""}
           ${ai ? `<div class="segs" role="group" aria-label="Review depth"><button type="button" data-aidepth="default" aria-pressed="${st.depth !== "deep"}">Standard</button><button type="button" data-aidepth="deep" aria-pressed="${st.depth === "deep"}">Deep</button></div>` : ""}
           <button type="button" class="btn" id="ai-ex">Fill in an example</button>
           <button type="button" class="btn" id="ai-sample">See an example result</button>
           <button type="button" class="btn ghost" id="ai-clear">Clear</button>
         </div>
-        ${!ai ? `<p class="note ai-off">${STANDALONE ? `This is the free public version. To run the AI step on your own case, open the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>, where it uses your own Claude account. The example result shows what you'll get.` : "The AI step runs inside Claude, on the viewer's own account. You can still explore the example result."}</p>` : missing.length ? `<p class="note">Fill in ${missing.map(fd => fd.lab.toLowerCase()).join(", ")} to get the best result.</p>` : ""}
+        ${!ai ? `<p class="note ai-off">${STANDALONE ? `This is the free public version. To run the AI step on your own case, open the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>, where it uses your own Claude account.${T.tmpl ? " Or build a plain template below from your own answers right now." : " The example result shows what you'll get."}` : "The AI step runs inside Claude, on the viewer's own account. You can still explore the example result."}</p>` : missing.length ? `<p class="note">Fill in ${missing.map(fd => fd.lab.toLowerCase()).join(", ")} to get the best result.</p>` : ""}
+        ${st.tmplText ? `<div class="ai-sec ai-tmpl-out"><div class="ai-sec-h"><h3>Template draft</h3><span class="pill">Template, not an AI review</span><span class="toast" id="ai-tmpl-toast" aria-live="polite"></span><button type="button" class="btn sm" id="ai-tmpl-copy">${icon("copy")}Copy</button></div>
+          <p class="note">Built only by filling your own answers into a letter shape - no AI wrote or checked this. Edit the brackets, and anything else, before you use it.</p>
+          <textarea class="input ai-tmpl-ta" id="ai-tmpl-ta" rows="12">${esc(st.tmplText)}</textarea></div>` : ""}
       </form>
       <aside class="ai-rail">
         <div class="card ai-about"><h4>How this works</h4>
@@ -385,6 +398,9 @@ function renderAI(key){
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
   const stop = $("#ai-stop"); if(stop) stop.onclick = () => { if(run.ctl) run.ctl.abort(); };
   const rb = $("#ai-run"); if(rb) rb.onclick = () => aiRun(key);
+  const tb = $("#ai-tmpl"); if(tb) tb.onclick = () => { if(document.getElementById("ai-form")) persist(); const s = aiGet(key); s.tmplText = T.tmpl(s.f); aiPut(key, s); renderAI(key); setTimeout(() => { const ta = $("#ai-tmpl-ta"); if(ta && ta.scrollIntoView) ta.scrollIntoView({behavior:"smooth", block:"nearest"}); }, 30); };
+  const tta = $("#ai-tmpl-ta"); if(tta) tta.oninput = () => { const s = aiGet(key); s.tmplText = tta.value; aiPut(key, s); };
+  const tcp = $("#ai-tmpl-copy"); if(tcp) tcp.onclick = () => { const ta2 = $("#ai-tmpl-ta"); copyText(ta2 ? ta2.value : st.tmplText, $("#ai-tmpl-toast")); };
   if(st.r){
     const md = T.md(st.r, st.f);
     view.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => copyText(b.dataset.copy === "__md" ? md : st.r[b.dataset.copy], $("#ai-toast")));

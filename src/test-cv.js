@@ -17,6 +17,8 @@ const body = function(){
   cvView = "table"; renderCoverage(); h = view.innerHTML; if(bad(h)) throw new Error("blank table has bad values: " + where(h));
   eq((h.match(/class="cv-mr"/g) || []).length, 8, "one matrix row per harm area"); eq((h.match(/role="radio"/g) || []).length, 8 * 5 * 4, "four levels per cell");
   eq(cvRisk(cv), null, "no risk without a source"); eq(/No risk yet: coverage only/.test(h) && /Start a pre-mortem/.test(h) && /Switch to guided/.test(h), true, "invites a pre-mortem");
+  eq(/See how this works with an example/.test(h) && /data-cvsrc="ex:teen_social"/.test(h), true, "coverage only is never a silent default: a banner steers to an example");
+  cv.src = "ex:teen_social"; eq(cvSrc(cv).src, "ex:teen_social", "the example banner's button sets a real source"); cv.src = null;
   cvView = null;
   out.push("blank: guided intro, or an 8 × 5 table; coverage only until there's a pre-mortem");
   // guided: which harms apply, one question at a time, a result after each area, then results
@@ -30,7 +32,9 @@ const body = function(){
   cvGo("guide"); eq(cvG.scr + cvG.a + cvG.l, "q11", "guided resumes at the first open question");
   CV_AREAS.forEach(a => { cv.r[a.k] = Object.assign({policy:1, detect:1, enforce:1, appeal:1, measure:1}, cv.r[a.k]); }); cvG = null; cvView = null; renderCoverage(); h = view.innerHTML;
   eq(cvMode(), "results", "every answer given: results"); eq(/Your coverage is <b>\d+%<\/b>/.test(h) && /data-cvtab="answers"/.test(h), true, "results with the detail in tabs");
-  cvTab = "answers"; renderCoverage(); eq((view.innerHTML.match(/class="cv-mr"/g) || []).length, 8, "answers editable in the results"); cvTab = "gaps";
+  cvTab = "answers"; renderCoverage(); eq((view.innerHTML.match(/class="cv-mr"/g) || []).length, 8, "answers editable in the results");
+  eq(view.innerHTML.includes('class="cv-cell-lv">Tested against edge cases, reviewed on a schedule, and shaped by appeals data.'), true, "a rated layer's level sentence shows inline, not only on hover");
+  cvTab = "gaps";
   out.push("guided: harms that apply, one question at a time, a result per area, back and resume, table and results");
   // example: teen social app risk against a typical early program
   cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); renderCoverage(); h = view.innerHTML;

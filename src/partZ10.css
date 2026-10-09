@@ -53,10 +53,11 @@
 .ev-rid{font-size:11.5px;color:var(--muted);margin-right:6px}
 .ev-rk{font-size:12.5px;color:var(--muted);padding-top:2px}
 .ev-row .select.sm{padding:4px 8px;font-size:13px;width:100%;box-sizing:border-box}
-.ev-own summary,.ev-opts summary,.ev-details summary,.ev-kinds summary,.ev-guide summary{cursor:pointer;font-weight:600;font-size:14px}
-.ev-own summary .note,.ev-opts summary .note,.ev-details summary .note{font-weight:400;margin-left:6px}
+.ev-own summary,.ev-opts summary,.ev-details summary,.ev-kinds summary,.ev-guide summary,.ev-local summary{cursor:pointer;font-weight:600;font-size:14px}
+.ev-own summary .note,.ev-opts summary .note,.ev-details summary .note,.ev-local summary .note{font-weight:400;margin-left:6px}
 .ev-own>.note,.ev-own textarea{margin-top:8px}
 .ev-own>.pol-run{margin-top:10px}
+.ev-local>.note,.ev-local>.ev-case-a{margin-top:8px}
 .ev-opts-b{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 20px;margin-top:12px}
 .ev-opts-b .ev-opt-wide{grid-column:1/-1}
 .ev-opts-b .tr-tiers{gap:8px}.ev-opts-b .tr-tier{padding:10px 12px}.ev-opts-b .tr-tier b{font-size:13.5px}

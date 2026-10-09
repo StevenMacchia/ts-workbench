@@ -43,6 +43,7 @@ function gdIntroHTML(spec){
     <span class="gd-tool"><span class="sb-glyph" style="background:${T.color}"><svg><use href="#i-${T.icon}"/></svg></span>${esc(T.name)}</span>
     <h1>${I.title}</h1>
     <p class="gd-lead">${I.lead}</p>
+    ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}
     ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
     ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
@@ -87,7 +88,11 @@ function gdRender(spec){
   view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" role="status" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
   if(spec.bind) spec.bind();
 }
-const gdFocus = () => { const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };
+// A step whose first field is still its own placeholder gets the cursor put right in it, the same
+// way a typed "name" question does, so the field reads as yours to change rather than as a label
+const gdAutoFill = () => { const f = view.querySelector && view.querySelector(".vd-names input.vname"); return f && /^Vendor [A-D]$/.test(f.value) ? f : null; };
+const gdFocus = () => { const fill = gdAutoFill(); if(fill) return (fill.focus(), fill.select());
+  const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };
 function gdShow(spec){ gdRender(spec); if(window.scrollY > 120) window.scrollTo(0, 0); gdFocus(); }
 function gdGo(spec, act){
   clearTimeout(gdGo.t); const p = gdPos(spec.k), st = gdLive(spec);

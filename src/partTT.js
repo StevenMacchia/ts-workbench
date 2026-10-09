@@ -19,6 +19,9 @@ const DIM_BLIND = {
   team:"You tended to overload or overlook your own team. Sustainable response needs triage, rotation and support for the people doing the work."
 };
 const ttProgress = () => store.get("tt:progress", {}) || {};
+// Every scenario written once per company type it's tailored for (ALL_TYPES.length versions each); the rest counted once.
+// This is the one count every "scenario version" figure on the site (All tools, inside the tool, About) is built from.
+const ttVersionCount = () => SCENARIOS.reduce((a, s) => a + (s.vars ? ALL_TYPES.length : 1), 0);
 const ttKey = (s, v) => { const sc = SCENARIOS[s]; return sc.id + (sc.vars ? ":" + (v || "all") : ""); };
 const ttSave = () => store.set("tt", tt);
 const sevPill = sev => `<span class="pill ${SEV_BAND[sev]||"crit"}"><span class="dot"></span>${esc(sev)}</span>`;
@@ -37,6 +40,12 @@ function ttWhyHTML(sc, type, full){
 }
 
 /* ---------- picker ---------- */
+// The highest-severity scenario not yet completed for this company type, so a newcomer can skip straight in
+const ttSevRank = s => +(String(s.severity || "").match(/\d/) || [9])[0];
+function ttBestFit(all, pOf){
+  const open = all.filter(x => !pOf(x)), pool = open.length ? open : all;
+  return pool.slice().sort((a, b) => ttSevRank(a.s) - ttSevRank(b.s))[0] || null;
+}
 function ttPicker(H){
   const ttMode = typeof ttfNew === "function" ? store.get("tt:mode", "solo") : "solo";
   const ttType = ttCompanyType(), tInfo = TT_TYPES.find(t=>t.k===ttType), prog = ttProgress(), filt = store.get("tt:filter", "all");
@@ -45,8 +54,10 @@ function ttPicker(H){
   const pOf = x => prog[ttKey(x.i, ttType)];
   const completed = all.filter(pOf).length;
   const list = filt==="todo" ? all.filter(x=>!pOf(x)) : filt==="done" ? all.filter(pOf) : all;
+  const bestFit = ttBestFit(all, pOf);
   view.innerHTML = H("Rehearse a crisis before it happens. Each scenario is four timed decisions. Pick a weaker answer and you'll see why, how it compares with the strongest call and the law behind it, and you can try again.") + `
     <p class="mxa-q tt-q">When something goes badly wrong, would your team make the right calls in the right order?</p>
+    ${bestFit ? `<div class="gd-a tt-one"><button type="button" class="btn primary" id="tt-one">Just show me one ${icon("arrow")}</button><span class="note">Starts ${esc(bestFit.s.title)}, the scenario most worth rehearsing right now. Skips the choices below.</span></div>` : ""}
     <div class="mxm-how tt-how"><ol class="mxm-how-s">
       <li><b>1</b><span><em>Pick your company type.</em> Scenarios are written for the risks and regulators you face.</span></li>
       <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as the incident unfolds. About 8 minutes each.</span></li>
@@ -58,7 +69,7 @@ function ttPicker(H){
       <div class="ttprog">
         <div class="row" style="justify-content:space-between"><span class="eyebrow">Your progress</span><span class="note mono">${completed} of ${all.length} completed</span></div>
         <div class="bar"><i style="width:${all.length?completed/all.length*100:0}%;background:var(--good)"></i></div>
-        <p class="note">${all.length} scenarios written for ${tInfo.s} companies.</p>
+        <p class="note">${all.length} scenarios written for ${tInfo.s} companies${all.length < SCENARIOS.length ? `, out of ${SCENARIOS.length} in the library` : ""} (${ttVersionCount()} versions in all, across ${ALL_TYPES.length} sectors).</p>
       </div>
     </div>
     <div class="row ttfilters"><div class="segs tt-mode" role="group" aria-label="How to play"><button type="button" data-ttmode="solo" aria-pressed="${ttMode !== "team"}">Play solo</button><button type="button" data-ttmode="team" aria-pressed="${ttMode === "team"}">Run with a team</button></div>
@@ -75,8 +86,10 @@ function ttPicker(H){
         <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p>
         <span class="scen-foot"><span class="note">${esc(s.platform)} · ${s.steps.length} decisions</span>
           ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
+        ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<small class="scen-src-cap">Sourced: backed by public data on how common this problem is</small>` : ""}
       </button>`; }).join("")}</div>`
     : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
+  const one = $("#tt-one"); if(one) one.onclick = () => ttMode === "team" ? ttfNew(bestFit.i, ttType) : ttStart(bestFit.i, ttType);
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
   $$("[data-ttmode]").forEach(b => b.onclick = () => { store.set("tt:mode", b.dataset.ttmode); renderTabletop(); const f = document.querySelector(`[data-ttmode="${b.dataset.ttmode}"]`); if(f) f.focus(); });
   $("#tt-type").onchange = e => { store.set("tt:type", e.target.value); renderTabletop(); };
@@ -87,7 +100,7 @@ function ttPicker(H){
 function ttMeters(sc){
   const answered = tt.first.filter(x=>x!==undefined).length, strong = sc.steps.filter((_,i)=>firstWasBest(sc,i)).length;
   return `<aside class="card meters" aria-label="Incident scorecard">
-    <span class="eyebrow">${esc(sc.title)}</span>
+    <span class="eyebrow">${esc(sc.title)} ${tip("Four scores, 0 to 100, that move with each decision you make: user safety, public trust, regulatory standing and team capacity. The debrief shows the average across all four.")}</span>
     ${DIMS.map(d=>`<div class="meter"><div class="top"><span>${d.n}</span><span class="mono">${tt.scores[d.k]}</span></div><div class="bar"><i style="width:${tt.scores[d.k]}%;background:${scoreColor(tt.scores[d.k])}"></i></div></div>`).join("")}
     <div class="firsttry"><span class="eyebrow">Strong calls on first try</span><span class="mono">${strong} / ${answered}</span></div>
     <button class="btn sm" id="tt-quit">Choose another scenario</button>
@@ -170,7 +183,7 @@ function ttDebrief(H, sc){
       <div class="card verdict" aria-live="polite">
         <div class="row" style="gap:8px"><span class="pill ${v[1]}">${firstStrong} of ${n} strongest calls on first try</span>${corrected?`<span class="pill accent">${corrected} corrected on retry</span>`:""}</div>
         <h3>${v[0]}</h3>
-        <p class="muted">Average across the four scores: <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
+        <p class="muted">Average across the four scores (user safety, public trust, regulatory standing and team capacity): <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
       </div>
       <div class="learnsum">
         <div class="card learnbox"><span class="eyebrow">Your blind spot in this run</span>

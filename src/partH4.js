@@ -43,6 +43,11 @@ OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <polygon points="80,22 114,35 112,68 96,98 70,90 44,69 50,36" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3"/>
     <polygon points="80,30 108,39 118,70 86,82 66,92 48,68 58,44" fill="var(--t-cv)" fill-opacity=".25" stroke="var(--t-cv)" stroke-width="2" stroke-linejoin="round"/>
     <circle cx="86" cy="82" r="4" fill="var(--crit)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
+OV_ART.rt = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect x="22" y="22" width="80" height="80" rx="10" fill="var(--surface)" stroke="var(--line-strong)"/>
+    ${[0,1,2,3].map(r => [0,1,2,3].map(c => `<rect x="${32 + c * 16}" y="${32 + r * 16}" width="12" height="12" rx="3" fill="${(r + c) % 3 === 0 ? "var(--t-rt)" : (r * 4 + c) % 5 === 0 ? "var(--high)" : "var(--sunk)"}" opacity="${(r + c) % 3 === 0 ? ".85" : "1"}"/>`).join("")).join("")}
+    <circle cx="124" cy="62" r="24" fill="var(--surface)" stroke="var(--t-rt)" stroke-width="3"/><circle cx="124" cy="62" r="14" fill="none" stroke="var(--t-rt)" stroke-width="2" opacity=".6"/><circle cx="124" cy="62" r="5" fill="var(--t-rt)"/>
+    <path d="M124 30v8M124 86v8M92 62h8M148 62h8" stroke="var(--t-rt)" stroke-width="2.5" stroke-linecap="round"/></svg>`;
 OV_ART.cp = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <rect x="28" y="18" width="72" height="90" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
     <rect x="40" y="31" width="34" height="6" rx="3" fill="var(--t-cp)" opacity=".85"/>
@@ -57,27 +62,14 @@ OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria
     <path d="M112 62l6 6 11-12" fill="none" stroke="var(--t-ds)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
-    <text x="110" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">gold</text><text x="124" y="14" font-size="9" font-family="var(--mono)" fill="var(--muted)">got</text></svg>`;
+    <rect x="104" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/><rect x="122" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/></svg>`;
+// The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
+// pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
-  const d = it.data || {};
-  if(it.kind==="premortem"){ const r = assess(openRecord(d)); return `<span class="ov-chip"><span class="sdot" style="background:${r.posture[1]?`var(--${r.posture[1]})`:"var(--faint)"}"></span>${r.posture[0]}</span>`; }
-  if(it.kind==="tabletop"){ const sc = SCENARIOS[d.s]; if(!sc) return ""; const picks = (d.first && d.first.length) ? d.first : (d.picks||[]); const b = picks.filter((p,i)=>sc.steps[i] && sc.steps[i].o[p] && sc.steps[i].o[p].best).length;
-    return `<span class="ov-chip"><span class="sdot" style="background:${b>=3?"var(--good)":b>=2?"var(--high)":"var(--crit)"}"></span>${b}/${sc.steps.length} first try</span>`; }
-  if(it.kind==="metrics"){ const n = METRICS.filter(m => m.st <= +d.stage && (m.p==="all" || m.p.includes(d.platform)) && (!m.reg || d.reg)).length; return `<span class="ov-chip">${n} metrics</span>`; }
-  if(it.kind==="maturity" && typeof maScore === "function"){ const sc = maScore(d); if(sc===null) return ""; const g = maGaps(d).length;
-    return `<span class="ov-chip"><span class="sdot" style="background:${g ? "var(--high)" : "var(--good)"}"></span>Level ${sc.toFixed(1)}</span>`; }
-  if(it.kind==="coverage" && typeof cvSummary === "function"){ const s = cvSummary(d); if(!s.rated) return "";
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.exposed.length ? "var(--crit)" : s.gaps.length ? "var(--high)" : "var(--good)"}"></span>${s.cov}% covered</span>`; }
-  if(it.kind==="policy"){ const s = d.result ? d.result.score : d.heur ? d.heur.score : null; if(s===null) return "";
-    return `<span class="ov-chip"><span class="sdot" style="background:${s>=75?"var(--good)":s>=50?"var(--high)":"var(--crit)"}"></span>Clarity ${s}</span>`; }
-  if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
-    return `<span class="ov-chip"><span class="sdot" style="background:${m.acc === null ? "var(--faint)" : m.acc >= .9 ? "var(--good)" : m.acc >= .75 ? "var(--high)" : "var(--crit)"}"></span>${m.pct(m.acc)} accurate</span>`; }
-  if(it.kind==="dsa" && typeof dsScore === "function"){ const dd = Object.assign(DS_BLANK(), d), s = dsScore(dd, dsCtx(dd));
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
-  if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), s = cpScore(dd, cpCtx(dd), cpApplies(dd));
-    return `<span class="ov-chip"><span class="sdot" style="background:${s.crit ? "var(--crit)" : s.pct >= 80 ? "var(--good)" : "var(--high)"}"></span>${s.pct}% ready</span>`; }
-  if(it.kind==="vendors"){ const top = vendorResult(d); return `<span class="ov-chip"><span class="sdot" style="background:${top?"var(--t-vd)":"var(--crit)"}"></span>${top ? esc(top.v.name.split(" (")[0]) : "None qualify"}</span>`; }
-  return "";
+  const s = typeof itemSummary === "function" ? itemSummary(it) : {};
+  if(!s.chip || !s.chip.label) return "";
+  const {cls, label} = s.chip;
+  return `<span class="ov-chip">${cls ? `<span class="sdot" style="background:var(--${cls})"></span>` : ""}${esc(label)}</span>`;
 }
 /* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
 const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
@@ -100,6 +92,14 @@ function asSum(k){
     if(k === "transparency"){ const p = trProgress(); return `${p.got} of ${p.total} sections filled in for ${tr.year}`; }
   }catch(e){}
   return "";
+}
+// When a step's own summary changes, stamp the time, so a completed step can show how stale it
+// is before the combined score is trusted. A new key, not a change to any tool's saved shape.
+function asTouch(k, sum){
+  const t = store.get("as:touch", {});
+  if(t[k] && t[k].sum === sum) return t[k].at;
+  t[k] = {sum, at:Date.now()}; store.set("as:touch", t);
+  return t[k].at;
 }
 // The most important thing each finished step found, plus a line on what comes next
 function asKnow(){
@@ -154,7 +154,8 @@ function asPictureHTML(empty){
   const plain = p => { const d = p.detail || "";
     if(p.k === "coverage") return asSum("coverage");
     if(p.k === "policy"){ const n = (d.match(/\d+/) || ["1"])[0]; return `${n} polic${n === "1" ? "y" : "ies"} tested`; }
-    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/ \(.*\)$/, "").replace(/practiced/, "rehearsed") : d; };
+    // Crisis readiness keeps its "(4 for full credit)" aside: it's what explains why a perfect run can still score under 100
+    return p.k === "maturity" ? d.split(" · ")[0] : p.k === "launch" ? d.replace(/ across .*$/, "") : p.k === "crisis" ? (d.split(" · ")[1] || d).replace(/practiced/, "rehearsed") : d; };
   // In step order, with the optional part last
   const order = p => AS_PART_STEP[p.k] ? stepOf(p.k) : 99;
   const rows = parts.slice().sort((a, b) => order(a) - order(b));
@@ -168,6 +169,7 @@ function asPictureHTML(empty){
       <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
         <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
+    ${o.score === null ? "" : `<p class="note as-pic-weight">${typeof rcWeightLine === "function" ? rcWeightLine() : ""}</p>`}
     ${asRadarsHTML()}
   </section>`;
 }
@@ -178,7 +180,10 @@ function asKnowHTML(){
 }
 function asStepHTML(s, i, next){
   const ok = s.done(), cur = s === next, color = s.k === "setup" ? "var(--faint)" : s.c;
-  if(ok) return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(asSum(s.k))}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="Review ${esc(s.n)}">Review</button></div>`;
+  if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
+    // "About your platform" is done on the workspace page itself, not its own report, so the button says where it actually goes
+    const label = s.k === "setup" ? "Open workspace" : "Review";
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
     <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
@@ -214,11 +219,12 @@ function asWelcomeHTML(J){
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
         <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
       </div>
-      ${asPictureHTML(true)}
     </section>
+    ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+      <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
     </section>
     ${asFootHTML()}
   </div>`;
@@ -262,36 +268,53 @@ function asBind(){
 }
 
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
+// Which stage each tool card belongs to, for the filter chips below. A tool keeps growing this
+// grid (Red Team Studio's modules among them), so the chips are a cheap way to keep it scannable
+const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
+const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI"};
+let ovStage = "all";
 function renderTools(){
-  const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}">
+  const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
       <div class="ov-art">${OV_ART[key]}</div>
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
+    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
+    <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
       <div class="ov-tools">
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
-        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios · 8 sectors`)}
+        ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios, ${typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.length} versions across ${typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8} sectors`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · precision and recall`) : ""}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong <span class="ov-term">precision and recall</span>`) : ""}
+        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">WIP</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
     ${typeof templateItems === "function" ? `<section class="rise">
       <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
       <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></button>`).join("")}</div>
     </section>` : ""}
+    <section class="rise">
+      <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
+      <div class="ov-ai">
+        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">WIP</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">WIP</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">WIP</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
+      </div>
+    </section>
     <section class="rise">
       <div class="ov-sec-h"><h3>Jump back in</h3><a href="#workspace">View workspace</a></div>
       <div class="ov-list">${items.length ? items.map(it => `<button type="button" class="ov-row" data-open="${esc(it.id)}">
@@ -303,6 +326,10 @@ function renderTools(){
     ${asFootHTML()}
   </div>`;
   view.querySelectorAll("[data-open]").forEach(b => b.onclick = () => openSaved(b.dataset.open));
+  const ovApplyStage = () => view.querySelectorAll("[data-stage]").forEach(el => { el.hidden = ovStage !== "all" && el.dataset.stage !== ovStage; });
+  ovApplyStage();
+  view.querySelectorAll("[data-ovstage]").forEach(b => b.onclick = () => { ovStage = b.dataset.ovstage;
+    view.querySelectorAll("[data-ovstage]").forEach(x => x.setAttribute("aria-pressed", x === b)); ovApplyStage(); });
   view.querySelectorAll("[data-tplgo]").forEach(b => b.onclick = () => templateItems()[+b.dataset.tplgo].run());
 }
 

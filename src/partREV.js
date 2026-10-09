@@ -43,9 +43,25 @@ function revDiff(a, b){
   if((a.crisis ? a.crisis.runs : 0) !== (b.crisis ? b.crisis.runs : 0)) out.push({k:"tt", t:`Crises rehearsed ${a.crisis ? a.crisis.runs : 0} → ${b.crisis ? b.crisis.runs : 0}`, good:true});
   const PN = {maturity:"Program maturity", coverage:"Harm coverage", launch:"Launch readiness", crisis:"Crisis readiness", policy:"Policy clarity"};
   Object.keys(PN).forEach(k => { const x = a.parts[k], y = b.parts[k]; if(x === null || x === undefined || y === null || y === undefined || x === y) return; out.push({k:"part", t:`${PN[k]} ${x} → ${y} (${sign(y - x)})`, good:y > x}); });
+  // Worse news leads the list; a stable sort keeps each category's own order within the two groups
+  out.sort((x, y) => (x.good ? 1 : 0) - (y.good ? 1 : 0));
   return out;
 }
 const revDays = t => Math.round((Date.now() - t) / 864e5);
+// A synthetic before/after, so a first-time visitor with nothing saved can see what the comparison looks like
+let revEx = false;
+const REV_EX_A = {t:Date.now() - 86400000 * 95, label:"Q2 2026", score:58,
+  parts:{maturity:52, launch:40, coverage:55, crisis:60, policy:64},
+  ma:{lv:{policy:2, detection:2, operations:3, quality:2, crisis:2, compliance:2, measurement:1, wellbeing:2}},
+  cv:{cov:48, exposed:2, gaps:3, rows:{child:{cov:40, st:"exposed"}, sexual:{cov:45, st:"gap"}, harass:{cov:60, st:"covered"}, violent:{cov:50, st:"gap"}, ai:{cov:30, st:"exposed"}, privacy:{cov:55, st:"gap"}, integrity:{cov:65, st:"covered"}, fraud:{cov:50, st:"gap"}}},
+  launch:{products:2, blockers:6, open:4, names:["Resale chat", "Pixelry app"]}, crisis:{runs:1, score:60},
+  find:["Policy: no rule yet for AI-generated nudity", "Coverage: no proactive detection for account takeover"]};
+const REV_EX_B = {t:Date.now(), label:"Q3 2026", score:71,
+  parts:{maturity:68, launch:75, coverage:66, crisis:80, policy:64},
+  ma:{lv:{policy:3, detection:3, operations:3, quality:2, crisis:3, compliance:2, measurement:2, wellbeing:2}},
+  cv:{cov:62, exposed:0, gaps:3, rows:{child:{cov:70, st:"covered"}, sexual:{cov:60, st:"gap"}, harass:{cov:65, st:"covered"}, violent:{cov:70, st:"covered"}, ai:{cov:55, st:"gap"}, privacy:{cov:60, st:"covered"}, integrity:{cov:50, st:"gap"}, fraud:{cov:65, st:"covered"}}},
+  launch:{products:3, blockers:9, open:2, names:["Resale chat", "Pixelry app", "Match chat"]}, crisis:{runs:3, score:80},
+  find:["Policy: added a rule for AI-generated nudity", "Coverage: added hash matching for account-takeover signals"]};
 // The home: what moved since the last saved quarter, or a nudge to save the first one
 function revHomeHTML(){
   const snaps = revSnaps(), now = revNow(); if(now.score === null) return "";
@@ -66,26 +82,30 @@ function revRadarHTML(a, b){
 }
 function renderReview(){
   if(typeof gdCur !== "undefined") gdCur = null;
-  const snaps = revSnaps(), now = revNow();
-  const a = snaps.find(s => String(s.t) === String(revPick.a)) || snaps[snaps.length - 1] || null;
+  const snaps = revSnaps(), now = revEx ? REV_EX_B : revNow();
+  const a = revEx ? REV_EX_A : (snaps.find(s => String(s.t) === String(revPick.a)) || snaps[snaps.length - 1] || null);
   const PN = [["maturity", "Program maturity"], ["launch", "Launch readiness"], ["coverage", "Harm coverage"], ["crisis", "Crisis readiness"], ["policy", "Policy clarity"]];
   const cell = v => v === null || v === undefined ? "–" : v, delta = (x, y) => x === null || x === undefined || y === null || y === undefined ? "" : y === x ? `<span class="rv-d same">same</span>` : `<span class="rv-d ${y > x ? "up" : "dn"}">${y > x ? "+" : ""}${y - x}</span>`;
   const d = a ? revDiff(a, now) : [];
+  const sampleBtn = `<button type="button" class="btn" data-rev="example">See a sample comparison</button>`;
+  // The empty state shows the shape of the comparison, faded, instead of hiding it behind a click
+  const samplePreview = `<div class="card rv-sample-preview" aria-hidden="true"><span class="pill">Sample</span><table><tbody>${PN.map(([k, n]) => `<tr><td>${n}</td><td class="mono">${REV_EX_A.parts[k]}</td><td class="rv-sample-arrow">${icon("arrow")}</td><td class="mono">${REV_EX_B.parts[k]}</td></tr>`).join("")}</tbody></table></div>`;
   view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each part, every area, the gaps you closed and the ones that opened.", "Assess",
-    `<span class="toast" id="rv-toast" role="status" aria-live="polite"></span>${now.score !== null ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
-    ${now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><a class="btn primary" href="#overview">Back to your assessment</a></div>` : !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button></div>` : `
+    `<span class="toast" id="rv-toast" role="status" aria-live="polite"></span>${now.score !== null && !revEx ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
+    ${revEx ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a sample program's picture, one quarter to the next.</span><button type="button" class="btn sm" data-rev="exit-example">Back to your review</button></div>` : ""}
+    ${!revEx && now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div>${samplePreview}<div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
     <div class="rv-top">
-      <label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>
+      ${revEx ? `<div class="field rv-pick"><span class="lbl">Compare now with</span><span class="note">${esc(a.label)} (example)</span></div>` : `<label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>`}
       <div class="rv-score"><div><span class="as-k">${esc(a.label)}</span><b class="mono">${cell(a.score)}</b></div><span class="rv-arrow">${icon("arrow")}</span><div><span class="as-k">Now</span><b class="mono">${cell(now.score)}</b></div>${delta(a.score, now.score)}</div>
     </div>
     <div class="rv-grid">
       <section class="card rv-parts"><h3>Each part</h3><table><thead><tr><th>Part</th><th>${esc(a.label)}</th><th>Now</th><th></th></tr></thead><tbody>${PN.map(([k, n]) => `<tr><td>${n}</td><td class="mono">${cell(a.parts[k])}</td><td class="mono">${cell(now.parts[k])}</td><td>${delta(a.parts[k], now.parts[k])}</td></tr>`).join("")}</tbody></table></section>
       <section class="card rv-what"><h3>What changed</h3>${d.length ? `<ul class="as-rev-l">${d.map(x => `<li class="${x.good ? "up" : "dn"}"><i></i>${esc(x.t)}</li>`).join("")}</ul>` : `<p class="note">Nothing has moved since ${esc(a.label)}. Retake a step and the difference shows here.</p>`}</section>
     </div>
-    ${revRadarHTML(a, now)}
+    ${revEx ? "" : revRadarHTML(a, now)}
     ${a.ma && now.ma ? `<section class="card rv-areas"><h3>Maturity by area</h3><div class="rv-area-g">${MA_AREAS.map(ar => { const x = a.ma.lv[ar.k], y = now.ma.lv[ar.k]; return `<div class="rv-area ${y > x ? "up" : y < x ? "dn" : ""}"><span>${esc(ar.s)}</span><b class="mono">${x} → ${y}</b></div>`; }).join("")}</div></section>` : ""}
     ${a.find && a.find.length ? `<section class="card rv-find"><h3>What we knew in ${esc(a.label)}</h3><ul>${a.find.map(t => `<li>${esc(t)}</li>`).join("")}</ul></section>` : ""}`}
-    ${snaps.length ? `<section class="rv-saved"><div class="as-sec-h"><h2>Saved quarters</h2><span class="note">Saving the same quarter again replaces it</span></div><div class="card"><ul class="rv-list">${snaps.slice().reverse().map(s => `<li><b>${esc(s.label)}</b><span class="note">${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})} · score ${cell(s.score)}</span><button type="button" class="btn sm icon" data-revdel="${s.t}" aria-label="Delete ${esc(s.label)}" title="Delete">${icon("trash")}</button></li>`).join("")}</ul></div></section>` : ""}
+    ${!revEx && snaps.length ? `<section class="rv-saved"><div class="as-sec-h"><h2>Saved quarters</h2><span class="note">Saving the same quarter again replaces it</span></div><div class="card"><ul class="rv-list">${snaps.slice().reverse().map(s => `<li><b>${esc(s.label)}</b><span class="note">${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})} · score ${cell(s.score)}</span><button type="button" class="btn sm icon" data-revdel="${s.t}" aria-label="Delete ${esc(s.label)}" title="Delete">${icon("trash")}</button></li>`).join("")}</ul></div></section>` : ""}
     <p class="note" style="margin-top:18px">Snapshots stay in this browser with the rest of your work, and go into your workspace file when you save one.</p>
   </div>`;
   const sel = $("#rv-a"); if(sel) sel.onchange = () => { revPick.a = sel.value; renderReview(); const s2 = $("#rv-a"); if(s2) s2.focus(); };
@@ -94,4 +114,6 @@ function renderReview(){
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-rev]"); if(!b || !view.contains(b)) return;
   if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = (location.hash || "").slice(1).split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
+  else if(b.dataset.rev === "example"){ revEx = true; renderReview(); window.scrollTo(0, 0); }
+  else if(b.dataset.rev === "exit-example"){ revEx = false; renderReview(); window.scrollTo(0, 0); }
 });

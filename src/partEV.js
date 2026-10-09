@@ -262,7 +262,7 @@ const EV_EXAMPLE = {name:"Harassment rule, v1 prompt", policy:"Users must not ha
 
 /* ---------- the page: one page, three steps, top to bottom ---------- */
 let evView = null; // set by callers that open a saved eval; the page has no separate views any more, so it's kept only for them
-const EVU = {all:false, opts:false, own:false, details:false, errAt:""}; // page state that isn't worth saving
+const EVU = {all:false, opts:false, own:false, details:false, local:false, errAt:""}; // page state that isn't worth saving
 const evErr = (msg, at) => { EVRUN.err = msg; EVU.errAt = at || ""; };
 const evErrHTML = at => EVRUN.err && EVU.errAt === at ? `<p class="ai-err" role="alert">${esc(EVRUN.err)}</p>` : "";
 const evMediaView = () => ev.view === "media" || (!!ev.media && ev.view !== "text");
@@ -363,7 +363,7 @@ function renderEval(){
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
     ${fresh ? evHeroHTML() : ""}
-    ${ev.ex && !media ? `<div class="banner ev-ex"><span><strong>This is the example:</strong> a harassment rule as many platforms write it, and 24 comments of the kinds classifiers get wrong.${m && ev.mode === "policy" ? " The labels came from Claude prompted with the rule alone: it gets the easy cases and fails the ones that matter." : ""} Change the right answers, add cases, or start over (top right) with your own rule.</span></div>` : ""}
+    ${ev.ex && !media ? `<div class="banner ev-ex"><span><strong>This is the example:</strong> a harassment rule as many platforms write it, and 24 comments of the kinds classifiers get wrong.${m && ev.mode === "policy" ? " The labels came from Claude prompted with the rule alone: a simulated run, graded by Claude against the rule, so the shape is real and the numbers are illustrative. It gets the easy cases and fails the ones that matter." : ""} Change the right answers, add cases, or start over (top right) with your own rule.</span></div>` : ""}
     ${media ? evMediaHTML(steps[0]) : evStepHTML(steps[0], 0, evStep1HTML(n)) + evStepHTML(steps[1], 1, evStep2HTML(n))}
     ${evStepHTML(steps[steps.length - 1], steps.length - 1, m ? evResultsHTML(m, media) : evWaitHTML(media))}
     ${m && !media && typeof evLoopHTML === "function" ? evLoopHTML() : ""}
@@ -381,7 +381,9 @@ function evSteps(media, n, m){
     {id:"ev-s3", n:"Results", t:"Results", st:m ? "done" : "todo", txt:m ? `${m.correct} of ${m.n} right` : "After step 2"}];
 }
 const evStepHTML = (s, i, body) => `<section class="card ev-step ${s.st}" id="${s.id}" aria-labelledby="${s.id}-h"><div class="ev-sh"><span class="pol-num" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span><div class="ev-sht"><h2 class="pol-lbl" id="${s.id}-h">${s.t}</h2><span class="note">${s.txt}</span></div></div><div class="ev-sb">${body}</div></section>`;
-const evHeroHTML = () => `<div class="card ev-hero"><span class="eyebrow">New here?</span><h2>Try the example</h2><p>A harassment rule as many platforms write it, 24 comments of the kinds classifiers get wrong, scored by a free model that runs in your browser. One click, a 24 MB download once, and nothing you see here leaves your browser.</p><div class="pol-run"><button type="button" class="btn primary" data-ev="quick">Try the example</button><span class="note">About a minute. Then change the right answers, add your own cases, or start with your own rule.</span></div></div>`;
+const evHeroHTML = () => `<div class="card ev-hero"><span class="eyebrow">New here?</span><h2>Try the example</h2><p>A harassment rule as many platforms write it, 24 comments of the kinds classifiers get wrong, scored by a free model that runs in your browser. One click, a 24 MB download once, and nothing you see here leaves your browser.</p>
+    <p class="note ev-whatfree">Without a Claude account: score cases with the free in-browser model or your own classifier's pasted labels. Open in Claude to have it label the cases itself.</p>
+    <div class="pol-run"><button type="button" class="btn primary" data-ev="quick">Try the example</button><span class="note">About a minute. Then change the right answers, add your own cases, or start with your own rule.</span></div></div>`;
 const evWaitHTML = media => `<p class="note ev-wait">${media ? "Once the list is scored: how many it got right, the items it got wrong, and what to change." : "Once a classifier has labeled the cases: how many it got right, the cases it got wrong, and what to change."}</p>${media ? "" : `<button type="button" class="pol-add" data-ev="example">See a finished example first</button>`}`;
 
 /* ---------- step 1: the rule and the cases ---------- */
@@ -410,15 +412,22 @@ function evStep1HTML(n){
 /* ---------- step 2: where the labels come from ---------- */
 function evStep2HTML(n){
   const ai = evAI(), tile = evTile(), has = n > 0;
-  const tiles = `<div class="tr-tiers ev-tiers3" role="radiogroup" aria-label="Where the labels come from">${EV_TILES.map(([k, nm, h]) => `<button type="button" role="radio" aria-checked="${tile === k}" class="card tr-tier ${tile === k ? "on" : ""}" data-evmode="${k}" ${has ? "" : "disabled"}><b>${esc(nm)}${k === "claude" && !ai ? ' <span class="pill">Claude version only</span>' : ""}</b><span>${esc(h)}</span></button>`).join("")}</div>`;
+  // The free in-browser model needs no classifier and no Claude account, so it's the one newcomer-safe default: promote it visually, not just logically.
+  const tiles = `<div class="tr-tiers ev-tiers3" role="radiogroup" aria-label="Where the labels come from">${EV_TILES.map(([k, nm, h]) => `<button type="button" role="radio" aria-checked="${tile === k}" class="card tr-tier ${tile === k ? "on" : ""}" data-evmode="${k}" ${has ? "" : "disabled"}><b>${esc(nm)}${k === "baseline" ? ' <span class="pill accent">Start here if you don’t have a classifier</span>' : k === "claude" && !ai ? ' <span class="pill">Claude version only</span>' : ""}</b><span>${esc(h)}</span></button>`).join("")}</div>`;
   if(!has) return `${tiles}<p class="note ev-wait">Add cases in step 1 first.</p>`;
   return `${tiles}<div class="ev-panel">${tile === "baseline" && typeof evbCardHTML === "function" ? evbCardHTML() : tile === "paste" ? evPastePanelHTML(n) : evClaudePanelHTML(ai, n)}</div>`;
 }
 function evPastePanelHTML(n){
   const L = evLabels(ev);
+  // "Paste your own classifier's labels" and "run a model locally with the runner script" are two different workflows
+  // that only share step 2; keep the local-model setup in its own disclosure instead of one mixed paragraph.
+  const localPolicy = ev.policy.trim() ? `<div class="ev-case-a"><button type="button" class="btn sm" data-ev="dlpoljson" title="Your rule as a policy for PolicyLM, Musubi's small open model. Fill in its TODO fields first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for PolicyLM` : `${icon("copy")}Copy the PolicyLM policy`}</button><button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for gpt-oss-safeguard or another policy-following model. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for gpt-oss-safeguard` : `${icon("copy")}Copy the gpt-oss-safeguard policy`}</button></div>` : `<p class="note">Add a rule in step 1 above first, to get a filled-in policy file.</p>`;
   return `<div class="ev-pp" id="ev-panel-paste">
-    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}${ev.policy.trim() ? `<button type="button" class="btn sm" data-ev="dlpoljson" title="Your rule as a policy for PolicyLM, Musubi's small open model. Fill in its TODO fields first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for PolicyLM` : `${icon("copy")}Copy the PolicyLM policy`}</button><button type="button" class="btn sm" data-ev="dlpol" title="Your rule as a policy file for gpt-oss-safeguard or another policy-following model. Fill in its TODO lines first.">${DL ? `<svg><use href="#i-download"/></svg>Policy for gpt-oss-safeguard` : `${icon("copy")}Copy the gpt-oss-safeguard policy`}</button>` : ""}</div>
-      <p class="note">${n} cases, one per line: id, kind, right answer, text. No classifier of your own? The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases on a free open model on your own computer: download the cases and a policy file, fill in the file's TODO lines, and the script writes labels you can paste here. PolicyLM (Musubi, 3.5 GB) runs on a laptop and needs Python. gpt-oss-safeguard (OpenAI, 14 GB) explains each label and needs Node.js, Ollama and a big graphics card.</p></div>
+    <div class="ev-pp-s"><b>1. Get the cases to your classifier.</b><div class="ev-case-a"><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy the cases</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download the cases</button>` : ""}</div>
+      <p class="note">${n} cases, one per line: id, kind, right answer, text.</p>
+      <details class="ev-local" id="ev-local-d" data-evd="local" ${EVU.local ? "open" : ""}><summary>No classifier of your own? Run a free open model on your own computer</summary>
+        <p class="note">The <a href="https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval" target="_blank" rel="noopener">runner script</a> runs the cases above on a free open model, locally: download a policy file below, fill in its TODO lines, and the script writes labels you paste into step 2. PolicyLM (Musubi, 3.5 GB) runs on a laptop and needs Python. gpt-oss-safeguard (OpenAI, 14 GB) explains each label and needs Node.js, Ollama and a big graphics card.</p>
+        ${localPolicy}</details></div>
     <div class="ev-pp-s"><label for="ev-paste"><b>2. Paste its labels.</b></label><p class="note">One per line: <span class="mono">id<span class="muted">⇥</span>label</span>, or just the labels in case order. Labels: ${L.map(l => `<span class="mono">${l}</span>`).join(", ")}.</p><textarea class="input mono" id="ev-paste" rows="5" placeholder="c1	violates&#10;c2	allowed">${esc(EVL.paste || "")}</textarea></div>
     <div class="field ev-name-f"><label for="ev-name-in">Name for this run <span class="note">optional</span></label><input class="input" id="ev-name-in" maxlength="80" value="${esc(ev.name)}" placeholder="${esc(ev.last ? evNextName(ev.last.name) : "For example: vendor model, keyword list, v2 prompt")}"></div>
     ${evErrHTML("paste")}<div class="pol-run"><button type="button" class="btn primary" data-ev="score">Score the labels</button><span class="note">Scored here, in your browser.</span></div></div>`;
@@ -446,13 +455,25 @@ function evResultsHTML(m, media){
         ${bench !== null && !ev.ex ? `<p class="bench-line">Typical for the built-in example (a harassment rule, judged by Claude with the rule alone): ${bench}% accurate</p>` : ""}
         <p class="note">${base ? "A general toxicity model scores words and tone, not your rule: it can't be told that reporting abuse is allowed, or that two people are friends. Where it disagrees with your right answers is where a fixed-category model stops being enough." : media ? "Scored against the labels your reviewers gave. The list named the items; the images and videos were never part of this." : m.main ? `Precision on "${esc(pos)}" ${m.pct(m.main.pr)}${evTip("precision")}, recall ${m.pct(m.main.rc)}${evTip("recall")}. The numbers by kind of case are under Details.` : ""}</p></div></div>
     ${loop ? `<div class="ev-sec ev-since"><h4>Since the last run</h4>${evCompareHTML()}</div>` : ""}
-    <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evFailsHTML(m)}</div>
+    <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evWorstLineHTML(m)}${evFailsHTML(m)}</div>
     <div class="ev-sec"><h4>What to change</h4><ol class="pk-list ev-adv-l">${adv.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.fix)}</li>`).join("")}</ol></div>
     ${chapterLinkHTML("eval")}
     <details class="ev-details" id="ev-details-d" data-evd="details" ${EVU.details ? "open" : ""}><summary>Details <span class="note">by kind of case, precision and recall, every ${media ? "item" : "case"}, runs</span></summary>
       <div class="segs" role="group" aria-label="Details">${[["kinds", "By kind of case", m.cats.filter(c => c.miss).length], ["scores", "Precision and recall", null], ["all", media ? "Every item" : "Every case", m.n], ["runs", "Runs", (ev.runs || []).length]].map(([k, nm, c]) => `<button type="button" data-evtab="${k}" aria-pressed="${tab === k}">${nm}${c === null ? "" : ` <span class="mono" style="opacity:.6">${c}</span>`}</button>`).join("")}</div>
       <div class="ev-tab">${body}</div></details>
     <p class="note ev-honest">${media ? "Items from your own labeled set, scored against your reviewers' labels. Keep a held-out set the model team never sees, and re-run this when the model or the policy changes." : "Synthetic cases written to probe the rule's edges, not a sample of real traffic. Before a classifier acts on its own, run a second eval on anonymized cases from your real queue."}</p>`;
+}
+// The aggregate "which kind of case is this worst at" view already exists under Details > By kind of case,
+// but it was a click away; lead with a one-line version right above the per-case list.
+function evWorstCat(m){
+  const cats = (m.cats || []).filter(c => c.miss > 0);
+  if(!cats.length) return null;
+  return cats.slice().sort((a, b) => (b.miss / b.total) - (a.miss / a.total) || b.miss - a.miss)[0];
+}
+function evWorstLineHTML(m){
+  const w = evWorstCat(m);
+  if(!w) return "";
+  return `<p class="note ev-worst">Worst at <b>${esc(w.n)}</b>: ${w.miss} of ${w.total} wrong (${Math.round(w.miss / w.total * 100)}%). Case by case, below.</p>`;
 }
 function evFailsHTML(m){
   if(!m.fails.length) return `<p class="note">Every ${ev.media ? "item" : "case"} was labeled the way a reviewer would. Add harder cases, or real ones from your queue.</p>`;
@@ -567,5 +588,7 @@ Object.assign(GT_MORE, {
   "precision":"Of everything the classifier flagged, the share that deserved it. Low precision means false positives: good content actioned.",
   "recall":"Of everything that deserved to be flagged, the share the classifier caught. Low recall means false negatives: violations missed.",
   "counter-speech":"Content that quotes, condemns or reports the behavior a rule bans, rather than doing it. Keyword classifiers flag it by mistake.",
-  "right answer":"In the classifier eval, the label a careful reviewer would give a case under the rule as written. Also called the gold label. The classifier is scored against it."
+  "right answer":"In the classifier eval, the label a careful reviewer would give a case under the rule as written. Also called the gold label. The classifier is scored against it.",
+  "PolicyLM":"A small open model from Musubi that labels content against a policy you write. About 3.5 GB; runs on a laptop and needs Python.",
+  "Ollama":"Free software that runs open AI models, such as gpt-oss-safeguard, on your own computer instead of in the cloud."
 });

@@ -98,6 +98,8 @@
 .ai-secs{display:grid;gap:18px;max-width:780px}
 .ai-secs h4{margin:0 0 4px;font-size:16px}
 .ai-secs p{margin:0;font-size:15.5px;line-height:1.7}
+.ai-tmpl-out{max-width:760px}
+.ai-tmpl-ta{width:100%;min-height:220px;font:14.5px/1.6 var(--body);resize:vertical}
 .ov-ai{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .ov-aic{display:flex;gap:14px;align-items:flex-start;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);text-decoration:none;transition:border-color .15s ease, transform .15s ease}
 .ov-aic:hover{border-color:color-mix(in oklab, var(--t-ai) 55%, var(--line));transform:translateY(-1px)}

@@ -30,6 +30,11 @@ const body = function(){
   eq((g1.match(/class="gl"/g)||[]).length, 3, "glossary marks each term once"); eq(g1.includes('data-tip="The median'), true, "glossary tip text");
   eq(mxGloss("<b>SLA</b>", new Set()).startsWith("&lt;b&gt;"), true, "glossary escapes HTML");
   out.push("glossary: " + Object.keys(MX_GLOSS).length + " terms, marked once per page, HTML escaped");
+  // the formula itself glosses its jargon, not just the prose around it (e.g. "basis points" in Fraud loss rate)
+  const fraudF = mxFormulaHTML(MX_HOW["Fraud loss rate"].f, new Set());
+  eq(/class="gl"/.test(fraudF) && fraudF.includes('data-tip="One basis point'), true, "basis points glossed inside the formula");
+  eq(mxFormulaHTML(MX_HOW["Fraud loss rate"].f).includes('class="gl"'), true, "formula glosses even with no shared seen set passed in");
+  out.push("formula gloss: jargon inside the formula itself (not only the prose around it) gets the same hover gloss");
   out.push("status logic: 15 cases pass (on / watch / off, higher- and lower-is-better, ranges, typed % and $ signs)");
 
   // a reference, not an assessment: a fresh visit opens on the metrics; the worksheet's guided fill-in is behind its own button
@@ -40,6 +45,23 @@ const body = function(){
   mxView = "guide"; gdReset("metrics"); renderMetrics(); eq(/data-gd="start"/.test(view.innerHTML), true, "guided fill-in on request"); eq(mxList().filter(m => m.t === "ns").every(m => mx.have[m.n]), true, "north stars pre-ticked");
   gdGo(gdCur, "start"); gdPick(gdCur, "market"); const live = gdLive(gdCur); eq(live.filter(z => /^m-/.test(z.id)).length, mxList().filter(m => mx.have[m.n]).length, "one screen per tracked metric");
   out.push("reference first: the metrics, then what to log and who reviews what; the worksheet is optional, with a guided fill-in");
+
+  // a short on-ramp lands a newcomer on 3 to 5 north-star metrics instead of the full catalog, with the full catalog one click away
+  mx = {platform:"market", stage:"2", reg:false, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; mxView = null; gdReset("metrics"); gdReset("metrics-onramp"); renderMetrics();
+  eq(/New here\?/.test(view.innerHTML) && /id="mx-onramp"/.test(view.innerHTML), true, "the full catalog invites a newcomer to the on-ramp");
+  mxView = "onramp"; gdReset("metrics-onramp"); renderMetrics();
+  eq(/data-gd="start"/.test(view.innerHTML), true, "the on-ramp has its own short intro");
+  gdGo(gdCur, "start"); eq(/What kind of platform is it\?/.test(view.innerHTML), true, "first on-ramp question is the platform");
+  gdPick(gdCur, "market"); gdGo(gdCur, "next"); eq(/How far along is your program\?/.test(view.innerHTML), true, "second on-ramp question is the stage");
+  gdPick(gdCur, "2"); gdGo(gdCur, "next");
+  eq(!!mx.nsOnly && !!mx.onramped, true, "finishing the on-ramp lands on the filtered view");
+  const nsList = mxList().filter(m => m.t === "ns"), nsHtml = view.innerHTML;
+  eq(nsList.length >= 1 && nsList.length <= 5, true, "a market platform gets a handful of north-star metrics: " + nsList.length);
+  eq((nsHtml.match(/class="mxm-card/g) || []).length, nsList.length, "only the north-star metrics show, not the full catalog");
+  eq(/id="mx-ns-full"/.test(nsHtml), true, "the full catalog stays one click away");
+  mx.nsOnly = false; mx.onramped = true; renderMetrics(); // what the "#mx-ns-full" button's handler does
+  eq((view.innerHTML.match(/class="mxm-card/g) || []).length > nsList.length, true, "back to the full catalog, which stays reachable");
+  out.push(`on-ramp: platform and stage, then ${nsList.length} north-star metrics for a market platform; full catalog one click away`);
   mxView = "page";
   let combos = 0, guides = 0, minN = 99, maxN = 0, shownNotes = 0;
   Object.keys(MX_PLATFORMS).forEach(p => ["1","2","3"].forEach(st => [true,false].forEach(reg => {
@@ -112,6 +134,8 @@ const body = function(){
   out.push("sample-size helper: 42,642 at 0.1% ± 0.03 points (95%); on " + Object.keys(MX_SAMPLE).length + " sampling metrics and the Data tab");
   return out.join("\n");
 };
-const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partGD.js")].join("\n")
+// The on-ramp's done() focuses "#view h1" the same way every other guided tool's done() does; the shared
+// test stub's document has no querySelector, so give it a harmless one rather than changing the shared stub.
+const src = stub + "\ndocument.querySelector = () => null;\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partGD.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

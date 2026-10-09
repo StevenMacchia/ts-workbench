@@ -1,0 +1,177 @@
+/* =========================================================
+   Red team studio: the sandbox, a local model to talk to. Aurora tokens only, light and dark.
+   ========================================================= */
+.rt-sb-teaser{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.rt-sb-teaser p{margin:0 0 10px}
+.rt-sb-card{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;gap:4px}
+.rt-sb-card p{margin:0;font-size:13.5px}
+.rt-sb-card b{color:var(--muted);font-weight:600}
+.rt-sb-chat{display:grid;gap:8px;margin:18px 0 0;max-height:46vh;overflow:auto;padding:4px 2px}
+.rt-sb-chat p{margin:0;max-width:78%;padding:9px 13px;border-radius:12px;font-size:14.5px;line-height:1.45}
+.rt-sb-chat p b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;font-weight:600}
+.rt-sb-chat .rt-sb-user{justify-self:end;background:var(--accent-soft);color:var(--ink);border-radius:12px 12px 2px 12px}
+.rt-sb-chat .rt-sb-bot{justify-self:start;background:var(--surface);border:1px solid var(--line);border-radius:12px 12px 12px 2px}
+.rt-sb-chat .rt-sb-busy{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.rt-sb-grade{margin-top:16px}
+@media (max-width:760px){.rt-sb-chat p{max-width:92%}}
+
+/* ---------- Pre-mortem report: the four stat tiles move into a disclosure, folded ---------- */
+/* into startHere()'s own summary sentence instead of standing alone as a dashboard. ---------- */
+.pm-kpis-d{margin-top:16px;overflow:hidden}
+.pm-kpis-d > summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;padding:14px 18px;font-weight:600;font-size:14.5px;position:relative}
+.pm-kpis-d > summary::-webkit-details-marker{display:none}
+.pm-kpis-d > summary::after{content:"";position:absolute;right:18px;top:50%;width:8px;height:8px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg)}
+.pm-kpis-d[open] > summary::after{transform:translateY(-30%) rotate(-135deg)}
+.pm-kpis-d[open] > summary{border-bottom:1px solid var(--line)}
+.pm-kpis-d .kpis{margin-top:0;padding:16px 18px}
+
+/* ---------- Workspace empty state: the "New project" nudge before a few results exist ---------- */
+.wsnudge{margin:-6px 0 10px}
+
+/* ---------- About: caption the stat tiles as the tool's own content, not the visitor's program ---------- */
+.ab-stats-cap{margin-top:8px;text-align:center}
+/* Coverage radar: each layer's chosen level, shown inline under its cell, not only as a hover title */
+.cv-cell{display:flex;flex-direction:column;align-items:center;gap:4px;max-width:150px;margin:0 auto}
+.cv-cell-lv{margin:0;font-size:11px;line-height:1.3;color:var(--muted);text-align:center}
+@media (max-width:1100px){.cv-cell{align-items:flex-end;max-width:none}.cv-cell-lv{text-align:right;max-width:220px}}
+
+/* Coverage radar: steer to an example instead of letting "coverage only" be a silent default */
+.cv-nosrc{margin-bottom:14px}
+
+/* Metrics: the on-ramp banner on the full catalog, and its "recommended for you" landing */
+.mxm-onramp{margin-bottom:18px}
+
+/* r3c: AI assistants - a hover/focus preview of what "Use the numbers from my Metrics scorecard" inserts */
+.ai-fill-wrap{position:relative;display:inline-block}
+.ai-fill-prev{position:absolute;left:0;bottom:calc(100% + 8px);max-width:320px;padding:9px 11px;border-radius:10px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-lift);font-family:var(--mono,monospace);font-size:11.5px;line-height:1.5;color:var(--muted);white-space:pre-line;z-index:5;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .12s ease, transform .12s ease}
+.ai-fill-wrap:hover .ai-fill-prev,.ai-fill-wrap:focus-within .ai-fill-prev{opacity:1;visibility:visible;transform:translateY(0)}
+@media (max-width:600px){.ai-fill-prev{max-width:86vw}}
+
+/* r3c: Works with ROOST - the two "starter, untested" items get their own labeled sub-section */
+/* instead of sitting in the same grid as the four working ones, with only a small tag to tell them apart. */
+.ab-starters{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.ab-starters-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin:0 0 12px}
+.ab-starters-h .wip-tag{flex:none}
+.ab-starters .ab-tools{margin-top:0}
+
+/* r3c: Overview's "pick up where you left off" pre-mortem card - the four-tile .ov-stats dashboard */
+/* (risks, critical, blockers, laws) said in one line instead, matching how the full report's startHere() */
+/* already turned its own four-tile dashboard into a counted sentence. Cross-tool audit item 4. */
+.ov-stats-sum{margin:2px 0 10px}
+
+/* r3b: Coverage radar: the rail's "Start here" step, promoted above the rating grid so it isn't missed below the fold */
+.cv-start-promo{margin-bottom:14px}
+
+/* r3b: Maturity: prompt a snapshot right after all areas are rated, instead of leaving Progress to be found by accident */
+.ma-snapq{margin-top:14px}
+
+/* r3b: Policy stress-tester: sticky progress dots for the one-page setup, since it has no guided crumb trail */
+.pol-dots{position:sticky;top:8px;z-index:5;display:flex;justify-content:center;gap:10px;padding:8px 0;margin:-4px 0 10px}
+.pol-dot{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--line);position:relative;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.pol-dot span{font-size:12px;font-weight:600;color:var(--muted);font-family:var(--mono)}
+.pol-dot.on{border-color:color-mix(in oklab, var(--t-pol) 45%, var(--line));background:color-mix(in oklab, var(--t-pol) 10%, var(--surface))}
+.pol-dot.on span{color:var(--t-pol)}
+.pol-dot:focus-visible{outline:2px solid var(--t-pol);outline-offset:2px}
+@media (max-width:640px){.pol-dots{position:static}}
+
+/* r3b: Policy stress-tester: repeat the "can't browse the web" caveat next to fields Claude filled in, not only by the lookup button */
+.pol-fromai{display:block;margin-top:4px;font-style:italic}
+
+/* r3b: COPPA readiness: the audience choice is the highest-leverage decision, framed before the tiles */
+.cp-aud-note{margin:0 0 8px}
+
+/* r3b: COPPA readiness: a plain cost/friction hint on each consent method, since the Rule doesn't say which need a vendor */
+.cp-cost{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:500;letter-spacing:.02em;color:var(--muted);background:var(--sunk);vertical-align:middle}
+
+/* r3b: DSA readiness: a one-line note when the size or features section is left out, so fewer questions isn't a silent gap */
+.ds-skipnote{margin:-4px 0 2px}
+/* r3a: remaining per-tool UX-audit items for Overview, Pre-mortem, Tabletop, Metrics, Vendors */
+/* Overview: the eval tool card's foot text, plain words with the industry term kept as a tag */
+.ov-term{display:inline-block;font-style:normal;font-weight:500;font-size:10.5px;color:var(--muted);background:var(--sunk);border-radius:5px;padding:1px 6px;margin-left:2px;white-space:nowrap}
+/* Pre-mortem: a plain-text link from Start Here into the risk burn-down chart below */
+.pm-burnlink{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--t-pm);margin-top:4px}
+.pm-burnlink:hover{text-decoration:underline;text-underline-offset:3px}
+.pm-burnlink:focus-visible{outline:2px solid var(--t-pm);outline-offset:2px;border-radius:3px}
+.pm-burnlink svg{width:14px;height:14px}
+/* Tabletop: a visible caption for "Sourced", so the reason isn't hover/focus only on touch */
+.scen-src-cap{display:none}
+@media (max-width:760px){.scen-src-cap{display:block;margin-top:2px;font-size:11px;line-height:1.4;color:var(--muted);text-align:left}}
+/* Vendor scorecard: the consequence of a hard minimum, spelled out once on the one-page view */
+.vd-dealnote{margin:2px 0 0;color:var(--crit)}
+/* Metrics: the no-tooling-team line surfaced in the compact list for north-star metrics, and a */
+/* one-line "what's in this tab" subtitle that reuses copy already written for the bands and reviews */
+.mxm-mvp{font-size:12.5px;line-height:1.45;color:var(--muted);background:var(--sunk);border-radius:8px;padding:8px 10px}
+.mxm-mvp b{color:var(--ink);font-weight:600}
+.mx-tabs-sub{margin:8px 0 0;max-width:70ch}
+/* Overview: the "All tools" stage filter, so the grid stays scannable as it grows */
+.ov-stagef{display:inline-flex;margin:14px 0 4px}
+
+/* clarity: Red team studio purpose card, walkthrough previews and the always-there "How this works" link */
+.rtf-intro-list li{margin-bottom:4px}
+.rtf-foot-min{justify-content:flex-start}
+/* A small, non-interactive preview built from the studio's own card classes: scaled down and dimmed, with */
+/* clicks disabled, so a walkthrough screen shows the real UI without a screenshot. */
+.rtf-walk-prev{position:relative;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);pointer-events:none;user-select:none}
+.rtf-walk-prev::after{content:"";position:absolute;inset:0;border-radius:14px;background:transparent}
+.rtf-walk-prev .rtf-opts,.rtf-walk-prev .rtf-hub{margin-top:10px}
+.rtf-walk-prev button{cursor:default}
+/* The hub's one-sentence orientation line sits just under the lead paragraph, in the same muted tone */
+.rtf-hubwhere{margin-top:8px}
+/* Learn guides: the minimum-path banner on the first Practice card */
+.ln-minpath{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+/* tsgloss: the T&S glossary, #tsglossary. All terms as one grid with the definition visible,
+   a group filter and a letter divider, instead of a pager -- the owner wants to see everything at once. */
+.tsg-xlink{margin:-2px 0 14px}
+.tsg-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.tsg-chip{all:unset;cursor:pointer;padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:500;background:var(--sunk);color:var(--muted);border:1px solid transparent}
+.tsg-chip[aria-pressed="true"]{background:color-mix(in oklab, var(--accent) 16%, var(--surface));color:var(--accent);border-color:color-mix(in oklab, var(--accent) 35%, transparent)}
+.tsg-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tsg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;align-items:start}
+.tsg-letter{grid-column:1/-1;font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted);margin:14px 0 -2px;padding-top:4px;border-top:1px solid var(--line)}
+.tsg-grid .tsg-letter:first-child{margin-top:0;border-top:0;padding-top:0}
+.tsg-card{padding:14px 16px;display:grid;gap:6px;align-content:start}
+.tsg-card h4{margin:0;font-size:15px;line-height:1.3}
+.tsg-g{margin:0;display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);background:var(--sunk);border-radius:5px;padding:2px 7px;width:max-content}
+.tsg-d{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink)}
+.tsg-r{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.tsg-tool{margin-top:2px;display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--accent);text-decoration:none}
+.tsg-tool:hover{text-decoration:underline;text-underline-offset:3px}
+.tsg-tool svg{width:13px;height:13px}
+@media (max-width:480px){.tsg-grid{grid-template-columns:1fr}}
+
+/* clarity: glossary restored to one page, a grid of cards (removed the A-Z letter-group pager this */
+/* replaced); .ln-gl's own display:grid (partZ14.css) is back in effect now that the display:block */
+/* override that card shape needed has been removed. A full-width letter divider between cards, and */
+/* the per-card "I know this" toggle sitting beside the now-unclamped definition text. */
+.ln-gl-div{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 2px 0;margin:0}
+.ln-gl-div:first-child{padding-top:0}
+.ln-term{cursor:default}
+.ln-term-name{all:unset;cursor:pointer;display:block}
+.ln-term-name:hover b,.ln-term-name:focus-visible b{text-decoration:underline;text-underline-offset:3px}
+.ln-term-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.ln-term>p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.ln-term-know{width:fit-content}
+
+/* intro: the shared purpose card and walkthrough for every tool outside the red team studio */
+/* (src/partINTRO.js). No new look: the card reuses .card/.rtf-card/.rtf-eb/.rtf-h1/.rtf-list/ */
+/* .rtf-intro-list/.rtf-act/.rtf-link from the studio's own intro (partZ14.css, this file above), */
+/* and the walkthrough modal reuses .ln-eb/.ln-why/.ln-body/.ln-pager/.rtf-walk-prev the same way. */
+/* .ph-help (partZ8.css) already spaces a second button of its own kind with margin-left, so the */
+/* new "How this works" link sits cleanly beside the existing "How this page works" button. */
+/* Hiring-manager audit, round 2: the home page's six-step promise, the quiet pre-demo preview, and a faded
+   sample on the empty quarter-review, so the proof of depth doesn't wait behind a click. */
+.as-six-note{margin:10px 0 0}
+.as-preview{margin:4px 0 8px;padding:14px 16px;border-radius:10px;background:var(--sunk);display:grid;gap:8px}
+.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.as-preview-lines{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.as-preview-lines li{font-size:14px;line-height:1.5;color:var(--ink)}
+.as-preview .ov-link{width:fit-content}
+.rv-sample-preview{margin-top:14px;padding:14px 16px;opacity:.55;display:grid;gap:8px}
+.rv-sample-preview .pill{width:fit-content}
+.rv-sample-preview table{width:100%;border-collapse:collapse;font-size:13px}
+.rv-sample-preview td{padding:3px 6px}
+.rv-sample-preview td:first-child{color:var(--muted)}
+.rv-sample-arrow svg{width:12px;height:12px;vertical-align:middle;color:var(--muted)}
+
+/* home strip: the arrow icon in the "See the whole picture" link had no size, so it filled the strip */
+.as-preview .ov-link svg{width:14px;height:14px;vertical-align:-2px;margin-left:4px}

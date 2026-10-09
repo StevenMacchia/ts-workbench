@@ -177,7 +177,7 @@ const SG = {
   pii_policy:{t:"A private-information policy with fast removal of doxxing, and detection of posted addresses and phone numbers", o:"policy", e:"S"},
   threat_escalation:{t:"An escalation path for credible threats, including emergency disclosure to law enforcement", o:"legal", e:"M"},
   terror_hash:{t:"Hash-sharing for terrorist content (e.g. GIFCT) and a crisis protocol for live attacks", o:"eng", e:"M"},
-  tco_removal:{t:"Ability to remove terrorist content within one hour of an EU removal order", o:"ops", e:"M"},
+  tco_removal:{t:"Ability to remove terrorist content within one hour of a removal order under the EU Terrorist Content Online Regulation (Regulation (EU) 2021/784)", o:"ops", e:"M"},
   live_controls:{t:"Eligibility rules for going live, instant stream shutdown and 24/7 on-call coverage", o:"ops", e:"M"},
   crisis_resources:{t:"Crisis resources and helplines shown when self-harm content, searches or messages are detected", o:"product", e:"S"},
   search_interventions:{t:"Block or add warning screens to searches linked to self-harm, eating disorders, child abuse and extremism", o:"product", e:"S"},

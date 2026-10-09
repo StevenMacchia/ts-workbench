@@ -5,6 +5,9 @@
 const RC_GRADES = [[85, "A", "good"], [70, "B", "good"], [55, "C", "med"], [40, "D", "high"], [0, "F", "crit"]];
 const rcGrade = s => RC_GRADES.find(g => s >= g[0]);
 const RC_WEIGHTS = {maturity:30, coverage:25, launch:20, crisis:15, policy:10};
+// Plain-English weighting line, built from RC_WEIGHTS so it can never drift from the real maths
+const RC_WEIGHT_LABEL = {maturity:"Maturity", coverage:"harm coverage", launch:"launch readiness", crisis:"crisis readiness", policy:"policy clarity"};
+const rcWeightLine = () => `${Object.keys(RC_WEIGHTS).map(k => `${RC_WEIGHT_LABEL[k]} ${RC_WEIGHTS[k]}`).join(", ")}. Parts you haven't done yet count as missing, so the grade rises as you finish them.`;
 // Each part: {k, n, icon, color, route, score (0 to 100, or null when not graded), detail, todo}
 function rcParts(){
   const out = [], items = Object.values(wsItems());

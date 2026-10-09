@@ -86,7 +86,10 @@ function maRadar(d, big, prev){
     ${!rated ? `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ma-rl">Rate an area to start</text>` : ""}</svg>`;
 }
 function maLegend(d, prev){
-  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Now</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span>${prev ? `<span><i class="ma-lg-old"></i>${esc(maDate(prev.t))}</span>` : ""}<span><i class="ma-lg-gap"></i>Below target</span></div>`;
+  // Caption the comparison point so a past date never reads as a stale target: the plan's very first
+  // rating if it's the only snapshot saved, or the most recent snapshot once there's more than one.
+  const prevLabel = prev ? ((d.hist || []).length <= 1 ? "Plan started" : "Last saved") : "";
+  return `<div class="ma-legend"><span><i class="ma-lg-cur"></i>Now</span><span><i class="ma-lg-tgt"></i>Target for ${esc(maStage(d).n.toLowerCase())}</span>${prev ? `<span><i class="ma-lg-old"></i>${esc(prevLabel)}, ${esc(maDate(prev.t))}</span>` : ""}<span><i class="ma-lg-gap"></i>Below target</span></div>`;
 }
 // Where the overall score sits on the five-level scale, with the stage target marked
 function maScaleHTML(){
@@ -168,7 +171,7 @@ function maItemHTML(id, i, text, seen){
 }
 function maRoadmapHTML(){
   const steps = maRoadmap(ma), seen = new Set(), unrated = MA_AREAS.filter(a => !ma.lv[a.k]);
-  const more = unrated.length ? `<div class="banner ma-more"><span>Rate the remaining ${unrated.length === 1 ? "area" : unrated.length + " areas"} (${unrated.map(a => esc(a.s.toLowerCase())).join(", ")}) to complete your roadmap.</span><button type="button" class="btn sm" data-open="${unrated[0].k}" data-scroll="1">Rate ${esc(unrated[0].n.toLowerCase())}</button></div>` : "";
+  const more = unrated.length ? `<div class="banner ma-more"><span>Rate the remaining ${unrated.length === 1 ? "area" : unrated.length + " areas"} (${unrated.map(a => esc(a.s.toLowerCase())).join(", ")}) to complete your roadmap. The roadmap below is already valid for what you've rated so far.</span><button type="button" class="btn sm" data-open="${unrated[0].k}" data-scroll="1">Rate ${esc(unrated[0].n.toLowerCase())}</button></div>` : "";
   if(!steps.length) {
     const stretch = MA_AREAS.filter(a => ma.lv[a.k] && maLevelOf(ma, a.k) < 5).sort((x, y) => maLevelOf(ma, x.k) - maLevelOf(ma, y.k) || MA_ORDER.indexOf(x.k) - MA_ORDER.indexOf(y.k)).slice(0, 3);
     return more + (MA_AREAS.some(a => ma.lv[a.k]) ? `<div class="card ma-none"><b>No gaps against your targets.</b><p class="note">${stretch.length ? "Stretch goals, if you want to go further. Find them under By area." : "Every area is at the top level."}</p>
@@ -247,6 +250,7 @@ function maPlanHTML(){
   const tabs = MA_TABS.map(([k, n]) => `<button type="button" role="tab" aria-selected="${ma.tab === k}" data-matab="${k}">${n}${k === "roadmap" ? ` <span class="mono">${pr.stepsDone}/${pr.steps.length}</span>` : k === "progress" && hist.length ? ` <span class="mono">${hist.length}</span>` : ""}</button>`).join("");
   const topGaps = gaps.slice(0, 3).map(g => ({t:g.a.n, sub:`Level ${g.cur} of ${g.tgt} target: ${(nx && nx.s.a.k === g.a.k ? nx.text : g.a.next[g.cur - 1][0])}`}));
   return `<section class="card ma-band">
+      ${nx ? `<p class="ma-band-next" style="grid-column:1/-1"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
@@ -255,13 +259,13 @@ function maPlanHTML(){
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
-        ${nx ? `<p class="ma-band-next"><span>Next up</span>${esc(nx.s.a.n)}: ${esc(nx.text)}</p>` : ""}
         <div class="ma-band-a"><button type="button" class="btn sm" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button>
           ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
     </section>
     ${chapterLinkHTML("maturity")}
+    ${maAllRated(ma) && !hist.length && !ma.ex ? `<div class="banner ma-snapq"><span><strong>All ${MA_AREAS.length} areas rated.</strong> Save a snapshot now, so the next time you check in you can show how far you've come.</span><button type="button" class="btn sm primary" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button></div>` : ""}
     <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
     <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
