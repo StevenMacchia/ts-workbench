@@ -1,0 +1,87 @@
+/* =========================================================
+   RED TEAM STUDIO: UX/UI polish pass (branch enh/rtpolish). Scoped to the studio's own classes
+   (.rtf-*, .rt-*) wherever possible. A few rules reach .rtf-q/.rtf-opts/.rtf-next/.rtf-link, which
+   the Learn guides' own check-question card also borrows (see partLearn.js ~line 1282); those rules
+   are purely additive polish (motion, pressed state, touch target) and don't change their markup or
+   behaviour, so the guides keep working exactly as before. Declared last in build-ws.js, after
+   partZ15.css, Aurora tokens only.
+   ========================================================= */
+
+/* ---------- motion: the card-change animation stays under 200ms, matching reality to the brief ---------- */
+.rtf-card{animation-duration:.18s}
+
+/* ---------- motion: every rule that moves or fades on interaction is covered by reduced-motion,
+   not just the subset partZ14.css already disables (.ln-ex,.ln-term,.ln-hub a,.ln-modal,.ln-chev) ---------- */
+@media (prefers-reduced-motion: reduce){
+  .rtf-card{animation:none}
+  .rtf-opts button,.rtf-chips button,.rtf-hubc,.rt-seed,.rt-f,.rt-trip button,.rt-sev button,
+  .ln-opts button,.rtf-link,.rt-check-d summary .bar i{transition:none}
+  .rtf-hubc:hover,.rt-seed:hover,.rt-f:hover{transform:none}
+}
+
+/* ---------- pressed states: the chip- and card-style controls had :hover but no :active, unlike
+   the shared .btn (partZ.css), so a click or tap gave no press feedback ---------- */
+.rtf-opts button,.rtf-chips button,.rt-sev button,.rt-trip button{transition:border-color .12s,box-shadow .12s,transform .08s}
+.rtf-opts button:active:not([disabled]),.rtf-chips button:active:not([disabled]),
+.rt-sev button:active,.rt-trip button:active:not([disabled]),.ln-opts button:active:not([disabled]){transform:translateY(1px)}
+.rtf-hubc:active,.rt-seed:active,.rt-f:active{transform:translateY(0)}
+.rtf-link:active{opacity:.7}
+
+/* ---------- one primary and one secondary button size inside a card's action row: .rtf-next (the
+   primary) is 40px; a plain .btn placed beside it in the same .rtf-act row (e.g. "I know the basics",
+   "See a finished example", "Accept the risk instead") was the site-wide default 32px, so the row
+   mixed two button heights. Match the row's own buttons to the primary's size. ---------- */
+.rtf-act .btn{height:40px;padding:0 16px;font-size:14.5px}
+
+/* ---------- touch targets: on a phone, the chip-style controls and footer links fell under the
+   44px minimum once their own padding was measured against their line-height ---------- */
+@media (max-width:760px){
+  .rtf-opts button{min-height:44px;padding:13px 14px}
+  .rtf-chips button{min-height:44px;padding:11px 14px}
+  .rtf-chips.sm button{min-height:40px;padding:9px 13px}
+  .rt-sev button{min-height:44px;padding:11px 12px}
+  .rt-trip button{min-height:44px}
+  .rtf-hubc{min-height:44px}
+  .rtf-link{display:inline-block;padding:10px 0;margin:-10px 0}
+  .rtf-foot .rtf-link{padding:10px 2px;margin:-10px -2px}
+  .ln-check li{min-height:44px}
+  .ln-check input{width:20px;height:20px}
+}
+
+/* ---------- Judge: "your call" and "the expert's call" read as one comparison, not a grid that
+   sits 12px above a separate explanation paragraph. Butt the two calls together (no gap, a shared
+   border instead of two), and pull the explanation right up against them. ---------- */
+.rt-cal{gap:0;margin-bottom:0}
+.rt-cal-c{border-radius:12px 0 0 12px;border-right:0}
+.rt-cal-c.ex{border-radius:0 12px 12px 0;border-right:1px solid var(--line)}
+.rt-cal+.learn{margin-top:6px}
+@media (max-width:760px){.rt-cal-c{border-radius:12px 12px 0 0;border-right:1px solid var(--line);border-bottom:0}.rt-cal-c.ex{border-radius:0 0 12px 12px;border-bottom:1px solid var(--line)}}
+
+/* ---------- dark mode: the trip-point badges set a solid severity colour behind a fixed white
+   numeral. Light mode's --crit/--high are saturated enough for that; dark mode's are deliberately
+   brightened for contrast against a dark surface (see partZ13.css), which leaves white-on-light-red
+   or white-on-light-orange failing AA. Use the (always-dark) light-mode ink instead, dark mode only. ---------- */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-mode="light"]) .rt-trip button.right b,
+  :root:not([data-theme="light"]):not([data-mode="light"]) .rt-trip button.seq b{color:#15172B}
+}
+:root[data-theme="dark"] .rt-trip button.right b,:root[data-mode="dark"] .rt-trip button.right b,
+:root[data-theme="dark"] .rt-trip button.seq b,:root[data-mode="dark"] .rt-trip button.seq b{color:#15172B}
+
+/* ---------- print: the one-page summary (Show the work) and a finding print cleanly. Scoped with
+   :has() so no shared chrome file needs editing: the sidebar, header and studio-only controls are
+   hidden only when a studio card (.rtf) or a finding's five-part layout (.rt-five) is on the page. ---------- */
+@media print{
+  body:has(.rtf) .side,body:has(.rtf) .pagehead,body:has(.rtf) .cmdk-trigger,
+  body:has(.rt-five) .side,body:has(.rt-five) .pagehead{display:none}
+  body:has(.rtf) #view,body:has(.rt-five) #view{margin:0;padding:0;max-width:none}
+  .rtf-dots,.rtf-foot,.rtf-act,.rtf-opts,.rtf-chips,.rt-art,.ln-toast,.rtf-link,
+  .rt-f,.rtf-hubc,.wip-tag,.banner{display:none}
+  .rtf{max-width:none;padding:0}
+  .rtf-card{box-shadow:none;border:1px solid #ccc;animation:none;background:#fff;color:#111;padding:18px}
+  .rtf-h1,.rtf-h2{background:none;-webkit-text-fill-color:#111;color:#111}
+  .rt-five{break-inside:avoid}
+  .rt-five-r{break-inside:avoid;border:1px solid #ccc;background:#fff;color:#111}
+  #rt-sum,.ln-pre{background:#fff;color:#111;border:1px solid #ccc;max-height:none;overflow:visible;white-space:pre-wrap}
+  a[href]::after{content:""}
+}

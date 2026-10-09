@@ -280,3 +280,35 @@ rtFlowBind = function(){
   // "Start over" also brings the purpose card back
   $$("[data-rtf='restart']").forEach(b => { const orig = b.onclick; b.onclick = () => { store.set("rt:seen-intro", false); if(orig) orig(); }; });
 };
+/* =========================================================
+   KEYBOARD: Enter or -> for Next, <- for Back, 0-4 to pick a grade chip, matching the convention the
+   guides already use on their own check-question card (partLearn.js, the keydown listener right after
+   lnMethod). Scoped to the studio route only (#redteam, not #redteamllm/#redteamworld, which keep their
+   own listener untouched), so this never touches that file or its behaviour. Escape already closes any
+   open studio modal and returns focus to what opened it: that's lnModal's own listener (partLearn.js),
+   nothing to add here.
+   Typing in a field is never hijacked (input/textarea/select are excluded outright, before anything
+   else), and a focused button or link is left to handle its own Enter/Space so a picked option isn't
+   also advanced to "Next" by the same keystroke.
+   ========================================================= */
+document.addEventListener("keydown", e => {
+  if((location.hash || "").slice(1).split("/")[0] !== "redteam") return;
+  if(e.ctrlKey || e.altKey || e.metaKey) return;
+  const tag = e.target && e.target.tagName;
+  if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+  const modal = $("#ln-modal"), modalOpen = modal && !modal.hidden;
+  if(/^[0-4]$/.test(e.key)){
+    const scope = modalOpen ? modal : view;
+    if(!scope) return;
+    const hit = $$('[data-grade="' + e.key + '"],[data-g="' + e.key + '"],[data-sbgrade="' + e.key + '"],[data-j="' + e.key + '"],[data-pick="' + e.key + '"]', scope).find(b => !b.disabled);
+    if(hit){ e.preventDefault(); hit.click(); }
+    return;
+  }
+  if(modalOpen) return; // the drill, finding and practice modals keep their own Back/Next pager
+  if(e.target && e.target.closest && e.target.closest('button,a,[role="button"]')) return;
+  if(e.key === "Enter" || e.key === "ArrowRight"){
+    const b = $('[data-rtf="next"]'); if(b && !b.disabled){ e.preventDefault(); b.click(); }
+  } else if(e.key === "ArrowLeft"){
+    const b = $('[data-rtf="back"]'); if(b && !b.disabled){ e.preventDefault(); b.click(); }
+  }
+});
