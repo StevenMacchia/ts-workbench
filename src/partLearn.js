@@ -1050,7 +1050,7 @@ function lnTab(){ const p = (location.hash || "").slice(1).split("/"); return LN
 function renderRedteam(k){
   const g = LN_GUIDES[k], tab = lnTab(), doneSteps = g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length, doneEx = g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length;
   const meta =`<a class="btn sm" href="#glossary">Glossary</a><a class="btn sm" href="#${k === "llm" ? "redteamworld" : "redteamllm"}">${k === "llm" ? "World models" : "LLMs"} guide</a>`;
-  view.innerHTML = head(g.name, g.desc, "Learn", meta) + `<div class="ln">
+  view.innerHTML = head(g.name, g.desc, "Learn", '<span class="wip-tag">Work in progress</span> ' + (meta || "")) + `<div class="ln">
     <div class="ln-tabs"><div class="segs" role="tablist" aria-label="Guide sections">${LN_TABS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${tab === id}" aria-pressed="${tab === id}" data-tab="${id}">${n}</button>`).join("")}</div>
       <span class="note">${doneSteps} of ${g.steps.length} steps read · ${doneEx} of ${g.exercises.length} exercises done</span></div>
     <div id="ln-view"></div></div>`;
@@ -1512,7 +1512,7 @@ function renderGlossary(){
   let q = "", f = "all";
   const due0 = glDueCount();
   const meta = `<button type="button" class="btn sm primary" id="ln-practice">Practice the terms</button>${due0 ? `<button type="button" class="btn sm" id="ln-review-due">${due0} due for review</button>` : ""}<a class="btn sm" href="#redteamllm">LLM guide</a><a class="btn sm" href="#redteamworld">World model guide</a>`;
-  view.innerHTML = head("Glossary", `${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
+  view.innerHTML = head("Glossary", `<span class="wip-tag">Work in progress</span> ${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
     <p class="note tsg-xlink">Looking for general Trust and Safety terms? <a href="#tsglossary">T&amp;S glossary</a></p>
     <div class="ln-gl-tools"><label class="ln-search"><svg><use href="#i-search"/></svg><input id="ln-q" type="search" placeholder="Search terms" autocomplete="off" aria-label="Search terms"></label>
       <div class="segs" role="group" aria-label="Filter"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="llm" aria-pressed="false">LLMs</button><button type="button" data-f="world" aria-pressed="false">World models</button></div>

@@ -150,7 +150,7 @@ function renderRedteamStudio(){
   if(!report) return gdRender(rtSpec());
   gdCur = null;
   const f = rt.findings || [], open = f.filter(x => x.status !== "closed").length;
-  view.innerHTML = headCompact("Red team studio", `${esc(rt.svc || "Your product")} · ${rtKinds().map(rtModelName).join(" and ")}`,
+  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">Work in progress</span> · ${esc(rt.svc || "Your product")} · ${rtKinds().map(rtModelName).join(" and ")}`,
     `${rt.mode === "full" ? `<button type="button" class="btn sm" data-rt="flow">← Back to the guided flow</button>` : ""}<button type="button" class="btn sm" data-rt="edit">Edit answers</button><button type="button" class="btn sm" data-rt="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("redteam", rt)}</span></button>${f.length && rt.who !== "learner" ? `<button type="button" class="btn sm" data-rt="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-rt="finding"><svg><use href="#i-plus"/></svg>File a finding</button>`) + rtReportHTML(open);
   $$("[data-rt]").forEach(b => b.onclick = () => rtAct(b.dataset.rt, b));
   $$("[data-rttab]").forEach(b => b.onclick = () => { rt.tab = b.dataset.rttab; rtSave(); renderRedteamStudio(); });
