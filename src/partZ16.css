@@ -76,7 +76,7 @@
   body:has(.rt-five) .side,body:has(.rt-five) .pagehead{display:none}
   body:has(.rtf) #view,body:has(.rt-five) #view{margin:0;padding:0;max-width:none}
   .rtf-dots,.rtf-foot,.rtf-act,.rtf-opts,.rtf-chips,.rt-art,.ln-toast,.rtf-link,
-  .rt-f,.rtf-hubc,.wip-tag,.banner{display:none}
+  .rt-f,.rtf-hubc,.wip-tag,.banner,.rtf-strip{display:none}
   .rtf{max-width:none;padding:0}
   .rtf-card{box-shadow:none;border:1px solid #ccc;animation:none;background:#fff;color:#111;padding:18px}
   .rtf-h1,.rtf-h2{background:none;-webkit-text-fill-color:#111;color:#111}
@@ -85,3 +85,30 @@
   #rt-sum,.ln-pre{background:#fff;color:#111;border:1px solid #ccc;max-height:none;overflow:visible;white-space:pre-wrap}
   a[href]::after{content:""}
 }
+
+/* =========================================================
+   fixstudio: four things that bothered the owner about the studio once a newcomer could reach it (branch
+   enh/fixstudio). Aurora tokens only; appended here per the "new CSS goes at the end of this file" rule.
+   ========================================================= */
+
+/* ---------- the quiet per-card strip under the eyebrow: "You're in X · n of m · next: Y" ---------- */
+.rtf-strip{margin:0 0 10px;opacity:.82}
+
+/* ---------- the hub's primary "what next" card: one recommendation above the four paths, which now sit
+   under "Or pick your own". A violet-to-peach gradient border, same pairing as the progress bars
+   (partZ13.css, .bar i), makes it read as "the one to look at first" without a second colour system. ---------- */
+.rtf-hub-primary{margin-top:16px}
+.rtf-hubc-primary{display:grid;gap:6px;text-align:left;padding:18px 20px;border-radius:14px;border:1px solid transparent;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box,
+    linear-gradient(120deg,var(--accent),#FF9A7A) border-box;
+  font:inherit;color:var(--ink);cursor:pointer;transition:transform .15s,box-shadow .15s;align-content:start}
+.rtf-hubc-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+.rtf-hubc-primary:active{transform:translateY(0)}
+.rtf-hubc-primary b{font-size:17px}
+.rtf-hubc-primary span{font-size:13.5px;color:var(--muted);line-height:1.5}
+.rtf-hub-rec{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+@media (prefers-reduced-motion: reduce){.rtf-hubc-primary{transition:none}.rtf-hubc-primary:hover{transform:none}}
+
+/* ---------- the evidence field (a try's and a drill's own "what did it do" question) reads as part of
+   that question, not a separate form; .rtf-in already gives it the right label and textarea styling. ---------- */
+.rt-ev{margin-top:10px}

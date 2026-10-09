@@ -312,3 +312,114 @@ document.addEventListener("keydown", e => {
     const b = $('[data-rtf="back"]'); if(b && !b.disabled){ e.preventDefault(); b.click(); }
   }
 });
+/* =========================================================
+   FIXSTUDIO: four things that still bothered the owner about the studio once a newcomer could actually
+   reach it. All additive, all scoped to the studio's own screens; evidence (partRT3.js, partRT4.js) and
+   judge disagreement (partRT5.js) live next to the code they extend. This file carries the two that touch
+   every card: one recommended next step, and a quiet way to flag confusion.
+   ========================================================= */
+// ---------- 1. rtNextStep: one pure function of `rt` state, used by the hub's primary card and by the
+// quiet per-card strip below. Seven branches; the first one that matches wins. Nothing here reads the DOM
+// or the clock beyond Date.now() indirectly through rtDrills()/rt.sess, so it is simple to test branch by
+// branch by shaping a fixture `rt` object. ----------
+const RT_HUB_LABELS = {target:"Start here", finding:"Finish your first finding", judge:"Judge", plan:"Plan the week", test:"Keep testing", show:"Show the work", rerun:"Rerun on the build that ships", newtarget:"Start over with a new target"};
+function rtNextStep(){
+  const m = rtM1(), cardFilled = !!(m.card.what.trim() && m.card.who.trim() && m.card.out.trim());
+  if(!cardFilled) return {key:"target", reason:"There's no target card yet, so the next few minutes are best spent writing one and running your first try."};
+  if(!m.filed) return {key:"finding", reason:"You've started testing but haven't filed a finding yet, so the next few minutes are best spent finishing it."};
+  const j = rt.judge || {};
+  if(!j.sessions) return {key:"judge", reason:"You have a finding and no judging practice yet, so the next ten minutes are best spent calibrating your calls against the expert's."};
+  const planDone = !!(rt.plan && rt.plan.dated && RT_RULES.every((r, i) => rt.plan.ack && rt.plan.ack[i]));
+  if(!planDone) return {key:"plan", reason:"You've judged at least one session and have no dated plan yet, so the next twenty minutes are best spent scoping the week."};
+  const drills = rtDrills(), ranIds = drills.filter(d => rt.flow && rt.flow.drill && rt.flow.drill[d.id] != null).map(d => d.id);
+  if(ranIds.length < 2) return {key:"test", reason:"You have a plan and fewer than two drills run, so the next fifteen minutes are best spent running more."};
+  const show = rt.show || {};
+  if(!(show.who || show.notTested)) return {key:"show", reason:"You've run drills and have no summary yet, so the next ten minutes are best spent writing it up."};
+  const allProd = ranIds.length > 0 && ranIds.every(id => rt.sess[id] && rt.sess[id].build === "prod");
+  if(!allProd) return {key:"rerun", reason:"Everything here has run on a development build at some point, so rerun it on the exact build that ships before you call it done."};
+  return {key:"newtarget", reason:"Every path is done for this target, so start a new round on a different feature or the next release."};
+}
+// ---------- 4. "Flag this card": a quiet confusion log, in every card's footer, for watching someone use
+// the tool. Its own new key, never mixed into the plan or the exports. ----------
+const RT_FLAGS_KEY = "rt:flags";
+const rtFlagsList = () => store.get(RT_FLAGS_KEY, []) || [];
+const rtFlagsCount = () => rtFlagsList().length;
+const rtFlagsText = () => rtFlagsList().map(fl => `- ${fl.screen}${fl.path ? " · " + fl.path : ""}: ${fl.note || "(no note)"} (${fl.date})`).join("\n");
+function rtFlagOpen(screenKey){
+  const pathNow = (rtF() && rtF().path) || "";
+  lnModal(`<p class="ln-eb">Flag this card</p><h2>What confused you?</h2><p class="ln-why">One line. Stays in this browser; nobody sees it unless you copy it out.</p>
+    <div class="ln-body"><textarea class="input" rows="2" id="rt-flag-txt" maxlength="200" placeholder="What was confusing, or what you expected instead."></textarea></div>
+    <div class="ln-pager"><div class="row"></div><div class="row"><button type="button" class="btn" data-cancel>Cancel</button><button type="button" class="btn primary" data-ok>Save</button></div></div>`);
+  const bg = $("#ln-modal");
+  $("[data-cancel]", bg).onclick = lnClose;
+  $("[data-ok]", bg).onclick = () => {
+    const note = ($("#rt-flag-txt", bg).value || "").trim().slice(0, 200);
+    const list = rtFlagsList(); list.push({screen:screenKey, path:pathNow, note, date:new Date().toISOString().slice(0, 10)}); store.set(RT_FLAGS_KEY, list);
+    lnClose(); renderRedteamStudio();
+  };
+}
+const rtFlagLineHTML = () => { const n = rtFlagsCount(); return n ? `<p class="note">${n} flagged. <button type="button" class="rtf-link" data-flagscopy>Copy flags</button><span class="ln-toast" id="rt-flags-toast" aria-live="polite"></span></p>` : ""; };
+// The hub gets the primary "what next" card, built from rtNextStep(), above the four paths it already had
+// (now introduced as "Or pick your own" so nothing that worked before is removed) plus the flagged count.
+const rtfHubFS = rtfHub;
+rtfHub = function(){
+  let h = rtfHubFS();
+  const step = rtNextStep(), hubAt = h.indexOf('<div class="rtf-hub">');
+  if(hubAt >= 0){
+    // The hub is only ever reached after module 1's finding is filed, so in real use rtNextStep() never
+    // returns "target" or "finding" here; the fallback still gives a working click if a test or an odd
+    // state reaches the hub without that invariant.
+    const action = ["judge", "plan", "test", "show"].includes(step.key) ? `data-hub="${step.key}"` : step.key === "newtarget" ? `data-rtf="restart"` : `data-hub="test"`;
+    const primary = `<button type="button" class="rtf-hubc rtf-hubc-primary" ${action}><span class="rtf-hub-rec">Recommended</span><b>${esc(RT_HUB_LABELS[step.key] || step.key)}</b><span>${esc(step.reason)}</span></button>`;
+    h = h.slice(0, hubAt) + `<div class="rtf-hub-primary">${primary}</div><p class="rtf-lbl" style="margin-top:12px">Or pick your own</p>` + h.slice(hubAt);
+  }
+  const flagLine = rtFlagLineHTML();
+  if(flagLine){ const newHere = h.indexOf('<p class="note" style="margin-top:12px">New here?'); h = newHere >= 0 ? h.slice(0, newHere) + flagLine + h.slice(newHere) : h + flagLine; }
+  return h;
+};
+// The done card gets the flagged count too, same line, same copy button.
+const rtfDoneFS = rtfDone;
+rtfDone = function(){
+  let h = rtfDoneFS(); const flagLine = rtFlagLineHTML(); if(!flagLine) return h;
+  const at = h.indexOf('<div class="rtf-act rtf-wrap">'); return at < 0 ? h + flagLine : h.slice(0, at) + flagLine + h.slice(at);
+};
+// "Delete evidence" on any finding's own editor (the engineers' finding modal), whichever path filed it.
+const rtOpenFindingFS = rtOpenFinding;
+rtOpenFinding = function(id, pre){
+  rtOpenFindingFS(id, pre);
+  if(!id || !rtEvGet(id)) return;
+  const bg = $("#ln-modal"), form = $(".rt-form", bg); if(!bg || !form) return;
+  const row = document.createElement("p"); row.className = "note";
+  row.innerHTML = `This finding has a pasted answer kept in this browser. <button type="button" class="rtf-link" data-evdelmodal="${esc(id)}">Delete evidence</button>`;
+  form.appendChild(row);
+  const b = $("[data-evdelmodal]", bg); if(b) b.onclick = () => { rtEvDelete(id); row.remove(); };
+};
+// ---------- the quiet per-card strip: "You're in <path> · <n> of <m> · next: <recommendation>", reusing
+// the same position counters every card's own footer already shows, right under the eyebrow. Skipped only
+// on the one-off purpose card, which has no eyebrow position and no footer of its own either. Alongside it,
+// the same "Flag this card" link lands next to "How this works" in every card's footer. ----------
+const RT_PATH_NAME = {intro:"Getting started", open:"Getting started", target:"Start here", card:"Start here", try:"Start here", finding1:"Start here", sandbox:"Start here", hub:"What next", judge:"Judge", basic:"The basics", model:"Keep testing", harms:"Keep testing", team:"Keep testing", drill:"Keep testing", verdict:"Keep testing", fix:"Keep testing", done:"Keep testing", show:"Show the work", answers:"Show the work", plan1:"Plan the week", plan2:"Plan the week", plan3:"Plan the week", method:"The method"};
+const rtFlowHTMLFS = rtFlowHTML;
+rtFlowHTML = function(){
+  let h = rtFlowHTMLFS();
+  const screens = rtScreens(), f = rtF(), i = Math.min(f.i, screens.length - 1), sc = screens[i];
+  if(sc.k !== "intro"){
+    const ebAt = h.indexOf('<span class="rtf-eb">');
+    if(ebAt >= 0){
+      const h1At = h.indexOf('<h1 class="rtf-h1"', ebAt), h2At = h.indexOf('<h2 class="rtf-h2"', ebAt);
+      const headAt = h1At < 0 ? h2At : h2At < 0 ? h1At : Math.min(h1At, h2At);
+      if(headAt >= 0){
+        const path = RT_PATH_NAME[sc.k] || "Red team studio", step = rtNextStep();
+        h = h.slice(0, headAt) + `<p class="note rtf-strip">You're in ${esc(path)} · ${i} of ${screens.length - 1} · next: ${esc(RT_HUB_LABELS[step.key] || step.key)}</p>` + h.slice(headAt);
+      }
+    }
+  }
+  if(h.indexOf(">How this works</button>") >= 0) h = h.replace(">How this works</button>", ">How this works</button>" + `<button type="button" class="rtf-link" data-flag="${esc(sc.k)}">Flag this card</button>`);
+  return h;
+};
+const rtFlowBindFS = rtFlowBind;
+rtFlowBind = function(){
+  rtFlowBindFS();
+  $$("[data-flag]").forEach(b => b.onclick = () => rtFlagOpen(b.dataset.flag));
+  $$("[data-flagscopy]").forEach(b => b.onclick = () => copyText(rtFlagsText(), $("#rt-flags-toast")));
+};

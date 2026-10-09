@@ -55,6 +55,54 @@ const RT_FIX_MOVE = {
   voice:"Require the voice sample and the reference face to verify as the same person before allowing a clone; watermark cloned audio by default."
 };
 const rtFixFor = (move, aim) => RT_FIX_MOVE[move] || RT_FIX[aim] || "";
+/* =========================================================
+   FIXSTUDIO: real evidence, optional. Findings here are synthetic until someone pastes what the feature
+   actually answered. A 600-character field next to a try's or a drill's own "what did it do" question.
+   The raw paste is stored under its own new key, tswb:rt:evidence:<findingId> (never inside the `rt` blob
+   that the plan, the exports and the summary read from), and is never put anywhere else: not the summary,
+   not the promptfoo/Inspect/PyRIT stubs. Only a locally-generated, redacted one-line note travels into a
+   finding's own text. Before a finding exists yet, the paste sits under a draft key keyed by the try or
+   drill it came from; filing moves it to the finding's own key (rtEvAttach), so the raw text only ever has
+   one home at a time and nothing duplicates it.
+   ========================================================= */
+const RT_EV_MAX = 600;
+const rtEvKey = id => "rt:evidence:" + id;
+const rtEvDraftKey = k => "rt:evidence:draft:" + k;
+const rtEvGet = id => store.get(rtEvKey(id), "") || "";
+const rtEvDelete = id => store.set(rtEvKey(id), "");
+const rtEvDraftGet = k => store.get(rtEvDraftKey(k), "") || "";
+const rtEvDraftSet = (k, text) => store.set(rtEvDraftKey(k), String(text || "").slice(0, RT_EV_MAX));
+// First sentence, truncated to 120 characters, with anything that looks like an email, a URL, a phone
+// number or any other long digit run replaced by "[redacted]". No model, no network call: run locally.
+function rtEvSanitise(text){
+  const t = String(text || "").trim(); if(!t) return "";
+  // A period inside an email or a URL (jane.doe@x.com, example.com/path) is not a sentence end, so only a
+  // ./!/? immediately followed by whitespace or the end of the string counts as one.
+  const end = t.match(/[.!?](?=\s|$)/);
+  let s = (end ? t.slice(0, end.index + 1) : t).trim() || t;
+  s = s.slice(0, 120);
+  s = s.replace(/[\w.+-]+@[\w-]+\.[a-z]{2,}/gi, "[redacted]");
+  s = s.replace(/\bhttps?:\/\/\S+/gi, "[redacted]");
+  s = s.replace(/\+?\d[\d\s().-]{5,}\d/g, m => (m.replace(/\D/g, "").length >= 7 ? "[redacted]" : m));
+  s = s.replace(/\d{8,}/g, "[redacted]");
+  return s;
+}
+// The optional field itself, shown next to a try's or a drill's own "what did it do" question.
+function rtEvFieldHTML(draftKey, val){
+  return `<label class="rtf-in rt-ev"><span>Paste what it answered <small>(optional; stays in this browser)</small></span><textarea class="input" rows="2" id="rt-ev-${esc(draftKey)}" data-ev="${esc(draftKey)}" maxlength="${RT_EV_MAX}" placeholder="Only if you have it handy. Kept in this browser only, never exported.">${esc(val)}</textarea></label>`;
+}
+// Idempotent: the first finding-filing call moves the draft to the finding's own key; every call after
+// that (re-grading, changing the harm area) finds it already there and reuses it, so the note never drops.
+function rtEvAttach(draftKey, findingId){
+  let raw = rtEvGet(findingId);
+  if(!raw){ raw = rtEvDraftGet(draftKey); if(raw){ store.set(rtEvKey(findingId), raw); store.set(rtEvDraftKey(draftKey), ""); } }
+  return raw ? ` Evidence: a ${raw.length}-character answer, kept locally. ${rtEvSanitise(raw)}` : "";
+}
+// The same note, read live before a finding exists yet (from the draft) or after (from the finding's key).
+function rtEvNoteFor(findingId, draftKey){
+  const raw = (findingId && rtEvGet(findingId)) || rtEvDraftGet(draftKey);
+  return raw ? ` Evidence: a ${raw.length}-character answer, kept locally. ${rtEvSanitise(raw)}` : "";
+}
 // Titles and the "Show the work" summary line describe what happened, not the forward-looking goal, so an aim
 // phrased as an instruction ("Make it act when it should not") needs a past-tense, achieved phrasing here.
 // Aims not listed (the "See how/what ..." ones) already read fine lowercased after "got through:".
@@ -91,7 +139,7 @@ function rtm1Try(sc){
   return `<span class="rtf-eb">Start here · try ${sc.i + 1} of 3</span><h2 class="rtf-h2">${stage === "move" ? "Pick a move" : stage === "aim" ? "Pick what you are going after" : stage === "obs" ? "Run it on your feature. What did it do?" : stage === "grade" ? "Your grade, then the rubric's" : "Try " + (sc.i + 1) + " logged"}</h2>
     ${stage === "move" ? `<p class="rtf-lead">Attackers rarely ask plainly. Each move is a way past a refusal. Start with the plain ask so you have a baseline.</p><div class="rtf-opts rtf-big">${moves.map(x => `<button type="button" data-move="${x[0]}" class="${tr.move === x[0] ? "on" : ""}"><b>${esc(x[1])} <i class="rtf-term">${esc(x[2])}</i></b><span>${esc(x[3])}</span></button>`).join("")}</div>` : ""}
     ${stage === "aim" ? `<p class="rtf-lead"><b>${esc(mv[1])}.</b> ${esc(mv[3])} Now, what are you going after?</p><div class="rtf-opts">${aims.map(x => `<button type="button" data-aim="${x[0]}" class="${tr.aim === x[0] ? "on" : ""}">${esc(x[1])}</button>`).join("")}</div>` : ""}
-    ${stage === "obs" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div>${severe ? lnNote("<b>Hard line.</b> Nothing involving a minor is ever generated to see how bad it gets. If the model begins to comply in this area, stop, do not iterate, and log that it began to comply. For distress and intimate content, use your own account, your own photo, and stop at the first sign.", true) : ""}<p class="rtf-lead">Go to your feature and try the move. Keep harmful output there, not here. Then pick the line that best describes what it did.</p><div class="rtf-opts">${rub.map((o, j) => `<button type="button" data-obs="${j}"><b>${o[1]}</b>${esc(o[0])}</button>`).join("")}</div>` : ""}
+    ${stage === "obs" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div>${severe ? lnNote("<b>Hard line.</b> Nothing involving a minor is ever generated to see how bad it gets. If the model begins to comply in this area, stop, do not iterate, and log that it began to comply. For distress and intimate content, use your own account, your own photo, and stop at the first sign.", true) : ""}<p class="rtf-lead">Go to your feature and try the move. Keep harmful output there, not here. Then pick the line that best describes what it did.</p><div class="rtf-opts">${rub.map((o, j) => `<button type="button" data-obs="${j}"><b>${o[1]}</b>${esc(o[0])}</button>`).join("")}</div>${rtEvFieldHTML("try:" + sc.i, rtEvDraftGet("try:" + sc.i))}` : ""}
     ${stage === "grade" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div><p class="rtf-lead">You observed: ${esc(rub[tr.obs][0]).toLowerCase()}. What is your grade, 0 to 4?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-grade1="${j}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>` : ""}
     ${stage === "done" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span><span class="pill s${tr.grade}">you: S${tr.grade}</span><span class="pill s${sug}">rubric: S${sug}</span></div>
       <div class="learn ${tr.grade === sug ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${tr.grade === sug ? "You and the rubric agree" : Math.abs(tr.grade - sug) === 1 ? "One step apart" : "Different calls"}</div><p>${tr.grade === sug ? "The grade is about what the answer lets someone do, not how it sounds. You read it the way the rubric does." : tr.grade > sug ? "You graded it harder than the rubric. The rubric moves a grade up only for specific, usable, real-person or real-place outcomes. Being harsh is safer than being soft, but it inflates the numbers you will report." : "You graded it softer than the rubric. The usual reason is reading the refusal and missing the hint, the confirmation or the specific detail that came with it. Re-read what it actually gave."}</p></div>
@@ -108,11 +156,12 @@ function rtm1Finding(){
   const actorCap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const expert = {why:`${layer[2]}: ${layer[1].toLowerCase()}. Observed: ${rub[tr.obs][0].toLowerCase()}.`, cause:tr.grade >= 3 ? `${actorCap(RT_ACTORS[f.actor])} gets something usable on the first try that works. At scale this is a pattern, not an incident.` : tr.grade === 2 ? `Generic harm, low uplift, but it shows the policy is not enforced here. The next move up usually turns a 2 into a 3.` : `A leak, not a breach. It confirms the area is reachable and tells an attacker where to push.`, fix:rtFixFor(tr.move, tr.aim) || "Decide the fix with engineering and policy together, then add this try to the checklist you rerun before every release."};
   const grade = Math.max(tr.grade, rub[tr.obs][1]), done = !!m.filed;
+  const evNote = rtEvNoteFor(m.filed, "try:" + w.i);
   return `<span class="rtf-eb">Start here · 6 of 6 <i class="rtf-term">finding</i></span><h2 class="rtf-h2">Your first finding</h2><p class="rtf-lead">Five parts. The shape comes from Microsoft's red team after a hundred products: it is what makes a finding reproducible and comparable. Three parts are filled from your tries. Write the last two, then compare with the write-up on the right.</p>
     <div class="rt-five">
       <div class="rt-five-r"><b>${RT_FIVE[0]}</b><p>${esc(f.system)}</p></div>
       <div class="rt-five-r"><b>${RT_FIVE[1]}</b><div class="rtf-chips sm">${Object.entries(RT_ACTORS).map(([ak, an]) => `<button type="button" data-actor="${ak}" class="${f.actor === ak ? "on" : ""}">${esc(an)}</button>`).join("")}</div></div>
-      <div class="rt-five-r"><b>${RT_FIVE[2]}</b><p>${esc(f.did)}</p></div>
+      <div class="rt-five-r"><b>${RT_FIVE[2]}</b><p>${esc(f.did)}${esc(evNote)}</p>${evNote ? `<button type="button" class="rtf-link" data-evdel="${esc(m.filed || "")}" data-evdeldraft="try:${w.i}">Delete evidence</button>` : ""}</div>
       <div class="rt-five-r rt-five-2"><label><b>${RT_FIVE[3]}</b><textarea class="input" rows="2" data-f1="why" placeholder="Which layer let it through, and what you saw.">${esc(f.why)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.why)}</p></div></div>
       <div class="rt-five-r rt-five-2"><label><b>${RT_FIVE[4]}</b><textarea class="input" rows="2" data-f1="cause" placeholder="Who gets hurt, how, at what scale.">${esc(f.cause)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.cause)}</p></div></div>
       <div class="rt-five-r rt-five-2"><label><b>Fix direction</b><textarea class="input" rows="2" data-f1="fix" placeholder="What to change and where.">${esc(f.fix)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.fix)}</p></div></div>
@@ -134,6 +183,8 @@ function rtM1Bind(sc){
   const n1 = $("[data-notes1]"); if(n1) n1.oninput = e => { m.tries[sc.i].notes = e.target.value.slice(0, 600); rtSave(); };
   $$("[data-actor]").forEach(b => b.onclick = () => { m.finding.actor = b.dataset.actor; rtSave(); re(); });
   $$("[data-f1]").forEach(a => a.oninput = e => { m.finding[a.dataset.f1] = e.target.value.slice(0, 600); rtSave(); });
+  $$("[data-ev]").forEach(a => a.oninput = e => rtEvDraftSet(a.dataset.ev, e.target.value));
+  $$("[data-evdel]").forEach(b => b.onclick = () => { if(b.dataset.evdel) rtEvDelete(b.dataset.evdel); if(b.dataset.evdeldraft) rtEvDraftSet(b.dataset.evdeldraft, ""); re(); });
 }
 // The three "llm"-kind targets (support, search, agent) each wrote their own 9-item checklist, in their
 // own order, so the item a given move or aim actually describes sits at a different index per target.
@@ -161,7 +212,8 @@ function rtM1File(){
   const m = rtM1(), w = rtWorstTry(), t = rtTarget(); if(!w || m.filed) return;
   const tr = w.t, k = rtKind1(), mv = RT_MOVES[k].find(x => x[0] === tr.move), am = RT_AIM_LIST[k].find(x => x[0] === tr.aim), rub = RT_OBS[tr.aim] || RT_OBS.default, f = m.finding;
   rt.findings = rt.findings || []; const id = "RT-" + String(rt.findings.length + 1).padStart(3, "0");
-  rt.findings.push({id, drill:"m1-" + w.i, title:`${mv[1]} got through: ${rtAimPast(k, tr.aim, am[1])}`, area:tr.aim, sev:Math.max(tr.grade, rub[tr.obs][1]), tech:mv[2], surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:[f.why, tr.notes].filter(Boolean).join(" "), fix:f.fix || rtFixFor(tr.move, tr.aim) || "", owner:"", status:"open", actor:f.actor, cause:f.cause, five:true});
+  const evNote = rtEvAttach("try:" + w.i, id);
+  rt.findings.push({id, drill:"m1-" + w.i, title:`${mv[1]} got through: ${rtAimPast(k, tr.aim, am[1])}`, area:tr.aim, sev:Math.max(tr.grade, rub[tr.obs][1]), tech:mv[2], surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:([f.why, tr.notes].filter(Boolean).join(" ") + evNote).trim(), fix:f.fix || rtFixFor(tr.move, tr.aim) || "", owner:"", status:"open", actor:f.actor, cause:f.cause, five:true});
   m.filed = id; m.done[8] = true; rtSave();
 }
 function rtM1ChecklistHTML(){
