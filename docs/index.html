@@ -4452,6 +4452,11 @@ table:not([class]) tr:last-child td{border-bottom:0}
    buttons beside it. Disabled now renders as a plain, clearly inert gray button instead of a
    washed-out primary, so the one enabled primary button is never ambiguous. */
 .ai-act .btn.primary[disabled]{opacity:1;background:var(--sunk);border-color:var(--line);color:var(--faint);box-shadow:none}
+
+/* sidebar pills never wrap and never push a label onto two lines */
+.side .navlink{white-space:nowrap}
+.side .navlink > span:first-of-type,.side .navlink .lbl{overflow:hidden;text-overflow:ellipsis}
+.sb-new,.sb-new.sb-wip,.sb-new.sb-ai{white-space:nowrap;flex:none;font:500 10.5px/1.6 var(--body);letter-spacing:0;padding:0 7px;border-radius:999px}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -5205,19 +5210,19 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
       <div class="sb-more">
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Enforcement notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
-      <a class="navlink" href="#redteam" data-route="redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span>Red team studio<span class="sb-new sb-wip">Work in progress</span></a>
+      <a class="navlink" href="#redteam" data-route="redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span>Red team studio<span class="sb-new sb-wip">In progress</span></a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
       </div>
-      <div class="sb-h sb-h-tag">Works with ROOST<span class="sb-new sb-wip">Work in progress</span></div>
+      <div class="sb-h sb-h-tag">Works with ROOST<span class="sb-new sb-wip">In progress</span></div>
       <div class="sb-more">
       <a class="navlink" href="#roost" data-route="roost"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span>Overview</a>
       <a class="navlink" href="#eval" data-route="eval"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span>Classifier eval<span class="sb-new">New</span></a>
       </div>
       <div class="sb-h sb-h-tag">Learn<span class="sb-new">New</span></div>
       <div class="sb-more">
-      <a class="navlink" href="#redteamllm" data-route="redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span>Red teaming LLMs<span class="sb-new sb-wip">Work in progress</span></a>
-      <a class="navlink" href="#redteamworld" data-route="redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span>Red teaming world models<span class="sb-new sb-wip">Work in progress</span></a>
-      <a class="navlink" href="#glossary" data-route="glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span>Glossary and practice<span class="sb-new sb-wip">Work in progress</span></a>
+      <a class="navlink" href="#redteamllm" data-route="redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span>Red teaming LLMs<span class="sb-new sb-wip">In progress</span></a>
+      <a class="navlink" href="#redteamworld" data-route="redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span>Red teaming world models<span class="sb-new sb-wip">In progress</span></a>
+      <a class="navlink" href="#glossary" data-route="glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span>Glossary and practice<span class="sb-new sb-wip">In progress</span></a>
       <a class="navlink" href="#tsglossary" data-route="tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span>T&amp;S glossary</a>
       </div>
       <div class="sb-h">Project</div>
@@ -12158,7 +12163,7 @@ function renderTools(){
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
-        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">Work in progress</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
+        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">In progress</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
@@ -12173,9 +12178,9 @@ function renderTools(){
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
-        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">Work in progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">Work in progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">Work in progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
       </div>
     </section>
@@ -12430,7 +12435,7 @@ const RO_USES = [
 ];
 function renderRoost(){
   const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
-  const meta = `<span class="wip-tag">Work in progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
+  const meta = `<span class="wip-tag">In progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
   view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
     <section class="ab-sec rise">
       <h2>What you can do today</h2>
@@ -13587,7 +13592,7 @@ function lnTab(){ const p = (location.hash || "").slice(1).split("/"); return LN
 function renderRedteam(k){
   const g = LN_GUIDES[k], tab = lnTab(), doneSteps = g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length, doneEx = g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length;
   const meta =`<a class="btn sm" href="#glossary">Glossary</a><a class="btn sm" href="#${k === "llm" ? "redteamworld" : "redteamllm"}">${k === "llm" ? "World models" : "LLMs"} guide</a>`;
-  view.innerHTML = head(g.name, g.desc, "Learn", '<span class="wip-tag">Work in progress</span> ' + (meta || "")) + `<div class="ln">
+  view.innerHTML = head(g.name, g.desc, "Learn", '<span class="wip-tag">In progress</span> ' + (meta || "")) + `<div class="ln">
     <div class="ln-tabs"><div class="segs" role="tablist" aria-label="Guide sections">${LN_TABS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${tab === id}" aria-pressed="${tab === id}" data-tab="${id}">${n}</button>`).join("")}</div>
       <span class="note">${doneSteps} of ${g.steps.length} steps read · ${doneEx} of ${g.exercises.length} exercises done</span></div>
     <div id="ln-view"></div></div>`;
@@ -14049,7 +14054,7 @@ function renderGlossary(){
   let q = "", f = "all";
   const due0 = glDueCount();
   const meta = `<button type="button" class="btn sm primary" id="ln-practice">Practice the terms</button>${due0 ? `<button type="button" class="btn sm" id="ln-review-due">${due0} due for review</button>` : ""}<a class="btn sm" href="#redteamllm">LLM guide</a><a class="btn sm" href="#redteamworld">World model guide</a>`;
-  view.innerHTML = head("Glossary", `<span class="wip-tag">Work in progress</span> ${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
+  view.innerHTML = head("Glossary", `<span class="wip-tag">In progress</span> ${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
     <p class="note tsg-xlink">Looking for general Trust and Safety terms? <a href="#tsglossary">T&amp;S glossary</a></p>
     <div class="ln-gl-tools"><label class="ln-search"><svg><use href="#i-search"/></svg><input id="ln-q" type="search" placeholder="Search terms" autocomplete="off" aria-label="Search terms"></label>
       <div class="segs" role="group" aria-label="Filter"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="llm" aria-pressed="false">LLMs</button><button type="button" data-f="world" aria-pressed="false">World models</button></div>
@@ -14520,7 +14525,7 @@ function renderRedteamStudio(){
   if(!report) return gdRender(rtSpec());
   gdCur = null;
   const f = rt.findings || [], open = f.filter(x => x.status !== "closed").length;
-  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">Work in progress</span> · ${esc(rt.svc || "Your product")} · ${rtKinds().map(rtModelName).join(" and ")}`,
+  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">In progress</span> · ${esc(rt.svc || "Your product")} · ${rtKinds().map(rtModelName).join(" and ")}`,
     `${rt.mode === "full" ? `<button type="button" class="btn sm" data-rt="flow">← Back to the guided flow</button>` : ""}<button type="button" class="btn sm" data-rt="edit">Edit answers</button><button type="button" class="btn sm" data-rt="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("redteam", rt)}</span></button>${f.length && rt.who !== "learner" ? `<button type="button" class="btn sm" data-rt="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-rt="finding"><svg><use href="#i-plus"/></svg>File a finding</button>`) + rtReportHTML(open);
   $$("[data-rt]").forEach(b => b.onclick = () => rtAct(b.dataset.rt, b));
   $$("[data-rttab]").forEach(b => b.onclick = () => { rt.tab = b.dataset.rttab; rtSave(); renderRedteamStudio(); });
@@ -15225,7 +15230,7 @@ renderRedteamStudio = function(){
   if(typeof GT_MORE === "object") Object.assign(GT_MORE, RT_TERMS);
   if(rt.mode === "full") return renderRedteamStudio0();
   if(rt.flow && rt.flow.i === undefined) rt.flow.i = 0;
-  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">Work in progress</span>${rt.svc ? " · " + esc(rt.svc) : ""}`, rt.flow && rt.flow.i ? `<span class="rtf-hmeta"><button type="button" class="rtf-link" data-rtf="full">Engineers' view</button></span>` : "") + rtFlowHTML();
+  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">In progress</span>${rt.svc ? " · " + esc(rt.svc) : ""}`, rt.flow && rt.flow.i ? `<span class="rtf-hmeta"><button type="button" class="rtf-link" data-rtf="full">Engineers' view</button></span>` : "") + rtFlowHTML();
   rtFlowBind();
 };
 const rtAct00 = rtAct;
@@ -16174,7 +16179,7 @@ rtFlowBind = function(){
 const rtIntroSeen = () => store.get("rt:seen-intro", false);
 const rtIntroMark = () => store.set("rt:seen-intro", true);
 function rtfIntro(){
-  return `<span class="rtf-eb">Red team studio <span class="wip-tag">Work in progress</span></span><h1 class="rtf-h1">Find out what your AI feature does when someone tries to misuse it, before a customer does</h1>
+  return `<span class="rtf-eb">Red team studio <span class="wip-tag">In progress</span></span><h1 class="rtf-h1">Find out what your AI feature does when someone tries to misuse it, before a customer does</h1>
     <ul class="rtf-list rtf-intro-list">
       <li>Who it's for: a small team with no safety person and a deadline.</li>
       <li>What you leave with: a target card, graded tries, a finding, and a one-page summary you can send a customer.</li>

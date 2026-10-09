@@ -157,7 +157,7 @@ renderRedteamStudio = function(){
   if(typeof GT_MORE === "object") Object.assign(GT_MORE, RT_TERMS);
   if(rt.mode === "full") return renderRedteamStudio0();
   if(rt.flow && rt.flow.i === undefined) rt.flow.i = 0;
-  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">Work in progress</span>${rt.svc ? " · " + esc(rt.svc) : ""}`, rt.flow && rt.flow.i ? `<span class="rtf-hmeta"><button type="button" class="rtf-link" data-rtf="full">Engineers' view</button></span>` : "") + rtFlowHTML();
+  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">In progress</span>${rt.svc ? " · " + esc(rt.svc) : ""}`, rt.flow && rt.flow.i ? `<span class="rtf-hmeta"><button type="button" class="rtf-link" data-rtf="full">Engineers' view</button></span>` : "") + rtFlowHTML();
   rtFlowBind();
 };
 const rtAct00 = rtAct;

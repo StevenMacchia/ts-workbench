@@ -455,3 +455,8 @@ table:not([class]) tr:last-child td{border-bottom:0}
    buttons beside it. Disabled now renders as a plain, clearly inert gray button instead of a
    washed-out primary, so the one enabled primary button is never ambiguous. */
 .ai-act .btn.primary[disabled]{opacity:1;background:var(--sunk);border-color:var(--line);color:var(--faint);box-shadow:none}
+
+/* sidebar pills never wrap and never push a label onto two lines */
+.side .navlink{white-space:nowrap}
+.side .navlink > span:first-of-type,.side .navlink .lbl{overflow:hidden;text-overflow:ellipsis}
+.sb-new,.sb-new.sb-wip,.sb-new.sb-ai{white-space:nowrap;flex:none;font:500 10.5px/1.6 var(--body);letter-spacing:0;padding:0 7px;border-radius:999px}
