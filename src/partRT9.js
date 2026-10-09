@@ -366,10 +366,10 @@ rtfHub = function(){
   let h = rtfHubFS();
   const step = rtNextStep(), hubAt = h.indexOf('<div class="rtf-hub">');
   if(hubAt >= 0){
-    // The hub is only ever reached after module 1's finding is filed, so in real use rtNextStep() never
-    // returns "target" or "finding" here; the fallback still gives a working click if a test or an odd
-    // state reaches the hub without that invariant.
-    const action = ["judge", "plan", "test", "show"].includes(step.key) ? `data-hub="${step.key}"` : step.key === "newtarget" ? `data-rtf="restart"` : `data-hub="test"`;
+    // The hub is reachable without a filed finding too ("Skip to the menu" on the opening card jumps
+    // straight here), so "target"/"finding" need their own route back into module 1's own screens
+    // (target card, try, finding) rather than the generic drill-setup path "test" uses.
+    const action = step.key === "target" || step.key === "finding" ? `data-rtf="m1"` : ["judge", "plan", "test", "show"].includes(step.key) ? `data-hub="${step.key}"` : step.key === "newtarget" ? `data-rtf="restart"` : `data-hub="test"`;
     const primary = `<button type="button" class="rtf-hubc rtf-hubc-primary" ${action}><span class="rtf-hub-rec">Recommended</span><b>${esc(RT_HUB_LABELS[step.key] || step.key)}</b><span>${esc(step.reason)}</span></button>`;
     h = h.slice(0, hubAt) + `<div class="rtf-hub-primary">${primary}</div><p class="rtf-lbl" style="margin-top:12px">Or pick your own</p>` + h.slice(hubAt);
   }
@@ -422,4 +422,7 @@ rtFlowBind = function(){
   rtFlowBindFS();
   $$("[data-flag]").forEach(b => b.onclick = () => rtFlagOpen(b.dataset.flag));
   $$("[data-flagscopy]").forEach(b => b.onclick = () => copyText(rtFlagsText(), $("#rt-flags-toast")));
+  // The hub's primary card routes "target"/"finding" here instead of into the generic "test" setup:
+  // back to module 1's own screens (target card first, or wherever its tries left off).
+  $$('[data-rtf="m1"]').forEach(b => b.onclick = () => rtGo(rtScreens().findIndex(x => x.k === "target")));
 };

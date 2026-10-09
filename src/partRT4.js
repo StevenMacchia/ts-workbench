@@ -80,11 +80,15 @@ function rtEvSanitise(text){
   // ./!/? immediately followed by whitespace or the end of the string counts as one.
   const end = t.match(/[.!?](?=\s|$)/);
   let s = (end ? t.slice(0, end.index + 1) : t).trim() || t;
-  s = s.slice(0, 120);
+  // Redact on the full first sentence, THEN cut to 120 characters for display -- never the other way
+  // round. Truncating first can slice a long email, URL, phone number or digit run in half, leaving an
+  // unredacted raw fragment (e.g. "jane." or "555-") past the cut; redacting first means the only thing
+  // the 120-character cap can ever cut into is the word "[redacted]" itself, never real contact details.
   s = s.replace(/[\w.+-]+@[\w-]+\.[a-z]{2,}/gi, "[redacted]");
   s = s.replace(/\bhttps?:\/\/\S+/gi, "[redacted]");
   s = s.replace(/\+?\d[\d\s().-]{5,}\d/g, m => (m.replace(/\D/g, "").length >= 7 ? "[redacted]" : m));
   s = s.replace(/\d{8,}/g, "[redacted]");
+  s = s.slice(0, 120);
   return s;
 }
 // The optional field itself, shown next to a try's or a drill's own "what did it do" question.

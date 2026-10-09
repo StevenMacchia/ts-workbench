@@ -198,9 +198,12 @@ const body4 = function(){
   eq(/matched the expert/.test(H()) && /Another ten/.test(H()), true, "session summary with a breakdown");
   const st = rtJStats(); eq(st.total, c.ids.length, "history counts every answer"); eq(Object.keys(st.by).length > 1, true, "breakdown by area");
   rt.model = "world"; eq(rtJPool().every(x => x.k !== "llm"), true, "a world model plan filters the bank");
-  // fixstudio: the hub also gets one recommended primary card (its own data-hub, since no target card
-  // and no finding yet falls back to "test" here); that is the +1 over the four paths, the basics and the method
-  rtF().path = ""; rtF().i = rtScreens().findIndex(x => x.k === "hub"); renderRedteamStudio(); eq((H().match(/data-hub=/g) || []).length, 7, "the hub offers a recommended card, four paths, the basics and the method"); if(bad(H())) throw new Error("hub bad: " + where(H()));
+  // fixstudio: the hub also gets one recommended primary card. With no target card and no finding yet,
+  // rtNextStep() says "target", so the primary card routes back into module 1 (data-rtf="m1"), not into
+  // the generic "test" setup path (module 1's own screens sit before the hub, not after it, so a
+  // data-hub click, which always advances past the hub, would land in the wrong place). The four paths,
+  // the basics and the method keep their own data-hub, so that count stays at 6.
+  rtF().path = ""; rtF().i = rtScreens().findIndex(x => x.k === "hub"); renderRedteamStudio(); eq((H().match(/data-hub=/g) || []).length, 6, "the hub offers four paths, the basics and the method, each its own data-hub"); eq(/data-rtf="m1"/.test(H()), true, "and the recommended card routes back into module 1 instead"); if(bad(H())) throw new Error("hub bad: " + where(H()));
   rtF().path = "basics"; eq(rtScreens().filter(x => x.k === "basic").length, 5, "basics path shows the five lessons"); rtF().path = "test"; eq(rtScreens().some(x => x.k === "verdict"), true, "test path reaches the verdict");
   // spaced review across days: a right streak spaces out further than a reset, due items lead the next session, nothing due is silent
   rt = RT_BLANK(); rt.model = "llm"; const j0 = rtJ();
@@ -675,6 +678,16 @@ const body14 = function(){
   rt.judge = {sessions:3, hist:[], miss:{}, seen:{}}; hub = rtfHub();
   eq(/data-hub="plan"><span class="rtf-hub-rec">Recommended<\/span><b>Plan the week<\/b>/.test(hub), true, "once judged, the primary card moves on to Plan the week");
   out.push("hub: one recommended primary card above the four original paths, computed by rtNextStep(), nothing removed");
+  // 1b2. the hub is reachable without a filed finding too (the opening card's "Skip to the menu" goes
+  // straight there), so with no target card yet the primary card must route back into module 1's own
+  // screens, not into the generic "test" setup path that sits after the hub, not before it.
+  rt = RT_BLANK(); rtF().i = rtScreens().findIndex(x => x.k === "hub"); renderRedteamStudio();
+  eq(/data-rtf="m1"><span class="rtf-hub-rec">Recommended<\/span><b>Start here<\/b>/.test(H()), true, "with no target card yet, the primary card still reads \"Start here\" and routes into module 1");
+  // the bound click handler for data-rtf="m1" (partRT9.js) does exactly this: jump to module 1's own
+  // target screen, which sits before the hub in rtScreens(), not after it like the generic test setup
+  rtGo(rtScreens().findIndex(x => x.k === "target"));
+  eq(/What are you building/.test(H()), true, "its target is module 1's own target card, not the generic model-type setup screen");
+  out.push("hub reached with no target card (Skip to the menu): the recommended card still routes into module 1, not the generic test setup");
   // 1c. the quiet per-card strip: path, position and the recommended next step, on every card but the purpose card
   rt = RT_BLANK(); rtF().skipBasics = true; rtM1().target = "support"; rt.model = "llm"; rt.areas = {fraud:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtSave();
   rtGo(rtScreens().findIndex(x => x.k === "target"));
@@ -711,7 +724,20 @@ const body14 = function(){
   eq(findingTxt.indexOf(sanit) >= 0 && findingTxt.indexOf(raw) < 0, true, "the findings export carries the sanitised note, never the raw paste");
   ["promptfoo", "pyrit", "inspect"].forEach(k => eq(rtExportText(k).indexOf("jane.doe") < 0, true, k + " export never carries the raw evidence either"));
   rtEvDelete(fid); eq(rtEvGet(fid), "", "Delete evidence clears the finding's own key");
-  out.push("evidence: an optional 600-character paste, redacted locally (email, phone, URL, long digit runs), moved onto the finding's own new key on filing, never exported, deletable");
+  // Regression: redaction has to run on the full first sentence before the 120-character display cap is
+  // applied, not after. Cutting first can slice a long email, phone number, URL or digit run in half,
+  // leaving an unredacted raw fragment past the cut (e.g. "jane." or "555-") in the finding's summary and
+  // every export. Build a paste where each sensitive item straddles that 120-character boundary.
+  [
+    {raw:"x".repeat(110) + " call 555-123-4567 now.", frag:"555-"},
+    {raw:"x".repeat(108) + " email jane.doe@example.com now.", frag:"jane."},
+    {raw:"x".repeat(108) + " acct 9876543210 now.", frag:"987654"},
+    {raw:"x".repeat(108) + " see https://example.com/a/b now.", frag:"https:/"}
+  ].forEach(({raw:rawCut, frag}) => {
+    const sanitCut = rtEvSanitise(rawCut);
+    eq(sanitCut.indexOf(frag) < 0, true, "truncation never leaves a raw fragment (\"" + frag + "\") unredacted past the 120-character cut");
+  });
+  out.push("evidence: an optional 600-character paste, redacted locally (email, phone, URL, long digit runs) before the display cap is applied so a cut never leaves a raw fragment, moved onto the finding's own new key on filing, never exported, deletable");
   // 3. judge: "I'd grade this differently" records {id, your call, the expert's, your reason, date} under
   // its own new key; the session-done card totals this session's disagreements and offers them back
   rt = RT_BLANK(); rt.model = "llm"; rtJStart();
