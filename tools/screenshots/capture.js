@@ -84,6 +84,7 @@ async function ensureServer() {
 // The daily sync (_build/gen-readmes.js) copies README images and showcase images from _build/; mirror each
 // capture there so the next sync keeps the new image instead of restoring an old one.
 function mirrorToBuild(outPath, t){
+  if(process.env.CAPTURE_NO_MIRROR) return;
   const B = path.resolve(__dirname, "..", "..", "..", "_build");
   if(!fs.existsSync(B)) return;
   const dest = t.dir === "assets" ? path.join(B, "shots", t.name) : path.join(B, "showcase", t.name);
