@@ -747,10 +747,13 @@ const body14 = function(){
   eq(rtFlagsText(), "- drill · test: wasn't sure what counted as a miss (2026-10-09)", "the copy text is a markdown list naming the screen, the path and the note");
   store.set("rt:flags", []);
   out.push("flags: a quiet \"Flag this card\" link in every footer; nothing shows at zero, a count and a copy-back once something is flagged");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body14.toString() + ")();")());
 // Embodied handoff step (2026-10-09): the world guide's "What is different" card named embodiment and stopped;
 // this adds a step between it and Scope that is the handoff, not a drill -- three cards (am I in this branch,
 // what a safety case is, what T&S still owns), a check, an exercise, a sources group and three glossary terms.
-const body14 = function(){
+const body15 = function(){
   const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const wSteps = LN_GUIDES.world.steps;
   const idx = wSteps.findIndex(s => s.id === "embodied");
@@ -797,4 +800,4 @@ const body14 = function(){
   out.push("embodied step: three named cards (am I in this branch, what a safety case is, what T&S still owns) plus a check and a handoff exercise; What is different and the harms table now point at it; a new sources group and three glossary terms");
   return out.join("\n");
 };
-console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body14.toString() + ")();")());
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body15.toString() + ")();")());
