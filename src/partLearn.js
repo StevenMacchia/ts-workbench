@@ -1320,13 +1320,24 @@ function lnMethod(k, g){
   draw();
 }
 // Enter/→ advances, ← goes back, matching the one-card flow's keyboard support, but only on the Method tab and
-// only when focus isn't already on one of its own controls (so a focused button's own Enter/Space isn't doubled).
+// only when focus isn't already on one of its own controls (so a focused button's own Enter/Space isn't doubled,
+// and a row's own Enter/Space toggle below isn't doubled into also advancing the card).
 document.addEventListener("keydown", e => {
   const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
   const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
-  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],input,textarea'))) return;
+  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],.ln-row,input,textarea'))) return;
   if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
   else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
+});
+// Collapsed rows (a Method card's "do" list, a Sources entry, a glossary bridge list) are a <details>/<summary>
+// pair; native keyboard support for toggling one with Space (and, in some browsers, Enter) is inconsistent, so
+// toggle it ourselves whenever the summary itself -- not a link or button inside it -- has focus.
+document.addEventListener("keydown", e => {
+  if(e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+  if(!e.target || e.target.tagName !== "SUMMARY" || !e.target.closest(".ln-row")) return;
+  e.preventDefault();
+  const d = e.target.parentElement;
+  if(d && d.tagName === "DETAILS") d.open = !d.open;
 });
 function lnRefreshCount(k, g){ const el = $(".ln-tabs .note"); if(el) el.textContent = `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps read · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} exercises done`; }
 function lnBindOpenAll(){ $$("[data-openall]").forEach(b => b.onclick = () => { const ul = $("#" + b.dataset.openall); if(ul) $$("details", ul).forEach(d => d.open = true); }); }
@@ -1525,7 +1536,8 @@ function renderGlossary(){
   // this" toggle (now right on the card instead of behind a tap) all carry over from the in-between version.
   const draw = () => {
     const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q))).sort((a, b) => a.t[0].localeCompare(b.t[0]));
-    $("#ln-known").textContent = `${Object.keys(kn).filter(x => kn[x]).length} of ${LN_GLOSS.length} marked known`;
+    const knownCount = Object.keys(kn).filter(x => kn[x]).length, filtered = !!q || f !== "all";
+    $("#ln-known").textContent = filtered ? `${list.length} of ${LN_GLOSS.length} terms match · ${knownCount} known` : `${knownCount} of ${LN_GLOSS.length} marked known`;
     if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
     let lastLetter = "";
     $("#ln-gl").innerHTML = list.map(({t, i}) => {
