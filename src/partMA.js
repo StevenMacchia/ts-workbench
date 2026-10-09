@@ -329,8 +329,8 @@ function maIntroHTML(){
     <span class="gd-tool"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</span>
     <h1>How strong is your Trust &amp; Safety program?</h1>
     <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
-    <div class="gd-facts"><div><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
-      <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
+    <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
+      <div><svg class="gd-fi"><use href="#i-lock"/></svg><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Fill everything in on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
   </div>${maPreviewHTML()}`;
