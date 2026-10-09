@@ -100,12 +100,12 @@ function packOpen(){
   if(!document.getElementById("mxop-css")){ const st = document.createElement("style"); st.id = "mxop-css"; st.textContent = MX_OP_CSS + MX_OP_PRINT; document.head.appendChild(st); }
   if(!document.getElementById("pack-css")){ const st = document.createElement("style"); st.id = "pack-css"; st.textContent = PACK_CSS; document.head.appendChild(st); }
   const prev = document.activeElement, bg = document.createElement("div");
-  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-label", "Leadership pack");
-  bg.innerHTML = `<div class="mxop-bar"><b>Leadership pack</b><span class="toast" id="pk-toast" aria-live="polite"></span>
+  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-labelledby", "pk-h");
+  bg.innerHTML = `<div class="mxop-bar"><b id="pk-h">Leadership pack</b><span class="toast" id="pk-toast" role="status" aria-live="polite"></span>
     <button type="button" class="btn sm" data-pk="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-pk="print">Print</button><button type="button" class="btn sm" data-pk="close">Close</button></div>
     <div class="mxop">${packInner()}</div>`;
   document.body.appendChild(bg);
-  const onKey = e => { if(e.key === "Escape") close(); };
+  const onKey = e => { if(e.key === "Escape") close(); else trapFocus(bg, e); };
   const close = () => { bg.remove(); document.removeEventListener("keydown", onKey); if(prev && prev.focus) prev.focus(); };
   document.addEventListener("keydown", onKey);
   bg.onclick = e => { if(e.target === bg) close(); };

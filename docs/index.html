@@ -4199,6 +4199,26 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 
 .gd-preview-frame{padding:18px 22px 0;background:var(--panel)}
 
+/* ---------- First-run choice: assess the program, or go straight to one tool ---------- */
+.firstrun{margin-bottom:16px;padding:20px 22px;display:grid;gap:14px}
+.firstrun-t h2{font-size:17px}
+.firstrun-t p{margin:2px 0 0}
+.firstrun-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.firstrun-opt{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;padding:16px 18px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.firstrun-opt:hover,.firstrun-opt:focus-visible{border-color:var(--accent);box-shadow:var(--shadow);outline:none}
+.firstrun-opt b{font-size:15px;color:var(--ink)}
+.firstrun-opt span{color:var(--muted);font-size:13px;line-height:1.4}
+@media (max-width:640px){.firstrun-opts{grid-template-columns:1fr}}
+
+/* ---------- Command palette: handbook/writing loading row ---------- */
+.cmdk .cmdk-wait{padding:8px 10px;font-size:13px;color:var(--faint)}
+
+/* ---------- Read the chapter: final link under a report's verdict ---------- */
+.chapter-line{margin:12px 0 0;font-size:13.5px}
+.chapter-line a{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-weight:600;text-decoration:none}
+.chapter-line a:hover{text-decoration:underline}
+.chapter-line a::after{content:"→"}
+
 /* ---------- Letter grade beside a verdict ---------- */
 .grade{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;font-family:var(--display);font-weight:700;font-size:21px;flex:none;margin-left:10px;vertical-align:middle}
 .grade-A,.grade-B{background:var(--good-soft);color:var(--good)}
@@ -4230,6 +4250,28 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 
 /* grade mark: top-right of the verdict, large enough to read as a grade */
 .grade{float:right;margin:-4px 0 10px 18px;width:54px;height:54px;border-radius:14px;font-size:25px;font-weight:700;display:grid;place-items:center}
+
+/* ---------- Site top bar: shared with stevenmacchia.com and the handbook ---------- */
+.sitetop{display:flex;align-items:center;gap:20px;height:44px;padding:0 18px;background:var(--bg);border-bottom:1px solid var(--line);font-size:13.5px;overflow-x:auto;white-space:nowrap}
+.sitetop .st-mark{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,var(--accent),#FF9A7A);flex:none}
+.sitetop a{color:var(--ink);text-decoration:none;flex:none}
+.sitetop a:hover{text-decoration:underline}
+.sitetop .st-name{font-weight:600;margin-right:auto}
+.sitetop .st-dl{padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+.sitetop .st-dl:hover{text-decoration:none;border-color:var(--line-strong)}
+.sitetop .st-phone{display:none;margin-left:auto}
+@media print{.sitetop{display:none}}
+@media (max-width:640px){
+  .sitetop{gap:12px;padding:0 14px}
+  .sitetop .st-full{display:none}
+  .sitetop .st-phone{display:inline}
+}
+.app{min-height:calc(100vh - 16px - 44px)}
+.side{height:calc(100vh - 16px - 44px)}
+@media (max-width:880px){
+  .app{min-height:calc(100vh - 44px)}
+  .side{top:44px}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -4309,6 +4351,17 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
   <symbol id="i-coppa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3v5.5c0 4.4-3.1 8.1-7.5 9.5-4.4-1.4-7.5-5.1-7.5-9.5V6L12 3z"/><circle cx="12" cy="10" r="2.1"/><path d="M8.7 16.2c.6-1.9 1.8-3 3.3-3s2.7 1.1 3.3 3"/></g></symbol>
   <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4"/><path d="M6.5 7h11v3.5a5.5 5.5 0 01-11 0z"/><path d="M12 16v5"/></g></symbol>
 </svg>
+<nav class="sitetop" aria-label="stevenmacchia.com">
+  <span class="st-mark" aria-hidden="true"></span>
+  <a class="st-name" href="https://stevenmacchia.com/">Steven Macchia</a>
+  <a class="st-link st-full" href="https://stevenmacchia.com/#projects">Projects</a>
+  <a class="st-link st-full" href="https://stevenmacchia.com/ts-handbook/">Handbook</a>
+  <a class="st-link st-full" href="https://stevenmacchia.com/writing/">Writing</a>
+  <a class="st-link st-full" href="https://stevenmacchia.com/#experience">Experience</a>
+  <a class="st-link st-full" href="https://www.linkedin.com/in/stevenmacchia">LinkedIn</a>
+  <a class="st-link st-full st-dl" href="https://stevenmacchia.com/Steven_Macchia_Resume.pdf" download>Download resume</a>
+  <a class="st-link st-phone" href="https://stevenmacchia.com/">Site</a>
+</nav>
 <div class="app" id="app">
   <aside class="side" id="side" aria-label="Sidebar">
     <a class="sb-brand" href="#overview">
@@ -4384,7 +4437,8 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
   <button type="button" data-bnav="more" data-bgroup="more" aria-controls="side"><svg><use href="#i-menu"/></svg><span>More</span></button>
 </nav>
 <div class="cmdk-bg" id="cmdk" hidden>
-  <div class="cmdk" role="dialog" aria-modal="true" aria-label="Search and jump">
+  <div class="cmdk" role="dialog" aria-modal="true" aria-labelledby="cmdk-h">
+    <h2 id="cmdk-h" class="visually-hidden">Search and jump</h2>
     <input id="cmdk-q" placeholder="Search tools, scenarios and saved work" autocomplete="off" aria-label="Search" aria-controls="cmdk-list">
     <ul id="cmdk-list" role="listbox"></ul>
     <div class="cmdk-ft"><span><kbd class="kbd">↑</kbd> <kbd class="kbd">↓</kbd> to move</span><span><kbd class="kbd">↵</kbd> to open</span><span><kbd class="kbd">esc</kbd> to close</span></div>
@@ -4786,6 +4840,36 @@ function shareParseHash(){
 }
 function shareBannerHTML(saveAttr){
   return `<div class="card share-banner" role="note"><div><b>You're viewing a shared result.</b><span class="note">Save a copy to edit it.</span></div><button type="button" class="btn primary sm" ${saveAttr}>Save a copy</button></div>`;
+}
+
+// ---------- Handbook chapter link: one shared map, so every report's verdict area can point to the chapter behind it ----------
+const CHAPTER_LINK = {
+  vendors:["choosing-vendors-and-tools", "Choosing vendors and tools"],
+  policy:["writing-policy", "Writing policy and an enforcement ladder"],
+  tabletop:["crisis-response", "Crisis response"],
+  metrics:["measuring-what-matters", "Measuring what matters"],
+  premortem:["know-your-risks", "Know your risks"],
+  coppa:["child-safety-and-age-assurance", "Child safety and age assurance"],
+  dsa:["regulation-and-compliance", "Regulation and compliance"],
+  transparency:["transparency-reports-and-notices", "Transparency reports and enforcement notices"],
+  maturity:["budgets-roadmaps-and-making-the-case", "Budgets, roadmaps and making the case"],
+  coverage:["detection-and-prevention", "Detection and prevention"],
+  eval:["quality-calibration-and-appeals", "Quality, calibration and appeals"]
+};
+function chapterLinkHTML(tool){
+  const c = CHAPTER_LINK[tool]; if(!c) return "";
+  return `<p class="chapter-line"><a href="https://stevenmacchia.com/ts-handbook/${c[0]}/" target="_blank" rel="noopener">Read the chapter: ${esc(c[1])}</a></p>`;
+}
+
+// ---------- Shared focus trap for modal dialogs: Tab and Shift+Tab stay inside `container` ----------
+function trapFocus(container, e){
+  if(!container || e.key !== "Tab") return;
+  const f = Array.from(container.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+    .filter(el => !el.hidden && el.getClientRects().length);
+  if(!f.length) return;
+  const i = f.indexOf(document.activeElement);
+  if(e.shiftKey){ if(i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } }
+  else if(i === f.length - 1 || i === -1){ e.preventDefault(); f[0].focus(); }
 }
 /* =========================================================
    ABUSE PRE-MORTEM: HARM LIBRARY
@@ -5602,7 +5686,7 @@ function renderPremortem(){
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
     "Build safely", actions) : headCompact("Abuse pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">
-      <span class="toast" id="pm-toast" aria-live="polite"></span>
+      <span class="toast" id="pm-toast" role="status" aria-live="polite"></span>
       ${pm.stage==="start" ? startScreen() : pm.stage==="ask" ? askScreen() : renderReport(assess(pm))}
     </div>`;
   bindPremortem();
@@ -5872,7 +5956,7 @@ function startHere(r){
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
-        <div class="verdict-row"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
         ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}</div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
@@ -5933,6 +6017,7 @@ function renderReport(r){
     </div></div>
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
+    ${chapterLinkHTML("premortem")}
     <details class="ev-details" style="margin-top:20px"><summary>Details <span class="note">Exposure numbers, the risk matrix, risks by harm area, burn-down</span></summary>
     <div class="section-title rep-detail"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">
@@ -8238,7 +8323,7 @@ function ttDebrief(H, sc){
   const avg = Math.round(DIMS.reduce((a,d)=>a+tt.scores[d.k],0)/DIMS.length);
   view.innerHTML = H("Your debrief: how your calls compare with strong practice, what to work on, and the law behind each decision.") + `
     <div class="play"><div>
-      <div class="card verdict">
+      <div class="card verdict" aria-live="polite">
         <div class="row" style="gap:8px"><span class="pill ${v[1]}">${firstStrong} of ${n} strongest calls on first try</span>${corrected?`<span class="pill accent">${corrected} corrected on retry</span>`:""}</div>
         <h3>${v[0]}</h3>
         <p class="muted">Average across the four scores: <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
@@ -8261,7 +8346,8 @@ function ttDebrief(H, sc){
       ${next.length?`<h3 class="dhead">Practice next</h3><div class="scen-grid">${next.map(({s,i})=>`<button class="card scen" data-next="${i}">
           <div class="scen-top"><span class="libicon sm"><svg><use href="#${ttIcon(s, type)}"/></svg></span>${sevPill(s.severity)}</div>
           <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p></button>`).join("")}</div>`:""}
-      <div class="row" style="margin-top:16px"><button class="btn primary" id="tt-replay">Replay this scenario</button><button class="btn" id="tt-other">Choose another scenario</button><button class="btn" id="tt-save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="tt-toast" aria-live="polite"></span></div>
+      <div class="row" style="margin-top:16px"><button class="btn primary" id="tt-replay">Replay this scenario</button><button class="btn" id="tt-other">Choose another scenario</button><button class="btn" id="tt-save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="tt-toast" role="status" aria-live="polite"></span></div>
+      ${chapterLinkHTML("tabletop")}
       ${typeof journeyNextHTML === "function" ? journeyNextHTML("crisis") : ""}
     </div>${ttMeters(sc)}</div>`;
   $("#tt-replay").onclick = () => ttStart(tt.s, tt.v);
@@ -9751,7 +9837,7 @@ function mxTabMine(list){
   ${mx.demo ? `<div class="mxs-demo">${mxIco("warn")}<span>You're looking at <b>example numbers</b> for a ${esc(MX_PLATFORMS[mx.platform].toLowerCase())} program, so you can see how a full scorecard reads.</span><button type="button" class="btn sm" id="mx-demo-clear">Clear example numbers</button></div>` : ""}
   <div class="mxs-top">
     <label class="mxa-y mxs-period"><span>Reporting period</span><input class="input" id="mx-period" value="${esc(mx.period || "")}" placeholder="For example Q3 2026"></label>
-    <div class="mxs-sum" id="mx-sc-sum">${mxSumHTML(list)}</div>
+    <div class="mxs-sum" id="mx-sc-sum" aria-live="polite">${mxSumHTML(list)}</div>
     <button type="button" class="btn primary mxs-op" id="mx-op">${mxIco("page", "mx-ico")}Leadership one-pager</button>
   </div>
   <div class="mxs-bar">
@@ -9760,6 +9846,7 @@ function mxTabMine(list){
     <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">See example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
   </div>
   <div class="card mx-sig" id="mx-sig">${mxSigHTML(list)}</div>
+  ${chapterLinkHTML("metrics")}
   <div class="card mx-sc">
     <div class="mx-sc-row h"><span>Metric</span><span>Your value</span><span>Target</span><span>Off track at</span><span>Trend</span><span>Status</span></div>
     ${MX_TORD.map(t => { const ms = list.filter(m => m.t === t); if(!ms.length) return "";
@@ -9881,12 +9968,12 @@ function mxOnePagerDoc(list){
 function mxOpenOnePager(list){
   if(!document.getElementById("mxop-css")){ const st = document.createElement("style"); st.id = "mxop-css"; st.textContent = MX_OP_CSS + MX_OP_PRINT; document.head.appendChild(st); }
   const prev = document.activeElement, bg = document.createElement("div");
-  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-label", "Leadership one-pager");
-  bg.innerHTML = `<div class="mxop-bar"><b>Leadership one-pager</b><span class="toast" id="mxop-toast" aria-live="polite"></span>
+  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-labelledby", "mxop-h");
+  bg.innerHTML = `<div class="mxop-bar"><b id="mxop-h">Leadership one-pager</b><span class="toast" id="mxop-toast" role="status" aria-live="polite"></span>
     ${DL ? `<button type="button" class="btn sm" data-op="dl"><svg><use href="#i-download"/></svg>Download to print</button>` : ""}<button type="button" class="btn sm" data-op="print">Print</button><button type="button" class="btn sm primary" data-op="close">Close</button></div>
     <div class="mxop">${mxOnePagerInner(list)}</div>`;
   document.body.appendChild(bg);
-  const onKey = e => { if(e.key === "Escape") close(); };
+  const onKey = e => { if(e.key === "Escape") close(); else trapFocus(bg, e); };
   const close = () => { bg.remove(); document.removeEventListener("keydown", onKey); if(prev && prev.focus) prev.focus(); };
   document.addEventListener("keydown", onKey);
   bg.onclick = e => { if(e.target === bg) close(); };
@@ -10018,8 +10105,8 @@ function renderMetrics(){
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>
-    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>`;
-  view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
+    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>`;
+  view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" role="status" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
 
   const save = () => { store.set("mx", mx); renderMetrics(); };
   const tabSub = k => (MX_TABS.find(t => t[0] === k) || [])[2] || "";
@@ -10271,16 +10358,17 @@ function vdResultsRender(){
   const {sorted, top} = vdRank(), all = sorted.every(x => x.done), bench = vdBenchRange();
   const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
   const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
-  view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
+  view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" role="status" aria-live="polite"></span>
     ${vx.shared ? shareBannerHTML('id="vx-unshare"') : ""}
     <div class="cvr">
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
-      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
+      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row" aria-live="polite"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
         ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
         ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
+    ${chapterLinkHTML("vendors")}
     <details class="ev-details"><summary>Details <span class="note">Every criterion, scored for every vendor</span></summary>
     <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
     </details>
@@ -10302,7 +10390,7 @@ function renderVendors(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
-    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
+    "Run the program", `<span class="toast" id="vx-toast" role="status" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
@@ -10518,7 +10606,7 @@ function renderWorkspace(){
     `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
     `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
      <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save workspace file</button>`) + `
-    <span class="toast" id="ws-toast" aria-live="polite"></span>
+    <span class="toast" id="ws-toast" role="status" aria-live="polite"></span>
     <div class="wstop">
       ${profileCard()}
       ${typeof orgCardHTML === "function" ? orgCardHTML() : ""}
@@ -10715,7 +10803,27 @@ function cmdkItems(){
   const type = ttCompanyType();
   SCENARIOS.forEach((s,i) => { if(type!=="all" && !(s.types||[]).includes(type)) return; const v = ttScenario(i, type);
     out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });
+  if(CMDK_HB.status === "done"){
+    CMDK_HB.chapters.forEach(c => out.push({g:"Handbook", label:c.title||"", sub:c.summary||"", color:"var(--faint)", icon:"doc", run:()=>{ location.href = c.url; }}));
+    CMDK_HB.posts.forEach(p => out.push({g:"Writing", label:p.title||"", sub:p.summary||"", color:"var(--faint)", icon:"info", run:()=>{ location.href = p.url; }}));
+  }
   return out;
+}
+// Cross-site search index (handbook chapters and writing posts), fetched once on first palette open and cached in memory.
+// status: idle -> loading -> done, or error (no extra groups, never shown to the user as an error).
+let CMDK_HB = {status:"idle", chapters:[], posts:[]};
+function cmdkHbLoad(){
+  if(CMDK_HB.status !== "idle") return;
+  CMDK_HB.status = "loading";
+  fetch("https://stevenmacchia.com/ts-handbook/search.json").then(r => { if(!r.ok) throw new Error("bad status"); return r.json(); })
+    .then(data => {
+      const items = Array.isArray(data && data.items) ? data.items : [];
+      CMDK_HB.chapters = items.filter(x => x && x.kind === "chapter" && x.title && x.url);
+      CMDK_HB.posts = items.filter(x => x && x.kind === "post" && x.title && x.url);
+      CMDK_HB.status = "done";
+    })
+    .catch(() => { CMDK_HB.status = "error"; })
+    .then(() => { if($("#cmdk") && !$("#cmdk").hidden){ cmdk.items = cmdkItems(); cmdkDraw(); } });
 }
 let cmdk = {items:[], shown:[], sel:0, prevFocus:null};
 function cmdkDraw(){
@@ -10725,14 +10833,15 @@ function cmdkDraw(){
   let g = "", h = "";
   cmdk.shown.forEach((x,i) => { if(x.g!==g){ g = x.g; h += `<li class="grp" role="presentation">${esc(g)}</li>`; }
     h += `<li class="it" role="option" id="cmdk-o${i}" data-i="${i}" aria-selected="${i===cmdk.sel}"><span class="sb-glyph" style="background:${x.color}"><svg><use href="#i-${x.icon}"/></svg></span><span class="lbl">${esc(x.label)}</span>${x.sub?`<small>${esc(x.sub)}</small>`:""}</li>`; });
+  if(CMDK_HB.status === "loading" && !q) h += `<li class="grp" role="presentation">Handbook</li><li class="cmdk-wait" role="presentation">Searching the handbook…</li>`;
   const list = $("#cmdk-list"); list.innerHTML = h || `<li class="grp">No matches. Try a tool, scenario or saved result.</li>`;
   $("#cmdk-q").setAttribute("aria-activedescendant", cmdk.shown.length ? "cmdk-o"+cmdk.sel : "");
   list.querySelectorAll(".it").forEach(li => { li.onmousemove = () => { if(cmdk.sel!==+li.dataset.i){ cmdk.sel = +li.dataset.i; cmdkDraw(); } }; li.onclick = () => { cmdk.sel = +li.dataset.i; cmdkPick(); }; });
   const cur = list.querySelector('[aria-selected="true"]'); if(cur && cur.scrollIntoView) cur.scrollIntoView({block:"nearest"});
 }
-function cmdkOpen(){ cmdk.prevFocus = document.activeElement; cmdk.items = cmdkItems(); cmdk.sel = 0; $("#cmdk").hidden = false; const q = $("#cmdk-q"); q.value = ""; cmdkDraw(); q.focus(); }
+function cmdkOpen(){ cmdk.prevFocus = document.activeElement; cmdk.items = cmdkItems(); cmdk.sel = 0; $("#cmdk").hidden = false; const q = $("#cmdk-q"); q.value = ""; cmdkDraw(); q.focus(); cmdkHbLoad(); }
 function cmdkClose(){ $("#cmdk").hidden = true; if(cmdk.prevFocus && cmdk.prevFocus.focus) try{ cmdk.prevFocus.focus(); }catch(e){} }
-function cmdkPick(){ const x = cmdk.shown[cmdk.sel]; $("#cmdk").hidden = true; if(x) x.run(); }
+function cmdkPick(){ const x = cmdk.shown[cmdk.sel]; $("#cmdk").hidden = true; if(x && x.run) x.run(); }
 $$("[data-cmdk]").forEach(b => b.addEventListener("click", cmdkOpen));
 $("#cmdk-q").addEventListener("input", () => { cmdk.sel = 0; cmdkDraw(); });
 $("#cmdk").addEventListener("click", e => { if(e.target.id==="cmdk") cmdkClose(); });
@@ -10740,6 +10849,7 @@ document.addEventListener("keydown", e => {
   if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==="k"){ e.preventDefault(); $("#cmdk").hidden ? cmdkOpen() : cmdkClose(); return; }
   if($("#cmdk").hidden) return;
   if(e.key==="Escape"){ e.preventDefault(); cmdkClose(); }
+  else if(e.key==="Tab"){ trapFocus($("#cmdk"), e); }
   else if(e.key==="ArrowDown"){ e.preventDefault(); cmdk.sel = (cmdk.sel+1) % Math.max(1, cmdk.shown.length); cmdkDraw(); }
   else if(e.key==="ArrowUp"){ e.preventDefault(); cmdk.sel = (cmdk.sel-1+cmdk.shown.length) % Math.max(1, cmdk.shown.length); cmdkDraw(); }
   else if(e.key==="Enter"){ e.preventDefault(); cmdkPick(); }
@@ -10935,6 +11045,24 @@ function asStepHTML(s, i, next){
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
   return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
 }
+// First visit, before any choice is remembered: assess the whole program, or go straight to one tool.
+// Never shown again once a choice is made (tswb:firstrun:seen), and never in the demo or while opening a shared link.
+function firstRunHTML(){
+  return `<div class="card firstrun" role="group" aria-labelledby="firstrun-h">
+    <div class="firstrun-t"><h2 id="firstrun-h">How do you want to start?</h2><p class="note">Pick one. You can always do the other later.</p></div>
+    <div class="firstrun-opts">
+      <button type="button" class="firstrun-opt" data-firstrun="assess"><b>Assess my program</b><span>The full guided assessment: one picture of your program, built up step by step.</span></button>
+      <button type="button" class="firstrun-opt" data-firstrun="tools"><b>Use one tool</b><span>Jump straight to any tool on its own, such as a pre-mortem or a vendor scorecard.</span></button>
+    </div>
+  </div>`;
+}
+function firstRunBind(){
+  view.querySelectorAll("[data-firstrun]").forEach(b => b.onclick = () => {
+    store.set("firstrun:seen", true);
+    if(b.dataset.firstrun === "tools") goRoute("tools");
+    else { store.set("as:start", true); renderOverview(); focusQuiet(document.querySelector("#view h1")); }
+  });
+}
 // First visit: what the assessment is, what you get, and a way to see it filled in
 function asWelcomeHTML(J){
   const total = J.reduce((t, s) => t + (s.min || 0), 0);
@@ -10962,7 +11090,14 @@ function renderOverview(){
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();
   const done = J.filter(s => s.done()), next = J.find(s => !s.done());
   const fresh = !demo && !done.length && !store.get("as:start", false) && !Object.keys(wsItems()).length;
-  if(fresh || !J.length){ view.innerHTML = asWelcomeHTML(J); return asBind(); }
+  if(fresh || !J.length){
+    const shared = typeof shareParseHash === "function" && shareParseHash();
+    const showFirstRun = fresh && !shared && !store.get("firstrun:seen", false);
+    view.innerHTML = (showFirstRun ? firstRunHTML() : "") + asWelcomeHTML(J);
+    asBind();
+    if(showFirstRun) firstRunBind();
+    return;
+  }
   const o = orgGet(), p = wsProfile(), left = J.filter(s => !s.done()).reduce((t, s) => t + (s.min || 0), 0);
   const who = [demo ? "Pixelry" : p && p.org, o.type && orgTypeName(o.type), o.stage && orgStageName(o.stage)].filter(Boolean).join(" · ");
   view.innerHTML = `<div class="ov as">
@@ -11801,11 +11936,12 @@ function polReportHTML(ai){
     <div class="card pol-sum">
       ${polRing(score, 96)}
       <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
-        <div class="verdict-row"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
+        <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
         <p class="note">${h.words} words · instant score ${h.score}/100${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
         ${bench ? `<p class="bench-line">Typical range among the built-in example rules: ${bench.min}–${bench.max}</p>` : ""}
         ${r && r.strengths.length ? `<div class="pol-strengths">${r.strengths.map(s=>`<span><svg><use href="#i-check"/></svg>${esc(s)}</span>`).join("")}</div>` : ""}
-        <span class="toast" id="pol-toast" aria-live="polite"></span></div>
+        <span class="toast" id="pol-toast" role="status" aria-live="polite"></span>
+        ${chapterLinkHTML("policy")}</div>
     </div>
 
     <div class="pol-tested">
@@ -11839,7 +11975,7 @@ function polTabHTML(tab){
   if(tab === "wording") return `${r.vague_terms.length ? `<h4 class="pol-sub">Words reviewers will read differently</h4><div class="pol-terms">${r.vague_terms.map(v=>`<div class="pol-term"><b>“${esc(v.term)}”</b><p>${esc(v.why||"")}</p>${v.suggest?`<p class="pol-sug"><span>Try:</span> ${esc(v.suggest)}</p>`:""}</div>`).join("")}</div>` : ""}
     ${r.gaps.length ? `<h4 class="pol-sub">What the rule forgets</h4><ul class="pol-gaps">${r.gaps.map(g=>`<li><b>${esc(g.gap)}</b><span>${esc(g.why||"")}</span></li>`).join("")}</ul>` : ""}`;
   if(tab === "rewrite") return `<div class="pol-diff"><div><span class="eyebrow">Your rule</span><blockquote>${esc(pol.rule)}</blockquote></div><div><span class="eyebrow">Rewrite</span><blockquote class="new">${esc(r.rewrite)}</blockquote></div></div>
-    <div class="row" style="gap:8px;margin-top:14px"><button type="button" class="btn sm" id="pol-copy">${icon("copy")}Copy rewrite</button><button type="button" class="btn sm primary" id="pol-retest">Test the rewrite ${icon("arrow")}</button>${typeof rxPolicyBtnHTML === "function" ? rxPolicyBtnHTML() : ""}<span class="toast" id="pol-rwtoast" aria-live="polite"></span></div>`;
+    <div class="row" style="gap:8px;margin-top:14px"><button type="button" class="btn sm" id="pol-copy">${icon("copy")}Copy rewrite</button><button type="button" class="btn sm primary" id="pol-retest">Test the rewrite ${icon("arrow")}</button>${typeof rxPolicyBtnHTML === "function" ? rxPolicyBtnHTML() : ""}<span class="toast" id="pol-rwtoast" role="status" aria-live="polite"></span></div>`;
   if(tab === "team") return `${r.reviewer_checklist.length ? `<h4 class="pol-sub">Reviewer checklist <span class="note">Apply in order</span></h4><ol class="pol-check">${r.reviewer_checklist.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>` : ""}
     ${r.open_questions.length ? `<h4 class="pol-sub">Open questions for your team</h4><ul class="pol-qs">${r.open_questions.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     ${r.enforcement_risks.length ? `<h4 class="pol-sub">Enforcement risks</h4><ul class="pol-risks">${r.enforcement_risks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}`;
@@ -12239,7 +12375,7 @@ function renderAI(key){
   const fill = T.fields.some(fd => fd.fill) && aiScoreFill();
   const out = run.busy ? `<div class="card ai-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ai-stage" aria-live="polite">${AI_PHASE[run.phase || "thinking"]}…</b><span class="note">${st.depth === "deep" ? "A deep review usually takes one to two minutes." : "This usually takes 15 to 40 seconds."} It runs on your own Claude account. The first time, Claude asks you to allow it.</span></div><button type="button" class="btn sm" id="ai-stop">Stop</button></div>`
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
-        <div class="ai-out-a"><span class="toast" id="ai-toast" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
+        <div class="ai-out-a"><span class="toast" id="ai-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
         <div class="ai-out">${T.render(st.r)}</div>` : "";
   view.innerHTML = head(T.n, T.desc, "AI assistants", `${typeof poweredBy === "function" ? poweredBy(["claude"]) : ""}<span class="pill ai-pill">AI · runs on your Claude account</span>`) + `
     <p class="mxa-q ai-q">${esc(T.q)}</p>
@@ -12740,7 +12876,7 @@ function maPlanHTML(){
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
-        <div class="ma-band-t verdict-row">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
+        <div class="ma-band-t verdict-row" aria-live="polite">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
         ${maBenchScore() !== null && !ma.ex ? `<p class="bench-line">Typical for a growing company like the built-in example: level ${maBenchScore().toFixed(1)} of 5</p>` : ""}
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
@@ -12751,6 +12887,7 @@ function maPlanHTML(){
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
     </section>
+    ${chapterLinkHTML("maturity")}
     <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
     <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
@@ -12861,7 +12998,7 @@ function maQHTML(){
 function maGuideRender(){
   const scr = maG ? maG.scr : "intro", rated = MA_AREAS.filter(a => ma.lv[a.k]).length;
   const body = scr === "stage" ? maStageStepHTML() : scr === "q" ? maQHTML() : maIntroHTML();
-  view.innerHTML = `<div class="gd gd-s-${scr}" style="--tc:var(--t-ma)">${asStepBar("maturity", Math.round(rated / MA_AREAS.length * 100), true)}<span class="toast" id="ma-toast" aria-live="polite"></span>${body}</div>`;
+  view.innerHTML = `<div class="gd gd-s-${scr}" style="--tc:var(--t-ma)">${asStepBar("maturity", Math.round(rated / MA_AREAS.length * 100), true)}<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>${body}</div>`;
 }
 // Every area rated: straight to the plan
 function maFinish(){ maG = null; ma.tab = "roadmap"; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1")); gsay(`All ${MA_AREAS.length} areas rated. Here's your plan`); }
@@ -12903,7 +13040,7 @@ document.addEventListener("keydown", e => {
 
 function maHeadMeta(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
-  return `<span class="toast" id="ma-toast" aria-live="polite"></span>
+  return `<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>
       ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
       ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
       <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
@@ -13248,7 +13385,7 @@ function cvResultHTML(){
 }
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
-  return `<span class="toast" id="cv-toast" aria-live="polite"></span>
+  return `<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>
     ${cv.ex ? `<button class="btn sm" data-cv="clear">Start over</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
     ${any ? `<button class="btn sm" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button><button class="btn sm primary" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
 }
@@ -13399,19 +13536,19 @@ function cvGuideRender(){
   // With no position yet, the intro shows without claiming one, so a finished set of answers still opens the results
   const scr = cvG ? cvG.scr : "intro", s = cvSummary(cv), pct = Math.round(s.rated / Math.max(1, s.total) * 100);
   const body = scr === "apply" ? cvApplyHTML() : scr === "q" ? cvQHTML() : scr === "done" ? cvAreaDoneHTML() : cvIntroHTML();
-  view.innerHTML = `<div class="gd gd-s-${scr}">${cvStepBar(pct)}<span class="toast" id="cv-toast" aria-live="polite"></span>${body}</div>`;
+  view.innerHTML = `<div class="gd gd-s-${scr}">${cvStepBar(pct)}<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>${body}</div>`;
 }
 function cvResultsRender(){
   const s = cvSummary(cv), acts = cvActions(cv), top = acts.slice(0, 3), rk = cvRisk(cv), inAs = cvInAssessment() && !cv.ex;
   const tabs = [["gaps", `All gaps${acts.length ? ` (${acts.length})` : ""}`], ["answers", "Your answers"], ["source", "Compare against"]];
   const bench = cvBenchPct();
-  view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" aria-live="polite"></span>
+  view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>
     ${cv.shared ? shareBannerHTML('data-cv="unshare"') : ""}
     ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
     <div class="card cvr-side">
       <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
       <h1 class="visually-hidden">Coverage radar results</h1>
-      <div class="verdict-row"><div class="pol-verdict">${cvWhy()}</div>${gradeBadge(s.cov, "Weighted coverage against risk, across your rated harm areas")}</div>
+      <div class="verdict-row" aria-live="polite"><div class="pol-verdict">${cvWhy()}</div>${gradeBadge(s.cov, "Weighted coverage against risk, across your rated harm areas")}</div>
       ${bench !== null && !cv.ex ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${bench}% coverage</p>` : ""}
       ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
       <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
@@ -13421,6 +13558,7 @@ function cvResultsRender(){
         ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
       ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
     </div>
+    ${chapterLinkHTML("coverage")}
     <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
@@ -13803,7 +13941,7 @@ function pfModal(inner, onAct){
   const prev = document.activeElement, bg = document.createElement("div");
   bg.className = "tk-bg"; bg.innerHTML = `<div class="tk pf" role="dialog" aria-modal="true" aria-labelledby="pf-h">${inner}</div>`;
   const close = () => { bg.remove(); document.removeEventListener("keydown", key); if(prev && prev.focus) prev.focus(); };
-  const key = e => { if(e.key === "Escape") close(); };
+  const key = e => { if(e.key === "Escape") close(); else trapFocus(bg, e); };
   bg.addEventListener("click", async e => { if(e.target === bg) return close(); const b = e.target.closest("[data-pfm]"); if(b && await onAct(b.dataset.pfm)) close(); });
   document.addEventListener("keydown", key); document.body.appendChild(bg);
   const first = bg.querySelector(".btn.primary"); if(first) first.focus();
@@ -13937,7 +14075,7 @@ function tkDialogHTML(){
     <p class="tk-how">${esc(TK_HOW[k])}</p>
     ${tkCfgHTML(k)}
     <div class="tk-list" id="tk-list">${tkListHTML()}</div>
-    <footer class="tk-f"><span class="toast" id="tk-toast" aria-live="polite"></span>
+    <footer class="tk-f"><span class="toast" id="tk-toast" role="status" aria-live="polite"></span>
       ${T.csv ? `<button type="button" class="btn primary" data-tkcsv="1" ${n ? "" : "disabled"}><svg><use href="#i-download"/></svg>Download CSV for ${esc(T.n)} (${n})</button>` : `<span class="note">Use the Create buttons to open each issue.</span>`}</footer>`;
 }
 function tkOpen(src){
@@ -13953,7 +14091,7 @@ function tkOpen(src){
   bg.className = "tk-bg"; bg.innerHTML = `<div class="tk" role="dialog" aria-modal="true" aria-labelledby="tk-h" id="tk">${tkDialogHTML()}</div>`;
   const box = bg.querySelector("#tk"), redraw = () => { box.innerHTML = tkDialogHTML(); }, list = () => { box.querySelector("#tk-list").innerHTML = tkListHTML(); const c = box.querySelector("[data-tkcsv]"); const n = tk.tasks.filter(t => tk.sel[t.id]).length; if(c){ c.disabled = !n; c.lastChild.textContent = `Download CSV for ${TK_TRACKERS.find(t => t.k === tkCfg.tracker).n} (${n})`; } };
   const close = () => { bg.remove(); document.removeEventListener("keydown", key); if(prev && prev.focus) prev.focus(); };
-  const key = e => { if(e.key === "Escape") close(); };
+  const key = e => { if(e.key === "Escape") close(); else trapFocus(box, e); };
   bg.addEventListener("click", e => {
     if(e.target === bg || e.target.closest("[data-tkclose]")) return close();
     const b = e.target.closest("[data-tktr],[data-tkcsv],[data-tkopen]"); if(!b) return;
@@ -14195,12 +14333,12 @@ function packOpen(){
   if(!document.getElementById("mxop-css")){ const st = document.createElement("style"); st.id = "mxop-css"; st.textContent = MX_OP_CSS + MX_OP_PRINT; document.head.appendChild(st); }
   if(!document.getElementById("pack-css")){ const st = document.createElement("style"); st.id = "pack-css"; st.textContent = PACK_CSS; document.head.appendChild(st); }
   const prev = document.activeElement, bg = document.createElement("div");
-  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-label", "Leadership pack");
-  bg.innerHTML = `<div class="mxop-bar"><b>Leadership pack</b><span class="toast" id="pk-toast" aria-live="polite"></span>
+  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-labelledby", "pk-h");
+  bg.innerHTML = `<div class="mxop-bar"><b id="pk-h">Leadership pack</b><span class="toast" id="pk-toast" role="status" aria-live="polite"></span>
     <button type="button" class="btn sm" data-pk="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-pk="print">Print</button><button type="button" class="btn sm" data-pk="close">Close</button></div>
     <div class="mxop">${packInner()}</div>`;
   document.body.appendChild(bg);
-  const onKey = e => { if(e.key === "Escape") close(); };
+  const onKey = e => { if(e.key === "Escape") close(); else trapFocus(bg, e); };
   const close = () => { bg.remove(); document.removeEventListener("keydown", onKey); if(prev && prev.focus) prev.focus(); };
   document.addEventListener("keydown", onKey);
   bg.onclick = e => { if(e.target === bg) close(); };
@@ -14407,10 +14545,11 @@ function ttfDebriefHTML(sc){
   if(!ttf.recorded){ const key = ttKey(ttf.s, ttf.v), prog = ttProgress(), prev = prog[key] || {}; prog[key] = {best:Math.max(prev.best || 0, strong), runs:(prev.runs || 0) + 1, last:Date.now(), team:true}; store.set("tt:progress", prog); ttf.recorded = true; ttfSave(); }
   const mins = Math.max(1, Math.round((Date.now() - ttf.started) / 60000));
   return `<div class="ttf-debrief">
-    <div class="card verdict"><div class="row" style="gap:8px"><span class="pill ${v[1]}">${strong} of ${n} strongest calls</span><span class="pill">${ttf.actions.length} action item${ttf.actions.length === 1 ? "" : "s"}</span></div>
+    <div class="card verdict" aria-live="polite"><div class="row" style="gap:8px"><span class="pill ${v[1]}">${strong} of ${n} strongest calls</span><span class="pill">${ttf.actions.length} action item${ttf.actions.length === 1 ? "" : "s"}</span></div>
       <h3>${v[0]}</h3><p class="muted">${esc(sc.title)} · ${esc(sc.platform)}${Object.values(ttf.roles).some(x => x && x.trim()) ? " · " + TTF_ROLES.filter(([k]) => ttf.roles[k] && ttf.roles[k].trim()).map(([k]) => esc(ttfRole(k))).join(", ") : ""}.</p>
       <div class="meters ttf-meters">${DIMS.map(d => `<div class="meter"><div class="top"><span>${d.n}</span><span class="mono">${ttf.scores[d.k]}</span></div><div class="bar"><i style="width:${ttf.scores[d.k]}%;background:${scoreColor(ttf.scores[d.k])}"></i></div></div>`).join("")}</div>
-      <div class="row ttf-go"><button type="button" class="btn primary" data-ttf-a="download"><svg><use href="#i-download"/></svg>After-action report</button><button type="button" class="btn" data-ttf-a="copy">${icon("copy")}Copy report</button>${ttf.actions.length ? `<button type="button" class="btn" data-ttf-a="tracker"><svg><use href="#i-send"/></svg>Send actions to tracker</button>` : ""}<button type="button" class="btn" data-ttf-a="save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="ttf-toast" aria-live="polite"></span></div></div>
+      <div class="row ttf-go"><button type="button" class="btn primary" data-ttf-a="download"><svg><use href="#i-download"/></svg>After-action report</button><button type="button" class="btn" data-ttf-a="copy">${icon("copy")}Copy report</button>${ttf.actions.length ? `<button type="button" class="btn" data-ttf-a="tracker"><svg><use href="#i-send"/></svg>Send actions to tracker</button>` : ""}<button type="button" class="btn" data-ttf-a="save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="ttf-toast" role="status" aria-live="polite"></span></div>
+      ${chapterLinkHTML("tabletop")}</div>
     ${ttf.actions.length ? `<section class="card ttf-sec"><h3>Action items</h3><ul class="ttf-acts">${ttf.actions.map(a => `<li><span>${esc(a.t)}</span><span class="tag">${esc(ttfRole(a.role) || "Unassigned")}</span><span class="note">Decision ${a.step + 1}</span></li>`).join("")}</ul></section>` : ""}
     <h3 class="dhead">Decision by decision</h3>
     <div class="debrief">${sc.steps.map((st, i) => { const f = st.o[ttf.picks[i]], b = st.o.find(o => o.best);
@@ -14747,13 +14886,14 @@ function trReportHTML(ai){
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
-        <div class="verdict-row"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
+        <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
         ${bench !== null ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% complete</p>` : ""}
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
         ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
-        <span class="toast" id="tr-toast" aria-live="polite"></span></div>
+        <span class="toast" id="tr-toast" role="status" aria-live="polite"></span></div>
     </div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${chapterLinkHTML("transparency")}
     <details class="ev-details"><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
       ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>
@@ -14947,13 +15087,15 @@ const TOUR = [
   [".as-know", "What the assessment found", "The most important finding from each step, in plain words."],
   ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
 ];
-let tourAt = -1, tourSteps = TOUR;
+let tourAt = -1, tourSteps = TOUR, tourPrevFocus = null;
 // Any page's walkthrough uses the same engine
-function tourRun(steps){ tourSteps = steps; tourStep(0); }
+function tourRun(steps){ if(tourAt < 0) tourPrevFocus = document.activeElement; tourSteps = steps; tourStep(0); }
 function tourEnd(){
   tourAt = -1;
   document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
   const p = document.getElementById("tour-pop"); if(p) p.remove();
+  if(tourPrevFocus && tourPrevFocus.focus){ try{ tourPrevFocus.focus(); }catch(e){} }
+  tourPrevFocus = null;
 }
 function tourStep(i){
   const steps = tourSteps.filter(([s]) => document.querySelector(s)), demoTour = tourSteps === TOUR;
@@ -14974,6 +15116,7 @@ function tourStep(i){
   p.focus({preventScroll:true});
 }
 function tourStart(){
+  if(tourAt < 0) tourPrevFocus = document.activeElement;
   tourSteps = TOUR;
   if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
   tourStep(0);
@@ -14997,7 +15140,8 @@ document.addEventListener("keydown", e => {
   }
   const offer = document.getElementById("tour-pop");
   if(e.key === "Escape" && offer && offer.dataset.kind === "offer" && typeof helpOfferClose === "function") return helpOfferClose();
-  if(e.key === "Escape" && tourAt >= 0) tourEnd();
+  if(e.key === "Escape" && tourAt >= 0) return tourEnd();
+  if(e.key === "Tab" && tourAt >= 0 && offer) trapFocus(offer, e);
 });
 // The quick-tour offer sits in the middle of the screen: a click outside it dismisses it and does nothing else
 document.addEventListener("click", e => {
@@ -15441,7 +15585,7 @@ function gdQHTML(spec){
 function gdRender(spec){
   gdCur = spec; const p = gdPos(spec.k);
   if(p.scr === "q" && !gdLive(spec).length) p.scr = "intro";
-  view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
+  view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" role="status" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
   if(spec.bind) spec.bind();
 }
 const gdFocus = () => { const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };
@@ -15951,7 +16095,7 @@ function renderCoppa(){
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-cp="sharelink">Copy link</button>`)
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="cp-toast" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
+        `<span class="toast" id="cp-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
 function cpSetupHTML(x, ap, s){
@@ -16002,11 +16146,12 @@ function cpReportHTML(x, ap, s){
     ${cp.shared ? shareBannerHTML('data-cp="unshare"') : ""}
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
       ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
-        <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
+        <span class="toast" id="cp-toast" role="status" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${chapterLinkHTML("coppa")}
     <details class="ev-details"><summary>Details <span class="note">Your plan, data map, drafts and requirements</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
@@ -16033,7 +16178,7 @@ function cpDraftsHTML(){
   return `<div class="segs cp-dtabs" role="group" aria-label="Drafts">${CP_DRAFTS.map(([v, nm]) => `<button type="button" data-cpdraft="${v}" aria-pressed="${v === k}">${nm}</button>`).join("")}</div>
     <p class="note cp-dnote">${intro} Text in brackets is for you to fill in.</p>
     <div class="cp-draft">${cpMd(cpDraftMd(k))}</div>
-    <div class="cp-dact"><button type="button" class="btn sm" data-cp="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-cp="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="cp-dtoast" aria-live="polite"></span></div>`;
+    <div class="cp-dact"><button type="button" class="btn sm" data-cp="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-cp="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="cp-dtoast" role="status" aria-live="polite"></span></div>`;
 }
 function cpReqsHTML(x, s){
   if(!s.reqs.length) return `<p class="note">Choose who your service is for, and mark the children's data you collect, to see which requirements apply.</p>`;
@@ -16466,7 +16611,7 @@ function renderDsa(){
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-ds="sharelink">Copy link</button>`)
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="ds-toast" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
+        `<span class="toast" id="ds-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }
 function dsSetupHTML(x, ap, s){
@@ -16497,11 +16642,12 @@ function dsReportHTML(x, ap, s){
     ${ds.shared ? shareBannerHTML('data-ds="unshare"') : ""}
     ${ds.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a social video platform with EU users, established in the US, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-ds="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ds-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable DSA duties in place")}</div><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable DSA duties in place")}</div><p class="note">${esc(ap.t)}</p>
       ${bench !== null && !ds.ex ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
-        <span class="toast" id="ds-toast" aria-live="polite"></span></div></div>
+        <span class="toast" id="ds-toast" role="status" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${chapterLinkHTML("dsa")}
     <details class="ev-details"><summary>Details <span class="note">Your plan, duties and drafts</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["duties", "Duties", s.total], ["drafts", "Drafts", DS_DRAFTS.length]].map(([k, nm, c]) => `<button type="button" data-dstab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "duties" ? dsReqsHTML(x, s) : tab === "drafts" ? dsDraftsHTML() : dsPlanHTML(x, s)}</div></div>
@@ -16524,7 +16670,7 @@ function dsDraftsHTML(){
   return `<div class="segs cp-dtabs" role="group" aria-label="Drafts">${DS_DRAFTS.map(([v, nm]) => `<button type="button" data-dsdraft="${v}" aria-pressed="${v === k}">${nm}</button>`).join("")}</div>
     <p class="note cp-dnote">${intro} Text in brackets is for you to fill in.</p>
     <div class="cp-draft ds-draft">${cpMd(dsDraftMd(k))}</div>
-    <div class="cp-dact"><button type="button" class="btn sm" data-ds="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-ds="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="ds-dtoast" aria-live="polite"></span></div>`;
+    <div class="cp-dact"><button type="button" class="btn sm" data-ds="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-ds="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="ds-dtoast" role="status" aria-live="polite"></span></div>`;
 }
 function dsReqsHTML(x, s){
   if(!s.reqs.length) return `<p class="note">Choose what kind of service you run to see which duties apply.</p>`;
@@ -17032,12 +17178,13 @@ function evResultsHTML(m, media){
   const bench = evBenchPct();
   return `${ev.shared ? shareBannerHTML('data-ev="unshare"') : ""}
     <div class="ev-sum"><div class="tr-ring ev-ring ${tone}"><b>${m.pct(m.acc)}</b><span>right</span></div>
-      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<div class="verdict-row"><h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>${m.acc === null ? "" : gradeBadge(m.acc * 100, "Accuracy against your right answers, across every case")}</div>
+      <div><span class="eyebrow">${esc((last && last.name) || ev.name || "Your classifier")}${media ? " · images and video" : base || (last && last.src && last.src !== "own") ? "" : " · " + esc(cpLabel(EV_MODES, ev.mode))}</span>${last && last.src ? evSourceBadge(last.src) : ""}<div class="verdict-row" aria-live="polite"><h3 class="pol-verdict">${esc(evSummary(ev, m))}</h3>${m.acc === null ? "" : gradeBadge(m.acc * 100, "Accuracy against your right answers, across every case")}</div>
         ${bench !== null && !ev.ex ? `<p class="bench-line">Typical for the built-in example (a harassment rule, judged by Claude with the rule alone): ${bench}% accurate</p>` : ""}
         <p class="note">${base ? "A general toxicity model scores words and tone, not your rule: it can't be told that reporting abuse is allowed, or that two people are friends. Where it disagrees with your right answers is where a fixed-category model stops being enough." : media ? "Scored against the labels your reviewers gave. The list named the items; the images and videos were never part of this." : m.main ? `Precision on "${esc(pos)}" ${m.pct(m.main.pr)}${evTip("precision")}, recall ${m.pct(m.main.rc)}${evTip("recall")}. The numbers by kind of case are under Details.` : ""}</p></div></div>
     ${loop ? `<div class="ev-sec ev-since"><h4>Since the last run</h4>${evCompareHTML()}</div>` : ""}
     <div class="ev-sec"><h4>What it got wrong <span class="note">${m.fails.length} of ${m.n}</span></h4>${evFailsHTML(m)}</div>
     <div class="ev-sec"><h4>What to change</h4><ol class="pk-list ev-adv-l">${adv.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.fix)}</li>`).join("")}</ol></div>
+    ${chapterLinkHTML("eval")}
     <details class="ev-details" id="ev-details-d" data-evd="details" ${EVU.details ? "open" : ""}><summary>Details <span class="note">by kind of case, precision and recall, every ${media ? "item" : "case"}, runs</span></summary>
       <div class="segs" role="group" aria-label="Details">${[["kinds", "By kind of case", m.cats.filter(c => c.miss).length], ["scores", "Precision and recall", null], ["all", media ? "Every item" : "Every case", m.n], ["runs", "Runs", (ev.runs || []).length]].map(([k, nm, c]) => `<button type="button" data-evtab="${k}" aria-pressed="${tab === k}">${nm}${c === null ? "" : ` <span class="mono" style="opacity:.6">${c}</span>`}</button>`).join("")}</div>
       <div class="ev-tab">${body}</div></details>
@@ -17805,7 +17952,7 @@ function rxBuildHTML(r){
     <div class="rx-h"><span class="eyebrow">Build it</span><span class="wip-tag">Starter, untested</span>${typeof poweredBy === "function" ? poweredBy(["roost"], "Formats by") : ""}</div>
     <h3 id="rx-h">From this report to files you can start from</h3>
     <p>Two starters from the top ${n} risks: rules for Osprey, ROOST's open-source rules engine, and a setup checklist for Coop, its review console. Every platform-specific value is a TODO, and nothing has run against a real deployment. The workbench is independent of ROOST.</p>
-    <div class="row rx-acts"><button type="button" class="btn sm" data-rx="osprey">${rxIcon()}Osprey starter rules</button><button type="button" class="btn sm" data-rx="coop">${rxIcon()}Coop checklist</button><span class="toast" id="rx-toast" aria-live="polite"></span></div>
+    <div class="row rx-acts"><button type="button" class="btn sm" data-rx="osprey">${rxIcon()}Osprey starter rules</button><button type="button" class="btn sm" data-rx="coop">${rxIcon()}Coop checklist</button><span class="toast" id="rx-toast" role="status" aria-live="polite"></span></div>
     <p class="note rx-files"><span class="mono">osprey-starter-${esc(fname)}.sml</span> · <span class="mono">coop-checklist-${esc(fname)}.md</span>${typeof pol !== "undefined" && pol && pol.result && pol.result.rewrite ? " · The Coop checklist includes your stress-tested rule." : ""}</p>
   </section>`;
 }
@@ -18026,7 +18173,7 @@ function renderPlan(){
   const sent = !!store.get("tk:used", false), demo = typeof demoOn === "function" && demoOn();
   const by = g => items.filter(x => x.g === g).sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
   const srcs = [...new Set(items.map(x => PLAN_KIND[x.kind]))];
-  view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" aria-live="polite"></span>
+  view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" role="status" aria-live="polite"></span>
     <div class="pl-head">
       <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
       <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>
@@ -18129,7 +18276,7 @@ function renderReview(){
   const cell = v => v === null || v === undefined ? "–" : v, delta = (x, y) => x === null || x === undefined || y === null || y === undefined ? "" : y === x ? `<span class="rv-d same">same</span>` : `<span class="rv-d ${y > x ? "up" : "dn"}">${y > x ? "+" : ""}${y - x}</span>`;
   const d = a ? revDiff(a, now) : [];
   view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each part, every area, the gaps you closed and the ones that opened.", "Assess",
-    `<span class="toast" id="rv-toast" aria-live="polite"></span>${now.score !== null ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
+    `<span class="toast" id="rv-toast" role="status" aria-live="polite"></span>${now.score !== null ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
     ${now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><a class="btn primary" href="#overview">Back to your assessment</a></div>` : !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button></div>` : `
     <div class="rv-top">
       <label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>

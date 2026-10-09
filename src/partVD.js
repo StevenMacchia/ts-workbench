@@ -174,16 +174,17 @@ function vdResultsRender(){
   const {sorted, top} = vdRank(), all = sorted.every(x => x.done), bench = vdBenchRange();
   const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
   const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
-  view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" aria-live="polite"></span>
+  view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" role="status" aria-live="polite"></span>
     ${vx.shared ? shareBannerHTML('id="vx-unshare"') : ""}
     <div class="cvr">
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
-      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
+      <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row" aria-live="polite"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
         ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
         ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
     </div>
+    ${chapterLinkHTML("vendors")}
     <details class="ev-details"><summary>Details <span class="note">Every criterion, scored for every vendor</span></summary>
     <div class="ma-rh" style="margin-top:28px"><h4>Every score</h4></div>${vdResultHTML().replace(/^<div class="card vd-why">[\s\S]*?<\/div>\s*/, "")}
     </details>
@@ -205,7 +206,7 @@ function renderVendors(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
     "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
-    "Run the program", `<span class="toast" id="vx-toast" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
+    "Run the program", `<span class="toast" id="vx-toast" role="status" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
     <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>

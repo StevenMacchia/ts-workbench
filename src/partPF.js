@@ -126,7 +126,7 @@ function pfModal(inner, onAct){
   const prev = document.activeElement, bg = document.createElement("div");
   bg.className = "tk-bg"; bg.innerHTML = `<div class="tk pf" role="dialog" aria-modal="true" aria-labelledby="pf-h">${inner}</div>`;
   const close = () => { bg.remove(); document.removeEventListener("keydown", key); if(prev && prev.focus) prev.focus(); };
-  const key = e => { if(e.key === "Escape") close(); };
+  const key = e => { if(e.key === "Escape") close(); else trapFocus(bg, e); };
   bg.addEventListener("click", async e => { if(e.target === bg) return close(); const b = e.target.closest("[data-pfm]"); if(b && await onAct(b.dataset.pfm)) close(); });
   document.addEventListener("keydown", key); document.body.appendChild(bg);
   const first = bg.querySelector(".btn.primary"); if(first) first.focus();

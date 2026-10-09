@@ -167,7 +167,7 @@ function ttDebrief(H, sc){
   const avg = Math.round(DIMS.reduce((a,d)=>a+tt.scores[d.k],0)/DIMS.length);
   view.innerHTML = H("Your debrief: how your calls compare with strong practice, what to work on, and the law behind each decision.") + `
     <div class="play"><div>
-      <div class="card verdict">
+      <div class="card verdict" aria-live="polite">
         <div class="row" style="gap:8px"><span class="pill ${v[1]}">${firstStrong} of ${n} strongest calls on first try</span>${corrected?`<span class="pill accent">${corrected} corrected on retry</span>`:""}</div>
         <h3>${v[0]}</h3>
         <p class="muted">Average across the four scores: <span class="mono">${avg}</span>/100. ${esc(sc.title)} · ${esc(sc.platform)}.</p>
@@ -190,7 +190,8 @@ function ttDebrief(H, sc){
       ${next.length?`<h3 class="dhead">Practice next</h3><div class="scen-grid">${next.map(({s,i})=>`<button class="card scen" data-next="${i}">
           <div class="scen-top"><span class="libicon sm"><svg><use href="#${ttIcon(s, type)}"/></svg></span>${sevPill(s.severity)}</div>
           <h3>${esc(s.title)}</h3><p>${esc(s.blurb)}</p></button>`).join("")}</div>`:""}
-      <div class="row" style="margin-top:16px"><button class="btn primary" id="tt-replay">Replay this scenario</button><button class="btn" id="tt-other">Choose another scenario</button><button class="btn" id="tt-save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="tt-toast" aria-live="polite"></span></div>
+      <div class="row" style="margin-top:16px"><button class="btn primary" id="tt-replay">Replay this scenario</button><button class="btn" id="tt-other">Choose another scenario</button><button class="btn" id="tt-save"><svg><use href="#i-save"/></svg>Save to workspace</button><span class="toast" id="tt-toast" role="status" aria-live="polite"></span></div>
+      ${chapterLinkHTML("tabletop")}
       ${typeof journeyNextHTML === "function" ? journeyNextHTML("crisis") : ""}
     </div>${ttMeters(sc)}</div>`;
   $("#tt-replay").onclick = () => ttStart(tt.s, tt.v);

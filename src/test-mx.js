@@ -58,7 +58,7 @@ const body = function(){
   mx = {platform:"fintech", stage:"3", reg:true, tab:"mine", period:"Q3 2026", have:{}, vals:{
     "Fraud loss rate":{v:"32", t:"25", a:"40"}, "Account takeover rate":{v:"1.9", t:"2", a:"3"}, "Appeal overturn rate":{v:"18%", t:"10", a:"15"}, "User-report rate":{v:"4"}}};
   renderMetrics(); const list = mxList(), h = view.innerHTML;
-  out.push("fintech scorecard summary: " + (h.match(/id="mx-sc-sum">([\s\S]*?)<\/div>/)||[])[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+  out.push("fintech scorecard summary: " + (h.match(/id="mx-sc-sum"[^>]*>([\s\S]*?)<\/div>/)||[])[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
   const csv = mxScoreCsv(list), md = mxScoreMd(list);
   if(csv.split("\n").length !== list.length + 1 || !csv.includes('"Watch"') || !csv.includes('"Off track"')) throw new Error("csv wrong");
   if(!md.includes("| Fraud losses (bps) | 32 | 25 | 40 | Watch |")) throw new Error("markdown row wrong: " + md.split("\n").find(l => l.includes("Fraud")));

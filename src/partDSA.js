@@ -358,7 +358,7 @@ function renderDsa(){
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-ds="sharelink">Copy link</button>`)
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="ds-toast" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
+        `<span class="toast" id="ds-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }
 function dsSetupHTML(x, ap, s){
@@ -389,11 +389,12 @@ function dsReportHTML(x, ap, s){
     ${ds.shared ? shareBannerHTML('data-ds="unshare"') : ""}
     ${ds.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a social video platform with EU users, established in the US, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-ds="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ds-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable DSA duties in place")}</div><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(dsLabel(DS_TIERS, ds.tier))}${ds.size && ds.tier !== "vlop" ? " · " + esc(dsLabel(DS_SIZE, ds.size).toLowerCase()) : ""}${ds.est ? " · " + (ds.est === "eu" ? "established in the EU" : "established outside the EU") : ""}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable DSA duties in place")}</div><p class="note">${esc(ap.t)}</p>
       ${bench !== null && !ds.ex ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
-        <span class="toast" id="ds-toast" aria-live="polite"></span></div></div>
+        <span class="toast" id="ds-toast" role="status" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${chapterLinkHTML("dsa")}
     <details class="ev-details"><summary>Details <span class="note">Your plan, duties and drafts</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["duties", "Duties", s.total], ["drafts", "Drafts", DS_DRAFTS.length]].map(([k, nm, c]) => `<button type="button" data-dstab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "duties" ? dsReqsHTML(x, s) : tab === "drafts" ? dsDraftsHTML() : dsPlanHTML(x, s)}</div></div>
@@ -416,7 +417,7 @@ function dsDraftsHTML(){
   return `<div class="segs cp-dtabs" role="group" aria-label="Drafts">${DS_DRAFTS.map(([v, nm]) => `<button type="button" data-dsdraft="${v}" aria-pressed="${v === k}">${nm}</button>`).join("")}</div>
     <p class="note cp-dnote">${intro} Text in brackets is for you to fill in.</p>
     <div class="cp-draft ds-draft">${cpMd(dsDraftMd(k))}</div>
-    <div class="cp-dact"><button type="button" class="btn sm" data-ds="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-ds="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="ds-dtoast" aria-live="polite"></span></div>`;
+    <div class="cp-dact"><button type="button" class="btn sm" data-ds="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-ds="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="ds-dtoast" role="status" aria-live="polite"></span></div>`;
 }
 function dsReqsHTML(x, s){
   if(!s.reqs.length) return `<p class="note">Choose what kind of service you run to see which duties apply.</p>`;

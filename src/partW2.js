@@ -173,7 +173,7 @@ function renderWorkspace(){
     `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
     `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
      <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save workspace file</button>`) + `
-    <span class="toast" id="ws-toast" aria-live="polite"></span>
+    <span class="toast" id="ws-toast" role="status" aria-live="polite"></span>
     <div class="wstop">
       ${profileCard()}
       ${typeof orgCardHTML === "function" ? orgCardHTML() : ""}

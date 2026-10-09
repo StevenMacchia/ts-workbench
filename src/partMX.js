@@ -284,7 +284,7 @@ function mxTabMine(list){
   ${mx.demo ? `<div class="mxs-demo">${mxIco("warn")}<span>You're looking at <b>example numbers</b> for a ${esc(MX_PLATFORMS[mx.platform].toLowerCase())} program, so you can see how a full scorecard reads.</span><button type="button" class="btn sm" id="mx-demo-clear">Clear example numbers</button></div>` : ""}
   <div class="mxs-top">
     <label class="mxa-y mxs-period"><span>Reporting period</span><input class="input" id="mx-period" value="${esc(mx.period || "")}" placeholder="For example Q3 2026"></label>
-    <div class="mxs-sum" id="mx-sc-sum">${mxSumHTML(list)}</div>
+    <div class="mxs-sum" id="mx-sc-sum" aria-live="polite">${mxSumHTML(list)}</div>
     <button type="button" class="btn primary mxs-op" id="mx-op">${mxIco("page", "mx-ico")}Leadership one-pager</button>
   </div>
   <div class="mxs-bar">
@@ -293,6 +293,7 @@ function mxTabMine(list){
     <span class="mxs-act">${mx.demo ? "" : `<button type="button" class="btn sm" id="mx-demo">See example numbers</button>`}<button type="button" class="btn sm" id="mx-sc-copy">${icon("copy")}Copy table</button>${DL ? `<button type="button" class="btn sm" id="mx-sc-csv"><svg><use href="#i-download"/></svg>CSV</button>` : ""}</span>
   </div>
   <div class="card mx-sig" id="mx-sig">${mxSigHTML(list)}</div>
+  ${chapterLinkHTML("metrics")}
   <div class="card mx-sc">
     <div class="mx-sc-row h"><span>Metric</span><span>Your value</span><span>Target</span><span>Off track at</span><span>Trend</span><span>Status</span></div>
     ${MX_TORD.map(t => { const ms = list.filter(m => m.t === t); if(!ms.length) return "";
@@ -414,12 +415,12 @@ function mxOnePagerDoc(list){
 function mxOpenOnePager(list){
   if(!document.getElementById("mxop-css")){ const st = document.createElement("style"); st.id = "mxop-css"; st.textContent = MX_OP_CSS + MX_OP_PRINT; document.head.appendChild(st); }
   const prev = document.activeElement, bg = document.createElement("div");
-  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-label", "Leadership one-pager");
-  bg.innerHTML = `<div class="mxop-bar"><b>Leadership one-pager</b><span class="toast" id="mxop-toast" aria-live="polite"></span>
+  bg.className = "mxop-bg"; bg.setAttribute("role", "dialog"); bg.setAttribute("aria-modal", "true"); bg.setAttribute("aria-labelledby", "mxop-h");
+  bg.innerHTML = `<div class="mxop-bar"><b id="mxop-h">Leadership one-pager</b><span class="toast" id="mxop-toast" role="status" aria-live="polite"></span>
     ${DL ? `<button type="button" class="btn sm" data-op="dl"><svg><use href="#i-download"/></svg>Download to print</button>` : ""}<button type="button" class="btn sm" data-op="print">Print</button><button type="button" class="btn sm primary" data-op="close">Close</button></div>
     <div class="mxop">${mxOnePagerInner(list)}</div>`;
   document.body.appendChild(bg);
-  const onKey = e => { if(e.key === "Escape") close(); };
+  const onKey = e => { if(e.key === "Escape") close(); else trapFocus(bg, e); };
   const close = () => { bg.remove(); document.removeEventListener("keydown", onKey); if(prev && prev.focus) prev.focus(); };
   document.addEventListener("keydown", onKey);
   bg.onclick = e => { if(e.target === bg) close(); };
@@ -551,8 +552,8 @@ function renderMetrics(){
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
       <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
     </div>
-    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" aria-live="polite"></span></div>`;
-  view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
+    <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>`;
+  view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" role="status" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
 
   const save = () => { store.set("mx", mx); renderMetrics(); };
   const tabSub = k => (MX_TABS.find(t => t[0] === k) || [])[2] || "";

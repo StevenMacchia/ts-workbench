@@ -171,11 +171,12 @@ function polReportHTML(ai){
     <div class="card pol-sum">
       ${polRing(score, 96)}
       <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
-        <div class="verdict-row"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
+        <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
         <p class="note">${h.words} words · instant score ${h.score}/100${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
         ${bench ? `<p class="bench-line">Typical range among the built-in example rules: ${bench.min}–${bench.max}</p>` : ""}
         ${r && r.strengths.length ? `<div class="pol-strengths">${r.strengths.map(s=>`<span><svg><use href="#i-check"/></svg>${esc(s)}</span>`).join("")}</div>` : ""}
-        <span class="toast" id="pol-toast" aria-live="polite"></span></div>
+        <span class="toast" id="pol-toast" role="status" aria-live="polite"></span>
+        ${chapterLinkHTML("policy")}</div>
     </div>
 
     <div class="pol-tested">
@@ -209,7 +210,7 @@ function polTabHTML(tab){
   if(tab === "wording") return `${r.vague_terms.length ? `<h4 class="pol-sub">Words reviewers will read differently</h4><div class="pol-terms">${r.vague_terms.map(v=>`<div class="pol-term"><b>“${esc(v.term)}”</b><p>${esc(v.why||"")}</p>${v.suggest?`<p class="pol-sug"><span>Try:</span> ${esc(v.suggest)}</p>`:""}</div>`).join("")}</div>` : ""}
     ${r.gaps.length ? `<h4 class="pol-sub">What the rule forgets</h4><ul class="pol-gaps">${r.gaps.map(g=>`<li><b>${esc(g.gap)}</b><span>${esc(g.why||"")}</span></li>`).join("")}</ul>` : ""}`;
   if(tab === "rewrite") return `<div class="pol-diff"><div><span class="eyebrow">Your rule</span><blockquote>${esc(pol.rule)}</blockquote></div><div><span class="eyebrow">Rewrite</span><blockquote class="new">${esc(r.rewrite)}</blockquote></div></div>
-    <div class="row" style="gap:8px;margin-top:14px"><button type="button" class="btn sm" id="pol-copy">${icon("copy")}Copy rewrite</button><button type="button" class="btn sm primary" id="pol-retest">Test the rewrite ${icon("arrow")}</button>${typeof rxPolicyBtnHTML === "function" ? rxPolicyBtnHTML() : ""}<span class="toast" id="pol-rwtoast" aria-live="polite"></span></div>`;
+    <div class="row" style="gap:8px;margin-top:14px"><button type="button" class="btn sm" id="pol-copy">${icon("copy")}Copy rewrite</button><button type="button" class="btn sm primary" id="pol-retest">Test the rewrite ${icon("arrow")}</button>${typeof rxPolicyBtnHTML === "function" ? rxPolicyBtnHTML() : ""}<span class="toast" id="pol-rwtoast" role="status" aria-live="polite"></span></div>`;
   if(tab === "team") return `${r.reviewer_checklist.length ? `<h4 class="pol-sub">Reviewer checklist <span class="note">Apply in order</span></h4><ol class="pol-check">${r.reviewer_checklist.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>` : ""}
     ${r.open_questions.length ? `<h4 class="pol-sub">Open questions for your team</h4><ul class="pol-qs">${r.open_questions.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     ${r.enforcement_risks.length ? `<h4 class="pol-sub">Enforcement risks</h4><ul class="pol-risks">${r.enforcement_risks.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>` : ""}`;

@@ -250,7 +250,7 @@ function maPlanHTML(){
       <div class="ma-band-l">
         <span class="ma-band-k">Your maturity plan · ${esc(maStage().n)}</span>
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
-        <div class="ma-band-t verdict-row">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
+        <div class="ma-band-t verdict-row" aria-live="polite">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
         ${maBenchScore() !== null && !ma.ex ? `<p class="bench-line">Typical for a growing company like the built-in example: level ${maBenchScore().toFixed(1)} of 5</p>` : ""}
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
@@ -261,6 +261,7 @@ function maPlanHTML(){
           <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
     </section>
+    ${chapterLinkHTML("maturity")}
     <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
     <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
@@ -371,7 +372,7 @@ function maQHTML(){
 function maGuideRender(){
   const scr = maG ? maG.scr : "intro", rated = MA_AREAS.filter(a => ma.lv[a.k]).length;
   const body = scr === "stage" ? maStageStepHTML() : scr === "q" ? maQHTML() : maIntroHTML();
-  view.innerHTML = `<div class="gd gd-s-${scr}" style="--tc:var(--t-ma)">${asStepBar("maturity", Math.round(rated / MA_AREAS.length * 100), true)}<span class="toast" id="ma-toast" aria-live="polite"></span>${body}</div>`;
+  view.innerHTML = `<div class="gd gd-s-${scr}" style="--tc:var(--t-ma)">${asStepBar("maturity", Math.round(rated / MA_AREAS.length * 100), true)}<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>${body}</div>`;
 }
 // Every area rated: straight to the plan
 function maFinish(){ maG = null; ma.tab = "roadmap"; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(view.querySelector && view.querySelector("h1")); gsay(`All ${MA_AREAS.length} areas rated. Here's your plan`); }
@@ -413,7 +414,7 @@ document.addEventListener("keydown", e => {
 
 function maHeadMeta(){
   const any = MA_AREAS.some(a => ma.lv[a.k]);
-  return `<span class="toast" id="ma-toast" aria-live="polite"></span>
+  return `<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>
       ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
       ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
       <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>

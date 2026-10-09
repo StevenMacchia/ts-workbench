@@ -68,7 +68,7 @@ function startHere(r){
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
-        <div class="verdict-row"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
         ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}</div>
       ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
@@ -129,6 +129,7 @@ function renderReport(r){
     </div></div>
     ${(() => { const ch = pmChanges(r); return ch ? `<div class="card pm-changes"><span class="eyebrow">What changed since you saved it on ${fmtDate(pm.base.t)}</span><ul>${ch.map(x => `<li>${x}</li>`).join("")}</ul></div>` : ""; })()}
     <div style="margin-top:16px">${startHere(r)}</div>
+    ${chapterLinkHTML("premortem")}
     <details class="ev-details" style="margin-top:20px"><summary>Details <span class="note">Exposure numbers, the risk matrix, risks by harm area, burn-down</span></summary>
     <div class="section-title" style="margin-top:28px"><h2>The detail</h2><span class="note">Top-right of the matrix is most urgent</span></div>
     <div class="kpis">

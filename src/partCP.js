@@ -464,7 +464,7 @@ function renderCoppa(){
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-cp="sharelink">Copy link</button>`)
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="cp-toast" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
+        `<span class="toast" id="cp-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
 function cpSetupHTML(x, ap, s){
@@ -515,11 +515,12 @@ function cpReportHTML(x, ap, s){
     ${cp.shared ? shareBannerHTML('data-cp="unshare"') : ""}
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
       ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
-        <span class="toast" id="cp-toast" aria-live="polite"></span></div></div>
+        <span class="toast" id="cp-toast" role="status" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${chapterLinkHTML("coppa")}
     <details class="ev-details"><summary>Details <span class="note">Your plan, data map, drafts and requirements</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "map" ? cpMapHTML(x) : tab === "drafts" ? cpDraftsHTML() : tab === "reqs" ? cpReqsHTML(x, s) : cpPlanHTML(x, s)}</div></div>
@@ -546,7 +547,7 @@ function cpDraftsHTML(){
   return `<div class="segs cp-dtabs" role="group" aria-label="Drafts">${CP_DRAFTS.map(([v, nm]) => `<button type="button" data-cpdraft="${v}" aria-pressed="${v === k}">${nm}</button>`).join("")}</div>
     <p class="note cp-dnote">${intro} Text in brackets is for you to fill in.</p>
     <div class="cp-draft">${cpMd(cpDraftMd(k))}</div>
-    <div class="cp-dact"><button type="button" class="btn sm" data-cp="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-cp="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="cp-dtoast" aria-live="polite"></span></div>`;
+    <div class="cp-dact"><button type="button" class="btn sm" data-cp="copyd">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm primary" data-cp="dld"><svg><use href="#i-download"/></svg>Download</button>` : ""}<span class="toast" id="cp-dtoast" role="status" aria-live="polite"></span></div>`;
 }
 function cpReqsHTML(x, s){
   if(!s.reqs.length) return `<p class="note">Choose who your service is for, and mark the children's data you collect, to see which requirements apply.</p>`;

@@ -110,7 +110,7 @@ function tkDialogHTML(){
     <p class="tk-how">${esc(TK_HOW[k])}</p>
     ${tkCfgHTML(k)}
     <div class="tk-list" id="tk-list">${tkListHTML()}</div>
-    <footer class="tk-f"><span class="toast" id="tk-toast" aria-live="polite"></span>
+    <footer class="tk-f"><span class="toast" id="tk-toast" role="status" aria-live="polite"></span>
       ${T.csv ? `<button type="button" class="btn primary" data-tkcsv="1" ${n ? "" : "disabled"}><svg><use href="#i-download"/></svg>Download CSV for ${esc(T.n)} (${n})</button>` : `<span class="note">Use the Create buttons to open each issue.</span>`}</footer>`;
 }
 function tkOpen(src){
@@ -126,7 +126,7 @@ function tkOpen(src){
   bg.className = "tk-bg"; bg.innerHTML = `<div class="tk" role="dialog" aria-modal="true" aria-labelledby="tk-h" id="tk">${tkDialogHTML()}</div>`;
   const box = bg.querySelector("#tk"), redraw = () => { box.innerHTML = tkDialogHTML(); }, list = () => { box.querySelector("#tk-list").innerHTML = tkListHTML(); const c = box.querySelector("[data-tkcsv]"); const n = tk.tasks.filter(t => tk.sel[t.id]).length; if(c){ c.disabled = !n; c.lastChild.textContent = `Download CSV for ${TK_TRACKERS.find(t => t.k === tkCfg.tracker).n} (${n})`; } };
   const close = () => { bg.remove(); document.removeEventListener("keydown", key); if(prev && prev.focus) prev.focus(); };
-  const key = e => { if(e.key === "Escape") close(); };
+  const key = e => { if(e.key === "Escape") close(); else trapFocus(box, e); };
   bg.addEventListener("click", e => {
     if(e.target === bg || e.target.closest("[data-tkclose]")) return close();
     const b = e.target.closest("[data-tktr],[data-tkcsv],[data-tkopen]"); if(!b) return;

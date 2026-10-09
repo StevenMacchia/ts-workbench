@@ -238,7 +238,7 @@ function renderPremortem(){
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
     "Build safely", actions) : headCompact("Abuse pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">
-      <span class="toast" id="pm-toast" aria-live="polite"></span>
+      <span class="toast" id="pm-toast" role="status" aria-live="polite"></span>
       ${pm.stage==="start" ? startScreen() : pm.stage==="ask" ? askScreen() : renderReport(assess(pm))}
     </div>`;
   bindPremortem();

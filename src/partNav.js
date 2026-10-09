@@ -77,7 +77,27 @@ function cmdkItems(){
   const type = ttCompanyType();
   SCENARIOS.forEach((s,i) => { if(type!=="all" && !(s.types||[]).includes(type)) return; const v = ttScenario(i, type);
     out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });
+  if(CMDK_HB.status === "done"){
+    CMDK_HB.chapters.forEach(c => out.push({g:"Handbook", label:c.title||"", sub:c.summary||"", color:"var(--faint)", icon:"doc", run:()=>{ location.href = c.url; }}));
+    CMDK_HB.posts.forEach(p => out.push({g:"Writing", label:p.title||"", sub:p.summary||"", color:"var(--faint)", icon:"info", run:()=>{ location.href = p.url; }}));
+  }
   return out;
+}
+// Cross-site search index (handbook chapters and writing posts), fetched once on first palette open and cached in memory.
+// status: idle -> loading -> done, or error (no extra groups, never shown to the user as an error).
+let CMDK_HB = {status:"idle", chapters:[], posts:[]};
+function cmdkHbLoad(){
+  if(CMDK_HB.status !== "idle") return;
+  CMDK_HB.status = "loading";
+  fetch("https://stevenmacchia.com/ts-handbook/search.json").then(r => { if(!r.ok) throw new Error("bad status"); return r.json(); })
+    .then(data => {
+      const items = Array.isArray(data && data.items) ? data.items : [];
+      CMDK_HB.chapters = items.filter(x => x && x.kind === "chapter" && x.title && x.url);
+      CMDK_HB.posts = items.filter(x => x && x.kind === "post" && x.title && x.url);
+      CMDK_HB.status = "done";
+    })
+    .catch(() => { CMDK_HB.status = "error"; })
+    .then(() => { if($("#cmdk") && !$("#cmdk").hidden){ cmdk.items = cmdkItems(); cmdkDraw(); } });
 }
 let cmdk = {items:[], shown:[], sel:0, prevFocus:null};
 function cmdkDraw(){
@@ -87,14 +107,15 @@ function cmdkDraw(){
   let g = "", h = "";
   cmdk.shown.forEach((x,i) => { if(x.g!==g){ g = x.g; h += `<li class="grp" role="presentation">${esc(g)}</li>`; }
     h += `<li class="it" role="option" id="cmdk-o${i}" data-i="${i}" aria-selected="${i===cmdk.sel}"><span class="sb-glyph" style="background:${x.color}"><svg><use href="#i-${x.icon}"/></svg></span><span class="lbl">${esc(x.label)}</span>${x.sub?`<small>${esc(x.sub)}</small>`:""}</li>`; });
+  if(CMDK_HB.status === "loading" && !q) h += `<li class="grp" role="presentation">Handbook</li><li class="cmdk-wait" role="presentation">Searching the handbook…</li>`;
   const list = $("#cmdk-list"); list.innerHTML = h || `<li class="grp">No matches. Try a tool, scenario or saved result.</li>`;
   $("#cmdk-q").setAttribute("aria-activedescendant", cmdk.shown.length ? "cmdk-o"+cmdk.sel : "");
   list.querySelectorAll(".it").forEach(li => { li.onmousemove = () => { if(cmdk.sel!==+li.dataset.i){ cmdk.sel = +li.dataset.i; cmdkDraw(); } }; li.onclick = () => { cmdk.sel = +li.dataset.i; cmdkPick(); }; });
   const cur = list.querySelector('[aria-selected="true"]'); if(cur && cur.scrollIntoView) cur.scrollIntoView({block:"nearest"});
 }
-function cmdkOpen(){ cmdk.prevFocus = document.activeElement; cmdk.items = cmdkItems(); cmdk.sel = 0; $("#cmdk").hidden = false; const q = $("#cmdk-q"); q.value = ""; cmdkDraw(); q.focus(); }
+function cmdkOpen(){ cmdk.prevFocus = document.activeElement; cmdk.items = cmdkItems(); cmdk.sel = 0; $("#cmdk").hidden = false; const q = $("#cmdk-q"); q.value = ""; cmdkDraw(); q.focus(); cmdkHbLoad(); }
 function cmdkClose(){ $("#cmdk").hidden = true; if(cmdk.prevFocus && cmdk.prevFocus.focus) try{ cmdk.prevFocus.focus(); }catch(e){} }
-function cmdkPick(){ const x = cmdk.shown[cmdk.sel]; $("#cmdk").hidden = true; if(x) x.run(); }
+function cmdkPick(){ const x = cmdk.shown[cmdk.sel]; $("#cmdk").hidden = true; if(x && x.run) x.run(); }
 $$("[data-cmdk]").forEach(b => b.addEventListener("click", cmdkOpen));
 $("#cmdk-q").addEventListener("input", () => { cmdk.sel = 0; cmdkDraw(); });
 $("#cmdk").addEventListener("click", e => { if(e.target.id==="cmdk") cmdkClose(); });
@@ -102,6 +123,7 @@ document.addEventListener("keydown", e => {
   if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==="k"){ e.preventDefault(); $("#cmdk").hidden ? cmdkOpen() : cmdkClose(); return; }
   if($("#cmdk").hidden) return;
   if(e.key==="Escape"){ e.preventDefault(); cmdkClose(); }
+  else if(e.key==="Tab"){ trapFocus($("#cmdk"), e); }
   else if(e.key==="ArrowDown"){ e.preventDefault(); cmdk.sel = (cmdk.sel+1) % Math.max(1, cmdk.shown.length); cmdkDraw(); }
   else if(e.key==="ArrowUp"){ e.preventDefault(); cmdk.sel = (cmdk.sel-1+cmdk.shown.length) % Math.max(1, cmdk.shown.length); cmdkDraw(); }
   else if(e.key==="Enter"){ e.preventDefault(); cmdkPick(); }

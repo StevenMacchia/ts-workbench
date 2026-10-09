@@ -240,13 +240,14 @@ function trReportHTML(ai){
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
-        <div class="verdict-row"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
+        <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
         ${bench !== null ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% complete</p>` : ""}
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
         ${catOver.length ? `<p class="pol-err">Your category breakdown adds up to more than your total for ${catOver.join(" and ")}. Categories shouldn't double count.</p>` : ""}
-        <span class="toast" id="tr-toast" aria-live="polite"></span></div>
+        <span class="toast" id="tr-toast" role="status" aria-live="polite"></span></div>
     </div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${chapterLinkHTML("transparency")}
     <details class="ev-details"><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
       ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>

@@ -210,6 +210,26 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 
 .gd-preview-frame{padding:18px 22px 0;background:var(--panel)}
 
+/* ---------- First-run choice: assess the program, or go straight to one tool ---------- */
+.firstrun{margin-bottom:16px;padding:20px 22px;display:grid;gap:14px}
+.firstrun-t h2{font-size:17px}
+.firstrun-t p{margin:2px 0 0}
+.firstrun-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.firstrun-opt{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;padding:16px 18px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.firstrun-opt:hover,.firstrun-opt:focus-visible{border-color:var(--accent);box-shadow:var(--shadow);outline:none}
+.firstrun-opt b{font-size:15px;color:var(--ink)}
+.firstrun-opt span{color:var(--muted);font-size:13px;line-height:1.4}
+@media (max-width:640px){.firstrun-opts{grid-template-columns:1fr}}
+
+/* ---------- Command palette: handbook/writing loading row ---------- */
+.cmdk .cmdk-wait{padding:8px 10px;font-size:13px;color:var(--faint)}
+
+/* ---------- Read the chapter: final link under a report's verdict ---------- */
+.chapter-line{margin:12px 0 0;font-size:13.5px}
+.chapter-line a{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-weight:600;text-decoration:none}
+.chapter-line a:hover{text-decoration:underline}
+.chapter-line a::after{content:"→"}
+
 /* ---------- Letter grade beside a verdict ---------- */
 .grade{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;font-family:var(--display);font-weight:700;font-size:21px;flex:none;margin-left:10px;vertical-align:middle}
 .grade-A,.grade-B{background:var(--good-soft);color:var(--good)}
@@ -241,3 +261,25 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 
 /* grade mark: top-right of the verdict, large enough to read as a grade */
 .grade{float:right;margin:-4px 0 10px 18px;width:54px;height:54px;border-radius:14px;font-size:25px;font-weight:700;display:grid;place-items:center}
+
+/* ---------- Site top bar: shared with stevenmacchia.com and the handbook ---------- */
+.sitetop{display:flex;align-items:center;gap:20px;height:44px;padding:0 18px;background:var(--bg);border-bottom:1px solid var(--line);font-size:13.5px;overflow-x:auto;white-space:nowrap}
+.sitetop .st-mark{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,var(--accent),#FF9A7A);flex:none}
+.sitetop a{color:var(--ink);text-decoration:none;flex:none}
+.sitetop a:hover{text-decoration:underline}
+.sitetop .st-name{font-weight:600;margin-right:auto}
+.sitetop .st-dl{padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+.sitetop .st-dl:hover{text-decoration:none;border-color:var(--line-strong)}
+.sitetop .st-phone{display:none;margin-left:auto}
+@media print{.sitetop{display:none}}
+@media (max-width:640px){
+  .sitetop{gap:12px;padding:0 14px}
+  .sitetop .st-full{display:none}
+  .sitetop .st-phone{display:inline}
+}
+.app{min-height:calc(100vh - 16px - 44px)}
+.side{height:calc(100vh - 16px - 44px)}
+@media (max-width:880px){
+  .app{min-height:calc(100vh - 44px)}
+  .side{top:44px}
+}

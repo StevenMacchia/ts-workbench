@@ -240,7 +240,7 @@ function rxBuildHTML(r){
     <div class="rx-h"><span class="eyebrow">Build it</span><span class="wip-tag">Starter, untested</span>${typeof poweredBy === "function" ? poweredBy(["roost"], "Formats by") : ""}</div>
     <h3 id="rx-h">From this report to files you can start from</h3>
     <p>Two starters from the top ${n} risks: rules for Osprey, ROOST's open-source rules engine, and a setup checklist for Coop, its review console. Every platform-specific value is a TODO, and nothing has run against a real deployment. The workbench is independent of ROOST.</p>
-    <div class="row rx-acts"><button type="button" class="btn sm" data-rx="osprey">${rxIcon()}Osprey starter rules</button><button type="button" class="btn sm" data-rx="coop">${rxIcon()}Coop checklist</button><span class="toast" id="rx-toast" aria-live="polite"></span></div>
+    <div class="row rx-acts"><button type="button" class="btn sm" data-rx="osprey">${rxIcon()}Osprey starter rules</button><button type="button" class="btn sm" data-rx="coop">${rxIcon()}Coop checklist</button><span class="toast" id="rx-toast" role="status" aria-live="polite"></span></div>
     <p class="note rx-files"><span class="mono">osprey-starter-${esc(fname)}.sml</span> · <span class="mono">coop-checklist-${esc(fname)}.md</span>${typeof pol !== "undefined" && pol && pol.result && pol.result.rewrite ? " · The Coop checklist includes your stress-tested rule." : ""}</p>
   </section>`;
 }

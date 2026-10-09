@@ -184,6 +184,24 @@ function asStepHTML(s, i, next){
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
   return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
 }
+// First visit, before any choice is remembered: assess the whole program, or go straight to one tool.
+// Never shown again once a choice is made (tswb:firstrun:seen), and never in the demo or while opening a shared link.
+function firstRunHTML(){
+  return `<div class="card firstrun" role="group" aria-labelledby="firstrun-h">
+    <div class="firstrun-t"><h2 id="firstrun-h">How do you want to start?</h2><p class="note">Pick one. You can always do the other later.</p></div>
+    <div class="firstrun-opts">
+      <button type="button" class="firstrun-opt" data-firstrun="assess"><b>Assess my program</b><span>The full guided assessment: one picture of your program, built up step by step.</span></button>
+      <button type="button" class="firstrun-opt" data-firstrun="tools"><b>Use one tool</b><span>Jump straight to any tool on its own, such as a pre-mortem or a vendor scorecard.</span></button>
+    </div>
+  </div>`;
+}
+function firstRunBind(){
+  view.querySelectorAll("[data-firstrun]").forEach(b => b.onclick = () => {
+    store.set("firstrun:seen", true);
+    if(b.dataset.firstrun === "tools") goRoute("tools");
+    else { store.set("as:start", true); renderOverview(); focusQuiet(document.querySelector("#view h1")); }
+  });
+}
 // First visit: what the assessment is, what you get, and a way to see it filled in
 function asWelcomeHTML(J){
   const total = J.reduce((t, s) => t + (s.min || 0), 0);
@@ -211,7 +229,14 @@ function renderOverview(){
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], demo = typeof demoOn === "function" && demoOn();
   const done = J.filter(s => s.done()), next = J.find(s => !s.done());
   const fresh = !demo && !done.length && !store.get("as:start", false) && !Object.keys(wsItems()).length;
-  if(fresh || !J.length){ view.innerHTML = asWelcomeHTML(J); return asBind(); }
+  if(fresh || !J.length){
+    const shared = typeof shareParseHash === "function" && shareParseHash();
+    const showFirstRun = fresh && !shared && !store.get("firstrun:seen", false);
+    view.innerHTML = (showFirstRun ? firstRunHTML() : "") + asWelcomeHTML(J);
+    asBind();
+    if(showFirstRun) firstRunBind();
+    return;
+  }
   const o = orgGet(), p = wsProfile(), left = J.filter(s => !s.done()).reduce((t, s) => t + (s.min || 0), 0);
   const who = [demo ? "Pixelry" : p && p.org, o.type && orgTypeName(o.type), o.stage && orgStageName(o.stage)].filter(Boolean).join(" · ");
   view.innerHTML = `<div class="ov as">

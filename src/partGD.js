@@ -84,7 +84,7 @@ function gdQHTML(spec){
 function gdRender(spec){
   gdCur = spec; const p = gdPos(spec.k);
   if(p.scr === "q" && !gdLive(spec).length) p.scr = "intro";
-  view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
+  view.innerHTML = `<div class="gd gd-s-${p.scr}" style="--tc:${spec.tool.color}">${asStepBar(spec.k, gdPct(spec), true)}<span class="toast" id="${spec.k}-toast" role="status" aria-live="polite"></span>${p.scr === "q" ? gdQHTML(spec) : gdIntroHTML(spec)}</div>`;
   if(spec.bind) spec.bind();
 }
 const gdFocus = () => { const el = view.querySelector && (view.querySelector(".gd-text .input") || view.querySelector("h1")); if(el){ if(el.classList.contains("input")) el.focus(); else focusQuiet(el); } };

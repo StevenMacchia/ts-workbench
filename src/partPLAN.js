@@ -29,7 +29,7 @@ function renderPlan(){
   const sent = !!store.get("tk:used", false), demo = typeof demoOn === "function" && demoOn();
   const by = g => items.filter(x => x.g === g).sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
   const srcs = [...new Set(items.map(x => PLAN_KIND[x.kind]))];
-  view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" aria-live="polite"></span>
+  view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" role="status" aria-live="polite"></span>
     <div class="pl-head">
       <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
       <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>

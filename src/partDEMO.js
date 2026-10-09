@@ -110,13 +110,15 @@ const TOUR = [
   [".as-know", "What the assessment found", "The most important finding from each step, in plain words."],
   ["#tb-demo", "Exit when you're ready", "Use Exit demo up here to leave. Your own work comes back untouched, and you can start on your own program."]
 ];
-let tourAt = -1, tourSteps = TOUR;
+let tourAt = -1, tourSteps = TOUR, tourPrevFocus = null;
 // Any page's walkthrough uses the same engine
-function tourRun(steps){ tourSteps = steps; tourStep(0); }
+function tourRun(steps){ if(tourAt < 0) tourPrevFocus = document.activeElement; tourSteps = steps; tourStep(0); }
 function tourEnd(){
   tourAt = -1;
   document.querySelectorAll(".tour-on").forEach(el => el.classList.remove("tour-on"));
   const p = document.getElementById("tour-pop"); if(p) p.remove();
+  if(tourPrevFocus && tourPrevFocus.focus){ try{ tourPrevFocus.focus(); }catch(e){} }
+  tourPrevFocus = null;
 }
 function tourStep(i){
   const steps = tourSteps.filter(([s]) => document.querySelector(s)), demoTour = tourSteps === TOUR;
@@ -137,6 +139,7 @@ function tourStep(i){
   p.focus({preventScroll:true});
 }
 function tourStart(){
+  if(tourAt < 0) tourPrevFocus = document.activeElement;
   tourSteps = TOUR;
   if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
   tourStep(0);
@@ -160,7 +163,8 @@ document.addEventListener("keydown", e => {
   }
   const offer = document.getElementById("tour-pop");
   if(e.key === "Escape" && offer && offer.dataset.kind === "offer" && typeof helpOfferClose === "function") return helpOfferClose();
-  if(e.key === "Escape" && tourAt >= 0) tourEnd();
+  if(e.key === "Escape" && tourAt >= 0) return tourEnd();
+  if(e.key === "Tab" && tourAt >= 0 && offer) trapFocus(offer, e);
 });
 // The quick-tour offer sits in the middle of the screen: a click outside it dismisses it and does nothing else
 document.addEventListener("click", e => {

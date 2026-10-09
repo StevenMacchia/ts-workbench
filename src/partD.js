@@ -324,3 +324,33 @@ function shareParseHash(){
 function shareBannerHTML(saveAttr){
   return `<div class="card share-banner" role="note"><div><b>You're viewing a shared result.</b><span class="note">Save a copy to edit it.</span></div><button type="button" class="btn primary sm" ${saveAttr}>Save a copy</button></div>`;
 }
+
+// ---------- Handbook chapter link: one shared map, so every report's verdict area can point to the chapter behind it ----------
+const CHAPTER_LINK = {
+  vendors:["choosing-vendors-and-tools", "Choosing vendors and tools"],
+  policy:["writing-policy", "Writing policy and an enforcement ladder"],
+  tabletop:["crisis-response", "Crisis response"],
+  metrics:["measuring-what-matters", "Measuring what matters"],
+  premortem:["know-your-risks", "Know your risks"],
+  coppa:["child-safety-and-age-assurance", "Child safety and age assurance"],
+  dsa:["regulation-and-compliance", "Regulation and compliance"],
+  transparency:["transparency-reports-and-notices", "Transparency reports and enforcement notices"],
+  maturity:["budgets-roadmaps-and-making-the-case", "Budgets, roadmaps and making the case"],
+  coverage:["detection-and-prevention", "Detection and prevention"],
+  eval:["quality-calibration-and-appeals", "Quality, calibration and appeals"]
+};
+function chapterLinkHTML(tool){
+  const c = CHAPTER_LINK[tool]; if(!c) return "";
+  return `<p class="chapter-line"><a href="https://stevenmacchia.com/ts-handbook/${c[0]}/" target="_blank" rel="noopener">Read the chapter: ${esc(c[1])}</a></p>`;
+}
+
+// ---------- Shared focus trap for modal dialogs: Tab and Shift+Tab stay inside `container` ----------
+function trapFocus(container, e){
+  if(!container || e.key !== "Tab") return;
+  const f = Array.from(container.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+    .filter(el => !el.hidden && el.getClientRects().length);
+  if(!f.length) return;
+  const i = f.indexOf(document.activeElement);
+  if(e.shiftKey){ if(i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } }
+  else if(i === f.length - 1 || i === -1){ e.preventDefault(); f[0].focus(); }
+}
