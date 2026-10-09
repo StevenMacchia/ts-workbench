@@ -102,9 +102,7 @@ function cvActions(d, n){
 }
 
 /* ---------- radar: risk against coverage ---------- */
-let cvSeq = 0;
 function cvRadar(d, big, prev){
-  const hid = "cv-h" + (++cvSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const rows = cvRows(d), n = rows.length, W = 400, H = big ? 320 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, f = v => v.toFixed(1);
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
@@ -112,7 +110,7 @@ function cvRadar(d, big, prev){
   const axes = rows.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
   const hasRisk = rows.some(x => x.riskPct !== null), anyRated = rows.some(x => x.rated);
   const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="none" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round" stroke-linejoin="round"/>` : "";
-  const cover = anyRated ? `${hatch(hid, "var(--ink)")}<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
+  const cover = anyRated ? `<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   // a previous quarter's coverage, dotted, for the quarter-by-quarter view
   const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>` : "";
   const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);

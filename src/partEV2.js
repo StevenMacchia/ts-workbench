@@ -72,16 +72,14 @@ function evNextName(name){
 /* ---------- misses by kind: previous run against the latest, drawn like the maturity and coverage radars ---------- */
 const evRadarLabel = n => { const w = String(n).split(" "); if(n.length <= 11 || w.length < 2) return [n]; let best = 1, diff = 1e9;
   for(let i = 1; i < w.length; i++){ const a = w.slice(0, i).join(" ").length, b = w.slice(i).join(" ").length; if(Math.abs(a - b) < diff){ diff = Math.abs(a - b); best = i; } } return [w.slice(0, best).join(" "), w.slice(best).join(" ")]; };
-let evSeq = 0;
 function evRadar(cats, names){
-  const hid = "ev-h" + (++evSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const n = cats.length, W = 400, H = 300, cx = W / 2, cy = H / 2, R = 96, f = v => v.toFixed(1), rate = c => c.total ? Math.round(c.before / c.total * 100) : 0, rate2 = c => c.total ? Math.round(c.after / c.total * 100) : 0;
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
   const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(cats.map(() => p))}" fill="${p === 100 ? "var(--surface)" : "none"}" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
   const axes = cats.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
   const was = `<polygon class="ev-r-prev" points="${poly(cats.map(rate))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>`;
-  const now = `${hatch(hid, "var(--ink)")}<polygon class="ev-r-now" points="${poly(cats.map(rate2))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>`;
+  const now = `<polygon class="ev-r-now" points="${poly(cats.map(rate2))}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>`;
   const dots = cats.map((c, i) => { if(!c.after) return ""; const [a, b] = pt(i, rate2(c)); return `<circle cx="${f(a)}" cy="${f(b)}" r="3.5" fill="${c.after > c.before ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const labels = cats.map((c, i) => { const [a, b] = pt(i, 120), cs = Math.cos(ang(i)), sn = Math.sin(ang(i)), ls = evRadarLabel(c.n), extra = ls.length - 1;
     const anchor = cs > .3 ? "start" : cs < -.3 ? "end" : "middle", dy0 = sn < -.6 ? `${-.2 - 1.1 * extra}em` : sn > .6 ? ".9em" : `${.35 - .55 * extra}em`;

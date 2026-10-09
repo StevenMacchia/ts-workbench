@@ -62,9 +62,7 @@ function maNextItem(d){
 }
 
 /* ---------- radar ---------- */
-let maSeq = 0;
 function maRadar(d, big, prev){
-  const hid = "ma-h" + (++maSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const W = 400, H = big ? 330 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, n = MA_AREAS.length, t = maStage(d).t;
   const pt = (i, v) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(ang) * R * v / 5, cy + Math.sin(ang) * R * v / 5]; };
   const poly = vals => vals.map((v, i) => pt(i, v).map(x => x.toFixed(1)).join(",")).join(" ");
@@ -78,7 +76,7 @@ function maRadar(d, big, prev){
   }).join("");
   const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>`;
   const old = prev && rated ? `<polygon class="ma-old" points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
-  const cur = rated ? `${hatch(hid, "var(--ink)")}<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
+  const cur = rated ? `<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   const dots = MA_AREAS.map((a, i) => { const v = lv(a.k); if(!v) return ""; const [x, y] = pt(i, v);
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" class="ma-dot ${v < t[a.k] ? "" : "ok"}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${lv(a.k)} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";

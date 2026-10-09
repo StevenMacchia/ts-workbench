@@ -1584,7 +1584,7 @@ thead th{background:var(--surface-2)}
 
 /* Trends */
 .mx-spark{display:block;overflow:visible}
-.mx-spark .sp-line{fill:none;stroke:var(--faint);stroke-width:1.6;stroke-linejoin:round}
+.mx-spark .sp-line{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linejoin:round}
 .mx-spark .sp-dot{fill:var(--faint)}
 .mx-spark .sp-dot.good{fill:var(--good)}
 .mx-spark .sp-dot.med{fill:var(--med)}
@@ -4381,6 +4381,43 @@ input[type="checkbox"]:checked,input[type="radio"]:checked{animation:mo-cb .14s 
   .gd-opt,.gd-radio,.ocard,.sb-pill{transition:none!important}
   .gd-opt:active,.ocard:active,.scen:active{transform:none!important}
 }
+
+/* =========================================================
+   RHYTHM: one set of tokens for card typography, tables and charts, enforced here so a tool
+   can't quietly drift (gap scale is 8/12/16/24 only; card padding 20px, 24px on report cards).
+   ========================================================= */
+.card{padding:20px}
+.ev-hero,.starthere{padding:24px}
+.eyebrow{font-size:12.5px;color:var(--muted);font-weight:500;letter-spacing:0;text-transform:none}
+.meta{font-size:13px;color:var(--muted)}
+.card h3,.card h4{font-size:16px;font-weight:600}
+.card p,.card .body{font-size:14.5px}
+.ln-hub h3{font-size:16px}
+
+/* Tables: a plain, unclassed <table> (partMX/partREV/partJN/partVD/partCP's inline drafts) had no
+   styling of its own at all; this gives every one of them the same shape as the classed tables
+   below. No stripes anywhere; .mono marks the numeric columns so they can right-align. */
+table:not([class]){border-collapse:collapse;width:100%;font-size:14.5px}
+table:not([class]) th{text-align:left;font-size:12.5px;font-weight:600;color:var(--muted);padding:10px;border-bottom:1px solid var(--line)}
+table:not([class]) td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+table:not([class]) tr:last-child td{border-bottom:0}
+:is(table:not([class]),.tr-ct,.ev-ct,.cp-map,.ln-t) td:first-child,:is(table:not([class]),.tr-ct,.ev-ct,.cp-map,.ln-t) th:first-child{font-weight:600}
+:is(table:not([class]),.tr-ct,.ev-ct,.cp-map,.ln-t) td.mono,:is(table:not([class]),.tr-ct,.ev-ct,.cp-map,.ln-t) th.mono{text-align:right;font-variant-numeric:tabular-nums}
+.tr-ct th,.tr-ct td,.ev-ct th,.ev-ct td,.cp-map th,.cp-map td{padding:10px;border-top:0}
+.tr-ct th,.ev-ct th,.cp-map th{font-size:12.5px}
+.rt-grid th{font-size:12.5px}
+
+/* Charts: the same ring, polygon and dot everywhere a radar is drawn (coverage, maturity, eval's
+   before/after radar); the same trend-line weight and color everywhere a sparkline is drawn
+   (metrics rows, the home score's trend) -- see cv-cov/ma-cur/ev-r-now and .mx-spark/.rc-trend
+   above for the polygon and line fixes themselves. This just locks the label treatment down. */
+.ma-rl,.cv-rl{font-size:12.5px;fill:var(--muted)}
+.ma-radar.big .ma-rl,.cv-radar.big .cv-rl{fill:var(--muted)}
+
+/* Bars: every simple score/progress bar is 8px tall. .gd-mbar (the tabletop decision meters, which
+   carry a marker and more detail) stays its own, taller size -- a different component, not a bar. */
+.vd-bar{height:8px}
+.pol-meter{height:8px}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -17418,9 +17455,7 @@ function maNextItem(d){
 }
 
 /* ---------- radar ---------- */
-let maSeq = 0;
 function maRadar(d, big, prev){
-  const hid = "ma-h" + (++maSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const W = 400, H = big ? 330 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, n = MA_AREAS.length, t = maStage(d).t;
   const pt = (i, v) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(ang) * R * v / 5, cy + Math.sin(ang) * R * v / 5]; };
   const poly = vals => vals.map((v, i) => pt(i, v).map(x => x.toFixed(1)).join(",")).join(" ");
@@ -17434,7 +17469,7 @@ function maRadar(d, big, prev){
   }).join("");
   const tgt = `<polygon points="${poly(MA_AREAS.map(a => t[a.k]))}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round"/>`;
   const old = prev && rated ? `<polygon class="ma-old" points="${poly(MA_AREAS.map(a => prev.lv[a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>` : "";
-  const cur = rated ? `${hatch(hid, "var(--ink)")}<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
+  const cur = rated ? `<polygon class="ma-cur" points="${poly(MA_AREAS.map(a => lv(a.k)))}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   const dots = MA_AREAS.map((a, i) => { const v = lv(a.k); if(!v) return ""; const [x, y] = pt(i, v);
     return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 4 : 3.5}" class="ma-dot ${v < t[a.k] ? "" : "ok"}" fill="${v < t[a.k] ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const aria = rated ? `Maturity radar. ${MA_AREAS.filter(a => d.lv[a.k]).map(a => `${a.n} level ${lv(a.k)} of 5, target ${t[a.k]}`).join(". ")}.` : "Maturity radar, nothing rated yet.";
@@ -17992,9 +18027,7 @@ function cvActions(d, n){
 }
 
 /* ---------- radar: risk against coverage ---------- */
-let cvSeq = 0;
 function cvRadar(d, big, prev){
-  const hid = "cv-h" + (++cvSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const rows = cvRows(d), n = rows.length, W = 400, H = big ? 320 : 300, cx = W / 2, cy = H / 2, R = big ? 104 : 96, f = v => v.toFixed(1);
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
@@ -18002,7 +18035,7 @@ function cvRadar(d, big, prev){
   const axes = rows.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
   const hasRisk = rows.some(x => x.riskPct !== null), anyRated = rows.some(x => x.rated);
   const risk = hasRisk ? `<polygon class="cv-risk" points="${poly(rows.map(x => x.riskPct || 0))}" fill="none" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="2 3" stroke-linecap="round" stroke-linejoin="round"/>` : "";
-  const cover = anyRated ? `${hatch(hid, "var(--ink)")}<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
+  const cover = anyRated ? `<polygon class="cv-cov" points="${poly(rows.map(x => x.cov))}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>` : "";
   // a previous quarter's coverage, dotted, for the quarter-by-quarter view
   const was = prev && rows.some(x => prev[x.a.k] !== undefined) ? `<polygon class="cv-prev" points="${poly(rows.map(x => prev[x.a.k] || 0))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>` : "";
   const dots = anyRated ? rows.map((x, i) => { if(!x.rated) return ""; const [a, b] = pt(i, x.cov);
@@ -18558,7 +18591,7 @@ function rcTrend(hist){
   if(hist.length < 2) return "";
   const pts = hist.slice(-8), W = 120, H = 34, x = i => 4 + i * (W - 8) / (pts.length - 1), lo = Math.min(...pts.map(p => p.s)) - 5, hi = Math.max(...pts.map(p => p.s)) + 5, y = v => H - 4 - (v - lo) / Math.max(1, hi - lo) * (H - 8);
   const first = hist[0], last = hist[hist.length - 1], d = last.s - first.s;
-  return `<span class="rc-trend"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline points="${pts.map((p, i) => x(i).toFixed(1) + "," + y(p.s).toFixed(1)).join(" ")}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(last.s).toFixed(1)}" r="3" fill="var(--ink)"/></svg>
+  return `<span class="rc-trend"><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><polyline points="${pts.map((p, i) => x(i).toFixed(1) + "," + y(p.s).toFixed(1)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(last.s).toFixed(1)}" r="3" fill="var(--accent)"/></svg>
     <small class="${d > 0 ? "up" : d < 0 ? "dn" : ""}">${d > 0 ? "+" : ""}${d} since ${esc(new Date(first.d + "T12:00:00").toLocaleDateString(undefined, {month:"short", day:"numeric"}))}</small></span>`;
 }
 function rcMarkdown(){
@@ -22638,16 +22671,14 @@ function evNextName(name){
 /* ---------- misses by kind: previous run against the latest, drawn like the maturity and coverage radars ---------- */
 const evRadarLabel = n => { const w = String(n).split(" "); if(n.length <= 11 || w.length < 2) return [n]; let best = 1, diff = 1e9;
   for(let i = 1; i < w.length; i++){ const a = w.slice(0, i).join(" ").length, b = w.slice(i).join(" ").length; if(Math.abs(a - b) < diff){ diff = Math.abs(a - b); best = i; } } return [w.slice(0, best).join(" "), w.slice(best).join(" ")]; };
-let evSeq = 0;
 function evRadar(cats, names){
-  const hid = "ev-h" + (++evSeq), hatch = (id, c) => `<defs><pattern id="${id}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="${c}" stroke-width="1.1"/></pattern></defs>`;
   const n = cats.length, W = 400, H = 300, cx = W / 2, cy = H / 2, R = 96, f = v => v.toFixed(1), rate = c => c.total ? Math.round(c.before / c.total * 100) : 0, rate2 = c => c.total ? Math.round(c.after / c.total * 100) : 0;
   const ang = i => -Math.PI / 2 + i * 2 * Math.PI / n, pt = (i, pct) => [cx + Math.cos(ang(i)) * R * pct / 100, cy + Math.sin(ang(i)) * R * pct / 100];
   const poly = vals => vals.map((v, i) => pt(i, v).map(f).join(",")).join(" ");
   const rings = [25, 50, 75, 100].map(p => `<polygon points="${poly(cats.map(() => p))}" fill="${p === 100 ? "var(--surface)" : "none"}" stroke="var(--line${p === 100 ? "-strong" : ""})"/>`).join("");
   const axes = cats.map((x, i) => { const [a, b] = pt(i, 100); return `<line x1="${cx}" y1="${cy}" x2="${f(a)}" y2="${f(b)}" stroke="var(--line)"/>`; }).join("");
   const was = `<polygon class="ev-r-prev" points="${poly(cats.map(rate))}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1.5 3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>`;
-  const now = `${hatch(hid, "var(--ink)")}<polygon class="ev-r-now" points="${poly(cats.map(rate2))}" fill="url(#${hid})" stroke="var(--ink)" stroke-width="1.8" stroke-linejoin="round"/>`;
+  const now = `<polygon class="ev-r-now" points="${poly(cats.map(rate2))}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>`;
   const dots = cats.map((c, i) => { if(!c.after) return ""; const [a, b] = pt(i, rate2(c)); return `<circle cx="${f(a)}" cy="${f(b)}" r="3.5" fill="${c.after > c.before ? "var(--crit)" : "var(--ink)"}" stroke="var(--surface)" stroke-width="1.5"/>`; }).join("");
   const labels = cats.map((c, i) => { const [a, b] = pt(i, 120), cs = Math.cos(ang(i)), sn = Math.sin(ang(i)), ls = evRadarLabel(c.n), extra = ls.length - 1;
     const anchor = cs > .3 ? "start" : cs < -.3 ? "end" : "middle", dy0 = sn < -.6 ? `${-.2 - 1.1 * extra}em` : sn > .6 ? ".9em" : `${.35 - .55 * extra}em`;

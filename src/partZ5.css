@@ -360,7 +360,7 @@
 
 /* Trends */
 .mx-spark{display:block;overflow:visible}
-.mx-spark .sp-line{fill:none;stroke:var(--faint);stroke-width:1.6;stroke-linejoin:round}
+.mx-spark .sp-line{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linejoin:round}
 .mx-spark .sp-dot{fill:var(--faint)}
 .mx-spark .sp-dot.good{fill:var(--good)}
 .mx-spark .sp-dot.med{fill:var(--med)}
