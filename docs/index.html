@@ -5168,7 +5168,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
   body:has(.rt-five) .side,body:has(.rt-five) .pagehead{display:none}
   body:has(.rtf) #view,body:has(.rt-five) #view{margin:0;padding:0;max-width:none}
   .rtf-dots,.rtf-foot,.rtf-act,.rtf-opts,.rtf-chips,.rt-art,.ln-toast,.rtf-link,
-  .rt-f,.rtf-hubc,.wip-tag,.banner{display:none}
+  .rt-f,.rtf-hubc,.wip-tag,.banner,.rtf-strip{display:none}
   .rtf{max-width:none;padding:0}
   .rtf-card{box-shadow:none;border:1px solid #ccc;animation:none;background:#fff;color:#111;padding:18px}
   .rtf-h1,.rtf-h2{background:none;-webkit-text-fill-color:#111;color:#111}
@@ -5177,6 +5177,33 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
   #rt-sum,.ln-pre{background:#fff;color:#111;border:1px solid #ccc;max-height:none;overflow:visible;white-space:pre-wrap}
   a[href]::after{content:""}
 }
+
+/* =========================================================
+   fixstudio: four things that bothered the owner about the studio once a newcomer could reach it (branch
+   enh/fixstudio). Aurora tokens only; appended here per the "new CSS goes at the end of this file" rule.
+   ========================================================= */
+
+/* ---------- the quiet per-card strip under the eyebrow: "You're in X · n of m · next: Y" ---------- */
+.rtf-strip{margin:0 0 10px;opacity:.82}
+
+/* ---------- the hub's primary "what next" card: one recommendation above the four paths, which now sit
+   under "Or pick your own". A violet-to-peach gradient border, same pairing as the progress bars
+   (partZ13.css, .bar i), makes it read as "the one to look at first" without a second colour system. ---------- */
+.rtf-hub-primary{margin-top:16px}
+.rtf-hubc-primary{display:grid;gap:6px;text-align:left;padding:18px 20px;border-radius:14px;border:1px solid transparent;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box,
+    linear-gradient(120deg,var(--accent),#FF9A7A) border-box;
+  font:inherit;color:var(--ink);cursor:pointer;transition:transform .15s,box-shadow .15s;align-content:start}
+.rtf-hubc-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+.rtf-hubc-primary:active{transform:translateY(0)}
+.rtf-hubc-primary b{font-size:17px}
+.rtf-hubc-primary span{font-size:13.5px;color:var(--muted);line-height:1.5}
+.rtf-hub-rec{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+@media (prefers-reduced-motion: reduce){.rtf-hubc-primary{transition:none}.rtf-hubc-primary:hover{transform:none}}
+
+/* ---------- the evidence field (a try's and a drill's own "what did it do" question) reads as part of
+   that question, not a separate form; .rtf-in already gives it the right label and textarea styling. ---------- */
+.rt-ev{margin-top:10px}
 /* =========================================================
    lnpolish: UX/UI refinement pass on the Learn section's red-teaming pages (hub, the two guides' Method/
    Practice/Worksheets/Sources tabs, and the glossary). Only src/partLearn.js and this file were touched;
@@ -15369,6 +15396,7 @@ function rtfDrill(sc, i, screens){
     ${d.plain ? `<details class="rtf-det"><summary>Full version</summary><p class="rtf-lead">${esc(d.why)}</p><ol class="rtf-steps">${d.steps.map(st => `<li>${esc(st)}</li>`).join("")}</ol></details>` : ""}
     <details class="rtf-det"><summary>What good looks like, and notes</summary>${lnGood(d.good.map(esc))}<textarea class="input" rows="3" id="rtf-notes" placeholder="What the model did, in your words. Not the output itself.">${esc(s.notes || "")}</textarea></details>
     <div class="rtf-q"><p>What did it do?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-grade="${j}" class="${picked === j ? "on" : ""}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>
+    ${rtEvFieldHTML("drill:" + d.id, rtEvDraftGet("drill:" + d.id))}
     ${picked != null && picked >= 2 ? `<p class="rtf-lbl" style="margin-top:12px">Which harm did it touch?</p><div class="rtf-chips sm">${(areasPicked.length ? areasPicked : rtPicked()).map(a => `<button type="button" data-fa="${a.k}" class="${rt.flow.area === a.k ? "on" : ""}">${esc(RT_PLAIN[a.k] || a.n)}</button>`).join("")}</div>` : ""}
     ${picked != null && picked >= 2 && rt.flow.area ? `<p class="note">Noted as a finding. You will get a fix card for it at the end.</p>` : ""}</div>
     ${picked == null ? `<p class="note">Run the drill, then pick what happened. You can also <button type="button" class="rtf-link" data-rtf="skipdrill">skip this one</button>.</p>` : needArea ? `<p class="note">Pick the harm it touched to continue.</p>` : rtfNext(n === drills.length ? "See the verdict" : "Next drill")}`;
@@ -15425,6 +15453,7 @@ function rtFlowBind(){
   const langs = $("#rtf-langs"); if(langs) langs.oninput = e => { rt.langs = e.target.value.slice(0, 80); rtSave(); };
   const s3 = $("#rtf-s3"); if(s3) s3.oninput = e => { rt.gates.s3 = Math.max(0, Math.min(100, +e.target.value || 0)); rtSave(); };
   const notes = $("#rtf-notes"); if(notes) notes.oninput = e => { const s = rt.sess[sc.id]; if(s){ s.notes = e.target.value; rtSave(); } };
+  $$("[data-ev]").forEach(a => a.oninput = e => rtEvDraftSet(a.dataset.ev, e.target.value));
   $$("[data-grade]").forEach(b => b.onclick = () => { const g = +b.dataset.grade, s = rt.sess[sc.id]; f.drill[sc.id] = g; s.grade = g; s.done = true; f.area = ""; rtFindingFromDrill(sc.id, g, ""); rtSave(); renderRedteamStudio(); });
   $$("[data-fa]").forEach(b => b.onclick = () => { f.area = b.dataset.fa; rtFindingFromDrill(sc.id, f.drill[sc.id], f.area); rtSave(); renderRedteamStudio(); });
   const owner = $("#rtf-owner"); if(owner) owner.oninput = e => { const x = rt.findings.find(y => y.id === sc.id); if(x){ x.owner = e.target.value; rtSave(); } };
@@ -15435,7 +15464,9 @@ function rtFindingFromDrill(id, g, area){
   const d = rtDrills().find(x => x.id === id), s = rt.sess[id] || {}, cur = rt.findings.find(x => x.drill === id);
   if(g < 2){ if(cur) rt.findings = rt.findings.filter(x => x.drill !== id); return; }
   if(!area) return;
-  const o = {id:cur ? cur.id : "RT-" + String(rt.findings.length + 1).padStart(3, "0"), drill:id, title:(d ? d.title : "Drill") + " got through", area, sev:g, tech:d ? d.title : "", surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:(s.notes || "").slice(0, 300), fix:RT_FIX[area] || "", owner:cur ? cur.owner : "", status:cur ? cur.status : "open"};
+  const fid = cur ? cur.id : "RT-" + String(rt.findings.length + 1).padStart(3, "0");
+  const evNote = rtEvAttach("drill:" + id, fid);
+  const o = {id:fid, drill:id, title:(d ? d.title : "Drill") + " got through", area, sev:g, tech:d ? d.title : "", surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:((s.notes || "").slice(0, 300) + evNote).trim(), fix:RT_FIX[area] || "", owner:cur ? cur.owner : "", status:cur ? cur.status : "open"};
   if(cur) Object.assign(cur, o); else rt.findings.push(o);
 }
 // The flow is the default; the six-tab plan is the engineers' view
@@ -15506,6 +15537,54 @@ const RT_FIX_MOVE = {
   voice:"Require the voice sample and the reference face to verify as the same person before allowing a clone; watermark cloned audio by default."
 };
 const rtFixFor = (move, aim) => RT_FIX_MOVE[move] || RT_FIX[aim] || "";
+/* =========================================================
+   FIXSTUDIO: real evidence, optional. Findings here are synthetic until someone pastes what the feature
+   actually answered. A 600-character field next to a try's or a drill's own "what did it do" question.
+   The raw paste is stored under its own new key, tswb:rt:evidence:<findingId> (never inside the `rt` blob
+   that the plan, the exports and the summary read from), and is never put anywhere else: not the summary,
+   not the promptfoo/Inspect/PyRIT stubs. Only a locally-generated, redacted one-line note travels into a
+   finding's own text. Before a finding exists yet, the paste sits under a draft key keyed by the try or
+   drill it came from; filing moves it to the finding's own key (rtEvAttach), so the raw text only ever has
+   one home at a time and nothing duplicates it.
+   ========================================================= */
+const RT_EV_MAX = 600;
+const rtEvKey = id => "rt:evidence:" + id;
+const rtEvDraftKey = k => "rt:evidence:draft:" + k;
+const rtEvGet = id => store.get(rtEvKey(id), "") || "";
+const rtEvDelete = id => store.set(rtEvKey(id), "");
+const rtEvDraftGet = k => store.get(rtEvDraftKey(k), "") || "";
+const rtEvDraftSet = (k, text) => store.set(rtEvDraftKey(k), String(text || "").slice(0, RT_EV_MAX));
+// First sentence, truncated to 120 characters, with anything that looks like an email, a URL, a phone
+// number or any other long digit run replaced by "[redacted]". No model, no network call: run locally.
+function rtEvSanitise(text){
+  const t = String(text || "").trim(); if(!t) return "";
+  // A period inside an email or a URL (jane.doe@x.com, example.com/path) is not a sentence end, so only a
+  // ./!/? immediately followed by whitespace or the end of the string counts as one.
+  const end = t.match(/[.!?](?=\s|$)/);
+  let s = (end ? t.slice(0, end.index + 1) : t).trim() || t;
+  s = s.slice(0, 120);
+  s = s.replace(/[\w.+-]+@[\w-]+\.[a-z]{2,}/gi, "[redacted]");
+  s = s.replace(/\bhttps?:\/\/\S+/gi, "[redacted]");
+  s = s.replace(/\+?\d[\d\s().-]{5,}\d/g, m => (m.replace(/\D/g, "").length >= 7 ? "[redacted]" : m));
+  s = s.replace(/\d{8,}/g, "[redacted]");
+  return s;
+}
+// The optional field itself, shown next to a try's or a drill's own "what did it do" question.
+function rtEvFieldHTML(draftKey, val){
+  return `<label class="rtf-in rt-ev"><span>Paste what it answered <small>(optional; stays in this browser)</small></span><textarea class="input" rows="2" id="rt-ev-${esc(draftKey)}" data-ev="${esc(draftKey)}" maxlength="${RT_EV_MAX}" placeholder="Only if you have it handy. Kept in this browser only, never exported.">${esc(val)}</textarea></label>`;
+}
+// Idempotent: the first finding-filing call moves the draft to the finding's own key; every call after
+// that (re-grading, changing the harm area) finds it already there and reuses it, so the note never drops.
+function rtEvAttach(draftKey, findingId){
+  let raw = rtEvGet(findingId);
+  if(!raw){ raw = rtEvDraftGet(draftKey); if(raw){ store.set(rtEvKey(findingId), raw); store.set(rtEvDraftKey(draftKey), ""); } }
+  return raw ? ` Evidence: a ${raw.length}-character answer, kept locally. ${rtEvSanitise(raw)}` : "";
+}
+// The same note, read live before a finding exists yet (from the draft) or after (from the finding's key).
+function rtEvNoteFor(findingId, draftKey){
+  const raw = (findingId && rtEvGet(findingId)) || rtEvDraftGet(draftKey);
+  return raw ? ` Evidence: a ${raw.length}-character answer, kept locally. ${rtEvSanitise(raw)}` : "";
+}
 // Titles and the "Show the work" summary line describe what happened, not the forward-looking goal, so an aim
 // phrased as an instruction ("Make it act when it should not") needs a past-tense, achieved phrasing here.
 // Aims not listed (the "See how/what ..." ones) already read fine lowercased after "got through:".
@@ -15542,7 +15621,7 @@ function rtm1Try(sc){
   return `<span class="rtf-eb">Start here · try ${sc.i + 1} of 3</span><h2 class="rtf-h2">${stage === "move" ? "Pick a move" : stage === "aim" ? "Pick what you are going after" : stage === "obs" ? "Run it on your feature. What did it do?" : stage === "grade" ? "Your grade, then the rubric's" : "Try " + (sc.i + 1) + " logged"}</h2>
     ${stage === "move" ? `<p class="rtf-lead">Attackers rarely ask plainly. Each move is a way past a refusal. Start with the plain ask so you have a baseline.</p><div class="rtf-opts rtf-big">${moves.map(x => `<button type="button" data-move="${x[0]}" class="${tr.move === x[0] ? "on" : ""}"><b>${esc(x[1])} <i class="rtf-term">${esc(x[2])}</i></b><span>${esc(x[3])}</span></button>`).join("")}</div>` : ""}
     ${stage === "aim" ? `<p class="rtf-lead"><b>${esc(mv[1])}.</b> ${esc(mv[3])} Now, what are you going after?</p><div class="rtf-opts">${aims.map(x => `<button type="button" data-aim="${x[0]}" class="${tr.aim === x[0] ? "on" : ""}">${esc(x[1])}</button>`).join("")}</div>` : ""}
-    ${stage === "obs" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div>${severe ? lnNote("<b>Hard line.</b> Nothing involving a minor is ever generated to see how bad it gets. If the model begins to comply in this area, stop, do not iterate, and log that it began to comply. For distress and intimate content, use your own account, your own photo, and stop at the first sign.", true) : ""}<p class="rtf-lead">Go to your feature and try the move. Keep harmful output there, not here. Then pick the line that best describes what it did.</p><div class="rtf-opts">${rub.map((o, j) => `<button type="button" data-obs="${j}"><b>${o[1]}</b>${esc(o[0])}</button>`).join("")}</div>` : ""}
+    ${stage === "obs" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div>${severe ? lnNote("<b>Hard line.</b> Nothing involving a minor is ever generated to see how bad it gets. If the model begins to comply in this area, stop, do not iterate, and log that it began to comply. For distress and intimate content, use your own account, your own photo, and stop at the first sign.", true) : ""}<p class="rtf-lead">Go to your feature and try the move. Keep harmful output there, not here. Then pick the line that best describes what it did.</p><div class="rtf-opts">${rub.map((o, j) => `<button type="button" data-obs="${j}"><b>${o[1]}</b>${esc(o[0])}</button>`).join("")}</div>${rtEvFieldHTML("try:" + sc.i, rtEvDraftGet("try:" + sc.i))}` : ""}
     ${stage === "grade" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div><p class="rtf-lead">You observed: ${esc(rub[tr.obs][0]).toLowerCase()}. What is your grade, 0 to 4?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-grade1="${j}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>` : ""}
     ${stage === "done" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span><span class="pill s${tr.grade}">you: S${tr.grade}</span><span class="pill s${sug}">rubric: S${sug}</span></div>
       <div class="learn ${tr.grade === sug ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${tr.grade === sug ? "You and the rubric agree" : Math.abs(tr.grade - sug) === 1 ? "One step apart" : "Different calls"}</div><p>${tr.grade === sug ? "The grade is about what the answer lets someone do, not how it sounds. You read it the way the rubric does." : tr.grade > sug ? "You graded it harder than the rubric. The rubric moves a grade up only for specific, usable, real-person or real-place outcomes. Being harsh is safer than being soft, but it inflates the numbers you will report." : "You graded it softer than the rubric. The usual reason is reading the refusal and missing the hint, the confirmation or the specific detail that came with it. Re-read what it actually gave."}</p></div>
@@ -15559,11 +15638,12 @@ function rtm1Finding(){
   const actorCap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const expert = {why:`${layer[2]}: ${layer[1].toLowerCase()}. Observed: ${rub[tr.obs][0].toLowerCase()}.`, cause:tr.grade >= 3 ? `${actorCap(RT_ACTORS[f.actor])} gets something usable on the first try that works. At scale this is a pattern, not an incident.` : tr.grade === 2 ? `Generic harm, low uplift, but it shows the policy is not enforced here. The next move up usually turns a 2 into a 3.` : `A leak, not a breach. It confirms the area is reachable and tells an attacker where to push.`, fix:rtFixFor(tr.move, tr.aim) || "Decide the fix with engineering and policy together, then add this try to the checklist you rerun before every release."};
   const grade = Math.max(tr.grade, rub[tr.obs][1]), done = !!m.filed;
+  const evNote = rtEvNoteFor(m.filed, "try:" + w.i);
   return `<span class="rtf-eb">Start here · 6 of 6 <i class="rtf-term">finding</i></span><h2 class="rtf-h2">Your first finding</h2><p class="rtf-lead">Five parts. The shape comes from Microsoft's red team after a hundred products: it is what makes a finding reproducible and comparable. Three parts are filled from your tries. Write the last two, then compare with the write-up on the right.</p>
     <div class="rt-five">
       <div class="rt-five-r"><b>${RT_FIVE[0]}</b><p>${esc(f.system)}</p></div>
       <div class="rt-five-r"><b>${RT_FIVE[1]}</b><div class="rtf-chips sm">${Object.entries(RT_ACTORS).map(([ak, an]) => `<button type="button" data-actor="${ak}" class="${f.actor === ak ? "on" : ""}">${esc(an)}</button>`).join("")}</div></div>
-      <div class="rt-five-r"><b>${RT_FIVE[2]}</b><p>${esc(f.did)}</p></div>
+      <div class="rt-five-r"><b>${RT_FIVE[2]}</b><p>${esc(f.did)}${esc(evNote)}</p>${evNote ? `<button type="button" class="rtf-link" data-evdel="${esc(m.filed || "")}" data-evdeldraft="try:${w.i}">Delete evidence</button>` : ""}</div>
       <div class="rt-five-r rt-five-2"><label><b>${RT_FIVE[3]}</b><textarea class="input" rows="2" data-f1="why" placeholder="Which layer let it through, and what you saw.">${esc(f.why)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.why)}</p></div></div>
       <div class="rt-five-r rt-five-2"><label><b>${RT_FIVE[4]}</b><textarea class="input" rows="2" data-f1="cause" placeholder="Who gets hurt, how, at what scale.">${esc(f.cause)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.cause)}</p></div></div>
       <div class="rt-five-r rt-five-2"><label><b>Fix direction</b><textarea class="input" rows="2" data-f1="fix" placeholder="What to change and where.">${esc(f.fix)}</textarea></label><div class="rt-expert"><span class="eyebrow">Expert write-up</span><p>${esc(expert.fix)}</p></div></div>
@@ -15585,6 +15665,8 @@ function rtM1Bind(sc){
   const n1 = $("[data-notes1]"); if(n1) n1.oninput = e => { m.tries[sc.i].notes = e.target.value.slice(0, 600); rtSave(); };
   $$("[data-actor]").forEach(b => b.onclick = () => { m.finding.actor = b.dataset.actor; rtSave(); re(); });
   $$("[data-f1]").forEach(a => a.oninput = e => { m.finding[a.dataset.f1] = e.target.value.slice(0, 600); rtSave(); });
+  $$("[data-ev]").forEach(a => a.oninput = e => rtEvDraftSet(a.dataset.ev, e.target.value));
+  $$("[data-evdel]").forEach(b => b.onclick = () => { if(b.dataset.evdel) rtEvDelete(b.dataset.evdel); if(b.dataset.evdeldraft) rtEvDraftSet(b.dataset.evdeldraft, ""); re(); });
 }
 // The three "llm"-kind targets (support, search, agent) each wrote their own 9-item checklist, in their
 // own order, so the item a given move or aim actually describes sits at a different index per target.
@@ -15612,7 +15694,8 @@ function rtM1File(){
   const m = rtM1(), w = rtWorstTry(), t = rtTarget(); if(!w || m.filed) return;
   const tr = w.t, k = rtKind1(), mv = RT_MOVES[k].find(x => x[0] === tr.move), am = RT_AIM_LIST[k].find(x => x[0] === tr.aim), rub = RT_OBS[tr.aim] || RT_OBS.default, f = m.finding;
   rt.findings = rt.findings || []; const id = "RT-" + String(rt.findings.length + 1).padStart(3, "0");
-  rt.findings.push({id, drill:"m1-" + w.i, title:`${mv[1]} got through: ${rtAimPast(k, tr.aim, am[1])}`, area:tr.aim, sev:Math.max(tr.grade, rub[tr.obs][1]), tech:mv[2], surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:[f.why, tr.notes].filter(Boolean).join(" "), fix:f.fix || rtFixFor(tr.move, tr.aim) || "", owner:"", status:"open", actor:f.actor, cause:f.cause, five:true});
+  const evNote = rtEvAttach("try:" + w.i, id);
+  rt.findings.push({id, drill:"m1-" + w.i, title:`${mv[1]} got through: ${rtAimPast(k, tr.aim, am[1])}`, area:tr.aim, sev:Math.max(tr.grade, rub[tr.obs][1]), tech:mv[2], surf:Object.keys(rt.surf)[0] || "", k:1, n:1, sum:([f.why, tr.notes].filter(Boolean).join(" ") + evNote).trim(), fix:f.fix || rtFixFor(tr.move, tr.aim) || "", owner:"", status:"open", actor:f.actor, cause:f.cause, five:true});
   m.filed = id; m.done[8] = true; rtSave();
 }
 function rtM1ChecklistHTML(){
@@ -15771,7 +15854,7 @@ function rtJStart(){
   lnShuffle(missed).slice(0, 3).forEach(it => { if(!pick.includes(it.id)) pick.push(it.id); });
   while(pick.length < 10 && (byKind.grade.length || byKind.move.length || byKind.fair.length)){ ["grade", "move", "fair"].forEach(k => { if(pick.length < 10 && byKind[k].length) pick.push(byKind[k].shift().id); }); }
   seen.forEach(it => { if(pick.length < 10) pick.push(it.id); });
-  j.cur = {ids:pick, i:0, picked:null, right:0, gaps:[], retry:[]}; j.sessions++; rtSave();
+  j.cur = {ids:pick, i:0, picked:null, right:0, gaps:[], retry:[], dis:[]}; j.sessions++; rtSave();
 }
 const rtJItem = id => rtJPool().find(it => it.id === id) || ["grade", "move", "fair"].flatMap(k => rtJItems(k)).find(it => it.id === id);
 function rtJAnswer(v){
@@ -15789,14 +15872,39 @@ function rtJStats(){
   h.forEach(r => { const k = r.kind === "move" ? "moves" : r.area || "other"; const b = by[k] || (by[k] = {n:0, right:0}); b.n++; if(r.right) b.right++; if(r.kind === "grade"){ n++; if(r.you < r.ex) soft++; if(r.you > r.ex) hard++; } });
   return {by, soft, hard, n, total:h.length, right:h.filter(r => r.right).length, missed:Object.keys(j.miss).length};
 }
+/* ---------- FIXSTUDIO: "I'd grade this differently" ----------
+   The expert grades in RT_BANK come from published rubrics and system cards, not from a human red teamer
+   watching this exact answer. So every judge result gets a quiet way to log a disagreement: a one-line
+   reason, saved under its own new key (never mixed into the judge history that drives the breakdown),
+   with the item, both calls and the date. The session-done card totals this session's disagreements and
+   offers them back as a markdown list to paste somewhere a human reviews. RT_JD is UI-only, like RT_SB:
+   which item's one-line form is open, its draft text, and which item index was just saved (so the control
+   shows a quiet "Noted" instead of re-opening until the next item). */
+const RT_JD = {open:null, text:"", doneIdx:null};
+const RT_JDIS_KEY = "rt:judge:disagree";
+function rtJDisagreeList(){ return store.get(RT_JDIS_KEY, []) || []; }
+function rtJDisagreeSave(itemId){
+  const j = rtJ(), c = j.cur; if(!c) return;
+  const it = rtJItem(itemId); if(!it) return;
+  const your = it.kind === "move" ? c.picked : it.kind === "grade" ? "S" + c.picked : it.opts[c.picked];
+  const expert = it.kind === "move" ? it.a : it.kind === "grade" ? "S" + it.a : it.opts[it.a];
+  const rec = {id:it.id, q:it.q, your, expert, reason:(RT_JD.text || "").trim().slice(0, 140), date:new Date().toISOString().slice(0, 10)};
+  const list = rtJDisagreeList(); list.push(rec); store.set(RT_JDIS_KEY, list);
+  c.dis = c.dis || []; c.dis.push(rec);
+  RT_JD.open = null; RT_JD.text = ""; RT_JD.doneIdx = c.i;
+  rtSave();
+}
+// One line, markdown, for pasting where a human reviews: the question, both calls, and the reason.
+function rtJDisagreeText(list){ return (list || []).map(d => `- ${d.q}\n  You said ${d.your}; the expert said ${d.expert}. ${d.reason || "(no reason given)"}`).join("\n"); }
 function rtfJudge(){
   const j = rtJ(); if(!j.cur) rtJStart();
   const c = j.cur, done = c.i >= c.ids.length;
   if(done){
-    const s = rtJStats(), rows = Object.entries(s.by).sort((a, b) => b[1].n - a[1].n);
+    const s = rtJStats(), rows = Object.entries(s.by).sort((a, b) => b[1].n - a[1].n), disN = (c.dis || []).length;
     return `<span class="rtf-eb">Judge · session ${j.sessions} done</span><h2 class="rtf-h2">${c.right} of ${c.ids.length} matched the expert</h2><p class="rtf-lead">${s.n >= 5 ? (s.soft > s.hard ? `Across ${s.n} grading calls you have been softer than the expert ${s.soft} times and harder ${s.hard}. Softer usually means reading the refusal and missing the hint or the specific detail that came with it.` : s.hard > s.soft ? `Across ${s.n} grading calls you have been harder than the expert ${s.hard} times and softer ${s.soft}. Harder is safer than softer, but it inflates the numbers you report.` : `Across ${s.n} grading calls you have been softer ${s.soft} times and harder ${s.hard}. That is balanced.`) : "A few more sessions and the breakdown will show where you drift."}</p>
       <div class="rt-tw"><table class="rt-grid rt-res"><thead><tr><th>Area</th><th>Seen</th><th>Matched</th></tr></thead><tbody>${rows.map(([k, b]) => `<tr><td class="k">${esc(RT_PLAIN[k] || (k === "moves" ? "Spotting the move" : k === "over" ? "Fair questions" : k))}</td><td>${b.n}</td><td>${Math.round(100 * b.right / b.n)}%</td></tr>`).join("")}</tbody></table></div>
       <p class="note">${s.missed ? `${s.missed} item${s.missed === 1 ? "" : "s"} will come back until you match the expert twice.` : "Nothing waiting to come back."}${rtJDueCount() ? ` ${rtJDueCount()} item${rtJDueCount() === 1 ? "" : "s"} due for review.` : ""} ${rtJPool().length} items in the bank for this model type. Answers are saved in this browser.</p>
+      ${disN ? `<p class="note">You disagreed on ${disN} of ${c.ids.length}. <button type="button" class="rtf-link" data-jdiscopy>Copy your disagreements</button><span class="ln-toast" id="rt-jdis-toast" aria-live="polite"></span></p>` : ""}
       ${rtfNext("Another ten", `<button type="button" class="btn" data-rtf="hub">Back to the menu</button>`)}`;
   }
   const it = rtJItem(c.ids[c.i]), picked = c.picked, again = rtJ().miss[it.id] && picked === null && c.i > 0 && c.ids.slice(0, c.i).includes(it.id);
@@ -15805,15 +15913,30 @@ function rtfJudge(){
   else if(it.kind === "move") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map(o => `<button type="button" data-jm="${esc(o)}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (o === it.a ? "right" : o === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   else body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map((o, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   const right = picked !== null && picked === it.a;
+  // The owner's own honest line: the first card of every session names where the expert grades come from,
+  // right where the disagree control first appears, so "I'd grade this differently" reads as the point of
+  // the feature rather than a complaint box.
+  const honest = c.i === 0 ? `<p class="note rt-jhonest">The expert grades come from published rubrics and system cards. Your disagreements are how they get better.</p>` : "";
+  const disOpen = picked !== null && RT_JD.open === it.id;
+  const disDone = picked !== null && RT_JD.doneIdx === c.i;
+  const disCtrl = picked === null ? "" : disDone ? `<p class="note">Noted, thanks.</p>` : disOpen
+    ? `<div class="rtf-q rt-jdis"><label><span>Why would you grade it differently? <small>(one line, stays in this browser)</small></span><input class="input" id="rt-jdis-txt" maxlength="140" value="${esc(RT_JD.text)}" placeholder="What you'd call it instead, and why."></label><div class="rtf-act"><button type="button" class="btn sm" data-jdis-cancel>Cancel</button><button type="button" class="btn sm primary" data-jdis-save="${esc(it.id)}">Save</button></div></div>`
+    : `<button type="button" class="rtf-link" data-jdis-open="${esc(it.id)}">I'd grade this differently</button>`;
   return `<span class="rtf-eb">Judge · ${c.i + 1} of ${c.ids.length} <i class="rtf-term">${RT_JUDGE_NAMES[it.kind]}</i>${again ? ` <i class="rtf-term">again</i>` : ""}</span><h2 class="rtf-h2">${it.kind === "grade" ? "Your call: how bad was it?" : it.kind === "move" ? "What did the attacker do?" : "Which should the model answer?"}</h2>
+    ${honest}
     ${it.area ? `<p class="note" style="margin:6px 0 0">${esc(RT_PLAIN[it.area] || (it.area === "over" ? "Fair questions" : it.area))}${it.k === "world" ? " · video or world model" : it.k === "llm" ? " · chat model" : ""}</p>` : ""}
     ${body}
-    ${picked !== null ? `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>${it.kind === "move" ? esc(picked) : it.kind === "grade" ? "S" + picked : esc(it.opts[picked])}</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>${it.kind === "move" ? esc(it.a) : it.kind === "grade" ? "S" + it.a : esc(it.opts[it.a])}</b></div></div><div class="learn ${right ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${right ? "Match" : it.kind === "grade" ? (picked < it.a ? "Softer than the expert" : "Harder than the expert") : "Not this one"}</div><p>${esc(it.why)}</p></div>${rtfNext(c.i === c.ids.length - 1 ? "See the session" : "Next")}` : `<p class="note">Make the call first. The expert's call appears after yours.</p>`}`;
+    ${picked !== null ? `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>${it.kind === "move" ? esc(picked) : it.kind === "grade" ? "S" + picked : esc(it.opts[picked])}</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>${it.kind === "move" ? esc(it.a) : it.kind === "grade" ? "S" + it.a : esc(it.opts[it.a])}</b></div></div><div class="learn ${right ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${right ? "Match" : it.kind === "grade" ? (picked < it.a ? "Softer than the expert" : "Harder than the expert") : "Not this one"}</div><p>${esc(it.why)}</p></div>${disCtrl}${rtfNext(c.i === c.ids.length - 1 ? "See the session" : "Next")}` : `<p class="note">Make the call first. The expert's call appears after yours.</p>`}`;
 }
 function rtJBind(){
   const j = rtJ(), c = j.cur; if(!c) return;
   $$("[data-j]").forEach(b => b.onclick = () => { rtJAnswer(+b.dataset.j); renderRedteamStudio(); });
   $$("[data-jm]").forEach(b => b.onclick = () => { rtJAnswer(b.dataset.jm); renderRedteamStudio(); });
+  $$("[data-jdis-open]").forEach(b => b.onclick = () => { RT_JD.open = b.dataset.jdisOpen; RT_JD.text = ""; renderRedteamStudio(); });
+  $$("[data-jdis-cancel]").forEach(b => b.onclick = () => { RT_JD.open = null; renderRedteamStudio(); });
+  const jdisTxt = $("#rt-jdis-txt"); if(jdisTxt) jdisTxt.oninput = e => { RT_JD.text = e.target.value.slice(0, 140); };
+  $$("[data-jdis-save]").forEach(b => b.onclick = () => { rtJDisagreeSave(b.dataset.jdisSave); renderRedteamStudio(); });
+  const c2 = rtJ().cur; if(c2 && c2.i >= c2.ids.length){ const cp = $("[data-jdiscopy]"); if(cp) cp.onclick = () => copyText(rtJDisagreeText(c2.dis || []), $("#rt-jdis-toast")); }
 }
 /* ---------- the hub: what next ---------- */
 function rtfHub(){
@@ -16533,6 +16656,117 @@ document.addEventListener("keydown", e => {
     const b = $('[data-rtf="back"]'); if(b && !b.disabled){ e.preventDefault(); b.click(); }
   }
 });
+/* =========================================================
+   FIXSTUDIO: four things that still bothered the owner about the studio once a newcomer could actually
+   reach it. All additive, all scoped to the studio's own screens; evidence (partRT3.js, partRT4.js) and
+   judge disagreement (partRT5.js) live next to the code they extend. This file carries the two that touch
+   every card: one recommended next step, and a quiet way to flag confusion.
+   ========================================================= */
+// ---------- 1. rtNextStep: one pure function of `rt` state, used by the hub's primary card and by the
+// quiet per-card strip below. Seven branches; the first one that matches wins. Nothing here reads the DOM
+// or the clock beyond Date.now() indirectly through rtDrills()/rt.sess, so it is simple to test branch by
+// branch by shaping a fixture `rt` object. ----------
+const RT_HUB_LABELS = {target:"Start here", finding:"Finish your first finding", judge:"Judge", plan:"Plan the week", test:"Keep testing", show:"Show the work", rerun:"Rerun on the build that ships", newtarget:"Start over with a new target"};
+function rtNextStep(){
+  const m = rtM1(), cardFilled = !!(m.card.what.trim() && m.card.who.trim() && m.card.out.trim());
+  if(!cardFilled) return {key:"target", reason:"There's no target card yet, so the next few minutes are best spent writing one and running your first try."};
+  if(!m.filed) return {key:"finding", reason:"You've started testing but haven't filed a finding yet, so the next few minutes are best spent finishing it."};
+  const j = rt.judge || {};
+  if(!j.sessions) return {key:"judge", reason:"You have a finding and no judging practice yet, so the next ten minutes are best spent calibrating your calls against the expert's."};
+  const planDone = !!(rt.plan && rt.plan.dated && RT_RULES.every((r, i) => rt.plan.ack && rt.plan.ack[i]));
+  if(!planDone) return {key:"plan", reason:"You've judged at least one session and have no dated plan yet, so the next twenty minutes are best spent scoping the week."};
+  const drills = rtDrills(), ranIds = drills.filter(d => rt.flow && rt.flow.drill && rt.flow.drill[d.id] != null).map(d => d.id);
+  if(ranIds.length < 2) return {key:"test", reason:"You have a plan and fewer than two drills run, so the next fifteen minutes are best spent running more."};
+  const show = rt.show || {};
+  if(!(show.who || show.notTested)) return {key:"show", reason:"You've run drills and have no summary yet, so the next ten minutes are best spent writing it up."};
+  const allProd = ranIds.length > 0 && ranIds.every(id => rt.sess[id] && rt.sess[id].build === "prod");
+  if(!allProd) return {key:"rerun", reason:"Everything here has run on a development build at some point, so rerun it on the exact build that ships before you call it done."};
+  return {key:"newtarget", reason:"Every path is done for this target, so start a new round on a different feature or the next release."};
+}
+// ---------- 4. "Flag this card": a quiet confusion log, in every card's footer, for watching someone use
+// the tool. Its own new key, never mixed into the plan or the exports. ----------
+const RT_FLAGS_KEY = "rt:flags";
+const rtFlagsList = () => store.get(RT_FLAGS_KEY, []) || [];
+const rtFlagsCount = () => rtFlagsList().length;
+const rtFlagsText = () => rtFlagsList().map(fl => `- ${fl.screen}${fl.path ? " · " + fl.path : ""}: ${fl.note || "(no note)"} (${fl.date})`).join("\n");
+function rtFlagOpen(screenKey){
+  const pathNow = (rtF() && rtF().path) || "";
+  lnModal(`<p class="ln-eb">Flag this card</p><h2>What confused you?</h2><p class="ln-why">One line. Stays in this browser; nobody sees it unless you copy it out.</p>
+    <div class="ln-body"><textarea class="input" rows="2" id="rt-flag-txt" maxlength="200" placeholder="What was confusing, or what you expected instead."></textarea></div>
+    <div class="ln-pager"><div class="row"></div><div class="row"><button type="button" class="btn" data-cancel>Cancel</button><button type="button" class="btn primary" data-ok>Save</button></div></div>`);
+  const bg = $("#ln-modal");
+  $("[data-cancel]", bg).onclick = lnClose;
+  $("[data-ok]", bg).onclick = () => {
+    const note = ($("#rt-flag-txt", bg).value || "").trim().slice(0, 200);
+    const list = rtFlagsList(); list.push({screen:screenKey, path:pathNow, note, date:new Date().toISOString().slice(0, 10)}); store.set(RT_FLAGS_KEY, list);
+    lnClose(); renderRedteamStudio();
+  };
+}
+const rtFlagLineHTML = () => { const n = rtFlagsCount(); return n ? `<p class="note">${n} flagged. <button type="button" class="rtf-link" data-flagscopy>Copy flags</button><span class="ln-toast" id="rt-flags-toast" aria-live="polite"></span></p>` : ""; };
+// The hub gets the primary "what next" card, built from rtNextStep(), above the four paths it already had
+// (now introduced as "Or pick your own" so nothing that worked before is removed) plus the flagged count.
+const rtfHubFS = rtfHub;
+rtfHub = function(){
+  let h = rtfHubFS();
+  const step = rtNextStep(), hubAt = h.indexOf('<div class="rtf-hub">');
+  if(hubAt >= 0){
+    // The hub is only ever reached after module 1's finding is filed, so in real use rtNextStep() never
+    // returns "target" or "finding" here; the fallback still gives a working click if a test or an odd
+    // state reaches the hub without that invariant.
+    const action = ["judge", "plan", "test", "show"].includes(step.key) ? `data-hub="${step.key}"` : step.key === "newtarget" ? `data-rtf="restart"` : `data-hub="test"`;
+    const primary = `<button type="button" class="rtf-hubc rtf-hubc-primary" ${action}><span class="rtf-hub-rec">Recommended</span><b>${esc(RT_HUB_LABELS[step.key] || step.key)}</b><span>${esc(step.reason)}</span></button>`;
+    h = h.slice(0, hubAt) + `<div class="rtf-hub-primary">${primary}</div><p class="rtf-lbl" style="margin-top:12px">Or pick your own</p>` + h.slice(hubAt);
+  }
+  const flagLine = rtFlagLineHTML();
+  if(flagLine){ const newHere = h.indexOf('<p class="note" style="margin-top:12px">New here?'); h = newHere >= 0 ? h.slice(0, newHere) + flagLine + h.slice(newHere) : h + flagLine; }
+  return h;
+};
+// The done card gets the flagged count too, same line, same copy button.
+const rtfDoneFS = rtfDone;
+rtfDone = function(){
+  let h = rtfDoneFS(); const flagLine = rtFlagLineHTML(); if(!flagLine) return h;
+  const at = h.indexOf('<div class="rtf-act rtf-wrap">'); return at < 0 ? h + flagLine : h.slice(0, at) + flagLine + h.slice(at);
+};
+// "Delete evidence" on any finding's own editor (the engineers' finding modal), whichever path filed it.
+const rtOpenFindingFS = rtOpenFinding;
+rtOpenFinding = function(id, pre){
+  rtOpenFindingFS(id, pre);
+  if(!id || !rtEvGet(id)) return;
+  const bg = $("#ln-modal"), form = $(".rt-form", bg); if(!bg || !form) return;
+  const row = document.createElement("p"); row.className = "note";
+  row.innerHTML = `This finding has a pasted answer kept in this browser. <button type="button" class="rtf-link" data-evdelmodal="${esc(id)}">Delete evidence</button>`;
+  form.appendChild(row);
+  const b = $("[data-evdelmodal]", bg); if(b) b.onclick = () => { rtEvDelete(id); row.remove(); };
+};
+// ---------- the quiet per-card strip: "You're in <path> · <n> of <m> · next: <recommendation>", reusing
+// the same position counters every card's own footer already shows, right under the eyebrow. Skipped only
+// on the one-off purpose card, which has no eyebrow position and no footer of its own either. Alongside it,
+// the same "Flag this card" link lands next to "How this works" in every card's footer. ----------
+const RT_PATH_NAME = {intro:"Getting started", open:"Getting started", target:"Start here", card:"Start here", try:"Start here", finding1:"Start here", sandbox:"Start here", hub:"What next", judge:"Judge", basic:"The basics", model:"Keep testing", harms:"Keep testing", team:"Keep testing", drill:"Keep testing", verdict:"Keep testing", fix:"Keep testing", done:"Keep testing", show:"Show the work", answers:"Show the work", plan1:"Plan the week", plan2:"Plan the week", plan3:"Plan the week", method:"The method"};
+const rtFlowHTMLFS = rtFlowHTML;
+rtFlowHTML = function(){
+  let h = rtFlowHTMLFS();
+  const screens = rtScreens(), f = rtF(), i = Math.min(f.i, screens.length - 1), sc = screens[i];
+  if(sc.k !== "intro"){
+    const ebAt = h.indexOf('<span class="rtf-eb">');
+    if(ebAt >= 0){
+      const h1At = h.indexOf('<h1 class="rtf-h1"', ebAt), h2At = h.indexOf('<h2 class="rtf-h2"', ebAt);
+      const headAt = h1At < 0 ? h2At : h2At < 0 ? h1At : Math.min(h1At, h2At);
+      if(headAt >= 0){
+        const path = RT_PATH_NAME[sc.k] || "Red team studio", step = rtNextStep();
+        h = h.slice(0, headAt) + `<p class="note rtf-strip">You're in ${esc(path)} · ${i} of ${screens.length - 1} · next: ${esc(RT_HUB_LABELS[step.key] || step.key)}</p>` + h.slice(headAt);
+      }
+    }
+  }
+  if(h.indexOf(">How this works</button>") >= 0) h = h.replace(">How this works</button>", ">How this works</button>" + `<button type="button" class="rtf-link" data-flag="${esc(sc.k)}">Flag this card</button>`);
+  return h;
+};
+const rtFlowBindFS = rtFlowBind;
+rtFlowBind = function(){
+  rtFlowBindFS();
+  $$("[data-flag]").forEach(b => b.onclick = () => rtFlagOpen(b.dataset.flag));
+  $$("[data-flagscopy]").forEach(b => b.onclick = () => copyText(rtFlagsText(), $("#rt-flags-toast")));
+};
 /* =========================================================
    POLICY STRESS-TESTER
    Instant checks run for everyone. Deeper analysis uses Claude on the

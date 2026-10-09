@@ -116,7 +116,7 @@ function rtJStart(){
   lnShuffle(missed).slice(0, 3).forEach(it => { if(!pick.includes(it.id)) pick.push(it.id); });
   while(pick.length < 10 && (byKind.grade.length || byKind.move.length || byKind.fair.length)){ ["grade", "move", "fair"].forEach(k => { if(pick.length < 10 && byKind[k].length) pick.push(byKind[k].shift().id); }); }
   seen.forEach(it => { if(pick.length < 10) pick.push(it.id); });
-  j.cur = {ids:pick, i:0, picked:null, right:0, gaps:[], retry:[]}; j.sessions++; rtSave();
+  j.cur = {ids:pick, i:0, picked:null, right:0, gaps:[], retry:[], dis:[]}; j.sessions++; rtSave();
 }
 const rtJItem = id => rtJPool().find(it => it.id === id) || ["grade", "move", "fair"].flatMap(k => rtJItems(k)).find(it => it.id === id);
 function rtJAnswer(v){
@@ -134,14 +134,39 @@ function rtJStats(){
   h.forEach(r => { const k = r.kind === "move" ? "moves" : r.area || "other"; const b = by[k] || (by[k] = {n:0, right:0}); b.n++; if(r.right) b.right++; if(r.kind === "grade"){ n++; if(r.you < r.ex) soft++; if(r.you > r.ex) hard++; } });
   return {by, soft, hard, n, total:h.length, right:h.filter(r => r.right).length, missed:Object.keys(j.miss).length};
 }
+/* ---------- FIXSTUDIO: "I'd grade this differently" ----------
+   The expert grades in RT_BANK come from published rubrics and system cards, not from a human red teamer
+   watching this exact answer. So every judge result gets a quiet way to log a disagreement: a one-line
+   reason, saved under its own new key (never mixed into the judge history that drives the breakdown),
+   with the item, both calls and the date. The session-done card totals this session's disagreements and
+   offers them back as a markdown list to paste somewhere a human reviews. RT_JD is UI-only, like RT_SB:
+   which item's one-line form is open, its draft text, and which item index was just saved (so the control
+   shows a quiet "Noted" instead of re-opening until the next item). */
+const RT_JD = {open:null, text:"", doneIdx:null};
+const RT_JDIS_KEY = "rt:judge:disagree";
+function rtJDisagreeList(){ return store.get(RT_JDIS_KEY, []) || []; }
+function rtJDisagreeSave(itemId){
+  const j = rtJ(), c = j.cur; if(!c) return;
+  const it = rtJItem(itemId); if(!it) return;
+  const your = it.kind === "move" ? c.picked : it.kind === "grade" ? "S" + c.picked : it.opts[c.picked];
+  const expert = it.kind === "move" ? it.a : it.kind === "grade" ? "S" + it.a : it.opts[it.a];
+  const rec = {id:it.id, q:it.q, your, expert, reason:(RT_JD.text || "").trim().slice(0, 140), date:new Date().toISOString().slice(0, 10)};
+  const list = rtJDisagreeList(); list.push(rec); store.set(RT_JDIS_KEY, list);
+  c.dis = c.dis || []; c.dis.push(rec);
+  RT_JD.open = null; RT_JD.text = ""; RT_JD.doneIdx = c.i;
+  rtSave();
+}
+// One line, markdown, for pasting where a human reviews: the question, both calls, and the reason.
+function rtJDisagreeText(list){ return (list || []).map(d => `- ${d.q}\n  You said ${d.your}; the expert said ${d.expert}. ${d.reason || "(no reason given)"}`).join("\n"); }
 function rtfJudge(){
   const j = rtJ(); if(!j.cur) rtJStart();
   const c = j.cur, done = c.i >= c.ids.length;
   if(done){
-    const s = rtJStats(), rows = Object.entries(s.by).sort((a, b) => b[1].n - a[1].n);
+    const s = rtJStats(), rows = Object.entries(s.by).sort((a, b) => b[1].n - a[1].n), disN = (c.dis || []).length;
     return `<span class="rtf-eb">Judge · session ${j.sessions} done</span><h2 class="rtf-h2">${c.right} of ${c.ids.length} matched the expert</h2><p class="rtf-lead">${s.n >= 5 ? (s.soft > s.hard ? `Across ${s.n} grading calls you have been softer than the expert ${s.soft} times and harder ${s.hard}. Softer usually means reading the refusal and missing the hint or the specific detail that came with it.` : s.hard > s.soft ? `Across ${s.n} grading calls you have been harder than the expert ${s.hard} times and softer ${s.soft}. Harder is safer than softer, but it inflates the numbers you report.` : `Across ${s.n} grading calls you have been softer ${s.soft} times and harder ${s.hard}. That is balanced.`) : "A few more sessions and the breakdown will show where you drift."}</p>
       <div class="rt-tw"><table class="rt-grid rt-res"><thead><tr><th>Area</th><th>Seen</th><th>Matched</th></tr></thead><tbody>${rows.map(([k, b]) => `<tr><td class="k">${esc(RT_PLAIN[k] || (k === "moves" ? "Spotting the move" : k === "over" ? "Fair questions" : k))}</td><td>${b.n}</td><td>${Math.round(100 * b.right / b.n)}%</td></tr>`).join("")}</tbody></table></div>
       <p class="note">${s.missed ? `${s.missed} item${s.missed === 1 ? "" : "s"} will come back until you match the expert twice.` : "Nothing waiting to come back."}${rtJDueCount() ? ` ${rtJDueCount()} item${rtJDueCount() === 1 ? "" : "s"} due for review.` : ""} ${rtJPool().length} items in the bank for this model type. Answers are saved in this browser.</p>
+      ${disN ? `<p class="note">You disagreed on ${disN} of ${c.ids.length}. <button type="button" class="rtf-link" data-jdiscopy>Copy your disagreements</button><span class="ln-toast" id="rt-jdis-toast" aria-live="polite"></span></p>` : ""}
       ${rtfNext("Another ten", `<button type="button" class="btn" data-rtf="hub">Back to the menu</button>`)}`;
   }
   const it = rtJItem(c.ids[c.i]), picked = c.picked, again = rtJ().miss[it.id] && picked === null && c.i > 0 && c.ids.slice(0, c.i).includes(it.id);
@@ -150,15 +175,30 @@ function rtfJudge(){
   else if(it.kind === "move") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map(o => `<button type="button" data-jm="${esc(o)}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (o === it.a ? "right" : o === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   else body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map((o, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   const right = picked !== null && picked === it.a;
+  // The owner's own honest line: the first card of every session names where the expert grades come from,
+  // right where the disagree control first appears, so "I'd grade this differently" reads as the point of
+  // the feature rather than a complaint box.
+  const honest = c.i === 0 ? `<p class="note rt-jhonest">The expert grades come from published rubrics and system cards. Your disagreements are how they get better.</p>` : "";
+  const disOpen = picked !== null && RT_JD.open === it.id;
+  const disDone = picked !== null && RT_JD.doneIdx === c.i;
+  const disCtrl = picked === null ? "" : disDone ? `<p class="note">Noted, thanks.</p>` : disOpen
+    ? `<div class="rtf-q rt-jdis"><label><span>Why would you grade it differently? <small>(one line, stays in this browser)</small></span><input class="input" id="rt-jdis-txt" maxlength="140" value="${esc(RT_JD.text)}" placeholder="What you'd call it instead, and why."></label><div class="rtf-act"><button type="button" class="btn sm" data-jdis-cancel>Cancel</button><button type="button" class="btn sm primary" data-jdis-save="${esc(it.id)}">Save</button></div></div>`
+    : `<button type="button" class="rtf-link" data-jdis-open="${esc(it.id)}">I'd grade this differently</button>`;
   return `<span class="rtf-eb">Judge · ${c.i + 1} of ${c.ids.length} <i class="rtf-term">${RT_JUDGE_NAMES[it.kind]}</i>${again ? ` <i class="rtf-term">again</i>` : ""}</span><h2 class="rtf-h2">${it.kind === "grade" ? "Your call: how bad was it?" : it.kind === "move" ? "What did the attacker do?" : "Which should the model answer?"}</h2>
+    ${honest}
     ${it.area ? `<p class="note" style="margin:6px 0 0">${esc(RT_PLAIN[it.area] || (it.area === "over" ? "Fair questions" : it.area))}${it.k === "world" ? " · video or world model" : it.k === "llm" ? " · chat model" : ""}</p>` : ""}
     ${body}
-    ${picked !== null ? `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>${it.kind === "move" ? esc(picked) : it.kind === "grade" ? "S" + picked : esc(it.opts[picked])}</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>${it.kind === "move" ? esc(it.a) : it.kind === "grade" ? "S" + it.a : esc(it.opts[it.a])}</b></div></div><div class="learn ${right ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${right ? "Match" : it.kind === "grade" ? (picked < it.a ? "Softer than the expert" : "Harder than the expert") : "Not this one"}</div><p>${esc(it.why)}</p></div>${rtfNext(c.i === c.ids.length - 1 ? "See the session" : "Next")}` : `<p class="note">Make the call first. The expert's call appears after yours.</p>`}`;
+    ${picked !== null ? `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>${it.kind === "move" ? esc(picked) : it.kind === "grade" ? "S" + picked : esc(it.opts[picked])}</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>${it.kind === "move" ? esc(it.a) : it.kind === "grade" ? "S" + it.a : esc(it.opts[it.a])}</b></div></div><div class="learn ${right ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${right ? "Match" : it.kind === "grade" ? (picked < it.a ? "Softer than the expert" : "Harder than the expert") : "Not this one"}</div><p>${esc(it.why)}</p></div>${disCtrl}${rtfNext(c.i === c.ids.length - 1 ? "See the session" : "Next")}` : `<p class="note">Make the call first. The expert's call appears after yours.</p>`}`;
 }
 function rtJBind(){
   const j = rtJ(), c = j.cur; if(!c) return;
   $$("[data-j]").forEach(b => b.onclick = () => { rtJAnswer(+b.dataset.j); renderRedteamStudio(); });
   $$("[data-jm]").forEach(b => b.onclick = () => { rtJAnswer(b.dataset.jm); renderRedteamStudio(); });
+  $$("[data-jdis-open]").forEach(b => b.onclick = () => { RT_JD.open = b.dataset.jdisOpen; RT_JD.text = ""; renderRedteamStudio(); });
+  $$("[data-jdis-cancel]").forEach(b => b.onclick = () => { RT_JD.open = null; renderRedteamStudio(); });
+  const jdisTxt = $("#rt-jdis-txt"); if(jdisTxt) jdisTxt.oninput = e => { RT_JD.text = e.target.value.slice(0, 140); };
+  $$("[data-jdis-save]").forEach(b => b.onclick = () => { rtJDisagreeSave(b.dataset.jdisSave); renderRedteamStudio(); });
+  const c2 = rtJ().cur; if(c2 && c2.i >= c2.ids.length){ const cp = $("[data-jdiscopy]"); if(cp) cp.onclick = () => copyText(rtJDisagreeText(c2.dis || []), $("#rt-jdis-toast")); }
 }
 /* ---------- the hub: what next ---------- */
 function rtfHub(){

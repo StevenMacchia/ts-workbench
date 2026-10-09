@@ -198,7 +198,9 @@ const body4 = function(){
   eq(/matched the expert/.test(H()) && /Another ten/.test(H()), true, "session summary with a breakdown");
   const st = rtJStats(); eq(st.total, c.ids.length, "history counts every answer"); eq(Object.keys(st.by).length > 1, true, "breakdown by area");
   rt.model = "world"; eq(rtJPool().every(x => x.k !== "llm"), true, "a world model plan filters the bank");
-  rtF().path = ""; rtF().i = rtScreens().findIndex(x => x.k === "hub"); renderRedteamStudio(); eq((H().match(/data-hub=/g) || []).length, 6, "the hub offers four paths, the basics and the method"); if(bad(H())) throw new Error("hub bad: " + where(H()));
+  // fixstudio: the hub also gets one recommended primary card (its own data-hub, since no target card
+  // and no finding yet falls back to "test" here); that is the +1 over the four paths, the basics and the method
+  rtF().path = ""; rtF().i = rtScreens().findIndex(x => x.k === "hub"); renderRedteamStudio(); eq((H().match(/data-hub=/g) || []).length, 7, "the hub offers a recommended card, four paths, the basics and the method"); if(bad(H())) throw new Error("hub bad: " + where(H()));
   rtF().path = "basics"; eq(rtScreens().filter(x => x.k === "basic").length, 5, "basics path shows the five lessons"); rtF().path = "test"; eq(rtScreens().some(x => x.k === "verdict"), true, "test path reaches the verdict");
   // spaced review across days: a right streak spaces out further than a reset, due items lead the next session, nothing due is silent
   rt = RT_BLANK(); rt.model = "llm"; const j0 = rtJ();
@@ -638,6 +640,7 @@ const body13 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body13.toString() + ")();")());
+<<<<<<< HEAD
 // Embodied handoff step (2026-10-09): the world guide's "What is different" card named embodiment and stopped;
 // this adds a step between it and Scope that is the handoff, not a drill -- three cards (am I in this branch,
 // what a safety case is, what T&S still owns), a check, an exercise, a sources group and three glossary terms.
@@ -686,6 +689,115 @@ const body14 = function(){
   // the generic per-step and per-exercise checks already run on the whole guide (body10's forEach, body()'s
   // plain-drill check) cover this step and this exercise too, since they iterate LN_GUIDES[k].steps/exercises.
   out.push("embodied step: three named cards (am I in this branch, what a safety case is, what T&S still owns) plus a check and a handoff exercise; What is different and the harms table now point at it; a new sources group and three glossary terms");
+=======
+// fixstudio (branch enh/fixstudio): one recommended next step (rtNextStep, pure, used by the hub's primary
+// card and by a quiet per-card strip), real evidence that is optional and redacted locally, "I'd grade this
+// differently" on the judge, and a quiet way to flag a confusing card. All additive: new top-level store
+// keys only, new fields on things earlier rounds already extended the same way (rt.sess[id].build, etc).
+const body14 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + JSON.stringify(a) + ", want " + JSON.stringify(b)); };
+  const H = () => view.innerHTML;
+  store.set("rt:seen-intro", true);
+  // 1a. rtNextStep: seven branches, each a pure read of `rt` state, checked in the order a real round moves through them
+  rt = RT_BLANK(); eq(rtNextStep().key, "target", "no target card yet: start here");
+  rtM1().target = "support"; rtM1().card = Object.assign({}, RT_TARGETS[0].card);
+  eq(rtNextStep().key, "finding", "card written, tried nothing filed yet: finish the first finding");
+  rtM1().filed = "RT-001";
+  eq(rtNextStep().key, "judge", "a finding and no judge session yet: judge");
+  rt.judge = {sessions:1, hist:[], miss:{}, seen:{}};
+  eq(rtNextStep().key, "plan", "judged once, no dated plan yet: plan the week");
+  rt.model = "llm"; rt.team = "pair"; rt.time = "afternoon"; rt.areas = {fraud:1};
+  rt.plan = {dated:"2026-10-09", ack:{0:1, 1:1, 2:1, 3:1, 4:1, 5:1, 6:1}};
+  eq(rtNextStep().key, "test", "a dated, fully-acknowledged plan, fewer than two drills run: keep testing");
+  const d0 = rtDrills()[0].id, d1 = rtDrills()[1].id;
+  rtF(); rt.flow.drill[d0] = 0; rt.flow.drill[d1] = 0; rt.sess[d0] = {build:"dev"}; rt.sess[d1] = {build:"dev"};
+  eq(rtNextStep().key, "show", "two drills run, no summary yet: show the work");
+  rt.show = {who:"Sam, PM"};
+  eq(rtNextStep().key, "rerun", "a summary exists but the drills ran on a dev build: rerun on the build that ships");
+  rt.sess[d0].build = "prod"; rt.sess[d1].build = "prod";
+  eq(rtNextStep().key, "newtarget", "everything, including a rerun on the shipping build, is done: start over with a new target");
+  out.push("rtNextStep: target, finding, judge, plan, test, show, rerun and newtarget, in that order, each read straight off state");
+  // 1b. the hub's primary card, built from rtNextStep(), above the four paths now under "Or pick your own"
+  rt = RT_BLANK(); rtM1().target = "support"; rtM1().card = Object.assign({}, RT_TARGETS[0].card); rtM1().filed = "RT-001"; rt.model = "llm"; rtF(); rtSave();
+  let hub = rtfHub();
+  eq(/data-hub="judge"><span class="rtf-hub-rec">Recommended<\/span><b>Judge<\/b>/.test(hub), true, "with a finding and no judge session, the primary card recommends Judge");
+  eq(/Or pick your own/.test(hub) && /data-hub="plan"/.test(hub) && /data-hub="test"/.test(hub) && /data-hub="show"/.test(hub), true, "the four original paths are still there, under their own label");
+  rt.judge = {sessions:3, hist:[], miss:{}, seen:{}}; hub = rtfHub();
+  eq(/data-hub="plan"><span class="rtf-hub-rec">Recommended<\/span><b>Plan the week<\/b>/.test(hub), true, "once judged, the primary card moves on to Plan the week");
+  out.push("hub: one recommended primary card above the four original paths, computed by rtNextStep(), nothing removed");
+  // 1c. the quiet per-card strip: path, position and the recommended next step, on every card but the purpose card
+  rt = RT_BLANK(); rtF().skipBasics = true; rtM1().target = "support"; rt.model = "llm"; rt.areas = {fraud:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtSave();
+  rtGo(rtScreens().findIndex(x => x.k === "target"));
+  eq(/You're in Start here · \d+ of \d+ · next: Start here/.test(H()), true, "the strip names the path, the position and today's recommendation");
+  rtM1().card = Object.assign({}, RT_TARGETS[0].card); rtM1().filed = "RT-001"; rt.team = "pair"; rt.time = "afternoon"; renderRedteamStudio();
+  rtGo(rtScreens().findIndex(x => x.k === "drill"));
+  eq(/You're in Keep testing · \d+ of \d+ · next: Judge/.test(H()), true, "a drill card's strip still points at whatever is actually next, here Judge");
+  eq(/data-flag="drill"/.test(H()), true, "and its footer carries a flag link too");
+  rtGo(0); eq(/data-flag="open"/.test(H()), true, "even the sixty-second try card, which gets a minimal footer, carries a flag link");
+  out.push("strip: every card but the purpose card names its own path, position and the one recommended next step");
+  // 2. evidence: optional, capped at 600, redacted locally, moved from a draft key to the finding's own
+  // key on filing, never in any export, deletable
+  rt = RT_BLANK(); rtM1().target = "support"; rt.model = "llm"; rt.areas = {privacy:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtSave();
+  rtM1().card = Object.assign({}, RT_TARGETS[0].card); rtGo(rtScreens().findIndex(x => x.k === "try" && x.i === 0));
+  const tr0 = rtM1().tries[0]; tr0.move = "story"; tr0.aim = "privacy"; renderRedteamStudio();
+  eq(/data-ev="try:0"/.test(H()) && /maxlength="600"/.test(H()) && /Paste what it answered/.test(H()) && /stays in this browser/.test(H()), true, "the try card's obs stage offers the optional, capped evidence field");
+  const raw = "Yes, it told me jane.doe@example.com and said call 555-123-4567 or see https://example.com/acct/88112233 for the record.";
+  rtEvDraftSet("try:0", raw); tr0.obs = 1; tr0.grade = 1; rtM1Check(tr0);
+  eq(rtEvDraftGet("try:0"), raw, "the paste is kept under its own draft key while the try is still open");
+  rtGo(rtScreens().findIndex(x => x.k === "finding1")); rtM1().finding.why = "the filter passed it"; rtM1().finding.cause = "a stalker could confirm a customer";
+  eq(/Delete evidence/.test(H()), true, "a delete control shows up before the finding is even filed");
+  rtM1File();
+  const fid = rtM1().filed;
+  eq(rtEvGet(fid), raw, "filing moves the raw paste to tswb:rt:evidence:<findingId>, the finding's own new key");
+  eq(rtEvDraftGet("try:0"), "", "the draft is cleared once the paste has a home");
+  const sanit = rtEvSanitise(raw);
+  eq(/\[redacted\]/.test(sanit), true, "the locally-generated line marks what it redacted");
+  eq(/jane\.doe/.test(sanit) || /555-123-4567/.test(sanit) || /example\.com\/acct/.test(sanit), false, "and none of the email, the phone number or the URL survive in it");
+  const finding = rt.findings.find(f => f.id === fid);
+  eq(new RegExp("Evidence: a " + raw.length + "-character answer, kept locally").test(finding.sum), true, "the finding's own summary gets the exact character count and the \"kept locally\" note");
+  eq(finding.sum.indexOf(sanit) >= 0, true, "plus the locally-generated sanitised line");
+  eq(finding.sum.indexOf(raw) < 0, true, "never the raw paste itself");
+  const findingTxt = rtFindingText(finding);
+  eq(findingTxt.indexOf(sanit) >= 0 && findingTxt.indexOf(raw) < 0, true, "the findings export carries the sanitised note, never the raw paste");
+  ["promptfoo", "pyrit", "inspect"].forEach(k => eq(rtExportText(k).indexOf("jane.doe") < 0, true, k + " export never carries the raw evidence either"));
+  rtEvDelete(fid); eq(rtEvGet(fid), "", "Delete evidence clears the finding's own key");
+  out.push("evidence: an optional 600-character paste, redacted locally (email, phone, URL, long digit runs), moved onto the finding's own new key on filing, never exported, deletable");
+  // 3. judge: "I'd grade this differently" records {id, your call, the expert's, your reason, date} under
+  // its own new key; the session-done card totals this session's disagreements and offers them back
+  rt = RT_BLANK(); rt.model = "llm"; rtJStart();
+  let c = rtJ().cur;
+  eq(/The expert grades come from published rubrics and system cards\. Your disagreements are how they get better\./.test(rtfJudge()), true, "the honest line sits on the session's first card");
+  const it0 = rtJItem(c.ids[0]), wrongPick = it0.kind === "move" ? it0.opts.find(o => o !== it0.a) : (it0.a === 0 ? 1 : 0);
+  rtJAnswer(wrongPick);
+  eq(/I'd grade this differently/.test(rtfJudge()), true, "every judge result offers the disagree control");
+  RT_JD.open = it0.id; RT_JD.text = "it should have been a 2, it named the company";
+  rtJDisagreeSave(it0.id);
+  const disList = rtJDisagreeList();
+  eq(disList.length, 1, "exactly one disagreement saved so far");
+  eq(disList[0].id, it0.id, "it records the item");
+  eq(disList[0].reason, "it should have been a 2, it named the company", "and the one-line reason");
+  eq(disList[0].your !== disList[0].expert, true, "both calls are recorded, and they differ, since this one was a miss");
+  eq(typeof disList[0].date, "string", "and a date");
+  eq(c.dis.length, 1, "the session also keeps its own running count, for the done card's total");
+  eq(/Noted, thanks/.test(rtfJudge()), true, "once saved, the control gives way to a quiet acknowledgement for this item");
+  for(let k = 1; k < c.ids.length; k++){ c.i = k; c.picked = null; const x = rtJItem(c.ids[k]); rtJAnswer(x.a); }
+  c.i = c.ids.length;
+  const doneHtml = rtfJudge();
+  eq(new RegExp("You disagreed on 1 of " + c.ids.length).test(doneHtml) && /Copy your disagreements/.test(doneHtml), true, "the session-done card totals this session's disagreements and offers them back");
+  const copyTxt = rtJDisagreeText(c.dis);
+  eq(copyTxt.indexOf(it0.q) >= 0 && copyTxt.indexOf("it should have been a 2") >= 0, true, "the copy text is a markdown list with the question, both calls and the reason");
+  out.push("judge: \"I'd grade this differently\" records your call, the expert's and your reason under its own key; the session-done card totals and offers them back; the honest line opens the session");
+  // 4. "flag this card": a quiet confusion log, in every footer, shown back only once there is something to show
+  rt = RT_BLANK(); rtF(); store.set("rt:flags", []);
+  let hub2 = rtfHub(); eq(/flagged/.test(hub2), false, "nothing shows on the hub when nothing is flagged");
+  let done2 = rtfDone(); eq(/flagged/.test(done2), false, "same on the done card");
+  store.set("rt:flags", [{screen:"drill", path:"test", note:"wasn't sure what counted as a miss", date:"2026-10-09"}]);
+  hub2 = rtfHub(); eq(/1 flagged/.test(hub2) && /Copy flags/.test(hub2), true, "one flag shows a count and a way to copy it back");
+  done2 = rtfDone(); eq(/1 flagged/.test(done2) && /Copy flags/.test(done2), true, "the done card shows the same");
+  eq(rtFlagsText(), "- drill · test: wasn't sure what counted as a miss (2026-10-09)", "the copy text is a markdown list naming the screen, the path and the note");
+  store.set("rt:flags", []);
+  out.push("flags: a quiet \"Flag this card\" link in every footer; nothing shows at zero, a count and a copy-back once something is flagged");
+>>>>>>> enh/fixstudio
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body14.toString() + ")();")());
