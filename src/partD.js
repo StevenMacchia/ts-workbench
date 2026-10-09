@@ -247,6 +247,24 @@ function gradeBadge(pct, title){
 // tool's own icon from the shared sprite, drawn large in the accent color, plus one peach accent
 // shape, on the card's own tinted background (set by the caller via --c). Same size and padding
 // on every card; the icon is the only thing that changes.
+// Counts a number up from 0 to its rendered value once per session (keyed so a later re-render
+// of the same spot, e.g. after editing an answer, doesn't replay it). Skipped under reduced motion.
+const countUpSeen = {};
+function countUp(el, key){
+  if(!el) return;
+  if(key){ if(countUpSeen[key]) return; countUpSeen[key] = true; }
+  const m = /-?\d+(\.\d+)?/.exec(el.textContent);
+  if(!m || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+  const target = parseFloat(m[0]), decimals = (m[0].split(".")[1] || "").length;
+  const pre = el.textContent.slice(0, m.index), post = el.textContent.slice(m.index + m[0].length), dur = 600, t0 = performance.now();
+  const step = now => {
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = pre + (target * e).toFixed(decimals) + post;
+    if(p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 function cardArt(iconId){
   return `<div class="ov-art"><svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true" class="ca-art">
     <circle class="ca-peach" cx="132" cy="28" r="22"/>

@@ -209,6 +209,8 @@ function renderOverview(){
 function asBind(){
   if(typeof bindOverviewPicture === "function") bindOverviewPicture();
   view.querySelectorAll('[data-as="start"]').forEach(b => b.onclick = () => { store.set("as:start", true); renderOverview(); focusQuiet(document.querySelector("#view h1")); });
+  const big = view.querySelectorAll(".as-big b.mono")[0];
+  if(big && typeof countUp === "function" && /^\d/.test(big.textContent)) countUp(big, "as-score");
 }
 
 /* ---------- All tools: every tool on its own, plus recent work ---------- */

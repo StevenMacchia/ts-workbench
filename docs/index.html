@@ -4334,6 +4334,53 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
    corner radius and grey tone, so the boundary between the two was hard to see ---------- */
 .tt-why{background:none;border:0;box-shadow:none;padding:0 2px 14px;margin-bottom:0}
 .tt-why .eyebrow{color:var(--faint)}
+
+/* =========================================================
+   MOTION LAYER: every transition and keyframe below is 120-200ms, ease-out, and nothing bounces.
+   All of it is disabled in the reduced-motion block at the end of this section.
+   ========================================================= */
+@keyframes mo-fade{from{opacity:0}to{opacity:1}}
+@keyframes mo-rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes mo-pop{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@keyframes mo-cb{0%{transform:scale(.8)}100%{transform:scale(1)}}
+@keyframes mo-toast{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Tab panels (coverage/maturity/metrics/learn's role="tabpanel" bodies) cross-fade in on every
+   render -- a fresh element each time, so the animation runs again the moment it's inserted */
+[role="tabpanel"]{animation:mo-rise .16s ease-out}
+
+/* <details> content (every ev-details report disclosure, the Learn collapsed-row lists) fades
+   and slides down the moment it opens; nothing extra needed in the markup, every sibling after
+   <summary> already gets it */
+details > summary ~ *{animation:mo-rise .18s ease-out}
+
+/* Toasts ease in from below */
+.gtoast{animation:mo-toast .18s ease-out}
+.wb-undo{transition-duration:.18s}
+
+/* Checkboxes and the guided option cards animate their selected state instead of snapping */
+input[type="checkbox"]:checked,input[type="radio"]:checked{animation:mo-cb .14s ease-out}
+.gd-opt,.gd-radio{transition:background .14s ease-out,border-color .14s ease-out,color .14s ease-out,box-shadow .14s ease-out}
+.ocard{transition:background .14s ease-out,border-color .14s ease-out,box-shadow .14s ease-out}
+
+/* The grade mark pops in on every render; the big score numbers count up once per session via
+   countUp() in partD.js (called where the verdict renders: the home picture, maturity's plan) */
+.grade{animation:mo-pop .16s ease-out}
+
+/* Sidebar active pill: a slim bar that slides to the current link (positioned in partR.js's
+   sbMovePill(), called on every route change) instead of the highlight just appearing there */
+.sb-nav{position:relative}
+.sb-pill{position:absolute;left:-7px;top:0;width:3px;height:0;border-radius:3px;background:var(--accent);opacity:0;pointer-events:none;z-index:1;transition:transform .16s ease-out,height .16s ease-out,opacity .16s ease-out}
+
+/* Buttons already get a pressed state (.btn:active translateY) further up this file; this just
+   extends the same treatment to the option-card and pill buttons that don't inherit .btn */
+.gd-opt:active,.ocard:active,.scen:active{transform:translateY(1px)}
+
+@media (prefers-reduced-motion: reduce){
+  [role="tabpanel"],details > summary ~ *,.gtoast,input[type="checkbox"]:checked,input[type="radio"]:checked,.grade{animation:none!important}
+  .gd-opt,.gd-radio,.ocard,.sb-pill{transition:none!important}
+  .gd-opt:active,.ocard:active,.scen:active{transform:none!important}
+}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -5473,6 +5520,24 @@ function gradeBadge(pct, title){
 // tool's own icon from the shared sprite, drawn large in the accent color, plus one peach accent
 // shape, on the card's own tinted background (set by the caller via --c). Same size and padding
 // on every card; the icon is the only thing that changes.
+// Counts a number up from 0 to its rendered value once per session (keyed so a later re-render
+// of the same spot, e.g. after editing an answer, doesn't replay it). Skipped under reduced motion.
+const countUpSeen = {};
+function countUp(el, key){
+  if(!el) return;
+  if(key){ if(countUpSeen[key]) return; countUpSeen[key] = true; }
+  const m = /-?\d+(\.\d+)?/.exec(el.textContent);
+  if(!m || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+  const target = parseFloat(m[0]), decimals = (m[0].split(".")[1] || "").length;
+  const pre = el.textContent.slice(0, m.index), post = el.textContent.slice(m.index + m[0].length), dur = 600, t0 = performance.now();
+  const step = now => {
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = pre + (target * e).toFixed(decimals) + post;
+    if(p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 function cardArt(iconId){
   return `<div class="ov-art"><svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true" class="ca-art">
     <circle class="ca-peach" cx="132" cy="28" r="22"/>
@@ -11991,6 +12056,8 @@ function renderOverview(){
 function asBind(){
   if(typeof bindOverviewPicture === "function") bindOverviewPicture();
   view.querySelectorAll('[data-as="start"]').forEach(b => b.onclick = () => { store.set("as:start", true); renderOverview(); focusQuiet(document.querySelector("#view h1")); });
+  const big = view.querySelectorAll(".as-big b.mono")[0];
+  if(big && typeof countUp === "function" && /^\d/.test(big.textContent)) countUp(big, "as-score");
 }
 
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
@@ -17755,6 +17822,8 @@ function maScrollTo(el){ if(el && el.scrollIntoView) el.scrollIntoView({behavior
 function maOpenPlan(){ ma.edit = false; maView = null; maG = null; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }
 function bindMaturity(){
   const root = view;
+  const big = root.querySelectorAll(".ma-score.big b.mono")[0];
+  if(big && typeof countUp === "function") countUp(big, "ma-score");
   root.querySelectorAll(".ma-fw").forEach(d => d.addEventListener("toggle", () => store.set("ma:fw", d.open)));
   root.onclick = e => {
     const b = e.target.closest("button"); if(!b || !root.contains(b)) return;
@@ -23519,6 +23588,20 @@ document.addEventListener("click", e => {
 });
 /* ---------- Router ---------- */
 const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), credits:()=>renderCredits(), learn:renderLearn, redteamllm:()=>renderRedteam("llm"), redteamworld:()=>renderRedteam("world"), glossary:renderGlossary, tsglossary:renderTsGlossary, redteam:renderRedteamStudio, policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), premortem:renderPremortem, tabletop:renderTabletop, metrics:renderMetrics, vendors:renderVendors};
+// A slim accent bar beside the sidebar's current link, repositioned (not rebuilt) on every route
+// change so it slides to the new spot instead of the highlight just snapping there.
+function sbMovePill(name){
+  if(typeof document === "undefined" || !document.querySelector) return;
+  const nav = document.querySelector(".sb-nav"); if(!nav) return;
+  let pill = nav.querySelector(".sb-pill");
+  if(!pill){ pill = document.createElement("span"); pill.className = "sb-pill"; pill.setAttribute("aria-hidden", "true"); nav.prepend(pill); }
+  const active = nav.querySelector(`.navlink[data-route="${name}"]`);
+  if(!active){ pill.style.opacity = "0"; return; }
+  const navTop = nav.getBoundingClientRect().top, r = active.getBoundingClientRect();
+  pill.style.transform = `translateY(${r.top - navTop}px)`;
+  pill.style.height = r.height + "px";
+  pill.style.opacity = "1";
+}
 function route(){
   // A shared result link: "#<route>?s=<data>". Decode it, apply it, then route normally on the clean hash.
   const shareHit = typeof shareParseHash === "function" ? shareParseHash() : null;
@@ -23535,6 +23618,7 @@ function route(){
   if(h === "demo" && typeof demoStart === "function"){ demoStart(); return; }
   const name = ROUTES[h] ? h : 'overview';
   $$('.navlink').forEach(a => a.dataset.route === name ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current'));
+  if(typeof sbMovePill === "function") sbMovePill(name);
   ROUTES[name]();
   shellUpdate(name);
   window.scrollTo(0,0);

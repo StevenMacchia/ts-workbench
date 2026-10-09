@@ -337,3 +337,50 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
    corner radius and grey tone, so the boundary between the two was hard to see ---------- */
 .tt-why{background:none;border:0;box-shadow:none;padding:0 2px 14px;margin-bottom:0}
 .tt-why .eyebrow{color:var(--faint)}
+
+/* =========================================================
+   MOTION LAYER: every transition and keyframe below is 120-200ms, ease-out, and nothing bounces.
+   All of it is disabled in the reduced-motion block at the end of this section.
+   ========================================================= */
+@keyframes mo-fade{from{opacity:0}to{opacity:1}}
+@keyframes mo-rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes mo-pop{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+@keyframes mo-cb{0%{transform:scale(.8)}100%{transform:scale(1)}}
+@keyframes mo-toast{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Tab panels (coverage/maturity/metrics/learn's role="tabpanel" bodies) cross-fade in on every
+   render -- a fresh element each time, so the animation runs again the moment it's inserted */
+[role="tabpanel"]{animation:mo-rise .16s ease-out}
+
+/* <details> content (every ev-details report disclosure, the Learn collapsed-row lists) fades
+   and slides down the moment it opens; nothing extra needed in the markup, every sibling after
+   <summary> already gets it */
+details > summary ~ *{animation:mo-rise .18s ease-out}
+
+/* Toasts ease in from below */
+.gtoast{animation:mo-toast .18s ease-out}
+.wb-undo{transition-duration:.18s}
+
+/* Checkboxes and the guided option cards animate their selected state instead of snapping */
+input[type="checkbox"]:checked,input[type="radio"]:checked{animation:mo-cb .14s ease-out}
+.gd-opt,.gd-radio{transition:background .14s ease-out,border-color .14s ease-out,color .14s ease-out,box-shadow .14s ease-out}
+.ocard{transition:background .14s ease-out,border-color .14s ease-out,box-shadow .14s ease-out}
+
+/* The grade mark pops in on every render; the big score numbers count up once per session via
+   countUp() in partD.js (called where the verdict renders: the home picture, maturity's plan) */
+.grade{animation:mo-pop .16s ease-out}
+
+/* Sidebar active pill: a slim bar that slides to the current link (positioned in partR.js's
+   sbMovePill(), called on every route change) instead of the highlight just appearing there */
+.sb-nav{position:relative}
+.sb-pill{position:absolute;left:-7px;top:0;width:3px;height:0;border-radius:3px;background:var(--accent);opacity:0;pointer-events:none;z-index:1;transition:transform .16s ease-out,height .16s ease-out,opacity .16s ease-out}
+
+/* Buttons already get a pressed state (.btn:active translateY) further up this file; this just
+   extends the same treatment to the option-card and pill buttons that don't inherit .btn */
+.gd-opt:active,.ocard:active,.scen:active{transform:translateY(1px)}
+
+@media (prefers-reduced-motion: reduce){
+  [role="tabpanel"],details > summary ~ *,.gtoast,input[type="checkbox"]:checked,input[type="radio"]:checked,.grade{animation:none!important}
+  .gd-opt,.gd-radio,.ocard,.sb-pill{transition:none!important}
+  .gd-opt:active,.ocard:active,.scen:active{transform:none!important}
+}

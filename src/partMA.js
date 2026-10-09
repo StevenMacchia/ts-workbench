@@ -466,6 +466,8 @@ function maScrollTo(el){ if(el && el.scrollIntoView) el.scrollIntoView({behavior
 function maOpenPlan(){ ma.edit = false; maView = null; maG = null; ma.open = null; maSave(); renderMaturity(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }
 function bindMaturity(){
   const root = view;
+  const big = root.querySelectorAll(".ma-score.big b.mono")[0];
+  if(big && typeof countUp === "function") countUp(big, "ma-score");
   root.querySelectorAll(".ma-fw").forEach(d => d.addEventListener("toggle", () => store.set("ma:fw", d.open)));
   root.onclick = e => {
     const b = e.target.closest("button"); if(!b || !root.contains(b)) return;
