@@ -231,7 +231,6 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .chapter-line a::after{content:"→"}
 
 /* ---------- Letter grade beside a verdict ---------- */
-.grade{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;font-family:var(--display);font-weight:700;font-size:21px;flex:none;margin-left:10px;vertical-align:middle}
 .grade-A,.grade-B{background:var(--good-soft);color:var(--good)}
 .grade-C{background:var(--med-soft);color:var(--med)}
 .grade-D{background:var(--high-soft);color:var(--high)}
@@ -250,7 +249,7 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .wb-undo button{background:none;border:none;color:#fff;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;font-size:13.5px}
 
 /* ---------- "+ New" menu: template section ---------- */
-.tb-newsep{padding:10px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
+.tb-newsep{padding:10px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
 
 /* ---------- Template gallery on All tools ---------- */
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
@@ -282,4 +281,21 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 @media (max-width:880px){
   .app{min-height:calc(100vh - 44px)}
   .side{top:44px}
+}
+
+/* ---------- Polish pass: status pill vs. feature-tag pill ----------
+   One shape (.sb-new), three explicit, color-coded meanings so a reader can tell
+   a status tag from a feature tag at a glance:
+   - .sb-new on its own = "New" (a feature just shipped), accent good-green
+   - .sb-new.sb-wip = "Work in progress" (the one standardized label, used everywhere
+     this status appears: sidebar, All-tools cards, page headers, the ROOST banner)
+   - .sb-new.sb-ai = "AI" (a feature tag, not a status), kept in var(--t-ai) */
+.sb-new{color:var(--good);background:color-mix(in oklab, var(--good) 16%, transparent)}
+.sb-new.sb-wip{color:var(--high);background:color-mix(in oklab, var(--high) 16%, transparent)}
+
+/* ---------- Polish pass: a clipped horizontal tab row needs a "there's more" cue ----------
+   .section-title .segs scrolls under 760px with no scrollbar (partZ5.css:527); a fade at the
+   trailing edge says there's more to swipe to instead of just clipping the last label. */
+@media (max-width:760px){
+  .section-title .segs{-webkit-mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%)}
 }

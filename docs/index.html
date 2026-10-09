@@ -4223,7 +4223,6 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .chapter-line a::after{content:"→"}
 
 /* ---------- Letter grade beside a verdict ---------- */
-.grade{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;font-family:var(--display);font-weight:700;font-size:21px;flex:none;margin-left:10px;vertical-align:middle}
 .grade-A,.grade-B{background:var(--good-soft);color:var(--good)}
 .grade-C{background:var(--med-soft);color:var(--med)}
 .grade-D{background:var(--high-soft);color:var(--high)}
@@ -4242,7 +4241,7 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .wb-undo button{background:none;border:none;color:#fff;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;font-size:13.5px}
 
 /* ---------- "+ New" menu: template section ---------- */
-.tb-newsep{padding:10px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
+.tb-newsep{padding:10px 10px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted);border-top:1px solid var(--line);margin-top:4px}
 
 /* ---------- Template gallery on All tools ---------- */
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
@@ -4274,6 +4273,23 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 @media (max-width:880px){
   .app{min-height:calc(100vh - 44px)}
   .side{top:44px}
+}
+
+/* ---------- Polish pass: status pill vs. feature-tag pill ----------
+   One shape (.sb-new), three explicit, color-coded meanings so a reader can tell
+   a status tag from a feature tag at a glance:
+   - .sb-new on its own = "New" (a feature just shipped), accent good-green
+   - .sb-new.sb-wip = "Work in progress" (the one standardized label, used everywhere
+     this status appears: sidebar, All-tools cards, page headers, the ROOST banner)
+   - .sb-new.sb-ai = "AI" (a feature tag, not a status), kept in var(--t-ai) */
+.sb-new{color:var(--good);background:color-mix(in oklab, var(--good) 16%, transparent)}
+.sb-new.sb-wip{color:var(--high);background:color-mix(in oklab, var(--high) 16%, transparent)}
+
+/* ---------- Polish pass: a clipped horizontal tab row needs a "there's more" cue ----------
+   .section-title .segs scrolls under 760px with no scrollbar (partZ5.css:527); a fade at the
+   trailing edge says there's more to swipe to instead of just clipping the last label. */
+@media (max-width:760px){
+  .section-title .segs{-webkit-mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%)}
 }
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
@@ -4890,7 +4906,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
    sample on the empty quarter-review, so the proof of depth doesn't wait behind a click. */
 .as-six-note{margin:10px 0 0}
 .as-preview{margin:4px 0 8px;padding:14px 16px;border-radius:10px;background:var(--sunk);display:grid;gap:8px}
-.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
 .as-preview-lines{margin:0;padding:0;list-style:none;display:grid;gap:5px}
 .as-preview-lines li{font-size:14px;line-height:1.5;color:var(--ink)}
 .as-preview .ov-link{width:fit-content}
@@ -5013,7 +5029,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
       </div>
       <div class="sb-h">Assess and prepare</div>
       <div class="sb-more">
-      <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new">AI</span></a>
+      <a class="navlink" href="#policy" data-route="policy"><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new sb-ai">AI</span></a>
       <a class="navlink" href="#coppa" data-route="coppa"><span class="sb-glyph" style="background:var(--t-cp)"><svg><use href="#i-coppa"/></svg></span>COPPA readiness</a>
       <a class="navlink" href="#dsa" data-route="dsa"><span class="sb-glyph" style="background:var(--t-ds)"><svg><use href="#i-dsa"/></svg></span>DSA readiness</a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="sb-glyph" style="background:var(--t-vd)"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
@@ -5023,19 +5039,19 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
       <div class="sb-more">
       <a class="navlink" href="#notice" data-route="notice"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-mail"/></svg></span>Enforcement notice writer</a>
       <a class="navlink" href="#appeal" data-route="appeal"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-appeal"/></svg></span>Appeal reviewer</a>
-      <a class="navlink" href="#redteam" data-route="redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span>Red team studio<span class="sb-new">WIP</span></a>
+      <a class="navlink" href="#redteam" data-route="redteam"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span>Red team studio<span class="sb-new sb-wip">Work in progress</span></a>
       <a class="navlink" href="#transparency" data-route="transparency"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-chart"/></svg></span>Transparency report</a>
       </div>
-      <div class="sb-h sb-h-tag">Works with ROOST<span class="sb-new">WIP</span></div>
+      <div class="sb-h sb-h-tag">Works with ROOST<span class="sb-new sb-wip">Work in progress</span></div>
       <div class="sb-more">
       <a class="navlink" href="#roost" data-route="roost"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span>Overview</a>
       <a class="navlink" href="#eval" data-route="eval"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-eval"/></svg></span>Classifier eval<span class="sb-new">New</span></a>
       </div>
       <div class="sb-h sb-h-tag">Learn<span class="sb-new">New</span></div>
       <div class="sb-more">
-      <a class="navlink" href="#redteamllm" data-route="redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span>Red teaming LLMs<span class="sb-new">WIP</span></a>
-      <a class="navlink" href="#redteamworld" data-route="redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span>Red teaming world models<span class="sb-new">WIP</span></a>
-      <a class="navlink" href="#glossary" data-route="glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span>Glossary and practice<span class="sb-new">WIP</span></a>
+      <a class="navlink" href="#redteamllm" data-route="redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span>Red teaming LLMs<span class="sb-new sb-wip">Work in progress</span></a>
+      <a class="navlink" href="#redteamworld" data-route="redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span>Red teaming world models<span class="sb-new sb-wip">Work in progress</span></a>
+      <a class="navlink" href="#glossary" data-route="glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span>Glossary and practice<span class="sb-new sb-wip">Work in progress</span></a>
       <a class="navlink" href="#tsglossary" data-route="tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span>T&amp;S glossary</a>
       </div>
       <div class="sb-h">Project</div>
@@ -5485,6 +5501,39 @@ function shareParseHash(){
 }
 function shareBannerHTML(saveAttr){
   return `<div class="card share-banner" role="note"><div><b>You're viewing a shared result.</b><span class="note">Save a copy to edit it.</span></div><button type="button" class="btn primary sm" ${saveAttr}>Save a copy</button></div>`;
+}
+
+// ---------- Shared action-row copy: one label per action, so the same action never reads
+// differently from one tool to the next ("Start over" vs. "Clear it and start yours", "Download"
+// vs. "Download result", "Copy link" vs. "Copy result") ----------
+const START_OVER_LABEL = "Start over";
+const SEE_EXAMPLE_LABEL = "See an example";
+const EDIT_ANSWERS_LABEL = "Edit answers";
+const DOWNLOAD_LABEL = "Download";
+const COPY_LABEL = "Copy";
+const COPY_LINK_LABEL = "Copy link";
+const SEND_TRACKER_LABEL = "Send to tracker";
+
+// ---------- Shared report header action row ----------
+// Every report tool calls this instead of hand-rolling its own row of buttons, so the order
+// (example/edit, start over, save, download, tracker, then the tool's own extras), the
+// primary-button rule (Download is primary unless a tool deliberately marks something else
+// primary) and the example-mode visibility rule (nothing here is hidden just because the
+// result on screen is the example) are enforced in one place.
+// slots: {example, edit, reset, save, download, tracker, extra:[...]}, each either falsy or
+// {attrs:"data-x=\"y\"", label, icon, primary}. tail is raw HTML appended at the end (a toast span,
+// a Copy link button with its own id, etc.) since those vary more than the standard slots do.
+function reportHeaderActions(slots, tail){
+  slots = slots || {};
+  const explicitPrimary = ["example", "edit", "reset", "save", "download", "tracker"].some(k => slots[k] && slots[k].primary);
+  const btn = (b, isDownload) => {
+    if(!b) return "";
+    const primary = b.primary !== undefined ? b.primary : (isDownload && !explicitPrimary);
+    const ic = b.icon ? `<svg><use href="#i-${b.icon}"/></svg>` : "";
+    return `<button type="button" class="btn sm${primary ? " primary" : ""}" ${b.attrs || ""}>${ic}${esc(b.label)}</button>`;
+  };
+  return [btn(slots.example), btn(slots.edit), btn(slots.reset), btn(slots.save), btn(slots.download, true), btn(slots.tracker)].join("")
+    + (slots.extra || []).map(b => btn(b)).join("") + (tail || "");
 }
 
 // ---------- Handbook chapter link: one shared map, so every report's verdict area can point to the chapter behind it ----------
@@ -11129,8 +11178,8 @@ function vdResultsRender(){
       <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row" aria-live="polite"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
         ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
         ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
-        <div class="cvr-a"><button type="button" class="btn primary" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-copy">${icon("copy")}Copy result</button>${DL ? `<button type="button" class="btn" id="vx-dl"><svg><use href="#i-download"/></svg>Download result</button>` : ""}<button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
-        <div class="cvr-more"><button type="button" class="ov-link" id="vx-own">Start a new comparison</button><button type="button" class="ov-link" id="vx-reset">See the example</button></div></div>
+        <div class="cvr-a"><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button>${DL ? `<button type="button" class="btn primary" id="vx-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn" id="vx-copy">${icon("copy")}Copy</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
+        <div class="cvr-more"><button type="button" class="ov-link" id="vx-reset">See an example</button><button type="button" class="ov-link" id="vx-own">Start over</button></div></div>
     </div>
     ${chapterLinkHTML("vendors")}
     <details class="ev-details"><summary>Details <span class="note">Every criterion, scored for every vendor</span></summary>
@@ -11957,7 +12006,7 @@ function renderTools(){
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong <span class="ov-term">precision and recall</span>`) : ""}
-        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">WIP</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
+        ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">Work in progress</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
@@ -11972,9 +12021,9 @@ function renderTools(){
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
-        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">WIP</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">WIP</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">WIP</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">Work in progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">Work in progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">Work in progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
       </div>
     </section>
@@ -16924,6 +16973,14 @@ AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Servi
 // AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
 // no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
 // above, so the placeholder path was unreachable dead code (audit §12 item 2).
+// Shared "How this works" explanation: the guided intro's third fact and the one-page
+// form's aside say the same thing, so it lives here once instead of being hand-typed twice.
+function aiHowThisWorksHTML(){
+  return `<div class="card ai-about"><h4>How this works</h4>
+    <ul><li><b>Your account, your data.</b> The request runs on your own Claude account. Nothing is stored on a server, and your inputs stay in this browser.</li>
+      <li><b>Leave out personal data.</b> Describe people and content without names, handles or contact details.</li>
+      <li><b>A person decides.</b> Claude drafts and reviews. Someone accountable must check the output before it's used.</li></ul></div>`;
+}
 /* ---------- Guided: each field on its own screen, then the run ---------- */
 const aiView = {};
 function aiSpec(key){
@@ -16961,7 +17018,7 @@ function renderAI(key){
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
         <div class="ai-out-a"><span class="toast" id="ai-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
         <div class="ai-out">${T.render(st.r)}</div>` : "";
-  view.innerHTML = head(T.n, T.desc, "AI assistants", `${typeof poweredBy === "function" ? poweredBy(["claude"]) : ""}<span class="pill ai-pill">AI · runs on your Claude account</span>`) + `
+  const formBlock = `
     <p class="mxa-q ai-q">${esc(T.q)}</p>
     <div class="mxm-how ai-how"><ol class="mxm-how-s">${T.steps.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="ai-grid">
@@ -16983,14 +17040,14 @@ function renderAI(key){
           <p class="note">Built only by filling your own answers into a letter shape - no AI wrote or checked this. Edit the brackets, and anything else, before you use it.</p>
           <textarea class="input ai-tmpl-ta" id="ai-tmpl-ta" rows="12">${esc(st.tmplText)}</textarea></div>` : ""}
       </form>
-      <aside class="ai-rail">
-        <div class="card ai-about"><h4>How this works</h4>
-          <ul><li><b>Your account, your data.</b> The request runs on your own Claude account. Nothing is stored on a server, and your inputs stay in this browser.</li>
-            <li><b>Leave out personal data.</b> Describe people and content without names, handles or contact details.</li>
-            <li><b>A person decides.</b> Claude drafts and reviews. Someone accountable must check the output before it's used.</li></ul></div>
-      </aside>
-    </div>
-    <div id="ai-results">${out}</div>`;
+      <aside class="ai-rail">${aiHowThisWorksHTML()}</aside>
+    </div>`;
+  // Once there's a result, show it first (the useful content) and collapse the long input
+  // form behind a Details toggle, mirroring the verdict-then-Details pattern every report uses.
+  view.innerHTML = head(T.n, T.desc, "AI assistants", `${typeof poweredBy === "function" ? poweredBy(["claude"]) : ""}<span class="pill ai-pill">AI · runs on your Claude account</span>`) +
+    (st.r && !run.busy
+      ? `<div id="ai-results">${out}</div><details class="ev-details"><summary>Edit answers <span class="note">Change your inputs and draft again</span></summary>${formBlock}</details>`
+      : `${formBlock}<div id="ai-results">${out}</div>`);
 
   const persist = () => { const s = aiGet(key); s.f = aiRead(T); aiPut(key, s); };
   view.querySelectorAll("[data-fk]").forEach(el => { el.oninput = persist; el.onchange = persist; });
@@ -17476,9 +17533,6 @@ function maPlanHTML(){
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
-        <div class="ma-band-a"><button type="button" class="btn sm" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button>
-          ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
-          <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
     </section>
     ${chapterLinkHTML("maturity")}
@@ -17491,10 +17545,8 @@ function maPlanHTML(){
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
-  const any = MA_AREAS.some(a => ma.lv[a.k]);
-  return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
-      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
+  return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}</div>${maStandHTML()}</div>
+    <div class="ma-rh"><h4>Your roadmap</h4></div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d), pr = maProgress(d);
@@ -17633,20 +17685,28 @@ document.addEventListener("keydown", e => {
   e.preventDefault(); if(maG.scr === "q") maPick(+e.key); else maPickStage(MA_STAGES[+e.key - 1].k);
 });
 
+// One action row for every maturity view (plan and the one-page table): Edit ratings, Start over,
+// Save to workspace, Download (primary), Send to tracker, Copy link, then the tool's one extra
+// (Save a snapshot). Everything that used to be split across the plan card and the roadmap now
+// lives here, so there's one place to look for "what can I do with this".
 function maHeadMeta(){
-  const any = MA_AREAS.some(a => ma.lv[a.k]);
-  return `<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>
-      ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
-      ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
-      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm" data-ma="sharelink">Copy link</button>` : ""}`;
+  const any = MA_AREAS.some(a => ma.lv[a.k]), pr = any ? maProgress(ma) : null;
+  return `<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>` + reportHeaderActions({
+    edit:any ? {attrs:'data-ma="edit"', label:EDIT_ANSWERS_LABEL} : null,
+    reset:(ma.ex || any) ? {attrs:`data-ma="${ma.ex ? "clear" : "reset"}"`, label:START_OVER_LABEL} : null,
+    example:(!ma.ex && !any) ? {attrs:'data-ma="example"', label:SEE_EXAMPLE_LABEL} : null,
+    save:any ? {attrs:'data-ma="save"', label:wsSaveLabel("maturity", ma), icon:"save"} : null,
+    download:any ? {attrs:'data-ma="download"', label:DOWNLOAD_LABEL, icon:"download"} : null,
+    tracker:(any && pr && pr.steps.length) ? {attrs:'data-ma="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null,
+    extra:any ? [{attrs:'data-ma="sharelink"', label:COPY_LINK_LABEL}, {attrs:'data-ma="snapshot"', label:"Save a snapshot", icon:"save"}] : []
+  });
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
   if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
-  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "");
+  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Start over to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Start over</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
@@ -17993,9 +18053,12 @@ function cvResultHTML(){
 }
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
-  return `<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>
-    ${cv.ex ? `<button class="btn sm" data-cv="clear">Start over</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button><button class="btn sm primary" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
+  return `<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>` + reportHeaderActions({
+    example:(!cv.ex && !any) ? {attrs:'data-cv="example"', label:SEE_EXAMPLE_LABEL} : null,
+    reset:(cv.ex || any) ? {attrs:`data-cv="${cv.ex ? "clear" : "reset"}"`, label:START_OVER_LABEL} : null,
+    save:any ? {attrs:'data-cv="save"', label:wsSaveLabel("coverage", cv), icon:"save"} : null,
+    download:any ? {attrs:'data-cv="download"', label:DOWNLOAD_LABEL, icon:"download"} : null
+  });
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
@@ -18152,19 +18215,19 @@ function cvResultsRender(){
   const bench = cvBenchPct();
   view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>
     ${cv.shared ? shareBannerHTML('data-cv="unshare"') : ""}
-    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Start over</button></div>` : ""}
     <div class="card cvr-side">
       <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
       <h1 class="visually-hidden">Coverage radar results</h1>
       <div class="verdict-row" aria-live="polite"><div class="pol-verdict">${cvWhy()}</div>${gradeBadge(s.cov, "Weighted coverage against risk, across your rated harm areas")}</div>
       ${bench !== null && !cv.ex ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${bench}% coverage</p>` : ""}
       ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
-      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
-        ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
-        <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+        ${acts.length ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+        <button type="button" class="btn primary" data-cv="download">${icon("download")}Download</button>
         <button type="button" class="btn" data-cv="sharelink">Copy link</button>
         ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
-      ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+      <div class="cvr-more">${cv.ex ? "" : `<button type="button" class="ov-link" data-cvg="again">Go through the questions again</button>`}<button type="button" class="ov-link" data-cv="${cv.ex ? "clear" : "reset"}">Start over</button></div>
     </div>
     ${chapterLinkHTML("coverage")}
     <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
@@ -19599,8 +19662,12 @@ function trMeter(){ const bar = document.querySelector(".tr-setup .pol-runbar");
    in this browser and comes back, untouched, when they exit the demo.
    ========================================================= */
 const DEMO_BACKUP = "tswbdemo:backup";
-// Browser preferences stay put; everything else in the workspace is swapped out
+// Browser preferences stay put; everything else in the workspace is swapped out.
+// The per-route "seen this intro card" flags (tswb:intro:<route>) stay put too: the demo loads a
+// populated sidebar ("1/8", Pixelry data already there), so a visitor who already dismissed a
+// tool's intro card shouldn't see it resurface mid-demo and contradict what's on screen.
 const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
+const demoKeepKey = k => DEMO_KEEP.includes(k) || k.startsWith("tswb:intro:");
 const demoOn = () => !!store.get("demo", false);
 function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
 function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
@@ -19609,7 +19676,7 @@ function demoStart(){
   try{
     const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
     localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
-    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
+    demoKeys().filter(k => !demoKeepKey(k)).forEach(k => localStorage.removeItem(k));
     store.set("demo", true); store.set("demo:pending", true); store.set("demo:welcome", true);
   }catch(e){ return gsay("This browser blocked the demo"); }
   demoReload();
@@ -19617,8 +19684,8 @@ function demoStart(){
 function demoExit(){
   try{
     const raw = localStorage.getItem(DEMO_BACKUP), backup = raw ? JSON.parse(raw) : {};
-    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
-    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !DEMO_KEEP.includes(k) && typeof v === "string") localStorage.setItem(k, v); });
+    demoKeys().filter(k => !demoKeepKey(k)).forEach(k => localStorage.removeItem(k));
+    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !demoKeepKey(k) && typeof v === "string") localStorage.setItem(k, v); });
     localStorage.removeItem(DEMO_BACKUP);
   }catch(e){ return gsay("This browser blocked restoring your work"); }
   demoReload();
@@ -21161,9 +21228,14 @@ function renderCoppa(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
-        `<button type="button" class="btn sm" data-cp="edit">Edit answers</button><button type="button" class="btn sm" data-cp="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("coppa", cp)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-cp="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-cp="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-cp="sharelink">Copy link</button>`)
+        reportHeaderActions({
+          edit:{attrs:'data-cp="edit"', label:EDIT_ANSWERS_LABEL},
+          save:{attrs:'data-cp="save"', label:wsSaveLabel("coppa", cp), icon:"save"},
+          download:{attrs:'data-cp="memo"', label:"Memo for Legal", icon:"download"},
+          tracker:s.gaps.length ? {attrs:'data-cp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
+        }, `<button type="button" class="btn sm" data-cp="sharelink">${COPY_LINK_LABEL}</button>`))
     : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="cp-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">See an example</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">Start over</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
+        `<span class="toast" id="cp-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">${SEE_EXAMPLE_LABEL}</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">${START_OVER_LABEL}</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
 function cpSetupHTML(x, ap, s){
@@ -21683,9 +21755,14 @@ function renderDsa(){
   gdCur = null;
   view.innerHTML = (report
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
-        `<button type="button" class="btn sm" data-ds="edit">Edit answers</button><button type="button" class="btn sm" data-ds="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("dsa", ds)}</span></button>${s.gaps.length ? `<button type="button" class="btn sm" data-ds="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}<button type="button" class="btn sm primary" data-ds="memo"><svg><use href="#i-download"/></svg>Memo for Legal</button><button type="button" class="btn sm" data-ds="sharelink">Copy link</button>`)
+        reportHeaderActions({
+          edit:{attrs:'data-ds="edit"', label:EDIT_ANSWERS_LABEL},
+          save:{attrs:'data-ds="save"', label:wsSaveLabel("dsa", ds), icon:"save"},
+          download:{attrs:'data-ds="memo"', label:"Memo for Legal", icon:"download"},
+          tracker:s.gaps.length ? {attrs:'data-ds="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
+        }, `<button type="button" class="btn sm" data-ds="sharelink">${COPY_LINK_LABEL}</button>`))
     : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
-        `<span class="toast" id="ds-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">See an example</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">Start over</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
+        `<span class="toast" id="ds-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">${SEE_EXAMPLE_LABEL}</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">${START_OVER_LABEL}</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }
 function dsSetupHTML(x, ap, s){
@@ -22195,7 +22272,7 @@ function evSteps(media, n, m){
 const evStepHTML = (s, i, body) => `<section class="card ev-step ${s.st}" id="${s.id}" aria-labelledby="${s.id}-h"><div class="ev-sh"><span class="pol-num" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span><div class="ev-sht"><h2 class="pol-lbl" id="${s.id}-h">${s.t}</h2><span class="note">${s.txt}</span></div></div><div class="ev-sb">${body}</div></section>`;
 const evHeroHTML = () => `<div class="card ev-hero"><span class="eyebrow">New here?</span><h2>Try the example</h2><p>A harassment rule as many platforms write it, 24 comments of the kinds classifiers get wrong, scored by a free model that runs in your browser. One click, a 24 MB download once, and nothing you see here leaves your browser.</p>
     <p class="note ev-whatfree">Without a Claude account: score cases with the free in-browser model or your own classifier's pasted labels. Open in Claude to have it label the cases itself.</p>
-    <div class="pol-run"><button type="button" class="btn primary" data-ev="quick">Try the example</button><span class="note">About a minute. Then change the right answers, add your own cases, or start with your own rule.</span></div></div>`;
+    <div class="pol-run"><button type="button" class="btn primary" data-ev="quick">Try the example</button><button type="button" class="btn" data-ev="example">See a finished example</button><span class="note">About a minute. Then change the right answers, add your own cases, or start with your own rule.</span></div></div>`;
 const evWaitHTML = media => `<p class="note ev-wait">${media ? "Once the list is scored: how many it got right, the items it got wrong, and what to change." : "Once a classifier has labeled the cases: how many it got right, the cases it got wrong, and what to change."}</p>${media ? "" : `<button type="button" class="pol-add" data-ev="example">See a finished example first</button>`}`;
 
 /* ---------- step 1: the rule and the cases ---------- */

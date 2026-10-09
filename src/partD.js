@@ -325,6 +325,39 @@ function shareBannerHTML(saveAttr){
   return `<div class="card share-banner" role="note"><div><b>You're viewing a shared result.</b><span class="note">Save a copy to edit it.</span></div><button type="button" class="btn primary sm" ${saveAttr}>Save a copy</button></div>`;
 }
 
+// ---------- Shared action-row copy: one label per action, so the same action never reads
+// differently from one tool to the next ("Start over" vs. "Clear it and start yours", "Download"
+// vs. "Download result", "Copy link" vs. "Copy result") ----------
+const START_OVER_LABEL = "Start over";
+const SEE_EXAMPLE_LABEL = "See an example";
+const EDIT_ANSWERS_LABEL = "Edit answers";
+const DOWNLOAD_LABEL = "Download";
+const COPY_LABEL = "Copy";
+const COPY_LINK_LABEL = "Copy link";
+const SEND_TRACKER_LABEL = "Send to tracker";
+
+// ---------- Shared report header action row ----------
+// Every report tool calls this instead of hand-rolling its own row of buttons, so the order
+// (example/edit, start over, save, download, tracker, then the tool's own extras), the
+// primary-button rule (Download is primary unless a tool deliberately marks something else
+// primary) and the example-mode visibility rule (nothing here is hidden just because the
+// result on screen is the example) are enforced in one place.
+// slots: {example, edit, reset, save, download, tracker, extra:[...]}, each either falsy or
+// {attrs:"data-x=\"y\"", label, icon, primary}. tail is raw HTML appended at the end (a toast span,
+// a Copy link button with its own id, etc.) since those vary more than the standard slots do.
+function reportHeaderActions(slots, tail){
+  slots = slots || {};
+  const explicitPrimary = ["example", "edit", "reset", "save", "download", "tracker"].some(k => slots[k] && slots[k].primary);
+  const btn = (b, isDownload) => {
+    if(!b) return "";
+    const primary = b.primary !== undefined ? b.primary : (isDownload && !explicitPrimary);
+    const ic = b.icon ? `<svg><use href="#i-${b.icon}"/></svg>` : "";
+    return `<button type="button" class="btn sm${primary ? " primary" : ""}" ${b.attrs || ""}>${ic}${esc(b.label)}</button>`;
+  };
+  return [btn(slots.example), btn(slots.edit), btn(slots.reset), btn(slots.save), btn(slots.download, true), btn(slots.tracker)].join("")
+    + (slots.extra || []).map(b => btn(b)).join("") + (tail || "");
+}
+
 // ---------- Handbook chapter link: one shared map, so every report's verdict area can point to the chapter behind it ----------
 const CHAPTER_LINK = {
   vendors:["choosing-vendors-and-tools", "Choosing vendors and tools"],

@@ -4,8 +4,12 @@
    in this browser and comes back, untouched, when they exit the demo.
    ========================================================= */
 const DEMO_BACKUP = "tswbdemo:backup";
-// Browser preferences stay put; everything else in the workspace is swapped out
+// Browser preferences stay put; everything else in the workspace is swapped out.
+// The per-route "seen this intro card" flags (tswb:intro:<route>) stay put too: the demo loads a
+// populated sidebar ("1/8", Pixelry data already there), so a visitor who already dismissed a
+// tool's intro card shouldn't see it resurface mid-demo and contradict what's on screen.
 const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
+const demoKeepKey = k => DEMO_KEEP.includes(k) || k.startsWith("tswb:intro:");
 const demoOn = () => !!store.get("demo", false);
 function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
 function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
@@ -14,7 +18,7 @@ function demoStart(){
   try{
     const backup = {}; demoKeys().forEach(k => { backup[k] = localStorage.getItem(k); });
     localStorage.setItem(DEMO_BACKUP, JSON.stringify(backup));
-    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
+    demoKeys().filter(k => !demoKeepKey(k)).forEach(k => localStorage.removeItem(k));
     store.set("demo", true); store.set("demo:pending", true); store.set("demo:welcome", true);
   }catch(e){ return gsay("This browser blocked the demo"); }
   demoReload();
@@ -22,8 +26,8 @@ function demoStart(){
 function demoExit(){
   try{
     const raw = localStorage.getItem(DEMO_BACKUP), backup = raw ? JSON.parse(raw) : {};
-    demoKeys().filter(k => !DEMO_KEEP.includes(k)).forEach(k => localStorage.removeItem(k));
-    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !DEMO_KEEP.includes(k) && typeof v === "string") localStorage.setItem(k, v); });
+    demoKeys().filter(k => !demoKeepKey(k)).forEach(k => localStorage.removeItem(k));
+    Object.entries(backup).forEach(([k, v]) => { if(k.startsWith("tswb:") && !demoKeepKey(k) && typeof v === "string") localStorage.setItem(k, v); });
     localStorage.removeItem(DEMO_BACKUP);
   }catch(e){ return gsay("This browser blocked restoring your work"); }
   demoReload();

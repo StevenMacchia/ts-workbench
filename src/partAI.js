@@ -320,6 +320,14 @@ AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Servi
 // AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
 // no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
 // above, so the placeholder path was unreachable dead code (audit §12 item 2).
+// Shared "How this works" explanation: the guided intro's third fact and the one-page
+// form's aside say the same thing, so it lives here once instead of being hand-typed twice.
+function aiHowThisWorksHTML(){
+  return `<div class="card ai-about"><h4>How this works</h4>
+    <ul><li><b>Your account, your data.</b> The request runs on your own Claude account. Nothing is stored on a server, and your inputs stay in this browser.</li>
+      <li><b>Leave out personal data.</b> Describe people and content without names, handles or contact details.</li>
+      <li><b>A person decides.</b> Claude drafts and reviews. Someone accountable must check the output before it's used.</li></ul></div>`;
+}
 /* ---------- Guided: each field on its own screen, then the run ---------- */
 const aiView = {};
 function aiSpec(key){
@@ -357,7 +365,7 @@ function renderAI(key){
     : st.r ? `<div class="ai-out-h"><div><h2>${st.sample ? "Example result" : "Result"}</h2><span class="note">${st.sample ? "A worked example so you can see what the tool produces. Run it on your own case above." : "Drafted " + relTime(st.ts) + ". Review everything before you use it."}</span></div>
         <div class="ai-out-a"><span class="toast" id="ai-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-copy="__md">${icon("copy")}Copy as text</button>${DL ? `<button type="button" class="btn sm" id="ai-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}</div></div>
         <div class="ai-out">${T.render(st.r)}</div>` : "";
-  view.innerHTML = head(T.n, T.desc, "AI assistants", `${typeof poweredBy === "function" ? poweredBy(["claude"]) : ""}<span class="pill ai-pill">AI · runs on your Claude account</span>`) + `
+  const formBlock = `
     <p class="mxa-q ai-q">${esc(T.q)}</p>
     <div class="mxm-how ai-how"><ol class="mxm-how-s">${T.steps.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="ai-grid">
@@ -379,14 +387,14 @@ function renderAI(key){
           <p class="note">Built only by filling your own answers into a letter shape - no AI wrote or checked this. Edit the brackets, and anything else, before you use it.</p>
           <textarea class="input ai-tmpl-ta" id="ai-tmpl-ta" rows="12">${esc(st.tmplText)}</textarea></div>` : ""}
       </form>
-      <aside class="ai-rail">
-        <div class="card ai-about"><h4>How this works</h4>
-          <ul><li><b>Your account, your data.</b> The request runs on your own Claude account. Nothing is stored on a server, and your inputs stay in this browser.</li>
-            <li><b>Leave out personal data.</b> Describe people and content without names, handles or contact details.</li>
-            <li><b>A person decides.</b> Claude drafts and reviews. Someone accountable must check the output before it's used.</li></ul></div>
-      </aside>
-    </div>
-    <div id="ai-results">${out}</div>`;
+      <aside class="ai-rail">${aiHowThisWorksHTML()}</aside>
+    </div>`;
+  // Once there's a result, show it first (the useful content) and collapse the long input
+  // form behind a Details toggle, mirroring the verdict-then-Details pattern every report uses.
+  view.innerHTML = head(T.n, T.desc, "AI assistants", `${typeof poweredBy === "function" ? poweredBy(["claude"]) : ""}<span class="pill ai-pill">AI · runs on your Claude account</span>`) +
+    (st.r && !run.busy
+      ? `<div id="ai-results">${out}</div><details class="ev-details"><summary>Edit answers <span class="note">Change your inputs and draft again</span></summary>${formBlock}</details>`
+      : `${formBlock}<div id="ai-results">${out}</div>`);
 
   const persist = () => { const s = aiGet(key); s.f = aiRead(T); aiPut(key, s); };
   view.querySelectorAll("[data-fk]").forEach(el => { el.oninput = persist; el.onchange = persist; });

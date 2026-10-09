@@ -162,7 +162,7 @@
    sample on the empty quarter-review, so the proof of depth doesn't wait behind a click. */
 .as-six-note{margin:10px 0 0}
 .as-preview{margin:4px 0 8px;padding:14px 16px;border-radius:10px;background:var(--sunk);display:grid;gap:8px}
-.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.as-preview-lead{margin:0;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
 .as-preview-lines{margin:0;padding:0;list-style:none;display:grid;gap:5px}
 .as-preview-lines li{font-size:14px;line-height:1.5;color:var(--ink)}
 .as-preview .ov-link{width:fit-content}

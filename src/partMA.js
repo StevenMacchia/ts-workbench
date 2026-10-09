@@ -259,9 +259,6 @@ function maPlanHTML(){
         ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
-        <div class="ma-band-a"><button type="button" class="btn sm" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button>
-          ${pr.steps.length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}
-          <button type="button" class="btn sm" data-ma="edit">Edit ratings</button></div>
       </div>
     </section>
     ${chapterLinkHTML("maturity")}
@@ -274,10 +271,8 @@ function maPlanHTML(){
     ${ma.ex ? "" : typeof journeyNextHTML === "function" ? journeyNextHTML("maturity") : ""}`;
 }
 function maResultHTML(){
-  const any = MA_AREAS.some(a => ma.lv[a.k]);
-  return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}
-      ${any ? `<div class="ma-sum-cta"><button type="button" class="btn sm" data-ma="download"><svg><use href="#i-download"/></svg>Download the roadmap</button><button type="button" class="btn sm primary" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button></div>` : ""}</div>${maStandHTML()}</div>
-    <div class="ma-rh"><h4>Your roadmap</h4>${maRoadmap(ma).length ? `<button type="button" class="btn sm" data-ma="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>` : ""}</div>${maRoadmapHTML()}`;
+  return `<div class="ma-res"><div class="card ma-sum"><div class="ma-sum-t">${maWhy()}</div>${maScaleHTML()}</div>${maStandHTML()}</div>
+    <div class="ma-rh"><h4>Your roadmap</h4></div>${maRoadmapHTML()}`;
 }
 function maMarkdown(d){
   const t = maStage(d).t, sc = maScore(d), p = typeof wsProfile === "function" ? wsProfile() : null, steps = maRoadmap(d), pr = maProgress(d);
@@ -416,20 +411,28 @@ document.addEventListener("keydown", e => {
   e.preventDefault(); if(maG.scr === "q") maPick(+e.key); else maPickStage(MA_STAGES[+e.key - 1].k);
 });
 
+// One action row for every maturity view (plan and the one-page table): Edit ratings, Start over,
+// Save to workspace, Download (primary), Send to tracker, Copy link, then the tool's one extra
+// (Save a snapshot). Everything that used to be split across the plan card and the roadmap now
+// lives here, so there's one place to look for "what can I do with this".
 function maHeadMeta(){
-  const any = MA_AREAS.some(a => ma.lv[a.k]);
-  return `<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>
-      ${ma.ex ? `<button class="btn sm" data-ma="clear">Start over</button>` : any ? `<button class="btn sm" data-ma="reset">Start over</button>` : `<button class="btn sm" data-ma="example">See an example</button>`}
-      ${any ? `<button class="btn sm" data-ma="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("maturity", ma)}</button>
-      <button class="btn sm primary" data-ma="download"><svg><use href="#i-download"/></svg>Download</button>
-      <button class="btn sm" data-ma="sharelink">Copy link</button>` : ""}`;
+  const any = MA_AREAS.some(a => ma.lv[a.k]), pr = any ? maProgress(ma) : null;
+  return `<span class="toast" id="ma-toast" role="status" aria-live="polite"></span>` + reportHeaderActions({
+    edit:any ? {attrs:'data-ma="edit"', label:EDIT_ANSWERS_LABEL} : null,
+    reset:(ma.ex || any) ? {attrs:`data-ma="${ma.ex ? "clear" : "reset"}"`, label:START_OVER_LABEL} : null,
+    example:(!ma.ex && !any) ? {attrs:'data-ma="example"', label:SEE_EXAMPLE_LABEL} : null,
+    save:any ? {attrs:'data-ma="save"', label:wsSaveLabel("maturity", ma), icon:"save"} : null,
+    download:any ? {attrs:'data-ma="download"', label:DOWNLOAD_LABEL, icon:"download"} : null,
+    tracker:(any && pr && pr.steps.length) ? {attrs:'data-ma="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null,
+    extra:any ? [{attrs:'data-ma="sharelink"', label:COPY_LINK_LABEL}, {attrs:'data-ma="snapshot"', label:"Save a snapshot", icon:"save"}] : []
+  });
 }
 const maPlanMode = () => maMode() === "plan";
 function renderMaturity(){
   if(typeof orgGet === "function"){ const o = orgGet(); if(o.stage && !ma.stageSet && !ma.ex && !MA_AREAS.some(a => ma.lv[a.k])) ma.stage = o.stage; }
   if(maMode() === "guide"){ maGuideRender(); return bindMaturity(); }
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
-  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Clear it to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Clear example</button></div>` : "");
+  const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Start over to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Start over</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
     "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `

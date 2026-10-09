@@ -247,9 +247,12 @@ function cvResultHTML(){
 }
 function cvHeadMeta(){
   const any = cvSummary(cv).rated;
-  return `<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>
-    ${cv.ex ? `<button class="btn sm" data-cv="clear">Start over</button>` : any ? `<button class="btn sm" data-cv="reset">Start over</button>` : `<button class="btn sm" data-cv="example">See an example</button>`}
-    ${any ? `<button class="btn sm" data-cv="save"><svg><use href="#i-save"/></svg>${wsSaveLabel("coverage", cv)}</button><button class="btn sm primary" data-cv="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}`;
+  return `<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>` + reportHeaderActions({
+    example:(!cv.ex && !any) ? {attrs:'data-cv="example"', label:SEE_EXAMPLE_LABEL} : null,
+    reset:(cv.ex || any) ? {attrs:`data-cv="${cv.ex ? "clear" : "reset"}"`, label:START_OVER_LABEL} : null,
+    save:any ? {attrs:'data-cv="save"', label:wsSaveLabel("coverage", cv), icon:"save"} : null,
+    download:any ? {attrs:'data-cv="download"', label:DOWNLOAD_LABEL, icon:"download"} : null
+  });
 }
 function cvMarkdown(d){
   const s = cvSummary(d), acts = cvActions(d), src = cvSrcName(d);
@@ -406,19 +409,19 @@ function cvResultsRender(){
   const bench = cvBenchPct();
   view.innerHTML = `<div class="gd cvr-page">${cvStepBar(100)}<span class="toast" id="cv-toast" role="status" aria-live="polite"></span>
     ${cv.shared ? shareBannerHTML('data-cv="unshare"') : ""}
-    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Clear it and start yours</button></div>` : ""}
+    ${cv.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a teen social app's risk against a typical early program's coverage.</span><button type="button" class="btn sm" data-cv="clear">Start over</button></div>` : ""}
     <div class="card cvr-side">
       <span class="as-eb">${cv.ex ? "Example" : "Coverage mapped"}</span>
       <h1 class="visually-hidden">Coverage radar results</h1>
       <div class="verdict-row" aria-live="polite"><div class="pol-verdict">${cvWhy()}</div>${gradeBadge(s.cov, "Weighted coverage against risk, across your rated harm areas")}</div>
       ${bench !== null && !cv.ex ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${bench}% coverage</p>` : ""}
       ${top.length ? `<ol class="card cvr-top">${top.map((x, i) => `<li><span class="cvr-n mono">${i + 1}</span><div><div class="cvr-th"><b>${esc(x.row.a.n)}</b><span class="note">${esc(x.layer.n)}</span><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div><p>${esc(x.text)}</p></div></li>`).join("")}</ol>` : ""}
-      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : cv.ex ? "" : `<button type="button" class="btn primary" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
-        ${acts.length && !cv.ex ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
-        <button type="button" class="btn" data-cv="download">${icon("download")}Download</button>
+      <div class="cvr-a">${inAs ? `<a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a>` : `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>`}
+        ${acts.length ? `<button type="button" class="btn" data-cv="tasks">${icon("send")}Send gaps to your tracker</button>` : ""}
+        <button type="button" class="btn primary" data-cv="download">${icon("download")}Download</button>
         <button type="button" class="btn" data-cv="sharelink">Copy link</button>
         ${inAs ? `<button type="button" class="btn" data-cv="save">${icon("save")}${wsSaveLabel("coverage", cv)}</button>` : ""}</div>
-      ${cv.ex ? "" : `<div class="cvr-more"><button type="button" class="ov-link" data-cvg="again">Go through the questions again</button><button type="button" class="ov-link" data-cv="reset">Start over</button></div>`}
+      <div class="cvr-more">${cv.ex ? "" : `<button type="button" class="ov-link" data-cvg="again">Go through the questions again</button>`}<button type="button" class="ov-link" data-cv="${cv.ex ? "clear" : "reset"}">Start over</button></div>
     </div>
     ${chapterLinkHTML("coverage")}
     <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
