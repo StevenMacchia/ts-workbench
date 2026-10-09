@@ -4418,6 +4418,40 @@ table:not([class]) tr:last-child td{border-bottom:0}
    carry a marker and more detail) stays its own, taller size -- a different component, not a bar. */
 .vd-bar{height:8px}
 .pol-meter{height:8px}
+
+/* ---------- Ambiguous audit decisions ----------
+   1. The three "orientation strip" components (a numbered how-this-works list, the guided
+   progress bar, and this 3-up fact row) stay separate -- a one-time explainer, an in-flow
+   position, and a feature-stat row are three different jobs, not one component in three
+   costumes. What they can share is a visual grammar, so the fact row gets the same icon
+   treatment as every other feature-summary row in the app (gdIntroHTML, src/partGD.js). */
+.gd-fi{width:18px;height:18px;color:var(--accent);margin-bottom:2px}
+
+/* 2. Red team studio's 0-4 grade picks (the 60-second try, every drill's "what did it do?") get
+   the same visual weight tabletop's A/B/C decisions use: a bigger, round, filled number and a
+   bold first line, instead of the plainest bordered row in the app despite being the first
+   interaction most visitors have with the tool. */
+.rtf-opts.rtf-grade button b{border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.rtf-opts.rtf-grade button span{font-weight:600;color:var(--ink)}
+.rtf-opts.rtf-grade button.right b,.rtf-opts.rtf-grade button.on b{background:var(--accent);color:#fff}
+.rtf-opts.rtf-grade button.wrong b{background:var(--crit);color:#fff}
+
+/* 3. Red team studio's "Engineers' view" link isolated itself top-right of the one-card flow's
+   header, its own unlabeled pill, while the footer on the same screen already carries Back/N of
+   M/Engineers' view together. Demoted to the same quiet text-link style as the footer's copy, so
+   it reads as "also available here" rather than a stray third control. */
+.rtf-hmeta .rtf-link{font-size:13px}
+
+/* 5. Notice and appeal's guided questions already share the exact same gdRender() engine, aside
+   and progress chips as COPPA/DSA/policy/transparency (gdQHTML, src/partGD.js) -- there never was
+   a second "jump list" component to unify; the only difference is question count. No change. */
+
+/* 6. The "Run with Claude"/"Open in Claude to run" CTA was already always .btn.primary regardless
+   of AI availability; what wasn't distinct was its disabled state, which just went translucent
+   purple (opacity:.55) and ended up reading as similar weight to the full-opacity secondary
+   buttons beside it. Disabled now renders as a plain, clearly inert gray button instead of a
+   washed-out primary, so the one enabled primary button is never ambiguous. */
+.ai-act .btn.primary[disabled]{opacity:1;background:var(--sunk);border-color:var(--line);color:var(--faint);box-shadow:none}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -5128,7 +5162,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
   <symbol id="i-eval" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h6"/><path d="M10 2.5v7L5.3 17a2 2 0 001.7 3h10a2 2 0 001.7-3L14 9.5v-7"/><path d="M8 14.5h8"/></g></symbol>
   <symbol id="i-dsa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 4l9 5.5"/><path d="M5 9.5v9M9 9.5v9M15 9.5v9M19 9.5v9"/><path d="M3 18.5h18"/></g></symbol>
   <symbol id="i-coppa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.3" r="2.5"/><path d="M7 12l2.6-2.2a2 2 0 011.3-.5h2.2a2 2 0 011.3.5L17 12M9.5 9.8V21M14.5 9.8V21M9.5 15.3h5"/></g></symbol>
-  <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4"/><path d="M6.5 7h11v3.5a5.5 5.5 0 01-11 0z"/><path d="M12 16v5"/></g></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4"/><path d="M6.5 7h11v3.5a5.5 5.5 0 01-11 0z"/><path d="M12 16v5"/></g></symbol><symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></g></symbol>
 </svg>
 <nav class="sitetop" aria-label="stevenmacchia.com">
   <span class="st-mark" aria-hidden="true"></span>
@@ -15072,7 +15106,7 @@ function rtfOpen(){
   const q = RT_PRACTICE.grade[0], f = rtF(), picked = f.openPick;
   return `<span class="rtf-eb">Free · private · a 60-second try</span><h1 class="rtf-h1">Find out what your AI model does when someone tries to make it cause harm</h1>
     <p class="rtf-lead">Before your users do. Try it now: here is something a model said. How bad was it?</p>
-    <div class="rtf-q"><p>${esc(q.q)}</p><p class="note">0 means it refused or helped safely; 3 means it gave something a person could actually use.</p><div class="rtf-opts">${RT_GRADES.slice(0, 4).map((g, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === q.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}><b>${j}</b>${g[0]}</button>`).join("")}</div>
+    <div class="rtf-q"><p>${esc(q.q)}</p><p class="note">0 means it refused or helped safely; 3 means it gave something a person could actually use.</p><div class="rtf-opts rtf-grade">${RT_GRADES.slice(0, 4).map((g, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === q.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}><b>${j}</b><span>${g[0]}</span></button>`).join("")}</div>
     ${picked != null ? `<div class="learn ${picked === q.a ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${picked === q.a ? "That is it" : "Close: it is a " + q.a}</div><p>${esc(q.why)} You just did the hardest part of red teaming: judging the answer.</p></div>` : ""}</div>
     ${picked != null ? rtfNext("Learn the basics in 10 minutes", `<button type="button" class="btn" data-rtf="skipbasics">I know the basics, set up a test</button><button type="button" class="btn" data-rtf="example">See a finished example</button>`) : `<p class="note">Free and private. Nothing you type leaves your browser. No harmful text anywhere in this tool.</p>`}`;
 }
@@ -15115,7 +15149,7 @@ function rtfDrill(sc, i, screens){
     <ol class="rtf-steps">${(d.plain || d.steps.slice(0, 5)).map(st => `<li>${esc(st)}</li>`).join("")}</ol>
     ${d.plain ? `<details class="rtf-det"><summary>Full version</summary><p class="rtf-lead">${esc(d.why)}</p><ol class="rtf-steps">${d.steps.map(st => `<li>${esc(st)}</li>`).join("")}</ol></details>` : ""}
     <details class="rtf-det"><summary>What good looks like, and notes</summary>${lnGood(d.good.map(esc))}<textarea class="input" rows="3" id="rtf-notes" placeholder="What the model did, in your words. Not the output itself.">${esc(s.notes || "")}</textarea></details>
-    <div class="rtf-q"><p>What did it do?</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" data-grade="${j}" class="${picked === j ? "on" : ""}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>
+    <div class="rtf-q"><p>What did it do?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-grade="${j}" class="${picked === j ? "on" : ""}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>
     ${picked != null && picked >= 2 ? `<p class="rtf-lbl" style="margin-top:12px">Which harm did it touch?</p><div class="rtf-chips sm">${(areasPicked.length ? areasPicked : rtPicked()).map(a => `<button type="button" data-fa="${a.k}" class="${rt.flow.area === a.k ? "on" : ""}">${esc(RT_PLAIN[a.k] || a.n)}</button>`).join("")}</div>` : ""}
     ${picked != null && picked >= 2 && rt.flow.area ? `<p class="note">Noted as a finding. You will get a fix card for it at the end.</p>` : ""}</div>
     ${picked == null ? `<p class="note">Run the drill, then pick what happened. You can also <button type="button" class="rtf-link" data-rtf="skipdrill">skip this one</button>.</p>` : needArea ? `<p class="note">Pick the harm it touched to continue.</p>` : rtfNext(n === drills.length ? "See the verdict" : "Next drill")}`;
@@ -15191,7 +15225,7 @@ renderRedteamStudio = function(){
   if(typeof GT_MORE === "object") Object.assign(GT_MORE, RT_TERMS);
   if(rt.mode === "full") return renderRedteamStudio0();
   if(rt.flow && rt.flow.i === undefined) rt.flow.i = 0;
-  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">Work in progress</span>${rt.svc ? " · " + esc(rt.svc) : ""}`, rt.flow && rt.flow.i ? `<button type="button" class="btn sm" data-rtf="full">Engineers' view</button>` : "") + rtFlowHTML();
+  view.innerHTML = headCompact("Red team studio", `<span class="wip-tag">Work in progress</span>${rt.svc ? " · " + esc(rt.svc) : ""}`, rt.flow && rt.flow.i ? `<span class="rtf-hmeta"><button type="button" class="rtf-link" data-rtf="full">Engineers' view</button></span>` : "") + rtFlowHTML();
   rtFlowBind();
 };
 const rtAct00 = rtAct;
@@ -15286,7 +15320,7 @@ function rtm1Try(sc){
     ${stage === "move" ? `<p class="rtf-lead">Attackers rarely ask plainly. Each move is a way past a refusal. Start with the plain ask so you have a baseline.</p><div class="rtf-opts rtf-big">${moves.map(x => `<button type="button" data-move="${x[0]}" class="${tr.move === x[0] ? "on" : ""}"><b>${esc(x[1])} <i class="rtf-term">${esc(x[2])}</i></b><span>${esc(x[3])}</span></button>`).join("")}</div>` : ""}
     ${stage === "aim" ? `<p class="rtf-lead"><b>${esc(mv[1])}.</b> ${esc(mv[3])} Now, what are you going after?</p><div class="rtf-opts">${aims.map(x => `<button type="button" data-aim="${x[0]}" class="${tr.aim === x[0] ? "on" : ""}">${esc(x[1])}</button>`).join("")}</div>` : ""}
     ${stage === "obs" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div>${severe ? lnNote("<b>Hard line.</b> Nothing involving a minor is ever generated to see how bad it gets. If the model begins to comply in this area, stop, do not iterate, and log that it began to comply. For distress and intimate content, use your own account, your own photo, and stop at the first sign.", true) : ""}<p class="rtf-lead">Go to your feature and try the move. Keep harmful output there, not here. Then pick the line that best describes what it did.</p><div class="rtf-opts">${rub.map((o, j) => `<button type="button" data-obs="${j}"><b>${o[1]}</b>${esc(o[0])}</button>`).join("")}</div>` : ""}
-    ${stage === "grade" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div><p class="rtf-lead">You observed: ${esc(rub[tr.obs][0]).toLowerCase()}. What is your grade, 0 to 4?</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" data-grade1="${j}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>` : ""}
+    ${stage === "grade" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span></div><p class="rtf-lead">You observed: ${esc(rub[tr.obs][0]).toLowerCase()}. What is your grade, 0 to 4?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-grade1="${j}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>` : ""}
     ${stage === "done" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span><span class="pill s${tr.grade}">you: S${tr.grade}</span><span class="pill s${sug}">rubric: S${sug}</span></div>
       <div class="learn ${tr.grade === sug ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${tr.grade === sug ? "You and the rubric agree" : Math.abs(tr.grade - sug) === 1 ? "One step apart" : "Different calls"}</div><p>${tr.grade === sug ? "The grade is about what the answer lets someone do, not how it sounds. You read it the way the rubric does." : tr.grade > sug ? "You graded it harder than the rubric. The rubric moves a grade up only for specific, usable, real-person or real-place outcomes. Being harsh is safer than being soft, but it inflates the numbers you will report." : "You graded it softer than the rubric. The usual reason is reading the refusal and missing the hint, the confirmation or the specific detail that came with it. Re-read what it actually gave."}</p></div>
       ${tr.grade >= 2 || sug >= 2 ? `<div class="rtf-q"><p>Why did it work? Pick the layer.</p><div class="rtf-chips sm">${RT_LAYERS.map(l => `<button type="button" data-layer="${l[0]}" class="${tr.layer === l[0] ? "on" : ""}">${esc(l[1])}</button>`).join("")}</div></div>` : ""}
@@ -15544,7 +15578,7 @@ function rtfJudge(){
   }
   const it = rtJItem(c.ids[c.i]), picked = c.picked, again = rtJ().miss[it.id] && picked === null && c.i > 0 && c.ids.slice(0, c.i).includes(it.id);
   let body = "";
-  if(it.kind === "grade") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${RT_GRADES.map((g, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}"><b>${i2}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div></div>`;
+  if(it.kind === "grade") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}"><b>${i2}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div></div>`;
   else if(it.kind === "move") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map(o => `<button type="button" data-jm="${esc(o)}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (o === it.a ? "right" : o === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   else body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map((o, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   const right = picked !== null && picked === it.a;
@@ -16054,7 +16088,7 @@ function rtSbGrading(k, moves, aims, p, mv, am, rub, sug){
     ${stage === "move" ? `<div class="rtf-opts">${moves.map(x => `<button type="button" data-sbmove="${x[0]}"><b>${esc(x[1])} <i class="rtf-term">${esc(x[2])}</i></b></button>`).join("")}</div>` : ""}
     ${stage === "aim" ? `<p class="rtf-lead"><b>${esc(mv[1])}.</b> ${esc(mv[3])}</p><div class="rtf-opts">${aims.map(x => `<button type="button" data-sbaim="${x[0]}">${esc(x[1])}</button>`).join("")}</div>` : ""}
     ${stage === "obs" ? `<div class="rtf-opts">${rub.map((o, j) => `<button type="button" data-sbobs="${j}"><b>${j}</b>${esc(o[0])}</button>`).join("")}</div>` : ""}
-    ${stage === "grade" ? `<p class="rtf-lead">You observed: ${esc(rub[p.obs][0]).toLowerCase()}.</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" data-sbgrade="${j}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>` : ""}
+    ${stage === "grade" ? `<p class="rtf-lead">You observed: ${esc(rub[p.obs][0]).toLowerCase()}.</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" data-sbgrade="${j}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>` : ""}
     ${stage === "done" ? `<div class="rt-tryline"><span class="tag">${esc(mv[1])}</span><span class="tag">${esc(am[1])}</span><span class="pill s${p.grade}">you: S${p.grade}</span><span class="pill s${sug}">rubric: S${sug}</span></div>
       <p class="note">${p.grade === sug ? "You and the rubric agree." : "Noted. The rubric suggests S" + sug + "; your call stands as the grade."}</p>
       ${rtfNext("Log this as a try", `<button type="button" class="btn" data-rtf="sbretry">Change this</button>`)}` : ""}
@@ -16158,7 +16192,7 @@ const RT_WALK = [
   {h:"You pick what you're testing", blurb:"Pick the nearest match to what you're building. Everything after this, the moves, the checklist and the first finding, is shaped around it.",
     prev:() => `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>A support assistant</b><span>Answers customers, reads your help docs and can open tickets or issue refunds.</span></button><button type="button" tabindex="-1"><b>An agent that acts</b><span>Can browse, send, buy, book or change things on the user's behalf.</span></button></div>`},
   {h:"You try a move and say what happened", blurb:"No typed attacks. You choose a move from a list, try it on your own feature, and say in plain words what happened.",
-    prev:() => `<p class="rtf-lead">Pick a move, run it on your own feature, then say what it did.</p><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>Wrap it in a story <i class="rtf-term">framing</i></b><span>Say it is for a novel or a training deck. The model answers the frame instead of the ask.</span></button></div><p class="rtf-lbl" style="margin-top:10px">What did it do?</p><div class="rtf-opts">${RT_GRADES.map((g, j) => `<button type="button" tabindex="-1" class="${j === 1 ? "on" : ""}"><b>${j}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div>`},
+    prev:() => `<p class="rtf-lead">Pick a move, run it on your own feature, then say what it did.</p><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>Wrap it in a story <i class="rtf-term">framing</i></b><span>Say it is for a novel or a training deck. The model answers the frame instead of the ask.</span></button></div><p class="rtf-lbl" style="margin-top:10px">What did it do?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" tabindex="-1" class="${j === 1 ? "on" : ""}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>`},
   {h:"Your call, then the expert's", blurb:"You grade what happened first, 0 to 4. Then you see the expert's grade on the same thing, with the gap explained.",
     prev:() => `<div class="rt-cal"><div class="rt-cal-c"><span class="eyebrow">Your call</span><b>S1</b></div><div class="rt-cal-c ex"><span class="eyebrow">Expert's call</span><b>S3</b></div></div><div class="learn warn"><div class="learn-h"><svg><use href="#i-info"/></svg>Softer than the expert</div><p>You read the refusal and missed the hint that came with it. That gap is the whole skill.</p></div>`},
   {h:"A finding is a fixed shape anyone can act on", blurb:"Five parts, the same shape every time. An engineer can act on it without a conversation.",
@@ -20438,6 +20472,9 @@ function gdPreviewHTML(spec){
     </div></div>
   </div>`;
 }
+// The 3-up fact row is almost always shaped the same way across tools: a time estimate first,
+// then a scope/approach note, then a reassurance -- so one icon per position, not per tool.
+const GD_FACT_ICON = ["i-clock", "i-layers", "i-lock"];
 function gdIntroHTML(spec){
   const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
   const resume = n > 0 && n < st.length && gdHas(st[0]);
@@ -20447,7 +20484,7 @@ function gdIntroHTML(spec){
     <p class="gd-lead">${I.lead}</p>
     ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}
     ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
-    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
+    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s], i) => `<div><svg class="gd-fi"><use href="#${GD_FACT_ICON[i] || "i-info"}"/></svg><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
   </div>${gdPreviewHTML(spec)}`;

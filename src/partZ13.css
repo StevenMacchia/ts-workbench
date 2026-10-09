@@ -421,3 +421,37 @@ table:not([class]) tr:last-child td{border-bottom:0}
    carry a marker and more detail) stays its own, taller size -- a different component, not a bar. */
 .vd-bar{height:8px}
 .pol-meter{height:8px}
+
+/* ---------- Ambiguous audit decisions ----------
+   1. The three "orientation strip" components (a numbered how-this-works list, the guided
+   progress bar, and this 3-up fact row) stay separate -- a one-time explainer, an in-flow
+   position, and a feature-stat row are three different jobs, not one component in three
+   costumes. What they can share is a visual grammar, so the fact row gets the same icon
+   treatment as every other feature-summary row in the app (gdIntroHTML, src/partGD.js). */
+.gd-fi{width:18px;height:18px;color:var(--accent);margin-bottom:2px}
+
+/* 2. Red team studio's 0-4 grade picks (the 60-second try, every drill's "what did it do?") get
+   the same visual weight tabletop's A/B/C decisions use: a bigger, round, filled number and a
+   bold first line, instead of the plainest bordered row in the app despite being the first
+   interaction most visitors have with the tool. */
+.rtf-opts.rtf-grade button b{border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.rtf-opts.rtf-grade button span{font-weight:600;color:var(--ink)}
+.rtf-opts.rtf-grade button.right b,.rtf-opts.rtf-grade button.on b{background:var(--accent);color:#fff}
+.rtf-opts.rtf-grade button.wrong b{background:var(--crit);color:#fff}
+
+/* 3. Red team studio's "Engineers' view" link isolated itself top-right of the one-card flow's
+   header, its own unlabeled pill, while the footer on the same screen already carries Back/N of
+   M/Engineers' view together. Demoted to the same quiet text-link style as the footer's copy, so
+   it reads as "also available here" rather than a stray third control. */
+.rtf-hmeta .rtf-link{font-size:13px}
+
+/* 5. Notice and appeal's guided questions already share the exact same gdRender() engine, aside
+   and progress chips as COPPA/DSA/policy/transparency (gdQHTML, src/partGD.js) -- there never was
+   a second "jump list" component to unify; the only difference is question count. No change. */
+
+/* 6. The "Run with Claude"/"Open in Claude to run" CTA was already always .btn.primary regardless
+   of AI availability; what wasn't distinct was its disabled state, which just went translucent
+   purple (opacity:.55) and ended up reading as similar weight to the full-opacity secondary
+   buttons beside it. Disabled now renders as a plain, clearly inert gray button instead of a
+   washed-out primary, so the one enabled primary button is never ambiguous. */
+.ai-act .btn.primary[disabled]{opacity:1;background:var(--sunk);border-color:var(--line);color:var(--faint);box-shadow:none}

@@ -36,6 +36,9 @@ function gdPreviewHTML(spec){
     </div></div>
   </div>`;
 }
+// The 3-up fact row is almost always shaped the same way across tools: a time estimate first,
+// then a scope/approach note, then a reassurance -- so one icon per position, not per tool.
+const GD_FACT_ICON = ["i-clock", "i-layers", "i-lock"];
 function gdIntroHTML(spec){
   const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
   const resume = n > 0 && n < st.length && gdHas(st[0]);
@@ -45,7 +48,7 @@ function gdIntroHTML(spec){
     <p class="gd-lead">${I.lead}</p>
     ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}
     ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
-    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
+    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s], i) => `<div><svg class="gd-fi"><use href="#${GD_FACT_ICON[i] || "i-info"}"/></svg><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
   </div>${gdPreviewHTML(spec)}`;

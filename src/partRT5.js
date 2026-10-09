@@ -146,7 +146,7 @@ function rtfJudge(){
   }
   const it = rtJItem(c.ids[c.i]), picked = c.picked, again = rtJ().miss[it.id] && picked === null && c.i > 0 && c.ids.slice(0, c.i).includes(it.id);
   let body = "";
-  if(it.kind === "grade") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${RT_GRADES.map((g, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}"><b>${i2}</b>${g[0]}<i class="rtf-term">${g[1]}</i></button>`).join("")}</div></div>`;
+  if(it.kind === "grade") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}"><b>${i2}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div></div>`;
   else if(it.kind === "move") body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map(o => `<button type="button" data-jm="${esc(o)}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (o === it.a ? "right" : o === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   else body = `<div class="rtf-q"><p>${esc(it.q)}</p><div class="rtf-opts">${it.opts.map((o, i2) => `<button type="button" data-j="${i2}" ${picked !== null ? "disabled" : ""} class="${picked !== null ? (i2 === it.a ? "right" : i2 === picked ? "wrong" : "") : ""}">${esc(o)}</button>`).join("")}</div></div>`;
   const right = picked !== null && picked === it.a;
