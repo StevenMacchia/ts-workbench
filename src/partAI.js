@@ -180,7 +180,7 @@ Return ONLY a JSON object with exactly these keys:
     ${r.suggested_action ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Suggested action</h3></div><p class="ai-p">${esc(r.suggested_action)}</p></div>` : ""}
     ${r.reply_to_user ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Reply to the user</h3><button type="button" class="btn sm" data-copy="reply_to_user">${icon("copy")}Copy</button></div><div class="ai-letter"><div class="ai-body">${esc(r.reply_to_user)}</div></div></div>` : ""}
     ${r.note_for_record ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Note for the case file</h3><button type="button" class="btn sm" data-copy="note_for_record">${icon("copy")}Copy</button></div><p class="ai-p">${esc(r.note_for_record)}</p></div>` : ""}
-    ${r.policy_feedback ? `<div class="ai-sec ai-fb"><div class="ai-sec-h"><h3>Feedback for the policy team</h3></div><p class="ai-p">${esc(r.policy_feedback)}</p></div>` : ""}`; },
+    ${r.policy_feedback ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Feedback for the policy team</h3><button type="button" class="btn sm" data-copy="policy_feedback">${icon("copy")}Copy</button></div><p class="ai-p">${esc(r.policy_feedback)}</p></div>` : ""}`; },
   md:r => ["# Appeal review", "", `**Recommendation:** ${AI_REC[r.recommendation][0]} (${r.confidence} confidence)`, "", r.summary, "",
     ...((r.steering_attempts || []).length ? ["## Text in the case tried to steer this review", ...r.steering_attempts.map(x => "- " + x), ""] : []), "## Does the rule apply?",
     ...r.elements.map(e => `- **${e.element}**: ${e.met}. ${e.reasoning}`), "", "## The user's arguments", ...r.user_arguments.map(a => `- ${a.argument} (${a.persuasive ? "persuasive" : "not persuasive"}): ${a.assessment}`), "",

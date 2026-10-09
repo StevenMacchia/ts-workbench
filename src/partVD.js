@@ -208,7 +208,7 @@ function vdResultsRender(){
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
       <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row" aria-live="polite"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
         ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
-        ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+        ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="cvr-a"><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button>${DL ? `<button type="button" class="btn primary" id="vx-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn" id="vx-copy">${icon("copy")}Copy</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-reset">See an example</button><button type="button" class="ov-link" id="vx-own">Start over</button></div></div>
     </div>

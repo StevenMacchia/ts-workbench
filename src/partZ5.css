@@ -524,4 +524,8 @@ text.mxt-a{fill:var(--crit)}
 .vd-heat table{min-width:0}
 .tt-q{margin:18px 0 0}
 .tt-how{margin:18px 0}
-@media (max-width:760px){.section-title .segs{max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.section-title .segs button{white-space:nowrap;flex:none}}
+/* A single-line, horizontally-scrolling tab row at every width: unscoped, .segs is a plain block
+   and its buttons wrap like words in a paragraph, landing each label a different height
+   (workspace's "All saved results" row). One line, consistently, reads better than that. */
+.section-title .segs{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
+.section-title .segs button{white-space:nowrap;flex:none}

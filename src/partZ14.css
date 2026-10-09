@@ -109,7 +109,7 @@ table.ln-t{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.45
 .ln-how div{font-size:13.5px;color:var(--muted);padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px}
 .ln-how b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
 /* glossary */
-.ln-gl-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ln-gl-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:64px;z-index:6;margin:0 -4px;padding:10px 4px;background:color-mix(in oklab, var(--bg) 92%, transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px)}
 .ln-gl-tools .ln-search{display:flex;align-items:center;gap:8px;flex:1;min-width:200px;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:6px 10px}
 .ln-gl-tools .ln-search svg{width:15px;height:15px;color:var(--muted);flex:none}
 .ln-gl-tools .ln-search input{border:0;outline:0;background:none;font:inherit;font-size:14px;width:100%;color:var(--ink)}

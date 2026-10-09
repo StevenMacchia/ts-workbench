@@ -50,6 +50,9 @@ const MX_OP_CSS = `
 .mxop .op-k{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
 .mxop h1{font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:4px 0 4px;color:var(--ink)}
 .mxop .op-h p,.mxop .op-date{margin:0;color:var(--muted);font-size:13px}
+.mxop .op-jump{display:flex;flex-wrap:wrap;gap:8px 14px;margin:0 0 20px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#f7f8fa}
+.mxop .op-jump a{color:var(--acc);font-size:12.5px;font-weight:600;text-decoration:none}
+.mxop .op-jump a:hover{text-decoration:underline}
 .mxop .op-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
 .mxop .op-tile{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .mxop .op-tile b{display:block;font-size:26px;line-height:1.1;letter-spacing:-.02em}

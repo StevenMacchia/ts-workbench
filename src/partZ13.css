@@ -299,3 +299,19 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 @media (max-width:760px){
   .section-title .segs{-webkit-mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%)}
 }
+
+/* ---------- Polish pass: an icon inside .ov-link had no size rule, so it rendered at the
+   browser's unstyled-SVG default (far bigger than the text) and read as a separate, orphaned
+   glyph rather than part of the link (About page's "See how the scores work", the demo preview's
+   "See the whole picture") ---------- */
+.ov-link svg{width:13px;height:13px;vertical-align:-2px;margin-left:3px}
+
+/* ---------- Policy stress-tester: a legend for the instant-checks glyphs, which otherwise
+   mix three icon meanings (good / note / issue) with nothing saying what each one means ---------- */
+.pol-find-legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 8px}
+.pol-find-lg{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.pol-find-lg.ok{color:var(--good)} .pol-find-lg.info{color:var(--accent)} .pol-find-lg.warn{color:var(--high)}
+
+/* ---------- Transparency report: the "By category" table has one or two numeric columns, so
+   stretching it to the full card width on a wide screen reads as sparse/unfinished ---------- */
+.tr-ct{max-width:480px}

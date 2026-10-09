@@ -341,9 +341,8 @@ function cvIntroHTML(){
     <h1>Do your defenses keep up with your risk?</h1>
     <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
     <div class="gd-facts"><div><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
-    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
-      ${!src ? `<button type="button" class="btn gd-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
-    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
+    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button></div>
+    <div class="gd-alt"><span>Other ways in:</span>${!src ? `<button type="button" class="ov-link" data-ov="new">Run a pre-mortem first, to compare against real risk</button>` : ""}<button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
   </div>${cvPreviewHTML()}`;
 }
 function cvApplyHTML(){

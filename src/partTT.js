@@ -101,6 +101,7 @@ function ttMeters(sc){
   const answered = tt.first.filter(x=>x!==undefined).length, strong = sc.steps.filter((_,i)=>firstWasBest(sc,i)).length;
   return `<aside class="card meters" aria-label="Incident scorecard">
     <span class="eyebrow">${esc(sc.title)} ${tip("Four scores, 0 to 100, that move with each decision you make: user safety, public trust, regulatory standing and team capacity. The debrief shows the average across all four.")}</span>
+    ${answered === 0 ? `<p class="note">Baseline, before your first call</p>` : ""}
     ${DIMS.map(d=>`<div class="meter"><div class="top"><span>${d.n}</span><span class="mono">${tt.scores[d.k]}</span></div><div class="bar"><i style="width:${tt.scores[d.k]}%;background:${scoreColor(tt.scores[d.k])}"></i></div></div>`).join("")}
     <div class="firsttry"><span class="eyebrow">Strong calls on first try</span><span class="mono">${strong} / ${answered}</span></div>
     <button class="btn sm" id="tt-quit">Choose another scenario</button>

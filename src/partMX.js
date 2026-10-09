@@ -442,6 +442,9 @@ function mxOnePagerInner(list){
   const delta = m => { const d = mxDelta(m); return d ? `<span class="op-d ${d.good}">${esc(d.text)} vs ${esc(d.prev)}</span>` : ""; };
   const row = m => { const st = mxStatus(m, mx.vals);
     return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}<small class="op-meas">${esc(MX_SC[m.n][0])}</small>${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
+  // A page this long (every tier, each with its own table) needs jump links: the same fix as the
+  // two glossaries, so "find North-star metrics" doesn't mean scrolling the whole report by hand.
+  const jumps = (att.length ? [["mxop-sec-att", "Needs attention"]] : []).concat(MX_TORD.filter(t => measured.some(m => m.t === t)).map(t => [`mxop-sec-${t}`, MX_TIER_NAME[t]]));
   return `<header class="op-h"><div><div class="op-k">Trust &amp; Safety scorecard</div><h1>${esc(mx.period || "Current period")}</h1>
       <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
       <div class="op-date">Prepared ${esc(new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}))}</div></header>
@@ -449,11 +452,12 @@ function mxOnePagerInner(list){
       <div class="op-tile good"><b>${c.on}</b><span>On track</span></div><div class="op-tile med"><b>${c.watch}</b><span>Watch</span></div>
       <div class="op-tile crit"><b>${c.off}</b><span>Off track</span></div><div class="op-tile"><b>${list.length - measured.length}</b><span>Not measured yet</span></div>
     </section>
-    ${att.length ? `<section class="op-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
+    ${jumps.length > 1 ? `<nav class="op-jump" aria-label="Jump to section">${jumps.map(([id, n]) => `<a href="#${id}" data-jump="${id}">${esc(n)}</a>`).join("")}</nav>` : ""}
+    ${att.length ? `<section class="op-att" id="mxop-sec-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
       return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b>: ${esc(MX_SC[m.n][0].charAt(0).toLowerCase() + MX_SC[m.n][0].slice(1))} is <b>${esc(val(m))}</b>, against a target of ${esc((mxTargetText(m) || "not set").replace(/^≤ 0 /, "0 "))}. Read it with ${esc(H.pair)}.</span></li>`; }).join("")}</ul></section>` : ""}
     ${mxSigHTML(list, true)}
     ${MX_TORD.map(t => { const ms = measured.filter(m => m.t === t); if(!ms.length) return "";
-      return `<section class="op-sec"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
+      return `<section class="op-sec" id="mxop-sec-${t}"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
     <footer class="op-f">Status compares each value with the program's own target and off-track line. ${(mx.hist || []).length ? `Trends cover ${esc((mx.hist || []).map(h => h.p).concat(mx.period ? [mx.period] : []).filter((p, j, a) => a.indexOf(p) === j).join(", "))}. ` : ""}Made with T&amp;S Workbench.</footer>`;
 }
 function mxOnePagerDoc(list){
@@ -473,6 +477,9 @@ function mxOpenOnePager(list){
   document.addEventListener("keydown", onKey);
   bg.onclick = e => { if(e.target === bg) close(); };
   bg.querySelector('[data-op="close"]').onclick = close;
+  // preventDefault so these in-page jumps scroll the one-pager, not change location.hash (which the
+  // app's router would read as a route change and navigate away from this modal)
+  bg.querySelectorAll("[data-jump]").forEach(a => a.onclick = e => { e.preventDefault(); const el = bg.querySelector("#" + a.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   bg.querySelector('[data-op="print"]').onclick = () => { try{ window.print(); }catch(e){ flashIn(bg.querySelector("#mxop-toast"), "Printing isn't available here. Use Download instead."); } };
   const d = bg.querySelector('[data-op="dl"]'); if(d) d.onclick = () => offerFile(`ts-scorecard${mx.period ? "-" + mx.period.replace(/[^a-z0-9]+/gi, "-").toLowerCase() : ""}.html`, mxOnePagerDoc(list), mxScoreMd(list), bg.querySelector("#mxop-toast"));
   bg.querySelector('[data-op="close"]').focus();

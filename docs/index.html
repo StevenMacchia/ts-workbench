@@ -1747,7 +1747,11 @@ text.mxt-a{fill:var(--crit)}
 .vd-heat table{min-width:0}
 .tt-q{margin:18px 0 0}
 .tt-how{margin:18px 0}
-@media (max-width:760px){.section-title .segs{max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.section-title .segs button{white-space:nowrap;flex:none}}
+/* A single-line, horizontally-scrolling tab row at every width: unscoped, .segs is a plain block
+   and its buttons wrap like words in a paragraph, landing each label a different height
+   (workspace's "All saved results" row). One line, consistently, reads better than that. */
+.section-title .segs{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
+.section-title .segs button{white-space:nowrap;flex:none}
 
 /* ---------- AI assistants ---------- */
 :root{--t-ai:#8E4EC6}
@@ -4291,6 +4295,22 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 @media (max-width:760px){
   .section-title .segs{-webkit-mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);mask-image:linear-gradient(to right, #000 calc(100% - 28px), transparent 100%)}
 }
+
+/* ---------- Polish pass: an icon inside .ov-link had no size rule, so it rendered at the
+   browser's unstyled-SVG default (far bigger than the text) and read as a separate, orphaned
+   glyph rather than part of the link (About page's "See how the scores work", the demo preview's
+   "See the whole picture") ---------- */
+.ov-link svg{width:13px;height:13px;vertical-align:-2px;margin-left:3px}
+
+/* ---------- Policy stress-tester: a legend for the instant-checks glyphs, which otherwise
+   mix three icon meanings (good / note / issue) with nothing saying what each one means ---------- */
+.pol-find-legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 8px}
+.pol-find-lg{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.pol-find-lg.ok{color:var(--good)} .pol-find-lg.info{color:var(--accent)} .pol-find-lg.warn{color:var(--high)}
+
+/* ---------- Transparency report: the "By category" table has one or two numeric columns, so
+   stretching it to the full card width on a wide screen reads as sparse/unfinished ---------- */
+.tr-ct{max-width:480px}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -4402,7 +4422,7 @@ table.ln-t{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.45
 .ln-how div{font-size:13.5px;color:var(--muted);padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px}
 .ln-how b{display:block;color:var(--ink);font-weight:600;margin-bottom:2px}
 /* glossary */
-.ln-gl-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ln-gl-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:64px;z-index:6;margin:0 -4px;padding:10px 4px;background:color-mix(in oklab, var(--bg) 92%, transparent);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px)}
 .ln-gl-tools .ln-search{display:flex;align-items:center;gap:8px;flex:1;min-width:200px;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:6px 10px}
 .ln-gl-tools .ln-search svg{width:15px;height:15px;color:var(--muted);flex:none}
 .ln-gl-tools .ln-search input{border:0;outline:0;background:none;font:inherit;font-size:14px;width:100%;color:var(--ink)}
@@ -8960,6 +8980,7 @@ function ttMeters(sc){
   const answered = tt.first.filter(x=>x!==undefined).length, strong = sc.steps.filter((_,i)=>firstWasBest(sc,i)).length;
   return `<aside class="card meters" aria-label="Incident scorecard">
     <span class="eyebrow">${esc(sc.title)} ${tip("Four scores, 0 to 100, that move with each decision you make: user safety, public trust, regulatory standing and team capacity. The debrief shows the average across all four.")}</span>
+    ${answered === 0 ? `<p class="note">Baseline, before your first call</p>` : ""}
     ${DIMS.map(d=>`<div class="meter"><div class="top"><span>${d.n}</span><span class="mono">${tt.scores[d.k]}</span></div><div class="bar"><i style="width:${tt.scores[d.k]}%;background:${scoreColor(tt.scores[d.k])}"></i></div></div>`).join("")}
     <div class="firsttry"><span class="eyebrow">Strong calls on first try</span><span class="mono">${strong} / ${answered}</span></div>
     <button class="btn sm" id="tt-quit">Choose another scenario</button>
@@ -10005,6 +10026,9 @@ const MX_OP_CSS = `
 .mxop .op-k{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
 .mxop h1{font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:4px 0 4px;color:var(--ink)}
 .mxop .op-h p,.mxop .op-date{margin:0;color:var(--muted);font-size:13px}
+.mxop .op-jump{display:flex;flex-wrap:wrap;gap:8px 14px;margin:0 0 20px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:#f7f8fa}
+.mxop .op-jump a{color:var(--acc);font-size:12.5px;font-weight:600;text-decoration:none}
+.mxop .op-jump a:hover{text-decoration:underline}
 .mxop .op-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
 .mxop .op-tile{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .mxop .op-tile b{display:block;font-size:26px;line-height:1.1;letter-spacing:-.02em}
@@ -10711,6 +10735,9 @@ function mxOnePagerInner(list){
   const delta = m => { const d = mxDelta(m); return d ? `<span class="op-d ${d.good}">${esc(d.text)} vs ${esc(d.prev)}</span>` : ""; };
   const row = m => { const st = mxStatus(m, mx.vals);
     return `<tr><td><b>${esc(m.n)}</b><small>${esc(MX_Q[m.n])}</small></td><td class="num">${esc(val(m))}<small class="op-meas">${esc(MX_SC[m.n][0])}</small>${delta(m)}</td><td class="num">${esc(mxTargetText(m) || "Not set")}</td><td>${mxSpark(m, 92, 26)}</td><td><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span></td></tr>`; };
+  // A page this long (every tier, each with its own table) needs jump links: the same fix as the
+  // two glossaries, so "find North-star metrics" doesn't mean scrolling the whole report by hand.
+  const jumps = (att.length ? [["mxop-sec-att", "Needs attention"]] : []).concat(MX_TORD.filter(t => measured.some(m => m.t === t)).map(t => [`mxop-sec-${t}`, MX_TIER_NAME[t]]));
   return `<header class="op-h"><div><div class="op-k">Trust &amp; Safety scorecard</div><h1>${esc(mx.period || "Current period")}</h1>
       <p>${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · EU DSA / UK OSA in scope" : ""}</p></div>
       <div class="op-date">Prepared ${esc(new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}))}</div></header>
@@ -10718,11 +10745,12 @@ function mxOnePagerInner(list){
       <div class="op-tile good"><b>${c.on}</b><span>On track</span></div><div class="op-tile med"><b>${c.watch}</b><span>Watch</span></div>
       <div class="op-tile crit"><b>${c.off}</b><span>Off track</span></div><div class="op-tile"><b>${list.length - measured.length}</b><span>Not measured yet</span></div>
     </section>
-    ${att.length ? `<section class="op-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
+    ${jumps.length > 1 ? `<nav class="op-jump" aria-label="Jump to section">${jumps.map(([id, n]) => `<a href="#${id}" data-jump="${id}">${esc(n)}</a>`).join("")}</nav>` : ""}
+    ${att.length ? `<section class="op-att" id="mxop-sec-att"><h2>Needs attention</h2><ul>${att.map(m => { const st = mxStatus(m, mx.vals), H = MX_HOW[m.n];
       return `<li><span class="op-st ${cls(st)}">${MX_STAT[st][0]}</span><span><b>${esc(m.n)}</b>: ${esc(MX_SC[m.n][0].charAt(0).toLowerCase() + MX_SC[m.n][0].slice(1))} is <b>${esc(val(m))}</b>, against a target of ${esc((mxTargetText(m) || "not set").replace(/^≤ 0 /, "0 "))}. Read it with ${esc(H.pair)}.</span></li>`; }).join("")}</ul></section>` : ""}
     ${mxSigHTML(list, true)}
     ${MX_TORD.map(t => { const ms = measured.filter(m => m.t === t); if(!ms.length) return "";
-      return `<section class="op-sec"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
+      return `<section class="op-sec" id="mxop-sec-${t}"><h2>${MX_TIER_NAME[t]}</h2><table><thead><tr><th>Metric</th><th>This period</th><th>Target</th><th>Trend</th><th>Status</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></section>`; }).join("")}
     <footer class="op-f">Status compares each value with the program's own target and off-track line. ${(mx.hist || []).length ? `Trends cover ${esc((mx.hist || []).map(h => h.p).concat(mx.period ? [mx.period] : []).filter((p, j, a) => a.indexOf(p) === j).join(", "))}. ` : ""}Made with T&amp;S Workbench.</footer>`;
 }
 function mxOnePagerDoc(list){
@@ -10742,6 +10770,9 @@ function mxOpenOnePager(list){
   document.addEventListener("keydown", onKey);
   bg.onclick = e => { if(e.target === bg) close(); };
   bg.querySelector('[data-op="close"]').onclick = close;
+  // preventDefault so these in-page jumps scroll the one-pager, not change location.hash (which the
+  // app's router would read as a route change and navigate away from this modal)
+  bg.querySelectorAll("[data-jump]").forEach(a => a.onclick = e => { e.preventDefault(); const el = bg.querySelector("#" + a.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   bg.querySelector('[data-op="print"]').onclick = () => { try{ window.print(); }catch(e){ flashIn(bg.querySelector("#mxop-toast"), "Printing isn't available here. Use Download instead."); } };
   const d = bg.querySelector('[data-op="dl"]'); if(d) d.onclick = () => offerFile(`ts-scorecard${mx.period ? "-" + mx.period.replace(/[^a-z0-9]+/gi, "-").toLowerCase() : ""}.html`, mxOnePagerDoc(list), mxScoreMd(list), bg.querySelector("#mxop-toast"));
   bg.querySelector('[data-op="close"]').focus();
@@ -11177,7 +11208,7 @@ function vdResultsRender(){
       <div class="card vd-railc cvr-radar">${vdRailHTML()}</div>
       <div class="cvr-side"><span class="as-eb">${all ? "Scorecard complete" : "Scorecard in progress"}</span><div class="verdict-row" aria-live="polite"><h1>${esc(headline)}</h1>${all && top ? gradeBadge(top.score / 5 * 100, "The winning vendor's weighted score out of 5, as a percentage") : ""}</div><div class="cvr-sum vd-why">${vdWhy()}</div>
         ${bench ? `<p class="bench-line">Typical range among the three built-in example vendors: ${bench.min.toFixed(2)}–${bench.max.toFixed(2)} out of 5</p>` : ""}
-        ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+        ${failed.length ? `<ol class="pk-list gd-vacts">${failed.slice(0, 3).map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="cvr-a"><button type="button" class="btn" data-vd="page">Change scores or weights</button><button type="button" class="btn" id="vx-save">${icon("save")}${wsSaveLabel("vendors", vx)}</button>${DL ? `<button type="button" class="btn primary" id="vx-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn" id="vx-copy">${icon("copy")}Copy</button><button type="button" class="btn" id="vx-sharelink">Copy link</button></div>
         <div class="cvr-more"><button type="button" class="ov-link" id="vx-reset">See an example</button><button type="button" class="ov-link" id="vx-own">Start over</button></div></div>
     </div>
@@ -12005,7 +12036,7 @@ function renderTools(){
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong <span class="ov-term">precision and recall</span>`) : ""}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
         ${typeof RT_AREAS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">Work in progress</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${RT_AREAS.length} harm areas · drills, findings, exports`) : ""}
         ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
@@ -14954,7 +14985,7 @@ function rtfOpen(){
   const q = RT_PRACTICE.grade[0], f = rtF(), picked = f.openPick;
   return `<span class="rtf-eb">Free · private · a 60-second try</span><h1 class="rtf-h1">Find out what your AI model does when someone tries to make it cause harm</h1>
     <p class="rtf-lead">Before your users do. Try it now: here is something a model said. How bad was it?</p>
-    <div class="rtf-q"><p>${esc(q.q)}</p><div class="rtf-opts">${RT_GRADES.slice(0, 4).map((g, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === q.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}><b>${j}</b>${g[0]}</button>`).join("")}</div>
+    <div class="rtf-q"><p>${esc(q.q)}</p><p class="note">0 means it refused or helped safely; 3 means it gave something a person could actually use.</p><div class="rtf-opts">${RT_GRADES.slice(0, 4).map((g, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === q.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}><b>${j}</b>${g[0]}</button>`).join("")}</div>
     ${picked != null ? `<div class="learn ${picked === q.a ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${picked === q.a ? "That is it" : "Close: it is a " + q.a}</div><p>${esc(q.why)} You just did the hardest part of red teaming: judging the answer.</p></div>` : ""}</div>
     ${picked != null ? rtfNext("Learn the basics in 10 minutes", `<button type="button" class="btn" data-rtf="skipbasics">I know the basics, set up a test</button><button type="button" class="btn" data-rtf="example">See a finished example</button>`) : `<p class="note">Free and private. Nothing you type leaves your browser. No harmful text anywhere in this tool.</p>`}`;
 }
@@ -16466,7 +16497,7 @@ function renderPolicy(){
          <button type="button" class="btn sm" id="pol-reset">Start over</button>
          <button type="button" class="btn sm" id="pol-save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("policy")}</span></button>
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}
-         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy report</button>
+         <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy as text</button>
          <button type="button" class="btn sm" id="pol-sharelink">Copy link</button>`)
     : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
         `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}`))
@@ -16585,7 +16616,7 @@ function polReportHTML(ai){
 }
 function polTabHTML(tab){
   const h = pol.heur, r = pol.result;
-  if(tab === "checks") return `<ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span><div>${esc(t)}</div></li>`).join("")}</ul>`;
+  if(tab === "checks") return `<p class="note pol-find-legend"><span class="pol-find-lg ok">✓ Good</span><span class="pol-find-lg info">i Note</span><span class="pol-find-lg warn">! Issue</span></p><ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span><div>${esc(t)}</div></li>`).join("")}</ul>`;
   if(tab === "cases"){
     const counts = {all:r.edge_cases.length, allow:0, remove:0, escalate:0}; r.edge_cases.forEach(c => counts[c.decision]++);
     const cases = r.edge_cases.filter(c => pol.filter === "all" || c.decision === pol.filter);
@@ -16833,7 +16864,7 @@ Return ONLY a JSON object with exactly these keys:
     ${r.suggested_action ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Suggested action</h3></div><p class="ai-p">${esc(r.suggested_action)}</p></div>` : ""}
     ${r.reply_to_user ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Reply to the user</h3><button type="button" class="btn sm" data-copy="reply_to_user">${icon("copy")}Copy</button></div><div class="ai-letter"><div class="ai-body">${esc(r.reply_to_user)}</div></div></div>` : ""}
     ${r.note_for_record ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Note for the case file</h3><button type="button" class="btn sm" data-copy="note_for_record">${icon("copy")}Copy</button></div><p class="ai-p">${esc(r.note_for_record)}</p></div>` : ""}
-    ${r.policy_feedback ? `<div class="ai-sec ai-fb"><div class="ai-sec-h"><h3>Feedback for the policy team</h3></div><p class="ai-p">${esc(r.policy_feedback)}</p></div>` : ""}`; },
+    ${r.policy_feedback ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Feedback for the policy team</h3><button type="button" class="btn sm" data-copy="policy_feedback">${icon("copy")}Copy</button></div><p class="ai-p">${esc(r.policy_feedback)}</p></div>` : ""}`; },
   md:r => ["# Appeal review", "", `**Recommendation:** ${AI_REC[r.recommendation][0]} (${r.confidence} confidence)`, "", r.summary, "",
     ...((r.steering_attempts || []).length ? ["## Text in the case tried to steer this review", ...r.steering_attempts.map(x => "- " + x), ""] : []), "## Does the rule apply?",
     ...r.elements.map(e => `- **${e.element}**: ${e.met}. ${e.reasoning}`), "", "## The user's arguments", ...r.user_arguments.map(a => `- ${a.argument} (${a.persuasive ? "persuasive" : "not persuasive"}): ${a.assessment}`), "",
@@ -17530,7 +17561,7 @@ function maPlanHTML(){
         <div class="ma-score big"><b class="mono">${sc.toFixed(1)}</b><span class="note">/ 5</span><span class="pill ma-pill">${maLevelName(sc)}</span></div>
         <div class="ma-band-t verdict-row" aria-live="polite">${maWhy()}${gradeBadge(sc / 5 * 100, "Average level across your eight areas, out of 5, shown as a percentage")}</div>
         ${maBenchScore() !== null && !ma.ex ? `<p class="bench-line">Typical for a growing company like the built-in example: level ${maBenchScore().toFixed(1)} of 5</p>` : ""}
-        ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+        ${topGaps.length ? `<ol class="pk-list ma-band-acts">${topGaps.map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
         <div class="ma-band-p"><div class="ma-prog-t"><span>${pr.done} of ${pr.items} actions done${pr.gained ? ` · ${pr.gained} level${pr.gained === 1 ? "" : "s"} gained` : ""}</span><span>${gaps.length ? `${gaps.length} below target` : "All on target"}</span></div>
           <div class="vd-bar"><i style="width:${pr.items ? pr.done / pr.items * 100 : 100}%"></i></div></div>
       </div>
@@ -18147,9 +18178,8 @@ function cvIntroHTML(){
     <h1>Do your defenses keep up with your risk?</h1>
     <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
     <div class="gd-facts"><div><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
-    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button>
-      ${!src ? `<button type="button" class="btn gd-cta" data-ov="new">Run a pre-mortem first</button>` : ""}</div>
-    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
+    <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button></div>
+    <div class="gd-alt"><span>Other ways in:</span>${!src ? `<button type="button" class="ov-link" data-ov="new">Run a pre-mortem first, to compare against real risk</button>` : ""}<button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
   </div>${cvPreviewHTML()}`;
 }
 function cvApplyHTML(){
@@ -19502,7 +19532,7 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy as text</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
     : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -21290,7 +21320,7 @@ function cpReportHTML(x, ap, s){
       ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
         <span class="toast" id="cp-toast" role="status" aria-live="polite"></span></div></div>
-    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
     ${chapterLinkHTML("coppa")}
     <details class="ev-details"><summary>Details <span class="note">Your plan, data map, drafts and requirements</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["map", "Data map", x.rows.length], ["drafts", "Drafts", CP_DRAFTS.length], ["reqs", "Requirements", s.total]].map(([k, nm, c]) => `<button type="button" data-cptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
@@ -21799,7 +21829,7 @@ function dsReportHTML(x, ap, s){
       ${bench !== null && !ds.ex ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% ready</p>` : ""}
         <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} duties in place</span>${feats.length ? `<span class="pill">${esc(feats.join(" · "))}</span>` : ""}</div>
         <span class="toast" id="ds-toast" role="status" aria-live="polite"></span></div></div>
-    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
+    ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
     ${chapterLinkHTML("dsa")}
     <details class="ev-details"><summary>Details <span class="note">Your plan, duties and drafts</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["duties", "Duties", s.total], ["drafts", "Drafts", DS_DRAFTS.length]].map(([k, nm, c]) => `<button type="button" data-dstab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
