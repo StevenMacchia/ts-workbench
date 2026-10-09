@@ -382,7 +382,7 @@ const body9 = function(){
   const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   // world step 5, "How to test" (the techniques step): a leading 12-row table used to be crammed into the
   // same card as the six-item "run it in this order" list; now the table is its own card.
-  const wSteps = LN_GUIDES.world.steps, wTech = wSteps[4]; eq(wTech.id, "techniques", "world step 5 is the techniques step");
+  const wSteps = LN_GUIDES.world.steps, wTech = wSteps.find(s => s.id === "techniques"); eq(!!wTech, true, "the world guide has a techniques step (How to test)");
   const wCards = lnStepCards("world", wTech);
   eq(wCards.length >= 3, true, "world step 5 splits into at least three cards: got " + wCards.length);
   eq(/class="ln-tblflip"/.test(wCards[0].html) && /data-astable=/.test(wCards[0].html), true, "the table lands on its own card, as rows with an As a table toggle");
@@ -606,7 +606,7 @@ const body13 = function(){
   eq(diff.eg.length, diffCards.length, "the different step's eg array still matches its card count");
   const harms = wSteps.find(s => s.id === "harms");
   eq(/Impersonation with voice and face/.test(harms.body), true, "the harms table gets an impersonation-with-voice-and-face row");
-  eq(/Physical-safety risk in embodied use/.test(harms.body) && /out of scope/.test(harms.body), true, "the harms table gets a physical-safety row marked out of scope for this guide's drills");
+  eq(/Physical-safety risk in embodied use/.test(harms.body) && /see the embodied step/.test(harms.body), true, "the harms table's physical-safety row now points to the embodied step instead of a bare out-of-scope pill");
   const harmsCards = lnStepCards("world", harms);
   eq(harms.eg.length, harmsCards.length, "the harms step's eg array still matches its card count after the new rows");
   const law = wSteps.find(s => s.id === "law");
@@ -638,3 +638,54 @@ const body13 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body13.toString() + ")();")());
+// Embodied handoff step (2026-10-09): the world guide's "What is different" card named embodiment and stopped;
+// this adds a step between it and Scope that is the handoff, not a drill -- three cards (am I in this branch,
+// what a safety case is, what T&S still owns), a check, an exercise, a sources group and three glossary terms.
+const body14 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const wSteps = LN_GUIDES.world.steps;
+  const idx = wSteps.findIndex(s => s.id === "embodied");
+  eq(idx > -1, true, "the embodied step exists");
+  eq(wSteps[idx - 1].id, "different", "it sits right after What is different");
+  eq(wSteps[idx + 1].id, "scope", "it sits right before Scope the exercise");
+  const emb = wSteps[idx];
+  eq(emb.title, "When the world steers something real", "the step's title matches");
+  const cards = lnStepCards("world", emb);
+  eq(cards.map(c => c.heading).join(" | "), "Is this you? | What a safety case is, in one card | What a T&S person still owns here", "the step renders its three named cards in order");
+  eq(/ln-note/.test(cards[2].html) && /Treat this step as the handoff/.test(cards[2].html), true, "the handoff note lands on the last card");
+  eq(Array.isArray(emb.eg) && emb.eg.length === cards.length, true, "the eg array has one Pixelry line per card (" + cards.length + ")");
+  eq(emb.eg.every(l => /Pixelry/.test(l)), true, "every eg line is a For Pixelry line");
+  eq(!!emb.check && typeof emb.check.q === "string" && emb.check.options.length === 3 && Number.isInteger(emb.check.a), true, "the step has a three-option check question");
+  eq(emb.have, "a one-page handoff: owner, hazards, what T&S keeps", "the have-line matches");
+  eq(emb.mins, 30, "the minutes estimate is 30");
+  eq(emb.ex, "e13", "the step points at exercise e13");
+  // the exercise itself: a handoff, not a safety-case authoring exercise
+  const ex13 = LN_GUIDES.world.exercises.find(e => e.id === "e13");
+  eq(!!ex13 && ex13.title === "Embodied handoff in 30 minutes", true, "exercise e13 exists with its title");
+  eq(/hazards named so far/.test(ex13.output) && /what T&S keeps/.test(ex13.output), true, "the exercise's output is the handoff page, not a safety case");
+  eq(ex13.steps.length === 5 && ex13.plain.length === 5, true, "the exercise has five steps and a five-step plain rewrite");
+  // What is different" now points here instead of saying the guide doesn't cover it; the harms row too
+  const diff = wSteps.find(s => s.id === "different"), harms = wSteps.find(s => s.id === "harms");
+  eq(/When the world steers something real/.test(diff.body), true, "the embodiment bullet in What is different now names the new step");
+  eq(/This guide's drills do not cover that exercise/.test(diff.body), false, "it no longer just says the guide doesn't cover it");
+  eq(/see the embodied step/.test(harms.body), true, "the harms table's physical-safety row points at the embodied step");
+  // sources: a new world-tagged group with the verified standards
+  const embGroup = LN_REFS.find(r => r.title === "Safety cases and standards for embodied systems");
+  eq(!!embGroup && embGroup.k === "world", true, "a new world-tagged LN_REFS group covers safety cases and standards");
+  ["ISO 21448", "ISO 26262", "UL 4600", "ISO 10218", "ISO 13482", "EU AI Act"].forEach(name => {
+    eq(embGroup.items.some(it => it[1].includes(name)), true, "the group cites " + name);
+  });
+  eq(embGroup.items.every(it => /^https:\/\//.test(it[0])), true, "every citation is a real link");
+  // glossary: three new terms, world-tagged, under 40 words
+  ["Safety case", "Operational design domain (ODD)", "Sim-to-real gap"].forEach(term => {
+    const row = LN_GLOSS.find(t => t[0] === term);
+    eq(!!row, true, "LN_GLOSS gains a \"" + term + "\" entry");
+    eq(row[1], "world", "\"" + term + "\" is tagged world");
+    eq(lnWordCount(row[2]) <= 40, true, "\"" + term + "\"'s definition is at or under 40 words");
+  });
+  // the generic per-step and per-exercise checks already run on the whole guide (body10's forEach, body()'s
+  // plain-drill check) cover this step and this exercise too, since they iterate LN_GUIDES[k].steps/exercises.
+  out.push("embodied step: three named cards (am I in this branch, what a safety case is, what T&S still owns) plus a check and a handoff exercise; What is different and the harms table now point at it; a new sources group and three glossary terms");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body14.toString() + ")();")());
