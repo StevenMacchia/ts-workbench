@@ -142,9 +142,20 @@ const body3 = function(){
   tr.layer = "filter"; tr.notes = "it named a person"; rtGo(6); if(bad(H())) throw new Error("finding bad: " + where(H())); eq(/Your first finding/.test(H()) && /Expert write-up/.test(H()) && /Output classifier/.test(H()), true, "five parts with the expert write-up");
   rtM1().finding.why = "the filter passed it"; rtM1().finding.cause = "a stalker could confirm a customer"; rtM1File(); eq(rt.findings.length, 1, "filed"); eq(rt.findings[0].sev === 3 && rt.findings[0].area === "privacy" && /named a person/.test(rt.findings[0].sum), true, "finding carries grade, area and notes");
   eq(rtM1().done[8], true, "writing the finding ticks the last item"); renderRedteamStudio(); eq(/3 of 9 things tested/.test(H()), true, "checklist counts");
-  rtM1().target = "media"; rt.model = "world"; rtGo(3); eq((H().match(/data-move=/g) || []).length === 6 && /cartoon/.test(H()), true, "world model moves");
+  rtM1().target = "media"; rt.model = "world"; rtGo(3); eq((H().match(/data-move=/g) || []).length === 8 && /cartoon/.test(H()), true, "world model moves, now including voice cloning and live steering");
   const s = rtScreens(); eq(s[1].k === "target" && s[2].k === "card" && s[6].k === "finding1" && s[7].k === "hub", true, "module one leads to the hub");
   out.push("module 1: target, card, 3 tries with rubric and gap, finding filed, checklist ticks");
+  // World-model additions: the voice-clone and live-steering moves, the impersonation aim, its rubric and
+  // past-tense phrasing, the move-level fix text for style/upload/voice, and the robotics/vehicle note on
+  // the one world target card, since no target type here is itself a robotics or driving target.
+  eq(RT_MOVES.world.some(m => m[0] === "voice") && RT_MOVES.world.some(m => m[0] === "live"), true, "the voice-clone and live-steering moves are in the world move list");
+  eq(RT_MOVES.world.length <= 8, true, "the world move list stays at eight or fewer");
+  eq(RT_AIM_LIST.world.some(a => a[0] === "impersonate"), true, "impersonation is an aim for world models");
+  eq(RT_OBS.impersonate.length === 5 && RT_OBS.impersonate.every(([t, g]) => g >= 0 && g <= 4), true, "impersonation has a five-point rubric");
+  eq(RT_AIM_PAST.world.impersonate, "it cloned a voice or face for someone else to use", "the impersonation aim has its own past-tense phrasing");
+  RT_AIM_LIST.world.forEach(a => { eq(!!(RT_OBS[a[0]] || RT_OBS.default), true, "world aim " + a[0] + " resolves to a rubric"); eq(rtAimPast("world", a[0], a[1]).length > 0, true, "world aim " + a[0] + " resolves to a past-tense phrase"); });
+  eq(!!RT_FIX_MOVE.style && !!RT_FIX_MOVE.upload && !!RT_FIX_MOVE.voice, true, "style, upload and voice moves each have their own fix text, not just the aim default");
+  eq(/safety-engineering exercise with a safety case/.test(RT_TARGETS.find(t => t.k === "media").card.out), true, "the media target's out-of-scope line notes that steering a robot or vehicle is a separate safety exercise, since no robotics target exists here");
   // Fix direction follows the move used, not only the aim: a persona claim and a hidden instruction are
   // different root causes even when aimed at the same harm, "make it act when it should not" (RT_PLAIN.agentic
   // names the harm, not a technique). The title and the "Show the work" line must say what happened, not
@@ -171,6 +182,12 @@ const body4 = function(){
   eq(RT_BANK.move.every(it => it.opts.includes(it.a) && it.opts.length === 4), true, "every move item has four options including the answer");
   eq(RT_BANK.fair.every(it => it.opts[it.a] && it.why), true, "every fair item has its answer among the options");
   const ids = ["grade", "move", "fair"].flatMap(k => RT_BANK[k].map((it, i) => k + "-" + i)); eq(new Set(ids).size, ids.length, "ids unique");
+  // World-model additions to the judge bank: two impersonation grade items, a provenance-stripped-by-re-save
+  // item, a real-time sequence item where no single step was refused, and a move item for the voice clone.
+  eq(RT_BANK.grade.filter(it => it.area === "impersonate").length, 2, "two grade items for the impersonation aim");
+  eq(RT_BANK.grade.some(it => it.area === "prov" && /re-saved/.test(it.q)), true, "a grade item covers provenance stripped by a re-save");
+  eq(RT_BANK.grade.some(it => it.area === "violence" && it.k === "world" && /No single step was refused/.test(it.q)), true, "a grade item covers a real-time sequence that reaches harm with no single step refused");
+  eq(RT_BANK.move.some(it => it.k === "world" && it.a === "Audio" && /nothing to prove they are the same person/.test(it.q)), true, "a move item covers the voice-clone technique and the missing same-person check");
   rt = RT_BLANK(); rt.model = "llm"; rtJStart(); const c = rtJ().cur; eq(c.ids.length, 10, "a session is ten items"); eq(new Set(c.ids.slice(0, 3).map(id => id.split("-")[0])).size, 3, "the first three interleave the three drills");
   rtF().path = "judge"; rtF().i = rtScreens().findIndex(x => x.k === "judge"); renderRedteamStudio(); if(bad(H())) throw new Error("judge bad: " + where(H()));
   eq(/Your call/.test(H()) || /What did the attacker do/.test(H()) || /Which should the model answer/.test(H()), true, "a judge card asks for the call first"); eq(/Expert's call/.test(H()), false, "no expert call before yours");
@@ -223,6 +240,15 @@ const body5 = function(){
   rtGo(rtScreens().findIndex(x => x.k === "plan3")); if(bad(H())) throw new Error("plan3 bad: " + where(H())); eq((H().match(/data-ack=/g) || []).length, 7, "seven rules to acknowledge");
   RT_RULES.forEach((r, i) => rtP().ack[i] = true); rtP().dated = "2026-10-08"; renderRedteamStudio(); eq(/Plan done/.test(H()), true, "all seven ticked and dated finishes the plan"); eq(/Acknowledged by: 7 of 7/.test(rtPlanText()), true, "the plan export records the acknowledgement");
   out.push("plan the week: scope, " + pers.length + " personas, " + rows.length + "-row sheet, invite, 7 rules, dated");
+  // The world-model test sheet always carries a provenance re-check and a same-person voice/face check,
+  // even though both are controls rather than picked harm areas; an llm-only plan gets neither.
+  eq(rows.some(r => r.check), false, "an llm-only plan has no world-only control-check rows");
+  const consentRule = RT_RULES.find(r => r[0] === "Real faces and voices need written consent");
+  eq(consentRule[1].includes("same consenting person"), true, "the consent rule covers the voice-and-face same-person check");
+  rt = RT_BLANK(); rt.model = "world"; rt.areas = {ncii:1}; rtSave();
+  const wrows = rtSheetRows();
+  eq(wrows.some(r => r.check && r.area === "prov"), true, "the world sheet always has a provenance re-check row");
+  eq(wrows.some(r => r.check && r.area === "impersonate"), true, "the world sheet always has a voice-and-face same-person check row");
   // Partial setup: the model and the harm areas are already answered from Start here, only who-and-time is not,
   // so only the team card should be re-asked; Change reopens all three existing setup cards, nothing new is built
   rt = RT_BLANK(); rt.model = "llm"; rt.areas = {fraud:1}; rt.surf = {chat:1}; rt.att = {curious:1}; rtM1().target = "support"; rtM1().card = Object.assign({}, RT_TARGETS[0].card); rt.flow = {i:0, basics:{}, drill:{}, fix:{}, skipBasics:true, path:"plan"}; rtSave();
@@ -565,3 +591,50 @@ const body12 = function(){
   return out.join("\n");
 };
 console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body12.toString() + ")();")());
+// World guide research refresh (2026-10): embodiment and real-time generation in "What is different", a
+// same-person voice/face check in the audio callout, impersonation and physical-safety rows in the harms
+// table, the four synthetic-media laws now in force, provenance framed as a moving-adversary measurement,
+// and the matching LN_REFS groups and LN_GLOSS entries.
+const body13 = function(){
+  const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
+  const wSteps = LN_GUIDES.world.steps;
+  const diff = wSteps.find(s => s.id === "different");
+  eq(/embodiment/.test(diff.body) && /20 to 40 milliseconds/.test(diff.body) && /persistent world|A world can be a place you keep/.test(diff.body), true, "the different step names embodiment, real-time generation and persistent 3D worlds");
+  eq(/same consenting person/.test(diff.body), true, "the audio callout adds the same-person voice/face test");
+  const diffCards = lnStepCards("world", diff);
+  eq(diffCards.length, 1, "the different step is still a single card after the new bullets");
+  eq(diff.eg.length, diffCards.length, "the different step's eg array still matches its card count");
+  const harms = wSteps.find(s => s.id === "harms");
+  eq(/Impersonation with voice and face/.test(harms.body), true, "the harms table gets an impersonation-with-voice-and-face row");
+  eq(/Physical-safety risk in embodied use/.test(harms.body) && /out of scope/.test(harms.body), true, "the harms table gets a physical-safety row marked out of scope for this guide's drills");
+  const harmsCards = lnStepCards("world", harms);
+  eq(harms.eg.length, harmsCards.length, "the harms step's eg array still matches its card count after the new rows");
+  const law = wSteps.find(s => s.id === "law");
+  eq(/Article 50/.test(law.body) && /2 August 2026/.test(law.body), true, "the law step cites EU AI Act Article 50 and its in-force date");
+  eq(/TAKE IT DOWN Act/.test(law.body) && /19 May 2026/.test(law.body), true, "the law step cites the US TAKE IT DOWN Act and the platform deadline");
+  eq(/Data \(Use and Access\) Act 2025/.test(law.body) && /6 February 2026/.test(law.body), true, "the law step cites the UK Data (Use and Access) Act 2025 and its in-force date");
+  eq(/hash-match/.test(law.body), false, "the UK clause drops the hash-matching claim, which did not verify against the cited source");
+  eq(/SB 942/.test(law.body) && /AB 2839/.test(law.body) && /permanently enjoined/.test(law.body), true, "the law step cites California SB 942 and notes AB 2839/2655 were enjoined");
+  const lawCards = lnStepCards("world", law);
+  eq(law.eg.length, lawCards.length, "the law step's eg array matches its (possibly new) card count");
+  const grade = wSteps.find(s => s.id === "grade"), techniques = wSteps.find(s => s.id === "techniques"), check = wSteps.find(s => s.id === "check");
+  eq(/moving adversary/.test(grade.body) && /no watermark was found, not that the content is authentic/.test(grade.body), true, "the grade step frames provenance as a measurement against a moving adversary");
+  eq(/strip a watermark/.test(techniques.body), true, "the techniques step notes public tools already strip watermarks and metadata");
+  eq(/next month's removal tool/.test(check.body), true, "the check-the-fixes step frames a provenance pass as temporary, not permanent");
+  const worldRefs = LN_REFS.filter(r => r.k === "world");
+  eq(worldRefs.some(g => g.items.some(it => it[0] === "https://synthid.com")), true, "LN_REFS gains the public SynthID Detector link");
+  const vidGroup = worldRefs.find(g => g.title === "Video and embodiment red-teaming research");
+  eq(!!vidGroup, true, "a new LN_REFS group covers video and embodiment red-teaming research");
+  eq(vidGroup.items.map(it => it[1]).join(","), "TEAR,JailWAM,Security of World-Model-Based Embodied AI", "the group lists TEAR, JailWAM and the embodied-AI security survey");
+  const cardGroup = worldRefs.find(g => g.title === "Vendor system cards");
+  eq(!!cardGroup && cardGroup.items.some(it => it[0] === "https://openai.com/index/sora-2-system-card/"), true, "a new LN_REFS group links the Sora 2 system card");
+  ["Same-person check", "Embodied world model", "Real-time generation"].forEach(term => {
+    const row = LN_GLOSS.find(t => t[0] === term);
+    eq(!!row, true, "LN_GLOSS gains a \"" + term + "\" entry");
+    eq(row[1], "world", "\"" + term + "\" is tagged world");
+    eq(lnWordCount(row[2]) <= 40, true, "\"" + term + "\"'s definition is at or under 40 words");
+  });
+  out.push("world guide research refresh: embodiment, real-time generation and persistent worlds in What is different; the same-person audio test; impersonation and physical-safety harm rows; the four in-force synthetic-media laws with the unverified UK hash-matching clause dropped; provenance framed against a moving adversary in grade, techniques and check; new SynthID Detector, video/embodiment research and vendor system card sources; three new glossary entries");
+  return out.join("\n");
+};
+console.log(new Function(stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partLearn.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partLOOP.js")].join("\n") + "\nreturn (" + body13.toString() + ")();")());
