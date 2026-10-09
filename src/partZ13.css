@@ -136,7 +136,6 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .ma-lg-old,.rv-lg-dot{border-color:var(--accent)!important}
 .ma-old,.cv-prev,.ev-r-prev{stroke:var(--accent);stroke-opacity:.55}
 .ma-dot.ok,.cv-dot.ok{fill:var(--accent)}
-.ov-art-ring{stroke:var(--accent);stroke-opacity:.4}
 .gd-radio{border-color:var(--line-strong);color:var(--muted)}
 .gd-opt.on .gd-radio{border-color:var(--accent);color:#fff}
 .pagehead h1{display:block;width:fit-content;max-width:100%}

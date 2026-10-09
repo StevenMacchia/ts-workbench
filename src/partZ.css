@@ -203,8 +203,9 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:-.02em}
 .ov-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font:500 11.5px var(--mono);color:var(--faint)}
 .ov-go{width:15px;height:15px;color:var(--c);opacity:0;transform:translateX(-4px);transition:.2s}
 .ov-tool:hover .ov-go{opacity:1;transform:none}
-.ov-tool:hover .sweep{animation:ovspin 2.4s linear infinite;transform-origin:80px 62px}
-@keyframes ovspin{to{transform:rotate(360deg)}}
+.ca-art{width:100%;height:100%;display:block}
+.ca-peach{fill:#FF9A7A;opacity:.3}
+.ca-ic{color:var(--accent)}
 .ov-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px}
 .ov-list{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
 .ov-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:11px 14px;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left;cursor:pointer;color:inherit;transition:background .12s}

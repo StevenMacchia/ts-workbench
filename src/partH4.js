@@ -1,68 +1,12 @@
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
-const OV_ART = {
-  pm:`<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><linearGradient id="ovsw" x1="0" x2="1"><stop offset="0" stop-color="var(--t-pm)" stop-opacity="0"/><stop offset="1" stop-color="var(--t-pm)" stop-opacity=".35"/></linearGradient></defs>
-    <circle cx="80" cy="62" r="46" fill="none" stroke="var(--line-strong)"/><circle cx="80" cy="62" r="30" fill="none" stroke="var(--line-strong)"/><circle cx="80" cy="62" r="14" fill="none" stroke="var(--line-strong)"/>
-    <path class="sweep" d="M80 62 L126 62 A46 46 0 0 0 112.5 29.5 Z" fill="url(#ovsw)"/>
-    <circle cx="104" cy="40" r="9" fill="var(--crit)" opacity=".15"/><circle cx="104" cy="40" r="4" fill="var(--crit)"/><circle cx="52" cy="78" r="3.5" fill="var(--high)"/><circle cx="96" cy="92" r="3" fill="var(--faint)"/><circle cx="58" cy="44" r="3" fill="var(--faint)"/>
-    <circle cx="80" cy="62" r="9" fill="var(--t-pm)"/><path d="M76.5 62l2.4 2.4 4.6-4.8" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  tt:`<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="M24 88 H136" stroke="var(--line-strong)" stroke-dasharray="3 4"/>
-    <circle cx="36" cy="88" r="5" fill="var(--good)"/><circle cx="68" cy="88" r="5" fill="var(--high)"/><circle cx="100" cy="88" r="10" fill="var(--t-tt)" opacity=".18"/><circle cx="100" cy="88" r="5" fill="var(--t-tt)"/><circle cx="132" cy="88" r="5" fill="var(--surface)" stroke="var(--line-strong)"/>
-    <rect x="52" y="22" width="84" height="44" rx="8" fill="var(--surface)" stroke="var(--line-strong)"/><rect x="62" y="32" width="30" height="6" rx="3" fill="var(--t-tt)" opacity=".85"/><rect x="62" y="44" width="62" height="4" rx="2" fill="var(--faint)" opacity=".55"/><rect x="62" y="53" width="46" height="4" rx="2" fill="var(--faint)" opacity=".35"/>
-    <circle cx="38" cy="40" r="14" fill="var(--surface)" stroke="var(--line-strong)"/><path d="M38 32v8l5 3" stroke="var(--t-tt)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
-  mx:`<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><linearGradient id="ovar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--t-mx)" stop-opacity=".35"/><stop offset="1" stop-color="var(--t-mx)" stop-opacity="0"/></linearGradient></defs>
-    <path d="M22 96 H138" stroke="var(--line-strong)"/><path d="M22 72 H138 M22 48 H138" stroke="var(--line)"/>
-    <path d="M22 84 C40 80 48 62 64 66 S88 44 104 48 S126 30 138 28 V96 H22Z" fill="url(#ovar)"/><path d="M22 84 C40 80 48 62 64 66 S88 44 104 48 S126 30 138 28" fill="none" stroke="var(--t-mx)" stroke-width="2"/>
-    <circle cx="138" cy="28" r="4" fill="var(--t-mx)" stroke="var(--surface)" stroke-width="2"/></svg>`,
-  vd:`<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <rect x="28" y="30" width="104" height="22" rx="6" fill="var(--surface)" stroke="var(--line-strong)"/><rect x="36" y="38" width="22" height="6" rx="3" fill="var(--faint)" opacity=".55"/><rect x="72" y="38" width="46" height="6" rx="3" fill="var(--sunk)"/><rect x="72" y="38" width="38" height="6" rx="3" fill="var(--t-vd)"/>
-    <rect x="28" y="58" width="104" height="22" rx="6" fill="var(--surface)" stroke="var(--line-strong)"/><rect x="36" y="66" width="22" height="6" rx="3" fill="var(--faint)" opacity=".55"/><rect x="72" y="66" width="46" height="6" rx="3" fill="var(--sunk)"/><rect x="72" y="66" width="27" height="6" rx="3" fill="var(--t-vd)" opacity=".55"/>
-    <rect x="28" y="86" width="104" height="22" rx="6" fill="var(--surface)" stroke="var(--line-strong)"/><rect x="36" y="94" width="22" height="6" rx="3" fill="var(--faint)" opacity=".55"/><rect x="72" y="94" width="46" height="6" rx="3" fill="var(--sunk)"/><rect x="72" y="94" width="18" height="6" rx="3" fill="var(--crit)" opacity=".7"/>
-    <circle cx="132" cy="30" r="9" fill="var(--t-vd)"/><path d="M128.4 30l2.3 2.3 4.2-4.4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-};
-OV_ART.pol = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <rect x="34" y="18" width="80" height="92" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
-    <rect x="46" y="32" width="44" height="6" rx="3" fill="var(--t-pol)" opacity=".85"/>
-    <rect x="46" y="46" width="56" height="4" rx="2" fill="var(--faint)" opacity=".5"/><rect x="46" y="56" width="22" height="4" rx="2" fill="var(--faint)" opacity=".5"/>
-    <rect x="70" y="54" width="32" height="8" rx="3" fill="var(--high)" opacity=".22"/><rect x="72" y="56" width="28" height="4" rx="2" fill="var(--high)" opacity=".75"/>
-    <rect x="46" y="68" width="50" height="4" rx="2" fill="var(--faint)" opacity=".5"/><rect x="46" y="78" width="40" height="4" rx="2" fill="var(--faint)" opacity=".35"/><rect x="46" y="88" width="46" height="4" rx="2" fill="var(--faint)" opacity=".35"/>
-    <circle cx="116" cy="84" r="20" fill="var(--surface)" stroke="var(--t-pol)" stroke-width="3"/><path d="M130 98l10 10" stroke="var(--t-pol)" stroke-width="4" stroke-linecap="round"/>
-    <path d="M108.5 84l5 5 9-10" stroke="var(--t-pol)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-{
-  const oct = (r, vals) => [0,1,2,3,4,5,6,7].map(i => { const a = -Math.PI/2 + i*Math.PI/4, rr = vals ? vals[i]/4*r : r; return (80 + Math.cos(a)*rr).toFixed(1) + "," + (62 + Math.sin(a)*rr).toFixed(1); }).join(" ");
-  const cur = [3.4,2,3,2.2,1.4,2.6,3,3.2], low = -Math.PI/2 + 4*Math.PI/4;
-  OV_ART.ma = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    ${[46, 34, 22].map(r => `<polygon points="${oct(r)}" fill="none" stroke="var(--line-strong)"/>`).join("")}
-    <polygon points="${oct(46, cur)}" fill="var(--t-ma)" fill-opacity=".22" stroke="var(--t-ma)" stroke-width="2" stroke-linejoin="round"/>
-    <polygon class="ov-art-ring" points="${oct(34.5)}" fill="none" stroke="var(--ink)" stroke-opacity=".5" stroke-dasharray="3 3"/>
-    <circle cx="${(80 + Math.cos(low)*1.4/4*46).toFixed(1)}" cy="${(62 + Math.sin(low)*1.4/4*46).toFixed(1)}" r="4" fill="var(--crit)"/></svg>`;
-}
-OV_ART.cv = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <polygon points="80,16 118,32 126,70 104,104 56,104 34,70 42,32" fill="none" stroke="var(--line-strong)"/><polygon points="80,39 99,47 103,66 92,83 68,83 57,66 61,47" fill="none" stroke="var(--line-strong)"/>
-    <polygon points="80,22 114,35 112,68 96,98 70,90 44,69 50,36" fill="var(--crit)" fill-opacity=".1" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3"/>
-    <polygon points="80,30 108,39 118,70 86,82 66,92 48,68 58,44" fill="var(--t-cv)" fill-opacity=".25" stroke="var(--t-cv)" stroke-width="2" stroke-linejoin="round"/>
-    <circle cx="86" cy="82" r="4" fill="var(--crit)" stroke="var(--surface)" stroke-width="1.5"/></svg>`;
-OV_ART.rt = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <rect x="22" y="22" width="80" height="80" rx="10" fill="var(--surface)" stroke="var(--line-strong)"/>
-    ${[0,1,2,3].map(r => [0,1,2,3].map(c => `<rect x="${32 + c * 16}" y="${32 + r * 16}" width="12" height="12" rx="3" fill="${(r + c) % 3 === 0 ? "var(--t-rt)" : (r * 4 + c) % 5 === 0 ? "var(--high)" : "var(--sunk)"}" opacity="${(r + c) % 3 === 0 ? ".85" : "1"}"/>`).join("")).join("")}
-    <circle cx="124" cy="62" r="24" fill="var(--surface)" stroke="var(--t-rt)" stroke-width="3"/><circle cx="124" cy="62" r="14" fill="none" stroke="var(--t-rt)" stroke-width="2" opacity=".6"/><circle cx="124" cy="62" r="5" fill="var(--t-rt)"/>
-    <path d="M124 30v8M124 86v8M92 62h8M148 62h8" stroke="var(--t-rt)" stroke-width="2.5" stroke-linecap="round"/></svg>`;
-OV_ART.cp = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <rect x="28" y="18" width="72" height="90" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
-    <rect x="40" y="31" width="34" height="6" rx="3" fill="var(--t-cp)" opacity=".85"/>
-    ${[48, 62, 76, 90].map((y, i) => `<rect x="40" y="${y}" width="10" height="10" rx="3" fill="${i < 2 ? "var(--good)" : "var(--sunk)"}" stroke="${i < 2 ? "none" : "var(--line-strong)"}"/><rect x="56" y="${y + 3}" width="${[32, 26, 34, 22][i]}" height="4" rx="2" fill="var(--faint)" opacity=".5"/>`).join("")}
-    <path d="M118 36l20 8v15c0 12-8.5 22-20 26-11.5-4-20-14-20-26V44l20-8z" fill="var(--surface)" stroke="var(--t-cp)" stroke-width="3" stroke-linejoin="round"/>
-    <circle cx="118" cy="55" r="5" fill="var(--t-cp)"/><path d="M109 71c1.6-5 4.8-7.6 9-7.6s7.4 2.6 9 7.6" stroke="var(--t-cp)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
-OV_ART.ds = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    <rect x="24" y="20" width="76" height="86" rx="9" fill="var(--surface)" stroke="var(--line-strong)"/>
-    ${[36, 52, 68, 84].map((y, i) => `<rect x="36" y="${y}" width="${[44, 52, 38, 48][i]}" height="6" rx="3" fill="${i === 1 ? "var(--t-ds)" : "var(--line-strong)"}" opacity="${i === 1 ? ".9" : "1"}"/>`).join("")}
-    <circle cx="120" cy="62" r="26" fill="var(--surface)" stroke="var(--t-ds)" stroke-width="3"/>
-    ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => { const a = i * Math.PI / 6; return `<circle cx="${(120 + Math.cos(a) * 17).toFixed(1)}" cy="${(62 + Math.sin(a) * 17).toFixed(1)}" r="2.2" fill="var(--t-ds)"/>`; }).join("")}
-    <path d="M112 62l6 6 11-12" fill="none" stroke="var(--t-ds)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-OV_ART.ev = `<svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-    ${[22, 40, 58, 76, 94].map((y, i) => `<rect x="24" y="${y}" width="${[70, 58, 76, 50, 64][i]}" height="8" rx="2" fill="var(--line-strong)"/><rect x="104" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 1, 0, 1, 0][i] ? "var(--good)" : "var(--crit)"}"/><rect x="122" y="${y - 2}" width="12" height="12" rx="2" fill="${[1, 0, 0, 1, 1][i] ? "var(--good)" : "var(--crit)"}"/>`).join("")}
-    <rect x="104" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/><rect x="122" y="6" width="12" height="4" rx="2" fill="var(--muted)" opacity=".4"/></svg>`;
+// One illustration language for every All-tools / Learn-hub card: the tool's own icon, large, in
+// the accent color, plus one peach accent shape (cardArt(), partD.js). The old per-tool ad hoc
+// illustrations (a radar sweep, a trend line, a lock, a grid of tiles, each hand-drawn once) are
+// gone; a tool is now recognizable by its icon, not by a bespoke drawing.
+const OV_ART_ICON = {pm:"radar", tt:"siren", mx:"gauge", vd:"scale", pol:"doc", ma:"steps", cv:"cover", rt:"shield", cp:"coppa", ds:"dsa", ev:"eval"};
+const OV_ART = Object.fromEntries(Object.entries(OV_ART_ICON).map(([k, icon]) => [k, cardArt(icon)]));
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -275,7 +219,7 @@ const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"M
 let ovStage = "all";
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
-      <div class="ov-art">${OV_ART[key]}</div>
+      ${OV_ART[key]}
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
@@ -311,8 +255,8 @@ function renderTools(){
       <div class="ov-ai">
         <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">Work in progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">Work in progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">Work in progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-doc"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
+        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">Work in progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
       </div>
     </section>
     <section class="rise">

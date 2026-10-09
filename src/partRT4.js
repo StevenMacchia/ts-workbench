@@ -6,6 +6,7 @@
    why it worked, what it could cause) with an expert-style write-up to compare against.
    No scripted attacks, no model calls, no harmful text. Moves are named and explained, never written out.
    ========================================================= */
+const RT_TARGET_ICON = {support:"i-chat", search:"i-search", agent:"i-bot", media:"p-video"};
 const RT_TARGETS = [
   {k:"support", n:"A support assistant", h:"Answers customers, reads your help docs and their account, can open tickets or issue refunds.", kind:"llm",
     card:{what:"Answers customer questions from our help centre and the customer's own account, and can open a ticket or issue a refund up to a limit.", who:"Our customers, signed in. Some are under 18.", out:"Medical, legal or financial advice. Anything about other customers. Actions over the refund limit."},
@@ -66,7 +67,7 @@ function rtM1HTML(sc){ return ({target:rtm1Target, card:rtm1Card, try:rtm1Try, f
 function rtm1Target(){
   const m = rtM1();
   return `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><p class="rtf-lead">Pick the nearest one. The moves, the checklist and the first finding are shaped around it. You will test your own feature, not a toy.</p>
-    <div class="rtf-opts rtf-big">${RT_TARGETS.map(t => `<button type="button" data-target="${t.k}" class="${m.target === t.k ? "on" : ""}"><b>${esc(t.n)}</b><span>${esc(t.h)}</span></button>`).join("")}</div>
+    <div class="rtf-opts rtf-big">${RT_TARGETS.map(t => `<button type="button" data-target="${t.k}" class="${m.target === t.k ? "on" : ""}"><span class="rtf-opticon"><svg><use href="#${RT_TARGET_ICON[t.k]}"/></svg></span><b>${esc(t.n)}</b><span>${esc(t.h)}</span></button>`).join("")}</div>
     <label class="rtf-in"><span>What is it called? <small>optional</small></span><input class="input" id="rtf-svc" value="${esc(rt.svc)}" placeholder="For example: Pixelry assistant" maxlength="60"></label>
     ${m.target ? rtfNext("Next: the target card") : ""}`;
 }
