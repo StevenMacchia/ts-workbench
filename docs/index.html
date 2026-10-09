@@ -19963,7 +19963,9 @@ function demoPreviewHTML(){
     <button type="button" class="ov-link" data-demo="start">See the whole picture ${icon("arrow")}</button>
   </section>`;
 }
-if(demoOn() && store.get("demo:pending", false)){ try{ demoFill(); }catch(e){} store.set("demo:pending", false); }
+// Deferred to the next tick: demoProgram() reads example data declared later in the bundle (const/let), which is not
+// yet initialised while this file is still being evaluated. Filling at load time silently threw and left the demo empty.
+if(demoOn() && store.get("demo:pending", false)){ setTimeout(() => { try{ demoFill(); }catch(e){ console.error("Demo fill failed", e); } store.set("demo:pending", false); try{ route(); }catch(e){} }, 0); }
 
 /* ---------- "Demo: Pixelry · Exit demo" in the top bar, on every page and screen size ---------- */
 const DEMO_PILL = `<button type="button" class="tb-demo-t" data-demo="about" title="About the demo"><i aria-hidden="true"></i><span>Demo<span class="tb-demo-co">: Pixelry</span></span></button><button type="button" class="tb-demo-x" data-demo="exit">Exit demo</button>`;
