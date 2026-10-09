@@ -300,7 +300,7 @@ document.addEventListener("keydown", e => {
   if(/^[0-4]$/.test(e.key)){
     const scope = modalOpen ? modal : view;
     if(!scope) return;
-    const hit = $$('[data-grade="' + e.key + '"],[data-g="' + e.key + '"],[data-sbgrade="' + e.key + '"],[data-j="' + e.key + '"],[data-pick="' + e.key + '"]', scope).find(b => !b.disabled);
+    const hit = $$('[data-grade="' + e.key + '"],[data-grade1="' + e.key + '"],[data-g="' + e.key + '"],[data-sbgrade="' + e.key + '"],[data-j="' + e.key + '"],[data-pick="' + e.key + '"]', scope).find(b => !b.disabled);
     if(hit){ e.preventDefault(); hit.click(); }
     return;
   }

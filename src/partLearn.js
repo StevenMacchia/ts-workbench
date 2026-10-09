@@ -502,7 +502,7 @@ Then change one number (fraud S3+ to 1.8%, or es over-refusal to 7%) and decide 
   world: {route:"redteamworld", name:"Red teaming world models", short:"world model", icon:"monitor", color:"#E0532F",
     desc:"How to find the harm a video, image-to-video or interactive world model can cause before users do. What is different from text, the method in ten steps, twelve drills, worksheets and the sources.",
     steps:[
-      {id:"different", title:"What is different from text", why:"The harm categories carry over from language models. Six things about video and interactive models change how you test.", body:`${lnDo([
+      {id:"different", title:"What is different from text", why:"The harm categories carry over from language models. Nine things about video and interactive models change how you test.", body:`${lnDo([
         "<b>The output is believable.</b> A paragraph about an event is a claim. A video of it is evidence to most viewers. The same content lands a grade higher when it is rendered realistically, and realism classifiers become part of what you are testing.",
         "<b>Uploads are the main attack.</b> Most deepfake and NCII harm starts with an image of a real person being fed to an image-to-video or edit flow, not with a clever prompt. Test the upload path with photos of consenting testers, and test what the model does with partial, cropped and composited images.",
         "<b>The harm is built over time.</b> In an interactive world, no single action is the violation. The user places a character, changes the clothing, adds a prop, changes the setting, and the scene becomes the harm over several steps. Checks that look at one prompt or one frame miss it. Test sequences, not prompts.",
@@ -865,7 +865,7 @@ const LN_STEP_EXTRA = {
   },
   world: {
     different: {
-      have:"six ways video testing differs from text", mins:10,
+      have:"nine ways video testing differs from text", mins:10,
       eg:["For Pixelry: a realistic clip from the tool reads as real to most viewers, so the realism classifier matters as much as the harm category."],
       check:{q:"Most deepfake and NCII harm in a world model starts with...",
         options:["A clever text prompt", "An uploaded photo of a real person fed to an image-to-video flow", "A long conversation building up over many turns"], a:1,

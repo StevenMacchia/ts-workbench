@@ -42,8 +42,8 @@
   .rt-sev button{min-height:44px;padding:11px 12px}
   .rt-trip button{min-height:44px}
   .rtf-hubc{min-height:44px}
-  .rtf-link{display:inline-block;padding:10px 0;margin:-10px 0}
-  .rtf-foot .rtf-link{padding:10px 2px;margin:-10px -2px}
+  .rtf-link{display:inline-block;padding:12px 0;margin:-12px 0}
+  .rtf-foot .rtf-link{padding:12px 2px;margin:-12px -2px}
   .ln-check li{min-height:44px}
   .ln-check input{width:20px;height:20px}
 }
