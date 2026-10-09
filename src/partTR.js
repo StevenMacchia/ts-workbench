@@ -244,7 +244,7 @@ function trReportHTML(ai){
     ${tr.shared ? shareBannerHTML('data-tr="unshare"') : ""}
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
-      <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
+      <div><span class="eyebrow">Service type: ${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
         <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
         ${bench !== null ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% complete</p>` : ""}
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}

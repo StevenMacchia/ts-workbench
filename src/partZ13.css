@@ -315,3 +315,26 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 /* ---------- Transparency report: the "By category" table has one or two numeric columns, so
    stretching it to the full card width on a wide screen reads as sparse/unfinished ---------- */
 .tr-ct{max-width:480px}
+
+/* ---------- Command palette: the trigger button has a search icon, the input it opens didn't ---------- */
+.cmdk-search{position:relative}
+.cmdk-search svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.cmdk-search input{padding-left:44px}
+
+/* ---------- "Starter, untested" (unrun starter code) and "Work in progress" (an unfinished
+   feature) are different meanings that happen to share .wip-tag's orange; give the starter-code
+   badge its own color by context, without touching the shared class or its text ---------- */
+.rx-h .wip-tag,.ab-starters-h .wip-tag{background:var(--med-soft);color:var(--med)}
+
+/* ---------- Vendor scorecard: a ruled-out vendor's score bar was drawn at full saturation,
+   the same color as the winning vendor's, so it didn't look deprioritized ---------- */
+.vd-rk.out .vd-bar i{filter:grayscale(1) opacity(.5)}
+
+/* ---------- Policy stress-tester: "Edit the rule or context" sat flush under the context
+   paragraph with no gap, easy to miss as a link rather than more body text ---------- */
+.pol-tested-c .pol-add{margin-top:8px;text-decoration:underline}
+
+/* ---------- Tabletop: the "Why this scenario" citation card shared the main scenario card's
+   corner radius and grey tone, so the boundary between the two was hard to see ---------- */
+.tt-why{background:none;border:0;box-shadow:none;padding:0 2px 14px;margin-bottom:0}
+.tt-why .eyebrow{color:var(--faint)}

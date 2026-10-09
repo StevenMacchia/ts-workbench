@@ -86,7 +86,7 @@ const PAGE_TOURS = {
     ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar."],
     [".ma-byarea", "One area at a time", "Pick an area to see every level, the steps to reach the next one, its owner and your evidence."],
     [".ma-prog-tab", "Show progress", "Save a snapshot each quarter, and the trend shows leadership how the program has grown."],
-    [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
+    [".headmeta", "Share it and keep it current", "Edit ratings, save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or copy a link to it."]
   ],
   coverage:[
     [".gd-intro h1", "One question at a time", "Five short questions for each kind of harm, about five minutes in all. At the end you'll see your risk next to your defenses."],

@@ -4311,6 +4311,29 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 /* ---------- Transparency report: the "By category" table has one or two numeric columns, so
    stretching it to the full card width on a wide screen reads as sparse/unfinished ---------- */
 .tr-ct{max-width:480px}
+
+/* ---------- Command palette: the trigger button has a search icon, the input it opens didn't ---------- */
+.cmdk-search{position:relative}
+.cmdk-search svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.cmdk-search input{padding-left:44px}
+
+/* ---------- "Starter, untested" (unrun starter code) and "Work in progress" (an unfinished
+   feature) are different meanings that happen to share .wip-tag's orange; give the starter-code
+   badge its own color by context, without touching the shared class or its text ---------- */
+.rx-h .wip-tag,.ab-starters-h .wip-tag{background:var(--med-soft);color:var(--med)}
+
+/* ---------- Vendor scorecard: a ruled-out vendor's score bar was drawn at full saturation,
+   the same color as the winning vendor's, so it didn't look deprioritized ---------- */
+.vd-rk.out .vd-bar i{filter:grayscale(1) opacity(.5)}
+
+/* ---------- Policy stress-tester: "Edit the rule or context" sat flush under the context
+   paragraph with no gap, easy to miss as a link rather than more body text ---------- */
+.pol-tested-c .pol-add{margin-top:8px;text-decoration:underline}
+
+/* ---------- Tabletop: the "Why this scenario" citation card shared the main scenario card's
+   corner radius and grey tone, so the boundary between the two was hard to see ---------- */
+.tt-why{background:none;border:0;box-shadow:none;padding:0 2px 14px;margin-bottom:0}
+.tt-why .eyebrow{color:var(--faint)}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -5114,7 +5137,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 <div class="cmdk-bg" id="cmdk" hidden>
   <div class="cmdk" role="dialog" aria-modal="true" aria-labelledby="cmdk-h">
     <h2 id="cmdk-h" class="visually-hidden">Search and jump</h2>
-    <input id="cmdk-q" placeholder="Search tools, scenarios and saved work" autocomplete="off" aria-label="Search" aria-controls="cmdk-list">
+    <div class="cmdk-search"><svg aria-hidden="true"><use href="#i-search"/></svg><input id="cmdk-q" placeholder="Search tools, scenarios and saved work" autocomplete="off" aria-label="Search" aria-controls="cmdk-list"></div>
     <ul id="cmdk-list" role="listbox"></ul>
     <div class="cmdk-ft"><span><kbd class="kbd">↑</kbd> <kbd class="kbd">↓</kbd> to move</span><span><kbd class="kbd">↵</kbd> to open</span><span><kbd class="kbd">esc</kbd> to close</span></div>
   </div>
@@ -11645,7 +11668,7 @@ function shellUpdate(name){
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";
-  const ct = $("#sb-cnt-tt"); if(ct) ct.textContent = SCENARIOS.length;
+  const ct = $("#sb-cnt-tt"); if(ct){ ct.textContent = SCENARIOS.length; ct.title = `${SCENARIOS.length} scenarios available`; }
   const pins = $("#sb-pins"), ph = $("#sb-pin-h");
   if(pins){
     const top = items.slice(0,3);
@@ -12014,7 +12037,7 @@ function asBind(){
 // Which stage each tool card belongs to, for the filter chips below. A tool keeps growing this
 // grid (Red Team Studio's modules among them), so the chips are a cheap way to keep it scannable
 const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
-const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI"};
+const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI assistants"};
 let ovStage = "all";
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
@@ -16760,7 +16783,7 @@ The checklist must cover: the action and what it means, the facts, the rule reli
       `How to appeal: ${AI_STR(f.appeal) || "[say where, and by what deadline, the user can appeal]"}`, "",
       "[This is a plain template built only from the answers above - edit every bracket, and the rest, before you send it.]" + regionNote].join("\n"); },
   render:r => `
-    <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">Reading level: ${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy notice</button></div>
+    <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">Reading level: ${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy</button></div>
       <div class="ai-letter"><div class="ai-subj"><span>Subject</span><b>${esc(r.subject)}</b></div><div class="ai-body">${esc(r.notice)}</div></div></div>
     ${r.short_version ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Short version</h3><span class="note">For a push notification or text message</span><button type="button" class="btn sm" data-copy="short_version">${icon("copy")}Copy</button></div><div class="ai-short">${esc(r.short_version)}</div></div>` : ""}
     ${r.checklist.length ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Statement-of-reasons check</h3><span class="note">${r.checklist.filter(c => c.present).length} of ${r.checklist.length} covered</span></div>
@@ -17639,7 +17662,7 @@ function maIntroHTML(){
     <div class="gd-facts"><div><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
       <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
-    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Rate them all on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
+    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Fill everything in on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
   </div>${maPreviewHTML()}`;
 }
 function maStageStepHTML(){
@@ -19595,7 +19618,7 @@ function trReportHTML(ai){
     ${tr.shared ? shareBannerHTML('data-tr="unshare"') : ""}
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
-      <div><span class="eyebrow">${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
+      <div><span class="eyebrow">Service type: ${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
         <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${p.missing.length ? `${p.missing.length} section${p.missing.length === 1 ? "" : "s"} still need${p.missing.length === 1 ? "s" : ""} numbers before you publish` : "Every section the DSA asks for is filled in"}. ${esc(trDue())}</h2>${gradeBadge(p.pct, "Share of required DSA transparency sections filled in")}</div>
         ${bench !== null ? `<p class="bench-line">Typical for a growth-stage social media company like the built-in example (Pixelry): ${bench}% complete</p>` : ""}
         ${trExempt() ? `<p class="note">As a micro or small enterprise you may be exempt, so this can be a voluntary report.</p>` : ""}
@@ -20045,7 +20068,7 @@ const PAGE_TOURS = {
     ["#ma-plan .ma-road", "Work the roadmap", "Each card takes one area up one level. Tick both items and the area moves up on the radar."],
     [".ma-byarea", "One area at a time", "Pick an area to see every level, the steps to reach the next one, its owner and your evidence."],
     [".ma-prog-tab", "Show progress", "Save a snapshot each quarter, and the trend shows leadership how the program has grown."],
-    [".ma-band-a", "Share it and keep it current", "Save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or change your ratings."]
+    [".headmeta", "Share it and keep it current", "Edit ratings, save a snapshot, send the plan to Jira, Asana, Linear or GitHub, or copy a link to it."]
   ],
   coverage:[
     [".gd-intro h1", "One question at a time", "Five short questions for each kind of harm, about five minutes in all. At the end you'll see your risk next to your defenses."],

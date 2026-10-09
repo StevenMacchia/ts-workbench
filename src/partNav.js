@@ -49,7 +49,7 @@ function shellUpdate(name){
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";
-  const ct = $("#sb-cnt-tt"); if(ct) ct.textContent = SCENARIOS.length;
+  const ct = $("#sb-cnt-tt"); if(ct){ ct.textContent = SCENARIOS.length; ct.title = `${SCENARIOS.length} scenarios available`; }
   const pins = $("#sb-pins"), ph = $("#sb-pin-h");
   if(pins){
     const top = items.slice(0,3);

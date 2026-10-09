@@ -334,7 +334,7 @@ function maIntroHTML(){
     <div class="gd-facts"><div><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
       <div><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
-    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Rate them all on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
+    <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Fill everything in on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
   </div>${maPreviewHTML()}`;
 }
 function maStageStepHTML(){

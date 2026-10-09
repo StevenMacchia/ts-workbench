@@ -76,7 +76,7 @@ The checklist must cover: the action and what it means, the facts, the rule reli
       `How to appeal: ${AI_STR(f.appeal) || "[say where, and by what deadline, the user can appeal]"}`, "",
       "[This is a plain template built only from the answers above - edit every bracket, and the rest, before you send it.]" + regionNote].join("\n"); },
   render:r => `
-    <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">Reading level: ${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy notice</button></div>
+    <div class="ai-sec"><div class="ai-sec-h"><h3>The notice</h3>${r.reading_level ? `<span class="pill">Reading level: ${esc(r.reading_level)}</span>` : ""}<button type="button" class="btn sm" data-copy="notice">${icon("copy")}Copy</button></div>
       <div class="ai-letter"><div class="ai-subj"><span>Subject</span><b>${esc(r.subject)}</b></div><div class="ai-body">${esc(r.notice)}</div></div></div>
     ${r.short_version ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Short version</h3><span class="note">For a push notification or text message</span><button type="button" class="btn sm" data-copy="short_version">${icon("copy")}Copy</button></div><div class="ai-short">${esc(r.short_version)}</div></div>` : ""}
     ${r.checklist.length ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Statement-of-reasons check</h3><span class="note">${r.checklist.filter(c => c.present).length} of ${r.checklist.length} covered</span></div>
