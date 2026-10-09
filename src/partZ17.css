@@ -1,0 +1,48 @@
+/* =========================================================
+   lnpolish: UX/UI refinement pass on the Learn section's red-teaming pages (hub, the two guides' Method/
+   Practice/Worksheets/Sources tabs, and the glossary). Only src/partLearn.js and this file were touched;
+   every selector below is scoped to a class or id that belongs to those pages alone (verified against
+   partTSG.js and the red team studio's own partRT*.js, which share a few base classes with Learn but not
+   these). Aurora tokens only, light and dark, "refine, do not restyle."
+   ========================================================= */
+
+/* ---------- rows: hover/pressed feedback (.ln-row had none) and an eased reveal on open ---------- */
+/* summary gets its own rounded corners (matching the details' 10px, minus the 1px border) instead of
+   overflow:hidden on the details box, so the focus-visible ring (drawn 2px outside the summary) isn't
+   clipped by a hidden parent. */
+.ln-row summary{border-radius:9px;transition:background-color .12s ease}
+.ln-row details[open] summary{border-radius:9px 9px 0 0}
+.ln-row summary:hover{background:var(--sunk)}
+.ln-row summary:active{background:var(--accent-soft)}
+.ln-row details[open] .ln-rowb{animation:ln-row-in .16s ease-out}
+@keyframes ln-row-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .ln-row summary{transition:none}
+  .ln-row details[open] .ln-rowb{animation:none}
+}
+
+/* ---------- dark mode: .ln-tag.world's text (color-mix with the darker #E0532F) reads at ~3.8:1 against
+   its own pill background in dark mode, below the 4.5:1 AA floor for 11px text (measured in-browser against
+   the rendered pill background; light mode is ~4.57:1 and unaffected). Mixing from the lighter #FF9A7A
+   instead keeps the same peach identity and clears AA with room to spare (~6.5:1 at the dark surface). */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]) .ln-tag.world{color:color-mix(in oklab, #FF9A7A 70%, var(--ink))} }
+:root[data-theme="dark"] .ln-tag.world, :root[data-mode="dark"] .ln-tag.world{color:color-mix(in oklab, #FF9A7A 70%, var(--ink))}
+
+/* ---------- glossary: a result count alongside the clear button on the search field (src/partLearn.js now
+   renders "N of 48 terms match" in #ln-known when filtered) -- no layout change needed, this only keeps it
+   from wrapping awkwardly next to the segmented filter on narrow panes. ---------- */
+.ln-gl-tools #ln-known{white-space:nowrap}
+@media (max-width:480px){.ln-gl-tools #ln-known{white-space:normal;width:100%;margin-top:4px}}
+
+/* ---------- print: a guide step and the glossary, as a document. The sitewide rule in partZ13.css already
+   hides .btn/.segs/.side/.topbar and forces open <details> content to show; this fills the Learn-specific
+   gaps it leaves: the "All steps"/"All exercises"/"As a table" jump links (styled as text, not .btn, so they
+   still render visible-but-dead), the row chevron glyphs, and the tag/chip background tint that the browser's
+   default "no background graphics" print setting would otherwise drop. ---------- */
+@media print{
+  .ln .rtf-link, .ln .ln-chev, .ln .ln-donetick, #ln-practice, #ln-review-due{display:none!important}
+  .ln .ln-tag, .ln .ln-chip, .ln .pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ln-row details{break-inside:avoid}
+  .ln-gl{display:block}
+  .ln-gl .card.ln-term{break-inside:avoid;margin-bottom:10px}
+}

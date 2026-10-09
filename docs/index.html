@@ -4990,6 +4990,54 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
   #rt-sum,.ln-pre{background:#fff;color:#111;border:1px solid #ccc;max-height:none;overflow:visible;white-space:pre-wrap}
   a[href]::after{content:""}
 }
+/* =========================================================
+   lnpolish: UX/UI refinement pass on the Learn section's red-teaming pages (hub, the two guides' Method/
+   Practice/Worksheets/Sources tabs, and the glossary). Only src/partLearn.js and this file were touched;
+   every selector below is scoped to a class or id that belongs to those pages alone (verified against
+   partTSG.js and the red team studio's own partRT*.js, which share a few base classes with Learn but not
+   these). Aurora tokens only, light and dark, "refine, do not restyle."
+   ========================================================= */
+
+/* ---------- rows: hover/pressed feedback (.ln-row had none) and an eased reveal on open ---------- */
+/* summary gets its own rounded corners (matching the details' 10px, minus the 1px border) instead of
+   overflow:hidden on the details box, so the focus-visible ring (drawn 2px outside the summary) isn't
+   clipped by a hidden parent. */
+.ln-row summary{border-radius:9px;transition:background-color .12s ease}
+.ln-row details[open] summary{border-radius:9px 9px 0 0}
+.ln-row summary:hover{background:var(--sunk)}
+.ln-row summary:active{background:var(--accent-soft)}
+.ln-row details[open] .ln-rowb{animation:ln-row-in .16s ease-out}
+@keyframes ln-row-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){
+  .ln-row summary{transition:none}
+  .ln-row details[open] .ln-rowb{animation:none}
+}
+
+/* ---------- dark mode: .ln-tag.world's text (color-mix with the darker #E0532F) reads at ~3.8:1 against
+   its own pill background in dark mode, below the 4.5:1 AA floor for 11px text (measured in-browser against
+   the rendered pill background; light mode is ~4.57:1 and unaffected). Mixing from the lighter #FF9A7A
+   instead keeps the same peach identity and clears AA with room to spare (~6.5:1 at the dark surface). */
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]) .ln-tag.world{color:color-mix(in oklab, #FF9A7A 70%, var(--ink))} }
+:root[data-theme="dark"] .ln-tag.world, :root[data-mode="dark"] .ln-tag.world{color:color-mix(in oklab, #FF9A7A 70%, var(--ink))}
+
+/* ---------- glossary: a result count alongside the clear button on the search field (src/partLearn.js now
+   renders "N of 48 terms match" in #ln-known when filtered) -- no layout change needed, this only keeps it
+   from wrapping awkwardly next to the segmented filter on narrow panes. ---------- */
+.ln-gl-tools #ln-known{white-space:nowrap}
+@media (max-width:480px){.ln-gl-tools #ln-known{white-space:normal;width:100%;margin-top:4px}}
+
+/* ---------- print: a guide step and the glossary, as a document. The sitewide rule in partZ13.css already
+   hides .btn/.segs/.side/.topbar and forces open <details> content to show; this fills the Learn-specific
+   gaps it leaves: the "All steps"/"All exercises"/"As a table" jump links (styled as text, not .btn, so they
+   still render visible-but-dead), the row chevron glyphs, and the tag/chip background tint that the browser's
+   default "no background graphics" print setting would otherwise drop. ---------- */
+@media print{
+  .ln .rtf-link, .ln .ln-chev, .ln .ln-donetick, #ln-practice, #ln-review-due{display:none!important}
+  .ln .ln-tag, .ln .ln-chip, .ln .pill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ln-row details{break-inside:avoid}
+  .ln-gl{display:block}
+  .ln-gl .card.ln-term{break-inside:avoid;margin-bottom:10px}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -13743,13 +13791,24 @@ function lnMethod(k, g){
   draw();
 }
 // Enter/→ advances, ← goes back, matching the one-card flow's keyboard support, but only on the Method tab and
-// only when focus isn't already on one of its own controls (so a focused button's own Enter/Space isn't doubled).
+// only when focus isn't already on one of its own controls (so a focused button's own Enter/Space isn't doubled,
+// and a row's own Enter/Space toggle below isn't doubled into also advancing the card).
 document.addEventListener("keydown", e => {
   const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
   const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
-  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],input,textarea'))) return;
+  if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],.ln-row,input,textarea'))) return;
   if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
   else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
+});
+// Collapsed rows (a Method card's "do" list, a Sources entry, a glossary bridge list) are a <details>/<summary>
+// pair; native keyboard support for toggling one with Space (and, in some browsers, Enter) is inconsistent, so
+// toggle it ourselves whenever the summary itself -- not a link or button inside it -- has focus.
+document.addEventListener("keydown", e => {
+  if(e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+  if(!e.target || e.target.tagName !== "SUMMARY" || !e.target.closest(".ln-row")) return;
+  e.preventDefault();
+  const d = e.target.parentElement;
+  if(d && d.tagName === "DETAILS") d.open = !d.open;
 });
 function lnRefreshCount(k, g){ const el = $(".ln-tabs .note"); if(el) el.textContent = `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps read · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} exercises done`; }
 function lnBindOpenAll(){ $$("[data-openall]").forEach(b => b.onclick = () => { const ul = $("#" + b.dataset.openall); if(ul) $$("details", ul).forEach(d => d.open = true); }); }
@@ -13948,7 +14007,8 @@ function renderGlossary(){
   // this" toggle (now right on the card instead of behind a tap) all carry over from the in-between version.
   const draw = () => {
     const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q))).sort((a, b) => a.t[0].localeCompare(b.t[0]));
-    $("#ln-known").textContent = `${Object.keys(kn).filter(x => kn[x]).length} of ${LN_GLOSS.length} marked known`;
+    const knownCount = Object.keys(kn).filter(x => kn[x]).length, filtered = !!q || f !== "all";
+    $("#ln-known").textContent = filtered ? `${list.length} of ${LN_GLOSS.length} terms match · ${knownCount} known` : `${knownCount} of ${LN_GLOSS.length} marked known`;
     if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
     let lastLetter = "";
     $("#ln-gl").innerHTML = list.map(({t, i}) => {
