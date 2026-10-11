@@ -142,6 +142,8 @@ document.addEventListener("keydown", e => {
 }, true);
 
 /* ---------- mobile nav and new-assessment button ---------- */
-$("#nav-toggle").addEventListener("click", () => $("#app").classList.toggle("nav-open"));
+$("#nav-toggle").addEventListener("click", () => { const open = $("#app").classList.toggle("nav-open"); if(open) $("#side").scrollTop = 0; });
 $("#sb-scrim").addEventListener("click", () => $("#app").classList.remove("nav-open"));
+$("#sb-close").addEventListener("click", () => { $("#app").classList.remove("nav-open"); $("#nav-toggle").focus(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && $("#app").classList.contains("nav-open")){ $("#app").classList.remove("nav-open"); $("#nav-toggle").focus(); } });
 $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(); });

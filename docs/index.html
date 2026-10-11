@@ -5225,6 +5225,41 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
   .ln-gl{display:block}
   .ln-gl .card.ln-term{break-inside:avoid;margin-bottom:10px}
 }
+/* =========================================================
+   Phones: the navigation drawer is a solid sheet.
+   partZ13.css frosts .side (a 55% translucent --side over a blur) and then, under 760px, switches the
+   blur off because it is expensive on phones. That left the open drawer translucent with nothing blurring
+   what sat behind it: the page's own text showed straight through the menu, and the bottom tab bar
+   (z-index 50, under the drawer's 70) bled through its lower edge. The drawer also started 44px down,
+   under a site bar that scrolls away, so a strip of page showed above it once the page was scrolled.
+   Here the drawer gets an opaque surface of its own (one tint off the white/near-black its cards use,
+   so "The assessment" box and the current-page highlight still read), covers the full screen height
+   with safe-area padding at both ends, locks the page behind it, and gains a close button and Escape.
+   Desktop is untouched: every rule is inside the 880px query the drawer already lives in.
+   ========================================================= */
+:root, :root[data-mode="light"]{--side-sheet:#F3F4F9}
+:root[data-theme="dark"], :root[data-mode="dark"]{--side-sheet:#10121F}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--side-sheet:#10121F} }
+
+.sb-close{display:none;position:absolute;top:calc(12px + env(safe-area-inset-top, 0px));right:10px;width:36px;height:36px;border:0;border-radius:9px;background:none;color:var(--muted);place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sb-close:hover{background:var(--hover);color:var(--ink)}
+.sb-close svg{width:18px;height:18px}
+
+@media (max-width:880px){
+  #app .side{top:0;bottom:0;height:auto;width:min(304px, 86vw);background:var(--side-sheet);backdrop-filter:none;-webkit-backdrop-filter:none;border-right:1px solid var(--side-line);padding:calc(14px + env(safe-area-inset-top, 0px)) 12px calc(18px + env(safe-area-inset-bottom, 0px));overscroll-behavior:contain}
+  #app .side .sb-brand{padding-right:44px}
+  #app.nav-open .sb-scrim{background:rgba(21,23,43,.48)}
+  .sb-close{display:grid}
+  body:has(#app.nav-open){overflow:hidden}
+}
+
+/* The sidebar's "Back up to a file" row (partZ8.css) was written for the dark sidebar of an earlier
+   theme: white text on a 8% white fill. On today's light sidebar, and on this light drawer, its Open
+   and Save buttons were white on white. Tokens instead, so they read in both themes. */
+.sb-sync{background:var(--sunk);border-color:var(--line);color:var(--muted)}
+.sb-sync button{color:var(--ink);background:var(--surface);box-shadow:0 0 0 1px var(--line)}
+.sb-sync button:hover{background:var(--hover)}
+.sb-sync button:focus-visible{outline-color:var(--accent)}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5317,6 +5352,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 </nav>
 <div class="app" id="app">
   <aside class="side" id="side" aria-label="Sidebar">
+    <button type="button" class="sb-close" id="sb-close" aria-label="Close navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button>
     <a class="sb-brand" href="#overview">
       <span class="sb-mark"><svg><use href="#i-logo"/></svg></span>
       <span><b>T&amp;S Workbench</b><span id="sb-ws">Your workspace</span></span>
@@ -12053,8 +12089,10 @@ document.addEventListener("keydown", e => {
 }, true);
 
 /* ---------- mobile nav and new-assessment button ---------- */
-$("#nav-toggle").addEventListener("click", () => $("#app").classList.toggle("nav-open"));
+$("#nav-toggle").addEventListener("click", () => { const open = $("#app").classList.toggle("nav-open"); if(open) $("#side").scrollTop = 0; });
 $("#sb-scrim").addEventListener("click", () => $("#app").classList.remove("nav-open"));
+$("#sb-close").addEventListener("click", () => { $("#app").classList.remove("nav-open"); $("#nav-toggle").focus(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && $("#app").classList.contains("nav-open")){ $("#app").classList.remove("nav-open"); $("#nav-toggle").focus(); } });
 $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(); });
 /* =========================================================
    OVERVIEW (studio layout, live data)
@@ -23694,7 +23732,7 @@ function aiOrgDefaults(T, st){
 }
 
 /* ---------- Phones: More in the bottom bar opens the full menu ---------- */
-document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); });
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); const side = $("#side"); if(side) side.scrollTop = 0; });
 /* =========================================================
    YOUR PLAN: one prioritized list from every step of the assessment
    Launch blockers, coverage gaps, roadmap items and COPPA gaps, in three groups (do first, next, later),

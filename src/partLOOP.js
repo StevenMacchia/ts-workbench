@@ -171,4 +171,4 @@ function aiOrgDefaults(T, st){
 }
 
 /* ---------- Phones: More in the bottom bar opens the full menu ---------- */
-document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); });
+document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-bnav]"); if(!b) return; e.preventDefault(); const app = $("#app"); if(app) app.classList.add("nav-open"); const side = $("#side"); if(side) side.scrollTop = 0; });
