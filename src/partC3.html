@@ -68,7 +68,7 @@ const HEAD_META = () => {
   const ai = ["Runs on your own Claude account", "Nothing stored on a server", "A person makes the final call"];
   const m = {
     premortem:["radar", () => [HARMS.length + " abuse risks", Object.keys(SG).length + " safeguards", REGIONS.length + " jurisdictions"]],
-    tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", "8 company types", "The law behind every call"]],
+    tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", (typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8) + " company types", "The law behind every call"]],
     metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
     vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
     coverage:["cover", () => [CV_AREAS.length + " harm areas", CV_LAYERS.length + " layers of defense", "Risk vs coverage radar"]],

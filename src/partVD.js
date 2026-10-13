@@ -152,7 +152,7 @@ const vdMode = () => vdView === "page" ? "page" : vdView === "results" || vx.ven
 function vdSpec(){
   const names = () => vx.vendors.length >= VD_MIN && vx.vendors.every(v => v.name && v.name.trim());
   const steps = [
-    {id:"pre", eb:"What matters", title:"What matters most in this choice?", why:"Each starting point weights the eight criteria differently. You can fine-tune every weight on the one-page scorecard.", kind:"single",
+    {id:"pre", eb:"What matters", title:"What matters most in this choice?", why:`Each starting point weights the ${CRITERIA.length} criteria differently. You can fine-tune every weight on the one-page scorecard.`, kind:"single",
       opts:() => VD_PRESETS.map(([k, n]) => ({k, n, h:VD_PRESET_HINT[k]})).concat(!vdPresetOn() && vdTotal() ? [{k:"custom", n:"Keep my own weights", h:"Set on the one-page scorecard."}] : []),
       get:() => vdPresetOn() || (vdTotal() ? "custom" : ""), set:k => { const p = VD_PRESETS.find(x => x[0] === k); if(p){ vx.weights = Object.assign({}, p[2]); vdSave(); } }, has:() => vdTotal() > 0},
     {id:"names", eb:"Your shortlist", title:"Who are you comparing?", why:`Two to ${VD_MAX} vendors: specialists, outsourcing firms, regional teams or tools. Use the names you'd use in the room.`, kind:"custom", html:() => vdNamesHTML(), answered:names, has:names, next:"Continue"}

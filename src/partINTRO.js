@@ -318,7 +318,10 @@ renderAI = function(key){
 // "Start over" / "New": the tools that offer a full reset also drop the card back in front, so
 // starting fresh starts fresh. (Tabletop, vendors, metrics, notice, appeal, transparency, plan,
 // review and workspace have no equivalent whole-tool reset control.)
-const INTRO_RESET_SEL = [["premortem", '[data-act="new"]'], ["coppa", '[data-cp="reset"]'], ["dsa", '[data-ds="reset"]'],
+// The pre-mortem is left out on purpose: its "Start a new assessment" and "New" buttons share data-act="new". This listener runs
+// after the tool's own click handler has already drawn question 1, so clearing the flag here made the NEXT redraw (a number key
+// picking an answer) fall back to the purpose card. The card is shown once, on the first visit, and "How this works" reopens it.
+const INTRO_RESET_SEL = [["coppa", '[data-cp="reset"]'], ["dsa", '[data-ds="reset"]'],
   ["maturity", '[data-ma="reset"]'], ["coverage", '[data-cv="reset"]'], ["policy", "#pol-reset"], ["eval", '[data-ev="reset"]']];
 if(typeof document !== "undefined" && document.addEventListener){
   document.addEventListener("click", e => {

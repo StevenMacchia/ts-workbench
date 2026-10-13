@@ -3,6 +3,10 @@
    ========================================================= */
 const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
 const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
+// The tools, one entry per route, in the order the About page lists them. The single source for "how many tools":
+// the About page counts it, the home-page heading and the READMEs read it from this line (_build/gen-readmes.js
+// parses it). The guides, glossaries, plan and review pages are not tools. Add a new tool here, to ROUTE_LABEL and to AB_GROUPS.
+const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","dsa","tabletop","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){

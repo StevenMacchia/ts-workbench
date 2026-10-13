@@ -5429,7 +5429,7 @@ const HEAD_META = () => {
   const ai = ["Runs on your own Claude account", "Nothing stored on a server", "A person makes the final call"];
   const m = {
     premortem:["radar", () => [HARMS.length + " abuse risks", Object.keys(SG).length + " safeguards", REGIONS.length + " jurisdictions"]],
-    tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", "8 company types", "The law behind every call"]],
+    tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", (typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8) + " company types", "The law behind every call"]],
     metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
     vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
     coverage:["cover", () => [CV_AREAS.length + " harm areas", CV_LAYERS.length + " layers of defense", "Risk vs coverage radar"]],
@@ -5712,6 +5712,18 @@ const PRESETS = {
   delivery:{name:"Delivery platform (example)", type:"gig", youth:"adult_verified", aud:["creators"], adult:"none", identity:"verified", contact:"limited", money:["p2p","payouts"], regions:["us","ca"], scale:"large", team:"mature", features:["signup","login","profiles","dm","location","meetups","reviews","referrals"]},
   creator:{name:"Creator subscription site (example)", type:"creator", youth:"adult_verified", aud:["creators"], adult:"explicit", identity:"verified", contact:"strangers", money:["subs","payouts","p2p"], regions:["us","uk","eu"], scale:"mid", team:"dedicated", features:["signup","login","profiles","dm","posts","media","live","discovery"]}
 };
+// The harm areas (CATS keys) that define each kind of product. The plan's first actions come from these before the
+// actions every platform needs (child safety, law-enforcement requests, reporting), so a marketplace sees fraud,
+// scams and prohibited goods first. Every PLATFORMS key has an entry.
+const TYPE_CATS = {
+  social:["harass","violent","integrity"], messaging:["fraud","security","harass"], video:["violent","harass","illegal"], creator:["sexual","fraud","illegal"],
+  marketplace:["fraud","illegal","integrity"], fintech:["fincrime","fraud","security"], crypto:["fincrime","fraud","security"], gaming:["harass","fraud","security"],
+  dating:["sexual","fraud","physical"], genai:["ai","violent","selfharm"], gig:["physical","fraud","integrity"], rentals:["fraud","physical","privacy"],
+  edtech:["privacy","harass","selfharm"], health:["selfharm","privacy","fraud"], workplace:["security","privacy","harass"]
+};
+// How the built-in example of each kind of product is described in a benchmark line ("Typical for a growing marketplace")
+const BENCH_NOUN = {social:"social app", fintech:"payments app", marketplace:"marketplace", gaming:"game", genai:"AI companion app", dating:"dating app", gig:"gig platform", creator:"creator subscription site"};
+const BENCH_STAGE = {prelaunch:"pre-launch", small:"early-stage", mid:"growing", large:"large-scale"};
 
 /* =========================================================
    SHARED: letter grades, undo-able resets, shareable result links
@@ -6427,8 +6439,12 @@ function ctx(p){
 function assess(p){
   const c = ctx(p);
   const risks = [];
+  // Until the under-18 question is answered we can't tell whether children are present, so the child-safety
+  // risks are not rated at all (they would otherwise be assumed at their worst). They come back, rated, once it is.
+  const youthPending = !p.youth; let pendingChild = 0;
   HARMS.forEach(h => {
     if(!h.req(c)) return;
+    if(youthPending && h.cat==="child"){ pendingChild++; return; }
     const drivers = (h.drv ? h.drv(c) : []).filter(x=>x[0]);
     const reducers = (h.red ? h.red(c) : []).filter(x=>x[0]);
     const ups = (h.up ? h.up(c) : []).filter(x=>x[0]);
@@ -6446,7 +6462,7 @@ function assess(p){
   const add = id => map[id] || (map[id] = {id, ...SG[id], rank:0, covers:[], critCovers:0, legal:null});
   // The first three safeguards listed for a harm are its core controls and take the risk's full priority;
   // supporting controls sit one tier lower.
-  risks.forEach(r => r.sgs.forEach((id, i) => { const s = add(id); s.rank = Math.max(s.rank, Math.max(0, BANDS[r.band][2] - (i < 3 ? 0 : 1))); s.covers.push(r.n); if(r.band==="crit") s.critCovers++; }));
+  risks.forEach(r => r.sgs.forEach((id, i) => { const s = add(id); s.rank = Math.max(s.rank, Math.max(0, BANDS[r.band][2] - (i < 3 ? 0 : 1))); s.covers.push(r.n); (s.cats || (s.cats = [])).push(r.cat); if(r.band==="crit") s.critCovers++; }));
   obligations.forEach(o => o.sg.forEach(id => {
     const s = add(id);
     if(o.status==="applies"){ s.legal = "applies"; if(o.bump!==false) s.rank = 3; }
@@ -6457,19 +6473,25 @@ function assess(p){
 
   const counts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>counts[r.band]++);
   const postureOf = n => n.crit>=4 ? ["Severe","crit"] : (n.crit>=1||n.high>=5) ? ["High","high"] : n.high>=1 ? ["Moderate","med"] : risks.length ? ["Low","good"] : ["Not assessed",""];
-  const posture = postureOf(counts);
+  // Child-safety risks are unrated until the under-18 question is answered, so the overall band is only partly known
+  const posture = youthPending ? ["Partly rated",""] : postureOf(counts);
   // Residual risk: safeguards in place make harm less likely, not less severe. A risk's likelihood falls
   // one step once half of its safeguards are done and two steps when all are, never below Rare.
   const done = p.done || {};
   risks.forEach(r => { r.sgDone = r.sgs.filter(id => done[id]).length; r.cut = r.sgs.length ? Math.min(r.lik - 1, Math.floor(2 * r.sgDone / r.sgs.length + 1e-9)) : 0;
     r.rlik = r.lik - r.cut; r.rscore = r.sev * r.rlik; r.rband = bandOf(r.rscore); });
   const rcounts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>rcounts[r.rband]++);
-  const rposture = postureOf(rcounts);
+  const rposture = youthPending ? ["Partly rated",""] : postureOf(rcounts);
   const total = risks.reduce((a,r)=>a+r.score,0), rtotal = risks.reduce((a,r)=>a+r.rscore,0);
   const decisions = (DECISIONS[p.type]||[]).map((q,i)=>({id:p.type+"-"+i, q, src:labelOf(PLATFORMS,p.type)}))
     .concat(derivedDecisions(c).map((q,i)=>({id:"d-"+q.slice(0,24), q, src:"Your profile"})));
-  return {c, risks, obligations, safeguards, counts, posture, decisions, rcounts, rposture, total, rtotal};
+  return {c, risks, obligations, safeguards, counts, posture, decisions, rcounts, rposture, total, rtotal, youthPending, pendingChild};
 }
+
+// Is this action mainly about the harm areas typical of the kind of product (TYPE_CATS, partD.js)? At least half of the
+// risks it covers must sit in those areas, so a control that protects against a bit of everything (a law-enforcement
+// request process, reporting) counts as one every platform needs.
+const sgOwn = (s, type) => { const own = (s.cats || []).filter(c => (TYPE_CATS[type] || []).includes(c)).length; return own > 0 && own * 2 >= s.cats.length; };
 
 /* ---------- state ---------- */
 const blankPM = () => ({name:"", type:"", youth:"", aud:[], adult:"none", identity:"", contact:"", money:[], regions:[], scale:"", team:"", features:[], done:{}, notes:{}, stage:"ask", qi:0, answered:{}, impact:null, tab:"plan", group:"tier", filter:{cell:"",cat:"",band:""}, example:false});
@@ -6483,7 +6505,7 @@ const QS = [
    tip:"Your sector sets the baseline. Fintech and crypto raise fraud and money-laundering risks; dating raises offline-safety risks. It also decides which policy questions we ask."},
   {k:"features", sec:"Your product", t:"What can people do in it?", h:"We've pre-selected what's typical for this kind of product. Adjust it to match yours, or to just the feature you're launching.", kind:"features",
    tip:"Each capability switches on the risks it enables. Private messaging brings grooming and scams; image uploads bring CSAM and intimate-image abuse; AI generation brings deepfakes and jailbreaks."},
-  {k:"youth", sec:"Your users", t:"Could anyone under 18 use it?", h:"This changes more than any other answer. A rule that says “18+” doesn't keep children out unless you check.", kind:"single",
+  {k:"youth", sec:"Your users", t:"Could anyone under 18 use it?", h:"This changes more than any other answer. A rule that says “18+” doesn't keep children out unless you check.", kind:"single", required:true,
    tip:"Under-18s raise the likelihood and severity of child-safety risks and trigger children's laws in most countries. “18+ without checks” is still treated as minors being present, just fewer of them.", opts:[
     {k:"kids", n:"Yes, it's made for children", h:"Under-13s are part of the audience"},
     {k:"teens", n:"Yes, teens can join", h:"Teens and adults use it together"},
@@ -6500,7 +6522,7 @@ const QS = [
     {k:"none", n:"No", h:"It isn't allowed anywhere"},
     {k:"nudity", n:"Some nudity", h:"Art, education, breastfeeding, or behind a warning"},
     {k:"explicit", n:"Yes, explicit content", h:"Sexual content is allowed or sold"}]},
-  {k:"contact", sec:"How people interact", t:"Can people contact someone they don't know?", h:"Most grooming, scams and harassment start with a message from a stranger.", kind:"single", skip:p=>!["dm","groups","voice","live"].some(f=>p.features.includes(f)), skipVal:"none",
+  {k:"contact", sec:"How people interact", t:"Can people contact someone they don't know?", h:"Most grooming, scams and harassment start with a message from a stranger.", kind:"single", skip:p=>p.features.length>0 && !["dm","groups","voice","live"].some(f=>p.features.includes(f)), skipVal:"none",
    tip:"Stranger contact is the biggest driver of grooming, sextortion, scams and harassment. Requiring a connection first lowers all of them.", opts:[
     {k:"strangers", n:"Yes, anyone can message anyone", h:"People can find and contact strangers"},
     {k:"limited", n:"Only after they connect", h:"A match, follow-back, invite or purchase comes first"},
@@ -6534,9 +6556,20 @@ const QS = [
 let pm = store.get("pm3", null) || Object.assign(fromPreset("teen_social"), {stage:"start"});
 // A rough 0-100 so the exposure band can show a grade: Low/Moderate/High/Severe mapped to a representative percentage
 const PM_BAND_PCT = {Low:92, Moderate:76, High:50, Severe:20};
-// The built-in teen social example's own exposure band, for a benchmark line under the verdict
-function pmBenchBand(){ try{ return assess(fromPreset("teen_social")).posture[0]; }catch(e){ return null; } }
-shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
+// The exposure band of the built-in example that matches the reader's own kind of product, for a benchmark line under
+// the verdict: {band, label:"growing marketplace"}. Matches on product type, and on whether minors are in the audience
+// (a teen social app is no benchmark for an adults-only network). No matching example, or nothing answered yet: null,
+// and the line is left out.
+function pmBench(p){
+  try{
+    if(!p.type || !p.youth || !BENCH_NOUN[p.type]) return null;
+    const minors = y => y==="kids" || y==="teens";
+    const pr = Object.values(PRESETS).find(x => x.type===p.type && minors(x.youth)===minors(p.youth));
+    if(!pr) return null;
+    const who = pr.youth==="teens" ? "teen " : pr.youth==="kids" ? "kids' " : "";
+    return {band:assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(pr)))).posture[0], label:`${BENCH_STAGE[pr.scale]} ${who}${BENCH_NOUN[p.type]}`};
+  }catch(e){ return null; }
+}shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
 const savePM = () => { if(pm.saved){ pm.updated = Date.now(); const lib = libLoad(); lib[pm.id] = recordOf(pm); libSave(lib); } store.set("pm3", pm); };
 const visibleQs = () => QS.filter(q => !(q.skip && q.skip(pm)));
 const applySkips = () => QS.forEach(q => { if(q.skip && q.skip(pm)) pm[q.k] = q.skipVal; });
@@ -6635,7 +6668,8 @@ function askScreen(){
   if(Q.kind==="multi"){
     const extra = Q.none ? `<button type="button" class="gd-opt opt-key" data-none="${Q.k}" aria-pressed="${!pm[Q.k].length && !!pm.answered[Q.k]}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.none)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`
       : `<button type="button" class="gd-opt opt-key" data-all="${Q.k}" aria-pressed="${pm[Q.k].length===Q.opts.length}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.all)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`;
-    body = `<p class="note gd-multi-n">Choose all that apply.</p><div class="gd-opts gd-grid" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
+    const typ = PLATFORMS.find(x=>x.k===pm.type), pre = Q.k==="money" && typ && typ.m.length && sameSet(pm.money, typ.m), n = pm[Q.k].length;
+    body = `<p class="note gd-multi-n" aria-live="polite">Choose all that apply.${pre ? ` Pre-selected for ${esc(typ.n.toLowerCase())}: a number key or a click switches an option on or off.` : n ? ` ${n} selected.` : pm.answered[Q.k] ? "" : ` Nothing is selected yet. Pick what applies${Q.none ? `, or “${esc(Q.none)}”` : ""}.`}</p><div class="gd-opts gd-grid" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
   }
   if(Q.kind==="features"){
     const t = PLATFORMS.find(x=>x.k===pm.type);
@@ -6654,7 +6688,7 @@ function askScreen(){
       ${body}
       <div class="gd-foot">
         ${pm.qi>0?`<button type="button" class="btn" data-back="1">Back</button>`:`<button type="button" class="btn" data-act="home">Cancel</button>`}
-        <span class="gd-foot-r"><span class="note">${Q.kind==="single"||Q.kind==="multi" ? "Number keys pick an answer, " : ""}Enter continues.</span><button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button></span>
+        <span class="gd-foot-r"><span class="note">${Q.kind==="single"||Q.kind==="multi" ? "Number keys pick an answer, " : ""}${Q.required && !answered ? "Enter waits for an answer here." : "Enter continues."}</span><button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button></span>
       </div>
     </div>
     <aside class="gd-aside" aria-label="What your answers change">${livePanel(assess(pm))}</aside></div>
@@ -6727,6 +6761,13 @@ function renderPremortem(){
 }
 // A question showing a selection (a default, or a pre-fill from workspace settings) counts as answered once the person moves on
 const qHasValue = Q => Q.kind === "single" ? !!pm[Q.k] : Q.kind === "multi" ? pm[Q.k].length > 0 : false;
+// Whether starting over would throw away answers the person gave: not on a built-in example, and not on a blank
+// assessment (the start screen's own "Start a new assessment" on a fresh visit holds nothing to clear)
+const pmHasWork = p => {
+  if(p.example) return false;
+  const fresh = orgPrefillPM(blankPM()); // what "new" would give: blank, or pre-filled from the workspace settings
+  return !!p.name || ![...PROFILE_KEYS, "answered"].every(k => JSON.stringify(p[k]) === JSON.stringify(fresh[k]));
+};
 function goNext(){
   const qs = visibleQs(), Q = qs[pm.qi];
   if(Q && qHasValue(Q)) pm.answered[Q.k] = true;
@@ -6750,9 +6791,11 @@ function bindPremortem(){
     const b = e.target.closest("button"); if(!b) return;
     const d = b.dataset;
     if(d.set){ const k = d.set, v = d.v; withImpact(() => { if(k==="type") setType(v); else pm[k] = v; }); pm.answered[k] = true; return rerender(); }
-    if(d.toggle){ const k = d.toggle; withImpact(() => { const a = pm[k]; pm[k] = a.includes(d.v) ? a.filter(x=>x!==d.v) : a.concat(d.v); }); pm.answered[k] = true; return rerender(); }
+    if(d.toggle){ const k = d.toggle; withImpact(() => { const a = pm[k]; pm[k] = a.includes(d.v) ? a.filter(x=>x!==d.v) : a.concat(d.v); });
+      // Switching every option off is not an answer: only the explicit "none" button records one, so an emptied list is never reported as "None"
+      pm.answered[k] = pm[k].length > 0; return rerender(); }
     if(d.none){ withImpact(() => { pm[d.none] = []; }); pm.answered[d.none] = true; return rerender(); }
-    if(d.all){ const Q = QS.find(q=>q.k===d.all); withImpact(() => { pm[d.all] = pm[d.all].length===Q.opts.length ? [] : Q.opts.map(o=>o.k); }); pm.answered[d.all] = true; return rerender(); }
+    if(d.all){ const Q = QS.find(q=>q.k===d.all); withImpact(() => { pm[d.all] = pm[d.all].length===Q.opts.length ? [] : Q.opts.map(o=>o.k); }); pm.answered[d.all] = pm[d.all].length > 0; return rerender(); }
     if(d.next) return goNext();
     if(d.back){ pm.qi = Math.max(0, pm.qi-1); return rerender(); }
     if(d.goq) return goToQuestion(d.goq);
@@ -6769,7 +6812,9 @@ function bindPremortem(){
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
-      case "new": { const snap = JSON.parse(JSON.stringify(pm)); pm = orgPrefillPM(blankPM()); rerender(); withUndo("Cleared", snap, s2 => { pm = s2; savePM(); renderPremortem(); }); return; }
+      case "new": { const snap = JSON.parse(JSON.stringify(pm)), had = pmHasWork(pm); pm = orgPrefillPM(blankPM()); rerender();
+        // Only offer Undo when something was actually replaced: the start screen and a built-in example hold nothing of the person's
+        if(had) withUndo("Cleared", snap, s2 => { pm = s2; savePM(); renderPremortem(); }); return; }
       case "sharelink": return shareCopy("premortem", pm, {name:pm.name, type:pm.type, posture:assess(pm).posture[0]}, $("#pm-toast"));
       case "unshare": { pm.shared = false; savePM(); pm.flash = "Saved. It's yours to edit now."; return rerender(); }
       case "report": pm.stage = "report";
@@ -6812,8 +6857,18 @@ document.addEventListener("keydown", e => {
   const tag = (e.target.tagName||"").toLowerCase();
   if(tag==="input" || tag==="textarea" || tag==="select"){ if(e.key==="Enter" && e.target.id==="pm-name"){ e.preventDefault(); goNext(); } return; }
   if(/^[1-9]$/.test(e.key)){ const btn = $$("#pm-root .opt-key")[+e.key-1]; if(btn){ e.preventDefault(); btn.click(); } }
-  else if(e.key==="Enter" && tag!=="button" && tag!=="a" && tag!=="summary"){ e.preventDefault(); goNext(); }
+  else if(e.key==="Enter" && tag!=="button" && tag!=="a" && tag!=="summary"){ e.preventDefault(); pmEnter(); }
 });
+// Enter continues, except on a required question nobody has answered: the under-18 answer decides how child-safety
+// risks are rated, so only the visible "Skip for now" button (a deliberate click) can pass it. Returns whether it moved on.
+function pmEnter(){
+  const Q = visibleQs()[pm.qi];
+  if(Q && Q.required && !pm.answered[Q.k] && !qHasValue(Q)){
+    const t = $("#pm-toast"); if(t){ t.textContent = "Pick an answer to continue. This one decides how child-safety risks are rated. You can still choose Skip for now."; setTimeout(() => { t.textContent = ""; }, 5000); }
+    return false;
+  }
+  goNext(); return true;
+}
 /* =========================================================
    WORKSPACE STORE
    Profile, projects and saved results from every tool, kept in this browser.
@@ -6964,11 +7019,11 @@ function answerChips(){
     ["type","Product",labelOf(PLATFORMS,pm.type)||"Not answered"],
     ["features","Capabilities",pm.features.length+" selected"],
     ["youth","Under-18s",optLabel("youth")],
-    ["aud","Groups",pm.aud.length?pm.aud.map(k=>QS[3].opts.find(o=>o.k===k).n).join(", "):"None"],
+    ["aud","Groups",pm.aud.length?pm.aud.map(k=>QS[3].opts.find(o=>o.k===k).n).join(", "):pm.answered.aud?"None":"Not answered"],
     ["adult","Sexual content",optLabel("adult")],
     ["contact","Strangers can make contact",optLabel("contact")],
     ["identity","To sign up",optLabel("identity")],
-    ["money","Money",pm.money.length?pm.money.map(k=>QS[7].opts.find(o=>o.k===k).n).join(", "):"None"],
+    ["money","Money",pm.money.length?pm.money.map(k=>QS[7].opts.find(o=>o.k===k).n).join(", "):pm.answered.money?"None":"Not answered"],
     ["regions","Where",pm.regions.map(k=>labelOf(REGIONS,k)).join(", ")||"Not answered"],
     ["scale","Size",optLabel("scale")],
     ["team","Safety team",optLabel("team")]
@@ -6978,22 +7033,29 @@ function answerChips(){
 function startHere(r){
   const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
   const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
-  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
-  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, firstBlocker = blockers.find(s=>!pm.done[s.id]);
+  // The first actions come from the harms typical of this kind of product (a marketplace: fraud, scams, prohibited
+  // goods), then the actions every platform needs. Within each group the order is the usual one: priority, then reach.
+  const sgOwnTop = s => sgOwn(s, pm.type) && s.rank >= 2;
+  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>(sgOwnTop(b)?1:0)-(sgOwnTop(a)?1:0) || b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
+  const ownTyp = PLATFORMS.find(x=>x.k===pm.type), ownTop = todo.some(sgOwnTop);
+  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, firstBlocker = blockers.filter(s=>!pm.done[s.id]).sort((a,b)=>(sgOwn(b,pm.type)?1:0)-(sgOwn(a,pm.type)?1:0))[0];
   const blockerClause = firstBlocker ? ` Start with: ${gloss(firstBlocker.t.split(",")[0].split("(")[0].trim())}.` : blockers.length ? " Every launch blocker is done." : "";
   const applies = r.obligations.filter(o=>o.status==="applies").length;
-  const summary = r.posture[0]==="Low"
+  const pending = !!r.youthPending;
+  const summary = pending
+    ? `<strong>Answer the under-18 question to rate child-safety risks.</strong>${r.pendingChild ? ` ${r.pendingChild} child-safety risk${r.pendingChild===1?" isn't":"s aren't"} rated yet, and no grade is given until they are.` : ""}${r.risks.length ? ` The other ${r.risks.length} are rated: ${r.counts.crit} critical and ${r.counts.high} high, mostly in ${topCats.join(" and ")}.` : ""}${blockerClause}`
+    : r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
     : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}${blockerClause}`;
   // The numbers used to sit in their own four-tile dashboard; said in one line instead, each one naming what it counts
   const counted = `You've logged <strong>${r.risks.length} risk${r.risks.length===1?"":"s"}</strong>, each scored severity × likelihood. ${bDone} of ${blockers.length} launch blockers are done, and ${applies} of ${r.obligations.length} legal duties apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"} you named.`;
-  const bandPct = PM_BAND_PCT[r.posture[0]], benchBand = !pm.example ? pmBenchBand() : null;
+  const bandPct = pending ? undefined : PM_BAND_PCT[r.posture[0]], bench = !pm.example && !pending ? pmBench(pm) : null;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
-        <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
-        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}<p class="note">${counted}</p></div>
-      ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
+        <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${pending ? `<button type="button" class="btn sm primary" data-goq="youth">Answer it</button>` : bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        ${bench ? `<p class="bench-line">Typical for ${/^[aeiou]/i.test(bench.label) ? "an" : "a"} ${esc(bench.label)} like the built-in example: ${bench.band} risk exposure</p>` : ""}<p class="note">${counted}</p></div>
+      ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div>${ownTyp && ownTop ? `<p class="note" style="margin:-2px 0 8px">Ordered by the harms most common for ${esc(ownTyp.n.toLowerCase())}, ahead of the actions every platform needs.</p>` : ""}<ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
           ${s.covers.length?`<span class="covers">Protects against: ${s.covers.slice(0,3).map(esc).join(" · ")}${s.covers.length>3?` and ${s.covers.length-3} more`:""}</span>`:""}</span></label></li>`).join("")}</ol></div>`
@@ -7132,7 +7194,7 @@ const bandCounts = list => ["crit","high","med","low"].map(b=>[b, list.filter(x=
 const miniPills = list => bandCounts(list).map(([b,n])=>`<span class="pill ${BANDS[b][1]}">${n} ${BANDS[b][0].toLowerCase()}</span>`).join("");
 function tabPlan(r){
   const byOwner = pm.group==="owner";
-  const order = (a,b) => (pm.done[a.id]?1:0)-(pm.done[b.id]?1:0) || b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length;
+  const order = (a,b) => (pm.done[a.id]?1:0)-(pm.done[b.id]?1:0) || b.rank-a.rank || (sgOwn(b, pm.type)?1:0)-(sgOwn(a, pm.type)?1:0) || b.critCovers-a.critCovers || b.covers.length-a.covers.length;
   const groups = byOwner
     ? Object.keys(OWNERS).map(o=>{ const items = r.safeguards.filter(s=>s.o===o).sort(order); return {key:"own-"+o, title:`<b>${OWNERS[o]}</b>`, sub:`${items.filter(s=>s.rank===3).length} launch blockers`, items, dflt:items.some(s=>s.rank===3)}; })
     : TIERS.map(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r).sort(order); return {key:"tier-"+t.r, title:pill(["low","med","high","crit"][t.r], t.n), sub:t.h, items, dflt:t.r>=2}; });
@@ -7198,7 +7260,7 @@ function reportMarkdown(r){
   L.push(`# Abuse pre-mortem: ${pm.name||"Untitled assessment"}`, "");
   L.push(`**Profile:** ${labelOf(PLATFORMS,pm.type)}; ${labelOf(YOUTH,pm.youth)}; ${labelOf(IDENTITY,pm.identity)}; ${labelOf(CONTACT,pm.contact)}; adult content: ${labelOf(ADULT,pm.adult).toLowerCase()}; money: ${pm.money.map(k=>labelOf(MONEY,k)).join(", ")||"none"}; regions: ${pm.regions.map(k=>k.toUpperCase()).join(", ")||"none"}; scale: ${labelOf(SCALE,pm.scale)}; T&S: ${labelOf(TEAM,pm.team)}.`);
   L.push(`**Capabilities:** ${pm.features.map(k=>FEATURES[k][0]).join(", ")}`, "");
-  L.push(`**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`);
+  L.push(r.youthPending ? `**Overall exposure:** not graded yet. The under-18 question is unanswered, so ${r.pendingChild} child-safety risk${r.pendingChild===1?" is":"s are"} not rated. The ${r.risks.length} others: ${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low` : `**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`);
   L.push(`**After safeguards in place:** ${r.rposture[0]} (${r.rcounts.crit} critical, ${r.rcounts.high} high, ${r.rcounts.med} medium, ${r.rcounts.low} low). Total risk ${r.rtotal} of ${r.total}${r.total && r.rtotal < r.total ? `, down ${Math.round((r.total - r.rtotal) / r.total * 100)}%` : ""}.`, "");
   L.push("## Launch plan");
   TIERS.forEach(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r); if(!items.length) return;
@@ -11467,7 +11529,7 @@ const vdMode = () => vdView === "page" ? "page" : vdView === "results" || vx.ven
 function vdSpec(){
   const names = () => vx.vendors.length >= VD_MIN && vx.vendors.every(v => v.name && v.name.trim());
   const steps = [
-    {id:"pre", eb:"What matters", title:"What matters most in this choice?", why:"Each starting point weights the eight criteria differently. You can fine-tune every weight on the one-page scorecard.", kind:"single",
+    {id:"pre", eb:"What matters", title:"What matters most in this choice?", why:`Each starting point weights the ${CRITERIA.length} criteria differently. You can fine-tune every weight on the one-page scorecard.`, kind:"single",
       opts:() => VD_PRESETS.map(([k, n]) => ({k, n, h:VD_PRESET_HINT[k]})).concat(!vdPresetOn() && vdTotal() ? [{k:"custom", n:"Keep my own weights", h:"Set on the one-page scorecard."}] : []),
       get:() => vdPresetOn() || (vdTotal() ? "custom" : ""), set:k => { const p = VD_PRESETS.find(x => x[0] === k); if(p){ vx.weights = Object.assign({}, p[2]); vdSave(); } }, has:() => vdTotal() > 0},
     {id:"names", eb:"Your shortlist", title:"Who are you comparing?", why:`Two to ${VD_MAX} vendors: specialists, outsourcing firms, regional teams or tools. Use the names you'd use in the room.`, kind:"custom", html:() => vdNamesHTML(), answered:names, has:names, next:"Continue"}
@@ -11914,6 +11976,10 @@ function pmProjectSelect(){
    ========================================================= */
 const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
 const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
+// The tools, one entry per route, in the order the About page lists them. The single source for "how many tools":
+// the About page counts it, the home-page heading and the READMEs read it from this line (_build/gen-readmes.js
+// parses it). The guides, glossaries, plan and review pages are not tools. Add a new tool here, to ROUTE_LABEL and to AB_GROUPS.
+const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","dsa","tabletop","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -12452,7 +12518,7 @@ const AB_GROUPS = [
     ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."],
     ["t-cp","coppa","COPPA readiness","Works out whether the US children's privacy law applies, maps children's data, and turns gaps against the 2025 amended Rule into a plan and four drafts for Legal."],
     ["t-ds","dsa","DSA readiness","Works out which duties under the EU Digital Services Act apply to a service, article by article, and turns the gaps into a plan and four drafts: a statement of reasons, a notice-and-action procedure, a complaints process and a memo for Legal."]]],
-  ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
+  ["Prepare", [["t-tt","siren","Incident tabletop",`Crisis scenarios across ${ALL_TYPES.length} company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law.`],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
     ["t-rt","shield","Red team studio","Plans a red team of a language or world model from nine questions: a coverage grid, seed cards with benign twins, drills that fit the team, findings, and exports for open-source harnesses."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
@@ -12467,8 +12533,8 @@ const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and reg
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
   const versions = typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
-  const tools = AB_GROUPS.reduce((a, g) => a + g[1].length, 0);
-  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,`tabletop scenario versions ${tip(`${SCENARIOS.length} scenarios, each written for up to ${ALL_TYPES.length} sectors`)}`],[lawSteps,"decisions with law notes"],
+  const tools = TOOL_ROUTES.length; // AB_GROUPS lists the same tools, one card each (test-v9 checks they agree)
+  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[SCENARIOS.length,`crisis scenarios, in ${versions} versions ${tip(`Each scenario is written for up to ${ALL_TYPES.length} sectors, which makes ${versions} playable versions`)}`],[lawSteps,"decisions with law notes"],
     [typeof MA_AREAS !== "undefined" ? MA_AREAS.length * 5 : 40,"maturity level descriptions"],[typeof CV_AREAS !== "undefined" ? CV_AREAS.length * CV_LAYERS.length : 40,"coverage checks"]];
   const decisions = [
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
@@ -12517,7 +12583,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>Designed for learning</h2>
       <p>The tabletop turns mistakes into teaching moments. Pick a weaker call and you see what happened, how your choice compares with the strongest one on safety, trust, regulatory standing and team capacity, the principle behind it, and the relevant law. Then you can try again.</p>
-      <p>Universal scenarios, like an account takeover wave or a government takedown order, rewrite themselves for eight company types, so a fintech team and a gaming studio each rehearse their own version of the crisis.</p>
+      <p>Universal scenarios, like an account takeover wave or a government takedown order, rewrite themselves for ${ALL_TYPES.length} company types, so a fintech team and a gaming studio each rehearse their own version of the crisis.</p>
     </section>
 
     <section class="ab-sec rise">
@@ -12534,7 +12600,7 @@ function renderAbout(){
 
     <section class="ab-sec ab-note rise">
       <h2>Limits and what's next</h2>
-      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}. Next: a transparency report drafter and a rebuilt metrics flow.</p>
+      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}.</p>
     </section>
   </article>`;
   const scores = $("#ab-scores"); if(scores) $$('[data-ab="scores"]').forEach(b => b.onclick = () => scores.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}));
@@ -20317,7 +20383,7 @@ const PAGE_TOURS = {
     [".as-know", "What we know so far", "The most important finding from each step you've done."]
   ],
   premortem:[
-    [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
+    [".card.hero", "Assess a product or feature", `Answer ${QS.length} plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed.`],
     [".pm-cur", "What you'll get", "A report like this one: the risks that apply and how serious each one is, the launch blockers, and the laws likely to apply in your markets."],
     [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."],
     [".gd-pm .gd-main", "One question at a time", "Pick the answer that fits, or press its number, then Next. Nothing is final: you can change any answer later from the report."],
@@ -21118,7 +21184,10 @@ renderAI = function(key){
 // "Start over" / "New": the tools that offer a full reset also drop the card back in front, so
 // starting fresh starts fresh. (Tabletop, vendors, metrics, notice, appeal, transparency, plan,
 // review and workspace have no equivalent whole-tool reset control.)
-const INTRO_RESET_SEL = [["premortem", '[data-act="new"]'], ["coppa", '[data-cp="reset"]'], ["dsa", '[data-ds="reset"]'],
+// The pre-mortem is left out on purpose: its "Start a new assessment" and "New" buttons share data-act="new". This listener runs
+// after the tool's own click handler has already drawn question 1, so clearing the flag here made the NEXT redraw (a number key
+// picking an answer) fall back to the purpose card. The card is shown once, on the first visit, and "How this works" reopens it.
+const INTRO_RESET_SEL = [["coppa", '[data-cp="reset"]'], ["dsa", '[data-ds="reset"]'],
   ["maturity", '[data-ma="reset"]'], ["coverage", '[data-cv="reset"]'], ["policy", "#pol-reset"], ["eval", '[data-ev="reset"]']];
 if(typeof document !== "undefined" && document.addEventListener){
   document.addEventListener("click", e => {

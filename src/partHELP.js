@@ -12,7 +12,7 @@ const PAGE_TOURS = {
     [".as-know", "What we know so far", "The most important finding from each step you've done."]
   ],
   premortem:[
-    [".card.hero", "Assess a product or feature", "Answer 12 plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed."],
+    [".card.hero", "Assess a product or feature", `Answer ${QS.length} plain-language questions about what you're building and who uses it. It takes about 3 minutes, and no Trust & Safety background is needed.`],
     [".pm-cur", "What you'll get", "A report like this one: the risks that apply and how serious each one is, the launch blockers, and the laws likely to apply in your markets."],
     [".exgrid", "Or start from an example", "Open a finished assessment for a common kind of product to see the whole report before you answer anything."],
     [".gd-pm .gd-main", "One question at a time", "Pick the answer that fits, or press its number, then Next. Nothing is final: you can change any answer later from the report."],
