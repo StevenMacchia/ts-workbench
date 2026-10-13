@@ -6254,7 +6254,7 @@ const OBL = [
 {r:"us", law:"State age-verification laws for adult content", st:c=>c.explicit?"applies":null,
  t:"Many states require reliable age verification before users can reach sexually explicit material. The Supreme Court upheld Texas's law in 2025.", sg:["age_assurance"]},
 {r:"us", law:"State children's online safety and design laws", st:c=>(c.youth&&(c.comms||c.F("posts")||c.F("discovery")))?"may":null,
- t:"Several states (including Utah, Texas, New York and California) regulate minors' accounts, feeds, parental consent or product design. Requirements differ, and several laws are being challenged in court.", sg:["teen_defaults","parental_tools"]},
+ t:"Several states (including Utah, Texas, New York and California) regulate minors' accounts, feeds, parental consent or product design. Courts have blocked parts of some (California's design code, Texas's content-filtering rule) and let others proceed (California's addictive-feed rules, Texas's app store law, New York's SAFE for Kids Act from January 2027). Check the current status of each before relying on it.", sg:["teen_defaults","parental_tools"]},
 {r:"us", law:"Fair housing, fair lending and equal-employment laws", st:c=>(c.T("rentals")||c.M("credit")||c.F("ads"))?"may":null,
  t:"Rental decisions, credit decisions and housing, job or credit ads must not discriminate on protected characteristics, including through targeting or algorithms.", sg:["anti_discrimination"]},
 
@@ -6286,7 +6286,7 @@ const OBL = [
 {r:"uk", law:"APP fraud mandatory reimbursement", st:c=>(c.T("fintech")&&c.M("p2p"))?"applies":null,
  t:"Payment firms must reimburse most victims of authorised push payment scams, up to £85,000 per claim, with the cost split between the sending and receiving firms.", sg:["confirmation_payee"]},
 {r:"uk", law:"FCA rules: Consumer Duty, AML and financial promotions", st:c=>c.T("fintech","crypto")?"may":null,
- t:"Regulated firms must deliver good outcomes, including for customers in vulnerable circumstances. Crypto firms need FCA registration for AML and must follow the financial promotions rules.", sg:["vulnerable_customers"]},
+ t:"Regulated firms must deliver good outcomes, including for customers in vulnerable circumstances. Crypto firms need FCA registration for AML now and full FCA authorisation from 25 October 2027 (applications open 30 September 2026 to 28 February 2027; AML registration does not convert), and must follow the financial promotions rules.", sg:["vulnerable_customers"]},
 
 {r:"au", law:"Online Safety Act 2021 and industry codes", st:c=>c.ugc?"applies":null,
  t:"Respond to eSafety Commissioner removal notices within 24 hours (image-based abuse, cyberbullying of children, adult cyber-abuse and seriously harmful content), meet the Basic Online Safety Expectations and follow registered industry codes.", sg:["ncii_process","review_queue"]},
@@ -6294,23 +6294,23 @@ const OBL = [
  t:"Since December 2025, age-restricted social media platforms must take reasonable steps to stop under-16s from having accounts. Messaging, online gaming, education and health services are largely excluded.", sg:["age_assurance","underage_removal"]},
 
 {r:"ca", law:"Mandatory reporting of child sexual abuse material", st:c=>(c.hostsMedia||c.F("dm"))?"applies":null,
- t:"Internet service providers must report CSAM they are told about to the Canadian Centre for Child Protection, and notify police and preserve data when they believe an offence was committed using their service.", sg:["csam_reporting"]},
+ t:"Online service providers must report web addresses of suspected child sexual abuse and exploitation material to the Canadian Centre for Child Protection, notify police when they have reasonable grounds to believe their service was used for such an offence, and keep the related data for 21 days.", sg:["csam_reporting"]},
 {r:"ca", law:"Proceeds of Crime (Money Laundering) and Terrorist Financing Act", st:c=>(c.T("fintech","crypto")&&c.moneyMoves)?"may":null,
  t:"Money services businesses, including crypto dealers, must register with FINTRAC, verify identity, keep records and report suspicious and large transactions.", sg:["kyc","aml_monitoring"]},
 
 {r:"in", law:"IT (Intermediary Guidelines and Digital Media Ethics Code) Rules", st:c=>c.ugc?"applies":null,
- t:"Appoint a grievance officer, acknowledge complaints within 24 hours and resolve them within 15 days, and remove non-consensual intimate imagery within 24 hours of a complaint. Significant platforms (5M+ users in India) have extra duties, and recent amendments address AI-generated content.", sg:["report_btn","ncii_process"]},
+ t:"Appoint a grievance officer and resolve complaints on a short clock (the February 2026 amendments cut several deadlines: court or government takedown orders within 3 hours, and, per law-firm summaries, intimate-image complaints within 2 hours and other grievances within 7 days). Label AI-generated content and carry provenance markers. Significant platforms (5M+ users in India) have extra duties.", sg:["report_btn","ncii_process"]},
 {r:"in", law:"Digital Personal Data Protection Act 2023", st:c=>c.minors?(c.youth?"applies":"may"):null,
- t:"Get verifiable parental consent before processing personal data of anyone under 18, and don't track, behaviorally monitor or target ads at children. Obligations are phasing in under rules issued in 2025.", sg:["parental_consent","no_minor_ads"]},
+ t:"Get verifiable parental consent before processing personal data of anyone under 18, and don't track, behaviorally monitor or target ads at children. Obligations phase in under rules issued in November 2025, with the children's-consent rules applying from 13 May 2027.", sg:["parental_consent","no_minor_ads"]},
 
 {r:"br", law:"Digital Statute of Children and Adolescents (ECA Digital)", st:c=>c.minors?(c.youth?"applies":"may"):null,
- t:"Enacted in 2025. Products aimed at or likely to be accessed by minors need age verification beyond self-declaration, parental supervision tools and protective defaults, and loot boxes are banned in games for minors.", sg:["age_assurance","parental_tools","teen_defaults"]},
+ t:"In force since 17 March 2026. Services that offer content unsuitable for under-18s must check age reliably (self-declaration is banned); products aimed at or likely to be used by minors need parental supervision tools and protective defaults, and loot boxes are banned in games for minors.", sg:["age_assurance","parental_tools","teen_defaults"]},
 {r:"br", law:"General Data Protection Law (LGPD)", st:c=>"applies", bump:false,
  t:"Process personal data on a legal basis and in the best interests of children and adolescents, with specific parental consent for children's data.", sg:["data_minimization"]}
 ];
 
 // Where each law note comes from: the official text or the regulator's own page. Checked when the notes were last reviewed.
-const LAW_REVIEWED = "September 2026";
+const LAW_REVIEWED = "October 2026";
 const LAW_SRC = {
   "Federal CSAM reporting duty (18 U.S.C. § 2258A)":["https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title18-section2258A&num=0&edition=prelim", "US Code, 18 U.S.C. § 2258A"],
   "Children's Online Privacy Protection Act (COPPA)":["https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa", "FTC, COPPA Rule (16 CFR Part 312)"],
@@ -8864,7 +8864,7 @@ const TT_EVIDENCE = {
     source:"Thorn, Youth Perspectives on Online Safety", url:"https://info.thorn.org/hubfs/Research/Thorn_2025YouthPerspectives_Report.pdf", published:"2026-07"},
   classroom:{claim:"In Thorn's late-2025 survey of US 9-17-year-olds, roughly 1 in 6 (16%) said they had been sent or shown another minor's nude image without that person's consent.",
     source:"Thorn, Youth Perspectives on Online Safety", url:"https://info.thorn.org/hubfs/Research/Thorn_2025YouthPerspectives_Report.pdf", published:"2026-07"},
-  comments:{claim:"Meta reported that in 2025 its specialist teams removed nearly 135,000 Instagram accounts for leaving sexualized comments on, or requesting sexual images from, adult-managed accounts featuring children under 13.",
+  comments:{claim:"Meta said in July 2025 that earlier that year its specialist teams removed nearly 135,000 Instagram accounts for leaving sexualized comments on, or requesting sexual images from, adult-managed accounts featuring children under 13.",
     source:"Meta newsroom", url:"https://about.fb.com/news/2025/07/expanding-teen-account-protections-child-safety-features/", published:"2025-07"},
   minor:{claim:"In Thorn's late-2025 survey of US 9-17-year-olds, about 1 in 6 (16%) said they had used a dating app, though these apps are built for adults.",
     source:"Thorn, Youth Perspectives on Online Safety", url:"https://info.thorn.org/hubfs/Research/Thorn_2025YouthPerspectives_Report.pdf", published:"2026-07"},
@@ -8963,7 +8963,7 @@ const TT_EVIDENCE = {
         source:"GOV.UK, Online Safety Act explainer", url:"https://www.gov.uk/government/publications/online-safety-act-explainer/online-safety-act-explainer", published:"2025-04"},
       genai:{claim:"The EU AI Act's transparency rules, which the European Commission said would take effect in August 2026, require that people using AI systems such as chatbots be told they are interacting with a machine.",
         source:"European Commission, AI Act", url:"https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", published:"2026"},
-      kids:{claim:"The FTC's January 2025 update to the COPPA Rule requires separate verifiable parental consent before sharing children's data with third parties for targeted advertising, limits data retention, and gives companies one year to comply.",
+      kids:{claim:"The FTC's updated COPPA Rule (announced January 2025, published April 2025) requires separate parental consent before sharing children's data with third parties and limits retention; compliance was required by 22 April 2026.",
         source:"US Federal Trade Commission", url:"https://www.ftc.gov/news-events/news/press-releases/2025/01/ftc-finalizes-changes-childrens-privacy-rule-limiting-companies-ability-monetize-kids-data", published:"2025-01"},
       fintech:{claim:"Since October 2025, EU instant payment rules require payment providers to offer payee verification, so a payee's name must match the IBAN; the European Commission says this helps prevent mistakes and scams.",
         source:"European Commission", url:"https://finance.ec.europa.eu/news/new-eu-rules-make-instant-euro-payments-faster-and-safer-2025-10-10_en", published:"2025-10"},
@@ -9060,7 +9060,7 @@ SCENARIOS.push(
           op("Target friction by risk: a warning describing this exact scam, a hold and specialist call for high-risk payments, and a second conversation for customers who insist.", "Most genuine payments go through untouched. On the second call, the insistent customer hears how the fake platform works and stops paying.", [12,5,7,-6], true),
           op("Show a stronger warning on all transfers and let customers proceed once they confirm they understand the risk.", "Coached customers tap through it in seconds. Losses continue, and the insistent customer sends another £15,000.", [-10,-4,-5,5]) ],
       lesson:"Friction works when it is targeted: generic warnings get tapped through, blanket holds punish genuine customers, and a customer under a scammer's influence often needs a real conversation.",
-      law:"Since 30 October 2024, the UK Payment Services (Amendment) Regulations 2024 let firms delay a payment by up to four business days when they have reasonable grounds to suspect the customer is being scammed. They must tell the customer why." },
+      law:"Since 30 October 2024, the UK Payment Services (Amendment) Regulations 2024 let firms delay a suspicious outbound sterling payment by up to four business days after it was requested, when they have reasonable grounds to suspect the customer is being scammed. They must tell the customer why." },
     // Law note source: https://www.psr.org.uk/information-for-consumers/app-fraud-reimbursement-protections/
     { t:"Fri 10:00", h:"Victims want their money back",
       s:"About 400 customers have lost a total of £1.4 million, and a few ignored your warnings. Some are now getting calls offering to recover their money for a fee. The receiving banks have frozen part of the funds, and a local newspaper is preparing a story.",
@@ -9104,7 +9104,7 @@ SCENARIOS.push(
           op("Link every complaint to the driver's full history with escalation rules, add continuous criminal-record monitoring, and build in-trip safety tools for riders and drivers alike.", "Patterns reach an investigator by the second complaint. Drivers, who face assaults from riders too, get the same emergency button and audio recording.", [12,8,7,-5], true),
           op("Launch a rider emergency button and a public safety report this month, and plan the complaint-system changes for next year.", "The launch gets good coverage. But complaints are still reviewed one trip at a time, and two months later another pattern slips through.", [2,3,-2,2]) ],
       lesson:"Low-level complaints are often early warnings, so review them as one history, not trip by trip. Build the same protections for drivers, who are assaulted by riders too.",
-      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires companies to rerun criminal background and driving history checks on every driver at least once a year. Continuous monitoring goes beyond that minimum." }
+      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires a criminal background check and a driving-record review before a driver starts, and the criminal check again at least once a year. Continuous monitoring goes beyond that minimum." }
   ]},
 { id:"datingsextortion", types:["dating"], title:"The video-call blackmail ring", platform:"Dating app", severity:"Sev 2",
   blurb:"A ring of fake profiles lures members to video chat, records them and demands money. One report leads to hundreds, and the network is still matching.",
@@ -12563,7 +12563,7 @@ const RO_USES = [
   ["ROOST's public docs and code", "The Osprey rule syntax and the Coop setup terms come from ROOST's documentation, example rules and source on GitHub, read in October 2026.", "roostorg on GitHub", "https://github.com/roostorg"],
   ["MiniLMv2 toxicity model", "The in-browser baseline. Apache-2.0, about 24 MB, distilled from Unitary's toxic-bert and trained on Jigsaw's toxic comment data. Downloads only when you click.", "Model card", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
   ["Transformers.js", "Hugging Face's library that runs the baseline model in your browser, loaded from jsDelivr. Version 3.8.1, pinned.", "Transformers.js", "https://huggingface.co/docs/transformers.js"],
-  ["PolicyLM-1.7B", "Optional, on your own computer. Musubi's small open-weight model that scores content against the policy you write, released with ROOST in October 2026. Run by the runner script; needs Python and a 3.5 GB download.", "Model card", "https://huggingface.co/musubilabs/policylm-1.7b"],
+  ["PolicyLM-1.7B", "Optional, on your own computer. Musubi's small open-weight model that scores content against the policy you write, released 6 October 2026 and listed in ROOST's Model Community. Run by the runner script; needs Python and a 3.5 GB download.", "Model card", "https://huggingface.co/musubilabs/policylm-1.7b"],
   ["gpt-oss-safeguard", "Optional, on your own computer. OpenAI's open-weight safety model, run with Ollama by the runner script.", "The runner script", RO_GH + "/ts-workbench/tree/main/tools/open-model-eval"],
   ["Claude", "Optional, in the Claude version only. Writes test cases and labels them, on your own Claude account.", "", ""],
   ["Nothing else", "No server and no accounts. What you type stays in your browser, and the model files above download only when you ask. Page views are counted anonymously, without cookies.", "", ""]
@@ -12617,7 +12617,7 @@ const CR_GROUPS = [
   {t:"Models that read content", ic:"eval", c:"var(--t-ai)", intro:"Each one downloads from its maker's own repository, unchanged, and only when you ask. Nothing from them is bundled into this page.", items:[
     ["MiniLMv2 toxic", "minuva, distilled from Unitary's toxic-bert and trained on Jigsaw's Toxic Comment data", "The free baseline in the classifier eval. About 24 MB, runs in your browser.", "Apache-2.0", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
     ["toxic-bert", "Unitary, with an ONNX port by Xenova", "The eval's fallback baseline when MiniLMv2 can't load. About 111 MB.", "Apache-2.0", "https://huggingface.co/Xenova/toxic-bert"],
-    ["PolicyLM-1.7B", "Musubi, released with ROOST in October 2026", "Scores your cases against the policy you write, on your own computer, through the runner script. 3.5 GB.", "Apache-2.0", "https://huggingface.co/musubilabs/policylm-1.7b"],
+    ["PolicyLM-1.7B", "Musubi, released 6 October 2026 and listed in ROOST's Model Community", "Scores your cases against the policy you write, on your own computer, through the runner script. 3.5 GB.", "Apache-2.0", "https://huggingface.co/musubilabs/policylm-1.7b"],
     ["gpt-oss-safeguard", "OpenAI", "Labels your cases against a written policy and explains each label, on your own computer with Ollama, through the runner script. 14 GB.", "Apache-2.0", "https://huggingface.co/openai/gpt-oss-safeguard-20b"],
     ["Claude", "Anthropic", "In the Claude version only: writes test cases and labels them, reviews rules, drafts notices and appeal replies. Runs on your own Claude account, under Anthropic's terms.", "", "https://www.anthropic.com"]
   ]},
@@ -12882,7 +12882,7 @@ const LN_REFS = [
     ["https://arxiv.org/abs/2604.05498","JailWAM","Jailbreaking World Action Models in robot control: current embodied world models remain vulnerable to instructions that induce unsafe physical behaviour."],
     ["https://arxiv.org/abs/2607.28226","Security of World-Model-Based Embodied AI","A lifecycle survey of threats, defenses and evaluation for embodied world models — the resource to read before testing anything that steers a robot, drone or vehicle."]]},
   {k:"world", title:"Vendor system cards", why:"The closest thing to a published red-team report for a world model today.", items:[
-    ["https://openai.com/index/sora-2-system-card/","Sora 2 System Card","OpenAI's public red-team methodology and results for a video model: categories tested, grading pipeline, and the C2PA and watermark details. No other major video or interactive world model has published an equivalent."]]},
+    ["https://deploymentsafety.openai.com/sora-2","Sora 2 System Card","OpenAI's system card for Sora 2 (discontinued 26 April 2026) remains the fullest public red-team write-up for a video model, with its C2PA and watermark details."]]},
   {k:"both", title:"Open safety infrastructure", why:"Shared tooling for the moderation side of the program.", items:[
     ["https://roost.tools/","ROOST","Robust Open Online Safety Tools: open-source building blocks for trust and safety teams. See the Works with ROOST page in this workbench."]]},
   {k:"both", title:"Child safety", why:"The rules behind the CSAE stop rules.", items:[
@@ -13287,10 +13287,10 @@ Visual fields:     Upload reference (if any), style, step or frame count, realis
           <li><b>Audit provenance end to end:</b> generate, export, edit, re-import, verify. Someone outside the team runs it.</li>
           <li><b>Shorter rotations.</b> Graders of visual material see less per session than text graders, and nobody grades severe material alone.</li></ul>`, ex:"e9"},
       {id:"law", title:"Where it is already expected", why:"The regimes and commitments that name adversarial testing and provenance, so the exercise record is written in the shape they will ask for.", body:`${LN_LAW}<ul>
-          <li><b>EU AI Act, Article 50.</b> AI-generated or manipulated images, audio or video realistic enough to pass as real must be labelled, clearly and machine-readably, at first exposure. In force since 2 August 2026; content made earlier carries no retroactive labelling duty.</li>
+          <li><b>EU AI Act, Article 50.</b> Since 2 August 2026, companies that build generative AI must mark what it produces (audio, images, video and text) so a machine can tell it is AI-made, and anyone who publishes a deepfake must say so, at the latest when people first see it. Systems already on the market before 2 August 2026 have until 2 December 2026 to add the marking. Content made before 2 August 2026 does not have to be re-labelled.</li>
           <li><b>US TAKE IT DOWN Act.</b> Publishing non-consensual intimate imagery, including AI-generated, is a federal crime. Covered platforms must run a notice-and-removal system and act on a verified request within 48 hours. The criminal provision took effect on signing; the platform duty has been required since 19 May 2026.</li>
           <li><b>UK Data (Use and Access) Act 2025.</b> Creating, or asking someone else to create, a non-consensual intimate-image deepfake is now a criminal offence, not only sharing one. In force since 6 February 2026.</li>
-          <li><b>California AI Transparency Act (SB 942).</b> Covered providers must embed machine-readable provenance in AI-generated or altered image, video and audio, and publish a free public tool that checks for it. Operative since 2 August 2026. California's earlier election-deepfake laws, AB 2839 and AB 2655, were permanently enjoined on First Amendment and Section 230 grounds in August 2025 and are not live law.</li></ul>
+          <li><b>California AI Transparency Act (SB 942).</b> Covered providers must embed machine-readable provenance in AI-generated or altered image, video and audio, and publish a free public tool that checks for it. Operative since 2 August 2026. California's two election-deepfake laws are blocked. A federal court struck down AB 2839 (deceptive candidate deepfakes) on First Amendment grounds in August 2025 and California did not appeal. It held that AB 2655 (platform takedowns) conflicts with Section 230, and California agreed not to enforce it while its Ninth Circuit appeal is pending.</li></ul>
         <p>The C2PA content credentials standard and the Partnership on AI's synthetic media practices set the disclosure norms the provenance gate measures against.</p>`}
     ],
     exercises:[
@@ -14429,7 +14429,7 @@ const TSG_TERMS = [
   /* ---------- Legal and regulation ---------- */
   {n:"COPPA (Children's Online Privacy Protection Act)", g:"Legal and regulation", d:"The US law requiring verifiable parental consent before collecting personal information from children under 13, enforced by the FTC. A 2025 amendment added a separate consent requirement for sharing children's data with third parties for advertising.", r:["Verifiable parental consent (VPC)"], tool:"coppa"},
   {n:"DSA (Digital Services Act)", g:"Legal and regulation", d:"The EU law setting rules for how online platforms handle illegal content, user complaints, advertising transparency, and, for the largest platforms, systemic risk.", r:["VLOP (very large online platform)","Trusted flagger","Statement of reasons"], tool:"dsa"},
-  {n:"VLOP (very large online platform)", g:"Legal and regulation", d:"Under the DSA, a very large online platform: one with more than 45 million average monthly users in the EU, designated by the European Commission and subject to the DSA's strictest duties.", r:["DSA (Digital Services Act)","Systemic risk"], tool:"dsa"},
+  {n:"VLOP (very large online platform)", g:"Legal and regulation", d:"Under the DSA, a very large online platform: one with 45 million or more average monthly users in the EU, designated by the European Commission and subject to the DSA's strictest duties.", r:["DSA (Digital Services Act)","Systemic risk"], tool:"dsa"},
   {n:"Statement of reasons", g:"Legal and regulation", d:"Under the DSA, the explanation a platform must give a user when it removes their content or restricts their account, including which rule was applied and how to appeal.", r:["DSA (Digital Services Act)","Appeals"], tool:"dsa"},
   {n:"Transparency report", g:"Legal and regulation", d:"A public report, often required by a law such as the DSA or published voluntarily, disclosing numbers such as how much content was removed, how many appeals succeeded, and how automated systems performed.", tool:"transparency"},
   {n:"Online Safety Act", g:"Legal and regulation", d:"The UK law requiring platforms to assess and reduce the risk of illegal content, and, where children are likely to use the service, content harmful to children, enforced by Ofcom.", r:["Ofcom","Duty of care"]},
@@ -19697,9 +19697,9 @@ if(window.addEventListener) window.addEventListener("hashchange", () => { if((lo
    TRANSPARENCY REPORT BUILDER: the numbers the EU Digital Services Act asks for, by type of service,
    with a completeness check, a readable report and, on request, a summary written by Claude.
    Requirements checked against Regulation (EU) 2022/2065 (Articles 15, 19, 24 and 42) and
-   Commission Implementing Regulation (EU) 2024/2835 in September 2026. Not legal advice.
+   Commission Implementing Regulation (EU) 2024/2835 in October 2026. Not legal advice.
    ========================================================= */
-const TR_REVIEWED = "September 2026";
+const TR_REVIEWED = "October 2026";
 const TR_SRC = {
   dsa:["Regulation (EU) 2022/2065, the Digital Services Act", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2065"],
   templates:["Implementing Regulation (EU) 2024/2835 on transparency report templates", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2835"],
@@ -19752,8 +19752,10 @@ const TR_SECTIONS = [
     why:"Published within three months of receiving each independent audit report: the risk assessment results, the mitigation measures, the audit report and the audit implementation report, and any consultations behind them.",
     f:[["doc_risk", "Risk assessment results (Article 34)", "chk"], ["doc_mitigation", "Mitigation measures (Article 35)", "chk"], ["doc_audit", "Independent audit report (Article 37(4))", "chk"], ["doc_impl", "Audit implementation report (Article 37(6))", "chk"], ["doc_consult", "Consultations behind the risk assessment, where applicable", "chk"]]}
 ];
-// The 15 high-level categories in the EU templates that apply to notices and own-initiative moderation (the list is exhaustive)
-const TR_CATS = ["Animal welfare", "Consumer information infringements", "Cyber violence", "Cyber violence against women", "Data protection and privacy violations", "Illegal or harmful speech", "Intellectual property infringements", "Negative effects on civic discourse or elections", "Protection of minors", "Risk for public security", "Scams and/or fraud", "Self-harm", "Unsafe, non-compliant or prohibited products", "Violence", "Other violation of provider’s terms and conditions"];
+// The fixed top-level categories in the EU templates (the list is exhaustive: 17 in all, 14 kinds of content, one for other terms-and-conditions breaches and two for cases where an authority or a reporter didn't say what kind of illegal content it was).
+// This tool covers notices and own-initiative moderation, so the one for orders is left out; the one for notices is notice-only.
+const TR_CATS = ["Animal welfare", "Consumer information infringements", "Cyber violence", "Cyber violence against women", "Data protection and privacy violations", "Illegal or harmful speech", "Intellectual property infringements", "Negative effects on civic discourse or elections", "Protection of minors", "Risk for public security", "Scams and/or fraud", "Self-harm", "Unsafe, non-compliant or prohibited products", "Violence", "Other violation of provider’s terms and conditions", "Type of alleged illegal content not specified by the notifier"];
+const TR_NOTICE_ONLY = ["Type of alleged illegal content not specified by the notifier"];
 const TR_BLANK = () => ({org:"", year:new Date().getFullYear() - 1, tier:"platform", sme:false, uk:false, v:{}, prev:{}, cat:{}, cmp:false, view:"setup", tab:"report", ai:null});
 const TR_EXAMPLE = {org:"Pixelry", year:2025, tier:"platform", sme:false, uk:false, cmp:true,
   v:{orders_act:14, orders_info:62, orders_time:9, notices:31400, notices_tf:820, notices_law:4100, notices_tc:18900, notices_auto:12600, notices_time:21,
@@ -19780,7 +19782,7 @@ const trFmt = (f, v) => v === undefined || v === "" || v === null ? "" : f[2] ==
 function trDue(){
   const y = +tr.year || new Date().getFullYear() - 1;
   return tr.tier === "vlop" ? `Every six months: 1 January to 30 June ${y}, published within two months (by the end of August ${y}), and 1 July to 31 December ${y}, published by the end of February ${y + 1}.`
-    : `Once a year: 1 January to 31 December ${y}, published within two months of the period ending, so by the end of February ${y + 1}.`;
+    : `Once a year: 1 January to 31 December ${y}, published within two months of the period ending, so by the end of February ${y + 1}.${y === 2025 ? " 2025 was a transition year: the templates applied from 1 July 2025, so the 2025 report need only follow them for the second half." : ""}`;
 }
 
 /* ---------- the report, as Markdown ---------- */
@@ -19920,10 +19922,10 @@ function trSetupHTML(){
   </div>`;
 }
 function trCatsHTML(){
-  return `<details class="tr-cats" ${store.get("tr:cats", false) ? "open" : ""}><summary><b>By category</b><span class="note">The EU templates' ${TR_CATS.length} categories for notices and own-initiative measures</span></summary>
-    <table><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.map(c => { const r = tr.cat[c] || {};
-      return `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td><input class="input mono" data-trc="${esc(c)}" data-trk="n" value="${esc(String(r.n || ""))}" inputmode="numeric" aria-label="${esc(c)}: notices"></td>` : ""}<td><input class="input mono" data-trc="${esc(c)}" data-trk="o" value="${esc(String(r.o || ""))}" inputmode="numeric" aria-label="${esc(c)}: own-initiative measures"></td></tr>`; }).join("")}</tbody></table>
-    <p class="note">The category list is exhaustive: you can't add new top-level categories, only sub-categories within them.</p></details>`;
+  return `<details class="tr-cats" ${store.get("tr:cats", false) ? "open" : ""}><summary><b>By category</b><span class="note">The EU templates' fixed categories for notices and own-initiative measures</span></summary>
+    <table><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.filter(c => trRank(tr.tier) >= 1 || !TR_NOTICE_ONLY.includes(c)).map(c => { const r = tr.cat[c] || {};
+      return `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td><input class="input mono" data-trc="${esc(c)}" data-trk="n" value="${esc(String(r.n || ""))}" inputmode="numeric" aria-label="${esc(c)}: notices"></td>` : ""}${TR_NOTICE_ONLY.includes(c) ? "<td></td>" : `<td><input class="input mono" data-trc="${esc(c)}" data-trk="o" value="${esc(String(r.o || ""))}" inputmode="numeric" aria-label="${esc(c)}: own-initiative measures"></td>`}</tr>`; }).join("")}</tbody></table>
+    <p class="note">The templates use 17 fixed categories: 14 kinds of content, one for other terms-and-conditions breaches, and two for cases where an authority or a reporter didn't say what kind of illegal content it was. You can't add top-level categories, only sub-categories within them.</p></details>`;
 }
 // Shared by the above-the-fold summary and the full report body, so the two never disagree.
 function trCatTableHTML(){
@@ -21776,7 +21778,7 @@ Object.assign(GT_MORE, {
    a severity, an owner, why it matters and what to do. The report gives a plan, the duties and four drafts.
    Reference: Regulation (EU) 2022/2065. Checked in DS_REVIEWED. A starting point for counsel, not legal advice.
    ========================================================= */
-const DS_REVIEWED = "September 2026";
+const DS_REVIEWED = "October 2026";
 const DS_SRC = [
   ["Regulation (EU) 2022/2065 (the DSA)", "https://eur-lex.europa.eu/eli/reg/2022/2065/oj"],
   ["European Commission, the DSA in practice", "https://digital-strategy.ec.europa.eu/en/policies/digital-services-act"],
@@ -21820,8 +21822,8 @@ const DS_CASE = {
   x:"In December 2025 the Commission fined X €120 million, its first DSA decision, over a verified badge that misled users, an incomplete ad repository and blocked researcher access.",
   meta:"In October 2025 the Commission preliminarily found that Facebook and Instagram's reporting tools added needless steps and dark patterns, and that their appeals didn't let users explain or add evidence.",
   tiktok:"In 2024 TikTok withdrew its Lite rewards program from the EU after the Commission opened proceedings over launching it without a risk assessment.",
-  temu:"In July 2025 the Commission preliminarily found that Temu's risk assessment of illegal products on its marketplace was inaccurate and too general.",
-  adult:"In May 2025 the Commission opened proceedings against four adult platforms over age verification and other measures to protect minors."
+  temu:"In July 2025 the Commission preliminarily found Temu's risk assessment of illegal products inaccurate and too general; in May 2026 it fined Temu €200 million.",
+  adult:"In May 2025 the Commission opened proceedings against four adult platforms, and in March 2026 preliminarily found all four in breach: clicking 'I am over 18' is not age verification."
 };
 // When a duty applies, given the context x
 const DS_APPLY = {
@@ -21949,8 +21951,8 @@ const DS_CTRL = [
       why:"Fields for safety labels, warnings, CE marks and the like have to exist and be usable before a listing goes live.", fix:"Add structured fields for the information EU consumer and product-safety law requires, and make them mandatory by category."},
     {k:"k_checks", t:"Random checks of whether products have been identified as illegal in official databases", sev:"med", o:"ops", cite:"Art. 31(3)", a:"traders",
       why:"Best efforts include sampling listings against sources such as the EU Safety Gate.", fix:"Run a monthly sample of listings against Safety Gate and remove matches."},
-    {k:"k_inform", t:"Consumers who bought an illegal product are told within six months of your learning of it", sev:"high", o:"ops", cite:"Art. 32", a:"traders",
-      why:"If you have the buyer's contact details, you must tell them the product was illegal, who sold it, and where to seek redress. Otherwise you publish it.",
+    {k:"k_inform", t:"Consumers who bought an illegal product in the six months before you learned of it are told", sev:"high", o:"ops", cite:"Art. 32", a:"traders",
+      why:"When you learn a product is illegal, you must tell everyone who bought it in the previous six months, who sold it and where to seek redress, or publish a notice if you don't have their contact details.",
       fix:"Add an illegal-product recall flow that emails affected buyers and posts a public notice when contacts are unknown."}]},
   {k:"vlop", n:"Very large platforms", h:"The duties that come with designation.", items:[
     {k:"v_risk", t:"A yearly systemic-risk assessment, and one before every significant new functionality", sev:"crit", o:"legal", cite:"Art. 34", a:"vlop",
