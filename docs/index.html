@@ -4455,19 +4455,21 @@ table:not([class]) tr:last-child td{border-bottom:0}
 .side .navlink > span:first-of-type,.side .navlink .lbl{overflow:hidden;text-overflow:ellipsis}
 .sb-new,.sb-new.sb-wip,.sb-new.sb-ai{white-space:nowrap;flex:none;font:500 10.5px/1.6 var(--body);letter-spacing:0;padding:0 7px;border-radius:999px}
 
-/* ---------- Tool cards: thumb | plain (TOOL_CARD_STYLE in partH4.js) ----------
-   thumb: a real screenshot of the tool in its example state in a 16:10 frame, same radius as the
-   card, 1px line, cropped to the top-left. A missing file removes the frame (onerror), leaving the plain card.
-   plain: no art; the tool's own 20px icon sits beside the title on one line. */
-.tc-thumb{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:var(--surface-2)}
-.tc-thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .25s ease}
-.ln-hub .card .tc-thumb{aspect-ratio:auto;height:170px}
-a:hover > .tc-thumb img{transform:scale(1.015)}
-.cs-plain .ov-tool h4 .sb-glyph{width:20px;height:20px;border-radius:0;background:none!important;color:var(--accent)}
-.cs-plain .ov-tool h4 .sb-glyph svg{width:20px!important;height:20px!important}
-.cs-plain .ov-tool .ov-tb{padding:16px 18px;gap:8px}
-.cs-plain .ov-tool h4 .wip-tag{margin-left:auto;flex:none}
-@media (prefers-reduced-motion: reduce){.tc-thumb img{transition:none}a:hover > .tc-thumb img{transform:none}}
+/* ---------- Icon tile (icTile() in partD.js; glyphs are Lucide, see tools/screenshots/ICONS.md) ----------
+   One tile for the All tools cards, the Learn hub cards and the assessment steps: 44px, 12px corners,
+   accent-soft ground, a 22px accent icon. Sidebar glyphs keep their own tile and show the same icon at 16px. */
+.ic-tile{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.ic-tile svg{width:22px;height:22px;display:block}
+.ov-tool{grid-template-rows:1fr}
+.ov-tb > .ic-tile{margin-bottom:6px}
+.ov-tb h4{flex-wrap:wrap;row-gap:4px}
+.lnh-b > .ic-tile{margin-bottom:4px}
+.as-six > li > .ic-tile{margin-bottom:4px}
+.as-cur-t{display:flex;align-items:center;gap:12px}
+.as-cur-t .as-cur-n{min-width:0}
+.ov-aic > .ic-tile{margin-top:0}
+.side .sb-nav .navlink .sb-glyph{width:24px;height:24px;border-radius:8px;opacity:1}
+.side .sb-nav .navlink .sb-glyph svg{width:16px!important;height:16px!important}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -4576,7 +4578,6 @@ table.ln-t{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.45
 .ln-hub p{margin:0;font-size:13.5px;color:var(--muted)}
 .ln-hub a>.go{font-weight:600;font-size:13.5px;color:var(--accent);margin-top:4px}
 .ln-hub .card{display:grid!important;grid-template-rows:auto 1fr;padding:0!important;overflow:hidden}
-.ln-hub .card .ov-art{height:96px}
 .lnh-b{display:grid;gap:8px;padding:16px 18px 18px;align-content:start}
 .ln-how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .ln-how div{font-size:13.5px;color:var(--muted);padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px}
@@ -5240,80 +5241,83 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <!-- Brand -->
-  <symbol id="i-logo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l7.5 2.9v5.7c0 4.6-3.1 8.5-7.5 9.8-4.4-1.3-7.5-5.2-7.5-9.8V5.7z"/><path d="M8.6 12l2.4 2.4 4.4-4.6"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="m9 12 2 2 4-4" /></g></symbol>
   <!-- UI -->
-  <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.9v.1"/></g></symbol>
-  <symbol id="i-save" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></g></symbol>
-  <symbol id="i-folder" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5A1.5 1.5 0 014.5 5H9l2 2.5h8.5A1.5 1.5 0 0121 9v9.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18.5z"/></g></symbol>
-  <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></g></symbol>
-  <symbol id="i-download" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></g></symbol>
-  <symbol id="i-upload" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M7 9.5l5-5 5 5M5 20h14"/></g></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></g></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></g></symbol>
-  <symbol id="i-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 4.5-9 4.5-9-4.5z"/><path d="M3 13l9 4.5 9-4.5"/></g></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></g></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" /><path d="M7 3v4a1 1 0 0 0 1 1h7" /></g></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></g></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6" /><path d="M14 11v6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></g></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></g></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12" /><path d="m17 8-5-5-5 5" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /></g></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></g></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" /><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" /><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" /></g></symbol>
   <!-- Platforms -->
-  <symbol id="p-social" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.3c2.2.3 3.9 1.9 4.5 4.7"/></g></symbol>
-  <symbol id="p-messaging" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h11a2 2 0 012 2V12a2 2 0 01-2 2H9.5L6 17v-3H4a2 2 0 01-2-2V6.5a2 2 0 012-2z"/><path d="M20 9a2 2 0 012 2v4.5a2 2 0 01-2 2h-1v2.5l-3-2.5h-3"/></g></symbol>
-  <symbol id="p-video" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10 9.3v5.4l4.6-2.7z"/></g></symbol>
-  <symbol id="p-creator" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></g></symbol>
-  <symbol id="p-marketplace" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a2 2 0 01-2 1.8H8.2a2 2 0 01-2-1.8z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></g></symbol>
-  <symbol id="p-fintech" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M2.5 10h19M6.5 15h4"/></g></symbol>
-  <symbol id="p-crypto" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 8h3.8a2 2 0 010 4H9.5zM9.5 12h4.3a2 2 0 010 4H9.5zM11 6.5V8M11 16v1.5"/></g></symbol>
-  <symbol id="p-gaming" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10a4 4 0 013.9 4.9l-.9 3.9a2 2 0 01-3.4.9L14.5 15h-5l-2.1 2.7a2 2 0 01-3.4-.9l-.9-3.9A4 4 0 017 8z"/><path d="M8 11v3M6.5 12.5h3M15.5 11.5h.01M17.5 13.5h.01"/></g></symbol>
-  <symbol id="p-dating" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></g></symbol>
-  <symbol id="p-genai" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5l1.8 5.2 5.2 1.8-5.2 1.8L11 17.5l-1.8-5.2L4 10.5l5.2-1.8z"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></g></symbol>
-  <symbol id="p-gig" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l3.5-7h5l3.5 7M9.5 10L8 6.5H5.5M14.5 10l1.5-3.5h2.5"/></g></symbol>
-  <symbol id="p-rentals" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5L19 9M14 9l2 2"/></g></symbol>
-  <symbol id="p-edtech" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9L12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c1.5 1.5 3.4 2.2 5.5 2.2s4-.7 5.5-2.2V11M21.5 9v5"/></g></symbol>
-  <symbol id="p-health" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/></g></symbol>
-  <symbol id="p-workplace" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M3 13h18"/></g></symbol>
+  <symbol id="p-social" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" /></g></symbol>
+  <symbol id="p-messaging" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></g></symbol>
+  <symbol id="p-video" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /><rect x="2" y="6" width="14" height="12" rx="2" /></g></symbol>
+  <symbol id="p-creator" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></g></symbol>
+  <symbol id="p-marketplace" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5" /><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244" /><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05" /></g></symbol>
+  <symbol id="p-fintech" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /><path d="M6 14h2" /></g></symbol>
+  <symbol id="p-crypto" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 4.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727" /></g></symbol>
+  <symbol id="p-gaming" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11" /><line x1="8" x2="8" y1="9" y2="13" /><line x1="15" x2="15.01" y1="12" y2="12" /><line x1="18" x2="18.01" y1="10" y2="10" /><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" /></g></symbol>
+  <symbol id="p-dating" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></g></symbol>
+  <symbol id="p-genai" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /><path d="M20 2v4" /><path d="M22 4h-4" /><circle cx="4" cy="20" r="2" /></g></symbol>
+  <symbol id="p-gig" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5" /><circle cx="5.5" cy="17.5" r="3.5" /><circle cx="15" cy="5" r="1" /><path d="M12 17.5V14l-3-3 4-3 2 3h2" /></g></symbol>
+  <symbol id="p-rentals" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" /><circle cx="16.5" cy="7.5" r=".5" fill="currentColor" /></g></symbol>
+  <symbol id="p-edtech" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" /><path d="M22 10v6" /><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" /></g></symbol>
+  <symbol id="p-health" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /><path d="M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" /></g></symbol>
+  <symbol id="p-workplace" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /><rect width="20" height="14" x="2" y="6" rx="2" /></g></symbol>
   <!-- Harm areas -->
-  <symbol id="c-child" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><path d="M7 11.5l2.6-2.2a2 2 0 011.3-.5h2.2a2 2 0 011.3.5l2.6 2.2M9.5 9.5V21M14.5 9.5V21M9.5 15h5"/></g></symbol>
-  <symbol id="c-sexual" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12s3.3-6 9-6c1.9 0 3.5.6 4.9 1.5M21 12s-3.3 6-9 6c-1.9 0-3.5-.6-4.9-1.5"/><path d="M4 20L20 4"/><path d="M9.6 12.4a2.5 2.5 0 013-3"/></g></symbol>
-  <symbol id="c-fraud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3.5v10a5 5 0 01-10 0V11"/><path d="M5 11l-2 2.5M13 5.5l2-2 2 2"/></g></symbol>
-  <symbol id="c-fincrime" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 4l9 5.5M4.5 9.5h15M6 10v7M10 10v7M14 10v7M18 10v7M3.5 20h17"/></g></symbol>
-  <symbol id="c-security" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 018 0v3M12 14.5v2.5"/></g></symbol>
-  <symbol id="c-harass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a1 1 0 011 1v10a1 1 0 01-1 1h-8l-5 3.5V17H4a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M12 8.5v4M12 14.8v.2"/></g></symbol>
-  <symbol id="c-violent" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5L2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></g></symbol>
-  <symbol id="c-selfharm" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M6 6l3.5 3.5M14.5 14.5L18 18M18 6l-3.5 3.5M9.5 14.5L6 18"/></g></symbol>
-  <symbol id="c-privacy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></g></symbol>
-  <symbol id="c-physical" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0c0 5.4-6.5 11-6.5 11z"/><path d="M12 7v3.8M12 13.3v.2"/></g></symbol>
-  <symbol id="c-integrity" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="2.5"/><path d="M12 4.5V8M9.5 12.5h.01M14.5 12.5h.01M9.5 15.8h5M3 12v3.5M21 12v3.5"/></g></symbol>
-  <symbol id="c-illegal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></g></symbol>
-  <symbol id="c-ai" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9.5 9.5h5v5h-5zM9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></g></symbol>
-  <symbol id="c-readiness" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 12.5l2.5 2.5 4.5-5"/></g></symbol>
-  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c.9-3.9 3.9-6.2 7.5-6.2s6.6 2.3 7.5 6.2"/></g></symbol>
-  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6L6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></g></symbol>
-  <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></g></symbol>
-  <symbol id="i-monitor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/></g></symbol>
+  <symbol id="c-child" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" /><path d="M15 12h.01" /><path d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" /><path d="M9 12h.01" /></g></symbol>
+  <symbol id="c-sexual" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" /><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" /><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" /><path d="m2 2 20 20" /></g></symbol>
+  <symbol id="c-fraud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></g></symbol>
+  <symbol id="c-fincrime" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2" /><circle cx="12" cy="12" r="2" /><path d="M6 12h.01M18 12h.01" /></g></symbol>
+  <symbol id="c-security" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="16" r="1" /><rect x="3" y="10" width="18" height="12" rx="2" /><path d="M7 10V7a5 5 0 0 1 10 0v3" /></g></symbol>
+  <symbol id="c-harass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" /><path d="M12 15h.01" /><path d="M12 7v4" /></g></symbol>
+  <symbol id="c-violent" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" /><path d="M12 9v4" /><path d="M12 17h.01" /></g></symbol>
+  <symbol id="c-selfharm" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="m4.93 4.93 4.24 4.24" /><path d="m14.83 9.17 4.24-4.24" /><path d="m14.83 14.83 4.24 4.24" /><path d="m9.17 14.83-4.24 4.24" /><circle cx="12" cy="12" r="4" /></g></symbol>
+  <symbol id="c-privacy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></g></symbol>
+  <symbol id="c-physical" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /><circle cx="12" cy="10" r="3" /></g></symbol>
+  <symbol id="c-integrity" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></g></symbol>
+  <symbol id="c-illegal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M4.929 4.929 19.07 19.071" /></g></symbol>
+  <symbol id="c-ai" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v2" /><path d="M12 2v2" /><path d="M17 20v2" /><path d="M17 2v2" /><path d="M2 12h2" /><path d="M2 17h2" /><path d="M2 7h2" /><path d="M20 12h2" /><path d="M20 17h2" /><path d="M20 7h2" /><path d="M7 20v2" /><path d="M7 2v2" /><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="8" y="8" width="8" height="8" rx="1" /></g></symbol>
+  <symbol id="c-readiness" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><path d="m9 14 2 2 4-4" /></g></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" /></g></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></g></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></g></symbol>
+  <symbol id="i-glossary" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" /><path d="m8 13 4-7 4 7" /><path d="M9.1 11h5.7" /></g></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" /></g></symbol>
+  <symbol id="i-world" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></g></symbol>
 </svg>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.3"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></g></symbol>
-  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5L12 4l8 6.5V20h-5v-6H9v6H4z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></symbol>
-  <symbol id="i-radar" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6l8-3z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></symbol>
-  <symbol id="i-siren" viewBox="0 0 24 24"><path d="M6 18v-5a6 6 0 0112 0v5M4 18h16v3H4zM12 3v2M4.2 6.2l1.4 1.4M19.8 6.2l-1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 18a8 8 0 1116 0" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M12 18l4-6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M4 18h16" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
-  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 4v16M7 20h10M5 7h14M5 7l-3 6a3 3 0 006 0zM19 7l-3 6a3 3 0 006 0z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M8 11V8a4 4 0 018 0v3" fill="none" stroke="currentColor" stroke-width="1.75"/></symbol>
-  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3" fill="none" stroke="currentColor" stroke-width="1.75"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="22" x2="18" y1="12" y2="12" /><line x1="6" x2="2" y1="12" y2="12" /><line x1="12" x2="12" y1="6" y2="2" /><line x1="12" x2="12" y1="22" y2="18" /></g></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></g></symbol>
+  <symbol id="i-radar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" /><path d="M12 8v4" /><path d="M12 16h.01" /></g></symbol>
+  <symbol id="i-siren" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-6a5 5 0 1 1 10 0v6" /><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z" /><path d="M21 12h1" /><path d="M18.5 4.5 18 5" /><path d="M2 12h1" /><path d="M12 2v1" /><path d="m4.929 4.929.707.707" /><path d="M12 12v6" /></g></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4" /><path d="M3.34 19a10 10 0 1 1 17.32 0" /></g></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18" /><path d="m19 8 3 8a5 5 0 0 1-6 0zV7" /><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" /><path d="m5 8 3 8a5 5 0 0 1-6 0zV7" /><path d="M7 21h10" /></g></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></g></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></g></symbol>
 </svg>
 
  <script>try{var m=JSON.parse(localStorage.getItem("tswb:theme")||"null");if(m!=="dark"&&m!=="system")m="light";if(m==="dark"||m==="light")document.documentElement.setAttribute("data-mode",m);}catch(e){document.documentElement.setAttribute("data-mode","light");}</script>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></g></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></g></symbol><symbol id="i-appeal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5l4 4-6.5 6.5-4-4z"/><path d="M4.5 15.5l3-3M12.5 17.5l3-3"/><path d="M3 20.5h8"/></g></symbol><symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7"/><path d="M3 20h18"/></g></symbol><symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4.5"/></g></symbol><symbol id="i-book" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5c2-1.3 5-1.3 8 .3v13c-3-1.6-6-1.6-8-.3z"/><path d="M20 5.5c-2-1.3-5-1.3-8 .3v13c3-1.6 6-1.6 8-.3z"/></g></symbol><symbol id="i-chat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a1 1 0 011 1v9a1 1 0 01-1 1h-8l-4 4v-4H5a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M8.3 10h.01M12 10h.01M15.7 10h.01"/></g></symbol><symbol id="i-bot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8.5" width="14" height="10" rx="3"/><path d="M12 8.5V5.5M9.5 3.5h5"/><path d="M9 16.5h6"/></g><circle cx="9.5" cy="13" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="13" r="1.1" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16V4.5h-4.5v4h-4v4h-4v4H4z"/></g></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
-  <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></g></symbol>
-  <symbol id="i-cover" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></g></symbol>
-  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="i-eval" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5h6"/><path d="M10 2.5v7L5.3 17a2 2 0 001.7 3h10a2 2 0 001.7-3L14 9.5v-7"/><path d="M8 14.5h8"/></g></symbol>
-  <symbol id="i-dsa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 4l9 5.5"/><path d="M5 9.5v9M9 9.5v9M15 9.5v9M19 9.5v9"/><path d="M3 18.5h18"/></g></symbol>
-  <symbol id="i-coppa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.3" r="2.5"/><path d="M7 12l2.6-2.2a2 2 0 011.3-.5h2.2a2 2 0 011.3.5L17 12M9.5 9.8V21M14.5 9.8V21M9.5 15.3h5"/></g></symbol>
-  <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4M15 3v4"/><path d="M6.5 7h11v3.5a5.5 5.5 0 01-11 0z"/><path d="M12 16v5"/></g></symbol><symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></g></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34" /><circle cx="11" cy="11" r="8" /></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h16" /></g></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" /><rect x="2" y="4" width="20" height="16" rx="2" /></g></symbol><symbol id="i-appeal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381" /><path d="m16 16 6-6" /><path d="m21.5 10.5-8-8" /><path d="m8 8 6-6" /><path d="m8.5 7.5 8 8" /></g></symbol><symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></g></symbol><symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6" /><path d="M14 2v5a1 1 0 0 0 1 1h5" /><path d="m14 20 2 2 4-4" /></g></symbol><symbol id="i-book" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v16" /><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" /></g></symbol><symbol id="i-chat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" /></g></symbol><symbol id="i-bot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2" /><path d="M20 14h2" /><path d="M15 13v2" /><path d="M9 13v2" /></g></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6" /><path d="m22 7-8.5 8.5-5-5L2 17" /></g></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></g></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /><path d="m21.854 2.147-10.94 10.939" /></g></symbol>
+  <symbol id="i-cover" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.07 4.93A10 10 0 0 0 6.99 3.34" /><path d="M4 6h.01" /><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35" /><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67" /><path d="M12 18h.01" /><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67" /><circle cx="12" cy="12" r="2" /><path d="m13.41 10.59 5.66-5.66" /></g></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></g></symbol>
+  <symbol id="i-eval" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" /><path d="M6.453 15h11.094" /><path d="M8.5 2h7" /></g></symbol>
+  <symbol id="i-dsa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18v-7" /><path d="M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z" /><path d="M14 18v-7" /><path d="M18 18v-7" /><path d="M3 22h18" /><path d="M6 18v-7" /></g></symbol>
+  <symbol id="i-coppa" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" /><path d="M15 12h.01" /><path d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" /><path d="M9 12h.01" /></g></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h.01" /><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20" /><path d="m20 7 2 .5-2 .5" /><path d="M10 18v3" /><path d="M14 17.75V21" /><path d="M7 18a6 6 0 0 0 3.84-10.61" /></g></symbol><symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></g></symbol>
 </svg>
 <nav class="sitetop" aria-label="stevenmacchia.com">
   <span class="st-mark" aria-hidden="true"></span>
@@ -5336,7 +5340,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
     <nav class="sb-nav" aria-label="Main">
       <a class="navlink" href="#overview" data-route="overview"><svg><use href="#i-home"/></svg>Your assessment</a>
       <a class="navlink" href="#tools" data-route="tools"><svg><use href="#i-layers"/></svg>All tools</a>
-      <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
+      <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-folder"/></svg>My workspace<span class="sb-cnt" id="sb-cnt-ws"></span></a>
       <div class="sb-assess" id="sb-assess">
         <div class="sb-h sb-assess-h">The assessment<span id="sb-assess-n"></span></div>
         <a class="navlink" href="#maturity" data-route="maturity" data-step="2"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</a>
@@ -5367,13 +5371,13 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
       <div class="sb-h sb-h-tag">Learn<span class="sb-new">New</span></div>
       <div class="sb-more">
       <a class="navlink" href="#redteamllm" data-route="redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span>Red teaming LLMs<span class="sb-new sb-wip">In progress</span></a>
-      <a class="navlink" href="#redteamworld" data-route="redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span>Red teaming world models<span class="sb-new sb-wip">In progress</span></a>
-      <a class="navlink" href="#glossary" data-route="glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span>Glossary and practice<span class="sb-new sb-wip">In progress</span></a>
-      <a class="navlink" href="#tsglossary" data-route="tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span>T&amp;S glossary</a>
+      <a class="navlink" href="#redteamworld" data-route="redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-world"/></svg></span>Red teaming world models<span class="sb-new sb-wip">In progress</span></a>
+      <a class="navlink" href="#glossary" data-route="glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-glossary"/></svg></span>Glossary and practice<span class="sb-new sb-wip">In progress</span></a>
+      <a class="navlink" href="#tsglossary" data-route="tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-glossary"/></svg></span>T&amp;S glossary</a>
       </div>
       <div class="sb-h">Project</div>
       <a class="navlink" href="#about" data-route="about"><svg><use href="#i-info"/></svg>About this project</a>
-      <a class="navlink" href="#credits" data-route="credits"><svg><use href="#i-plug"/></svg>Built with</a>
+      <a class="navlink" href="#credits" data-route="credits"><svg><use href="#i-wrench"/></svg>Built with</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
       <div id="sb-pins" class="sb-pins"></div>
     </nav>
@@ -5451,12 +5455,12 @@ const HEAD_META = () => {
     eval:["eval", () => [EV_CATS.length + " kinds of hard case", "Precision and recall by kind", "Works with any classifier"]],
     tools:["layers", () => ["Use any tool on its own", "Free and private", "No sign-up"]],
     redteam:["shield", () => ["Plan, drills, findings, exports", "Learn as you go", "No attack strings"]],
-    learn:["steps", () => ["2 guides", "23 drills", (typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms"]],
+    learn:["book", () => ["2 guides", "23 drills", (typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms"]],
     redteamllm:["shield", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.llm.steps.length : 9) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.llm.exercises.length : 11) + " drills", "No attack strings"]],
-    redteamworld:["monitor", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.steps.length : 10) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.exercises.length : 12) + " drills", "Uploads, steering, provenance"]],
-    glossary:["doc", () => [(typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms", "Flashcards and a quiz", "Tagged by model type"]],
-    tsglossary:["doc", () => [(typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 100) + " terms", "9 groups", "Search and browse A to Z"]],
-    workspace:["user", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
+    redteamworld:["world", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.steps.length : 10) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.exercises.length : 12) + " drills", "Uploads, steering, provenance"]],
+    glossary:["glossary", () => [(typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms", "Flashcards and a quiz", "Tagged by model type"]],
+    tsglossary:["glossary", () => [(typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 100) + " terms", "9 groups", "Search and browse A to Z"]],
+    workspace:["folder", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
   let stats = []; try{ stats = m[1](); }catch(e){}
@@ -5759,6 +5763,9 @@ function countUp(el, key){
   };
   requestAnimationFrame(step);
 }
+
+// The one icon tile for cards: 44px, accent-soft, the tool's Lucide glyph at 22px (ICONS.md).
+function icTile(iconId){ return `<span class="ic-tile" aria-hidden="true"><svg><use href="#i-${iconId}"/></svg></span>`; }
 
 // Toast with an Undo action, shared by every "Start over" handler.
 // label: what happened. snapshot: a deep copy taken before clearing. restore(snapshot): puts it back.
@@ -11990,8 +11997,8 @@ function cmdkItems(){
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("Red team studio","redteam","var(--t-rt)","shield");
-  go("Learn","learn","var(--accent)","steps"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","monitor"); go("Glossary and practice","glossary","var(--accent)","doc"); go("T&S glossary","tsglossary","var(--accent)","doc");
-  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","plug");
+  go("Learn","learn","var(--accent)","book"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","world"); go("Glossary and practice","glossary","var(--accent)","glossary"); go("T&S glossary","tsglossary","var(--accent)","glossary");
+  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","wrench");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
@@ -12063,15 +12070,6 @@ $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
-// Card art for the All tools grid and the Learn hub. One constant picks the look so the two can be
-// previewed and compared: "thumb" shows a real screenshot of the tool in its example state
-// (docs/thumbs/<route>.jpg, written by `node tools/screenshots/capture.js --thumbs`); "plain" shows
-// no art, only the tool's icon beside the title. A missing thumbnail falls back to the plain card.
-const TOOL_CARD_STYLE = "thumb"; // "thumb" | "plain"
-function toolCardArt(route){
-  if(TOOL_CARD_STYLE !== "thumb") return "";
-  return `<div class="tc-thumb"><img src="thumbs/${route}.jpg" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></div>`;
-}
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -12194,7 +12192,7 @@ function asStepHTML(s, i, next){
     const label = s.k === "setup" ? "Open workspace" : "Review";
     return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
-    <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
+    <div class="as-cur-t">${icTile(s.icon)}<b class="as-cur-n">${s.n}</b></div><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
   return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
 }
@@ -12232,7 +12230,7 @@ function asWelcomeHTML(J){
     ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
-      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}">${icTile(s.icon)}<span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
       <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
     </section>
     ${asFootHTML()}
@@ -12286,8 +12284,7 @@ const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"M
 let ovStage = "all";
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
-      ${toolCardArt(route)}
-      <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
+      <div class="ov-tb">${icTile(iconId)}<h4>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
@@ -12295,7 +12292,7 @@ function renderTools(){
     <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools cs-${TOOL_CARD_STYLE}">
+      <div class="ov-tools">
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
@@ -12311,7 +12308,7 @@ function renderTools(){
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai">${icTile(String(AI_TOOLS[k].icon).replace(/^i-/, ""))}<div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
     ${typeof templateItems === "function" ? `<section class="rise">
       <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
@@ -12320,10 +12317,10 @@ function renderTools(){
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
-        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
+        <a class="ln-aic ov-aic" href="#redteamllm">${icTile("shield")}<div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamworld">${icTile("world")}<div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#glossary">${icTile("glossary")}<div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary">${icTile("glossary")}<div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
       </div>
     </section>
     <section class="rise">
@@ -12641,6 +12638,7 @@ const CR_GROUPS = [
     ["Hugging Face Hub", "Hugging Face", "Hosts the model files your browser or the runner script downloads.", "", "https://huggingface.co"],
     ["GitHub Pages", "GitHub", "Serves this page. The source is public in the same repository.", "", "https://github.com/StevenMacchia/ts-workbench"],
     ["Cloudflare Web Analytics", "Cloudflare", "Counts visits without cookies. It never sees what you type.", "", "https://www.cloudflare.com/web-analytics/"],
+    ["Lucide 1.56.0", "Lucide Contributors; a few icons derive from Feather, by Cole Bemis", "Every icon on the cards, in the sidebar and on buttons. The glyphs are copied into the page unchanged.", "ISC; MIT for the Feather icons", "https://lucide.dev"],
     ["Inter, Instrument Sans and IBM Plex Mono", "Rasmus Andersson; Rodrigo Fuenzalida; IBM. Served by Google Fonts", "The typefaces: Inter and Instrument Sans for text, IBM Plex Mono for data.", "SIL Open Font License", "https://fonts.google.com"],
     ["Node.js, Python, PyTorch and Ollama", "The OpenJS Foundation; the Python Software Foundation; the PyTorch Foundation; Ollama", "Only for the runner scripts you run on your own computer. vLLM and LM Studio work too.", "", "https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval"]
   ]},
@@ -13183,7 +13181,7 @@ Then change one number (fraud S3+ to 1.8%, or es over-refusal to 7%) and decide 
     ],
     checklist:["Target written down: model, version, system prompt, settings, every surface, every guardrail layer, who the users are.","At least three attacker profiles chosen and named in the plan.","Success criteria, release gates and thresholds agreed in writing, before testing starts.","Stop rules, escalation path, evidence vault and deletion schedule in place. CSAE process signed by legal.","Tester welfare rules set: time limits, rotation, support, nobody alone on severe material.","Seeds written for every harm area, each mapped to a policy line, each with a benign twin.","Seeds cover every shipped language plus unsupported ones, and every input format including uploads and voice.","Baseline run first, then one technique at a time, then combinations, then automated breadth, then human depth.","Every attempt logged with the same fields, every finding reproduced k of n.","Graded on the S0 to S4 scale against written rubrics. Humans on all S3 and S4. Grader agreement measured.","Every number reported says what it counts: which severity, which denominator, which surfaces.","Findings filed in the template, with vault references, owners and dates. No harmful output in tickets.","Exercise report gives the decision first, the gates pass or fail, the trend, and the residual risk with a signature.","Fixes retested: the finding, its variants, and the benign twins. Over-refusal before and after in the ticket.","Every finding and variant added to the regression suite, which runs on every build.","Graders calibrated on the gold set this round. Judge model audited by humans. Coverage audited by someone outside the team.","Records kept in the shape a regulator would ask for: scope, set version, results, decisions, sign-offs."]
   },
-  world: {route:"redteamworld", name:"Red teaming world models", short:"world model", icon:"monitor", color:"#E0532F",
+  world: {route:"redteamworld", name:"Red teaming world models", short:"world model", icon:"world", color:"#E0532F",
     desc:"How to find the harm a video, image-to-video or interactive world model can cause before users do. What is different from text, the method in ten steps, twelve drills, worksheets and the sources.",
     steps:[
       {id:"different", title:"What is different from text", why:"The harm categories carry over from language models. Nine things about video and interactive models change how you test.", body:`${lnDo([
@@ -14342,10 +14340,10 @@ function renderLearn(){
   const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length, due = glDueCount();
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
   view.innerHTML = head("Learn", "Start in the studio. Read the guide when you want the reasons. Look up a word when one stops you.", "Learn") + `<div class="ln">
-    <div class="ln-hub cs-${TOOL_CARD_STYLE}">
-      <a class="card" href="#redteam" style="--c:var(--t-rt)">${toolCardArt("redteam")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></span></a>
-      <div class="card" style="--c:var(--t-ai)">${toolCardArt("redteamllm")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-book"/></svg></span><h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></span></div>
-      <div class="card" style="--c:var(--accent)">${toolCardArt("tsglossary")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><h3>Look up a word: two glossaries</h3><p><a href="#tsglossary">T&amp;S glossary</a> — ${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 103} everyday Trust and Safety terms, in plain words.</p><p><a href="#glossary">Red-teaming glossary</a> — ${LN_GLOSS.length} terms, with flashcards and a quiz.</p><span class="note">${due ? due + " due for review · " : ""}${known} of ${LN_GLOSS.length} red-teaming terms known</span></span></div>
+    <div class="ln-hub">
+      <a class="card" href="#redteam" style="--c:var(--t-rt)"><span class="lnh-b">${icTile("shield")}<h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></span></a>
+      <div class="card" style="--c:var(--t-ai)"><span class="lnh-b">${icTile("book")}<h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></span></div>
+      <div class="card" style="--c:var(--accent)"><span class="lnh-b">${icTile("glossary")}<h3>Look up a word: two glossaries</h3><p><a href="#tsglossary">T&amp;S glossary</a> — ${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 103} everyday Trust and Safety terms, in plain words.</p><p><a href="#glossary">Red-teaming glossary</a> — ${LN_GLOSS.length} terms, with flashcards and a quiz.</p><span class="note">${due ? due + " due for review · " : ""}${known} of ${LN_GLOSS.length} red-teaming terms known</span></span></div>
     </div>
     <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
 }

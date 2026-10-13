@@ -112,9 +112,7 @@ const C = patch(rd("partC3.html"), [
    `<svg><use href="#i-home"/></svg>Overview</a>\n        <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace</a>`]
 ], "partC3");
 
-const I = patch(rd("partI3.svg"), [
-  [`  <symbol id="i-sun"`, `  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c.9-3.9 3.9-6.2 7.5-6.2s6.6 2.3 7.5 6.2"/></g></symbol>\n  <symbol id="i-sun"`]
-], "partI3");
+const I = rd("partI3.svg"); // sprite is Lucide, applied by tools/screenshots/apply-lucide.js (ICONS.md)
 
 const W2 = rd("partW2.js") + `
 function pmProjectSelect(){

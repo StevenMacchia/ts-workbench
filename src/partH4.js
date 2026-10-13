@@ -1,15 +1,6 @@
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
-// Card art for the All tools grid and the Learn hub. One constant picks the look so the two can be
-// previewed and compared: "thumb" shows a real screenshot of the tool in its example state
-// (docs/thumbs/<route>.jpg, written by `node tools/screenshots/capture.js --thumbs`); "plain" shows
-// no art, only the tool's icon beside the title. A missing thumbnail falls back to the plain card.
-const TOOL_CARD_STYLE = "thumb"; // "thumb" | "plain"
-function toolCardArt(route){
-  if(TOOL_CARD_STYLE !== "thumb") return "";
-  return `<div class="tc-thumb"><img src="thumbs/${route}.jpg" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></div>`;
-}
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -132,7 +123,7 @@ function asStepHTML(s, i, next){
     const label = s.k === "setup" ? "Open workspace" : "Review";
     return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
-    <b class="as-cur-n">${s.n}</b><p>${esc(s.get)}</p>
+    <div class="as-cur-t">${icTile(s.icon)}<b class="as-cur-n">${s.n}</b></div><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
   return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
 }
@@ -170,7 +161,7 @@ function asWelcomeHTML(J){
     ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
-      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
+      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}">${icTile(s.icon)}<span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
       <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
     </section>
     ${asFootHTML()}
@@ -224,8 +215,7 @@ const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"M
 let ovStage = "all";
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
-      ${toolCardArt(route)}
-      <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
+      <div class="ov-tb">${icTile(iconId)}<h4>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
   view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
@@ -233,7 +223,7 @@ function renderTools(){
     <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools cs-${TOOL_CARD_STYLE}">
+      <div class="ov-tools">
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
@@ -249,7 +239,7 @@ function renderTools(){
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
       <div class="ov-sec-h"><h3>AI assistants</h3><span class="note">Run on your own Claude account, only when you click</span></div>
-      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai"><span class="sb-glyph" style="background:${AI_TOOLS[k].wip ? "var(--faint)" : "var(--t-ai)"}"><svg><use href="#${AI_TOOLS[k].icon}"/></svg></span><div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
+      <div class="ov-ai">${["notice","appeal","transparency"].map(k => `<a class="ov-aic ${AI_TOOLS[k].wip ? "ov-wip" : ""}" href="#${k}" data-stage="ai">${icTile(String(AI_TOOLS[k].icon).replace(/^i-/, ""))}<div><h4>${AI_TOOLS[k].n}${AI_TOOLS[k].wip ? ` <span class="wip-chip">Under construction</span>` : ""}</h4><p>${esc(AI_TOOLS[k].desc)}</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>`).join("")}</div>
     </section>` : ""}
     ${typeof templateItems === "function" ? `<section class="rise">
       <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
@@ -258,10 +248,10 @@ function renderTools(){
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
-        <a class="ln-aic ov-aic" href="#redteamllm"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-shield"/></svg></span><div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#redteamworld"><span class="sb-glyph" style="background:#E0532F"><svg><use href="#i-monitor"/></svg></span><div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        <a class="ln-aic ov-aic" href="#glossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
-        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
+        <a class="ln-aic ov-aic" href="#redteamllm">${icTile("shield")}<div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamworld">${icTile("world")}<div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#glossary">${icTile("glossary")}<div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        ${typeof TSG_TERMS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary">${icTile("glossary")}<div><h4>T&amp;S glossary</h4><p>${TSG_TERMS.length} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
       </div>
     </section>
     <section class="rise">

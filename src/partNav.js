@@ -75,8 +75,8 @@ function cmdkItems(){
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("Red team studio","redteam","var(--t-rt)","shield");
-  go("Learn","learn","var(--accent)","steps"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","monitor"); go("Glossary and practice","glossary","var(--accent)","doc"); go("T&S glossary","tsglossary","var(--accent)","doc");
-  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","plug");
+  go("Learn","learn","var(--accent)","book"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","world"); go("Glossary and practice","glossary","var(--accent)","glossary"); go("T&S glossary","tsglossary","var(--accent)","glossary");
+  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","wrench");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});

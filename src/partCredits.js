@@ -25,6 +25,7 @@ const CR_GROUPS = [
     ["Hugging Face Hub", "Hugging Face", "Hosts the model files your browser or the runner script downloads.", "", "https://huggingface.co"],
     ["GitHub Pages", "GitHub", "Serves this page. The source is public in the same repository.", "", "https://github.com/StevenMacchia/ts-workbench"],
     ["Cloudflare Web Analytics", "Cloudflare", "Counts visits without cookies. It never sees what you type.", "", "https://www.cloudflare.com/web-analytics/"],
+    ["Lucide 1.56.0", "Lucide Contributors; a few icons derive from Feather, by Cole Bemis", "Every icon on the cards, in the sidebar and on buttons. The glyphs are copied into the page unchanged.", "ISC; MIT for the Feather icons", "https://lucide.dev"],
     ["Inter, Instrument Sans and IBM Plex Mono", "Rasmus Andersson; Rodrigo Fuenzalida; IBM. Served by Google Fonts", "The typefaces: Inter and Instrument Sans for text, IBM Plex Mono for data.", "SIL Open Font License", "https://fonts.google.com"],
     ["Node.js, Python, PyTorch and Ollama", "The OpenJS Foundation; the Python Software Foundation; the PyTorch Foundation; Ollama", "Only for the runner scripts you run on your own computer. vLLM and LM Studio work too.", "", "https://github.com/StevenMacchia/ts-workbench/tree/main/tools/open-model-eval"]
   ]},

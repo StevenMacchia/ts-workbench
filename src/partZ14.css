@@ -106,7 +106,6 @@ table.ln-t{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.45
 .ln-hub p{margin:0;font-size:13.5px;color:var(--muted)}
 .ln-hub a>.go{font-weight:600;font-size:13.5px;color:var(--accent);margin-top:4px}
 .ln-hub .card{display:grid!important;grid-template-rows:auto 1fr;padding:0!important;overflow:hidden}
-.ln-hub .card .ov-art{height:96px}
 .lnh-b{display:grid;gap:8px;padding:16px 18px 18px;align-content:start}
 .ln-how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .ln-how div{font-size:13.5px;color:var(--muted);padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px}

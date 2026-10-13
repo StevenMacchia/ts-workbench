@@ -265,6 +265,9 @@ function countUp(el, key){
   requestAnimationFrame(step);
 }
 
+// The one icon tile for cards: 44px, accent-soft, the tool's Lucide glyph at 22px (ICONS.md).
+function icTile(iconId){ return `<span class="ic-tile" aria-hidden="true"><svg><use href="#i-${iconId}"/></svg></span>`; }
+
 // Toast with an Undo action, shared by every "Start over" handler.
 // label: what happened. snapshot: a deep copy taken before clearing. restore(snapshot): puts it back.
 function withUndo(label, snapshot, restore){
