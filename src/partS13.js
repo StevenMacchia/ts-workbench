@@ -126,7 +126,7 @@ SCENARIOS.push(
           op("Link every complaint to the driver's full history with escalation rules, add continuous criminal-record monitoring, and build in-trip safety tools for riders and drivers alike.", "Patterns reach an investigator by the second complaint. Drivers, who face assaults from riders too, get the same emergency button and audio recording.", [12,8,7,-5], true),
           op("Launch a rider emergency button and a public safety report this month, and plan the complaint-system changes for next year.", "The launch gets good coverage. But complaints are still reviewed one trip at a time, and two months later another pattern slips through.", [2,3,-2,2]) ],
       lesson:"Low-level complaints are often early warnings, so review them as one history, not trip by trip. Build the same protections for drivers, who are assaulted by riders too.",
-      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires companies to rerun criminal background and driving history checks on every driver at least once a year. Continuous monitoring goes beyond that minimum." }
+      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires a criminal background check and a driving-record review before a driver starts, and the criminal check again at least once a year. Continuous monitoring goes beyond that minimum." }
   ]},
 { id:"datingsextortion", types:["dating"], title:"The video-call blackmail ring", platform:"Dating app", severity:"Sev 2",
   blurb:"A ring of fake profiles lures members to video chat, records them and demands money. One report leads to hundreds, and the network is still matching.",
