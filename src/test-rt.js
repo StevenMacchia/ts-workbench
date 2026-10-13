@@ -614,7 +614,7 @@ const body13 = function(){
   eq(/TAKE IT DOWN Act/.test(law.body) && /19 May 2026/.test(law.body), true, "the law step cites the US TAKE IT DOWN Act and the platform deadline");
   eq(/Data \(Use and Access\) Act 2025/.test(law.body) && /6 February 2026/.test(law.body), true, "the law step cites the UK Data (Use and Access) Act 2025 and its in-force date");
   eq(/hash-match/.test(law.body), false, "the UK clause drops the hash-matching claim, which did not verify against the cited source");
-  eq(/SB 942/.test(law.body) && /AB 2839/.test(law.body) && /permanently enjoined/.test(law.body), true, "the law step cites California SB 942 and notes AB 2839/2655 were enjoined");
+  eq(/SB 942/.test(law.body) && /AB 2839/.test(law.body) && /AB 2655/.test(law.body) && /are blocked/.test(law.body) && /Ninth Circuit appeal is pending/.test(law.body), true, "the law step cites California SB 942 and notes AB 2839 and AB 2655 are blocked, AB 2655 on appeal");
   const lawCards = lnStepCards("world", law);
   eq(law.eg.length, lawCards.length, "the law step's eg array matches its (possibly new) card count");
   const grade = wSteps.find(s => s.id === "grade"), techniques = wSteps.find(s => s.id === "techniques"), check = wSteps.find(s => s.id === "check");
@@ -627,7 +627,7 @@ const body13 = function(){
   eq(!!vidGroup, true, "a new LN_REFS group covers video and embodiment red-teaming research");
   eq(vidGroup.items.map(it => it[1]).join(","), "TEAR,JailWAM,Security of World-Model-Based Embodied AI", "the group lists TEAR, JailWAM and the embodied-AI security survey");
   const cardGroup = worldRefs.find(g => g.title === "Vendor system cards");
-  eq(!!cardGroup && cardGroup.items.some(it => it[0] === "https://openai.com/index/sora-2-system-card/"), true, "a new LN_REFS group links the Sora 2 system card");
+  eq(!!cardGroup && cardGroup.items.some(it => it[0] === "https://deploymentsafety.openai.com/sora-2"), true, "a new LN_REFS group links the Sora 2 system card");
   ["Same-person check", "Embodied world model", "Real-time generation"].forEach(term => {
     const row = LN_GLOSS.find(t => t[0] === term);
     eq(!!row, true, "LN_GLOSS gains a \"" + term + "\" entry");
