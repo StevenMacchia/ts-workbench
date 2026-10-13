@@ -4,7 +4,7 @@
    a severity, an owner, why it matters and what to do. The report gives a plan, the duties and four drafts.
    Reference: Regulation (EU) 2022/2065. Checked in DS_REVIEWED. A starting point for counsel, not legal advice.
    ========================================================= */
-const DS_REVIEWED = "September 2026";
+const DS_REVIEWED = "October 2026";
 const DS_SRC = [
   ["Regulation (EU) 2022/2065 (the DSA)", "https://eur-lex.europa.eu/eli/reg/2022/2065/oj"],
   ["European Commission, the DSA in practice", "https://digital-strategy.ec.europa.eu/en/policies/digital-services-act"],
@@ -48,8 +48,8 @@ const DS_CASE = {
   x:"In December 2025 the Commission fined X €120 million, its first DSA decision, over a verified badge that misled users, an incomplete ad repository and blocked researcher access.",
   meta:"In October 2025 the Commission preliminarily found that Facebook and Instagram's reporting tools added needless steps and dark patterns, and that their appeals didn't let users explain or add evidence.",
   tiktok:"In 2024 TikTok withdrew its Lite rewards program from the EU after the Commission opened proceedings over launching it without a risk assessment.",
-  temu:"In July 2025 the Commission preliminarily found that Temu's risk assessment of illegal products on its marketplace was inaccurate and too general.",
-  adult:"In May 2025 the Commission opened proceedings against four adult platforms over age verification and other measures to protect minors."
+  temu:"In July 2025 the Commission preliminarily found Temu's risk assessment of illegal products inaccurate and too general; in May 2026 it fined Temu €200 million.",
+  adult:"In May 2025 the Commission opened proceedings against four adult platforms, and in March 2026 preliminarily found all four in breach: clicking 'I am over 18' is not age verification."
 };
 // When a duty applies, given the context x
 const DS_APPLY = {
@@ -177,8 +177,8 @@ const DS_CTRL = [
       why:"Fields for safety labels, warnings, CE marks and the like have to exist and be usable before a listing goes live.", fix:"Add structured fields for the information EU consumer and product-safety law requires, and make them mandatory by category."},
     {k:"k_checks", t:"Random checks of whether products have been identified as illegal in official databases", sev:"med", o:"ops", cite:"Art. 31(3)", a:"traders",
       why:"Best efforts include sampling listings against sources such as the EU Safety Gate.", fix:"Run a monthly sample of listings against Safety Gate and remove matches."},
-    {k:"k_inform", t:"Consumers who bought an illegal product are told within six months of your learning of it", sev:"high", o:"ops", cite:"Art. 32", a:"traders",
-      why:"If you have the buyer's contact details, you must tell them the product was illegal, who sold it, and where to seek redress. Otherwise you publish it.",
+    {k:"k_inform", t:"Consumers who bought an illegal product in the six months before you learned of it are told", sev:"high", o:"ops", cite:"Art. 32", a:"traders",
+      why:"When you learn a product is illegal, you must tell everyone who bought it in the previous six months, who sold it and where to seek redress, or publish a notice if you don't have their contact details.",
       fix:"Add an illegal-product recall flow that emails affected buyers and posts a public notice when contacts are unknown."}]},
   {k:"vlop", n:"Very large platforms", h:"The duties that come with designation.", items:[
     {k:"v_risk", t:"A yearly systemic-risk assessment, and one before every significant new functionality", sev:"crit", o:"legal", cite:"Art. 34", a:"vlop",
