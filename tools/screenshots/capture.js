@@ -120,10 +120,19 @@ async function markIntrosSeen(page) {
   }, INTRO_ROUTES);
 }
 
+// A tool path (/premortem) is not a file on the static server, so a true reload there lands on the 404 page;
+// reload from the root instead and let gotoHash take the app back to the tool.
+async function reloadRoot(page) {
+  await page.goto(BASE_URL + "/", { waitUntil: "load" });
+}
+
 async function gotoHash(page, hash) {
+  // Path routing reads the path before the hash, so a bare hash change is ignored once the app is on a tool
+  // path; goHash is the app's own router entry and works in both modes.
   await page.evaluate((h) => {
-    location.hash = h;
-  }, "#" + hash);
+    if (typeof goHash === "function") goHash(h);
+    else location.hash = "#" + h;
+  }, hash);
   await sleep(250);
 }
 
@@ -231,7 +240,7 @@ async function ensureLightTheme(page) {
     .catch(() => null);
   if (isDark === '"dark"') {
     await page.evaluate(() => localStorage.removeItem("tswb:theme"));
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await sleep(300);
   }
 }
@@ -315,7 +324,7 @@ const builders = {
   async overviewDark(page) {
     await openOverviewDemo(page, { tour: false });
     await page.evaluate(() => localStorage.setItem("tswb:theme", JSON.stringify("dark")));
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await sleep(300);
     await page.evaluate(() => window.scrollTo(0, 0));
   },
@@ -332,7 +341,7 @@ const builders = {
     // `let pm = …` init, so a leftover in-memory pm from an earlier target
     // in this run could still show a saved/finished report. Force a true
     // reload so pm is rebuilt fresh from the (now-cleared) storage above.
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "premortem");
     await page.waitForSelector('[data-act="report"]', { timeout: 8000 });
     await clickSel(page, '[data-act="report"]');
@@ -341,7 +350,7 @@ const builders = {
   async tabletop(page) {
     await ensureDemoOff(page);
     await page.evaluate(() => localStorage.removeItem("tswb:tt"));
-    await page.reload({ waitUntil: "load" }); // see the note in premortem() above
+    await reloadRoot(page); // see the note in premortem() above
     await gotoHash(page, "tabletop");
     await page.waitForSelector('.scen[data-i="0"]', { timeout: 8000 });
     await clickSel(page, '.scen[data-i="0"]', 400);
@@ -409,7 +418,7 @@ const builders = {
       localStorage.removeItem("tswb:ev");
       localStorage.removeItem("tswb:ws:cur:eval");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await sleep(300);
     await gotoHash(page, "eval");
     await clickSel(page, '[data-ev="example"]', 300);
@@ -438,7 +447,7 @@ const builders = {
       localStorage.setItem("tswb:rt:seen-intro", "true");
       localStorage.removeItem("tswb:rt");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "redteam");
     // The correct grade for the first practice item (RT_PRACTICE.grade[0].a) is 1.
     await page.waitForSelector('[data-pick="1"]', { timeout: 8000 });
@@ -453,7 +462,7 @@ const builders = {
         .filter((k) => k.startsWith("tswb:learn:"))
         .forEach((k) => localStorage.removeItem(k));
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "learn");
   },
 
@@ -481,7 +490,7 @@ const builders = {
   async tabletopList(page) {
     await ensureDemoOff(page);
     await page.evaluate(() => localStorage.removeItem("tswb:tt"));
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "tabletop");
     await page.waitForSelector('.scen[data-i="0"]', { timeout: 8000 });
   },
@@ -494,7 +503,7 @@ const builders = {
       localStorage.removeItem("tswb:cv");
       localStorage.removeItem("tswb:ws:cur:coverage");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "coverage");
     await page.waitForSelector('[data-cv="example"]', { timeout: 8000 });
     await clickSel(page, '[data-cv="example"]', 400);
@@ -509,7 +518,7 @@ const builders = {
       localStorage.removeItem("tswb:pol");
       localStorage.removeItem("tswb:ws:cur:policy");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "policy");
     await page.waitForSelector(".gd-intro, #pol-full", { timeout: 8000 });
     if (await exists(page, ".gd-intro")) {
@@ -528,7 +537,7 @@ const builders = {
       localStorage.removeItem("tswb:cp");
       localStorage.removeItem("tswb:ws:cur:coppa");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "coppa");
     await clickByText(page, "button", "See a finished example", 400);
   },
@@ -538,7 +547,7 @@ const builders = {
       localStorage.removeItem("tswb:ds");
       localStorage.removeItem("tswb:ws:cur:dsa");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "dsa");
     await clickByText(page, "button", "See a finished example", 400);
   },
@@ -552,7 +561,7 @@ const builders = {
       localStorage.removeItem("tswb:tr");
       localStorage.removeItem("tswb:ws:cur:transparency");
     });
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
     await gotoHash(page, "transparency");
     await page.waitForSelector(".gd-intro", { timeout: 8000 });
     await clickByText(page, "button", "See an example", 400);
@@ -658,7 +667,7 @@ async function runReviewPass(browser, kind) {
   await markIntrosSeen(page);
   if (kind === "dark") {
     await page.evaluate(() => localStorage.setItem("tswb:theme", JSON.stringify("dark")));
-    await page.reload({ waitUntil: "load" });
+    await reloadRoot(page);
   }
   await settle(page);
 
