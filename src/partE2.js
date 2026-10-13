@@ -22,7 +22,7 @@ const OBL = [
 {r:"us", law:"State age-verification laws for adult content", st:c=>c.explicit?"applies":null,
  t:"Many states require reliable age verification before users can reach sexually explicit material. The Supreme Court upheld Texas's law in 2025.", sg:["age_assurance"]},
 {r:"us", law:"State children's online safety and design laws", st:c=>(c.youth&&(c.comms||c.F("posts")||c.F("discovery")))?"may":null,
- t:"Several states (including Utah, Texas, New York and California) regulate minors' accounts, feeds, parental consent or product design. Requirements differ, and several laws are being challenged in court.", sg:["teen_defaults","parental_tools"]},
+ t:"Several states (including Utah, Texas, New York and California) regulate minors' accounts, feeds, parental consent or product design. Courts have blocked parts of some (California's design code, Texas's content-filtering rule) and let others proceed (California's addictive-feed rules, Texas's app store law, New York's SAFE for Kids Act from January 2027). Check the current status of each before relying on it.", sg:["teen_defaults","parental_tools"]},
 {r:"us", law:"Fair housing, fair lending and equal-employment laws", st:c=>(c.T("rentals")||c.M("credit")||c.F("ads"))?"may":null,
  t:"Rental decisions, credit decisions and housing, job or credit ads must not discriminate on protected characteristics, including through targeting or algorithms.", sg:["anti_discrimination"]},
 
@@ -62,23 +62,23 @@ const OBL = [
  t:"Since December 2025, age-restricted social media platforms must take reasonable steps to stop under-16s from having accounts. Messaging, online gaming, education and health services are largely excluded.", sg:["age_assurance","underage_removal"]},
 
 {r:"ca", law:"Mandatory reporting of child sexual abuse material", st:c=>(c.hostsMedia||c.F("dm"))?"applies":null,
- t:"Internet service providers must report CSAM they are told about to the Canadian Centre for Child Protection, and notify police and preserve data when they believe an offence was committed using their service.", sg:["csam_reporting"]},
+ t:"Online service providers must report web addresses of suspected child sexual abuse and exploitation material to the Canadian Centre for Child Protection, notify police when they have reasonable grounds to believe their service was used for such an offence, and keep the related data for 21 days.", sg:["csam_reporting"]},
 {r:"ca", law:"Proceeds of Crime (Money Laundering) and Terrorist Financing Act", st:c=>(c.T("fintech","crypto")&&c.moneyMoves)?"may":null,
  t:"Money services businesses, including crypto dealers, must register with FINTRAC, verify identity, keep records and report suspicious and large transactions.", sg:["kyc","aml_monitoring"]},
 
 {r:"in", law:"IT (Intermediary Guidelines and Digital Media Ethics Code) Rules", st:c=>c.ugc?"applies":null,
- t:"Appoint a grievance officer, acknowledge complaints within 24 hours and resolve them within 15 days, and remove non-consensual intimate imagery within 24 hours of a complaint. Significant platforms (5M+ users in India) have extra duties, and recent amendments address AI-generated content.", sg:["report_btn","ncii_process"]},
+ t:"Appoint a grievance officer and resolve complaints on a short clock (the February 2026 amendments cut several deadlines: court or government takedown orders within 3 hours, and, per law-firm summaries, intimate-image complaints within 2 hours and other grievances within 7 days). Label AI-generated content and carry provenance markers. Significant platforms (5M+ users in India) have extra duties.", sg:["report_btn","ncii_process"]},
 {r:"in", law:"Digital Personal Data Protection Act 2023", st:c=>c.minors?(c.youth?"applies":"may"):null,
  t:"Get verifiable parental consent before processing personal data of anyone under 18, and don't track, behaviorally monitor or target ads at children. Obligations are phasing in under rules issued in 2025.", sg:["parental_consent","no_minor_ads"]},
 
 {r:"br", law:"Digital Statute of Children and Adolescents (ECA Digital)", st:c=>c.minors?(c.youth?"applies":"may"):null,
- t:"Enacted in 2025. Products aimed at or likely to be accessed by minors need age verification beyond self-declaration, parental supervision tools and protective defaults, and loot boxes are banned in games for minors.", sg:["age_assurance","parental_tools","teen_defaults"]},
+ t:"In force since 17 March 2026. Services that offer content unsuitable for under-18s must check age reliably (self-declaration is banned); products aimed at or likely to be used by minors need parental supervision tools and protective defaults, and loot boxes are banned in games for minors.", sg:["age_assurance","parental_tools","teen_defaults"]},
 {r:"br", law:"General Data Protection Law (LGPD)", st:c=>"applies", bump:false,
  t:"Process personal data on a legal basis and in the best interests of children and adolescents, with specific parental consent for children's data.", sg:["data_minimization"]}
 ];
 
 // Where each law note comes from: the official text or the regulator's own page. Checked when the notes were last reviewed.
-const LAW_REVIEWED = "September 2026";
+const LAW_REVIEWED = "October 2026";
 const LAW_SRC = {
   "Federal CSAM reporting duty (18 U.S.C. § 2258A)":["https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title18-section2258A&num=0&edition=prelim", "US Code, 18 U.S.C. § 2258A"],
   "Children's Online Privacy Protection Act (COPPA)":["https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa", "FTC, COPPA Rule (16 CFR Part 312)"],
