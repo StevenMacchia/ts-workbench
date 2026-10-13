@@ -54,7 +54,7 @@ const OBL = [
 {r:"uk", law:"APP fraud mandatory reimbursement", st:c=>(c.T("fintech")&&c.M("p2p"))?"applies":null,
  t:"Payment firms must reimburse most victims of authorised push payment scams, up to £85,000 per claim, with the cost split between the sending and receiving firms.", sg:["confirmation_payee"]},
 {r:"uk", law:"FCA rules: Consumer Duty, AML and financial promotions", st:c=>c.T("fintech","crypto")?"may":null,
- t:"Regulated firms must deliver good outcomes, including for customers in vulnerable circumstances. Crypto firms need FCA registration for AML and must follow the financial promotions rules.", sg:["vulnerable_customers"]},
+ t:"Regulated firms must deliver good outcomes, including for customers in vulnerable circumstances. Crypto firms need FCA registration for AML now and full FCA authorisation from 25 October 2027 (applications open 30 September 2026 to 28 February 2027; AML registration does not convert), and must follow the financial promotions rules.", sg:["vulnerable_customers"]},
 
 {r:"au", law:"Online Safety Act 2021 and industry codes", st:c=>c.ugc?"applies":null,
  t:"Respond to eSafety Commissioner removal notices within 24 hours (image-based abuse, cyberbullying of children, adult cyber-abuse and seriously harmful content), meet the Basic Online Safety Expectations and follow registered industry codes.", sg:["ncii_process","review_queue"]},
@@ -69,7 +69,7 @@ const OBL = [
 {r:"in", law:"IT (Intermediary Guidelines and Digital Media Ethics Code) Rules", st:c=>c.ugc?"applies":null,
  t:"Appoint a grievance officer and resolve complaints on a short clock (the February 2026 amendments cut several deadlines: court or government takedown orders within 3 hours, and, per law-firm summaries, intimate-image complaints within 2 hours and other grievances within 7 days). Label AI-generated content and carry provenance markers. Significant platforms (5M+ users in India) have extra duties.", sg:["report_btn","ncii_process"]},
 {r:"in", law:"Digital Personal Data Protection Act 2023", st:c=>c.minors?(c.youth?"applies":"may"):null,
- t:"Get verifiable parental consent before processing personal data of anyone under 18, and don't track, behaviorally monitor or target ads at children. Obligations are phasing in under rules issued in 2025.", sg:["parental_consent","no_minor_ads"]},
+ t:"Get verifiable parental consent before processing personal data of anyone under 18, and don't track, behaviorally monitor or target ads at children. Obligations phase in under rules issued in November 2025, with the children's-consent rules applying from 13 May 2027.", sg:["parental_consent","no_minor_ads"]},
 
 {r:"br", law:"Digital Statute of Children and Adolescents (ECA Digital)", st:c=>c.minors?(c.youth?"applies":"may"):null,
  t:"In force since 17 March 2026. Services that offer content unsuitable for under-18s must check age reliably (self-declaration is banned); products aimed at or likely to be used by minors need parental supervision tools and protective defaults, and loot boxes are banned in games for minors.", sg:["age_assurance","parental_tools","teen_defaults"]},
