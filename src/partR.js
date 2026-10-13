@@ -15,17 +15,20 @@ function sbMovePill(name){
   pill.style.opacity = "1";
 }
 function route(){
-  // A shared result link: "#<route>?s=<data>". Decode it, apply it, then route normally on the clean hash.
+  canonNow();   // an old #tool link becomes /tool (once); a ?s= payload is set aside and taken off the address
+  // A shared result link: "#<route>?s=<data>" (or "/<route>?s=<data>"). Decode it, apply it, then route normally on the clean address.
   const shareHit = typeof shareParseHash === "function" ? shareParseHash() : null;
+  route.path = location.pathname;
+  if(shareHit && PATHMODE) SHARE_STASH = null;
   if(shareHit && typeof SHARE_APPLY !== "undefined" && SHARE_APPLY[shareHit.route]){
-    shareDecode(shareHit.s).then(data => {
+    shareDecode(shareHit.s).catch(() => null).then(data => {
       if(data) SHARE_APPLY[shareHit.route](data);
-      history.replaceState(null, "", location.pathname + "#" + shareHit.route);
+      if(!PATHMODE) history.replaceState(null, "", location.pathname + "#" + shareHit.route);
       route();
     });
     return;
   }
-  const h = (location.hash || '').slice(1);
+  const h = hashNow();
   // A shareable link straight into the demo company
   if(h === "demo" && typeof demoStart === "function"){ demoStart(); return; }
   const name = ROUTES[h] ? h : 'overview';
@@ -38,7 +41,22 @@ function route(){
   if(typeof helpAfterRoute === "function") helpAfterRoute(name, h);
   route.done = true;
 }
-window.addEventListener('hashchange', route);
+// Hash mode: the hash is the route. Path mode: a hashchange only matters for an old #tool link (canonNow turns it
+// into a path); the synthetic ones goHash fires for the cleanup listeners carry no hash and are ignored here.
+window.addEventListener('hashchange', () => { if(!PATHMODE || canonNow()) route(); });
+if(PATHMODE){
+  // Back and Forward between tool paths; in-page #anchors also fire popstate, so only act when the path changed
+  window.addEventListener('popstate', () => { if(location.pathname !== route.path){ window.dispatchEvent(new Event('hashchange')); route(); } });
+  // Links written as href="#tool" (sidebar, buttons, cards) become real navigations to /tool
+  document.addEventListener('click', e => {
+    if(e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if(!a || (a.target && a.target !== "_self")) return;
+    const h = a.getAttribute('href').slice(1), first = h.split('/')[0];
+    if(!/^[\w-]+(\/[\w-]+)*$/.test(h) || !ROUTES[first]) return;
+    e.preventDefault(); goHash(h);
+  });
+}
 route();
 })();
 </script>

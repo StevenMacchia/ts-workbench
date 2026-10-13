@@ -12,7 +12,7 @@ const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
 const demoKeepKey = k => DEMO_KEEP.includes(k) || k.startsWith("tswb:intro:");
 const demoOn = () => !!store.get("demo", false);
 function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
-function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
+function demoReload(){ try{ history.replaceState(null, "", PATHMODE ? pathUrl("overview") + location.search : location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
 function demoStart(){
   if(demoOn()){ goRoute("overview"); return demoWelcome(); }
   try{
@@ -237,7 +237,7 @@ function tourStep(i){
 function tourStart(){
   if(tourAt < 0) tourPrevFocus = document.activeElement;
   tourSteps = TOUR;
-  if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
+  if((hashNow() || "overview").split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
   tourStep(0);
 }
 document.addEventListener("click", e => {

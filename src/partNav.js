@@ -54,6 +54,13 @@ function seoUpdate(name){
     document.title = t.title;
     const m = document.querySelector('meta[name="description"]');
     if(m && t.desc) m.setAttribute("content", t.desc);
+    // Canonical link: the page's own path (home is the root). Needs the site's address from og:url.
+    const og = document.querySelector('meta[property="og:url"]'), root = og && og.getAttribute("content");
+    if(root){
+      let c = document.querySelector('link[rel="canonical"]');
+      if(!c && document.createElement && document.head){ c = document.createElement("link"); c.setAttribute("rel", "canonical"); document.head.appendChild(c); }
+      if(c) c.setAttribute("href", name === "overview" || !ROUTE_LABEL[name] ? root : root + name);
+    }
   }catch(e){}
 }
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
@@ -83,7 +90,7 @@ function openSaved(id){
     const k = it.data.guide === "world" ? "world" : "llm", g = LN_GUIDES[k], i = g.exercises.findIndex(e => e.id === it.data.exId);
     if(i >= 0) lnStore.set(k + ":epos", i);
     const h = g.route + "/practice";
-    if(location.hash.slice(1) === h) renderRedteam(k); else location.hash = h;
+    if(hashNow() === h) renderRedteam(k); else goHash(h);
     return;
   }
   goRoute(KINDS[it.kind].route);
@@ -139,7 +146,7 @@ function cmdkItems(){
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","light"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
   Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(it =>
     out.push({g:"Your saved work", label:it.title||"Untitled", sub:KINDS[it.kind].n, color:TOOL_COLOR[it.kind], icon:KINDS[it.kind].icon.replace("i-",""), run:()=>openSaved(it.id)}));
-  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", icon:"gauge", run:()=>{ location.hash = "metrics/" + mxSlug(m); }}));
+  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", icon:"gauge", run:()=>{ goHash("metrics/" + mxSlug(m)); }}));
   const type = ttCompanyType();
   SCENARIOS.forEach((s,i) => { if(type!=="all" && !(s.types||[]).includes(type)) return; const v = ttScenario(i, type);
     out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });

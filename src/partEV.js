@@ -552,7 +552,7 @@ function evPaint(){
   const n = ev.cases.length && !ev.media ? ev.cases.length : 0, s1 = document.getElementById("ev-s1"); if(!s1 || evMediaView()) return;
   const st = s1.querySelector(".ev-sht .note"); if(st) st.textContent = n ? `${n} cases${ev.policy.trim() ? "" : " · no rule yet"}` : "Start here";
 }
-const evHere = () => (location.hash || "").slice(1).split("/")[0] === "eval";
+const evHere = () => hashNow().split("/")[0] === "eval";
 function evBind(){
   view.querySelectorAll("[data-evgold]").forEach(s => s.onchange = () => { ev.gold = Object.assign({}, ev.gold, {[s.dataset.evgold]:s.value}); ev.ex = false; evSave(); if(ev.preds) evRedraw3(); });
   view.querySelectorAll("details[data-evd]").forEach(d => d.ontoggle = () => { EVU[d.dataset.evd] = d.open; });

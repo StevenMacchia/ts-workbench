@@ -134,12 +134,12 @@ function loopMxHTML(list){
     <div class="loop-mx">${xs.map(x => `<button type="button" class="loop-i" data-open="${METRICS.indexOf(x.m)}"><b>${esc(x.m.n)}</b><small>${esc(x.cat.n)} · ${esc(MX_Q[x.m.n] || "")}</small></button>`).join("")}</div></section>`;
 }
 function loopGo(v){
-  const here = (location.hash || "").slice(1).split("/")[0];
+  const here = hashNow().split("/")[0];
   const src = here === "premortem" && pm && pm.type ? {r:assess(pm), p:pm, name:pm.name || "this assessment"} : loopSource();
   if(v.startsWith("tt:")){ const parts = v.split(":"), i = +parts[1], variant = TT_TYPES.some(t => t.k === parts[2]) ? parts[2] : ttCompanyType(); if(!SCENARIOS[i]) return; ttStart(i, variant); return goRoute("tabletop"); }
   if(v.startsWith("mx:")){ const parts = v.split(":"), m = METRICS[+parts[1]], pk = parts[2]; if(!m) return;
     if(!mxList().includes(m)){ if(!(m.p === "all" || m.p.includes(mx.platform)) && pk && MX_PLATFORMS[pk]) mx.platform = pk; if(m.st > +mx.stage) mx.stage = String(m.st); if(m.reg) mx.reg = true; }
-    mx.orgSet = true; store.set("mx", mx); location.hash = "metrics/" + mxSlug(m); return; }
+    mx.orgSet = true; store.set("mx", mx); goHash("metrics/" + mxSlug(m)); return; }
   if(v === "vd"){ if(!src) return goRoute("vendors");
     const fit = loopVendorWeights(src); vx.weights = Object.assign({}, fit.w); vx.fitW = Object.assign({}, fit.w); vx.fitWhy = {up:fit.up, down:fit.down}; vx.fitName = src.name; store.set("vx", vx);
     goRoute("vendors"); return gsay("Vendor weights fitted to the risks in " + src.name); }

@@ -1065,7 +1065,7 @@ const lnChips = ex => `<div class="ln-chips"><span class="ln-chip">${LN_ICON.clo
 
 /* ---------- guide pages ---------- */
 const LN_TABS = [["method","Method"],["practice","Practice"],["worksheets","Worksheets"],["sources","Sources"]];
-function lnTab(){ const p = (location.hash || "").slice(1).split("/"); return LN_TABS.some(t => t[0] === p[1]) ? p[1] : "method"; }
+function lnTab(){ const p = hashNow().split("/"); return LN_TABS.some(t => t[0] === p[1]) ? p[1] : "method"; }
 function renderRedteam(k){
   const g = LN_GUIDES[k], tab = lnTab(), doneSteps = g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length, doneEx = g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length;
   const meta =`<a class="btn sm" href="#glossary">Glossary</a><a class="btn sm" href="#${k === "llm" ? "redteamworld" : "redteamllm"}">${k === "llm" ? "World models" : "LLMs"} guide</a>`;
@@ -1073,7 +1073,7 @@ function renderRedteam(k){
     <div class="ln-tabs"><div class="segs" role="tablist" aria-label="Guide sections">${LN_TABS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${tab === id}" aria-pressed="${tab === id}" data-tab="${id}">${n}</button>`).join("")}</div>
       <span class="note">${doneSteps} of ${g.steps.length} steps read · ${doneEx} of ${g.exercises.length} exercises done</span></div>
     <div id="ln-view"></div></div>`;
-  $$("[data-tab]").forEach(b => b.onclick = () => { location.hash = g.route + "/" + b.dataset.tab; });
+  $$("[data-tab]").forEach(b => b.onclick = () => { goHash(g.route + "/" + b.dataset.tab); });
   ({method:lnMethod, practice:lnPractice, worksheets:lnWorksheets, sources:lnSources})[tab](k, g);
 }
 /* ---------- method: split each step's body on its <h3> headings, and on heavy blocks within a heading,
@@ -1279,7 +1279,7 @@ function lnMethod(k, g){
       if(ci < total - 1){ ci++; picked = null; }
       else {
         lnMarkRead(k + ":s:" + g.steps[si].id);
-        if(si < n - 1){ si++; ci = 0; loadStep(); } else { location.hash = g.route + "/practice"; return; }
+        if(si < n - 1){ si++; ci = 0; loadStep(); } else { goHash(g.route + "/practice"); return; }
       }
     } else {
       if(ci > 0){ ci--; picked = null; }
@@ -1343,7 +1343,7 @@ function lnMethod(k, g){
 // and a row's own Enter/Space toggle below isn't doubled into also advancing the card).
 document.addEventListener("keydown", e => {
   const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
-  const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
+  const h = hashNow().split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
   if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],.ln-row,input,textarea'))) return;
   if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
   else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
@@ -1429,7 +1429,7 @@ function lnPractice(k, g){
     const run = $("[data-run]"); if(run) run.onclick = () => lnOpenExercise(k, g, e.id, draw);
     lnBindSave(k, e, draw);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
-    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/worksheets"; };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else goHash(g.route + "/worksheets"); };
     const mo = $("[data-minonly]"); if(mo) mo.onclick = () => { onlyMin = !onlyMin; lnStore.set(onlyKey, onlyMin); i = 0; save(); draw(); };
   };
   draw();
@@ -1480,7 +1480,7 @@ function lnWorksheets(k, g){
     const dl = $("[data-dl]"); if(dl) dl.onclick = () => offerFile(w.file, pre ? pre.text : w.text, pre ? pre.text : w.text, $("#ln-toast"));
     const oc = $("[data-open-check]"); if(oc) oc.onclick = () => lnOpenChecklist(k, g);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
-    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/sources"; };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else goHash(g.route + "/sources"); };
   };
   draw();
 }

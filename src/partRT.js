@@ -139,7 +139,7 @@ function rtSpec(){
   return {k:"redteam", tool:{name:"Red team studio", icon:"shield", color:"var(--t-rt)"},
     intro:{title:"Plan a red team, run it, and learn the craft on the way", lead:"Ten plain questions about where you are coming from, what you are testing and who you have. Then you get a plan: a coverage grid, seed cards with benign twins, the drills that fit your team and your time, findings you can file as you go, and exports for open-source harnesses. Methods and categories only. No attack strings.",
       facts:[["About 5 minutes", "One question at a time, with the idea behind each one."], ["Drills in modals", "A timer, the steps, a scribe log and a grade. File a finding from the drill."], ["Learn as you go", "Grade real outputs, spot the technique, find the trip point."]], start:"Start"},
-    alt:[{n:"See a finished example", run:() => rtAct("example")}, {n:"Read the method first", run:() => { location.hash = rt.model === "world" ? "redteamworld" : "redteamllm"; }}].concat(rt.mode === "full" ? [{n:"Back to the guided flow", run:() => rtAct("flow")}] : []),
+    alt:[{n:"See a finished example", run:() => rtAct("example")}, {n:"Read the method first", run:() => { goHash(rt.model === "world" ? "redteamworld" : "redteamllm"); }}].concat(rt.mode === "full" ? [{n:"Back to the guided flow", run:() => rtAct("flow")}] : []),
     steps, finish:"Build my plan",
     done:() => { rt.view = "report"; rt.tab = "plan"; rtSave(); renderRedteamStudio(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); },
     bind:() => { $$("[data-rtg]").forEach(i => i.oninput = () => { rt.gates[i.dataset.rtg] = Math.max(0, Math.min(100, +i.value || 0)); rtSave(); }); }};

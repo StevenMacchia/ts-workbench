@@ -330,7 +330,7 @@ function bindPremortem(){
   root.addEventListener("toggle", e => { const k = e.target.dataset && e.target.dataset.open; if(k){ pm.open = pm.open || {}; pm.open[k] = e.target.open; store.set("pm3", pm); } }, true);
 }
 document.addEventListener("keydown", e => {
-  if(location.hash.slice(1)!=="premortem" || pm.stage!=="ask" || e.metaKey || e.ctrlKey || e.altKey) return;
+  if(hashNow()!=="premortem" || pm.stage!=="ask" || e.metaKey || e.ctrlKey || e.altKey) return;
   const tag = (e.target.tagName||"").toLowerCase();
   if(tag==="input" || tag==="textarea" || tag==="select"){ if(e.key==="Enter" && e.target.id==="pm-name"){ e.preventDefault(); goNext(); } return; }
   if(/^[1-9]$/.test(e.key)){ const btn = $$("#pm-root .opt-key")[+e.key-1]; if(btn){ e.preventDefault(); btn.click(); } }

@@ -292,7 +292,7 @@ rtFlowBind = function(){
    also advanced to "Next" by the same keystroke.
    ========================================================= */
 document.addEventListener("keydown", e => {
-  if((location.hash || "").slice(1).split("/")[0] !== "redteam") return;
+  if(hashNow().split("/")[0] !== "redteam") return;
   if(e.ctrlKey || e.altKey || e.metaKey) return;
   const tag = e.target && e.target.tagName;
   if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
