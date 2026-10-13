@@ -1,0 +1,40 @@
+/* =========================================================
+   AURORA CLEANUP (2026-10-13). Keeps the Aurora palette and type, and removes what made it look unfinished:
+   two-tone gradient headlines, unstyled browser-blue links, the decorative art block on tool cards,
+   a monospace page title, a heavy gray preview box, clipped sidebar tags and an empty hero column.
+   Declared last.
+   ========================================================= */
+
+/* Headlines: solid ink. The ink-to-violet gradient split every heading into two colors. */
+.as-hero-t h1,.pagehead h1,.rtf-h1,.rtf-h2,.intro-card h1,.intro-card h2{
+  background:none!important;-webkit-background-clip:border-box;background-clip:border-box;
+  -webkit-text-fill-color:currentColor;color:var(--ink)}
+
+/* Links in running text: one style everywhere (violet, no underline until hover), never the browser default. */
+#view a:not([class]),#view .note a,#view p a:not(.btn){color:var(--accent);text-decoration:none;font-weight:500}
+#view a:not([class]):hover,#view .note a:hover,#view p a:not(.btn):hover{text-decoration:underline;text-underline-offset:3px}
+#view a:not([class]):visited,#view .note a:visited{color:var(--accent)}
+
+/* Tool cards: drop the art block (a big icon on a gray panel with a peach dot). The small icon beside each
+   title already identifies the tool, so the cards become one compact row of text. */
+.ov-tools > .ov-tool .ov-art,.ov-tool .ov-art{display:none}
+.ov-tool .ov-tb{padding-top:18px}
+
+/* The tool's name in the top bar of every tool page: the body face, not monospace. */
+.asb-mid,.asb-mid b{font:600 14px/1.3 var(--body);letter-spacing:-.005em;color:var(--ink)}
+
+/* Overview: the example-company preview reads as a quiet panel, not a gray slab. */
+.as-preview{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+
+/* Overview hero: with no picture beside it (first visit), the text takes the room the picture would have. */
+.as-hero:not(:has(> :nth-child(2))){grid-template-columns:minmax(0,760px)}
+.as-hero-t h1{max-width:18ch}
+
+/* Sidebar: the three Learn labels are too long to sit beside their tag on one line, so they wrap instead of
+   pushing the tag out of the sidebar. Shorter labels keep one line. */
+.side .navlink:is([data-route="redteamllm"],[data-route="redteamworld"],[data-route="glossary"]){white-space:normal;line-height:1.3}
+.side .navlink .sb-new{flex:none;margin-left:auto}
+
+/* One radius scale: 14px panels, 10px controls. */
+.card,.ov-tool,.firstrun,.firstrun-opt,.intro-card{border-radius:14px}
+.btn,.side .navlink,input,select,textarea{border-radius:10px}
