@@ -12,12 +12,13 @@
 <meta property="og:title" content="T&amp;S Workbench: free Trust &amp; Safety tools">
 <meta property="og:description" content="Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, program maturity, a coverage radar and AI assistants. Built by Steven Macchia.">
 <meta property="og:url" content="https://stevenmacchia.com/ts-workbench/">
+<link rel="canonical" href="https://stevenmacchia.com/ts-workbench/">
 <meta property="og:image" content="https://stevenmacchia.com/ts-workbench/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="627">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://stevenmacchia.com/ts-workbench/og-image.png">
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ed43d34957a49fcb90ec8e43f7db523"}'></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "6ed43d34957a49fcb90ec8e43f7db523", "spa": true}'></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap">
@@ -5254,6 +5255,46 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
   .ln-gl{display:block}
   .ln-gl .card.ln-term{break-inside:avoid;margin-bottom:10px}
 }
+/* =========================================================
+   AURORA CLEANUP (2026-10-13). Keeps the Aurora palette and type, and removes what made it look unfinished:
+   two-tone gradient headlines, unstyled browser-blue links, the decorative art block on tool cards,
+   a monospace page title, a heavy gray preview box, clipped sidebar tags and an empty hero column.
+   Declared last.
+   ========================================================= */
+
+/* Headlines: solid ink. The ink-to-violet gradient split every heading into two colors. */
+.as-hero-t h1,.pagehead h1,.rtf-h1,.rtf-h2,.intro-card h1,.intro-card h2{
+  background:none!important;-webkit-background-clip:border-box;background-clip:border-box;
+  -webkit-text-fill-color:currentColor;color:var(--ink)}
+
+/* Links in running text: one style everywhere (violet, no underline until hover), never the browser default. */
+#view a:not([class]),#view .note a,#view p a:not(.btn){color:var(--accent);text-decoration:none;font-weight:500}
+#view a:not([class]):hover,#view .note a:hover,#view p a:not(.btn):hover{text-decoration:underline;text-underline-offset:3px}
+#view a:not([class]):visited,#view .note a:visited{color:var(--accent)}
+
+/* Tool cards: drop the art block (a big icon on a gray panel with a peach dot). The small icon beside each
+   title already identifies the tool, so the cards become one compact row of text. */
+.ov-tools > .ov-tool .ov-art,.ov-tool .ov-art{display:none}
+.ov-tool .ov-tb{padding-top:18px}
+
+/* The tool's name in the top bar of every tool page: the body face, not monospace. */
+.asb-mid,.asb-mid b{font:600 14px/1.3 var(--body);letter-spacing:-.005em;color:var(--ink)}
+
+/* Overview: the example-company preview reads as a quiet panel, not a gray slab. */
+.as-preview{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+
+/* Overview hero: with no picture beside it (first visit), the text takes the room the picture would have. */
+.as-hero:not(:has(> :nth-child(2))){grid-template-columns:minmax(0,760px)}
+.as-hero-t h1{max-width:18ch}
+
+/* Sidebar: the three Learn labels are too long to sit beside their tag on one line, so they wrap instead of
+   pushing the tag out of the sidebar. Shorter labels keep one line. */
+.side .navlink:is([data-route="redteamllm"],[data-route="redteamworld"],[data-route="glossary"]){white-space:normal;line-height:1.3}
+.side .navlink .sb-new{flex:none;margin-left:auto}
+
+/* One radius scale: 14px panels, 10px controls. */
+.card,.ov-tool,.firstrun,.firstrun-opt,.intro-card{border-radius:14px}
+.btn,.side .navlink,input,select,textarea{border-radius:10px}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5457,7 +5498,7 @@ function copyText(txt, toastEl){
 const view = $('#view');
 // Tool pages open with a hero band. Its icon and key stats come from the current route.
 const HEAD_META = () => {
-  const r = (location.hash || "").slice(1).split("/")[0] || "overview";
+  const r = hashNow().split("/")[0] || "overview";
   const ai = ["Runs on your own Claude account", "Nothing stored on a server", "A person makes the final call"];
   const m = {
     premortem:["radar", () => [HARMS.length + " abuse risks", Object.keys(SG).length + " safeguards", REGIONS.length + " jurisdictions"]],
@@ -5485,7 +5526,7 @@ const HEAD_META = () => {
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
 const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
-const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
+const headRoute = () => hashNow().split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };
 const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(), strip = headStrip(), r = headRoute(); return strip + `
@@ -5507,9 +5548,28 @@ const headCompact = (title, ctx, meta='') => { const hm = HEAD_META(), strip = h
   </div>`; };
 
 /* ---------- Theme switch: a per-viewer convenience kept in browser storage ---------- */
+/* The claude.ai viewer stamps data-theme with its own theme. An explicit choice here has to win, so data-theme is
+   kept in step with data-mode, and re-set if the host stamps it again. "System" leaves the host's stamp alone.
+   Guarded so the test stubs, which have no real root element, still load this part. */
+const themeRoot = document.documentElement;
+const themeAttrs = !!(themeRoot && typeof themeRoot.getAttribute === "function");
+let themeHostStamp = themeAttrs ? themeRoot.getAttribute("data-theme") : null;
+function themeSync(){
+  if(!themeAttrs) return;
+  const m = themeRoot.getAttribute("data-mode");
+  if(m && themeRoot.getAttribute("data-theme") !== m) themeRoot.setAttribute("data-theme", m);
+}
+if(themeAttrs && typeof MutationObserver === "function") new MutationObserver(() => {
+  const m = themeRoot.getAttribute("data-mode"), t = themeRoot.getAttribute("data-theme");
+  if(!m || t !== m) themeHostStamp = t;
+  themeSync();
+}).observe(themeRoot, {attributes:true, attributeFilter:["data-theme","data-mode"]});
 function applyTheme(m){
-  if(m==="light"||m==="dark") document.documentElement.setAttribute("data-mode", m);
-  else document.documentElement.removeAttribute("data-mode");
+  if(m==="light"||m==="dark"){ document.documentElement.setAttribute("data-mode", m); themeSync(); }
+  else {
+    document.documentElement.removeAttribute("data-mode");
+    if(themeAttrs){ if(themeHostStamp) themeRoot.setAttribute("data-theme", themeHostStamp); else themeRoot.removeAttribute("data-theme"); }
+  }
   $$(".themeseg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.thememode===(m==="light"||m==="dark"?m:"system"))));
 }
 applyTheme(store.get("theme","light"));
@@ -5872,13 +5932,58 @@ async function shareDecode(s){
   }
   try{ return JSON.parse(new TextDecoder().decode(bytes)); }catch(e){ return null; }
 }
+/* PATHROUTE START */
+// Every tool has its own address (/ts-workbench/premortem), so the analytics beacon sees a real URL change on
+// each route. Old #route links keep working: they are rewritten to the path form once, on load (canonNow).
+// APP_BASE is filled in at build time for the public page only. The copy hosted inside Claude keeps the
+// placeholder, so PATHMODE is off there and routing stays on the hash, as before. Off the public host (served
+// locally at /) the base is "/".
+const APP_BASE = "/ts-workbench/";
+const PATHMODE = typeof location !== "undefined" && typeof history !== "undefined" && !!history.pushState && /^https?:$/.test(location.protocol || "") && APP_BASE.charAt(0) === "/";
+const appBase = () => location.pathname.indexOf(APP_BASE) === 0 ? APP_BASE : "/";
+let SHARE_STASH = null;
+// The current route as "tool" or "tool/sub", read from the path (or, before canonNow has run, the hash)
+function hashNow(){
+  if(!PATHMODE) return (location.hash || "").slice(1);
+  let rest = location.pathname.slice(appBase().length);
+  try{ rest = decodeURIComponent(rest); }catch(e){}
+  rest = rest.replace(/\/+$/, "");
+  if(rest === "index.html") rest = "";
+  return rest || (location.hash || "").slice(1).replace(/\?.*$/, "");
+}
+const pathUrl = x => appBase() + (x === "overview" ? "" : x);
+const hashUrl = x => PATHMODE ? pathUrl(x) : "#" + x;
+// Goes to a route: a new history entry at the path, then the same cleanup listeners the hash used to trigger
+function goHash(x){
+  if(!PATHMODE){ location.hash = x; return; }
+  if(pathUrl(x) === location.pathname) return;
+  history.pushState(null, "", pathUrl(x) + location.search);
+  window.dispatchEvent(new Event("hashchange"));
+  route();
+}
+// An old "#tool", "#tool?s=…" link, or a path carrying "?s=…", becomes the clean path. The share payload is set
+// aside (SHARE_STASH) and taken off the address before the analytics beacon loads, so it is not logged or counted twice.
+function canonNow(){
+  if(!PATHMODE) return false;
+  const hs = (location.hash || "").slice(1), qi = hs.indexOf("?"), r = qi < 0 ? hs : hs.slice(0, qi), first = r.split("/")[0];
+  const fromHash = !!first && first !== "demo" && !!ROUTES[first];
+  const params = location.search.replace(/^\?/, "").split("&").filter(Boolean);
+  if(fromHash && qi >= 0) hs.slice(qi + 1).split("&").filter(Boolean).forEach(x => params.push(x));
+  let s = null;
+  for(let i = params.length - 1; i >= 0; i--) if(params[i].slice(0, 2) === "s="){ s = params[i].slice(2); params.splice(i, 1); }
+  if(!fromHash && s === null) return false;
+  history.replaceState(null, "", (fromHash ? pathUrl(r) : location.pathname) + (params.length ? "?" + params.join("&") : "") + (fromHash ? "" : location.hash));
+  if(s !== null) SHARE_STASH = {route: hashNow(), s};
+  return true;
+}
+/* PATHROUTE END */
 // Copies a link that carries `state`. If it would be too big (roughly 8KB), carries `summary` instead and says so.
 function shareCopy(route, state, summary, toastEl){
   shareEncode(state).then(s => {
     if(s.length > 8000 && summary) return shareEncode(summary).then(s2 => ({s:s2, big:true}));
     return {s, big:false};
   }).then(({s, big}) => {
-    const url = location.origin + location.pathname + "#" + route + "?s=" + s;
+    const url = location.origin + (PATHMODE ? appBase() + route : location.pathname + "#" + route) + "?s=" + s;
     const say = msg => flashIn(toastEl, msg);
     try{
       navigator.clipboard.writeText(url).then(
@@ -5890,9 +5995,10 @@ function shareCopy(route, state, summary, toastEl){
 // Each report tool registers how to apply shared data into its own state.
 const SHARE_APPLY = {};
 function shareRegister(route, apply){ SHARE_APPLY[route] = apply; }
-// The hash's "?s=" part, read straight off location.hash so the router can strip it before normal routing.
+// The "?s=" part of a shared link, read off the hash (or, in path mode, the payload canonNow set aside) so the router can strip it before normal routing.
 function shareParseHash(){
-  const h = (location.hash || "").slice(1), qi = h.indexOf("?s=");
+  if(PATHMODE) return SHARE_STASH;
+  const h = hashNow(), qi = h.indexOf("?s=");
   return qi < 0 ? null : {route: h.slice(0, qi), s: h.slice(qi + 3)};
 }
 function shareBannerHTML(saveAttr){
@@ -6902,7 +7008,7 @@ function bindPremortem(){
   root.addEventListener("toggle", e => { const k = e.target.dataset && e.target.dataset.open; if(k){ pm.open = pm.open || {}; pm.open[k] = e.target.open; store.set("pm3", pm); } }, true);
 }
 document.addEventListener("keydown", e => {
-  if(location.hash.slice(1)!=="premortem" || pm.stage!=="ask" || e.metaKey || e.ctrlKey || e.altKey) return;
+  if(hashNow()!=="premortem" || pm.stage!=="ask" || e.metaKey || e.ctrlKey || e.altKey) return;
   const tag = (e.target.tagName||"").toLowerCase();
   if(tag==="input" || tag==="textarea" || tag==="select"){ if(e.key==="Enter" && e.target.id==="pm-name"){ e.preventDefault(); goNext(); } return; }
   if(/^[1-9]$/.test(e.key)){ const btn = $$("#pm-root .opt-key")[+e.key-1]; if(btn){ e.preventDefault(); btn.click(); } }
@@ -6983,7 +7089,7 @@ if(STANDALONE && typeof Blob !== "undefined" && typeof URL !== "undefined" && UR
 }
 try{
   if(window.claude && typeof window.claude.use === "function"){
-    window.claude.use("downloads").then(ns => { DL = ns; if((location.hash||"").slice(1)==="premortem") renderPremortem(); }).catch(()=>{});
+    window.claude.use("downloads").then(ns => { DL = ns; if(hashNow()==="premortem") renderPremortem(); }).catch(()=>{});
   }
 }catch(e){}
 async function offerFile(filename, data, fallbackText, toastEl){
@@ -11226,16 +11332,16 @@ function mxFlash(el, block = "center"){
   el.classList.remove("mx-flash"); void el.offsetWidth; el.classList.add("mx-flash");
 }
 // Every view has its own address, so Back works and a metric can be linked to directly
-function mxGo(sub){ const h = "#metrics" + (sub ? "/" + sub : ""); if(location.hash === h) renderMetrics(); else location.hash = h; }
+function mxGo(sub){ const h = "metrics" + (sub ? "/" + sub : ""); if(hashNow() === h) renderMetrics(); else goHash(h); }
 function mxFromHash(list){
-  const parts = (location.hash || "").slice(1).split("/");
+  const parts = hashNow().split("/");
   if(parts[0] !== "metrics") return;
   const sub = parts[1] || "", tab = MX_TABS.find(t => t[2] && t[2] === sub);
   if(tab){ mx.tab = tab[0]; mx.open = null; return; }
   mx.tab = "card";
   const m = sub && list.find(x => mxSlug(x) === sub);
   mx.open = m ? m.n : null;
-  if(sub && !m && typeof history !== "undefined" && history.replaceState) history.replaceState(null, "", "#metrics");
+  if(sub && !m && typeof history !== "undefined" && history.replaceState) history.replaceState(null, "", hashUrl("metrics"));
 }
 
 function mxSetVal(m, inp, list){
@@ -11725,7 +11831,7 @@ const KINDS = {
   learn:{n:"Exercise", plural:"Exercises", icon:"i-save", route:"redteamllm", prefix:"EX"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
-function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }
+function goRoute(r){ if(hashNow()===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else goHash(r); }
 function flashIn(el, msg){ if(!el) return; el.textContent = msg; setTimeout(()=>{ el.textContent = ""; }, 3500); }
 const projName = id => { const p = wsProjects()[id]; return p ? p.name : ""; };
 const savedWhere = () => { const a = wsActive(); return a ? `Saved to ${projName(a)}` : "Saved to your workspace"; };
@@ -12025,6 +12131,66 @@ function pmProjectSelect(){
    ========================================================= */
 const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
 const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
+// One-line summaries for the page description, per route (the same lines as the All tools cards, plain
+// text). The three AI assistants take theirs from AI_TOOLS. Any route not listed here, and the home page,
+// fall back to the site description captured at load.
+const ROUTE_DESC = {
+  tools:"Every tool in the workbench, to use on its own, from program maturity to AI assistants. Free and private.",
+  plan:"Your assessment results turned into one prioritized plan, with owners and next steps.",
+  review:"Your plan, quarter by quarter: what to do first and what can wait.",
+  workspace:"Everything you have saved in the workbench, kept on your own device.",
+  maturity:"Rate your Trust & Safety program in eight areas and get a roadmap for the biggest gaps.",
+  premortem:"Profile a product and see how it will be misused before launch.",
+  coverage:"See where your products' risk outruns the defenses you have in place.",
+  tabletop:"Rehearse a crisis and learn from every call, with the law behind it.",
+  policy:"Paste a rule to find vague words, missing exceptions and hard edge cases.",
+  coppa:"Check children's privacy against the amended COPPA Rule, with drafts for Legal.",
+  dsa:"Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",
+  vendors:"Choose a moderation vendor on evidence, with RFP questions.",
+  eval:"Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",
+  metrics:"A reference for learning: the numbers a T&S program runs on, and how to measure each one.",
+  redteam:"Test your own AI feature for harm the way real red teams do, one calm step at a time, ending in findings and a one-page summary.",
+  learn:"Guides, drills, worksheets and glossaries for Trust & Safety work, starting with red teaming AI.",
+  redteamllm:"The method for red teaming language models in nine steps, with drills to run with your team, worksheets and sources.",
+  redteamworld:"Red teaming video, image-to-video and interactive world models: uploads, scene steering, style and provenance.",
+  glossary:"Red teaming terms in plain words, with flashcards and a quiz.",
+  tsglossary:"Everyday Trust and Safety terms, from strike to statement of reasons, in plain words.",
+  about:"About the T&S Workbench: who built it, how the tools fit together, and the decisions behind them.",
+  roost:"ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with.",
+  credits:"The models, tools, services and public sources the workbench uses or names, who made each one, and on what terms."
+};
+// Route name -> tab title and meta description, so each tool is findable and bookmarkable by name.
+// The base title and description are read from the page once, so the home page stays as published.
+const seoBase = {};
+function seoFor(name){
+  if(!seoBase.title){
+    seoBase.title = document.title;
+    const m = document.querySelector('meta[name="description"]');
+    seoBase.desc = m ? m.getAttribute("content") : "";
+  }
+  const home = name === "overview" || !ROUTE_LABEL[name];
+  const ai = typeof AI_TOOLS !== "undefined" && AI_TOOLS[name] && AI_TOOLS[name].desc;
+  return {
+    title: home ? seoBase.title : ROUTE_LABEL[name] + " · T&S Workbench",
+    desc: home ? seoBase.desc : (ROUTE_DESC[name] || ai || seoBase.desc)
+  };
+}
+function seoUpdate(name){
+  if(typeof document === "undefined" || !document.querySelector) return;
+  try{
+    const t = seoFor(name);
+    document.title = t.title;
+    const m = document.querySelector('meta[name="description"]');
+    if(m && t.desc) m.setAttribute("content", t.desc);
+    // Canonical link: the page's own path (home is the root). Needs the site's address from og:url.
+    const og = document.querySelector('meta[property="og:url"]'), root = og && og.getAttribute("content");
+    if(root){
+      let c = document.querySelector('link[rel="canonical"]');
+      if(!c && document.createElement && document.head){ c = document.createElement("link"); c.setAttribute("rel", "canonical"); document.head.appendChild(c); }
+      if(c) c.setAttribute("href", name === "overview" || !ROUTE_LABEL[name] ? root : root + name);
+    }
+  }catch(e){}
+}
 // The tools, one entry per route, in the order the About page lists them. The single source for "how many tools":
 // the About page counts it, the home-page heading and the READMEs read it from this line (_build/gen-readmes.js
 // parses it). The guides, glossaries, plan and review pages are not tools. Add a new tool here, to ROUTE_LABEL and to AB_GROUPS.
@@ -12056,7 +12222,7 @@ function openSaved(id){
     const k = it.data.guide === "world" ? "world" : "llm", g = LN_GUIDES[k], i = g.exercises.findIndex(e => e.id === it.data.exId);
     if(i >= 0) lnStore.set(k + ":epos", i);
     const h = g.route + "/practice";
-    if(location.hash.slice(1) === h) renderRedteam(k); else location.hash = h;
+    if(hashNow() === h) renderRedteam(k); else goHash(h);
     return;
   }
   goRoute(KINDS[it.kind].route);
@@ -12066,6 +12232,7 @@ function focusQuiet(el){ if(!el || !el.focus) return; if(!el.hasAttribute("tabin
 const focusLost = () => !document.activeElement || document.activeElement === document.body;
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
+  seoUpdate(name);
   if(document.body && document.body.dataset) document.body.dataset.route = name;
   if(typeof JOURNEY !== "undefined"){ const n = $("#sb-assess-n"), done = JOURNEY.filter(s => { try{ return s.done(); }catch(e){ return false; } }).length;
     if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
@@ -12111,7 +12278,7 @@ function cmdkItems(){
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","light"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
   Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(it =>
     out.push({g:"Your saved work", label:it.title||"Untitled", sub:KINDS[it.kind].n, color:TOOL_COLOR[it.kind], tone:TOOL_TONE[it.kind] || "neutral", icon:KINDS[it.kind].icon.replace("i-",""), run:()=>openSaved(it.id)}));
-  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", tone:"measure", icon:"gauge", run:()=>{ location.hash = "metrics/" + mxSlug(m); }}));
+  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", tone:"measure", icon:"gauge", run:()=>{ goHash("metrics/" + mxSlug(m)); }}));
   const type = ttCompanyType();
   SCENARIOS.forEach((s,i) => { if(type!=="all" && !(s.types||[]).includes(type)) return; const v = ttScenario(i, type);
     out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", tone:"assess", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });
@@ -13851,7 +14018,7 @@ const lnChips = ex => `<div class="ln-chips"><span class="ln-chip">${LN_ICON.clo
 
 /* ---------- guide pages ---------- */
 const LN_TABS = [["method","Method"],["practice","Practice"],["worksheets","Worksheets"],["sources","Sources"]];
-function lnTab(){ const p = (location.hash || "").slice(1).split("/"); return LN_TABS.some(t => t[0] === p[1]) ? p[1] : "method"; }
+function lnTab(){ const p = hashNow().split("/"); return LN_TABS.some(t => t[0] === p[1]) ? p[1] : "method"; }
 function renderRedteam(k){
   const g = LN_GUIDES[k], tab = lnTab(), doneSteps = g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length, doneEx = g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length;
   const meta =`<a class="btn sm" href="#glossary">Glossary</a><a class="btn sm" href="#${k === "llm" ? "redteamworld" : "redteamllm"}">${k === "llm" ? "World models" : "LLMs"} guide</a>`;
@@ -13859,7 +14026,7 @@ function renderRedteam(k){
     <div class="ln-tabs"><div class="segs" role="tablist" aria-label="Guide sections">${LN_TABS.map(([id, n]) => `<button type="button" role="tab" aria-selected="${tab === id}" aria-pressed="${tab === id}" data-tab="${id}">${n}</button>`).join("")}</div>
       <span class="note">${doneSteps} of ${g.steps.length} steps read · ${doneEx} of ${g.exercises.length} exercises done</span></div>
     <div id="ln-view"></div></div>`;
-  $$("[data-tab]").forEach(b => b.onclick = () => { location.hash = g.route + "/" + b.dataset.tab; });
+  $$("[data-tab]").forEach(b => b.onclick = () => { goHash(g.route + "/" + b.dataset.tab); });
   ({method:lnMethod, practice:lnPractice, worksheets:lnWorksheets, sources:lnSources})[tab](k, g);
 }
 /* ---------- method: split each step's body on its <h3> headings, and on heavy blocks within a heading,
@@ -14065,7 +14232,7 @@ function lnMethod(k, g){
       if(ci < total - 1){ ci++; picked = null; }
       else {
         lnMarkRead(k + ":s:" + g.steps[si].id);
-        if(si < n - 1){ si++; ci = 0; loadStep(); } else { location.hash = g.route + "/practice"; return; }
+        if(si < n - 1){ si++; ci = 0; loadStep(); } else { goHash(g.route + "/practice"); return; }
       }
     } else {
       if(ci > 0){ ci--; picked = null; }
@@ -14129,7 +14296,7 @@ function lnMethod(k, g){
 // and a row's own Enter/Space toggle below isn't doubled into also advancing the card).
 document.addEventListener("keydown", e => {
   const modal = $("#ln-modal"); if(modal && !modal.hidden) return;
-  const h = (location.hash || "").slice(1).split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
+  const h = hashNow().split("/"); if(!/^redteam(llm|world)$/.test(h[0]) || (h[1] || "method") !== "method") return;
   if(!LN_M.go || (e.target && e.target.closest && e.target.closest('[data-next],[data-back],[data-done],[data-step],[data-ex],[data-openall],[data-all],[data-checkpick],[data-bridge],[data-astable],.ln-row,input,textarea'))) return;
   if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); LN_M.go(1); }
   else if(e.key === "ArrowLeft"){ e.preventDefault(); LN_M.go(-1); }
@@ -14215,7 +14382,7 @@ function lnPractice(k, g){
     const run = $("[data-run]"); if(run) run.onclick = () => lnOpenExercise(k, g, e.id, draw);
     lnBindSave(k, e, draw);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
-    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/worksheets"; };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else goHash(g.route + "/worksheets"); };
     const mo = $("[data-minonly]"); if(mo) mo.onclick = () => { onlyMin = !onlyMin; lnStore.set(onlyKey, onlyMin); i = 0; save(); draw(); };
   };
   draw();
@@ -14266,7 +14433,7 @@ function lnWorksheets(k, g){
     const dl = $("[data-dl]"); if(dl) dl.onclick = () => offerFile(w.file, pre ? pre.text : w.text, pre ? pre.text : w.text, $("#ln-toast"));
     const oc = $("[data-open-check]"); if(oc) oc.onclick = () => lnOpenChecklist(k, g);
     const back = $("[data-back]"); if(back) back.onclick = () => { i = Math.max(0, i - 1); save(); draw(); };
-    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else location.hash = g.route + "/sources"; };
+    const nx = $("[data-next]"); if(nx) nx.onclick = () => { if(i < n - 1){ i++; save(); draw(); } else goHash(g.route + "/sources"); };
   };
   draw();
 }
@@ -14789,7 +14956,7 @@ function rtSpec(){
   return {k:"redteam", tool:{name:"Red team studio", icon:"shield", color:"var(--t-rt)"},
     intro:{title:"Plan a red team, run it, and learn the craft on the way", lead:"Ten plain questions about where you are coming from, what you are testing and who you have. Then you get a plan: a coverage grid, seed cards with benign twins, the drills that fit your team and your time, findings you can file as you go, and exports for open-source harnesses. Methods and categories only. No attack strings.",
       facts:[["About 5 minutes", "One question at a time, with the idea behind each one."], ["Drills in modals", "A timer, the steps, a scribe log and a grade. File a finding from the drill."], ["Learn as you go", "Grade real outputs, spot the technique, find the trip point."]], start:"Start"},
-    alt:[{n:"See a finished example", run:() => rtAct("example")}, {n:"Read the method first", run:() => { location.hash = rt.model === "world" ? "redteamworld" : "redteamllm"; }}].concat(rt.mode === "full" ? [{n:"Back to the guided flow", run:() => rtAct("flow")}] : []),
+    alt:[{n:"See a finished example", run:() => rtAct("example")}, {n:"Read the method first", run:() => { goHash(rt.model === "world" ? "redteamworld" : "redteamllm"); }}].concat(rt.mode === "full" ? [{n:"Back to the guided flow", run:() => rtAct("flow")}] : []),
     steps, finish:"Build my plan",
     done:() => { rt.view = "report"; rt.tab = "plan"; rtSave(); renderRedteamStudio(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); },
     bind:() => { $$("[data-rtg]").forEach(i => i.oninput = () => { rt.gates[i.dataset.rtg] = Math.max(0, Math.min(100, +i.value || 0)); rtSave(); }); }};
@@ -16575,7 +16742,7 @@ rtFlowBind = function(){
    also advanced to "Next" by the same keystroke.
    ========================================================= */
 document.addEventListener("keydown", e => {
-  if((location.hash || "").slice(1).split("/")[0] !== "redteam") return;
+  if(hashNow().split("/")[0] !== "redteam") return;
   if(e.ctrlKey || e.altKey || e.metaKey) return;
   const tag = e.target && e.target.tagName;
   if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -16603,7 +16770,7 @@ document.addEventListener("keydown", e => {
 let SAMPLER = null;
 try{
   if(window.claude && typeof window.claude.use === "function"){
-    window.claude.use("sample").then(ns => { SAMPLER = ns; if((location.hash||"").slice(1)==="policy") renderPolicy(); }).catch(()=>{});
+    window.claude.use("sample").then(ns => { SAMPLER = ns; if(hashNow()==="policy") renderPolicy(); }).catch(()=>{});
   }
 }catch(e){}
 const POL_BLANK = () => ({rule:"", company:"", look:null, type:"social", product:"", youth:"", regions:["us","eu","uk"], enforce:[], actions:[], concerns:"", depth:"default", heur:null, result:null, ts:null, filter:"all"});
@@ -17573,13 +17740,13 @@ async function aiRun(key){
     else if(code !== "cancelled") run.err = AI_ERR[code] || AI_ERR.upstream_error;
   }finally{
     run.busy = false; run.ctl = null;
-    if((location.hash || "").slice(1) === key) renderAI(key);
+    if(hashNow() === key) renderAI(key);
   }
 }
 
 // When the sampler becomes available after first paint, refresh an open AI page
 if(window.claude && window.claude.use){
-  window.claude.use("sample").then(ns => { if(!SAMPLER) SAMPLER = ns; const h = (location.hash || "").slice(1); if(AI_TOOLS[h]) renderAI(h); }).catch(() => {});
+  window.claude.use("sample").then(ns => { if(!SAMPLER) SAMPLER = ns; const h = hashNow(); if(AI_TOOLS[h]) renderAI(h); }).catch(() => {});
 }
 /* =========================================================
    PROGRAM MATURITY: content (areas, levels, stages, next steps)
@@ -19092,7 +19259,7 @@ function pfMergeOld(data){
     const lib = libLoad(); (Array.isArray(data) ? data : data.assessments).forEach(rec => { if(rec && rec.id && rec.type){ lib[rec.id] = rec; n++; } }); libSave(lib);
   }
   gsay(`Added ${n} saved result${n === 1 ? "" : "s"} from an older export`);
-  const r = (location.hash || "").slice(1).split("/")[0] || "overview"; if(ROUTES[r]) ROUTES[r](); shellUpdate(r);
+  const r = hashNow().split("/")[0] || "overview"; if(ROUTES[r]) ROUTES[r](); shellUpdate(r);
 }
 function pfModal(inner, onAct){
   const prev = document.activeElement, bg = document.createElement("div");
@@ -19801,7 +19968,7 @@ document.addEventListener("keydown", e => {
   if(e.key === "Escape" && document.body.classList.contains("tt-present")){ document.body.classList.remove("tt-present"); ttfRender(); }
 });
 document.addEventListener("fullscreenchange", () => { if(!document.fullscreenElement && ttf && document.body.classList.contains("tt-present")){ document.body.classList.remove("tt-present"); ttfRender(); } });
-if(window.addEventListener) window.addEventListener("hashchange", () => { if((location.hash || "").slice(1) !== "tabletop"){ ttfStop(); document.body.classList.remove("tt-present"); } });
+if(window.addEventListener) window.addEventListener("hashchange", () => { if(hashNow() !== "tabletop"){ ttfStop(); document.body.classList.remove("tt-present"); } });
 /* =========================================================
    TRANSPARENCY REPORT BUILDER: the numbers the EU Digital Services Act asks for, by type of service,
    with a completeness check, a readable report and, on request, a summary written by Claude.
@@ -20155,7 +20322,7 @@ const DEMO_KEEP = ["tswb:theme", "tswb:pol:info"];
 const demoKeepKey = k => DEMO_KEEP.includes(k) || k.startsWith("tswb:intro:");
 const demoOn = () => !!store.get("demo", false);
 function demoKeys(){ const ks = []; try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if(k && k.startsWith("tswb:")) ks.push(k); } }catch(e){} return ks; }
-function demoReload(){ try{ history.replaceState(null, "", location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
+function demoReload(){ try{ history.replaceState(null, "", PATHMODE ? pathUrl("overview") + location.search : location.pathname + location.search + "#overview"); }catch(e){} location.reload(); }
 function demoStart(){
   if(demoOn()){ goRoute("overview"); return demoWelcome(); }
   try{
@@ -20380,7 +20547,7 @@ function tourStep(i){
 function tourStart(){
   if(tourAt < 0) tourPrevFocus = document.activeElement;
   tourSteps = TOUR;
-  if((location.hash || "#overview").slice(1).split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
+  if((hashNow() || "overview").split("/")[0] !== "overview"){ goRoute("overview"); return setTimeout(() => tourStep(0), 250); }
   tourStep(0);
 }
 document.addEventListener("click", e => {
@@ -20603,7 +20770,7 @@ const PAGE_TOURS = {
     [".sb-sync", "Keep a copy", "Your work lives in this browser. Save a workspace file to back it up or open it on another device."]
   ]
 };
-const helpRoute = () => (location.hash || "#overview").slice(1).split("/")[0] || "overview";
+const helpRoute = () => (hashNow() || "overview").split("/")[0] || "overview";
 // Screenshots and automated checks run without tips
 const helpQuiet = () => /[?&]shot=/.test(location.search || "");
 // One button, "How this works". Where the tool has a walkthrough (INTRO_SPECS, partINTRO.js) it opens
@@ -21838,7 +22005,7 @@ function cpAct(a){
     case "dld": { const d = CP_DRAFTS.find(z => z[0] === (cp.draft || "notice")) || CP_DRAFTS[0], md = cpDraftMd(d[0]); return offerFile(`${d[2]}-${slug(cp.svc || "service")}.md`, md, md, $("#cp-dtoast")); }
   }
 }
-const cpHere = () => (location.hash || "").slice(1).split("/")[0] === "coppa";
+const cpHere = () => hashNow().split("/")[0] === "coppa";
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-cp],[data-cpaud],[data-cpgate],[data-cpvpc],[data-cptab],[data-cpdraft],[data-cpshare],[data-cpfix]");
   if(!b || !cpHere() || !view.contains(b)) return;
@@ -22343,7 +22510,7 @@ function dsAct(a){
     case "dld": { const d = DS_DRAFTS.find(z => z[0] === (ds.draft || "sor")) || DS_DRAFTS[0], md = dsDraftMd(d[0]); return offerFile(`${d[2]}-${slug(ds.svc || "service")}.md`, md, md, $("#ds-dtoast")); }
   }
 }
-const dsHere = () => (location.hash || "").slice(1).split("/")[0] === "dsa";
+const dsHere = () => hashNow().split("/")[0] === "dsa";
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-ds],[data-dstier],[data-dssize],[data-dsest],[data-dstab],[data-dsdraft],[data-dsfix]");
   if(!b || !dsHere() || !view.contains(b)) return;
@@ -22924,7 +23091,7 @@ function evPaint(){
   const n = ev.cases.length && !ev.media ? ev.cases.length : 0, s1 = document.getElementById("ev-s1"); if(!s1 || evMediaView()) return;
   const st = s1.querySelector(".ev-sht .note"); if(st) st.textContent = n ? `${n} cases${ev.policy.trim() ? "" : " · no rule yet"}` : "Start here";
 }
-const evHere = () => (location.hash || "").slice(1).split("/")[0] === "eval";
+const evHere = () => hashNow().split("/")[0] === "eval";
 function evBind(){
   view.querySelectorAll("[data-evgold]").forEach(s => s.onchange = () => { ev.gold = Object.assign({}, ev.gold, {[s.dataset.evgold]:s.value}); ev.ex = false; evSave(); if(ev.preds) evRedraw3(); });
   view.querySelectorAll("details[data-evd]").forEach(d => d.ontoggle = () => { EVU[d.dataset.evd] = d.open; });
@@ -23761,12 +23928,12 @@ function loopMxHTML(list){
     <div class="loop-mx">${xs.map(x => `<button type="button" class="loop-i" data-open="${METRICS.indexOf(x.m)}"><b>${esc(x.m.n)}</b><small>${esc(x.cat.n)} · ${esc(MX_Q[x.m.n] || "")}</small></button>`).join("")}</div></section>`;
 }
 function loopGo(v){
-  const here = (location.hash || "").slice(1).split("/")[0];
+  const here = hashNow().split("/")[0];
   const src = here === "premortem" && pm && pm.type ? {r:assess(pm), p:pm, name:pm.name || "this assessment"} : loopSource();
   if(v.startsWith("tt:")){ const parts = v.split(":"), i = +parts[1], variant = TT_TYPES.some(t => t.k === parts[2]) ? parts[2] : ttCompanyType(); if(!SCENARIOS[i]) return; ttStart(i, variant); return goRoute("tabletop"); }
   if(v.startsWith("mx:")){ const parts = v.split(":"), m = METRICS[+parts[1]], pk = parts[2]; if(!m) return;
     if(!mxList().includes(m)){ if(!(m.p === "all" || m.p.includes(mx.platform)) && pk && MX_PLATFORMS[pk]) mx.platform = pk; if(m.st > +mx.stage) mx.stage = String(m.st); if(m.reg) mx.reg = true; }
-    mx.orgSet = true; store.set("mx", mx); location.hash = "metrics/" + mxSlug(m); return; }
+    mx.orgSet = true; store.set("mx", mx); goHash("metrics/" + mxSlug(m)); return; }
   if(v === "vd"){ if(!src) return goRoute("vendors");
     const fit = loopVendorWeights(src); vx.weights = Object.assign({}, fit.w); vx.fitW = Object.assign({}, fit.w); vx.fitWhy = {up:fit.up, down:fit.down}; vx.fitName = src.name; store.set("vx", vx);
     goRoute("vendors"); return gsay("Vendor weights fitted to the risks in " + src.name); }
@@ -23980,7 +24147,7 @@ function renderReview(){
 }
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-rev]"); if(!b || !view.contains(b)) return;
-  if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = (location.hash || "").slice(1).split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
+  if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = hashNow().split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
   else if(b.dataset.rev === "example"){ revEx = true; renderReview(); window.scrollTo(0, 0); }
   else if(b.dataset.rev === "exit-example"){ revEx = false; renderReview(); window.scrollTo(0, 0); }
 });
@@ -24001,17 +24168,20 @@ function sbMovePill(name){
   pill.style.opacity = "1";
 }
 function route(){
-  // A shared result link: "#<route>?s=<data>". Decode it, apply it, then route normally on the clean hash.
+  canonNow();   // an old #tool link becomes /tool (once); a ?s= payload is set aside and taken off the address
+  // A shared result link: "#<route>?s=<data>" (or "/<route>?s=<data>"). Decode it, apply it, then route normally on the clean address.
   const shareHit = typeof shareParseHash === "function" ? shareParseHash() : null;
+  route.path = location.pathname;
+  if(shareHit && PATHMODE) SHARE_STASH = null;
   if(shareHit && typeof SHARE_APPLY !== "undefined" && SHARE_APPLY[shareHit.route]){
-    shareDecode(shareHit.s).then(data => {
+    shareDecode(shareHit.s).catch(() => null).then(data => {
       if(data) SHARE_APPLY[shareHit.route](data);
-      history.replaceState(null, "", location.pathname + "#" + shareHit.route);
+      if(!PATHMODE) history.replaceState(null, "", location.pathname + "#" + shareHit.route);
       route();
     });
     return;
   }
-  const h = (location.hash || '').slice(1).split('/')[0];
+  const h = hashNow().split('/')[0];
   // A shareable link straight into the demo company
   if(h === "demo" && typeof demoStart === "function"){ demoStart(); return; }
   const name = ROUTES[h] ? h : 'overview';
@@ -24025,7 +24195,22 @@ function route(){
   if(typeof helpAfterRoute === "function") helpAfterRoute(name, h);
   route.done = true;
 }
-window.addEventListener('hashchange', route);
+// Hash mode: the hash is the route. Path mode: a hashchange only matters for an old #tool link (canonNow turns it
+// into a path); the synthetic ones goHash fires for the cleanup listeners carry no hash and are ignored here.
+window.addEventListener('hashchange', () => { if(!PATHMODE || canonNow()) route(); });
+if(PATHMODE){
+  // Back and Forward between tool paths; in-page #anchors also fire popstate, so only act when the path changed
+  window.addEventListener('popstate', () => { if(location.pathname !== route.path){ window.dispatchEvent(new Event('hashchange')); route(); } });
+  // Links written as href="#tool" (sidebar, buttons, cards) become real navigations to /tool
+  document.addEventListener('click', e => {
+    if(e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if(!a || (a.target && a.target !== "_self")) return;
+    const h = a.getAttribute('href').slice(1), first = h.split('/')[0];
+    if(!/^[\w-]+(\/[\w-]+)*$/.test(h) || !ROUTES[first]) return;
+    e.preventDefault(); goHash(h);
+  });
+}
 route();
 })();
 </script>
