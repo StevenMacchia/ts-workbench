@@ -265,13 +265,6 @@ function countUp(el, key){
   requestAnimationFrame(step);
 }
 
-function cardArt(iconId){
-  return `<div class="ov-art"><svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true" class="ca-art">
-    <circle class="ca-peach" cx="132" cy="28" r="22"/>
-    <svg x="56" y="38" width="48" height="48" viewBox="0 0 24 24" class="ca-ic"><use href="#i-${iconId}"/></svg>
-  </svg></div>`;
-}
-
 // Toast with an Undo action, shared by every "Start over" handler.
 // label: what happened. snapshot: a deep copy taken before clearing. restore(snapshot): puts it back.
 function withUndo(label, snapshot, restore){

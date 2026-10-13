@@ -19,6 +19,13 @@
  * With neither flag, the script behaves exactly as before (the targets
  * list above). See README.md for more on the review passes.
  *
+ * Card thumbnails (these ship with the site):
+ *   node capture.js --thumbs     # every tool on the All tools page and the
+ *                                # Learn hub in its example/report state at
+ *                                # 1440x900, cropped to the content area and
+ *                                # downscaled to 640x400 JPEG into
+ *                                # docs/thumbs/<route>.jpg (keep < 1.5 MB total)
+ *
  * Requires: puppeteer-core (installed in this folder) and a local Chrome at
  * the path in CHROME_PATH below. Does not download Chromium.
  */
@@ -683,12 +690,123 @@ async function runReviewPass(browser, kind) {
   return count;
 }
 
+// ------------------------------------------------------ card thumbnails ---
+// One 640x400 JPEG per tool card on the All tools page (partH4.js renderTools)
+// and the Learn hub (partLearn.js), written to docs/thumbs/<route>.jpg and shipped
+// with the site. The card shows it when TOOL_CARD_STYLE is "thumb" (partH4.js) and
+// falls back to the plain card when a file is missing. Each tool is shown in its
+// example/report state (the same builders as the other passes); tools with no
+// example (the Learn pages) are shown at their first screen. Intro cards are
+// marked seen up front (markIntrosSeen), so the first screen is the tool itself.
+// Nothing here is mirrored to _build/ (the daily sync does not own docs/thumbs),
+// so CAPTURE_NO_MIRROR has no effect; it is honoured only in the sense that this
+// pass never writes outside docs/. CAPTURE_PORT / CAPTURE_BASE_URL work as usual.
+const THUMBS_DIR = path.join(ROOT, "docs", "thumbs");
+const THUMB_W = 640, THUMB_H = 400, THUMB_CROP_W = 1100; // 16:10; 1100 css px wide crop of the content area
+const THUMB_VIEWPORT = { width: 1440, height: 900, deviceScaleFactor: 2 };
+const hashOnly = (route) => async (page) => {
+  await ensureDemoOff(page);
+  await gotoHash(page, route);
+  await page.evaluate(() => window.scrollTo(0, 0));
+};
+const THUMB_ROUTES = [
+  { route: "maturity", build: builders.maturity },
+  { route: "premortem", build: builders.premortem },
+  { route: "coverage", build: builders.coverageExample },
+  { route: "tabletop", build: builders.tabletop },
+  { route: "policy", build: builders.policyExample },
+  { route: "coppa", build: builders.coppaExample },
+  { route: "dsa", build: builders.dsaExample },
+  { route: "vendors", build: builders.vendors },
+  { route: "eval", build: builders.evalReport },
+  { route: "redteam", build: builders.redteam },
+  { route: "metrics", build: builders.metricsMap },
+  { route: "redteamllm", build: hashOnly("redteamllm") },
+  { route: "redteamworld", build: hashOnly("redteamworld") },
+  { route: "glossary", build: hashOnly("glossary") },
+  { route: "tsglossary", build: hashOnly("tsglossary") },
+];
+
+async function runThumbsPass(browser) {
+  fs.mkdirSync(THUMBS_DIR, { recursive: true });
+  const page = await browser.newPage();
+  await page.setViewport(THUMB_VIEWPORT);
+  await page.evaluateOnNewDocument(() => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const style = document.createElement("style");
+      style.textContent =
+        "::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}" +
+        "html{scrollbar-width:none!important}";
+      document.head.appendChild(style);
+    });
+  });
+  await page.goto(BASE_URL + "/", { waitUntil: "load" });
+  await markIntrosSeen(page);
+  await ensureLightTheme(page);
+  await settle(page);
+  // The downscale happens in the page itself (a detached canvas): the browser's own
+  // high-quality resampling of the 2x capture, then a JPEG at q80. No image library, and no
+  // second tab (a background tab would stall the screenshots).
+
+  let count = 0, bytes = 0;
+  for (const r of THUMB_ROUTES) {
+    const outPath = path.join(THUMBS_DIR, r.route + ".jpg");
+    try {
+      await r.build(page);
+      await page.evaluate(() => { window.scrollTo(0, 0); const v = document.getElementById("view"); if (v) v.scrollTop = 0; });
+      await settle(page);
+      const rect = await page.evaluate(() => {
+        const b = document.getElementById("view").getBoundingClientRect();
+        return { x: b.left + window.scrollX, y: b.top + window.scrollY, w: b.width };
+      });
+      const w = Math.min(THUMB_CROP_W, Math.floor(rect.w));
+      const clip = { x: Math.round(rect.x), y: Math.round(rect.y), width: w, height: Math.round(w * THUMB_H / THUMB_W) };
+      const png = await page.screenshot({ type: "png", clip });
+      const b64 = await page.evaluate(async (data, W, H) => {
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = "data:image/png;base64," + data; });
+        const c = document.createElement("canvas"); c.width = W; c.height = H;
+        const g = c.getContext("2d"); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+        g.fillStyle = "#fff"; g.fillRect(0, 0, W, H); g.drawImage(img, 0, 0, W, H);
+        return c.toDataURL("image/jpeg", 0.8).split(",")[1];
+      }, Buffer.from(png).toString("base64"), THUMB_W, THUMB_H);
+      const buf = Buffer.from(b64, "base64");
+      fs.writeFileSync(outPath, buf);
+      bytes += buf.length; count++;
+      console.log("Wrote " + outPath + " (" + Math.round(buf.length / 1024) + " KB)");
+    } catch (err) {
+      console.error("Failed to capture thumbs/" + r.route + ": " + err.message);
+    }
+  }
+  await page.close();
+  console.log("Thumbs pass: wrote " + count + " of " + THUMB_ROUTES.length + " images, " + Math.round(bytes / 1024) + " KB, to " + THUMBS_DIR);
+  if (bytes > 1.5 * 1024 * 1024) console.warn("WARNING: thumbs folder is over 1.5 MB; lower the JPEG quality or the size.");
+  return count;
+}
+
 // -------------------------------------------------------------- main ------
 
 async function main() {
   const rawArgs = process.argv.slice(2);
   const wantPhone = rawArgs.includes("--phone");
   const wantDark = rawArgs.includes("--dark");
+  const wantThumbs = rawArgs.includes("--thumbs");
+
+  if (wantThumbs) {
+    const serverChild = await ensureServer();
+    const browser = await puppeteer.launch({
+      executablePath: CHROME_PATH,
+      headless: "new",
+      defaultViewport: null,
+    });
+    try {
+      await runThumbsPass(browser);
+    } finally {
+      await browser.close();
+      if (serverChild) serverChild.kill();
+    }
+    return;
+  }
 
   // --phone/--dark are a separate mode: every tool, into assets/review/,
   // not the README/portfolio targets below. With neither flag, everything

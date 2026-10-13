@@ -460,3 +460,17 @@ table:not([class]) tr:last-child td{border-bottom:0}
 .side .navlink{white-space:nowrap}
 .side .navlink > span:first-of-type,.side .navlink .lbl{overflow:hidden;text-overflow:ellipsis}
 .sb-new,.sb-new.sb-wip,.sb-new.sb-ai{white-space:nowrap;flex:none;font:500 10.5px/1.6 var(--body);letter-spacing:0;padding:0 7px;border-radius:999px}
+
+/* ---------- Tool cards: thumb | plain (TOOL_CARD_STYLE in partH4.js) ----------
+   thumb: a real screenshot of the tool in its example state in a 16:10 frame, same radius as the
+   card, 1px line, cropped to the top-left. A missing file removes the frame (onerror), leaving the plain card.
+   plain: no art; the tool's own 20px icon sits beside the title on one line. */
+.tc-thumb{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.tc-thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .25s ease}
+.ln-hub .card .tc-thumb{aspect-ratio:auto;height:170px}
+a:hover > .tc-thumb img{transform:scale(1.015)}
+.cs-plain .ov-tool h4 .sb-glyph{width:20px;height:20px;border-radius:0;background:none!important;color:var(--accent)}
+.cs-plain .ov-tool h4 .sb-glyph svg{width:20px!important;height:20px!important}
+.cs-plain .ov-tool .ov-tb{padding:16px 18px;gap:8px}
+.cs-plain .ov-tool h4 .wip-tag{margin-left:auto;flex:none}
+@media (prefers-reduced-motion: reduce){.tc-thumb img{transition:none}a:hover > .tc-thumb img{transform:none}}

@@ -82,7 +82,9 @@ const body = function(){
   renderTools(); h = view.innerHTML; if(bad(h)) throw new Error("all tools has bad values: " + where(h));
   eq((h.match(/class="ov-tool"/g) || []).length >= 7, true, "every tool listed"); eq(/Jump back in/.test(h) && /data-open=/.test(h), true, "recent work");
   eq(h.includes(`${SCENARIOS.length} scenarios, ${ttVersionCount()} versions across ${ALL_TYPES.length} sectors`), true, "the tabletop card names scenarios and versions, matching About and the tool itself");
-  Object.entries(OV_ART).forEach(([k, svg]) => { if(/<text[\s>]/.test(svg)) throw new Error("decorative card art for " + k + " still has a stray <text> label a screen reader or text-scrape would read"); });
+  eq(typeof TOOL_CARD_STYLE, "string", "card style constant"); eq(["thumb","plain"].includes(TOOL_CARD_STYLE), true, "card style is thumb or plain");
+  { const cards = (h.match(/class="ov-tool"/g) || []).length, n = (h.match(/class="tc-thumb"><img src="thumbs[/][a-z]+[.]jpg" alt=""/g) || []).length;
+    eq(TOOL_CARD_STYLE === "thumb" ? n : 0, TOOL_CARD_STYLE === "thumb" ? cards : 0, "every tool card has a thumbnail in the thumb style, none in the plain style (" + n + " of " + cards + ")"); }
   out.push("all tools: " + (h.match(/class="ov-tool"/g) || []).length + " tools and recent work");
   // pre-mortem landing shows the current assessment and a radar per saved one
   pm = fromPreset("dating"); pm.example = false; pm.name = "Match chat"; pm.id = null; pm.saved = false; saveToLib();

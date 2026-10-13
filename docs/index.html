@@ -815,9 +815,6 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:600;letter-spacing:-.02em}
 .ov-foot{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font:500 11.5px var(--mono);color:var(--faint)}
 .ov-go{width:15px;height:15px;color:var(--c);opacity:0;transform:translateX(-4px);transition:.2s}
 .ov-tool:hover .ov-go{opacity:1;transform:none}
-.ca-art{width:100%;height:100%;display:block}
-.ca-peach{fill:#FF9A7A;opacity:.3}
-.ca-ic{color:var(--accent)}
 .ov-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px}
 .ov-list{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
 .ov-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:11px 14px;border:0;border-top:1px solid var(--line);background:none;width:100%;text-align:left;cursor:pointer;color:inherit;transition:background .12s}
@@ -4457,6 +4454,20 @@ table:not([class]) tr:last-child td{border-bottom:0}
 .side .navlink{white-space:nowrap}
 .side .navlink > span:first-of-type,.side .navlink .lbl{overflow:hidden;text-overflow:ellipsis}
 .sb-new,.sb-new.sb-wip,.sb-new.sb-ai{white-space:nowrap;flex:none;font:500 10.5px/1.6 var(--body);letter-spacing:0;padding:0 7px;border-radius:999px}
+
+/* ---------- Tool cards: thumb | plain (TOOL_CARD_STYLE in partH4.js) ----------
+   thumb: a real screenshot of the tool in its example state in a 16:10 frame, same radius as the
+   card, 1px line, cropped to the top-left. A missing file removes the frame (onerror), leaving the plain card.
+   plain: no art; the tool's own 20px icon sits beside the title on one line. */
+.tc-thumb{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.tc-thumb img{display:block;width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .25s ease}
+.ln-hub .card .tc-thumb{aspect-ratio:auto;height:170px}
+a:hover > .tc-thumb img{transform:scale(1.015)}
+.cs-plain .ov-tool h4 .sb-glyph{width:20px;height:20px;border-radius:0;background:none!important;color:var(--accent)}
+.cs-plain .ov-tool h4 .sb-glyph svg{width:20px!important;height:20px!important}
+.cs-plain .ov-tool .ov-tb{padding:16px 18px;gap:8px}
+.cs-plain .ov-tool h4 .wip-tag{margin-left:auto;flex:none}
+@media (prefers-reduced-motion: reduce){.tc-thumb img{transition:none}a:hover > .tc-thumb img{transform:none}}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -5747,13 +5758,6 @@ function countUp(el, key){
     if(p < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
-}
-
-function cardArt(iconId){
-  return `<div class="ov-art"><svg viewBox="0 0 160 124" preserveAspectRatio="xMidYMid meet" aria-hidden="true" class="ca-art">
-    <circle class="ca-peach" cx="132" cy="28" r="22"/>
-    <svg x="56" y="38" width="48" height="48" viewBox="0 0 24 24" class="ca-ic"><use href="#i-${iconId}"/></svg>
-  </svg></div>`;
 }
 
 // Toast with an Undo action, shared by every "Start over" handler.
@@ -12059,12 +12063,15 @@ $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
-// One illustration language for every All-tools / Learn-hub card: the tool's own icon, large, in
-// the accent color, plus one peach accent shape (cardArt(), partD.js). The old per-tool ad hoc
-// illustrations (a radar sweep, a trend line, a lock, a grid of tiles, each hand-drawn once) are
-// gone; a tool is now recognizable by its icon, not by a bespoke drawing.
-const OV_ART_ICON = {pm:"radar", tt:"siren", mx:"gauge", vd:"scale", pol:"doc", ma:"steps", cv:"cover", rt:"shield", cp:"coppa", ds:"dsa", ev:"eval"};
-const OV_ART = Object.fromEntries(Object.entries(OV_ART_ICON).map(([k, icon]) => [k, cardArt(icon)]));
+// Card art for the All tools grid and the Learn hub. One constant picks the look so the two can be
+// previewed and compared: "thumb" shows a real screenshot of the tool in its example state
+// (docs/thumbs/<route>.jpg, written by `node tools/screenshots/capture.js --thumbs`); "plain" shows
+// no art, only the tool's icon beside the title. A missing thumbnail falls back to the plain card.
+const TOOL_CARD_STYLE = "thumb"; // "thumb" | "plain"
+function toolCardArt(route){
+  if(TOOL_CARD_STYLE !== "thumb") return "";
+  return `<div class="tc-thumb"><img src="thumbs/${route}.jpg" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></div>`;
+}
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -12279,7 +12286,7 @@ const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"M
 let ovStage = "all";
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
-      ${OV_ART[key]}
+      ${toolCardArt(route)}
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
@@ -12288,7 +12295,7 @@ function renderTools(){
     <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools">
+      <div class="ov-tools cs-${TOOL_CARD_STYLE}">
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
@@ -14335,10 +14342,10 @@ function renderLearn(){
   const kn = lnStore.get("gloss:known", {}), known = Object.keys(kn).filter(x => kn[x]).length, due = glDueCount();
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
   view.innerHTML = head("Learn", "Start in the studio. Read the guide when you want the reasons. Look up a word when one stops you.", "Learn") + `<div class="ln">
-    <div class="ln-hub">
-      <a class="card" href="#redteam" style="--c:var(--t-rt)">${cardArt("shield")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></span></a>
-      <div class="card" style="--c:var(--t-ai)">${cardArt("book")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-book"/></svg></span><h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></span></div>
-      <div class="card" style="--c:var(--accent)">${cardArt("book")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><h3>Look up a word: two glossaries</h3><p><a href="#tsglossary">T&amp;S glossary</a> — ${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 103} everyday Trust and Safety terms, in plain words.</p><p><a href="#glossary">Red-teaming glossary</a> — ${LN_GLOSS.length} terms, with flashcards and a quiz.</p><span class="note">${due ? due + " due for review · " : ""}${known} of ${LN_GLOSS.length} red-teaming terms known</span></span></div>
+    <div class="ln-hub cs-${TOOL_CARD_STYLE}">
+      <a class="card" href="#redteam" style="--c:var(--t-rt)">${toolCardArt("redteam")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--t-rt)"><svg><use href="#i-shield"/></svg></span><h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></span></a>
+      <div class="card" style="--c:var(--t-ai)">${toolCardArt("redteamllm")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--t-ai)"><svg><use href="#i-book"/></svg></span><h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></span></div>
+      <div class="card" style="--c:var(--accent)">${toolCardArt("tsglossary")}<span class="lnh-b"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-book"/></svg></span><h3>Look up a word: two glossaries</h3><p><a href="#tsglossary">T&amp;S glossary</a> — ${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 103} everyday Trust and Safety terms, in plain words.</p><p><a href="#glossary">Red-teaming glossary</a> — ${LN_GLOSS.length} terms, with flashcards and a quiz.</p><span class="note">${due ? due + " due for review · " : ""}${known} of ${LN_GLOSS.length} red-teaming terms known</span></span></div>
     </div>
     <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
 }

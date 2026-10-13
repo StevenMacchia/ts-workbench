@@ -1,12 +1,15 @@
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
-// One illustration language for every All-tools / Learn-hub card: the tool's own icon, large, in
-// the accent color, plus one peach accent shape (cardArt(), partD.js). The old per-tool ad hoc
-// illustrations (a radar sweep, a trend line, a lock, a grid of tiles, each hand-drawn once) are
-// gone; a tool is now recognizable by its icon, not by a bespoke drawing.
-const OV_ART_ICON = {pm:"radar", tt:"siren", mx:"gauge", vd:"scale", pol:"doc", ma:"steps", cv:"cover", rt:"shield", cp:"coppa", ds:"dsa", ev:"eval"};
-const OV_ART = Object.fromEntries(Object.entries(OV_ART_ICON).map(([k, icon]) => [k, cardArt(icon)]));
+// Card art for the All tools grid and the Learn hub. One constant picks the look so the two can be
+// previewed and compared: "thumb" shows a real screenshot of the tool in its example state
+// (docs/thumbs/<route>.jpg, written by `node tools/screenshots/capture.js --thumbs`); "plain" shows
+// no art, only the tool's icon beside the title. A missing thumbnail falls back to the plain card.
+const TOOL_CARD_STYLE = "thumb"; // "thumb" | "plain"
+function toolCardArt(route){
+  if(TOOL_CARD_STYLE !== "thumb") return "";
+  return `<div class="tc-thumb"><img src="thumbs/${route}.jpg" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></div>`;
+}
 // The one-line chip shown in "Jump back in". Reuses itemSummary() (partW2.js), the same
 // pill text and color it shows in the workspace list, so the two pages never drift apart.
 function ovChip(it){
@@ -221,7 +224,7 @@ const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"M
 let ovStage = "all";
 function renderTools(){
   const tool = (key, route, color, iconId, name, desc, foot) => `<a class="ov-tool" href="#${route}" style="--c:${color}" data-stage="${OV_STAGE[key] || ""}">
-      ${OV_ART[key]}
+      ${toolCardArt(route)}
       <div class="ov-tb"><h4><span class="sb-glyph" style="background:${color}"><svg><use href="#i-${iconId}"/></svg></span>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
@@ -230,7 +233,7 @@ function renderTools(){
     <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
-      <div class="ov-tools">
+      <div class="ov-tools cs-${TOOL_CARD_STYLE}">
         ${typeof MA_AREAS !== "undefined" ? tool("ma","maturity","var(--t-ma)","steps","Program maturity","Rate your program in eight areas and get a roadmap for the biggest gaps.",`${MA_AREAS.length} areas · 5 levels`) : ""}
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
