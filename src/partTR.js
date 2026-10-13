@@ -2,9 +2,9 @@
    TRANSPARENCY REPORT BUILDER: the numbers the EU Digital Services Act asks for, by type of service,
    with a completeness check, a readable report and, on request, a summary written by Claude.
    Requirements checked against Regulation (EU) 2022/2065 (Articles 15, 19, 24 and 42) and
-   Commission Implementing Regulation (EU) 2024/2835 in September 2026. Not legal advice.
+   Commission Implementing Regulation (EU) 2024/2835 in October 2026. Not legal advice.
    ========================================================= */
-const TR_REVIEWED = "September 2026";
+const TR_REVIEWED = "October 2026";
 const TR_SRC = {
   dsa:["Regulation (EU) 2022/2065, the Digital Services Act", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2065"],
   templates:["Implementing Regulation (EU) 2024/2835 on transparency report templates", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2835"],
@@ -57,8 +57,10 @@ const TR_SECTIONS = [
     why:"Published within three months of receiving each independent audit report: the risk assessment results, the mitigation measures, the audit report and the audit implementation report, and any consultations behind them.",
     f:[["doc_risk", "Risk assessment results (Article 34)", "chk"], ["doc_mitigation", "Mitigation measures (Article 35)", "chk"], ["doc_audit", "Independent audit report (Article 37(4))", "chk"], ["doc_impl", "Audit implementation report (Article 37(6))", "chk"], ["doc_consult", "Consultations behind the risk assessment, where applicable", "chk"]]}
 ];
-// The 15 high-level categories in the EU templates that apply to notices and own-initiative moderation (the list is exhaustive)
-const TR_CATS = ["Animal welfare", "Consumer information infringements", "Cyber violence", "Cyber violence against women", "Data protection and privacy violations", "Illegal or harmful speech", "Intellectual property infringements", "Negative effects on civic discourse or elections", "Protection of minors", "Risk for public security", "Scams and/or fraud", "Self-harm", "Unsafe, non-compliant or prohibited products", "Violence", "Other violation of provider’s terms and conditions"];
+// The fixed top-level categories in the EU templates (the list is exhaustive: 17 in all, 14 kinds of content, one for other terms-and-conditions breaches and two for cases where an authority or a reporter didn't say what kind of illegal content it was).
+// This tool covers notices and own-initiative moderation, so the one for orders is left out; the one for notices is notice-only.
+const TR_CATS = ["Animal welfare", "Consumer information infringements", "Cyber violence", "Cyber violence against women", "Data protection and privacy violations", "Illegal or harmful speech", "Intellectual property infringements", "Negative effects on civic discourse or elections", "Protection of minors", "Risk for public security", "Scams and/or fraud", "Self-harm", "Unsafe, non-compliant or prohibited products", "Violence", "Other violation of provider’s terms and conditions", "Type of alleged illegal content not specified by the notifier"];
+const TR_NOTICE_ONLY = ["Type of alleged illegal content not specified by the notifier"];
 const TR_BLANK = () => ({org:"", year:new Date().getFullYear() - 1, tier:"platform", sme:false, uk:false, v:{}, prev:{}, cat:{}, cmp:false, view:"setup", tab:"report", ai:null});
 const TR_EXAMPLE = {org:"Pixelry", year:2025, tier:"platform", sme:false, uk:false, cmp:true,
   v:{orders_act:14, orders_info:62, orders_time:9, notices:31400, notices_tf:820, notices_law:4100, notices_tc:18900, notices_auto:12600, notices_time:21,
@@ -85,7 +87,7 @@ const trFmt = (f, v) => v === undefined || v === "" || v === null ? "" : f[2] ==
 function trDue(){
   const y = +tr.year || new Date().getFullYear() - 1;
   return tr.tier === "vlop" ? `Every six months: 1 January to 30 June ${y}, published within two months (by the end of August ${y}), and 1 July to 31 December ${y}, published by the end of February ${y + 1}.`
-    : `Once a year: 1 January to 31 December ${y}, published within two months of the period ending, so by the end of February ${y + 1}.`;
+    : `Once a year: 1 January to 31 December ${y}, published within two months of the period ending, so by the end of February ${y + 1}.${y === 2025 ? " 2025 was a transition year: the templates applied from 1 July 2025, so the 2025 report need only follow them for the second half." : ""}`;
 }
 
 /* ---------- the report, as Markdown ---------- */
@@ -225,10 +227,10 @@ function trSetupHTML(){
   </div>`;
 }
 function trCatsHTML(){
-  return `<details class="tr-cats" ${store.get("tr:cats", false) ? "open" : ""}><summary><b>By category</b><span class="note">The EU templates' ${TR_CATS.length} categories for notices and own-initiative measures</span></summary>
-    <table><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.map(c => { const r = tr.cat[c] || {};
-      return `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td><input class="input mono" data-trc="${esc(c)}" data-trk="n" value="${esc(String(r.n || ""))}" inputmode="numeric" aria-label="${esc(c)}: notices"></td>` : ""}<td><input class="input mono" data-trc="${esc(c)}" data-trk="o" value="${esc(String(r.o || ""))}" inputmode="numeric" aria-label="${esc(c)}: own-initiative measures"></td></tr>`; }).join("")}</tbody></table>
-    <p class="note">The category list is exhaustive: you can't add new top-level categories, only sub-categories within them.</p></details>`;
+  return `<details class="tr-cats" ${store.get("tr:cats", false) ? "open" : ""}><summary><b>By category</b><span class="note">The EU templates' fixed categories for notices and own-initiative measures</span></summary>
+    <table><thead><tr><th>Category</th>${trRank(tr.tier) >= 1 ? "<th>Notices</th>" : ""}<th>Own initiative</th></tr></thead><tbody>${TR_CATS.filter(c => trRank(tr.tier) >= 1 || !TR_NOTICE_ONLY.includes(c)).map(c => { const r = tr.cat[c] || {};
+      return `<tr><td>${esc(c)}</td>${trRank(tr.tier) >= 1 ? `<td><input class="input mono" data-trc="${esc(c)}" data-trk="n" value="${esc(String(r.n || ""))}" inputmode="numeric" aria-label="${esc(c)}: notices"></td>` : ""}${TR_NOTICE_ONLY.includes(c) ? "<td></td>" : `<td><input class="input mono" data-trc="${esc(c)}" data-trk="o" value="${esc(String(r.o || ""))}" inputmode="numeric" aria-label="${esc(c)}: own-initiative measures"></td>`}</tr>`; }).join("")}</tbody></table>
+    <p class="note">The templates use 17 fixed categories: 14 kinds of content, one for other terms-and-conditions breaches, and two for cases where an authority or a reporter didn't say what kind of illegal content it was. You can't add top-level categories, only sub-categories within them.</p></details>`;
 }
 // Shared by the above-the-fold summary and the full report body, so the two never disagree.
 function trCatTableHTML(){
