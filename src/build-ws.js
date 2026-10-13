@@ -245,12 +245,24 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
     '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="627">',
     '<meta name="twitter:card" content="summary_large_image">',
     '<meta name="twitter:image" content="' + img + '">',
-    cfa ? "<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"" + cfa + "\"}'></script>" : ''
+    cfa ? "<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"" + cfa + "\", \"spa\": true}'></script>" : ''
   ].filter(Boolean).join("\n");
   const body = v9.replace(/^<title>[^<]*<\/title>\s*/, "");
   const out = headTags + "\n" + body + "\n</html>\n";
   const dir = path.join(D, "..", "docs");
   if(!fs.existsSync(dir)) fs.mkdirSync(dir);
   fs.writeFileSync(path.join(dir, "index.html"), out);
+  // sitemap.xml and robots.txt, from ROUTE_LABEL so they stay in step with the tools. The home page is the
+  // root; the personal views (workspace, plan, quarter review) are empty for a crawler and are left out.
+  // Search engines treat hash routes as one URL, so this is cheap insurance, not a promise of indexing.
+  if(site){
+    const labels = new Function("return " + /const ROUTE_LABEL = (\{[^;]*\});/.exec(fs.readFileSync(path.join(D, "partNav.js"), "utf8"))[1])();
+    const skip = ["overview", "workspace", "plan", "review"];
+    const urls = [site + "/"].concat(Object.keys(labels).filter(k => !skip.includes(k)).map(k => site + "/#" + k));
+    const x = u => u.replace(/&/g, "&amp;");
+    fs.writeFileSync(path.join(dir, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => "  <url><loc>" + x(u) + "</loc></url>").join("\n") + "\n</urlset>\n");
+    fs.writeFileSync(path.join(dir, "robots.txt"), "User-agent: *\nAllow: /\n\nSitemap: " + site + "/sitemap.xml\n");
+    console.log("sitemap.xml written with " + urls.length + " URLs, robots.txt");
+  }
   console.log("github-pages/index.html written" + (site ? " for " + site : " (preview image path is relative until site-url.txt is set)"));
 }
