@@ -8,7 +8,7 @@ const CR_GROUPS = [
   {t:"Models that read content", ic:"eval", c:"var(--t-ai)", intro:"Each one downloads from its maker's own repository, unchanged, and only when you ask. Nothing from them is bundled into this page.", items:[
     ["MiniLMv2 toxic", "minuva, distilled from Unitary's toxic-bert and trained on Jigsaw's Toxic Comment data", "The free baseline in the classifier eval. About 24 MB, runs in your browser.", "Apache-2.0", "https://huggingface.co/minuva/MiniLMv2-toxic-jigsaw-onnx"],
     ["toxic-bert", "Unitary, with an ONNX port by Xenova", "The eval's fallback baseline when MiniLMv2 can't load. About 111 MB.", "Apache-2.0", "https://huggingface.co/Xenova/toxic-bert"],
-    ["PolicyLM-1.7B", "Musubi, released with ROOST in October 2026", "Scores your cases against the policy you write, on your own computer, through the runner script. 3.5 GB.", "Apache-2.0", "https://huggingface.co/musubilabs/policylm-1.7b"],
+    ["PolicyLM-1.7B", "Musubi, released 6 October 2026 and listed in ROOST's Model Community", "Scores your cases against the policy you write, on your own computer, through the runner script. 3.5 GB.", "Apache-2.0", "https://huggingface.co/musubilabs/policylm-1.7b"],
     ["gpt-oss-safeguard", "OpenAI", "Labels your cases against a written policy and explains each label, on your own computer with Ollama, through the runner script. 14 GB.", "Apache-2.0", "https://huggingface.co/openai/gpt-oss-safeguard-20b"],
     ["Claude", "Anthropic", "In the Claude version only: writes test cases and labels them, reviews rules, drafts notices and appeal replies. Runs on your own Claude account, under Anthropic's terms.", "", "https://www.anthropic.com"]
   ]},
