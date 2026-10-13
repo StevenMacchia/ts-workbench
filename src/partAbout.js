@@ -9,7 +9,7 @@ const AB_GROUPS = [
     ["t-pm","radar","Abuse pre-mortem","A plain-language profile of a product becomes a scored risk register, a launch plan with owners, and the laws that likely apply."],
     ["t-cp","coppa","COPPA readiness","Works out whether the US children's privacy law applies, maps children's data, and turns gaps against the 2025 amended Rule into a plan and four drafts for Legal."],
     ["t-ds","dsa","DSA readiness","Works out which duties under the EU Digital Services Act apply to a service, article by article, and turns the gaps into a plan and four drafts: a statement of reasons, a notice-and-action procedure, a complaints process and a memo for Legal."]]],
-  ["Prepare", [["t-tt","siren","Incident tabletop","Crisis scenarios across eight company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law."],
+  ["Prepare", [["t-tt","siren","Incident tabletop",`Crisis scenarios across ${ALL_TYPES.length} company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law.`],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
     ["t-rt","shield","Red team studio","Plans a red team of a language or world model from nine questions: a coverage grid, seed cards with benign twins, drills that fit the team, findings, and exports for open-source harnesses."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],
@@ -24,8 +24,8 @@ const AB_JOURNEY = [["user","var(--faint)","Set up","Company type, stage and reg
 function renderAbout(){
   const lawSteps = SCENARIOS.reduce((a,s)=>a+s.steps.filter(x=>x.law).length, 0);
   const versions = typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.reduce((a,s)=>a+(s.vars ? ALL_TYPES.length : 1), 0);
-  const tools = AB_GROUPS.reduce((a, g) => a + g[1].length, 0);
-  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[versions,`tabletop scenario versions ${tip(`${SCENARIOS.length} scenarios, each written for up to ${ALL_TYPES.length} sectors`)}`],[lawSteps,"decisions with law notes"],
+  const tools = TOOL_ROUTES.length; // AB_GROUPS lists the same tools, one card each (test-v9 checks they agree)
+  const stats = [[HARMS.length,"abuse risks modeled"],[Object.keys(SG).length,"safeguards with owners"],[SCENARIOS.length,`crisis scenarios, in ${versions} versions ${tip(`Each scenario is written for up to ${ALL_TYPES.length} sectors, which makes ${versions} playable versions`)}`],[lawSteps,"decisions with law notes"],
     [typeof MA_AREAS !== "undefined" ? MA_AREAS.length * 5 : 40,"maturity level descriptions"],[typeof CV_AREAS !== "undefined" ? CV_AREAS.length * CV_LAYERS.length : 40,"coverage checks"]];
   const decisions = [
     ["Private by default","Work is stored on the visitor's own device, so teams can describe unreleased products freely. A workspace file carries it to another device. AI features run only on a click, on the visitor's own Claude account." + (typeof STANDALONE !== "undefined" && STANDALONE ? " The website counts visits with Cloudflare Web Analytics, which uses no cookies and never sees what you type." : "")],
@@ -74,7 +74,7 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>Designed for learning</h2>
       <p>The tabletop turns mistakes into teaching moments. Pick a weaker call and you see what happened, how your choice compares with the strongest one on safety, trust, regulatory standing and team capacity, the principle behind it, and the relevant law. Then you can try again.</p>
-      <p>Universal scenarios, like an account takeover wave or a government takedown order, rewrite themselves for eight company types, so a fintech team and a gaming studio each rehearse their own version of the crisis.</p>
+      <p>Universal scenarios, like an account takeover wave or a government takedown order, rewrite themselves for ${ALL_TYPES.length} company types, so a fintech team and a gaming studio each rehearse their own version of the crisis.</p>
     </section>
 
     <section class="ab-sec rise">
@@ -91,7 +91,7 @@ function renderAbout(){
 
     <section class="ab-sec ab-note rise">
       <h2>Limits and what's next</h2>
-      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}. Next: a transparency report drafter and a rebuilt metrics flow.</p>
+      <p>This is a starting point for conversations with Legal, Policy and Engineering, not legal advice or an audit. Every law note links to its official source and was last reviewed in ${LAW_REVIEWED}.</p>
     </section>
   </article>`;
   const scores = $("#ab-scores"); if(scores) $$('[data-ab="scores"]').forEach(b => b.onclick = () => scores.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}));

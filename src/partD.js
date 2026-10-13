@@ -228,6 +228,18 @@ const PRESETS = {
   delivery:{name:"Delivery platform (example)", type:"gig", youth:"adult_verified", aud:["creators"], adult:"none", identity:"verified", contact:"limited", money:["p2p","payouts"], regions:["us","ca"], scale:"large", team:"mature", features:["signup","login","profiles","dm","location","meetups","reviews","referrals"]},
   creator:{name:"Creator subscription site (example)", type:"creator", youth:"adult_verified", aud:["creators"], adult:"explicit", identity:"verified", contact:"strangers", money:["subs","payouts","p2p"], regions:["us","uk","eu"], scale:"mid", team:"dedicated", features:["signup","login","profiles","dm","posts","media","live","discovery"]}
 };
+// The harm areas (CATS keys) that define each kind of product. The plan's first actions come from these before the
+// actions every platform needs (child safety, law-enforcement requests, reporting), so a marketplace sees fraud,
+// scams and prohibited goods first. Every PLATFORMS key has an entry.
+const TYPE_CATS = {
+  social:["harass","violent","integrity"], messaging:["fraud","security","harass"], video:["violent","harass","illegal"], creator:["sexual","fraud","illegal"],
+  marketplace:["fraud","illegal","integrity"], fintech:["fincrime","fraud","security"], crypto:["fincrime","fraud","security"], gaming:["harass","fraud","security"],
+  dating:["sexual","fraud","physical"], genai:["ai","violent","selfharm"], gig:["physical","fraud","integrity"], rentals:["fraud","physical","privacy"],
+  edtech:["privacy","harass","selfharm"], health:["selfharm","privacy","fraud"], workplace:["security","privacy","harass"]
+};
+// How the built-in example of each kind of product is described in a benchmark line ("Typical for a growing marketplace")
+const BENCH_NOUN = {social:"social app", fintech:"payments app", marketplace:"marketplace", gaming:"game", genai:"AI companion app", dating:"dating app", gig:"gig platform", creator:"creator subscription site"};
+const BENCH_STAGE = {prelaunch:"pre-launch", small:"early-stage", mid:"growing", large:"large-scale"};
 
 /* =========================================================
    SHARED: letter grades, undo-able resets, shareable result links

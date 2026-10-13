@@ -315,17 +315,10 @@ renderAI = function(key){
   introBind(key, () => renderAI9(key));
 };
 
-// "Start over" / "New": the tools that offer a full reset also drop the card back in front, so
-// starting fresh starts fresh. (Tabletop, vendors, metrics, notice, appeal, transparency, plan,
-// review and workspace have no equivalent whole-tool reset control.)
-const INTRO_RESET_SEL = [["premortem", '[data-act="new"]'], ["coppa", '[data-cp="reset"]'], ["dsa", '[data-ds="reset"]'],
-  ["maturity", '[data-ma="reset"]'], ["coverage", '[data-cv="reset"]'], ["policy", "#pol-reset"], ["eval", '[data-ev="reset"]']];
-if(typeof document !== "undefined" && document.addEventListener){
-  document.addEventListener("click", e => {
-    if(!e.target || !e.target.closest) return;
-    INTRO_RESET_SEL.forEach(([route, sel]) => { if(e.target.closest(sel)) store.set("intro:" + route, false); });
-  });
-}
+// Start over / New does not bring the card back. An earlier listener cleared the seen flag on those buttons, but it ran after the
+// tool's own click handler had already drawn the first question, so the NEXT redraw (a number key or a click on an answer)
+// bounced back to the card; and Undo would have restored the work behind it. The card is shown once, on the first visit to a
+// route, and "How this works" reopens it from any screen. test-walk.js presses a key on the first question of each tool.
 
 // The "How this works" link: every one of these 16 pages already carries a selector-based page
 // tour from helpBtn() in partHELP.js ("How this page works", PAGE_TOURS). That tour has its own job,

@@ -46,8 +46,12 @@ function ctx(p){
 function assess(p){
   const c = ctx(p);
   const risks = [];
+  // Until the under-18 question is answered we can't tell whether children are present, so the child-safety
+  // risks are not rated at all (they would otherwise be assumed at their worst). They come back, rated, once it is.
+  const youthPending = !p.youth; let pendingChild = 0;
   HARMS.forEach(h => {
     if(!h.req(c)) return;
+    if(youthPending && h.cat==="child"){ pendingChild++; return; }
     const drivers = (h.drv ? h.drv(c) : []).filter(x=>x[0]);
     const reducers = (h.red ? h.red(c) : []).filter(x=>x[0]);
     const ups = (h.up ? h.up(c) : []).filter(x=>x[0]);
@@ -65,7 +69,7 @@ function assess(p){
   const add = id => map[id] || (map[id] = {id, ...SG[id], rank:0, covers:[], critCovers:0, legal:null});
   // The first three safeguards listed for a harm are its core controls and take the risk's full priority;
   // supporting controls sit one tier lower.
-  risks.forEach(r => r.sgs.forEach((id, i) => { const s = add(id); s.rank = Math.max(s.rank, Math.max(0, BANDS[r.band][2] - (i < 3 ? 0 : 1))); s.covers.push(r.n); if(r.band==="crit") s.critCovers++; }));
+  risks.forEach(r => r.sgs.forEach((id, i) => { const s = add(id); s.rank = Math.max(s.rank, Math.max(0, BANDS[r.band][2] - (i < 3 ? 0 : 1))); s.covers.push(r.n); (s.cats || (s.cats = [])).push(r.cat); if(r.band==="crit") s.critCovers++; }));
   obligations.forEach(o => o.sg.forEach(id => {
     const s = add(id);
     if(o.status==="applies"){ s.legal = "applies"; if(o.bump!==false) s.rank = 3; }
@@ -76,19 +80,25 @@ function assess(p){
 
   const counts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>counts[r.band]++);
   const postureOf = n => n.crit>=4 ? ["Severe","crit"] : (n.crit>=1||n.high>=5) ? ["High","high"] : n.high>=1 ? ["Moderate","med"] : risks.length ? ["Low","good"] : ["Not assessed",""];
-  const posture = postureOf(counts);
+  // Child-safety risks are unrated until the under-18 question is answered, so the overall band is only partly known
+  const posture = youthPending ? ["Partly rated",""] : postureOf(counts);
   // Residual risk: safeguards in place make harm less likely, not less severe. A risk's likelihood falls
   // one step once half of its safeguards are done and two steps when all are, never below Rare.
   const done = p.done || {};
   risks.forEach(r => { r.sgDone = r.sgs.filter(id => done[id]).length; r.cut = r.sgs.length ? Math.min(r.lik - 1, Math.floor(2 * r.sgDone / r.sgs.length + 1e-9)) : 0;
     r.rlik = r.lik - r.cut; r.rscore = r.sev * r.rlik; r.rband = bandOf(r.rscore); });
   const rcounts = {crit:0,high:0,med:0,low:0}; risks.forEach(r=>rcounts[r.rband]++);
-  const rposture = postureOf(rcounts);
+  const rposture = youthPending ? ["Partly rated",""] : postureOf(rcounts);
   const total = risks.reduce((a,r)=>a+r.score,0), rtotal = risks.reduce((a,r)=>a+r.rscore,0);
   const decisions = (DECISIONS[p.type]||[]).map((q,i)=>({id:p.type+"-"+i, q, src:labelOf(PLATFORMS,p.type)}))
     .concat(derivedDecisions(c).map((q,i)=>({id:"d-"+q.slice(0,24), q, src:"Your profile"})));
-  return {c, risks, obligations, safeguards, counts, posture, decisions, rcounts, rposture, total, rtotal};
+  return {c, risks, obligations, safeguards, counts, posture, decisions, rcounts, rposture, total, rtotal, youthPending, pendingChild};
 }
+
+// Is this action mainly about the harm areas typical of the kind of product (TYPE_CATS, partD.js)? At least half of the
+// risks it covers must sit in those areas, so a control that protects against a bit of everything (a law-enforcement
+// request process, reporting) counts as one every platform needs.
+const sgOwn = (s, type) => { const own = (s.cats || []).filter(c => (TYPE_CATS[type] || []).includes(c)).length; return own > 0 && own * 2 >= s.cats.length; };
 
 /* ---------- state ---------- */
 const blankPM = () => ({name:"", type:"", youth:"", aud:[], adult:"none", identity:"", contact:"", money:[], regions:[], scale:"", team:"", features:[], done:{}, notes:{}, stage:"ask", qi:0, answered:{}, impact:null, tab:"plan", group:"tier", filter:{cell:"",cat:"",band:""}, example:false});

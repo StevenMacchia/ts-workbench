@@ -6,7 +6,7 @@ const QS = [
    tip:"Your sector sets the baseline. Fintech and crypto raise fraud and money-laundering risks; dating raises offline-safety risks. It also decides which policy questions we ask."},
   {k:"features", sec:"Your product", t:"What can people do in it?", h:"We've pre-selected what's typical for this kind of product. Adjust it to match yours, or to just the feature you're launching.", kind:"features",
    tip:"Each capability switches on the risks it enables. Private messaging brings grooming and scams; image uploads bring CSAM and intimate-image abuse; AI generation brings deepfakes and jailbreaks."},
-  {k:"youth", sec:"Your users", t:"Could anyone under 18 use it?", h:"This changes more than any other answer. A rule that says “18+” doesn't keep children out unless you check.", kind:"single",
+  {k:"youth", sec:"Your users", t:"Could anyone under 18 use it?", h:"This changes more than any other answer. A rule that says “18+” doesn't keep children out unless you check.", kind:"single", required:true,
    tip:"Under-18s raise the likelihood and severity of child-safety risks and trigger children's laws in most countries. “18+ without checks” is still treated as minors being present, just fewer of them.", opts:[
     {k:"kids", n:"Yes, it's made for children", h:"Under-13s are part of the audience"},
     {k:"teens", n:"Yes, teens can join", h:"Teens and adults use it together"},
@@ -23,7 +23,7 @@ const QS = [
     {k:"none", n:"No", h:"It isn't allowed anywhere"},
     {k:"nudity", n:"Some nudity", h:"Art, education, breastfeeding, or behind a warning"},
     {k:"explicit", n:"Yes, explicit content", h:"Sexual content is allowed or sold"}]},
-  {k:"contact", sec:"How people interact", t:"Can people contact someone they don't know?", h:"Most grooming, scams and harassment start with a message from a stranger.", kind:"single", skip:p=>!["dm","groups","voice","live"].some(f=>p.features.includes(f)), skipVal:"none",
+  {k:"contact", sec:"How people interact", t:"Can people contact someone they don't know?", h:"Most grooming, scams and harassment start with a message from a stranger.", kind:"single", skip:p=>p.features.length>0 && !["dm","groups","voice","live"].some(f=>p.features.includes(f)), skipVal:"none",
    tip:"Stranger contact is the biggest driver of grooming, sextortion, scams and harassment. Requiring a connection first lowers all of them.", opts:[
     {k:"strangers", n:"Yes, anyone can message anyone", h:"People can find and contact strangers"},
     {k:"limited", n:"Only after they connect", h:"A match, follow-back, invite or purchase comes first"},
@@ -57,9 +57,20 @@ const QS = [
 let pm = store.get("pm3", null) || Object.assign(fromPreset("teen_social"), {stage:"start"});
 // A rough 0-100 so the exposure band can show a grade: Low/Moderate/High/Severe mapped to a representative percentage
 const PM_BAND_PCT = {Low:92, Moderate:76, High:50, Severe:20};
-// The built-in teen social example's own exposure band, for a benchmark line under the verdict
-function pmBenchBand(){ try{ return assess(fromPreset("teen_social")).posture[0]; }catch(e){ return null; } }
-shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
+// The exposure band of the built-in example that matches the reader's own kind of product, for a benchmark line under
+// the verdict: {band, label:"growing marketplace"}. Matches on product type, and on whether minors are in the audience
+// (a teen social app is no benchmark for an adults-only network). No matching example, or nothing answered yet: null,
+// and the line is left out.
+function pmBench(p){
+  try{
+    if(!p.type || !p.youth || !BENCH_NOUN[p.type]) return null;
+    const minors = y => y==="kids" || y==="teens";
+    const pr = Object.values(PRESETS).find(x => x.type===p.type && minors(x.youth)===minors(p.youth));
+    if(!pr) return null;
+    const who = pr.youth==="teens" ? "teen " : pr.youth==="kids" ? "kids' " : "";
+    return {band:assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(pr)))).posture[0], label:`${BENCH_STAGE[pr.scale]} ${who}${BENCH_NOUN[p.type]}`};
+  }catch(e){ return null; }
+}shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
 const savePM = () => { if(pm.saved){ pm.updated = Date.now(); const lib = libLoad(); lib[pm.id] = recordOf(pm); libSave(lib); } store.set("pm3", pm); };
 const visibleQs = () => QS.filter(q => !(q.skip && q.skip(pm)));
 const applySkips = () => QS.forEach(q => { if(q.skip && q.skip(pm)) pm[q.k] = q.skipVal; });
@@ -158,7 +169,8 @@ function askScreen(){
   if(Q.kind==="multi"){
     const extra = Q.none ? `<button type="button" class="gd-opt opt-key" data-none="${Q.k}" aria-pressed="${!pm[Q.k].length && !!pm.answered[Q.k]}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.none)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`
       : `<button type="button" class="gd-opt opt-key" data-all="${Q.k}" aria-pressed="${pm[Q.k].length===Q.opts.length}"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><span class="gd-oh"><b>${esc(Q.all)}</b></span></span>${Q.opts.length<9?`<kbd aria-hidden="true">${Q.opts.length+1}</kbd>`:""}</button>`;
-    body = `<p class="note gd-multi-n">Choose all that apply.</p><div class="gd-opts gd-grid" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
+    const typ = PLATFORMS.find(x=>x.k===pm.type), pre = Q.k==="money" && typ && typ.m.length && sameSet(pm.money, typ.m), n = pm[Q.k].length;
+    body = `<p class="note gd-multi-n" aria-live="polite">Choose all that apply.${pre ? ` Pre-selected for ${esc(typ.n.toLowerCase())}: a number key or a click switches an option on or off.` : n ? ` ${n} selected.` : pm.answered[Q.k] ? "" : ` Nothing is selected yet. Pick what applies${Q.none ? `, or “${esc(Q.none)}”` : ""}.`}</p><div class="gd-opts gd-grid" role="group" aria-label="${esc(Q.t)}">${Q.opts.map((o,i)=>optCard(Q,o,i,pm[Q.k].includes(o.k),true)).join("")}${extra}</div>`;
   }
   if(Q.kind==="features"){
     const t = PLATFORMS.find(x=>x.k===pm.type);
@@ -177,7 +189,7 @@ function askScreen(){
       ${body}
       <div class="gd-foot">
         ${pm.qi>0?`<button type="button" class="btn" data-back="1">Back</button>`:`<button type="button" class="btn" data-act="home">Cancel</button>`}
-        <span class="gd-foot-r"><span class="note">${Q.kind==="single"||Q.kind==="multi" ? "Number keys pick an answer, " : ""}Enter continues.</span><button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button></span>
+        <span class="gd-foot-r"><span class="note">${Q.kind==="single"||Q.kind==="multi" ? "Number keys pick an answer, " : ""}${Q.required && !answered ? "Enter waits for an answer here." : "Enter continues."}</span><button type="button" class="btn primary" data-next="1">${last?"See my report":answered?"Next":"Skip for now"} ${icon("arrow")}</button></span>
       </div>
     </div>
     <aside class="gd-aside" aria-label="What your answers change">${livePanel(assess(pm))}</aside></div>
@@ -250,6 +262,13 @@ function renderPremortem(){
 }
 // A question showing a selection (a default, or a pre-fill from workspace settings) counts as answered once the person moves on
 const qHasValue = Q => Q.kind === "single" ? !!pm[Q.k] : Q.kind === "multi" ? pm[Q.k].length > 0 : false;
+// Whether starting over would throw away answers the person gave: not on a built-in example, and not on a blank
+// assessment (the start screen's own "Start a new assessment" on a fresh visit holds nothing to clear)
+const pmHasWork = p => {
+  if(p.example) return false;
+  const fresh = orgPrefillPM(blankPM()); // what "new" would give: blank, or pre-filled from the workspace settings
+  return !!p.name || ![...PROFILE_KEYS, "answered"].every(k => JSON.stringify(p[k]) === JSON.stringify(fresh[k]));
+};
 function goNext(){
   const qs = visibleQs(), Q = qs[pm.qi];
   if(Q && qHasValue(Q)) pm.answered[Q.k] = true;
@@ -273,9 +292,11 @@ function bindPremortem(){
     const b = e.target.closest("button"); if(!b) return;
     const d = b.dataset;
     if(d.set){ const k = d.set, v = d.v; withImpact(() => { if(k==="type") setType(v); else pm[k] = v; }); pm.answered[k] = true; return rerender(); }
-    if(d.toggle){ const k = d.toggle; withImpact(() => { const a = pm[k]; pm[k] = a.includes(d.v) ? a.filter(x=>x!==d.v) : a.concat(d.v); }); pm.answered[k] = true; return rerender(); }
+    if(d.toggle){ const k = d.toggle; withImpact(() => { const a = pm[k]; pm[k] = a.includes(d.v) ? a.filter(x=>x!==d.v) : a.concat(d.v); });
+      // Switching every option off is not an answer: only the explicit "none" button records one, so an emptied list is never reported as "None"
+      pm.answered[k] = pm[k].length > 0; return rerender(); }
     if(d.none){ withImpact(() => { pm[d.none] = []; }); pm.answered[d.none] = true; return rerender(); }
-    if(d.all){ const Q = QS.find(q=>q.k===d.all); withImpact(() => { pm[d.all] = pm[d.all].length===Q.opts.length ? [] : Q.opts.map(o=>o.k); }); pm.answered[d.all] = true; return rerender(); }
+    if(d.all){ const Q = QS.find(q=>q.k===d.all); withImpact(() => { pm[d.all] = pm[d.all].length===Q.opts.length ? [] : Q.opts.map(o=>o.k); }); pm.answered[d.all] = pm[d.all].length > 0; return rerender(); }
     if(d.next) return goNext();
     if(d.back){ pm.qi = Math.max(0, pm.qi-1); return rerender(); }
     if(d.goq) return goToQuestion(d.goq);
@@ -292,7 +313,9 @@ function bindPremortem(){
     if(d.cell!==undefined){ pm.filter.cell = pm.filter.cell===d.cell ? "" : d.cell; pm.tab = "register"; return rerender(); }
     if(d.cat!==undefined){ pm.filter.cat = pm.filter.cat===d.cat ? "" : d.cat; pm.tab = "register"; return rerender(); }
     switch(d.act){
-      case "new": { const snap = JSON.parse(JSON.stringify(pm)); pm = orgPrefillPM(blankPM()); rerender(); withUndo("Cleared", snap, s2 => { pm = s2; savePM(); renderPremortem(); }); return; }
+      case "new": { const snap = JSON.parse(JSON.stringify(pm)), had = pmHasWork(pm); pm = orgPrefillPM(blankPM()); rerender();
+        // Only offer Undo when something was actually replaced: the start screen and a built-in example hold nothing of the person's
+        if(had) withUndo("Cleared", snap, s2 => { pm = s2; savePM(); renderPremortem(); }); return; }
       case "sharelink": return shareCopy("premortem", pm, {name:pm.name, type:pm.type, posture:assess(pm).posture[0]}, $("#pm-toast"));
       case "unshare": { pm.shared = false; savePM(); pm.flash = "Saved. It's yours to edit now."; return rerender(); }
       case "report": pm.stage = "report";
@@ -334,5 +357,15 @@ document.addEventListener("keydown", e => {
   const tag = (e.target.tagName||"").toLowerCase();
   if(tag==="input" || tag==="textarea" || tag==="select"){ if(e.key==="Enter" && e.target.id==="pm-name"){ e.preventDefault(); goNext(); } return; }
   if(/^[1-9]$/.test(e.key)){ const btn = $$("#pm-root .opt-key")[+e.key-1]; if(btn){ e.preventDefault(); btn.click(); } }
-  else if(e.key==="Enter" && tag!=="button" && tag!=="a" && tag!=="summary"){ e.preventDefault(); goNext(); }
+  else if(e.key==="Enter" && tag!=="button" && tag!=="a" && tag!=="summary"){ e.preventDefault(); pmEnter(); }
 });
+// Enter continues, except on a required question nobody has answered: the under-18 answer decides how child-safety
+// risks are rated, so only the visible "Skip for now" button (a deliberate click) can pass it. Returns whether it moved on.
+function pmEnter(){
+  const Q = visibleQs()[pm.qi];
+  if(Q && Q.required && !pm.answered[Q.k] && !qHasValue(Q)){
+    const t = $("#pm-toast"); if(t){ t.textContent = "Pick an answer to continue. This one decides how child-safety risks are rated. You can still choose Skip for now."; setTimeout(() => { t.textContent = ""; }, 5000); }
+    return false;
+  }
+  goNext(); return true;
+}

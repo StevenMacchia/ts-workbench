@@ -46,11 +46,11 @@ function answerChips(){
     ["type","Product",labelOf(PLATFORMS,pm.type)||"Not answered"],
     ["features","Capabilities",pm.features.length+" selected"],
     ["youth","Under-18s",optLabel("youth")],
-    ["aud","Groups",pm.aud.length?pm.aud.map(k=>QS[3].opts.find(o=>o.k===k).n).join(", "):"None"],
+    ["aud","Groups",pm.aud.length?pm.aud.map(k=>QS[3].opts.find(o=>o.k===k).n).join(", "):pm.answered.aud?"None":"Not answered"],
     ["adult","Sexual content",optLabel("adult")],
     ["contact","Strangers can make contact",optLabel("contact")],
     ["identity","To sign up",optLabel("identity")],
-    ["money","Money",pm.money.length?pm.money.map(k=>QS[7].opts.find(o=>o.k===k).n).join(", "):"None"],
+    ["money","Money",pm.money.length?pm.money.map(k=>QS[7].opts.find(o=>o.k===k).n).join(", "):pm.answered.money?"None":"Not answered"],
     ["regions","Where",pm.regions.map(k=>labelOf(REGIONS,k)).join(", ")||"Not answered"],
     ["scale","Size",optLabel("scale")],
     ["team","Safety team",optLabel("team")]
@@ -60,22 +60,29 @@ function answerChips(){
 function startHere(r){
   const catScore = {}; r.risks.forEach(x=>catScore[x.cat]=(catScore[x.cat]||0)+x.score);
   const topCats = Object.keys(catScore).sort((a,b)=>catScore[b]-catScore[a]).slice(0,2).map(k=>CATS[k].toLowerCase());
-  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
-  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, firstBlocker = blockers.find(s=>!pm.done[s.id]);
+  // The first actions come from the harms typical of this kind of product (a marketplace: fraud, scams, prohibited
+  // goods), then the actions every platform needs. Within each group the order is the usual one: priority, then reach.
+  const sgOwnTop = s => sgOwn(s, pm.type) && s.rank >= 2;
+  const todo = r.safeguards.filter(s=>!pm.done[s.id]).sort((a,b)=>(sgOwnTop(b)?1:0)-(sgOwnTop(a)?1:0) || b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length).slice(0,3);
+  const ownTyp = PLATFORMS.find(x=>x.k===pm.type), ownTop = todo.some(sgOwnTop);
+  const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length, firstBlocker = blockers.filter(s=>!pm.done[s.id]).sort((a,b)=>(sgOwn(b,pm.type)?1:0)-(sgOwn(a,pm.type)?1:0))[0];
   const blockerClause = firstBlocker ? ` Start with: ${gloss(firstBlocker.t.split(",")[0].split("(")[0].trim())}.` : blockers.length ? " Every launch blocker is done." : "";
   const applies = r.obligations.filter(o=>o.status==="applies").length;
-  const summary = r.posture[0]==="Low"
+  const pending = !!r.youthPending;
+  const summary = pending
+    ? `<strong>Answer the under-18 question to rate child-safety risks.</strong>${r.pendingChild ? ` ${r.pendingChild} child-safety risk${r.pendingChild===1?" isn't":"s aren't"} rated yet, and no grade is given until they are.` : ""}${r.risks.length ? ` The other ${r.risks.length} are rated: ${r.counts.crit} critical and ${r.counts.high} high, mostly in ${topCats.join(" and ")}.` : ""}${blockerClause}`
+    : r.posture[0]==="Low"
     ? `Your risks are mostly low. The most useful things to do first are below.`
     : `This has <strong>${r.posture[0].toLowerCase()} risk exposure</strong>: ${r.counts.crit} critical and ${r.counts.high} high-rated risks, mostly in ${topCats.join(" and ")}.${r.rposture[0] !== r.posture[0] ? ` With the safeguards you've ticked, it's down to <strong>${r.rposture[0].toLowerCase()}</strong>.` : ""}${blockerClause}`;
   // The numbers used to sit in their own four-tile dashboard; said in one line instead, each one naming what it counts
   const counted = `You've logged <strong>${r.risks.length} risk${r.risks.length===1?"":"s"}</strong>, each scored severity × likelihood. ${bDone} of ${blockers.length} launch blockers are done, and ${applies} of ${r.obligations.length} legal duties apply across ${pm.regions.length} jurisdiction${pm.regions.length===1?"":"s"} you named.`;
-  const bandPct = PM_BAND_PCT[r.posture[0]], benchBand = !pm.example ? pmBenchBand() : null;
+  const bandPct = pending ? undefined : PM_BAND_PCT[r.posture[0]], bench = !pm.example && !pending ? pmBench(pm) : null;
   return `<div class="card starthere">
     <div class="card-b" style="display:grid;gap:14px">
       <div><span class="eyebrow">Start here ${tip("The three open actions that cover your most serious risks, ordered by priority and by how many critical risks each one addresses.")}</span>
-        <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
-        ${benchBand ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${benchBand} risk exposure</p>` : ""}<p class="note">${counted}</p></div>
-      ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div><ol class="firstlist">${todo.map(s=>`<li>
+        <div class="verdict-row" aria-live="polite"><p class="lead">${summary}</p>${pending ? `<button type="button" class="btn sm primary" data-goq="youth">Answer it</button>` : bandPct !== undefined ? gradeBadge(bandPct, `Derived from the exposure band: Low→92, Moderate→76, High→50, Severe→20, not a literal percentage`) : ""}</div>
+        ${bench ? `<p class="bench-line">Typical for ${/^[aeiou]/i.test(bench.label) ? "an" : "a"} ${esc(bench.label)} like the built-in example: ${bench.band} risk exposure</p>` : ""}<p class="note">${counted}</p></div>
+      ${todo.length ? `<div><div class="eyebrow" style="margin-bottom:8px">Do these first</div>${ownTyp && ownTop ? `<p class="note" style="margin:-2px 0 8px">Ordered by the harms most common for ${esc(ownTyp.n.toLowerCase())}, ahead of the actions every platform needs.</p>` : ""}<ol class="firstlist">${todo.map(s=>`<li>
         <label class="first"><input type="checkbox" data-sg="${s.id}"><span><span class="t">${gloss(s.t)}</span>
           <span class="meta">${ownerTag(s.o)}${effortTag(s.e)}${s.legal==="applies"?`${htag("legal","Legal requirement",LEGAL_TIP)}`:""}</span>
           ${s.covers.length?`<span class="covers">Protects against: ${s.covers.slice(0,3).map(esc).join(" · ")}${s.covers.length>3?` and ${s.covers.length-3} more`:""}</span>`:""}</span></label></li>`).join("")}</ol></div>`
@@ -214,7 +221,7 @@ const bandCounts = list => ["crit","high","med","low"].map(b=>[b, list.filter(x=
 const miniPills = list => bandCounts(list).map(([b,n])=>`<span class="pill ${BANDS[b][1]}">${n} ${BANDS[b][0].toLowerCase()}</span>`).join("");
 function tabPlan(r){
   const byOwner = pm.group==="owner";
-  const order = (a,b) => (pm.done[a.id]?1:0)-(pm.done[b.id]?1:0) || b.rank-a.rank || b.critCovers-a.critCovers || b.covers.length-a.covers.length;
+  const order = (a,b) => (pm.done[a.id]?1:0)-(pm.done[b.id]?1:0) || b.rank-a.rank || (sgOwn(b, pm.type)?1:0)-(sgOwn(a, pm.type)?1:0) || b.critCovers-a.critCovers || b.covers.length-a.covers.length;
   const groups = byOwner
     ? Object.keys(OWNERS).map(o=>{ const items = r.safeguards.filter(s=>s.o===o).sort(order); return {key:"own-"+o, title:`<b>${OWNERS[o]}</b>`, sub:`${items.filter(s=>s.rank===3).length} launch blockers`, items, dflt:items.some(s=>s.rank===3)}; })
     : TIERS.map(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r).sort(order); return {key:"tier-"+t.r, title:pill(["low","med","high","crit"][t.r], t.n), sub:t.h, items, dflt:t.r>=2}; });
@@ -280,7 +287,7 @@ function reportMarkdown(r){
   L.push(`# Abuse pre-mortem: ${pm.name||"Untitled assessment"}`, "");
   L.push(`**Profile:** ${labelOf(PLATFORMS,pm.type)}; ${labelOf(YOUTH,pm.youth)}; ${labelOf(IDENTITY,pm.identity)}; ${labelOf(CONTACT,pm.contact)}; adult content: ${labelOf(ADULT,pm.adult).toLowerCase()}; money: ${pm.money.map(k=>labelOf(MONEY,k)).join(", ")||"none"}; regions: ${pm.regions.map(k=>k.toUpperCase()).join(", ")||"none"}; scale: ${labelOf(SCALE,pm.scale)}; T&S: ${labelOf(TEAM,pm.team)}.`);
   L.push(`**Capabilities:** ${pm.features.map(k=>FEATURES[k][0]).join(", ")}`, "");
-  L.push(`**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`);
+  L.push(r.youthPending ? `**Overall exposure:** not graded yet. The under-18 question is unanswered, so ${r.pendingChild} child-safety risk${r.pendingChild===1?" is":"s are"} not rated. The ${r.risks.length} others: ${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low` : `**Overall exposure:** ${r.posture[0]} (${r.counts.crit} critical, ${r.counts.high} high, ${r.counts.med} medium, ${r.counts.low} low)`);
   L.push(`**After safeguards in place:** ${r.rposture[0]} (${r.rcounts.crit} critical, ${r.rcounts.high} high, ${r.rcounts.med} medium, ${r.rcounts.low} low). Total risk ${r.rtotal} of ${r.total}${r.total && r.rtotal < r.total ? `, down ${Math.round((r.total - r.rtotal) / r.total * 100)}%` : ""}.`, "");
   L.push("## Launch plan");
   TIERS.forEach(t=>{ const items = r.safeguards.filter(s=>s.rank===t.r); if(!items.length) return;

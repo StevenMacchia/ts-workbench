@@ -63,6 +63,10 @@ function seoUpdate(name){
     }
   }catch(e){}
 }
+// The tools, one entry per route, in the order the About page lists them. The single source for "how many tools":
+// the About page counts it, the home-page heading and the READMEs read it from this line (_build/gen-readmes.js
+// parses it). The guides, glossaries, plan and review pages are not tools. Add a new tool here, to ROUTE_LABEL and to AB_GROUPS.
+const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","dsa","tabletop","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
