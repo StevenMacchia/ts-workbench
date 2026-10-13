@@ -171,7 +171,7 @@ function itemRows(items){
       ? `<span class="row" style="gap:6px"><input class="input" id="wr-${it.id}" value="${esc(it.title||"")}" style="max-width:280px;padding:6px 9px"><button type="button" class="btn sm primary" data-ws-renameok="${it.id}">Save</button><button type="button" class="btn sm" data-ws="cancelrename">Cancel</button></span>`
       : `<b>${esc(it.title||"Untitled")}</b>`;
     return `<div class="wsrow">
-      <span class="libicon"><svg><use href="#${KINDS[it.kind].icon}"/></svg></span>
+      ${tileHTML(KINDS[it.kind].icon, TOOL_TONE[it.kind], "md")}
       <div class="libmain">${title}<span class="note">${KINDS[it.kind].n} · Updated ${fmtDate(it.updated)}</span></div>
       <div class="libstat">${s.html}</div>
       <label class="wsmove"><span class="visually-hidden">Project for ${esc(it.title||"this result")}</span><select class="select" data-ws-move="${it.id}">

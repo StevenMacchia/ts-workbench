@@ -132,7 +132,7 @@ function shellUpdate(name){
 /* ---------- command palette ---------- */
 function cmdkItems(){
   const out = [];
-  const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, icon:iconId, run:()=>goRoute(route)});
+  const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, tone:TOOL_TONE[route] || "neutral", icon:iconId, run:()=>goRoute(route)});
   go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("Your plan","plan","var(--accent)","send"); go("Quarter by quarter","review","var(--faint)","chart"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
@@ -140,8 +140,8 @@ function cmdkItems(){
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("Red team studio","redteam","var(--t-rt)","shield");
-  go("Learn","learn","var(--accent)","steps"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","monitor"); go("Glossary and practice","glossary","var(--accent)","doc"); go("T&S glossary","tsglossary","var(--accent)","doc");
-  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","plug");
+  go("Learn","learn","var(--accent)","book"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","world"); go("Glossary and practice","glossary","var(--accent)","glossary"); go("T&S glossary","tsglossary","var(--accent)","glossary");
+  go("Works with ROOST","roost","var(--accent)","plug"); go("About this project","about","var(--faint)","info"); go("Built with: credits and sources","credits","var(--faint)","wrench");
   if(typeof demoOn === "function") out.push({g:"Go to", label:demoOn() ? "Exit the demo company" : "Explore a demo company", sub:demoOn() ? "Bring back your own work" : "Every tool filled in for a fictional company", color:"var(--accent)", icon:"layers", run:() => demoOn() ? demoExit() : demoStart()});
   if(typeof helpTour === "function"){
     out.push({g:"Actions", label:"How this page works", sub:"A short tour of the page you're on", color:"var(--accent)", icon:"info", run:() => helpTour()});
@@ -149,11 +149,11 @@ function cmdkItems(){
   out.push({g:"Actions", label:"New pre-mortem assessment", sub:"", color:"var(--accent)", icon:"plus", run:newAssessment});
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","light"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
   Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(it =>
-    out.push({g:"Your saved work", label:it.title||"Untitled", sub:KINDS[it.kind].n, color:TOOL_COLOR[it.kind], icon:KINDS[it.kind].icon.replace("i-",""), run:()=>openSaved(it.id)}));
-  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", icon:"gauge", run:()=>{ goHash("metrics/" + mxSlug(m)); }}));
+    out.push({g:"Your saved work", label:it.title||"Untitled", sub:KINDS[it.kind].n, color:TOOL_COLOR[it.kind], tone:TOOL_TONE[it.kind] || "neutral", icon:KINDS[it.kind].icon.replace("i-",""), run:()=>openSaved(it.id)}));
+  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", tone:"measure", icon:"gauge", run:()=>{ goHash("metrics/" + mxSlug(m)); }}));
   const type = ttCompanyType();
   SCENARIOS.forEach((s,i) => { if(type!=="all" && !(s.types||[]).includes(type)) return; const v = ttScenario(i, type);
-    out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });
+    out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", tone:"assess", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });
   if(CMDK_HB.status === "done"){
     CMDK_HB.chapters.forEach(c => out.push({g:"Handbook", label:c.title||"", sub:c.summary||"", color:"var(--faint)", icon:"doc", run:()=>{ location.href = c.url; }}));
     CMDK_HB.posts.forEach(p => out.push({g:"Writing", label:p.title||"", sub:p.summary||"", color:"var(--faint)", icon:"info", run:()=>{ location.href = p.url; }}));
@@ -183,7 +183,7 @@ function cmdkDraw(){
   cmdk.sel = Math.min(cmdk.sel, Math.max(0, cmdk.shown.length-1));
   let g = "", h = "";
   cmdk.shown.forEach((x,i) => { if(x.g!==g){ g = x.g; h += `<li class="grp" role="presentation">${esc(g)}</li>`; }
-    h += `<li class="it" role="option" id="cmdk-o${i}" data-i="${i}" aria-selected="${i===cmdk.sel}"><span class="sb-glyph" style="background:${x.color}"><svg><use href="#i-${x.icon}"/></svg></span><span class="lbl">${esc(x.label)}</span>${x.sub?`<small>${esc(x.sub)}</small>`:""}</li>`; });
+    h += `<li class="it" role="option" id="cmdk-o${i}" data-i="${i}" aria-selected="${i===cmdk.sel}">${tileHTML(x.icon, x.tone || "neutral", "sm")}<span class="lbl">${esc(x.label)}</span>${x.sub?`<small>${esc(x.sub)}</small>`:""}</li>`; });
   if(CMDK_HB.status === "loading" && !q) h += `<li class="grp" role="presentation">Handbook</li><li class="cmdk-wait" role="presentation">Searching the handbook…</li>`;
   const list = $("#cmdk-list"); list.innerHTML = h || `<li class="grp">No matches. Try a tool, scenario or saved result.</li>`;
   $("#cmdk-q").setAttribute("aria-activedescendant", cmdk.shown.length ? "cmdk-o"+cmdk.sel : "");

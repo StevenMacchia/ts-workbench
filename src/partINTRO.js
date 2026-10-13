@@ -230,7 +230,7 @@ const INTRO_SPECS = {
 function introHTML(route){
   const s = INTRO_SPECS[route]; if(!s) return "";
   const label = (typeof ROUTE_LABEL !== "undefined" && ROUTE_LABEL[route]) || "";
-  return `<div class="card rtf-card intro-card"><span class="rtf-eb">${esc(label)}</span><h1 class="rtf-h1">${s.heading}</h1>
+  return `<div class="card rtf-card intro-card"><div class="intro-top">${routeTile(route, "md")}<span class="rtf-eb">${esc(label)}</span></div><h1 class="rtf-h1">${s.heading}</h1>
     <ul class="rtf-list rtf-intro-list">
       <li>Who it's for: ${s.who}</li>
       <li>What you leave with: ${s.leave}</li>

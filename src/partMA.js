@@ -326,7 +326,7 @@ function maPreviewHTML(){
 function maIntroHTML(){
   const rated = MA_AREAS.filter(a => ma.lv[a.k]).length, o = typeof orgGet === "function" ? orgGet() : {};
   return `<div class="gd-w gd-intro">
-    <span class="gd-tool"><span class="sb-glyph" style="background:var(--t-ma)"><svg><use href="#i-steps"/></svg></span>Program maturity</span>
+    <span class="gd-tool">${tileHTML("steps", "assess", "sm")}Program maturity</span>
     <h1>How strong is your Trust &amp; Safety program?</h1>
     <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
     <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>

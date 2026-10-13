@@ -112,9 +112,7 @@ const C = patch(rd("partC3.html"), [
    `<svg><use href="#i-home"/></svg>Overview</a>\n        <a class="navlink" href="#workspace" data-route="workspace"><svg><use href="#i-user"/></svg>My workspace</a>`]
 ], "partC3");
 
-const I = patch(rd("partI3.svg"), [
-  [`  <symbol id="i-sun"`, `  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c.9-3.9 3.9-6.2 7.5-6.2s6.6 2.3 7.5 6.2"/></g></symbol>\n  <symbol id="i-sun"`]
-], "partI3");
+const I = rd("partI3.svg"); // sprite is Lucide, applied by tools/screenshots/apply-lucide.js (ICONS.md)
 
 const W2 = rd("partW2.js") + `
 function pmProjectSelect(){
@@ -207,7 +205,7 @@ console.log("v8 assembled");
   // Report header becomes a document title; the detail heading gets its own spacing hook
   const F3_9 = patch(F3, [
     [`<div class="card"><div class="card-b" style="display:grid;gap:10px">\n      <div class="row" style="justify-content:space-between"><div><h2 style="font-size:20px">`,
-     `<div class="rephead"><div class="rephead-b">\n      <div class="row" style="justify-content:space-between;align-items:flex-end"><div><span class="rep-kicker"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem report</span><h2 class="rep-title">`],
+     `<div class="rephead"><div class="rephead-b">\n      <div class="row" style="justify-content:space-between;align-items:flex-end"><div><span class="rep-kicker"><span class="tile tile-sm" data-tone="assess" aria-hidden="true"><svg><use href="#i-radar"/></svg></span>Abuse pre-mortem report</span><h2 class="rep-title">`],
     [`<div class="section-title" style="margin-top:28px"><h2>The detail</h2>`, `<div class="section-title rep-detail"><h2>The detail</h2>`]
   ], "partF3 report header");
   const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css") + rd("partZ9.css") + rd("partZ10.css") + rd("partZ11.css") + rd("partZ12.css") + rd("partZ13.css") + rd("partZ14.css") + rd("partZ15.css") + rd("partZ16.css") + rd("partZ17.css") + rd("partZ18.css");

@@ -335,7 +335,7 @@ function cvIntroHTML(){
   const from = !src ? "No pre-mortem yet, so this maps coverage only. Run one to compare against real risk." : src === "all" ? `From your ${srcs.pms.length} saved pre-mortem${srcs.pms.length === 1 ? "" : "s"}, worst risk in each area.`
     : src.startsWith("pm:") ? `From the ${cvSrcName(cv)} pre-mortem.` : "From an example product. Run a pre-mortem for your own.";
   return `<div class="gd-w gd-intro">
-    <span class="gd-tool"><span class="sb-glyph" style="background:var(--t-cv)"><svg><use href="#i-cover"/></svg></span>Coverage radar</span>
+    <span class="gd-tool">${tileHTML("cover", "assess", "sm")}Coverage radar</span>
     <h1>Do your defenses keep up with your risk?</h1>
     <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
     <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><svg class="gd-fi"><use href="#i-lock"/></svg><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>

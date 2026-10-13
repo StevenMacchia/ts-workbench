@@ -43,7 +43,7 @@ function gdIntroHTML(spec){
   const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
   const resume = n > 0 && n < st.length && gdHas(st[0]);
   return `<div class="gd-w gd-intro">
-    <span class="gd-tool"><span class="sb-glyph" style="background:${T.color}"><svg><use href="#i-${T.icon}"/></svg></span>${esc(T.name)}</span>
+    <span class="gd-tool">${tileHTML(T.icon, toneOfColor(T.color), "sm")}${esc(T.name)}</span>
     <h1>${I.title}</h1>
     <p class="gd-lead">${I.lead}</p>
     ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}

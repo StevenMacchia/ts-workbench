@@ -93,9 +93,9 @@ function newMenuToggle(open){
 {
   const m = $("#tb-menu");
   if(m && m.innerHTML !== undefined){
-    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><span><b>${n}</b><small>${d}</small></span></button>`).join("")
+    m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}">${tileHTML(ic, TOOL_TONE[k], "md")}<span><b>${n}</b><small>${d}</small></span></button>`).join("")
       + `<div class="tb-newsep" role="separator">Start from a template</div>`
-      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}"><span class="sb-glyph" style="background:var(--faint)"><svg><use href="#i-${t.icon}"/></svg></span><span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
+      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}">${tileHTML("layers", "neutral", "md")}<span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
     m.addEventListener("click", e => { const nb = e.target.closest("[data-new]"); const tb = e.target.closest("[data-tpl]");
       if(nb){ newMenuToggle(false); NEW_ITEMS[+nb.dataset.new][5](); return; }
       if(tb){ newMenuToggle(false); templateItems()[+tb.dataset.tpl].run(); return; } });

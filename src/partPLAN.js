@@ -19,7 +19,7 @@ const PL_SHOW = 8, plMore = {};
 function planItemHTML(x, i){
   const color = TOOL_COLOR[x.kind] || "var(--accent)";
   return `<li class="nx-i pl-i ${x.done ? "done" : ""}">
-    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `<span class="sb-glyph nx-g" style="background:${color}"><svg><use href="#i-${{premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa", dsa:"dsa"}[x.kind]}"/></svg></span>`}
+    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `${tileHTML({premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa", dsa:"dsa"}[x.kind], TOOL_TONE[x.kind], "sm")}`}
     <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color} 65%, var(--ink))">${esc(PLAN_KIND[x.kind])}</span><span>${esc(x.ctx)}</span></small></div>
     <a class="nx-open" href="#${x.go || {premortem:"premortem", maturity:"maturity", coppa:"coppa", dsa:"dsa"}[x.kind]}" aria-label="Open in ${esc(PLAN_KIND[x.kind])}">${icon("arrow")}</a></li>`;
 }

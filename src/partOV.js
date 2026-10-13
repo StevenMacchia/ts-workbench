@@ -36,7 +36,7 @@ function pmCurrentHero(){
   const tone = r.posture[1] ? `var(--${r.posture[1]})` : "var(--faint)";
   return `<section class="ov-hero pm-cur" aria-label="Current assessment">
     <div class="ov-hl">
-      <div class="ov-eb"><span class="sb-glyph" style="background:var(--t-pm)"><svg><use href="#i-radar"/></svg></span>${pm.example ? "Example assessment" : "Pick up where you left off"}${pm.updated ? (relTime(pm.updated) === "now" ? " · updated just now" : " · updated " + relTime(pm.updated) + " ago") : ""}</div>
+      <div class="ov-eb">${tileHTML("radar", "assess", "sm")}${pm.example ? "Example assessment" : "Pick up where you left off"}${pm.updated ? (relTime(pm.updated) === "now" ? " · updated just now" : " · updated " + relTime(pm.updated) + " ago") : ""}</div>
       <h2>${esc(pm.name || "Untitled assessment")}</h2>
       <div class="ov-chips">
         <span class="ov-status" style="color:${tone};border-color:color-mix(in oklab, ${tone} 35%, transparent)"><span class="sdot" style="background:${tone}"></span>${r.posture[0]} exposure</span>

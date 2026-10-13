@@ -53,12 +53,12 @@ function renderAbout(){
     <section class="ab-sec rise">
       <h2>How it fits together</h2>
       <p>Each tool works on its own, but together they answer the questions a program leader gets asked: how mature are we, where are we exposed, are we ready for a crisis, and what do we do next.</p>
-      <ol class="ab-journey">${AB_JOURNEY.map(([ic, c, n, d], i) => `<li><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><b>${i + 1}. ${n}</b><small>${d}</small></li>`).join("")}</ol>
+      <ol class="ab-journey">${AB_JOURNEY.map(([ic, c, n, d], i) => `<li>${tileHTML(ic, toneOfColor(c), "md")}<b>${i + 1}. ${n}</b><small>${d}</small></li>`).join("")}</ol>
     </section>
 
     <section class="ab-sec rise">
       <h2>What it does</h2>
-      ${AB_GROUPS.map(([g, list]) => `<h3 class="ab-gh">${g}</h3><div class="ab-tools">${list.map(([c,i,n,d])=>`<div class="ab-tool"><span class="sb-glyph" style="background:var(--${c})"><svg><use href="#i-${i}"/></svg></span><div><h3>${n}</h3><p>${d}</p></div></div>`).join("")}</div>`).join("")}
+      ${AB_GROUPS.map(([g, list]) => `<h3 class="ab-gh">${g}</h3><div class="ab-tools">${list.map(([c,i,n,d])=>`<div class="ab-tool">${tileHTML(i, n === "Incident tabletop" ? "assess" : n === "Red team studio" ? "ai" : ({Assess:"assess", Prepare:"prepare", Measure:"measure", "AI assistants":"ai"})[g] || "neutral", "md")}<div><h3>${n}</h3><p>${d}</p></div></div>`).join("")}</div>`).join("")}
     </section>
 
     <section class="ab-sec rise" id="ab-scores" style="scroll-margin-top:16px">
@@ -131,15 +131,15 @@ function renderRoost(){
   view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
     <section class="ab-sec rise">
       <h2>What you can do today</h2>
-      <div class="ab-tools">${RO_NOW.filter(x => !x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div>
+      <div class="ab-tools">${RO_NOW.filter(x => !x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool">${tileHTML(ic, TOOL_TONE[r], "md")}<div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div>
       <p class="note" style="margin-top:12px">None of this is a ROOST integration: the workbench makes files and numbers you take to ROOST's tools yourself.</p>
       ${RO_NOW.some(x => x[5]) ? `<div class="ab-starters"><h3 class="ab-starters-h"><span class="wip-tag">Starter, untested</span> Every platform-specific value marked TODO; never run against a real deployment</h3>
-        <div class="ab-tools">${RO_NOW.filter(x => x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${c}"><svg><use href="#i-${ic}"/></svg></span><div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div></div>` : ""}
+        <div class="ab-tools">${RO_NOW.filter(x => x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool">${tileHTML(ic, TOOL_TONE[r], "md")}<div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div></div>` : ""}
     </section>
 
     <section class="ab-sec rise">
       <h2>ROOST's tools</h2>
-      <div class="ab-tools">${RO_TOOLS.map(([n, href, d]) => `<div class="ab-tool"><span class="sb-glyph" style="background:var(--accent)"><svg><use href="#i-plug"/></svg></span><div><h3>${ext(href, n)}</h3><p>${d}</p></div></div>`).join("")}</div>
+      <div class="ab-tools">${RO_TOOLS.map(([n, href, d]) => `<div class="ab-tool">${tileHTML("plug", "neutral", "md")}<div><h3>${ext(href, n)}</h3><p>${d}</p></div></div>`).join("")}</div>
     </section>
 
     <section class="ab-sec rise">
