@@ -26,8 +26,6 @@
 .ab-sec a svg{width:14px;height:14px}
 .ab-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .ab-tool{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
-.ab-tool .sb-glyph{width:30px;height:30px;border-radius:9px}
-.ab-tool .sb-glyph svg{width:15px!important;height:15px!important}
 .ab-tool h3{font-size:15px;margin:2px 0 4px}
 .ab-tool p{font-size:13.5px;line-height:1.55;color:var(--muted);margin:0}
 .ab-formula{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 18px}

@@ -10,7 +10,7 @@ function polStrengthHTML(){
 function polInfoHTML(){
   const open = store.get("pol:info", false);
   return `<details class="card pol-info" id="pol-info" ${open?"open":""}>
-    <summary><span class="sb-glyph" style="background:var(--t-pol)"><svg><use href="#i-info"/></svg></span><b>How this tool works</b><span class="note">Purpose, method, privacy and limits</span></summary>
+    <summary>${tileHTML("info", "prepare", "sm")}<b>How this tool works</b><span class="note">Purpose, method, privacy and limits</span></summary>
     <div class="pol-info-b">
       <div class="pol-info-lead">
         <h3>Why this exists</h3>

@@ -58,7 +58,7 @@ h1,h2,h3,h4{letter-spacing:-.022em}
 .side .navlink[aria-current="page"]{background:var(--side-active);box-shadow:var(--shadow), inset 0 0 0 1px var(--side-line)}
 .side .sb-search,.side .kbd{border-radius:9px}
 .sb-assess{border-radius:12px;background:var(--side-active)}
-.sb-glyph,.sb-assess .navlink .sb-glyph,.sb-mark,.sb-av,.brand .mark{border-radius:6px}
+.sb-mark,.sb-av,.brand .mark{border-radius:6px}
 .sb-assess .navlink.done::after{border-radius:50%}
 .topbar{background:color-mix(in oklab, var(--bg) 72%, transparent);border-bottom:1px solid var(--line);backdrop-filter:saturate(1.3) blur(14px);-webkit-backdrop-filter:saturate(1.3) blur(14px)}
 .tb-demo,.tb-demo-t,.tb-demo-x,.tb-demo-x:hover,.tb-demo b,.tb-demo .btn{border-radius:9px}
@@ -88,7 +88,7 @@ h1,h2,h3,h4{letter-spacing:-.022em}
 .btn:active{transform:translateY(1px);box-shadow:none}
 .btn.primary,.btn.primary:hover,.pagehead .headmeta .btn.primary,.pagehead .headmeta .btn.primary:hover{background:linear-gradient(135deg, #6D5DF6, #9B6BFF);border-color:transparent;color:#fff;box-shadow:0 6px 18px rgba(109,93,246,.35)}
 .btn.primary:hover,.pagehead .headmeta .btn.primary:hover{background:linear-gradient(135deg, #7A6BFF, #A77DFF);box-shadow:0 8px 22px rgba(109,93,246,.45)}
-.tb-demo b,.tb-demo .btn,.tb-demo-x,.tb-demo-x:hover,.sb-mark,.sb-av,.sb-glyph{background:var(--ink)!important;color:var(--bg)}
+.tb-demo b,.tb-demo .btn,.tb-demo-x,.tb-demo-x:hover,.sb-mark,.sb-av{background:var(--ink)!important;color:var(--bg)}
 .pill,.tag,.gd-tool,.gd-chip,.gd-lay,.as-part,.as-six-n,.cp-new,.tt-sev,.sev,.cv-off,.rv-d,.sb-new,.kbd,kbd,.gd-opt kbd{border-radius:999px}
 .pill.accent{background:var(--accent-soft);color:var(--accent)}
 .pill.crit::before,.pill.high::before,.pill.med::before,.pill.good::before,.pill .dot,.sdot,.ph-stats span::before,.ma-legend i,.as-rev-l li i{border-radius:50%}
@@ -130,7 +130,6 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 /* ---------- sweep: the per-tool colors, the icon tiles, previous-run outlines, radar dots, the guided radio ---------- */
 :root, :root[data-mode="light"], :root[data-theme="dark"], :root[data-mode="dark"]{--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}}
-.sb-glyph,.sb-assess .navlink .sb-glyph{background:var(--accent-soft)!important;color:var(--accent)}
 .sb-mark,.sb-av,.brand .mark{background:linear-gradient(135deg,#6D5DF6,#9B6BFF)!important;color:#fff}
 .brand .mark svg{color:#fff}
 .ma-lg-old,.rv-lg-dot{border-color:var(--accent)!important}
@@ -464,15 +463,48 @@ table:not([class]) tr:last-child td{border-bottom:0}
 /* ---------- Icon tile (icTile() in partD.js; glyphs are Lucide, see tools/screenshots/ICONS.md) ----------
    One tile for the All tools cards, the Learn hub cards and the assessment steps: 44px, 12px corners,
    accent-soft ground, a 22px accent icon. Sidebar glyphs keep their own tile and show the same icon at 16px. */
-.ic-tile{width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
-.ic-tile svg{width:22px;height:22px;display:block}
 .ov-tool{grid-template-rows:1fr}
-.ov-tb > .ic-tile{margin-bottom:6px}
 .ov-tb h4{flex-wrap:wrap;row-gap:4px}
-.lnh-b > .ic-tile{margin-bottom:4px}
-.as-six > li > .ic-tile{margin-bottom:4px}
 .as-cur-t{display:flex;align-items:center;gap:12px}
 .as-cur-t .as-cur-n{min-width:0}
-.ov-aic > .ic-tile{margin-top:0}
-.side .sb-nav .navlink .sb-glyph{width:24px;height:24px;border-radius:8px;opacity:1}
-.side .sb-nav .navlink .sb-glyph svg{width:16px!important;height:16px!important}
+
+/* ---------- App-icon tile (tileHTML() and TOOL_TONE in partD.js; glyphs are Lucide, tools/screenshots/ICONS.md) ----------
+   The treatment Raycast, Arc and Linear's integrations grid use: a white glyph on a two-stop gradient, a lit top edge,
+   a soft contact shadow and a tinted glow. Sizes: .tile-lg 48 (cards), .tile-md 36 (steps, hub, intro, rows), .tile-sm 22
+   (sidebar, palette). Tone = the tool's group, set with data-tone; --sw is the glyph stroke (the sprite reads it). */
+:root{--tile-line:rgba(21,23,43,.08);--tile-hi:.35}
+:root[data-theme="dark"],:root[data-mode="dark"]{--tile-line:rgba(255,255,255,.12);--tile-hi:.2}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--tile-line:rgba(255,255,255,.12);--tile-hi:.2}}
+.tile{--t1:#6D5DF6;--t2:#8B7BFF;--sw:2.25;box-sizing:border-box;width:48px;height:48px;border-radius:13px;display:grid;place-items:center;flex:none;color:#fff;
+  background:linear-gradient(135deg,var(--t1),var(--t2));border:1px solid var(--tile-line);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,var(--tile-hi)),0 2px 6px rgba(21,23,43,.12),0 8px 20px color-mix(in oklab,var(--t1) 30%,transparent)}
+.tile svg,.side .navlink .tile svg{width:24px;height:24px;display:block;opacity:1;color:#fff}
+.tile-lg{width:48px;height:48px;border-radius:13px}
+.tile-md{width:36px;height:36px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,var(--tile-hi)),0 1px 4px rgba(21,23,43,.12),0 5px 14px color-mix(in oklab,var(--t1) 28%,transparent)}
+.tile-md svg,.side .navlink .tile-md svg{width:19px;height:19px}
+.tile-sm{width:22px;height:22px;border-radius:6px;--sw:2.5;box-shadow:inset 0 1px 0 rgba(255,255,255,var(--tile-hi)),0 1px 2px rgba(21,23,43,.14),0 2px 6px color-mix(in oklab,var(--t1) 26%,transparent)}
+.tile-sm svg,.side .navlink .tile-sm svg{width:14px;height:14px}
+.tile[data-tone="assess"]{--t1:#6D5DF6;--t2:#8B7BFF}
+.tile[data-tone="prepare"]{--t1:#FF8A5B;--t2:#FFB07A}
+.tile[data-tone="measure"]{--t1:#2BB8A8;--t2:#6AD1C5}
+.tile[data-tone="ai"]{--t1:#7B5CF5;--t2:#E27BD8}
+.tile[data-tone="learn"]{--t1:#F5A524;--t2:#FFC75F}
+.tile[data-tone="neutral"]{--t1:#5B6478;--t2:#8A93A8}
+.ov-tool{grid-template-rows:1fr}
+.ov-tb > .tile{margin-bottom:8px}
+.ov-tb h4{flex-wrap:wrap;row-gap:4px}
+.lnh-b > .tile{margin-bottom:6px}
+.as-six > li > .tile{margin-bottom:4px}
+.as-cur-t{display:flex;align-items:center;gap:12px}
+.as-cur-t .as-cur-n{min-width:0}
+.tpl-grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.tpl-card{grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:12px}
+.tpl-t{display:grid;gap:3px;min-width:0}
+.cmdk .it .tile,#cmdk .it .tile{margin-right:2px}
+.nx-i > .tile{margin:0 2px}
+.intro-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.intro-top .rtf-eb{margin:0}
+.ph-eb > .tile{margin-right:2px}
+.tb-newmenu button{grid-template-columns:36px minmax(0,1fr)}
+.ov-row > .tile{flex:none}
+.wsrow > .tile{flex:none}

@@ -100,8 +100,6 @@ table.ln-t{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.45
 .ln-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .ln-hub a{text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
 .ln-hub a:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
-.ln-hub .sb-glyph{width:34px;height:34px;border-radius:9px}
-.ln-hub .sb-glyph svg{width:17px;height:17px}
 .ln-hub h3{margin:4px 0 0;font-size:17px}
 .ln-hub p{margin:0;font-size:13.5px;color:var(--muted)}
 .ln-hub a>.go{font-weight:600;font-size:13.5px;color:var(--accent);margin-top:4px}

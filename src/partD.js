@@ -265,8 +265,29 @@ function countUp(el, key){
   requestAnimationFrame(step);
 }
 
-// The one icon tile for cards: 44px, accent-soft, the tool's Lucide glyph at 22px (ICONS.md).
-function icTile(iconId){ return `<span class="ic-tile" aria-hidden="true"><svg><use href="#i-${iconId}"/></svg></span>`; }
+// The one app-icon tile (Raycast / Arc / Linear style): a white Lucide glyph on a two-stop gradient.
+// Tone is the tool's group: assess, prepare, measure, ai, learn, or neutral. One map, used by every renderer.
+const TOOL_TONE = {
+  maturity:"assess", premortem:"assess", coverage:"assess", tabletop:"assess",
+  policy:"prepare", coppa:"prepare", dsa:"prepare", vendors:"prepare",
+  metrics:"measure", eval:"measure",
+  notice:"ai", appeal:"ai", transparency:"ai", redteam:"ai",
+  learn:"learn", redteamllm:"learn", redteamworld:"learn", glossary:"learn", tsglossary:"learn",
+  workspace:"neutral", plan:"neutral", about:"neutral", credits:"neutral", overview:"neutral", tools:"neutral", roost:"neutral", review:"neutral"
+};
+const TOOL_ICON = {
+  maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren", policy:"doc", coppa:"coppa", dsa:"dsa", vendors:"scale",
+  metrics:"gauge", eval:"eval", notice:"mail", appeal:"appeal", transparency:"chart", redteam:"shield",
+  learn:"book", redteamllm:"shield", redteamworld:"world", glossary:"glossary", tsglossary:"glossary",
+  workspace:"folder", plan:"send", about:"info", credits:"wrench", overview:"home", tools:"layers", roost:"plug", review:"chart"
+};
+// size: "lg" (48px, cards), "md" (36px) or "sm" (22px, sidebar and palette rows)
+function tileHTML(iconId, tone, size){
+  return `<span class="tile tile-${size || "lg"}" data-tone="${tone || "neutral"}" aria-hidden="true"><svg><use href="#i-${String(iconId).replace(/^i-/, "")}"/></svg></span>`;
+}
+const COLOR_TONE = {"--t-ma":"assess","--t-pm":"assess","--t-cv":"assess","--t-tt":"assess","--t-pol":"prepare","--t-cp":"prepare","--t-ds":"prepare","--t-vd":"prepare","--t-mx":"measure","--t-ai":"ai","--t-rt":"ai"};
+function toneOfColor(c){ const m = /--[a-z-]+/.exec(String(c)); return (m && COLOR_TONE[m[0]]) || "neutral"; }
+function routeTile(route, size, iconId){ return tileHTML(iconId || TOOL_ICON[route] || "layers", TOOL_TONE[route], size); }
 
 // Toast with an Undo action, shared by every "Start over" handler.
 // label: what happened. snapshot: a deep copy taken before clearing. restore(snapshot): puts it back.

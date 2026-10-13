@@ -34,7 +34,7 @@ function journeyNextHTML(cur){
   const next = jnNext(cur);
   if(!next) return `<div class="card jn-next"><span class="jn-k">Program review complete</span><b>Share the results with leadership</b><small>One printable page with your report card, radars and top priorities.</small>
     <div class="jn-next-a"><button type="button" class="btn primary" data-pack="1">Leadership pack</button><a class="btn" href="#overview">Back to overview</a></div></div>`;
-  return `<div class="card jn-next"><span class="jn-k">Next in your program review</span><b><span class="sb-glyph" style="background:${next.c}"><svg><use href="#i-${next.icon}"/></svg></span>${next.n}</b><small>${next.d}</small>
+  return `<div class="card jn-next"><span class="jn-k">Next in your program review</span><b>${tileHTML(next.icon, TOOL_TONE[next.route], "sm")}${next.n}</b><small>${next.d}</small>
     <div class="jn-next-a"><button type="button" class="btn primary" data-jgo="${next.k}">Continue ${icon("arrow")}</button><a class="btn" href="#overview">Back to overview</a></div></div>`;
 }
 document.addEventListener("click", e => {

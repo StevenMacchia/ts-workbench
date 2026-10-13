@@ -53,7 +53,7 @@ function renderCredits(){
     ${CR_GROUPS.map(g => `<section class="ab-sec rise">
       <h2>${g.t}</h2>
       <p class="note" style="margin:-6px 0 14px">${g.intro}</p>
-      <div class="ab-tools">${g.items.map(([name, maker, use, lic, href]) => `<div class="ab-tool"><span class="sb-glyph" style="background:${g.c}"><svg><use href="#i-${g.ic}"/></svg></span><div><h3>${ext(href, esc(name))}${lic ? ` <span class="pill">${esc(lic)}</span>` : ""}</h3><p><strong>${esc(maker)}.</strong> ${esc(use)}</p></div></div>`).join("")}</div>
+      <div class="ab-tools">${g.items.map(([name, maker, use, lic, href]) => `<div class="ab-tool">${tileHTML(g.ic, "neutral", "md")}<div><h3>${ext(href, esc(name))}${lic ? ` <span class="pill">${esc(lic)}</span>` : ""}</h3><p><strong>${esc(maker)}.</strong> ${esc(use)}</p></div></div>`).join("")}</div>
     </section>`).join("\n")}
 
     <section class="ab-sec rise">

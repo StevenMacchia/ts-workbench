@@ -9,7 +9,7 @@ const ROOT = path.join(__dirname, "..", "..");
 const LUCIDE = path.join(__dirname, "node_modules", "lucide-static");
 const map = JSON.parse(fs.readFileSync(path.join(__dirname, "icons-map.json"), "utf8"));
 const files = ["src/partC3.html", "src/partShell.html", "src/partI3.svg"].map(f => path.join(ROOT, f));
-const WRAP = '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+const WRAP = '<g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round">';
 function glyph(name){
   const f = path.join(LUCIDE, "icons", name + ".svg");
   if(!fs.existsSync(f)) throw new Error("No Lucide icon named " + name);
