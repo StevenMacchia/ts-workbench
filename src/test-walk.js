@@ -18,10 +18,10 @@ const stub = base.replace(A, () => `
 const rootL = {}, docL = {}; let optBtns = () => [];
 const $ = s => { if(s === "#pm-root"){ for(const k in rootL) delete rootL[k]; const o = fake(); o.addEventListener = (t, fn) => { (rootL[t] = rootL[t] || []).push(fn); }; return (els[s] = o); } return (els[s] = els[s] || fake()); };
 const $$ = s => s === "#pm-root .opt-key" ? optBtns() : [];
-`).replace("document = {addEventListener(){}", () => "document = {addEventListener(t, fn){ (docL[t] = docL[t] || []).push(fn); }");
+`).replace("document = {addEventListener(){}", () => "document = {querySelector(){ return null; }, body:{dataset:{}}, addEventListener(t, fn){ (docL[t] = docL[t] || []).push(fn); }");
 const extra = "window.addEventListener = function(){};\n";
 
-const body = function(){
+const body = async function(){
   const out = [], eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   const bad = h => /undefined|NaN|\[object/.test(h);
   const txt = h => h.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
@@ -172,6 +172,40 @@ const body = function(){
   eq(/<span>Money<\/span><b>People pay each other, We pay people<\/b>/.test(view.innerHTML), true, "choosing the options again shows them in the report");
   out.push("multi-select: pre-selected defaults say so; number keys toggle and persist across Enter; an emptied list reads 'Not answered' (only the explicit button records 'None')");
 
+  /* ---------- C. a key on the first question of every guided tool stays on the tool ---------- */
+  // The purpose card is shown once per route. An old Start over listener cleared that flag after the tool had drawn its first
+  // question, so the next redraw (a key press) fell back to the card. For each tool: past the card, to its first choice
+  // question, the Start over click as the page delivers it, then a number key. The question must advance, the card stay away.
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  view.querySelector = s => (s === ".gd-s-q" && /gd-s-q/.test(view.innerHTML)) ? {} : null; view.contains = () => true;
+  const toChoice = () => { for(let i = 0; i < 12; i++){ const p = gdPos(gdCur.k), s = gdLive(gdCur)[p.i]; if(s.kind === "single" || s.kind === "multi") return s; if(s.kind === "text" && !s.opt) s.set("Test"); gdGo(gdCur, "next"); } throw new Error("no choice question found"); };
+  const GD = (route, setup, selector) => ({route, selector, setup, first: () => { gdGo(gdCur, "start"); toChoice(); return () => { const p = gdPos(gdCur.k); return p.scr + p.i; }; }});
+  const tools = [
+    GD("coppa", () => { cp = CP_BLANK(); cpView = null; gdReset("coppa"); renderCoppa(); }, '[data-cp="reset"]'),
+    GD("dsa", () => { ds = DS_BLANK(); dsView = null; gdReset("dsa"); renderDsa(); }, '[data-ds="reset"]'),
+    // the eval is one page, not a question flow: there is no number key, so a redraw (what an edit or click triggers) stands in for it
+    {route:"eval", selector:'[data-ev="reset"]', setup: () => { ev = EV_BLANK(); gdReset("eval"); renderEval(); }, first: () => () => "page", redraw: () => renderEval()},
+    GD("policy", () => { polView = null; gdReset("policy"); renderPolicy(); }, "#pol-reset"),
+    {route:"maturity", selector:'[data-ma="reset"]', setup: () => { ma = maInit({stage:"growth", lv:{}, done:{}, ex:false, open:"policy"}); maG = null; maView = null; renderMaturity(); },
+      first: () => { maGo("guide"); eq(["q", "stage"].includes(maG.scr), true, "maturity guide opens on a question"); document.body.dataset.route = "maturity"; return () => maG.scr + maG.i; }},
+    {route:"coverage", selector:'[data-cv="reset"]', setup: () => { cv = {src:null, ex:false, r:{}}; cvG = null; cvView = null; renderCoverage(); },
+      first: () => { cvGo("start"); cvGo("first"); eq(cvG.scr, "q", "coverage on its first question"); document.body.dataset.route = "coverage"; return () => cvG.scr + cvG.a + "/" + cvG.l; }}
+  ];
+  for(const T of tools){
+    store.set("intro:" + T.route, true); location.hash = "#" + T.route;
+    T.setup(); eq(/data-introbtn="start"/.test(view.innerHTML), false, T.route + ": past the card, the tool's own first screen shows");
+    let pos, before; try{ pos = T.first(); before = pos(); }catch(e){ throw new Error(T.route + ": " + e.message); }
+    // the Start over control being clicked, through every page-level click listener, as the page delivers it
+    (docL.click || []).forEach(f => f({target:{closest: sel => sel === T.selector ? {} : null}}));
+    eq(introSeen(T.route), true, T.route + ": Start over must not re-arm the purpose card");
+    if(T.redraw){ T.redraw(); eq(/data-introbtn="start"/.test(view.innerHTML), false, T.route + ": a redraw after Start over does not return to the purpose card"); document.body.dataset.route = ""; continue; }
+    key("1"); await sleep(320);
+    eq(/data-introbtn="start"/.test(view.innerHTML), false, T.route + ": a number key on the first question does not return to the purpose card");
+    eq(pos() !== before, true, T.route + ": the number key answered it and the question advanced (was " + before + ", now " + pos() + ")");
+    document.body.dataset.route = "";
+  }
+  out.push("intro card: a number key on the first question of coppa, dsa, policy, maturity and coverage advances (and a redraw of the one-page eval) never returns to the purpose card, even after a Start over click");
+
   return out.join("\n");
 };
 const rdSrc = "const rd_ = f => require('fs').readFileSync(require('path').join(" + JSON.stringify(D) + ", f), 'utf8');\n";
@@ -180,4 +214,4 @@ const src = stub + extra + rdSrc + [rd("partT.js"), rd("partD.js"), rd("partE1.j
   rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partTR.js"), rd("partHELP.js"), rd("partTYPE.js"), rd("partGD.js"),
   rd("partINTRO.js"), rd("partCP.js"), rd("partDSA.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
-console.log(new Function("require", src)(require));
+new Function("require", src)(require).then(console.log);
