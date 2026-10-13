@@ -434,11 +434,11 @@ async function aiRun(key){
     else if(code !== "cancelled") run.err = AI_ERR[code] || AI_ERR.upstream_error;
   }finally{
     run.busy = false; run.ctl = null;
-    if((location.hash || "").slice(1) === key) renderAI(key);
+    if(hashNow() === key) renderAI(key);
   }
 }
 
 // When the sampler becomes available after first paint, refresh an open AI page
 if(window.claude && window.claude.use){
-  window.claude.use("sample").then(ns => { if(!SAMPLER) SAMPLER = ns; const h = (location.hash || "").slice(1); if(AI_TOOLS[h]) renderAI(h); }).catch(() => {});
+  window.claude.use("sample").then(ns => { if(!SAMPLER) SAMPLER = ns; const h = hashNow(); if(AI_TOOLS[h]) renderAI(h); }).catch(() => {});
 }

@@ -31,7 +31,7 @@ if(STANDALONE && typeof Blob !== "undefined" && typeof URL !== "undefined" && UR
 }
 try{
   if(window.claude && typeof window.claude.use === "function"){
-    window.claude.use("downloads").then(ns => { DL = ns; if((location.hash||"").slice(1)==="premortem") renderPremortem(); }).catch(()=>{});
+    window.claude.use("downloads").then(ns => { DL = ns; if(hashNow()==="premortem") renderPremortem(); }).catch(()=>{});
   }
 }catch(e){}
 async function offerFile(filename, data, fallbackText, toastEl){

@@ -20,7 +20,7 @@ const KINDS = {
   learn:{n:"Exercise", plural:"Exercises", icon:"i-save", route:"redteamllm", prefix:"EX"}
 };
 let wsUI = {editProfile:false, newProject:false, editProject:null, rename:null, confirm:null};
-function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }
+function goRoute(r){ if(hashNow()===r) ROUTES[r](); else goHash(r); }
 function flashIn(el, msg){ if(!el) return; el.textContent = msg; setTimeout(()=>{ el.textContent = ""; }, 3500); }
 const projName = id => { const p = wsProjects()[id]; return p ? p.name : ""; };
 const savedWhere = () => { const a = wsActive(); return a ? `Saved to ${projName(a)}` : "Saved to your workspace"; };

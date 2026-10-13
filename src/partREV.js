@@ -113,7 +113,7 @@ function renderReview(){
 }
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-rev]"); if(!b || !view.contains(b)) return;
-  if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = (location.hash || "").slice(1).split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
+  if(b.dataset.rev === "save"){ const s = revSave(); if(!s) return gsay("Finish a step first"); const r = hashNow().split("/")[0]; if(r === "review") renderReview(); else renderOverview(); gsay(`${s.label} saved. Come back next quarter to compare`); }
   else if(b.dataset.rev === "example"){ revEx = true; renderReview(); window.scrollTo(0, 0); }
   else if(b.dataset.rev === "exit-example"){ revEx = false; renderReview(); window.scrollTo(0, 0); }
 });

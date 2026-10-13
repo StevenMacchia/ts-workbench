@@ -201,4 +201,4 @@ document.addEventListener("keydown", e => {
   if(e.key === "Escape" && document.body.classList.contains("tt-present")){ document.body.classList.remove("tt-present"); ttfRender(); }
 });
 document.addEventListener("fullscreenchange", () => { if(!document.fullscreenElement && ttf && document.body.classList.contains("tt-present")){ document.body.classList.remove("tt-present"); ttfRender(); } });
-if(window.addEventListener) window.addEventListener("hashchange", () => { if((location.hash || "").slice(1) !== "tabletop"){ ttfStop(); document.body.classList.remove("tt-present"); } });
+if(window.addEventListener) window.addEventListener("hashchange", () => { if(hashNow() !== "tabletop"){ ttfStop(); document.body.classList.remove("tt-present"); } });

@@ -187,7 +187,7 @@ const PAGE_TOURS = {
     [".sb-sync", "Keep a copy", "Your work lives in this browser. Save a workspace file to back it up or open it on another device."]
   ]
 };
-const helpRoute = () => (location.hash || "#overview").slice(1).split("/")[0] || "overview";
+const helpRoute = () => (hashNow() || "overview").split("/")[0] || "overview";
 // Screenshots and automated checks run without tips
 const helpQuiet = () => /[?&]shot=/.test(location.search || "");
 // One button, "How this works". Where the tool has a walkthrough (INTRO_SPECS, partINTRO.js) it opens

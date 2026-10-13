@@ -120,7 +120,7 @@ function pfMergeOld(data){
     const lib = libLoad(); (Array.isArray(data) ? data : data.assessments).forEach(rec => { if(rec && rec.id && rec.type){ lib[rec.id] = rec; n++; } }); libSave(lib);
   }
   gsay(`Added ${n} saved result${n === 1 ? "" : "s"} from an older export`);
-  const r = (location.hash || "").slice(1).split("/")[0] || "overview"; if(ROUTES[r]) ROUTES[r](); shellUpdate(r);
+  const r = hashNow().split("/")[0] || "overview"; if(ROUTES[r]) ROUTES[r](); shellUpdate(r);
 }
 function pfModal(inner, onAct){
   const prev = document.activeElement, bg = document.createElement("div");

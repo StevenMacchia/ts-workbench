@@ -200,9 +200,9 @@ console.log("v8 assembled");
   const C3 = rd("partC3.html"), a = C3.indexOf('<div class="app">'), b = C3.indexOf("\n<script>\n(function(){");
   if(a < 0 || b < 0) throw new Error("partC3 split points not found");
   const C9 = C3.slice(0, a) + rd("partShell.html") + C3.slice(b);
-  const W9 = patch(W2, [[`function goRoute(r){ if(location.hash.slice(1)===r) ROUTES[r](); else location.hash = r; }`,
-    `function goRoute(r){ if(location.hash.slice(1)===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else location.hash = r; }`]], "partW2 goRoute");
-  const R9 = patch(R, [[`const h = (location.hash || '').slice(1);`, `const h = (location.hash || '').slice(1).split('/')[0];`], [`  ROUTES[name]();`, `  ROUTES[name]();\n  shellUpdate(name);`],
+  const W9 = patch(W2, [[`function goRoute(r){ if(hashNow()===r) ROUTES[r](); else goHash(r); }`,
+    `function goRoute(r){ if(hashNow()===r){ ROUTES[r](); shellUpdate(r); window.scrollTo(0,0); } else goHash(r); }`]], "partW2 goRoute");
+  const R9 = patch(R, [[`const h = hashNow();`, `const h = hashNow().split('/')[0];`], [`  ROUTES[name]();`, `  ROUTES[name]();\n  shellUpdate(name);`],
     [`const ROUTES = {overview:renderOverview, workspace:renderWorkspace, `, `const ROUTES = {overview:renderOverview, workspace:renderWorkspace, tools:renderTools, plan:renderPlan, review:renderReview, dsa:renderDsa, eval:renderEval, about:renderAbout, roost:()=>renderRoost(), credits:()=>renderCredits(), learn:renderLearn, redteamllm:()=>renderRedteam("llm"), redteamworld:()=>renderRedteam("world"), glossary:renderGlossary, tsglossary:renderTsGlossary, redteam:renderRedteamStudio, policy:renderPolicy, `], [`policy:renderPolicy, `, `policy:renderPolicy, coppa:renderCoppa, maturity:renderMaturity, coverage:renderCoverage, notice:()=>renderAI("notice"), appeal:()=>renderAI("appeal"), transparency:()=>renderAI("transparency"), `]], "partR shell");
   // Report header becomes a document title; the detail heading gets its own spacing hook
   const F3_9 = patch(F3, [
@@ -241,16 +241,33 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
     '<meta property="og:title" content="' + title + '">',
     '<meta property="og:description" content="' + desc + '">',
     site ? '<meta property="og:url" content="' + site + '/">' : '',
+    site ? '<link rel="canonical" href="' + site + '/">' : '',
     '<meta property="og:image" content="' + img + '">',
     '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="627">',
     '<meta name="twitter:card" content="summary_large_image">',
     '<meta name="twitter:image" content="' + img + '">',
-    cfa ? "<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"" + cfa + "\"}'></script>" : ''
+    cfa ? "<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{\"token\": \"" + cfa + "\", \"spa\": true}'></script>" : ''
   ].filter(Boolean).join("\n");
-  const body = v9.replace(/^<title>[^<]*<\/title>\s*/, "");
+  // Path routing (/ts-workbench/<tool>) is switched on only here, on the public page: APP_BASE gets the site's path.
+  // The copy hosted inside Claude keeps the placeholder and stays hash-routed.
+  const appBase = site ? new URL(site).pathname.replace(/\/?$/, "/") : "";
+  const body = v9.replace(/^<title>[^<]*<\/title>\s*/, "").replace('const APP_BASE = "__APP_BASE__";', () => 'const APP_BASE = "' + appBase + '";');
   const out = headTags + "\n" + body + "\n</html>\n";
   const dir = path.join(D, "..", "docs");
   if(!fs.existsSync(dir)) fs.mkdirSync(dir);
   fs.writeFileSync(path.join(dir, "index.html"), out);
+  // sitemap.xml and robots.txt, from ROUTE_LABEL so they stay in step with the tools. The home page is the
+  // root; the personal views (workspace, plan, quarter review) are empty for a crawler and are left out.
+  // Each tool has its own path (see APP_BASE in partD.js); GitHub Pages answers those with 404.html, whose first
+  // script forwards a known tool path to the app (template in _build/gen-readmes.js).
+  if(site){
+    const labels = new Function("return " + /const ROUTE_LABEL = (\{[^;]*\});/.exec(fs.readFileSync(path.join(D, "partNav.js"), "utf8"))[1])();
+    const skip = ["overview", "workspace", "plan", "review"];
+    const urls = [site + "/"].concat(Object.keys(labels).filter(k => !skip.includes(k)).map(k => site + "/" + k));
+    const x = u => u.replace(/&/g, "&amp;");
+    fs.writeFileSync(path.join(dir, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => "  <url><loc>" + x(u) + "</loc></url>").join("\n") + "\n</urlset>\n");
+    fs.writeFileSync(path.join(dir, "robots.txt"), "User-agent: *\nAllow: /\n\nSitemap: " + site + "/sitemap.xml\n");
+    console.log("sitemap.xml written with " + urls.length + " URLs, robots.txt");
+  }
   console.log("github-pages/index.html written" + (site ? " for " + site : " (preview image path is relative until site-url.txt is set)"));
 }

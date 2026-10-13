@@ -507,16 +507,16 @@ function mxFlash(el, block = "center"){
   el.classList.remove("mx-flash"); void el.offsetWidth; el.classList.add("mx-flash");
 }
 // Every view has its own address, so Back works and a metric can be linked to directly
-function mxGo(sub){ const h = "#metrics" + (sub ? "/" + sub : ""); if(location.hash === h) renderMetrics(); else location.hash = h; }
+function mxGo(sub){ const h = "metrics" + (sub ? "/" + sub : ""); if(hashNow() === h) renderMetrics(); else goHash(h); }
 function mxFromHash(list){
-  const parts = (location.hash || "").slice(1).split("/");
+  const parts = hashNow().split("/");
   if(parts[0] !== "metrics") return;
   const sub = parts[1] || "", tab = MX_TABS.find(t => t[2] && t[2] === sub);
   if(tab){ mx.tab = tab[0]; mx.open = null; return; }
   mx.tab = "card";
   const m = sub && list.find(x => mxSlug(x) === sub);
   mx.open = m ? m.n : null;
-  if(sub && !m && typeof history !== "undefined" && history.replaceState) history.replaceState(null, "", "#metrics");
+  if(sub && !m && typeof history !== "undefined" && history.replaceState) history.replaceState(null, "", hashUrl("metrics"));
 }
 
 function mxSetVal(m, inp, list){

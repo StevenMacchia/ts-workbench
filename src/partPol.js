@@ -6,7 +6,7 @@
 let SAMPLER = null;
 try{
   if(window.claude && typeof window.claude.use === "function"){
-    window.claude.use("sample").then(ns => { SAMPLER = ns; if((location.hash||"").slice(1)==="policy") renderPolicy(); }).catch(()=>{});
+    window.claude.use("sample").then(ns => { SAMPLER = ns; if(hashNow()==="policy") renderPolicy(); }).catch(()=>{});
   }
 }catch(e){}
 const POL_BLANK = () => ({rule:"", company:"", look:null, type:"social", product:"", youth:"", regions:["us","eu","uk"], enforce:[], actions:[], concerns:"", depth:"default", heur:null, result:null, ts:null, filter:"all"});

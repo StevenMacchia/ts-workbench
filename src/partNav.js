@@ -3,6 +3,66 @@
    ========================================================= */
 const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
 const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
+// One-line summaries for the page description, per route (the same lines as the All tools cards, plain
+// text). The three AI assistants take theirs from AI_TOOLS. Any route not listed here, and the home page,
+// fall back to the site description captured at load.
+const ROUTE_DESC = {
+  tools:"Every tool in the workbench, to use on its own, from program maturity to AI assistants. Free and private.",
+  plan:"Your assessment results turned into one prioritized plan, with owners and next steps.",
+  review:"Your plan, quarter by quarter: what to do first and what can wait.",
+  workspace:"Everything you have saved in the workbench, kept on your own device.",
+  maturity:"Rate your Trust & Safety program in eight areas and get a roadmap for the biggest gaps.",
+  premortem:"Profile a product and see how it will be misused before launch.",
+  coverage:"See where your products' risk outruns the defenses you have in place.",
+  tabletop:"Rehearse a crisis and learn from every call, with the law behind it.",
+  policy:"Paste a rule to find vague words, missing exceptions and hard edge cases.",
+  coppa:"Check children's privacy against the amended COPPA Rule, with drafts for Legal.",
+  dsa:"Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",
+  vendors:"Choose a moderation vendor on evidence, with RFP questions.",
+  eval:"Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",
+  metrics:"A reference for learning: the numbers a T&S program runs on, and how to measure each one.",
+  redteam:"Test your own AI feature for harm the way real red teams do, one calm step at a time, ending in findings and a one-page summary.",
+  learn:"Guides, drills, worksheets and glossaries for Trust & Safety work, starting with red teaming AI.",
+  redteamllm:"The method for red teaming language models in nine steps, with drills to run with your team, worksheets and sources.",
+  redteamworld:"Red teaming video, image-to-video and interactive world models: uploads, scene steering, style and provenance.",
+  glossary:"Red teaming terms in plain words, with flashcards and a quiz.",
+  tsglossary:"Everyday Trust and Safety terms, from strike to statement of reasons, in plain words.",
+  about:"About the T&S Workbench: who built it, how the tools fit together, and the decisions behind them.",
+  roost:"ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with.",
+  credits:"The models, tools, services and public sources the workbench uses or names, who made each one, and on what terms."
+};
+// Route name -> tab title and meta description, so each tool is findable and bookmarkable by name.
+// The base title and description are read from the page once, so the home page stays as published.
+const seoBase = {};
+function seoFor(name){
+  if(!seoBase.title){
+    seoBase.title = document.title;
+    const m = document.querySelector('meta[name="description"]');
+    seoBase.desc = m ? m.getAttribute("content") : "";
+  }
+  const home = name === "overview" || !ROUTE_LABEL[name];
+  const ai = typeof AI_TOOLS !== "undefined" && AI_TOOLS[name] && AI_TOOLS[name].desc;
+  return {
+    title: home ? seoBase.title : ROUTE_LABEL[name] + " · T&S Workbench",
+    desc: home ? seoBase.desc : (ROUTE_DESC[name] || ai || seoBase.desc)
+  };
+}
+function seoUpdate(name){
+  if(typeof document === "undefined" || !document.querySelector) return;
+  try{
+    const t = seoFor(name);
+    document.title = t.title;
+    const m = document.querySelector('meta[name="description"]');
+    if(m && t.desc) m.setAttribute("content", t.desc);
+    // Canonical link: the page's own path (home is the root). Needs the site's address from og:url.
+    const og = document.querySelector('meta[property="og:url"]'), root = og && og.getAttribute("content");
+    if(root){
+      let c = document.querySelector('link[rel="canonical"]');
+      if(!c && document.createElement && document.head){ c = document.createElement("link"); c.setAttribute("rel", "canonical"); document.head.appendChild(c); }
+      if(c) c.setAttribute("href", name === "overview" || !ROUTE_LABEL[name] ? root : root + name);
+    }
+  }catch(e){}
+}
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -30,7 +90,7 @@ function openSaved(id){
     const k = it.data.guide === "world" ? "world" : "llm", g = LN_GUIDES[k], i = g.exercises.findIndex(e => e.id === it.data.exId);
     if(i >= 0) lnStore.set(k + ":epos", i);
     const h = g.route + "/practice";
-    if(location.hash.slice(1) === h) renderRedteam(k); else location.hash = h;
+    if(hashNow() === h) renderRedteam(k); else goHash(h);
     return;
   }
   goRoute(KINDS[it.kind].route);
@@ -40,6 +100,7 @@ function focusQuiet(el){ if(!el || !el.focus) return; if(!el.hasAttribute("tabin
 const focusLost = () => !document.activeElement || document.activeElement === document.body;
 function newAssessment(){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); goRoute("premortem"); }
 function shellUpdate(name){
+  seoUpdate(name);
   if(document.body && document.body.dataset) document.body.dataset.route = name;
   if(typeof JOURNEY !== "undefined"){ const n = $("#sb-assess-n"), done = JOURNEY.filter(s => { try{ return s.done(); }catch(e){ return false; } }).length;
     if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
@@ -85,7 +146,7 @@ function cmdkItems(){
   out.push({g:"Actions", label:"Switch theme", sub:"Light, dark or auto", color:"var(--faint)", icon:"moon", run:()=>{ const order = ["light","dark","system"]; const cur = store.get("theme","light"); const nx = order[(order.indexOf(cur)+1)%3]; store.set("theme", nx); applyTheme(nx); gsay(nx==="system" ? "Theme matches your device" : `${nx[0].toUpperCase()+nx.slice(1)} theme on`); }});
   Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0)).forEach(it =>
     out.push({g:"Your saved work", label:it.title||"Untitled", sub:KINDS[it.kind].n, color:TOOL_COLOR[it.kind], icon:KINDS[it.kind].icon.replace("i-",""), run:()=>openSaved(it.id)}));
-  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", icon:"gauge", run:()=>{ location.hash = "metrics/" + mxSlug(m); }}));
+  if(typeof mxList === "function") mxList().forEach(m => out.push({g:"Metrics", label:m.n, sub:MX_Q[m.n] || "", color:"var(--t-mx)", icon:"gauge", run:()=>{ goHash("metrics/" + mxSlug(m)); }}));
   const type = ttCompanyType();
   SCENARIOS.forEach((s,i) => { if(type!=="all" && !(s.types||[]).includes(type)) return; const v = ttScenario(i, type);
     out.push({g:"Tabletop scenarios", label:v.title, sub:v.tailored ? "Tailored" : (TT_TYPES.find(t=>t.k===(s.types||[])[0])||{n:""}).n, color:"var(--t-tt)", icon:"siren", run:()=>{ ttStart(i, type); goRoute("tabletop"); }}); });

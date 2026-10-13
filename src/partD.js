@@ -327,13 +327,58 @@ async function shareDecode(s){
   }
   try{ return JSON.parse(new TextDecoder().decode(bytes)); }catch(e){ return null; }
 }
+/* PATHROUTE START */
+// Every tool has its own address (/ts-workbench/premortem), so the analytics beacon sees a real URL change on
+// each route. Old #route links keep working: they are rewritten to the path form once, on load (canonNow).
+// APP_BASE is filled in at build time for the public page only. The copy hosted inside Claude keeps the
+// placeholder, so PATHMODE is off there and routing stays on the hash, as before. Off the public host (served
+// locally at /) the base is "/".
+const APP_BASE = "__APP_BASE__";
+const PATHMODE = typeof location !== "undefined" && typeof history !== "undefined" && !!history.pushState && /^https?:$/.test(location.protocol || "") && APP_BASE.charAt(0) === "/";
+const appBase = () => location.pathname.indexOf(APP_BASE) === 0 ? APP_BASE : "/";
+let SHARE_STASH = null;
+// The current route as "tool" or "tool/sub", read from the path (or, before canonNow has run, the hash)
+function hashNow(){
+  if(!PATHMODE) return (location.hash || "").slice(1);
+  let rest = location.pathname.slice(appBase().length);
+  try{ rest = decodeURIComponent(rest); }catch(e){}
+  rest = rest.replace(/\/+$/, "");
+  if(rest === "index.html") rest = "";
+  return rest || (location.hash || "").slice(1).replace(/\?.*$/, "");
+}
+const pathUrl = x => appBase() + (x === "overview" ? "" : x);
+const hashUrl = x => PATHMODE ? pathUrl(x) : "#" + x;
+// Goes to a route: a new history entry at the path, then the same cleanup listeners the hash used to trigger
+function goHash(x){
+  if(!PATHMODE){ location.hash = x; return; }
+  if(pathUrl(x) === location.pathname) return;
+  history.pushState(null, "", pathUrl(x) + location.search);
+  window.dispatchEvent(new Event("hashchange"));
+  route();
+}
+// An old "#tool", "#tool?s=…" link, or a path carrying "?s=…", becomes the clean path. The share payload is set
+// aside (SHARE_STASH) and taken off the address before the analytics beacon loads, so it is not logged or counted twice.
+function canonNow(){
+  if(!PATHMODE) return false;
+  const hs = (location.hash || "").slice(1), qi = hs.indexOf("?"), r = qi < 0 ? hs : hs.slice(0, qi), first = r.split("/")[0];
+  const fromHash = !!first && first !== "demo" && !!ROUTES[first];
+  const params = location.search.replace(/^\?/, "").split("&").filter(Boolean);
+  if(fromHash && qi >= 0) hs.slice(qi + 1).split("&").filter(Boolean).forEach(x => params.push(x));
+  let s = null;
+  for(let i = params.length - 1; i >= 0; i--) if(params[i].slice(0, 2) === "s="){ s = params[i].slice(2); params.splice(i, 1); }
+  if(!fromHash && s === null) return false;
+  history.replaceState(null, "", (fromHash ? pathUrl(r) : location.pathname) + (params.length ? "?" + params.join("&") : "") + (fromHash ? "" : location.hash));
+  if(s !== null) SHARE_STASH = {route: hashNow(), s};
+  return true;
+}
+/* PATHROUTE END */
 // Copies a link that carries `state`. If it would be too big (roughly 8KB), carries `summary` instead and says so.
 function shareCopy(route, state, summary, toastEl){
   shareEncode(state).then(s => {
     if(s.length > 8000 && summary) return shareEncode(summary).then(s2 => ({s:s2, big:true}));
     return {s, big:false};
   }).then(({s, big}) => {
-    const url = location.origin + location.pathname + "#" + route + "?s=" + s;
+    const url = location.origin + (PATHMODE ? appBase() + route : location.pathname + "#" + route) + "?s=" + s;
     const say = msg => flashIn(toastEl, msg);
     try{
       navigator.clipboard.writeText(url).then(
@@ -345,9 +390,10 @@ function shareCopy(route, state, summary, toastEl){
 // Each report tool registers how to apply shared data into its own state.
 const SHARE_APPLY = {};
 function shareRegister(route, apply){ SHARE_APPLY[route] = apply; }
-// The hash's "?s=" part, read straight off location.hash so the router can strip it before normal routing.
+// The "?s=" part of a shared link, read off the hash (or, in path mode, the payload canonNow set aside) so the router can strip it before normal routing.
 function shareParseHash(){
-  const h = (location.hash || "").slice(1), qi = h.indexOf("?s=");
+  if(PATHMODE) return SHARE_STASH;
+  const h = hashNow(), qi = h.indexOf("?s=");
   return qi < 0 ? null : {route: h.slice(0, qi), s: h.slice(qi + 3)};
 }
 function shareBannerHTML(saveAttr){

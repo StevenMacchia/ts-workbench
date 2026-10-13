@@ -64,7 +64,7 @@ function copyText(txt, toastEl){
 const view = $('#view');
 // Tool pages open with a hero band. Its icon and key stats come from the current route.
 const HEAD_META = () => {
-  const r = (location.hash || "").slice(1).split("/")[0] || "overview";
+  const r = hashNow().split("/")[0] || "overview";
   const ai = ["Runs on your own Claude account", "Nothing stored on a server", "A person makes the final call"];
   const m = {
     premortem:["radar", () => [HARMS.length + " abuse risks", Object.keys(SG).length + " safeguards", REGIONS.length + " jurisdictions"]],
@@ -92,7 +92,7 @@ const HEAD_META = () => {
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
 const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
-const headRoute = () => (location.hash || "").slice(1).split("/")[0] || "overview";
+const headRoute = () => hashNow().split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };
 const head = (title, desc, crumb, meta='') => { const hm = HEAD_META(), strip = headStrip(), r = headRoute(); return strip + `

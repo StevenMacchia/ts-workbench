@@ -594,7 +594,7 @@ function cpAct(a){
     case "dld": { const d = CP_DRAFTS.find(z => z[0] === (cp.draft || "notice")) || CP_DRAFTS[0], md = cpDraftMd(d[0]); return offerFile(`${d[2]}-${slug(cp.svc || "service")}.md`, md, md, $("#cp-dtoast")); }
   }
 }
-const cpHere = () => (location.hash || "").slice(1).split("/")[0] === "coppa";
+const cpHere = () => hashNow().split("/")[0] === "coppa";
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-cp],[data-cpaud],[data-cpgate],[data-cpvpc],[data-cptab],[data-cpdraft],[data-cpshare],[data-cpfix]");
   if(!b || !cpHere() || !view.contains(b)) return;

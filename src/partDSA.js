@@ -467,7 +467,7 @@ function dsAct(a){
     case "dld": { const d = DS_DRAFTS.find(z => z[0] === (ds.draft || "sor")) || DS_DRAFTS[0], md = dsDraftMd(d[0]); return offerFile(`${d[2]}-${slug(ds.svc || "service")}.md`, md, md, $("#ds-dtoast")); }
   }
 }
-const dsHere = () => (location.hash || "").slice(1).split("/")[0] === "dsa";
+const dsHere = () => hashNow().split("/")[0] === "dsa";
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-ds],[data-dstier],[data-dssize],[data-dsest],[data-dstab],[data-dsdraft],[data-dsfix]");
   if(!b || !dsHere() || !view.contains(b)) return;
