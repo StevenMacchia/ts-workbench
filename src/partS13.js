@@ -82,7 +82,7 @@ SCENARIOS.push(
           op("Target friction by risk: a warning describing this exact scam, a hold and specialist call for high-risk payments, and a second conversation for customers who insist.", "Most genuine payments go through untouched. On the second call, the insistent customer hears how the fake platform works and stops paying.", [12,5,7,-6], true),
           op("Show a stronger warning on all transfers and let customers proceed once they confirm they understand the risk.", "Coached customers tap through it in seconds. Losses continue, and the insistent customer sends another £15,000.", [-10,-4,-5,5]) ],
       lesson:"Friction works when it is targeted: generic warnings get tapped through, blanket holds punish genuine customers, and a customer under a scammer's influence often needs a real conversation.",
-      law:"Since 30 October 2024, the UK Payment Services (Amendment) Regulations 2024 let firms delay a payment by up to four business days when they have reasonable grounds to suspect the customer is being scammed. They must tell the customer why." },
+      law:"Since 30 October 2024, the UK Payment Services (Amendment) Regulations 2024 let firms delay a suspicious outbound sterling payment by up to four business days after it was requested, when they have reasonable grounds to suspect the customer is being scammed. They must tell the customer why." },
     // Law note source: https://www.psr.org.uk/information-for-consumers/app-fraud-reimbursement-protections/
     { t:"Fri 10:00", h:"Victims want their money back",
       s:"About 400 customers have lost a total of £1.4 million, and a few ignored your warnings. Some are now getting calls offering to recover their money for a fee. The receiving banks have frozen part of the funds, and a local newspaper is preparing a story.",
@@ -126,7 +126,7 @@ SCENARIOS.push(
           op("Link every complaint to the driver's full history with escalation rules, add continuous criminal-record monitoring, and build in-trip safety tools for riders and drivers alike.", "Patterns reach an investigator by the second complaint. Drivers, who face assaults from riders too, get the same emergency button and audio recording.", [12,8,7,-5], true),
           op("Launch a rider emergency button and a public safety report this month, and plan the complaint-system changes for next year.", "The launch gets good coverage. But complaints are still reviewed one trip at a time, and two months later another pattern slips through.", [2,3,-2,2]) ],
       lesson:"Low-level complaints are often early warnings, so review them as one history, not trip by trip. Build the same protections for drivers, who are assaulted by riders too.",
-      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires companies to rerun criminal background and driving history checks on every driver at least once a year. Continuous monitoring goes beyond that minimum." }
+      law:"In Texas, the ride-hail law (Occupations Code Chapter 2402) requires a criminal background check and a driving-record review before a driver starts, and the criminal check again at least once a year. Continuous monitoring goes beyond that minimum." }
   ]},
 { id:"datingsextortion", types:["dating"], title:"The video-call blackmail ring", platform:"Dating app", severity:"Sev 2",
   blurb:"A ring of fake profiles lures members to video chat, records them and demands money. One report leads to hundreds, and the network is still matching.",
