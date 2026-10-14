@@ -57,7 +57,7 @@ function itemSummary(it){
   const d = it.data || {};
   if(it.kind==="learn"){ const label = "Exercise · " + (d.guide === "world" ? "world models" : "LLMs");
     return {html:`<span class="pill">${esc(label)}</span><span class="note">${d.text ? d.text.length + " characters saved" : "No text saved"}</span>`, chip:{cls:"", label}}; }
-  if(it.kind==="redteam" && typeof rtDrills === "function"){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
+  if(it.kind==="redteam" && (typeof rtDrills === "function" || typeof lazyEnsure === "function")){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
     const cls = s4 ? "crit" : open ? "high" : "good", label = s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s");
     return {html:`<span class="pill ${cls}">${label}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
@@ -247,7 +247,9 @@ function bindWorkspace(){
       if(k==="transparency"){ store.set("ws:cur:transparency", null); tr = TR_BLANK(); store.set("tr", tr); }
       if(k==="coppa"){ store.set("ws:cur:coppa", null); cp = CP_BLANK(); cpSave(); }
       if(k==="dsa"){ store.set("ws:cur:dsa", null); ds = DS_BLANK(); dsSave(); }
-      if(k==="redteam"){ store.set("ws:cur:redteam", null); rt = RT_BLANK(); rtSave(); }
+      if(k==="redteam"){ store.set("ws:cur:redteam", null);
+        if(typeof RT_BLANK === "undefined" && typeof lazyEnsure === "function") return lazyEnsure("redteam").then(() => b.click(), () => toast("Could not load the red team studio. Check your connection and try again."));
+        rt = RT_BLANK(); rtSave(); }
       if(k==="eval"){ store.set("ws:cur:eval", null); ev = EV_BLANK(); evSave(); }
       return goRoute(KINDS[k].route); }
     if(d.wsDup){ const it = items[d.wsDup]; if(!it) return; const copy = JSON.parse(JSON.stringify(it));

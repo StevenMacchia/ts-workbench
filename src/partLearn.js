@@ -1213,6 +1213,8 @@ const lnCheckPassed = (k, stepId) => { const r = lnStore.get(lnCheckKey(k, stepI
 // itself would use -- never by faking a screen that state wouldn't actually reach.
 const LN_BRIDGE = {scope:1, harms:1, testset:1, techniques:1, grade:1, report:1, check:1, qa:1, law:1};
 function lnToStudio(k, stepId){
+  // The studio is a separate script on the public page; load it, then do this again
+  if(typeof rtSave === "undefined" && typeof lazyEnsure === "function"){ lazyEnsure("redteam").then(() => lnToStudio(k, stepId), () => { if(typeof gsay === "function") gsay("Could not load the studio. Check your connection and try again."); }); return; }
   const kind = k === "world" ? "world" : "llm";
   const freshFlow = (extra) => Object.assign({i:0, basics:{}, drill:{}, fix:{}, skipBasics:true}, extra || {});
   if(stepId === "scope"){
