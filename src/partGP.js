@@ -108,6 +108,11 @@ const GP_MEAS = [
   ["before", "Share of confirmed cases caught before the move to another app"],
   ["adults", "Adults found in teen spaces, and children found in adult spaces"]
 ];
+// How you know a safeguard works. A stage can't be Covered on assumptions alone.
+const GP_EV = [["assumed", "We believe it's on", "Nobody has tested it recently"], ["checked", "Someone checked it", "Tested the way a stranger would, within the last quarter"], ["measured", "We measure it", "A number tracks whether it works, week by week"]];
+const GP_EVN = {assumed:"Assumed", checked:"Checked", measured:"Measured"};
+// Which of the prevention measures has a metric in the metrics framework
+const GP_MX = {rate:"Unsafe-contact rate for minors", time:"Time to action by severity (p90)", adults:"Age-assurance coverage"};
 const GP_OWNERS = {product:"Product", eng:"Engineering", ops:"T&S Ops", legal:"Legal & Privacy"};
 const GP_EFF = {S:"Small", M:"Medium", L:"Large"};
 const GP_SEV = {crit:3, high:2, med:1};
@@ -236,11 +241,30 @@ const GP_SG = [
     how:"Pick at least two of the prevention measures and put them on the monthly leadership page. The draft is in this report.", src:["handbook"]}
 ];
 
+// How to check each safeguard works: the test a stranger would run, a replay of past cases, or a drill
+const GP_CHK = {
+  private:"Make a new adult account and search for a test minor account: nothing should show.", nosuggest:"From a new adult account, check suggestions, search, nearby and live for a test minor: it shouldn't appear.",
+  agegroup:"Join a space from a test minor account and from an adult one: they shouldn't meet.", location:"Upload a photo from a test minor account and read its metadata; open a minor's profile from a stranger's account and look for a place.",
+  filter:"Browse from a test minor account and log what sensitive content gets through.", dmconn:"From a new adult account, message, request and call a test minor you're not connected to: all three should fail.",
+  newcap:"From a new account, try to message more minors than the cap allows and record where it stops.", notice:"Send a first message from a new account to a test minor and screenshot what the minor sees.",
+  age:"Count how many active chat and voice users have an age check stronger than a typed birthday.", nogift:"Send a gift or payment from a stranger account to a test minor: it should be blocked or capped.",
+  rules:"Replay last quarter's confirmed cases through the rules and record how many fired, and when.", handover:"Take a dormant test account, change its behaviour, and see whether a re-check triggers.",
+  move:"Send a link and a mention of another app from a stranger account to a test minor: both should be flagged.", hidden:"Try to open a disappearing or encrypted thread with a test minor from a stranger account.",
+  limits:"Ask Legal for the written limits and the date they were agreed.", blur:"Send a flagged test image to a test minor and screenshot what arrives.",
+  calls:"Call a test minor from a stranger account: it should fail.", hash:"Run a known test hash through upload and confirm it's blocked, preserved and routed.",
+  classifier:"Score last quarter's confirmed and benign conversations and record precision and recall.", reports:"Report a contact from a test minor account and time how long until a trained reviewer sees it.",
+  queue:"Name the reviewers, their access, their daily limit and their last support session.", report:"Walk one past case through the procedure on paper and time each step.",
+  takeitdown:"Report a sextortion from a test minor account and check Take It Down and the crisis line appear.", network:"Pick a closed case and check whether linked accounts were mapped before the ban.",
+  parent:"Sign in as a parent and change who can contact a test minor, in one place.", owner:"Open the change log and find the last threshold change, with the numbers behind it.",
+  measure:"Open last month's leadership page and find the numbers."
+};
+GP_SG.forEach(s => { s.chk = GP_CHK[s.k] || "Test it the way a stranger would, and record the date."; });
+
 /* ---------- state ---------- */
-const GP_BLANK = () => ({svc:"", youth:"", age:"", find:[], reach:[], priv:[], gift:[], def:[], det:[], resp:[], meas:[], view:"setup", tab:"plan", draft:"brief", ex:false});
+const GP_BLANK = () => ({svc:"", youth:"", age:"", find:[], reach:[], priv:[], gift:[], def:[], det:[], resp:[], meas:[], ev:{}, at:null, view:"setup", tab:"plan", draft:"brief", ex:false});
 // Pixelry, the demo company: a photo and short-video app for 13 to 25-year-olds, partway there
 const GP_EXAMPLE = {svc:"Pixelry", youth:"teens", age:"declared", find:["search", "suggest", "profile", "posts", "live"], reach:["dm_any", "request", "comment"], priv:["text", "media", "links"], gift:["money"],
-  def:["private", "location"], det:["reports", "hash"], resp:["queue", "report"], meas:[], view:"report", tab:"plan", draft:"brief", ex:true};
+  def:["private", "location"], det:["reports", "hash"], resp:["queue", "report"], meas:[], ev:{private:"checked", hash:"measured", reports:"checked"}, view:"report", tab:"plan", draft:"brief", ex:true};
 let gp = Object.assign(GP_BLANK(), store.get("gp", null) || {});
 const gpSave = () => store.set("gp", gp);
 const gpTitle = d => "Grooming pathway: " + (d.svc || "Untitled product");
@@ -276,12 +300,15 @@ const gpWhy = (s, d) => typeof s.why === "function" ? s.why(d) : s.why;
 // Every applicable safeguard with its state, the stage picture, the score and the verdict
 function gpScore(d, x){
   x = x || gpCtx(d);
-  const reqs = GP_SG.filter(s => gpApplies(s, d, x)).map(s => Object.assign({}, s, {met:gpMet(s, d, x)}));
+  const reqs = GP_SG.filter(s => gpApplies(s, d, x)).map(s => { const met = gpMet(s, d, x); return Object.assign({}, s, {met, ev:met ? ((d.ev || {})[s.k] || "assumed") : null}); });
   const counted = reqs.filter(r => !r.opt), met = counted.filter(r => r.met).length;
+  const checks = counted.filter(r => r.met && r.ev === "assumed").sort((a, b) => GP_SEV[b.sev] - GP_SEV[a.sev]), evidenced = counted.filter(r => r.met && r.ev !== "assumed").length;
   const exp = gpExposure(d, x);
   const stages = GP_STAGES.map((st, i) => {
     const rs = counted.filter(r => r.st === st.k), m = rs.filter(r => r.met).length;
-    const prot = !rs.length ? 3 : m === 0 ? 0 : m === rs.length ? 3 : m / rs.length >= .5 ? 2 : 1;
+    let prot = !rs.length ? 3 : m === 0 ? 0 : m === rs.length ? 3 : m / rs.length >= .5 ? 2 : 1;
+    // Covered takes evidence: a stage whose safeguards are only assumed to work tops out at narrowed
+    if(m && rs.some(r => r.met && r.ev === "assumed")) prot = Math.min(prot, 2);
     const e = exp[st.k];
     const status = e === 0 ? "none" : prot >= e ? "covered" : prot >= e - 1 ? "narrowed" : "open";
     return {st, i, e, prot, status, reqs:rs, met:m, open:rs.filter(r => !r.met)};
@@ -299,7 +326,25 @@ function gpScore(d, x){
   else if(narrowed.length){ h = `Every path has something in the way, and ${narrowed.length === 1 ? "one stage is" : narrowed.length + " stages are"} only narrowed`; tone = "high"; }
   else if(live.length){ h = "Every path to a minor has a safeguard in the way"; tone = "good"; }
   else { h = "Strangers can't reach each other on this product"; tone = "good"; }
-  return {reqs, counted, total:counted.length, met, pct, gaps, crit, stages, exp, first, h, tone};
+  return {reqs, counted, total:counted.length, met, pct, gaps, crit, stages, exp, first, h, tone, checks, evidenced};
+}
+// The pre-mortem this review would have drawn on, if it changed after the review was made
+function gpStale(d){
+  try{ if(!d.at || typeof wsItems !== "function") return null;
+    const it = Object.values(wsItems()).filter(i => i.kind === "premortem" && (i.updated || 0) > d.at).sort((a, b) => (b.updated || 0) - (a.updated || 0))[0];
+    return it ? (it.title || "a pre-mortem") : null; }catch(e){ return null; }
+}
+// The coverage radar's child-safety row, for the side-by-side line in the report
+function gpRadar(){
+  try{ if(typeof cvRows !== "function" || typeof cv === "undefined" || !cv || cv.ex) return null;
+    const row = cvRows(cv).find(x => x.a.k === "child"); if(!row || !row.rated) return null;
+    return {cov:row.cov, layers:CV_LAYERS.map(l => ({n:l.n, lv:row.r[l.k]})).filter(z => z.lv !== undefined)}; }catch(e){ return null; }
+}
+// A prevention measure's metric in the metrics framework, if the framework is loaded
+function gpMetric(k){
+  const n = GP_MX[k]; if(!n || typeof METRICS === "undefined" || typeof mxSlug !== "function") return null;
+  const m = METRICS.find(z => z.n === n); if(!m) return null;
+  return {m, slug:mxSlug(m), tracked:!!(typeof mx !== "undefined" && mx && mx.have && mx.have[n])};
 }
 function gpBenchPct(){ try{ const d = Object.assign(GP_BLANK(), GP_EXAMPLE); return gpScore(d, gpCtx(d)).pct; }catch(e){ return null; } }
 // Starting answers from a pre-mortem: features, money, audience and the safeguards it ticked
@@ -333,6 +378,7 @@ function gpBriefMd(){
   L.push("", "## What to change, in order");
   if(!s.gaps.length) L.push("Nothing for the answers given. Recheck whenever a feature changes who can find or contact a minor.");
   s.gaps.forEach((r, i) => L.push(`${i + 1}. **${r.t}** (${GP_SEVN[r.sev][0]}; ${GP_OWNERS[r.o]}; ${GP_EFF[r.e].toLowerCase()} effort). ${r.how}`));
+  if(s.checks.length) L.push("", "## In place, but nobody has checked it works", ...s.checks.map(r => `- **${r.t}.** ${r.chk}`));
   L.push("", "## What each level of age assurance unlocks", "", "| What we know | How we know it | What it unlocks | What it never unlocks |", "|---|---|---|---|",
     "| A typed date of birth | The user told us | Locked-down defaults: private account, no discovery by strangers, no private messages from adults they don't know | [ ] |",
     "| An age estimate | Facial or behavioural estimation at the point a feature opens | Text and voice chat with people of about the same age | [ ] |",
@@ -369,7 +415,8 @@ function gpLadderMd(){
 function gpReviewMd(){
   const d = gp, s = gpScore(d, gpCtx(d)), svc = d.svc || "[product name]";
   return [`# Child-safety review: ${svc}`, "", "_One page for leadership, monthly or on the cadence your reviews already run. Each number says what it counts._", "",
-    "## Where we stand", `- ${s.h}. ${s.met} of ${s.total} safeguards in place; ${s.crit} critical gap${s.crit === 1 ? "" : "s"}.`, `- Stages: ${s.stages.map(st => `${st.st.n} ${gpStageLabel(st).toLowerCase()}`).join(" · ")}`, "",
+    "## Where we stand", `- ${s.h}. ${s.met} of ${s.total} safeguards in place, ${s.evidenced} of them checked or measured; ${s.crit} critical gap${s.crit === 1 ? "" : "s"}.`, `- Stages: ${s.stages.map(st => `${st.st.n} ${gpStageLabel(st).toLowerCase()}`).join(" · ")}`, "",
+    "## Evidence", "", "| Safeguard | Stage | How we know |", "|---|---|---|", ...s.counted.filter(r => r.met).map(r => `| ${r.t} | ${GP_STAGES.find(z => z.k === r.st).n} | ${GP_EVN[r.ev]}${r.ev === "assumed" ? ` ([check: ${r.chk}])` : ""} |`), "",
     "## The numbers", "", "| Measure | This period | Last period | What it counts |", "|---|---|---|---|",
     "| Age-check coverage | [ ] | [ ] | Share of active users of chat and voice with an age check stronger than a typed birthday |",
     "| Strangers reaching children | [ ] | [ ] | Contacts to minors from accounts they aren't connected to, per week |",
@@ -394,6 +441,7 @@ function gpMemoMd(){
   L.push("", "## Gaps, in order");
   if(!s.gaps.length) L.push("No gaps for the answers given.");
   s.gaps.forEach((r, i) => L.push(`${i + 1}. **${r.t}** (${GP_SEVN[r.sev][0]}; owner: ${GP_OWNERS[r.o]}; effort: ${GP_EFF[r.e].toLowerCase()}). ${gpWhy(r, d)} To do: ${r.how}`));
+  if(s.checks.length) L.push("", "## In place, not yet checked", "A safeguard nobody has tested is a belief. Each of these needs the check below, with a date, before it counts as evidence.", ...s.checks.map(r => `- **${r.t}.** ${r.chk}`));
   L.push("", "## What each market expects",
     "- **United Kingdom.** Online Safety Act: illegal content duties since 17 March 2025 and children's safety duties since 25 July 2025. Ofcom's codes expect safer defaults for under-18s on services at risk of grooming, including no messages from accounts a child isn't connected to, and hash matching from larger or higher-risk services. The ICO's Children's Code expects high-privacy and geolocation-off defaults.",
     "- **European Union.** DSA Article 28 requires a high level of privacy, safety and security for minors; the Commission's July 2025 guidelines set out minors' accounts private by default with details hidden from strangers, no adding minors to groups without consent, block and mute, no screenshots of minors' content, parental controls and criteria for age assurance. Article 28(2) bans profiling-based ads to minors. Scanning private messages is constrained; agree the basis for pattern detection before launch. The proposed KIDS Act (September 2026), which would prohibit unsolicited contact from strangers, is not yet law.",
@@ -457,18 +505,27 @@ function gpSpec(){
     multi("def", "Defaults for minors", "For accounts you believe belong to minors, what's true today?", "The defaults do most of the work. Tick what every under-18 account gets without anyone changing a setting.", GP_DEF, "def", "None of these yet", {skip:() => gp.youth === "adult_verified"}),
     multi("det", "What you can see", "What can you detect without reading messages?", "Patterns, not messages. Grooming builds over weeks and each step looks innocent alone.", GP_DET, "det", "Nothing yet"),
     multi("resp", "When a case lands", "When a case is confirmed, what happens?", "The stage where the law and the child both need the response to be ready before the first case.", GP_RESP, "resp", "Nothing written down yet"),
+    {id:"ev", eb:"How you know", title:"For the safeguards you have, how do you know each one works?", why:"A safeguard nobody has tested is a belief. Pick the honest answer; a stage can't be covered on assumptions alone, and anything assumed becomes a check to run.", kind:"custom", opt:true,
+      skip:() => !gpScore(gp, gpCtx(gp)).counted.some(r => r.met), html:() => gpEvRowsHTML(), next:"Continue"},
     multi("meas", "Measuring", "Which of these do you measure?", "Removals say nothing about whether children are safer. These do.", GP_MEAS, "meas", "None yet")
   ];
   const src = typeof loopSource === "function" ? loopSource() : null, org = typeof orgGet === "function" && orgGet().confirmed && GP_YOUTH.some(y => y[0] === orgGet().youth);
   return {k:"grooming", tool:{name:"Grooming pathway review", icon:"route", color:"var(--t-gp)"},
-    intro:{title:"How could an adult reach a child on your product, and what's in the way?", lead:"Eleven plain questions about who can find whom, how a conversation starts, what happens in private and what you do when a case lands. Then a map of the six stages contact moves through, the safeguards that apply to your product and whether each is in place, and five drafts to edit: a product brief, a response ladder, a leadership page, a memo for Legal and starter rules.",
+    intro:{title:"How could an adult reach a child on your product, and what's in the way?", lead:"Twelve plain questions about who can find whom, how a conversation starts, what happens in private, what you do when a case lands, and how you know each safeguard works. Then a map of the six stages contact moves through, the safeguards that apply to your product and whether each is in place and checked, and five drafts to edit: a product brief, a response ladder, a leadership page, a memo for Legal and starter rules.",
       note:"Nothing on these pages describes how grooming is done. Stages are named by what a platform can see, never by what is said.",
       facts:[["About 7 minutes", "One question at a time. Only the questions that apply to your answers."], ["Six stages", "Find, reach, bond, isolate, exchange, exploit. Each gets an exposure and a protection."], ["Not legal advice", "Where each market expects these defaults, with the source, for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { gpView = "page"; renderGrooming(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(org ? [{n:"Start from your workspace profile", run:() => gpAct("fromorg")}] : []).concat(src ? [{n:"Start from your pre-mortem", run:() => gpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => gpAct("example")}]),
     steps, finish:"Map the pathway",
     preview:gpPreviewHTML,
-    done:() => { gp.view = "report"; gp.tab = "plan"; gpSave(); renderGrooming(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+    done:() => { gp.view = "report"; gp.tab = "plan"; gp.at = Date.now(); gpSave(); renderGrooming(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
+}
+// One row per safeguard in place: how you know it works
+function gpEvRowsHTML(){
+  const s = gpScore(gp, gpCtx(gp)), rows = s.counted.filter(r => r.met);
+  if(!rows.length) return `<p class="note">Tick what you have in place first; then say how you know each one works.</p>`;
+  return `<div class="gp-ev">${rows.map(r => `<div class="gp-evrow"><div><b>${esc(r.t)}</b><small>${esc(GP_STAGES.find(z => z.k === r.st).n)} · ${esc(r.chk)}</small></div>
+    <div class="segs gp-evseg" role="group" aria-label="How you know: ${esc(r.t)}">${GP_EV.map(([k, n, h]) => `<button type="button" data-gpev="${r.k}" data-v="${k}" aria-pressed="${r.ev === k}" title="${esc(h)}">${esc(n)}</button>`).join("")}</div></div>`).join("")}</div>`;
 }
 function renderGrooming(){
   const x = gpCtx(gp), s = gpScore(gp, x), report = (gp.view === "report" && !!gp.youth) || gp.ex;
@@ -504,6 +561,7 @@ function gpSetupHTML(x, s){
     <div class="field"><span class="lbl">What you can detect without reading messages</span>${checks("det", GP_DET)}</div>
     <div class="field"><span class="lbl">When a case is confirmed</span>${checks("resp", GP_RESP)}</div>
     <div class="field"><span class="lbl">What you measure</span>${checks("meas", GP_MEAS)}</div>`);
+  if(s.counted.some(r => r.met)) out += sec(n++, "gp-s-ev", "How you know each one works", `${s.evidenced} of ${s.met} checked or measured`, gpEvRowsHTML(), "A safeguard nobody has tested is a belief. A stage can't be covered on assumptions alone, and anything assumed becomes a check to run.");
   const tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
   out += `<div class="card pol-runbar">
       <div class="pol-rb-meter"><div class="pol-rb-top"><span class="eyebrow">Safeguards in place</span>${s.total ? `<span class="pill ${tone}">${s.met} of ${s.total}</span>` : ""}</div>
@@ -520,16 +578,18 @@ function gpStageStrip(s){
 function gpReportHTML(x, s){
   const tab = ["plan", "path", "drafts", "sg"].includes(gp.tab) ? gp.tab : "plan", tone = s.tone || (s.crit ? "crit" : "good");
   const sentence = `${esc(s.h)}. ${s.pct}% of the safeguards that apply are in place${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
-  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.how}));
-  const bench = gpBenchPct();
+  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.how})).concat(s.checks.slice(0, Math.max(0, 3 - s.gaps.length)).map(r => ({t:`Check that ${gpLow(r.t)} really works`, sub:r.chk})));
+  const bench = gpBenchPct(), radar = gpRadar(), stale = gp.ex ? null : gpStale(gp);
   return `<div class="pol-report cp-report gp-report">
     ${gp.shared ? shareBannerHTML('data-gp="unshare"') : ""}
     ${gp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a photo and short-video app for 13 to 25-year-olds, partway there. Start over to map your own product.</span><button type="button" class="btn sm" data-gp="reset">Start over</button></div>` : ""}
+    ${stale ? `<div class="banner cp-ap high"><span><strong>${esc(stale)} changed after this review.</strong> A new feature can open a stage that was covered. Check the answers.</span><button type="button" class="btn sm" data-gp="edit">Edit answers</button></div>` : ""}
     <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>in place</span></div>
       <div><span class="eyebrow">${esc(gpLabel(GP_YOUTH, gp.youth))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable safeguards in place")}</div>
-      <p class="note">${s.first ? `The first open stage is <b>${esc(s.first.st.n.toLowerCase())}</b>: ${esc(gpLow(s.first.st.q))} Close it first; every later stage depends on it.` : "Contact that can't start can't escalate. Keep the defaults as features change."}</p>
+      <p class="note">${s.first ? `The first open stage is <b>${esc(s.first.st.n.toLowerCase())}</b>: ${esc(gpLow(s.first.st.q))} Close it first; every later stage depends on it.` : "Contact that can't start can't escalate. Keep the defaults as features change."}${s.checks.length ? ` ${s.checks.length === 1 ? "One safeguard is" : s.checks.length + " safeguards are"} in place but assumed to work; a stage can't be covered on assumptions.` : ""}</p>
+      ${radar ? `<p class="note gp-radar">Your <a href="#coverage">coverage radar</a> rates child safety at ${radar.cov}% coverage: ${esc(radar.layers.map(z => `${z.n.toLowerCase()} ${CV_LEVELS[z.lv].toLowerCase()}`).join(", "))}. The radar scores the layers of defence; this review scores the path.</p>` : (!gp.ex ? `<p class="note gp-radar"><a href="#coverage">Rate the child-safety row in your coverage radar</a> to see the layers of defence beside this path.</p>` : "")}
       ${bench !== null && !gp.ex ? `<p class="bench-line">Typical for a teen social app like the built-in example: ${bench}% in place</p>` : ""}
-        <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} safeguards in place</span><span class="pill">${s.stages.filter(z => z.status === "open").length} of ${s.stages.filter(z => z.status !== "none").length} stages open</span></div>
+        <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} safeguards in place</span><span class="pill ${s.met && !s.evidenced ? "high" : ""}">${s.evidenced} of ${s.met} checked or measured</span><span class="pill">${s.stages.filter(z => z.status === "open").length} of ${s.stages.filter(z => z.status !== "none").length} stages open</span></div>
         <span class="toast" id="gp-toast" role="status" aria-live="polite"></span></div></div>
     ${gpStageStrip(s)}
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
@@ -538,27 +598,43 @@ function gpReportHTML(x, s){
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${[["plan", "Your plan", s.gaps.length], ["path", "The pathway", s.stages.filter(z => z.status !== "none").length], ["drafts", "Drafts", GP_DRAFTS.length], ["sg", "Safeguards", s.total]].map(([k, nm, c]) => `<button type="button" data-gptab="${k}" aria-pressed="${tab === k}">${nm} <span class="mono" style="opacity:.6">${c}</span></button>`).join("")}</div></div>
       <div class="card-b">${tab === "path" ? gpPathHTML(x, s) : tab === "drafts" ? gpDraftsHTML() : tab === "sg" ? gpSgHTML(s) : gpPlanHTML(s)}</div></div>
     </details>
-    <p class="note">Nothing here describes how grooming is done; stages are named by what a platform can see. Sources checked in ${GP_REVIEWED}. A starting point for product, Legal and Privacy, not legal advice.</p>
+    <p class="note">${gp.at && !gp.ex ? `Reviewed ${new Date(gp.at).toISOString().slice(0, 10)}. Re-check whenever a feature changes who can find or contact a minor. ` : ""}Nothing here describes how grooming is done; stages are named by what a platform can see. Sources checked in ${GP_REVIEWED}. A starting point for product, Legal and Privacy, not legal advice.</p>
   </div>`;
 }
+// In place, but assumed: the checks to run, with the evidence control beside each
+function gpChecksHTML(s){
+  if(!s.checks.length) return "";
+  return `<div class="pol-sec-h gp-checks-h"><h4>Check it works <span class="note">${s.checks.length} in place but assumed</span></h4><p class="note">A safeguard nobody has tested is a belief. Run the check, then say how you know.</p></div>
+    <div class="cp-gaps">${s.checks.map(r => `<article class="cp-gap gp-check"><span class="cv-gn mono">✓</span><div class="cp-gb">
+      <span class="eyebrow">${esc(GP_STAGES.find(z => z.k === r.st).n)} · <span class="gp-tag">${esc(r.tag)}</span></span><h4>${esc(r.t)} <span class="pill high">Assumed</span></h4>
+      <p class="cp-fix"><b>How to check.</b> ${esc(r.chk)}</p>
+      <div class="segs gp-evseg" role="group" aria-label="How you know: ${esc(r.t)}">${GP_EV.map(([k, n, h]) => `<button type="button" data-gpev="${r.k}" data-v="${k}" aria-pressed="${r.ev === k}" title="${esc(h)}">${esc(n)}</button>`).join("")}</div></div></article>`).join("")}</div>`;
+}
+// The prevention measures that live in the metrics framework
+function gpMetricsHTML(){
+  const xs = Object.keys(GP_MX).map(k => ({k, m:gpMetric(k)})).filter(z => z.m);
+  if(!xs.length) return "";
+  return `<div class="pol-sec-h gp-mx-h"><h4>Track it <span class="note">in the metrics framework</span></h4></div>
+    <ul class="gp-mx">${xs.map(({k, m}) => `<li><a href="#metrics/${m.slug}">${esc(m.m.n)}</a><span class="note">${esc(gpLabel(GP_MEAS, k))}${m.tracked ? " · tracked today" : (gp.meas || []).includes(k) ? " · you measure this; mark it tracked there" : ""}</span></li>`).join("")}</ul>`;
+}
 function gpPlanHTML(s){
-  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Every safeguard that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever a feature changes who can find or contact a minor." : "Say who can use the product and what it allows to see what applies."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Every safeguard that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever a feature changes who can find or contact a minor." : "Say who can use the product and what it allows to see what applies."}</p></div>` + gpChecksHTML(s) + gpMetricsHTML();
   return `<div class="pol-sec-h"><p class="note">Earliest open stage first, then by severity. Each gap names who usually owns it, the effort, and where it's expected.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc(GP_STAGES.find(z => z.k === r.st).n)} · <span class="gp-tag">${esc(r.tag)}</span></span><h4>${esc(r.t)} ${pill(GP_SEVN[r.sev][1], GP_SEVN[r.sev][0])}</h4>
       <p>${esc(gpWhy(r, gp))}</p><p class="cp-fix"><b>What to do.</b> ${esc(r.how)}${r.link ? ` <a href="#${r.link[0]}">${esc(r.link[1])}</a>` : ""}</p>
-      <div class="cp-gm"><span class="tag">${esc(GP_OWNERS[r.o])}</span><span class="tag">${esc(GP_EFF[r.e])} effort</span>${r.src.map(k => `<a class="tag" href="${GP_SRC[k][1]}" target="_blank" rel="noopener">${esc(GP_SRC[k][0].split(",")[0])}</a>`).join("")}</div></div></article>`).join("")}</div>`;
+      <div class="cp-gm"><span class="tag">${esc(GP_OWNERS[r.o])}</span><span class="tag">${esc(GP_EFF[r.e])} effort</span>${r.src.map(k => `<a class="tag" href="${GP_SRC[k][1]}" target="_blank" rel="noopener">${esc(GP_SRC[k][0].split(",")[0])}</a>`).join("")}</div></div></article>`).join("")}</div>` + gpChecksHTML(s) + gpMetricsHTML();
 }
 function gpPathHTML(x, s){
   const allows = st => st.k === "find" ? gpOpts(GP_FIND, gp.find) : st.k === "reach" ? gpOpts(GP_REACH, gp.reach) : st.k === "bond" ? gpOpts(GP_GIFT, gp.gift).concat(x.priv.has("text") ? ["Private text"] : []) : st.k === "isolate" ? gpOpts(GP_PRIV, gp.priv.filter(k => ["links", "vanish", "e2ee"].includes(k))) : st.k === "exchange" ? gpOpts(GP_PRIV, gp.priv.filter(k => ["media", "calls"].includes(k))).concat(x.find.has("live") ? ["Live streams"] : []) : [];
-  return `<p class="note">Each stage shows what your product allows, how exposed that leaves a minor, and what's in the way. Exposure comes from your feature answers; protection from the safeguards in place for that stage.</p>
+  return `<p class="note">Each stage shows what your product allows, how exposed that leaves a minor, and what's in the way. Exposure comes from your feature answers; protection from the safeguards in place for that stage. A stage is covered only when its safeguards are checked or measured, not assumed.</p>
     <div class="gp-path">${s.stages.map(st => `<article class="card gp-stage ${st.status}">
       <div class="gp-sh"><span class="gp-stn">${st.i + 1}</span><div><h4>${esc(st.st.n)} <span class="gp-tag">${esc(st.st.tag)}</span></h4><p class="note">${esc(st.st.q)}</p></div><span class="pill ${GP_STATUS[st.status][1]}">${GP_STATUS[st.status][0]}</span></div>
       ${st.status === "none" ? `<p class="note">${esc(st.st.none || "Nothing applies.")}</p>` : `
       <div class="gp-meters"><div><span class="gp-ml">Exposure</span><div class="gp-m" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="${st.e}" aria-label="Exposure at ${esc(st.st.n)}"><i style="width:${st.e / 3 * 100}%;background:var(--${["good", "med", "high", "crit"][st.e]})"></i></div><small>${["None", "Low", "Medium", "High"][st.e]}</small></div>
         <div><span class="gp-ml">Protection</span><div class="gp-m" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="${st.prot}" aria-label="Protection at ${esc(st.st.n)}"><i style="width:${st.prot / 3 * 100}%;background:var(--good)"></i></div><small>${st.reqs.length ? `${st.met} of ${st.reqs.length} safeguards` : "Nothing needed"}</small></div></div>
       ${st.st.k !== "exploit" ? `<p class="gp-allow"><b>What you allow.</b> ${allows(st.st).length ? esc(allows(st.st).join(", ")) : "Nothing at this stage"}.</p>` : ""}
-      ${st.reqs.filter(r => r.met).length ? `<p class="gp-have"><b>In the way.</b> ${esc(st.reqs.filter(r => r.met).map(r => r.t).join("; "))}.</p>` : ""}
+      ${st.reqs.filter(r => r.met).length ? `<p class="gp-have"><b>In the way.</b> ${st.reqs.filter(r => r.met).map(r => esc(r.t) + (r.ev === "assumed" ? ` <span class="gp-tag">assumed</span>` : ` <span class="gp-tag gp-tag-ok">${esc(GP_EVN[r.ev].toLowerCase())}</span>`)).join("; ")}.</p>` : ""}
       ${st.open.length ? `<p class="gp-open"><b>Still open.</b> ${esc(st.open.map(r => r.t).join("; "))}.</p>` : ""}`}
     </article>`).join("")}</div>`;
 }
@@ -574,7 +650,7 @@ function gpDraftsHTML(){
 function gpSgHTML(s){
   if(!s.reqs.length) return `<p class="note">Say who can use the product and what it allows to see which safeguards apply.</p>`;
   return GP_STAGES.map(st => ({st, rs:s.reqs.filter(r => r.st === st.k)})).filter(z => z.rs.length).map(({st, rs}) => `<section class="cp-rq"><h4>${esc(st.n)} <span class="note">${rs.filter(r => r.met).length} of ${rs.length}</span></h4>
-      <ul class="tr-check">${rs.map(r => `<li class="${r.met ? "ok" : r.opt ? "na" : "miss"}"><span class="tr-st">${r.met ? "✓" : "○"}</span><div><b>${esc(r.t)}</b> <span class="gp-tag">${esc(r.tag)}</span>${r.opt ? ` <span class="note">Optional</span>` : ""}<p>${esc(gpWhy(r, gp))}</p><p class="note">${r.src.map(k => `<a href="${GP_SRC[k][1]}" target="_blank" rel="noopener">${esc(GP_SRC[k][0])}</a>`).join("; ")}</p></div></li>`).join("")}</ul></section>`).join("")
+      <ul class="tr-check">${rs.map(r => `<li class="${r.met ? "ok" : r.opt ? "na" : "miss"}"><span class="tr-st">${r.met ? "✓" : "○"}</span><div><b>${esc(r.t)}</b> <span class="gp-tag">${esc(r.tag)}</span>${r.met ? ` <span class="gp-tag ${r.ev === "assumed" ? "" : "gp-tag-ok"}">${esc(GP_EVN[r.ev])}</span>` : ""}${r.opt ? ` <span class="note">Optional</span>` : ""}<p>${esc(gpWhy(r, gp))}</p><p class="note"><b>How to check.</b> ${esc(r.chk)}</p><p class="note">${r.src.map(k => `<a href="${GP_SRC[k][1]}" target="_blank" rel="noopener">${esc(GP_SRC[k][0])}</a>`).join("; ")}</p></div></li>`).join("")}</ul></section>`).join("")
     + `<p class="note">Sources checked in ${GP_REVIEWED}. Not legal advice.</p>`;
 }
 
@@ -584,7 +660,10 @@ function tkFromGrooming(){
   return s.gaps.map((r, i) => ({id:"gp-" + r.k, title:r.t, group:GP_SEVN[r.sev][0] === "Critical" ? "Critical" : GP_SEVN[r.sev][0] + " priority", owner:GP_OWNERS[r.o], pr:GP_SEV[r.sev] + 1, done:false, def:r.sev !== "med" || i < 12,
     labels:["trust-and-safety", "child-safety", "grooming-pathway"],
     desc:[r.t, "", gpWhy(r, gp), "", "What to do: " + r.how, `Stage: ${GP_STAGES.find(z => z.k === r.st).n}. Owner: ${GP_OWNERS[r.o]}. Effort: ${GP_EFF[r.e].toLowerCase()}.`, "Sources: " + r.src.map(k => GP_SRC[k][1]).join(" · "), "",
-      `From a grooming pathway review of ${gp.svc || "your product"}, made with T&S Workbench. Not legal advice.`].join("\n")}));
+      `From a grooming pathway review of ${gp.svc || "your product"}, made with T&S Workbench. Not legal advice.`].join("\n")}))
+    .concat(s.checks.map(r => ({id:"gp-check-" + r.k, title:`Check that it works: ${gpLow(r.t)}`, group:"Check it works", owner:GP_OWNERS[r.o], pr:r.sev === "crit" ? 3 : 2, done:false, def:r.sev !== "med",
+      labels:["trust-and-safety", "child-safety", "grooming-pathway", "evidence"],
+      desc:[`${r.t} is in place but nobody has checked it works.`, "", "How to check: " + r.chk, "", `Stage: ${GP_STAGES.find(z => z.k === r.st).n}. Owner: ${GP_OWNERS[r.o]}.`, "", `From a grooming pathway review of ${gp.svc || "your product"}, made with T&S Workbench.`].join("\n")})));
 }
 
 /* ---------- events ---------- */
@@ -597,7 +676,7 @@ function gpAct(a){
     case "reset": { const snap = JSON.parse(JSON.stringify(gp)); gp = GP_BLANK(); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { gp = s2; gpSave(); renderGrooming(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "sharelink": { const s = gpScore(gp, gpCtx(gp)); return shareCopy("grooming", gp, {svc:gp.svc, youth:gp.youth, pct:s.pct, crit:s.crit}, $("#gp-toast")); }
     case "unshare": gp.shared = false; gpSave(); return gpAct("save");
-    case "build": gp.view = "report"; gp.tab = "plan"; gpSave(); renderGrooming(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "build": gp.view = "report"; gp.tab = "plan"; gp.at = Date.now(); gpSave(); renderGrooming(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": gpView = null; gdReset("grooming"); renderGrooming(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": gp.view = "setup"; gpView = "page"; gpSave(); renderGrooming(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "save": { const msg = wsSaveTool("grooming", gp, gpTitle(gp)); renderGrooming(); return flashIn($("#gp-toast"), msg); }
@@ -609,9 +688,10 @@ function gpAct(a){
 }
 const gpHere = () => hashNow().split("/")[0] === "grooming";
 document.addEventListener("click", e => {
-  const b = e.target.closest && e.target.closest("[data-gp],[data-gpyouth],[data-gpage],[data-gptab],[data-gpdraft]");
+  const b = e.target.closest && e.target.closest("[data-gp],[data-gpyouth],[data-gpage],[data-gptab],[data-gpdraft],[data-gpev]");
   if(!b || !gpHere() || !view.contains(b)) return;
   const d = b.dataset;
+  if(d.gpev){ gp.ev = Object.assign({}, gp.ev, {[d.gpev]:d.v}); gp.ex = false; gpSave(); const y = window.scrollY; renderGrooming(); window.scrollTo(0, y); const t = document.querySelector(`[data-gpev="${d.gpev}"][data-v="${d.v}"]`); if(t) try{ t.focus({preventScroll:true}); }catch(e2){} return; }
   if(d.gpyouth){ gp.youth = d.gpyouth; if(d.gpyouth === "adult_verified") gp.age = "verified"; return gpRerender(`[data-gpyouth="${d.gpyouth}"]`); }
   if(d.gpage){ gp.age = d.gpage; return gpRerender(`[data-gpage="${d.gpage}"]`); }
   if(d.gptab){ gp.tab = d.gptab; gpSave(); renderGrooming(); const t = document.querySelector(`[data-gptab="${d.gptab}"]`); if(t) t.focus(); return; }

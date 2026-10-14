@@ -20,7 +20,8 @@ const body = function(){
   eq(/How could a stranger start a conversation\?/.test(view.innerHTML), true, "then reach"); gdPick(gdCur, "dm_any"); gdGo(gdCur, "next");
   eq(/What can happen in private between two users\?/.test(view.innerHTML), true, "then private"); gdPick(gdCur, "__none"); eq(gp.priv.length, 0, "none clears and moves on");
   eq(/Can value move between users\?/.test(view.innerHTML), true, "then value");
-  const live = gdLive(gdCur); eq(live.length, 11, "eleven questions for a teen product"); eq(live.some(z => z.id === "def"), true, "defaults for minors are asked");
+  const live = gdLive(gdCur); eq(live.length, 11, "eleven questions for a teen product with nothing in place yet"); eq(live.some(z => z.id === "def"), true, "defaults for minors are asked");
+  gp.def = ["private"]; eq(gdLive(gpSpec()).some(z => z.id === "ev"), true, "once something is in place, the how-you-know question appears"); gp.def = [];
   gp.youth = "adult_verified"; eq(gdLive(gpSpec()).some(z => z.id === "age" || z.id === "def"), false, "an age-checked adult product skips the age and defaults questions");
   out.push("guided: " + live.length + " questions, only the ones that apply, with the content rule on the intro");
   // the one-page form is still there
@@ -32,9 +33,11 @@ const body = function(){
   eq(score().stages.every(s => s.status === "none"), true, "nothing allowed: no stage is on the product"); eq(score().h, "Strangers can't reach each other on this product", "verdict for a product with no contact");
   gp.reach = ["dm_any"]; eq(stage("reach").e, 3, "a private message to anyone is high exposure at reach"); eq(stage("reach").status, "open", "with nothing in the way it's open");
   eq(score().h, GP_STAGES[1].open, "the first open stage names the verdict"); eq(score().first.st.k, "reach", "and it's reach");
-  gp.def = ["dmconn", "notice"]; gp.det = ["rules"]; gp.age = "estimated"; eq(stage("reach").met, 4, "contact limits, a cap, a notice and age assurance all count at reach"); eq(stage("reach").status, "covered", "all four in place: covered");
+  gp.def = ["dmconn", "notice"]; gp.det = ["rules"]; gp.age = "estimated"; eq(stage("reach").met, 4, "contact limits, a cap, a notice and age assurance all count at reach"); eq(stage("reach").status, "narrowed", "all four in place but assumed: only narrowed");
+  eq(score().checks.length, 4, "four safeguards to check"); eq(score().evidenced, 0, "none evidenced yet");
+  gp.ev = {dmconn:"checked", newcap:"checked", notice:"measured", age:"measured"}; eq(stage("reach").status, "covered", "checked or measured: covered"); eq(score().checks.length, 0, "nothing left to check");
   gp.find = ["search", "suggest", "profile", "posts"]; eq(stage("find").e, 3, "four ways to find a user is high exposure"); eq(stage("find").status, "open", "nothing in the way at find");
-  gp.def.push("private"); eq(stage("find").status, "narrowed", "one of three find safeguards: narrowed"); gp.def.push("nosuggest"); eq(stage("find").status, "covered", "two of two counted find safeguards: covered");
+  gp.def.push("private"); eq(stage("find").status, "narrowed", "one of three find safeguards: narrowed"); gp.def.push("nosuggest"); gp.ev.private = "checked"; gp.ev.nosuggest = "checked"; eq(stage("find").status, "covered", "two of two counted find safeguards, both checked: covered");
   gp.priv = ["text", "media"]; eq(stage("exchange").e, 2, "media and text in private: medium exposure at exchange"); eq(stage("exchange").open.map(r => r.k).join(","), "blur,hash,classifier", "the exchange safeguards still open");
   gp.youth = "adult_verified"; eq(stage("find").e <= 1 && stage("reach").e <= 1, true, "an age-checked adult product caps exposure at low");
   gp = Object.assign(GP_BLANK(), {youth:"kids", age:"none", reach:["group", "voice"], find:["spaces"]});
@@ -47,6 +50,8 @@ const body = function(){
   eq(s.pct > 0 && s.pct < 100, true, "the example is partway there: " + s.pct + "%"); eq(s.first.st.k, "reach", "Pixelry's first open stage is reach");
   eq(/This is an example/.test(h) && /class="gp-strip"/.test(h) && /gp-st open/.test(h) && /Read the chapter/.test(h) && /Edit answers/.test(h) && /Copy link/.test(h), true, "example banner, stage strip, chapter link and header actions");
   eq((h.match(/<li><b>/g) || []).length, 3, "three actions under the verdict");
+  eq(new RegExp(`${s.evidenced} of ${s.met} checked or measured`).test(h), true, "the evidence count is a pill"); eq(s.checks.length > 0 && /Check it works/.test(h), true, "the plan ends with the checks to run");
+  eq(/Track it/.test(h) && /#metrics\/unsafe-contact-rate-for-minors/.test(h), true, "the prevention measures link into the metrics framework");
   ["path", "drafts", "sg"].forEach(t => { gp.tab = t; renderGrooming(); if(bad(view.innerHTML)) throw new Error(t + " tab bad: " + where(view.innerHTML)); });
   gp.tab = "path"; renderGrooming(); eq((view.innerHTML.match(/class="card gp-stage/g) || []).length, 6, "six stage cards on the pathway tab");
   GP_DRAFTS.forEach(([k]) => { gp.draft = k; renderGrooming(); if(bad(view.innerHTML)) throw new Error("draft " + k + " bad: " + where(view.innerHTML)); });
@@ -61,7 +66,12 @@ const body = function(){
   const html = cpMd(memo); eq(/\*\*|\|---/.test(html), false, "drafts render without raw Markdown");
   out.push("drafts: brief, ladder, leadership page, memo and starter rules");
   // tracker, workspace, search and sharing
-  gp.ex = false; const tasks = tkFromGrooming(); eq(tasks.length, score().gaps.length, "one task per gap"); eq(tasks[0].pr, 4, "critical gaps are highest priority"); eq(/Sources: https/.test(tasks[0].desc), true, "each task carries its sources");
+  gp.ex = false; const tasks = tkFromGrooming(); eq(tasks.length, score().gaps.length + score().checks.length, "one task per gap and per check"); eq(tasks[0].pr, 4, "critical gaps are highest priority"); eq(/Sources: https/.test(tasks[0].desc), true, "each task carries its sources");
+  eq(tasks.some(t => t.group === "Check it works" && /How to check/.test(t.desc)), true, "assumed safeguards become check tasks");
+  // the radar beside the path, and the re-check prompt
+  cv = {src:null, ex:false, r:{child:{policy:2, detect:1, enforce:2, appeal:1}}}; renderGrooming(); eq(/coverage radar<\/a> rates child safety at/.test(view.innerHTML), true, "the radar's child-safety row shows beside the path");
+  gp.at = Date.now() - 1000; wsPut({id:"TSW-9", kind:"premortem", title:"Teen live", data:{}, updated:Date.now()}); renderGrooming(); eq(/Teen live changed after this review/.test(view.innerHTML), true, "a pre-mortem saved after the review prompts a re-check");
+  gp.at = null; wsDel("TSW-9");
   const msg = wsSaveTool("grooming", gp, gpTitle(gp)), it = Object.values(wsItems()).find(i => i.kind === "grooming");
   eq(!!it && new RegExp(score().pct + "% in place").test(itemSummary(it).html), true, "workspace summary"); eq(cmdkItems().some(x => x.label === "Grooming pathway review"), true, "search reaches it");
   SHARE_APPLY.grooming(JSON.parse(JSON.stringify(GP_EXAMPLE))); eq(gp.shared === true && gp.svc === "Pixelry", true, "a shared link lands as a read-only copy");

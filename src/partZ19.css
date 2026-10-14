@@ -46,6 +46,21 @@
 .gp-open b{color:var(--crit)}
 .gp-have b{color:var(--good)}
 @media (max-width:560px){.gp-meters{grid-template-columns:1fr}.gp-sh{grid-template-columns:auto minmax(0,1fr)}.gp-sh .pill{grid-column:2}}
+/* how you know: one row per safeguard in place */
+.gp-ev{display:grid;gap:8px}
+.gp-evrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.gp-evrow b{font-size:14px;font-weight:600;display:block}
+.gp-evrow small{display:block;font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:2px}
+.gp-evseg{display:inline-flex;flex-wrap:wrap}
+.gp-evseg button{font-size:12.5px;padding:5px 10px}
+.gp-tag-ok{color:var(--good);background:var(--good-soft)}
+.gp-check .cv-gn{color:var(--good)}
+.gp-checks-h,.gp-mx-h{margin-top:18px}
+.gp-checks-h h4,.gp-mx-h h4{margin:0 0 4px;font-size:15.5px;display:flex;gap:8px;align-items:baseline}
+.gp-mx{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.gp-mx li{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13.5px}
+.gp-radar{margin-top:4px}
+@media (max-width:640px){.gp-evrow{grid-template-columns:1fr}}
 /* the starter-rules draft */
 pre.gp-code{white-space:pre-wrap;word-break:break-word;font:12.5px/1.55 var(--mono);color:var(--ink);margin:0}
 /* duties by market */
