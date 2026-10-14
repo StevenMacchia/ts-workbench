@@ -1,0 +1,23 @@
+name: test
+on:
+  push: {branches: [main]}
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      # The test chain has no dependencies (only Node built-ins), so install only if a lockfile exists.
+      - run: if [ -f package-lock.json ]; then npm ci; fi
+      - run: npm test
+  built-output:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node src/build-ws.js
+      # Fails if the committed docs/ is not what the committed src/ builds to.
+      - run: git diff --exit-code -- docs/index.html docs/sitemap.xml docs/robots.txt

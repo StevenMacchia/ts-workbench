@@ -1,0 +1,4 @@
+# The build's anchors are exact strings, so keep LF on every checkout (Windows and Linux runners).
+src/** text=auto eol=lf
+package.json text=auto eol=lf
+docs/** text=auto eol=lf
