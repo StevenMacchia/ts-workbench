@@ -4,6 +4,7 @@
 const KINDS = {
   premortem:{n:"Abuse pre-mortem", plural:"Pre-mortems", icon:"i-radar", route:"premortem", prefix:"TSW"},
   tabletop:{n:"Incident tabletop", plural:"Tabletops", icon:"i-siren", route:"tabletop", prefix:"TT"},
+  postmortem:{n:"Incident post-mortem", plural:"Post-mortems", icon:"i-doc", route:"postmortem", prefix:"PX"},
   metrics:{n:"Metrics framework", plural:"Metrics", icon:"i-gauge", route:"metrics", prefix:"MF"},
   vendors:{n:"Vendor scorecard", plural:"Vendor scorecards", icon:"i-scale", route:"vendors", prefix:"VS"},
   policy:{n:"Policy stress-tester", plural:"Policy tests", icon:"i-doc", route:"policy", prefix:"PT"},
@@ -60,6 +61,7 @@ function itemSummary(it){
   if(it.kind==="redteam" && typeof rtDrills === "function"){ const f = d.findings || [], s4 = f.some(x => x.sev === 4 && x.status !== "closed"), open = f.filter(x => x.status !== "closed").length;
     const cls = s4 ? "crit" : open ? "high" : "good", label = s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s");
     return {html:`<span class="pill ${cls}">${label}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`, chip:{cls, label}}; }
+  if(it.kind==="postmortem" && typeof pxScore === "function"){ const s = pxScore(d), n = (d.acts||[]).filter(a => a.w).length, cls = s.score >= 75 ? "good" : s.score >= 60 ? "high" : "crit"; return {html:`<span class="pill ${cls}">Response grade ${s.grade}</span><span class="note">Sev ${esc(d.sev||"?")} · ${n} action${n===1?"":"s"}</span>`, chip:{cls, label:`Grade ${s.grade}`}}; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
     const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
     return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
@@ -239,6 +241,7 @@ function bindWorkspace(){
     if(d.wsNew){ const k = d.wsNew;
       if(k==="premortem"){ pm = orgPrefillPM(Object.assign(blankPM(), {projectId:wsActive()})); store.set("pm3", pm); }
       if(k==="tabletop"){ tt = null; store.set("tt", null); }
+      if(k==="postmortem"){ px = PX_BLANK(); pxSave(); }
       if(k==="metrics"){ store.set("ws:cur:metrics", null); mx = {platform:"social", stage:"2", reg:true}; store.set("mx", mx); }
       if(k==="vendors"){ store.set("ws:cur:vendors", null); vx = JSON.parse(JSON.stringify(DEFAULT_V)); store.set("vx", vx); }
       if(k==="policy"){ store.set("ws:cur:policy", null); pol = {rule:"", type:"social", regions:["us","eu","uk"], heur:null, result:null, ts:null}; store.set("pol", pol); }
@@ -257,7 +260,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors","policy","maturity","coverage","transparency","coppa","dsa","eval"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity","coverage","transparency","coppa","dsa","eval","postmortem"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();

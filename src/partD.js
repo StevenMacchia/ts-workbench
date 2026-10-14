@@ -280,7 +280,7 @@ function countUp(el, key){
 // The one app-icon tile (Raycast / Arc / Linear style): a white Lucide glyph on a two-stop gradient.
 // Tone is the tool's group: assess, prepare, measure, ai, learn, or neutral. One map, used by every renderer.
 const TOOL_TONE = {
-  maturity:"assess", premortem:"assess", coverage:"assess", tabletop:"assess",
+  maturity:"assess", premortem:"assess", coverage:"assess", tabletop:"assess", postmortem:"assess",
   policy:"prepare", coppa:"prepare", dsa:"prepare", vendors:"prepare",
   metrics:"measure", eval:"measure",
   notice:"ai", appeal:"ai", transparency:"ai", redteam:"ai",
@@ -288,7 +288,7 @@ const TOOL_TONE = {
   workspace:"neutral", plan:"neutral", about:"neutral", credits:"neutral", overview:"neutral", tools:"neutral", roost:"neutral", review:"neutral"
 };
 const TOOL_ICON = {
-  maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren", policy:"doc", coppa:"coppa", dsa:"dsa", vendors:"scale",
+  maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren", postmortem:"doc", policy:"doc", coppa:"coppa", dsa:"dsa", vendors:"scale",
   metrics:"gauge", eval:"eval", notice:"mail", appeal:"appeal", transparency:"chart", redteam:"shield",
   learn:"book", redteamllm:"shield", redteamworld:"world", glossary:"glossary", tsglossary:"glossary",
   workspace:"folder", plan:"send", about:"info", credits:"wrench", overview:"home", tools:"layers", roost:"plug", review:"chart"
@@ -467,6 +467,7 @@ const CHAPTER_LINK = {
   vendors:["choosing-vendors-and-tools", "Choosing vendors and tools"],
   policy:["writing-policy", "Writing policy and an enforcement ladder"],
   tabletop:["crisis-response", "Crisis response"],
+  postmortem:["crisis-response", "Crisis response"],
   metrics:["measuring-what-matters", "Measuring what matters"],
   premortem:["know-your-risks", "Know your risks"],
   coppa:["child-safety-and-age-assurance", "Child safety and age assurance"],

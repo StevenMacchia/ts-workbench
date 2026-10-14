@@ -1,0 +1,67 @@
+/* Incident post-mortem (partPX.js). The tool reuses the guided flow, the report cards, the segmented tabs and the tracker;
+   this file only adds the three custom rows (timeline, promises, actions), the verdict ring tones and the document. */
+.px-ring{border-color:color-mix(in oklab, var(--t-tt) 35%, var(--sunk))}
+.px-ring.good{border-color:color-mix(in oklab, var(--good) 40%, var(--sunk))}
+.px-ring.high{border-color:color-mix(in oklab, var(--high) 40%, var(--sunk))}
+.px-ring.crit{border-color:color-mix(in oklab, var(--crit) 40%, var(--sunk))}
+.px-ring.crit b,.px-ring.high b,.px-ring.good b{color:var(--ink)}
+
+/* Guided steps with more than one field per row */
+.px-tl,.px-prs,.px-acts{display:grid;gap:10px}
+.px-trow,.px-prow,.px-arow{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.px-trow{display:grid;gap:8px}
+.px-tlab{display:flex;align-items:center;gap:10px;font-size:14px}
+.px-tlab .btn{margin-left:auto}
+.px-n{flex:none;width:24px;height:24px;border-radius:50%;display:inline-grid;place-content:center;font:600 12px/1 var(--mono);color:var(--accent);background:color-mix(in oklab, var(--accent) 12%, transparent)}
+.px-tf{display:grid;grid-template-columns:minmax(0,248px) minmax(0,1fr);gap:8px}
+.px-tf .input,.px-prow .input,.px-prow .select,.px-arow .input,.px-arow .select{width:100%;min-width:0;font-size:16px}
+.px-tlx{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-top:10px}
+.px-tlx .note{margin:0}
+.px-prow{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) minmax(0,150px) auto;gap:8px 10px;align-items:end}
+.px-prow .field,.px-arow .field{margin:0}
+.px-prow label,.px-arow label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.px-arow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;align-items:start}
+.px-arow .px-n{margin-top:2px}
+.px-af{display:grid;gap:8px;min-width:0}
+.px-arow textarea.input{min-height:96px;font-family:inherit;line-height:1.5;resize:vertical;overflow-wrap:anywhere}
+.px-ao{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,170px);gap:8px 10px}
+.px-aside{padding:12px 14px;margin-bottom:12px}
+.px-aside p{margin:6px 0 0;font-size:13.5px;line-height:1.5}
+@media (max-width:640px){
+  .px-tf{grid-template-columns:1fr}
+  .px-prow{grid-template-columns:minmax(0,1fr) minmax(0,150px)}
+  .px-prow .px-pw{grid-column:1 / -1;order:3}
+  .px-prow > .btn{justify-self:end}
+  .px-ao{grid-template-columns:1fr}
+  .px-arow{grid-template-columns:minmax(0,1fr)}
+  .px-arow > .px-n{display:none}
+}
+
+/* The report: the document, the tabs, the redaction checklist */
+.px-tw{overflow-x:auto;margin:6px 0 12px}
+.px-tw table{min-width:420px}
+.px-tw td{vertical-align:top;overflow-wrap:anywhere}
+.px-dv{margin-bottom:14px}
+.px-doc{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:18px 22px;font-size:14px;line-height:1.6}
+.px-doc h3{font-size:18px;margin:0 0 4px;letter-spacing:-.015em}
+.px-doc h4{font-size:15px;margin:18px 0 6px}
+.px-doc h5{font-size:14px;margin:12px 0 4px}
+.px-doc p{margin:0 0 8px}
+.px-doc .px-lab{margin:10px 0 4px}
+.px-doc ul{margin:0 0 8px;padding-left:20px}
+.px-doc li{margin:2px 0}
+.px-redact{margin-top:14px;padding:14px 18px}
+.px-redact ul{margin:8px 0;padding-left:20px;display:grid;gap:4px;font-size:13.5px}
+.px-redact .note{margin:6px 0 0}
+.px-layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.px-layer{padding:14px 16px}
+.px-lh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.px-layer p{margin:6px 0 0;display:grid;gap:4px;justify-items:start;font-size:13.5px}
+.px-layer .pill{white-space:normal;text-align:left}
+.px-duties{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:12px}
+.px-duties p{margin:4px 0 0;font-size:13.5px;line-height:1.5}
+.px-parts{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:14px}
+.px-ph{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px;font-size:14px}
+.px-parts .pol-meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.px-parts .pol-meter i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.px-parts .note{margin:6px 0 0}

@@ -68,6 +68,7 @@ const HEAD_META = () => {
   const ai = ["Runs on your own Claude account", "Nothing stored on a server", "A person makes the final call"];
   const m = {
     premortem:["radar", () => [HARMS.length + " abuse risks", Object.keys(SG).length + " safeguards", REGIONS.length + " jurisdictions"]],
+    postmortem:["doc", () => ["4 layers of failure", "The chapter 13 template", "Blameless by design"]],
     tabletop:["siren", () => [SCENARIOS.length + " crisis scenarios", (typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8) + " company types", "The law behind every call"]],
     metrics:["gauge", () => [METRICS.length + " metrics", Object.keys(MX_PLATFORMS).length + " platform types", "Starter SQL for each"]],
     vendors:["scale", () => [CRITERIA.length + " weighted criteria", "Wellness and security minimums", "RFP question bank"]],
@@ -91,7 +92,7 @@ const HEAD_META = () => {
   return {icon:m[0], stats};
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
-const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", postmortem:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
 const headRoute = () => hashNow().split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };

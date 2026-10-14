@@ -1,8 +1,8 @@
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
+const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", postmortem:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", postmortem:"Incident post-mortem", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
 // One-line summaries for the page description, per route (the same lines as the All tools cards, plain
 // text). The three AI assistants take theirs from AI_TOOLS. Any route not listed here, and the home page,
 // fall back to the site description captured at load.
@@ -15,6 +15,7 @@ const ROUTE_DESC = {
   premortem:"Profile a product and see how it will be misused before launch.",
   coverage:"See where your products' risk outruns the defenses you have in place.",
   tabletop:"Rehearse a crisis and learn from every call, with the law behind it.",
+  postmortem:"After a real incident, write a blameless post-mortem in fifteen minutes: a one-page document, a grade for the response, and three actions with owners and dates.",
   policy:"Paste a rule to find vague words, missing exceptions and hard edge cases.",
   coppa:"Check children's privacy against the amended COPPA Rule, with drafts for Legal.",
   dsa:"Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",
@@ -66,7 +67,7 @@ function seoUpdate(name){
 // The tools, one entry per route, in the order the About page lists them. The single source for "how many tools":
 // the About page counts it, the home-page heading and the READMEs read it from this line (_build/gen-readmes.js
 // parses it). The guides, glossaries, plan and review pages are not tools. Add a new tool here, to ROUTE_LABEL and to AB_GROUPS.
-const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","dsa","tabletop","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
+const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","dsa","tabletop","postmortem","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -77,6 +78,7 @@ function relTime(t){
 function openSaved(id){
   const it = wsItems()[id]; if(!it) return;
   if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); pm.base = typeof pmSnap === "function" ? pmSnap(pm) : null; savePM(); }
+  if(it.kind==="postmortem"){ px = Object.assign(PX_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); pxSave(); store.set("ws:cur:postmortem", it.id); }
   if(it.kind==="tabletop"){ tt = JSON.parse(JSON.stringify(it.data)); store.set("tt", tt); }
   if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }
   if(it.kind==="vendors"){ vx = JSON.parse(JSON.stringify(it.data)); store.set("vx", vx); store.set("ws:cur:vendors", it.id); }
@@ -110,7 +112,7 @@ function shellUpdate(name){
     if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
     $$("#sb-assess .navlink[data-step]").forEach(a => { const st = JOURNEY[+a.dataset.step - 1]; let ok = false; try{ ok = !!(st && st.done()); }catch(e){} a.classList.toggle("done", ok); }); }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
-  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", dsa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
+  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", dsa:"assess", tabletop:"prepare", postmortem:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";
@@ -134,7 +136,7 @@ function cmdkItems(){
   const out = [];
   const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, tone:TOOL_TONE[route] || "neutral", icon:iconId, run:()=>goRoute(route)});
   go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("Your plan","plan","var(--accent)","send"); go("Quarter by quarter","review","var(--faint)","chart"); go("My workspace","workspace","var(--faint)","user");
-  go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
+  go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren"); go("Incident post-mortem","postmortem","var(--t-tt)","doc");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
   go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");

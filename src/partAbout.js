@@ -10,6 +10,7 @@ const AB_GROUPS = [
     ["t-cp","coppa","COPPA readiness","Works out whether the US children's privacy law applies, maps children's data, and turns gaps against the 2025 amended Rule into a plan and four drafts for Legal."],
     ["t-ds","dsa","DSA readiness","Works out which duties under the EU Digital Services Act apply to a service, article by article, and turns the gaps into a plan and four drafts: a statement of reasons, a notice-and-action procedure, a complaints process and a memo for Legal."]]],
   ["Prepare", [["t-tt","siren","Incident tabletop",`Crisis scenarios across ${ALL_TYPES.length} company types. Every weaker call becomes a lesson: what happened, the stronger call, the principle and the law.`],
+    ["t-tt","doc","Incident post-mortem","After a real incident: fifteen questions become a one-page blameless review in the handbook's shape, a grade for the response (never the incident), and three actions with owners and dates for your tracker."],
     ["t-vd","scale","Vendor scorecard","Weighted comparison of moderation vendors, with wellness and security minimums and ready-to-use RFP questions."],
     ["t-rt","shield","Red team studio","Plans a red team of a language or world model from nine questions: a coverage grid, seed cards with benign twins, drills that fit the team, findings, and exports for open-source harnesses."],
     ["t-pol","doc","Policy stress-tester","An instant clarity check on a rule, then an AI review with vague terms, missing exceptions, edge cases and a clearer rewrite."]]],

@@ -1,6 +1,6 @@
 // Checks the shared intro component (partINTRO.js): every INTRO_SPECS entry is a real route with
 // all its fields, within the word limits, with 3 to 5 walkthrough screens; introSeen flips after
-// Start and the tool's own first screen runs; and, for every one of the 16 routes it covers, the
+// Start and the tool's own first screen runs; and, for every one of the 17 routes it covers, the
 // purpose card shows in place of the tool's first screen on first visit and gets out of the way
 // once introMark has run. Pattern follows test-rt.js: the stub and a module list from test-v9.js,
 // then calling the real render functions directly, without a browser.
@@ -18,9 +18,9 @@ const body = function(){
 
   // Routes this build actually registers (same flat list test-tsg.js uses, since the harness doesn't
   // assemble the real ROUTES object).
-  const VALID_ROUTES = ["overview", "premortem", "tabletop", "metrics", "vendors", "workspace", "tools", "plan", "review", "dsa", "eval", "about", "roost", "credits", "learn", "redteamllm", "redteamworld", "glossary", "tsglossary", "redteam", "policy", "coppa", "maturity", "coverage", "notice", "appeal", "transparency"];
+  const VALID_ROUTES = ["overview", "premortem", "tabletop", "postmortem", "metrics", "vendors", "workspace", "tools", "plan", "review", "dsa", "eval", "about", "roost", "credits", "learn", "redteamllm", "redteamworld", "glossary", "tsglossary", "redteam", "policy", "coppa", "maturity", "coverage", "notice", "appeal", "transparency"];
   const routes = Object.keys(INTRO_SPECS);
-  eq(routes.length, 16, "sixteen tools get the shared intro");
+  eq(routes.length, 17, "seventeen tools get the shared intro");
   routes.forEach(r => { if(!VALID_ROUTES.includes(r)) throw new Error("not a real route: " + r); });
   out.push("every INTRO_SPECS key is a real route (" + routes.length + " of them)");
 
@@ -63,16 +63,16 @@ const body = function(){
     if(/data-help="tour"/.test(hb)) throw new Error(route + ": helpBtn still renders a second, page-tour button");
     if((hb.match(/<button/g) || []).length !== 1) throw new Error(route + ": helpBtn should render exactly one button");
   });
-  out.push("helpBtn renders exactly one button, How this works, on all 16 routes; the page tour is offered from the walkthrough's last screen");
+  out.push("helpBtn renders exactly one button, How this works, on all 17 routes; the page tour is offered from the walkthrough's last screen");
 
   // 4) Each tool's own render: the card on first visit, its own first screen once introMark has run
   const RENDER = {
-    premortem:renderPremortem, tabletop:renderTabletop, maturity:renderMaturity, coverage:renderCoverage,
+    premortem:renderPremortem, tabletop:renderTabletop, postmortem:renderPostmortem, maturity:renderMaturity, coverage:renderCoverage,
     metrics:renderMetrics, vendors:renderVendors, policy:renderPolicy, coppa:renderCoppa, dsa:renderDsa, eval:renderEval,
     notice:() => renderAI("notice"), appeal:() => renderAI("appeal"), transparency:() => renderAI("transparency"),
     plan:renderPlan, review:renderReview, workspace:renderWorkspace
   };
-  eq(Object.keys(RENDER).length, 16, "a render check for every one of the 16 routes");
+  eq(Object.keys(RENDER).length, 17, "a render check for every one of the 17 routes");
   routes.forEach(route => {
     store.set("intro:" + route, false);
     RENDER[route]();
@@ -87,13 +87,13 @@ const body = function(){
     eq(/data-introbtn="start"/.test(h), false, route + ": card is gone once introMark has run");
     store.set("intro:" + route, false);
   });
-  out.push("all 16 routes: the card shows on first visit, and the tool's own first screen shows once introMark has run");
+  out.push("all 17 routes: the card shows on first visit, and the tool's own first screen shows once introMark has run");
 
   return out.join("\n");
 };
 const src = stub + extra + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"),
   rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"),
   rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partTR.js"), rd("partHELP.js"), rd("partTYPE.js"), rd("partGD.js"),
-  rd("partINTRO.js"), rd("partCP.js"), rd("partDSA.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js")].join("\n")
+  rd("partINTRO.js"), rd("partCP.js"), rd("partDSA.js"), rd("partPX.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 console.log(new Function(src)());

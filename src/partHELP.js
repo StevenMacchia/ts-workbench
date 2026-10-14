@@ -147,6 +147,12 @@ const PAGE_TOURS = {
     [".tr-sum", "How complete it is", "The share of what the DSA asks for at your tier that's filled in, and when the report is due."],
     [".tr-report .pol-tabs", "Three views", "The report as readers will see it, a checklist of what the DSA asks for, and a summary Claude writes from your numbers only."]
   ],
+  postmortem:[
+    [".gd-intro h1", "One question at a time", "What happened, who it reached, how you found out, the timeline, what worked and what failed in each layer. Every answer can be changed."],
+    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .px-tl, .gd-q .px-acts", "Answer, then continue", "Pick or type. Number keys work for choices, and Back lets you change anything."],
+    [".px-root .pol-sum", "Where the response stands", "A grade for the response, never the incident, with the three actions under it."],
+    [".px-root .ev-details", "The document", "The one-page review in the handbook's shape, for the team or for Legal, plus the timeline, the four layers, duties and promises."]
+  ],
   coppa:[
     [".gd-intro h1", "One question at a time", "Who the service is for, what you collect and what you have in place, only the questions that apply. At the end you get the result, and every answer can be changed."],
     [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
