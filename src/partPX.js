@@ -609,14 +609,14 @@ function renderPostmortem(){
   const s = pxScore(px), acts = pxLiveActions(px);
   view.innerHTML = headCompact("Incident post-mortem", esc((px.name || "").trim() || "Untitled incident"),
     reportHeaderActions({
-      example:px.ex ? null : {attrs:'data-px="example"', label:"Example"},
-      edit:{attrs:'data-px="edit"', label:"Edit answers"},
-      reset:{attrs:'data-px="reset"', label:"Start over"},
-      save:{attrs:'data-px="save"', label:wsSaveLabel("postmortem", px).replace("Save to workspace", "Save"), icon:"save"},
-      download:{attrs:'data-px="download"', label:"Download", icon:"download"},
-      tracker:acts.length ? {attrs:'data-px="tracker"', label:"Tracker tasks", icon:"send"} : null,
+      example:px.ex ? null : {attrs:'data-px="example"', label:SEE_EXAMPLE_LABEL},
+      edit:{attrs:'data-px="edit"', label:EDIT_ANSWERS_LABEL},
+      reset:{attrs:'data-px="reset"', label:START_OVER_LABEL},
+      save:{attrs:'data-px="save"', label:wsSaveLabel("postmortem", px), icon:"save"},
+      download:{attrs:'data-px="download"', label:DOWNLOAD_LABEL, icon:"download"},
+      tracker:acts.length ? {attrs:'data-px="tracker"', label:SEND_TRACKER_LABEL, icon:"send"} : null,
       extra:[{attrs:'data-px="legal"', label:"For Legal", icon:"download"}, {attrs:'data-px="slack"', label:"Slack message", icon:"copy"}]
-    }, `<button type="button" class="btn sm" data-px="sharelink">Copy link</button>`))
+    }, `<button type="button" class="btn sm" data-px="sharelink">${COPY_LINK_LABEL}</button>`))
     + `<div class="px-root">${pxReportHTML(px, s, acts)}</div>`;
 }
 

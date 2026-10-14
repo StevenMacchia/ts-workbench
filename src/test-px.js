@@ -172,7 +172,7 @@ const body = async function(){
   eq(/(^|[^A-Za-z])Sev [0-9]/.test(h) || /(^|[^A-Za-z])Sev [0-9]/.test(team) || /(^|[^A-Za-z])Sev [0-9]/.test(legal) || /(^|[^A-Za-z])Sev [0-9]/.test(pxSlack(px)), false, "no bare Sev: severity is spelled out");
   eq(/Severity 2/.test(h) && /severity 2/.test(pxVerdict(px, pxScore(px))), true, "severity 2 reads as severity 2");
   const labels = [...h.slice(0, h.indexOf("px-root")).matchAll(/<button type="button" class="btn sm[^"]*" data-px="[a-z]+"[^>]*>(?:<svg>.*?<[/]svg>)?([^<]+)<[/]button>/g)].map(m => m[1]);
-  eq(labels.length >= 6 && labels.every(l => l.trim().split(/[ ]+/).length <= 2), true, "every header button is one or two words: " + labels.join(" | "));
+  eq(labels.join("|"), [SEE_EXAMPLE_LABEL, EDIT_ANSWERS_LABEL, START_OVER_LABEL, "Save to workspace", DOWNLOAD_LABEL, SEND_TRACKER_LABEL, "For Legal", "Slack message", COPY_LINK_LABEL].join("|"), "the header uses the shared house labels in the house order: " + labels.join(" | "));
   eq(/Example loaded/.test(rd("partPX.js")) && !/Example loaded: /.test(rd("partPX.js")), true, "the example toast is short");
   out.push("report: verdict, actions, then Details; six real tabs, one shown at a time, Document first; no bare Sev; header buttons " + labels.join(", "));
 
