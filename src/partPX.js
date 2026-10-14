@@ -74,9 +74,9 @@ const PX_LAYERS = [
     ["blamed", "A front-line person was named as the cause", ""]]]
 ];
 const PX_SEV = [
-  ["1", "Sev 1", "Serious harm to people was happening or imminent, or harm was spreading faster than you could contain it"],
-  ["2", "Sev 2", "Serious harm or a serious failure, with hours or days to respond"],
-  ["3", "Sev 3", "A known risk with a deadline that needed a coordinated plan"]
+  ["1", "Severity 1", "Serious harm to people was happening or imminent, or harm was spreading faster than you could contain it"],
+  ["2", "Severity 2", "Serious harm or a serious failure, with hours or days to respond"],
+  ["3", "Severity 3", "A known risk with a deadline that needed a coordinated plan"]
 ];
 // The five fixed moments, in the chapter's order, then the extra one: [label, placeholder]
 const PX_TLROWS = {
@@ -216,7 +216,7 @@ function pxScore(d){
 }
 function pxVerdict(d, s){
   const rw = pxOpt(PX_REACH, d.reach), dw = pxOpt(PX_DETECT, d.detect);
-  const bits = [d.sev ? "Sev " + d.sev : "", rw ? rw[3] : "", dw ? "first seen " + dw[4] : ""].filter(Boolean).join(", ");
+  const bits = [d.sev ? "severity " + d.sev : "", rw ? rw[3] : "", dw ? "first seen " + dw[4] : ""].filter(Boolean).join(", ");
   return `${(d.name || "").trim() || "This incident"}: ${bits ? bits + ". " : ""}The response scores ${s.score} out of 100: ${PX_PHRASE[s.grade]}.`;
 }
 
@@ -228,7 +228,7 @@ function pxDraftActions(d){
   const fails = pxFailures(d), out = [], seen = {};
   layers.forEach(l => fails.filter(f => f.layer === l).forEach(f => {
     const fx = PX_FIX[f.src]; if(!fx || seen[fx[0]] || out.length >= 3) return; seen[fx[0]] = 1;
-    out.push({w:fx[0], owner:fx[1], by:pxPlusDays([14, 30, 45][out.length]), src:f.src});
+    out.push({w:fx[0], owner:fx[1], by:pxPlusDays(14), src:f.src});
   }));
   const add = (f, src) => { if(out.length >= 3 || seen[f[0]]) return; seen[f[0]] = 1; out.push({w:f[0], owner:f[1], by:pxPlusDays(f[2]), src}); };
   if(d.reach === "unknown") add(PX_FALLBACK.reach, "followup");
@@ -268,7 +268,7 @@ function pxDocModel(d, version){
   const date = pxDay(pxDateOf(d)) || "date not recorded", area = CATS[d.area] || "kind of harm not set";
   const B = [];
   B.push({t:"h1", x:"Post-mortem: " + ((d.name || "").trim() || "Untitled incident")});
-  B.push({t:"meta", x:[d.sev ? "Sev " + d.sev : "Severity not set", area, date].concat(legal ? ["written " + today, "draft for Legal review", "not legal advice"] : ["blameless review", "written " + today]).join(" · ")});
+  B.push({t:"meta", x:[d.sev ? "Severity " + d.sev : "Severity not set", area, date].concat(legal ? ["written " + today, "draft for Legal review", "not legal advice"] : ["blameless review", "written " + today]).join(" · ")});
   B.push({t:"h2", x:"In one paragraph"});
   B.push({t:"p", x:(d.what || "").trim() || "What happened was not written down."});
   B.push({t:"p", x:`It reached ${rw ? rw[4] : "a number of people we do not yet know"} and was first seen ${dw ? dw[4] : "in a way that was not recorded"}.` + (gp.signalToDeclared !== null ? ` From the first internal signal to a declared incident took ${pxMins(gp.signalToDeclared)}.` : "")});
@@ -355,7 +355,7 @@ function pxSlack(d){
   const prof = typeof wsProfile === "function" ? wsProfile() : null, author = (prof && prof.name) || "the author";
   const build = (cut, nPr) => {
     const L = [];
-    L.push(`*Post-mortem: ${(d.name || "").trim() || "Untitled incident"}* (${d.sev ? "Sev " + d.sev : "Severity not set"}, ${pxDateOf(d) || "date not recorded"})`);
+    L.push(`*Post-mortem: ${(d.name || "").trim() || "Untitled incident"}* (${d.sev ? "Severity " + d.sev : "Severity not set"}, ${pxDateOf(d) || "date not recorded"})`);
     L.push(pxVerdict(d, s));
     L.push(`*Impact:* ${who.length ? who.join(", ") : "not recorded"} · ${rw ? rw[5].toLowerCase() : "reach not recorded"} · ${span !== null ? pxMins(span) : "duration not recorded"}`);
     if(fails.length){ const first = fails.slice(0, 4).map(f => f.text), more = fails.length - first.length; L.push(`*What failed:* ${first.join(", ")}${more > 0 ? `, …and ${more} more` : ""}`); }
@@ -380,30 +380,100 @@ function tkFromPostmortem(){
     const layer = /^(prevention|detection|response|communication)\./.test(a.src || "") ? a.src.split(".")[0] : "followup", why = pxFailText(a.src);
     tasks.push({id:"px-act-" + i, title:a.w.trim(), group:"From the post-mortem: " + name, owner:pxOwnerName(a.owner), pr, done:false, def:true,
       labels:["trust-and-safety", "post-mortem", "incident-" + tkSlug(name), "layer-" + layer],
-      desc:[a.w.trim(), "", "Due: " + (a.by || "no date set"), `From the incident "${name}", Sev ${d.sev || "?"}, ${date || "date not recorded"}.`, why ? "Why: " + why : null, "", "From an incident post-mortem made with T&S Workbench."].filter(x => x !== null).join("\n")});
+      desc:[a.w.trim(), "", "Due: " + (a.by || "no date set"), `From the incident "${name}", severity ${d.sev || "?"}, ${date || "date not recorded"}.`, why ? "Why: " + why : null, "", "From an incident post-mortem made with T&S Workbench."].filter(x => x !== null).join("\n")});
   });
   (d.promises || []).forEach((p, i) => {
     if(!p || !(p.w || "").trim()) return;
     tasks.push({id:"px-pr-" + i, title:"Promise to " + pxToName(p.to).toLowerCase() + ": " + p.w.trim(), group:"Promises made during the incident", owner:"Comms", pr:3, done:false, def:true,
       labels:["trust-and-safety", "post-mortem", "promise"],
-      desc:["Promise to " + pxToName(p.to).toLowerCase() + ": " + p.w.trim(), "", "Due: " + (p.by || "no date set"), `From the incident "${name}", Sev ${d.sev || "?"}, ${date || "date not recorded"}.`, "", "From an incident post-mortem made with T&S Workbench."].join("\n")});
+      desc:["Promise to " + pxToName(p.to).toLowerCase() + ": " + p.w.trim(), "", "Due: " + (p.by || "no date set"), `From the incident "${name}", severity ${d.sev || "?"}, ${date || "date not recorded"}.`, "", "From an incident post-mortem made with T&S Workbench."].join("\n")});
   });
   return tasks;
 }
 
-/* ---------- the guided flow ---------- */
-function pxGapsAsideHTML(){
-  const g = pxGaps(px); if(g.signalToDeclared === null) return "";
-  return `<div class="card px-aside"><span class="as-eb">The gaps so far</span><p><b>Signal to declared:</b> ${pxMins(g.signalToDeclared)}</p>${g.declaredToContained !== null ? `<p><b>Declared to contained:</b> ${pxMins(g.declaredToContained)}</p>` : ""}</div>`;
+/* ---------- the guided flow: nine screens, grouped by what belongs together ---------- */
+// Plain words for a length of time: 160 -> "2 hours 40 minutes"
+function pxMinsWords(n){
+  n = Math.round(n); const dd = Math.floor(n / 1440), h = Math.floor((n % 1440) / 60), m = n % 60, u = (v, w) => v + " " + w + (v === 1 ? "" : "s");
+  if(dd) return u(dd, "day") + (h ? " " + u(h, "hour") : "");
+  if(h) return u(h, "hour") + (m ? " " + u(m, "minute") : "");
+  return u(m, "minute");
+}
+// "23:30", "2330", "11:30pm", "9" -> "HH:MM"; anything else -> ""
+function pxParseTime(s){
+  s = String(s || "").trim().toLowerCase().replace(/\./g, ":"); if(!s) return "";
+  const m = /^(\d{1,2})(?::?(\d{2}))?\s*(am|pm|a|p)?$/.exec(s); if(!m) return "";
+  let h = +m[1]; const mi = m[2] ? +m[2] : 0, ap = m[3], z = n => String(n).padStart(2, "0");
+  if(ap){ if(h < 1 || h > 12) return ""; if(ap[0] === "p" && h < 12) h += 12; if(ap[0] === "a" && h === 12) h = 0; }
+  return h > 23 || mi > 59 ? "" : z(h) + ":" + z(mi);
+}
+const pxAddDay = (iso, n) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return pxIso(d); };
+const pxDayLabel = iso => { const d = new Date(iso + "T12:00:00"); return isNaN(d.getTime()) ? iso : `${PX_WD[d.getDay()]} ${d.getDate()} ${PX_MON[d.getMonth()]}`; };
+const pxBaseDay = () => px.date || pxIso(new Date());
+// The day a newly typed time falls on: the row before's day, or the next day when the clock has gone round past midnight
+function pxAutoDay(i, tm){
+  let prev = ""; for(let j = i - 1; j >= 0; j--) if(px.tl[j].t){ prev = px.tl[j].t; break; }
+  if(!prev) return pxBaseDay();
+  const pd = prev.slice(0, 10); return pd + "T" + tm < prev ? pxAddDay(pd, 1) : pd;
+}
+const pxManualDay = {};   // rows whose day was picked by hand: typing a new time keeps that day
+const pxResetDays = () => Object.keys(pxManualDay).forEach(k => delete pxManualDay[k]);
+function pxTlTime(i, text){
+  const r = px.tl[i], tm = pxParseTime(text);
+  if(!tm){ r.t = ""; return; }
+  r.t = (r.t && pxManualDay[i] ? r.t.slice(0, 10) : pxAutoDay(i, tm)) + "T" + tm;
+}
+const PX_ORDER = ["basics", "impact", "detect", "timeline", "worked", "layers", "sevduties", "promises", "actions"];
+const PX_STEP_MINS = {basics:3, impact:1, detect:1, timeline:3, worked:1, layers:2, sevduties:1, promises:1, actions:2};
+function pxLeftText(id){
+  const i = Math.max(0, PX_ORDER.indexOf(id)), n = PX_ORDER.slice(i).reduce((t, k) => t + PX_STEP_MINS[k], 0);
+  return `About ${n} minute${n === 1 ? "" : "s"} left`;
+}
+function pxGapWords(){
+  const g = pxGaps(px);
+  if(g.signalToDeclared === null) return "Add a time to the first signal and to the declaration, and the gap between them shows here.";
+  return `From the first signal to a declared incident: ${pxMinsWords(g.signalToDeclared)}.` + (g.declaredToContained !== null ? ` From declared to contained: ${pxMinsWords(g.declaredToContained)}.` : "")
+    + (g.signalToDeclared > 240 ? " This is usually the gap worth closing first." : "");
+}
+const pxChk = (attr, val, on, label, hint, type) => `<label class="tr-chk"><input type="${type || "checkbox"}" ${attr} value="${esc(val)}" ${on ? "checked" : ""}><span>${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ""}</span></label>`;
+
+function pxBasicsHTML(){
+  if(!px.date){ px.date = pxIso(new Date()); pxSave(); }
+  return `<div class="px-form">
+    <div class="field"><label for="px-name">What do you call it?</label><input class="input" id="px-name" data-pxf="name" maxlength="80" value="${esc(px.name)}" placeholder="For example: The comment pile-on, 3 October" autocomplete="off"><p class="note">A plain name people will recognise in a month, not a code name.</p></div>
+    <div class="field"><label for="px-what">What happened, in two or three sentences?</label><textarea class="input" id="px-what" data-pxf="what" rows="4" maxlength="600">${esc(px.what)}</textarea><p class="note">Write 'the alert didn't fire', not 'someone missed the alert'. Say 'the on-call lead', not who it was.</p></div>
+    <div class="px-two"><div class="field"><label for="px-area">Which kind of harm was it?</label><select class="select" id="px-area" data-pxf="area"><option value="">Choose one</option>${PX_AREAS.map(k => `<option value="${k}" ${px.area === k ? "selected" : ""}>${esc(CATS[k])}</option>`).join("")}</select></div>
+      <div class="field"><label for="px-date">Day it started</label><input type="date" class="input" id="px-date" data-pxf="date" value="${esc(px.date)}"></div></div></div>`;
+}
+function pxImpactHTML(){
+  return `<div class="px-form"><fieldset class="px-fs"><legend>Who did it affect? <span class="note">Choose all that apply.</span></legend>${PX_WHO.map(([k, n, h]) => pxChk('data-pxwho="1"', k, px.who.includes(k), n, h)).join("")}</fieldset>
+    <fieldset class="px-fs"><legend>How many people did it reach?</legend><p class="note">Count the people who saw it, not the accounts behind it. Not sure? Say so: finding out becomes an action.</p>${PX_REACH.map(([k, n, h]) => pxChk('data-pxreach="1" name="px-reach"', k, px.reach === k, n, h, "radio")).join("")}</fieldset></div>`;
 }
 function pxTimelineHTML(){
+  const base = pxBaseDay();
   return `<div class="px-tl" role="group" aria-label="Timeline">${px.tl.map((r, i) => {
-    const row = PX_TLROWS[r.k] || PX_TLROWS.more, id = "px-tl-" + i;
-    return `<div class="px-trow"><div class="px-tlab"><span class="px-n" aria-hidden="true">${r.k === "more" ? "+" : i + 1}</span><b>${esc(row[0])}</b>${r.k === "more" ? `<button type="button" class="btn sm icon" data-px="tlrm" data-i="${i}" aria-label="Remove this moment"><svg><use href="#i-x"/></svg></button>` : ""}</div>
-      <div class="px-tf"><label class="visually-hidden" for="${id}-t">${esc(row[0])}: date and time</label><input type="datetime-local" class="input" id="${id}-t" data-pxtl-t="${i}" value="${esc(r.t)}">
-        <label class="visually-hidden" for="${id}-w">${esc(row[0])}: what happened</label><input class="input" id="${id}-w" data-pxtl-w="${i}" maxlength="140" value="${esc(r.w)}" placeholder="${esc(row[1])}" autocomplete="off"></div></div>`;
+    const row = PX_TLROWS[r.k] || PX_TLROWS.more, id = "px-tl-" + i, day = r.t ? r.t.slice(0, 10) : base;
+    const days = [0, 1, 2, 3, 4].map(n => pxAddDay(base, n)); if(!days.includes(day)) days.push(day);
+    return `<div class="px-trow"><div class="px-tlab"><span class="px-n" aria-hidden="true">${r.k === "more" ? "+" : i + 1}</span><b>${esc(row[0])}</b>${r.k === "more" ? `<button type="button" class="btn sm icon" data-px="tlrm" data-i="${i}" aria-label="Remove this row"><svg><use href="#i-x"/></svg></button>` : ""}</div>
+      <div class="px-tf"><div class="px-tt"><label class="visually-hidden" for="${id}-t">${esc(row[0])}: time</label><input class="input" id="${id}-t" data-pxtl-t="${i}" inputmode="text" value="${esc(r.t ? r.t.slice(11, 16) : "")}" placeholder="Time, like 23:30" autocomplete="off">
+          <label class="visually-hidden" for="${id}-d">${esc(row[0])}: day</label><select class="select" id="${id}-d" data-pxtl-d="${i}" ${r.t ? "" : "disabled"}>${days.sort().map(x => `<option value="${x}" ${x === day ? "selected" : ""}>${esc(pxDayLabel(x))}</option>`).join("")}</select></div>
+        <div><label class="visually-hidden" for="${id}-w">${esc(row[0])}: what happened</label><input class="input" id="${id}-w" data-pxtl-w="${i}" maxlength="140" value="${esc(r.w)}" placeholder="${esc(row[1])}" autocomplete="off"></div></div></div>`;
   }).join("")}</div>
-  <div class="px-tlx">${px.tl.length < 8 ? `<button type="button" class="btn sm" data-px="tladd"><svg><use href="#i-plus"/></svg>Add a moment</button>` : ""}<p class="note">Add times to the five rows and the report shows the gaps.</p></div>`;
+  <p class="note px-gap" id="px-gaps" aria-live="polite">${esc(pxGapWords())}</p>
+  <div class="px-tlx">${px.tl.length < 8 ? `<button type="button" class="btn sm" data-px="tladd"><svg><use href="#i-plus"/></svg>Add row</button><span class="note">Optional: another moment, like a statement going out.</span>` : ""}</div>
+  <p class="note">Type a time like 23:30 or 11:30pm. Leave it blank if you don't know it. If a moment never happened or you can't tell, write "Unknown" in the box beside it.</p>`;
+}
+function pxLayersHTML(){
+  return `<div class="px-layers-in">${PX_LAYERS.map(L => { const f = px.fail[L[0]] || [];
+    return `<fieldset class="px-fs card"><legend>${esc(L[1])}</legend>${L[3].map(([k, n, h]) => pxChk(`data-pxfail="${L[0]}|${k}"`, k, f.includes(k), n, h)).join("")}
+      <div class="px-none">${pxChk(`data-pxfail="${L[0]}|ok"`, "ok", f[0] === "ok", "Nothing failed here")}</div></fieldset>`; }).join("")}</div>`;
+}
+function pxSevDutiesHTML(){
+  const opts = pxDutyOpts();
+  return `<div class="px-form"><fieldset class="px-fs"><legend>How serious was it?</legend>${PX_SEV.map(([k, n, h]) => pxChk('data-pxsev="1" name="px-sev"', k, px.sev === k, n, h, "radio")).join("")}</fieldset>
+    <details class="px-det" ${px.duties.length ? "open" : ""}><summary>Laws or duties it touched <span class="note" id="px-duty-n">Optional · ${px.duties.length} chosen</span></summary>
+      <p class="note">The same obligation list as the abuse pre-mortem, for the regions in your workspace profile. Legal confirms; you record.</p>
+      ${opts.map(o => pxChk('data-pxduty="1"', o.k, px.duties.includes(o.k), o.n, o.h)).join("")}</details></div>`;
 }
 function pxPromisesHTML(){
   const rows = px.promises.map((p, i) => `<div class="px-prow">
@@ -411,64 +481,51 @@ function pxPromisesHTML(){
       <div class="field px-pw"><label for="px-pw-${i}">What was promised</label><input class="input" id="px-pw-${i}" data-pxpr-w="${i}" maxlength="140" value="${esc(p.w)}" placeholder="An update on what changed; a direct reply; a report" autocomplete="off"></div>
       <div class="field"><label for="px-pb-${i}">By</label><input type="date" class="input" id="px-pb-${i}" data-pxpr-by="${i}" value="${esc(p.by)}"></div>
       <button type="button" class="btn sm icon" data-px="prrm" data-i="${i}" aria-label="Remove this promise"><svg><use href="#i-x"/></svg></button></div>`).join("");
-  return `<div class="px-prs">${rows || `<p class="note">No promises yet. Add one, or continue.</p>`}</div>
-    ${px.promises.length < 6 ? `<div class="px-tlx"><button type="button" class="btn sm" data-px="pradd"><svg><use href="#i-plus"/></svg>Add a promise</button></div>` : ""}`;
+  return `<div class="px-prs">${rows || `<p class="note">Nothing promised? Skip this screen.</p>`}</div>
+    ${px.promises.length < 6 ? `<div class="px-tlx"><button type="button" class="btn sm" data-px="pradd"><svg><use href="#i-plus"/></svg>Add promise</button></div>` : ""}`;
 }
 function pxActionsHTML(){
   if(!px.actsSeeded){ px.acts = pxDraftActions(px); px.actsSeeded = true; pxSave(); }
   while(px.acts.length < 3) px.acts.push({w:"", owner:"", by:"", src:"you"});
   return `<div class="px-acts">${px.acts.slice(0, 3).map((a, i) => `<div class="px-arow"><span class="px-n" aria-hidden="true">${i + 1}</span><div class="px-af">
-      <div class="field"><label for="px-aw-${i}">Action ${i + 1}: the change</label><textarea class="input" id="px-aw-${i}" rows="2" maxlength="240" data-pxact-w="${i}" placeholder="A change to the system, not 'be more careful'">${esc(a.w)}</textarea></div>
+      <div class="field"><label for="px-aw-${i}">Action ${i + 1}</label><textarea class="input" id="px-aw-${i}" rows="3" maxlength="240" data-pxact-w="${i}" placeholder="A change to the system, not 'be more careful'">${esc(a.w)}</textarea></div>
       <div class="px-ao"><div class="field"><label for="px-ao-${i}">Owner</label><select class="select" id="px-ao-${i}" data-pxact-owner="${i}"><option value="">Choose</option>${PX_OWNERS.map(([k, n]) => `<option value="${k}" ${a.owner === k ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>
         <div class="field"><label for="px-ab-${i}">Due</label><input type="date" class="input" id="px-ab-${i}" data-pxact-by="${i}" value="${esc(a.by)}"></div></div></div></div>`).join("")}</div>
-    <div class="px-tlx"><button type="button" class="btn sm" data-px="actseed">Redraft from my answers</button></div>`;
+    <div class="px-tlx"><button type="button" class="btn sm" data-px="actseed">Redraft</button><span class="note">Drafted from what failed, with an owner and a date of two weeks from today. Edit the words, owner or date.</span></div>`;
 }
 function pxSpec(){
   const setV = (k, v) => { px[k] = v; px.ex = false; pxSave(); };
-  const toggleIn = (k, v) => setV(k, px[k].includes(v) ? px[k].filter(x => x !== v) : px[k].concat(v));
   const opts3 = list => () => list.map(([k, n, h]) => ({k, n, h}));
-  const layerStep = L => ({id:L[0], eb:L[1], title:L[2], why:"What in the system failed, not who. Pick everything that was true.", kind:"multi", none:"Nothing failed here",
-    opts:() => L[3].map(([k, n, h]) => ({k, n, h})), get:() => (px.fail[L[0]] || []).filter(k => k !== "ok"), has:() => (px.fail[L[0]] || []).length > 0, answered:() => (px.fail[L[0]] || []).length > 0,
-    noneOn:() => (px.fail[L[0]] || [])[0] === "ok",
-    toggle:k => { const cur = (px.fail[L[0]] || []).filter(x => x !== "ok"); px.fail = Object.assign({}, px.fail, {[L[0]]:cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)}); px.ex = false; pxSave(); },
-    clear:() => { px.fail = Object.assign({}, px.fail, {[L[0]]:["ok"]}); px.ex = false; pxSave(); }});
+  const filled = () => PX_LAYERS.every(L => (px.fail[L[0]] || []).length > 0);
   const steps = [
-    {id:"name", eb:"Name", title:"What do you call the incident?", why:"The title of the document. A plain name people will recognise in a month, not a code name.", kind:"text", max:80, placeholder:"For example: The comment pile-on, 3 October", get:() => px.name, set:v => setV("name", v.slice(0, 80))},
-    {id:"what", eb:"What happened", title:"What happened, in two or three sentences?", why:"Facts, in the order they happened: what people saw, did or lost. No names of staff; say 'the on-call lead', not who it was.", kind:"text", rows:4, max:600,
-      hint:"Write 'the alert didn't fire', not 'someone missed the alert'. The document stays blameless if the answers do.", get:() => px.what, set:v => setV("what", v.slice(0, 600))},
-    {id:"area", eb:"Kind of harm", title:"Which kind of harm was it?", why:"Ties the incident to the risk in your pre-mortem and your coverage radar.", kind:"single",
-      opts:() => PX_AREAS.map(k => ({k, n:CATS[k]})), get:() => px.area, set:k => setV("area", k)},
-    {id:"who", eb:"Who it affected", title:"Who did it affect?", why:"Impact is who, how many and for how long. This is the who.", kind:"multi", opts:opts3(PX_WHO), get:() => px.who, toggle:k => toggleIn("who", k)},
-    {id:"reach", eb:"How many", title:"How many people did it reach?", why:"Count the people who saw it or were exposed, not the accounts that did it. If you don't know, say so: finding out becomes an action.", kind:"single",
-      opts:opts3(PX_REACH), get:() => px.reach, set:k => setV("reach", k)},
+    {id:"basics", eb:"What happened", title:"What happened?", why:"Facts, in the order they happened: what people saw, did or lost.", kind:"custom", html:pxBasicsHTML,
+      answered:() => !!((px.name || "").trim() && (px.what || "").trim() && px.area), has:() => !!((px.name || "").trim() && (px.what || "").trim() && px.area)},
+    {id:"impact", eb:"Who and how many", title:"Who did it affect, and how many?", why:"Impact is who, how many and for how long. The time comes from your timeline.", kind:"custom", html:pxImpactHTML,
+      answered:() => px.who.length > 0 && !!px.reach, has:() => px.who.length > 0 && !!px.reach},
     {id:"detect", eb:"First signal", title:"How did you first find out?", why:"Where the first signal came from says more about your detection than any dashboard.", kind:"single",
       opts:opts3(PX_DETECT), get:() => px.detect, set:k => setV("detect", k)},
-    {id:"timeline", eb:"Timeline", title:"When did each of these happen?", why:"Five moments the handbook asks for, in order. The gap between the first signal and the declaration is usually the fastest one to fix.", kind:"custom",
+    {id:"timeline", eb:"Timeline", title:"When did each of these happen?", why:"Five moments, in order. The gap between the first signal and the declaration is usually the fastest one to fix.", kind:"custom",
       html:pxTimelineHTML, answered:() => px.tl.filter(r => (r.w || "").trim()).length >= 5, has:() => px.tl.filter(r => (r.w || "").trim()).length >= 5},
-    {id:"worked", eb:"What worked", title:"What worked?", why:"Levers, people and processes that helped. These go in the document so they survive the next reorg.", kind:"multi", none:"Nothing went well",
+    {id:"worked", eb:"What worked", title:"What worked?", why:"Levers, people and processes that helped. They go in the document so they survive the next reorg.", kind:"multi", none:"Nothing went well",
       opts:opts3(PX_WORKED), get:() => px.worked.filter(k => k !== "none"), has:() => px.worked.length > 0, answered:() => px.worked.length > 0, noneOn:() => px.worked[0] === "none",
-      toggle:k => { const cur = px.worked.filter(x => x !== "none"); setV("worked", cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)); }, clear:() => setV("worked", ["none"])}
-  ].concat(PX_LAYERS.map(layerStep)).concat([
-    {id:"sev", eb:"Severity", title:"How severe was it, on the tabletop's scale?", why:"The same three levels as the incident tabletop and chapter 13. The grade does not depend on this; it is for the document and for sorting the tracker.", kind:"single",
-      opts:opts3(PX_SEV), get:() => px.sev, set:k => setV("sev", k)},
-    {id:"duties", eb:"Laws and duties", title:"Which laws or duties did it touch?", why:"The same obligation list as the abuse pre-mortem, for the regions in your workspace profile. Legal confirms; you record.", kind:"multi", none:"None that we know of",
-      opts:pxDutyOpts, get:() => px.duties, has:() => px.dutiesSet, answered:() => px.dutiesSet, noneOn:() => px.dutiesSet && !px.duties.length,
-      toggle:k => { px.duties = px.duties.includes(k) ? px.duties.filter(x => x !== k) : px.duties.concat(k); px.dutiesSet = px.duties.length > 0; px.ex = false; pxSave(); },
-      clear:() => { px.duties = []; px.dutiesSet = true; px.ex = false; pxSave(); }},
-    {id:"promises", eb:"Promises", title:"What did you promise, and to whom?", why:"Every promise made during an incident is an action with a date. Write them down before they are forgotten.", kind:"custom", opt:true, next:"Continue",
-      html:pxPromisesHTML, has:() => px.promises.some(p => (p.w || "").trim())},
-    {id:"actions", eb:"Actions", title:"Three changes, each with an owner and a date", why:"Drafted from what failed. Edit the words, pick who owns each one and when it is due. A review that ends with 'be more careful' changes nothing.", kind:"custom",
+      toggle:k => { const cur = px.worked.filter(x => x !== "none"); setV("worked", cur.includes(k) ? cur.filter(x => x !== k) : cur.concat(k)); }, clear:() => setV("worked", ["none"])},
+    {id:"layers", eb:"What failed", title:"What failed in the system?", why:"What in the system failed, not who. In each group pick everything that was true, or say nothing failed there.", kind:"custom", html:pxLayersHTML, answered:filled, has:filled},
+    {id:"sevduties", eb:"Severity", title:"How serious was it, and what did it touch?", why:"The same three levels as the incident tabletop. The grade does not depend on this: it is for the document and for sorting the tracker.", kind:"custom", html:pxSevDutiesHTML,
+      answered:() => !!px.sev, has:() => !!px.sev},
+    {id:"promises", eb:"Promises", title:"What did you promise, and to whom?", why:"Every promise made during an incident is an action with a date. Write them down before they are forgotten.", kind:"custom", opt:true,
+      get next(){ return px.promises.some(p => (p.w || "").trim()) ? "Continue" : "Skip"; }, html:pxPromisesHTML, has:() => px.promises.some(p => (p.w || "").trim())},
+    {id:"actions", eb:"Actions", title:"Three changes, each with an owner and a date", why:"Drafted from what failed. Edit them rather than start from nothing. A review that ends with 'be more careful' changes nothing.", kind:"custom",
       html:pxActionsHTML, answered:() => (px.acts || []).some(a => (a.w || "").trim() && a.owner), has:() => (px.acts || []).some(a => (a.w || "").trim() && a.owner)}
-  ]);
+  ];
   return {k:"postmortem", tool:{name:"Incident post-mortem", icon:"doc", color:"var(--t-tt)"},
     intro:{title:"Write the post-mortem people will actually read",
-      lead:"Fifteen questions about what happened and how you responded. At the end you get a one-page document in the handbook's shape, a grade for the response (never for the incident), and three actions with an owner and a date each, ready for your tracker.",
+      lead:"Nine short screens about what happened and how you responded: about fifteen minutes with your timeline in front of you. At the end you get a one-page document in the handbook's shape, a grade for the response (never for the incident), and three actions with an owner and a date each, ready for your tracker.",
       note:"Blameless by design: it asks what in the system failed, never who. Roles, not names.",
-      facts:[["About 15 minutes", "Facts and timestamps. Come back any time."], ["The chapter 13 template", "Timeline, impact, what worked, what failed, actions, follow-up."], ["Stays in your browser", "Nothing leaves your device until you download it."]],
+      facts:[["About 15 minutes", "Facts and times. Come back any time."], ["The chapter 13 template", "Timeline, impact, what worked, what failed, actions, follow-up."], ["Stays in your browser", "Nothing leaves your device until you download it."]],
       start:"Start"},
-    alt:[{n:"See an example", run:() => pxAct("example")}],
-    steps, finish:"Write the post-mortem",
-    aside:s => s.id === "timeline" ? `<div id="px-aside-gaps">${pxGapsAsideHTML()}</div>` : "",
+    alt:[{n:"See example", run:() => pxAct("example")}],
+    steps, finish:"Build report",
+    aside:s => `<p class="note px-left" id="px-left">${esc(pxLeftText(s.id))}</p>`,
     preview:pxPreviewHTML,
     done:() => { pxView = null; pxAct("build"); }};
 }
@@ -479,15 +536,15 @@ function pxVerdictHTML(d, s, acts, toast){
   const layersHit = PX_LAYERS.filter(L => fails.some(f => f.layer === L[0])).length, pr = pxLivePromises(d).length;
   const blame = pxBlameAll(d);
   return `<div class="card pol-sum tr-sum"><div class="tr-ring px-ring ${tone}"><b>${s.score}</b><span>of 100</span></div>
-    <div><span class="eyebrow">${esc([d.sev ? "Sev " + d.sev : "Severity not set", CATS[d.area] || "Kind of harm not set", pxDay(pxDateOf(d)) || "Date not recorded"].join(" · "))}</span>
+    <div><span class="eyebrow">${esc([d.sev ? "Severity " + d.sev : "Severity not set", CATS[d.area] || "Kind of harm not set", pxDay(pxDateOf(d)) || "Date not recorded"].join(" · "))}</span>
       <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${esc(pxVerdict(d, s))}</h2>${gradeBadge(s.score, "The response, scored out of 100. Never the incident.")}</div>
-      <p class="note">The grade is for the response, not the incident. A Sev 1 handled well scores higher than a Sev 3 nobody led.</p>
+      <p class="note px-gnote">The grade is for the response, not the incident. A severity 1 incident handled well beats a severity 3 incident nobody led.</p>
       ${blame.length ? `<p class="note">${blame.length} phrase${blame.length === 1 ? "" : "s"} to soften before sharing: ${blame.map(b => "'" + esc(b) + "'").join(", ")}. Say what the system did, not what a person didn't.</p>` : ""}
-      <div class="cp-kpis"><span class="pill">${acts.length} action${acts.length === 1 ? "" : "s"}</span><span class="pill ${fails.length ? "high" : "good"}">${fails.length} failure${fails.length === 1 ? "" : "s"} across ${layersHit} layer${layersHit === 1 ? "" : "s"}</span><span class="pill">${pr} promise${pr === 1 ? "" : "s"}</span>${gp.signalToDeclared !== null ? `<span class="pill ${gp.signalToDeclared > 240 ? "high" : "good"}">Signal to declared ${pxMins(gp.signalToDeclared)}</span>` : ""}</div>
+      <div class="cp-kpis"><span class="pill">${acts.length} action${acts.length === 1 ? "" : "s"}</span><span class="pill ${fails.length ? "high" : "good"}">${fails.length} failure${fails.length === 1 ? "" : "s"} across ${layersHit} layer${layersHit === 1 ? "" : "s"}</span><span class="pill">${pr} promise${pr === 1 ? "" : "s"}</span>${gp.signalToDeclared !== null ? `<span class="pill ${gp.signalToDeclared > 240 ? "high" : "good"}">Signal to declared: ${pxMinsWords(gp.signalToDeclared)}</span>` : ""}</div>
       ${toast ? `<span class="toast" id="px-toast" role="status" aria-live="polite"></span>` : ""}</div></div>`;
 }
 function pxActionsListHTML(acts){
-  return acts.length ? `<ol class="pk-list gd-vacts">${acts.map(a => `<li><b>${esc(a.w.trim().replace(/\.$/, ""))}.</b> ${esc(pxOwnerName(a.owner) || "No owner yet")} · due ${esc(pxDay(a.by) || "no date set")}</li>`).join("")}</ol>` : "";
+  return acts.length ? `<ol class="pk-list gd-vacts">${acts.map(a => `<li><b class="px-aw">${esc(a.w.trim().replace(/\.$/, ""))}.</b> <span class="px-am">${esc(pxOwnerName(a.owner) || "No owner yet")} · due ${esc(pxDay(a.by) || "no date set")}</span></li>`).join("")}</ol>` : "";
 }
 // The finished example under the intro: swap it in, draw, put the visitor's own answers back. No saving, no events.
 function pxPreviewHTML(){
@@ -504,7 +561,7 @@ function pxTabHTML(d, s, tab){
     const rows = pxSortedTl(d); let prev = null;
     return rows.length ? `<div class="px-tw"><table class="ln-t"><thead><tr><th scope="col">When</th><th scope="col">What</th><th scope="col">Since the one before</th></tr></thead><tbody>${rows.map(r => {
       const gap = prev && r.m ? Math.round((r.m - prev) / 60000) : null; if(r.m) prev = r.m;
-      return `<tr><td>${esc(pxWhen(r.t))}</td><td>${esc(r.w || "")}</td><td>${gap !== null ? esc(pxMins(gap)) : "—"}</td></tr>`; }).join("")}</tbody></table></div>` : `<p class="note">No moments were written down.</p>`;
+      return `<tr><td>${esc(pxWhen(r.t))}</td><td>${esc(r.w || "")}</td><td>${gap !== null ? esc(pxMinsWords(gap)) : "—"}</td></tr>`; }).join("")}</tbody></table></div>` : `<p class="note">No moments were written down.</p>`;
   }
   if(tab === "layers"){
     return `<div class="px-layers">${PX_LAYERS.map(L => {
@@ -523,11 +580,11 @@ function pxTabHTML(d, s, tab){
   }
   if(tab === "score"){
     return `<ul class="px-parts">${s.parts.map(p => `<li><div class="px-ph"><b>${esc(p.n)}</b><span class="mono">${p.got} of ${p.max}</span></div><div class="pol-meter" role="meter" aria-valuemin="0" aria-valuemax="${p.max}" aria-valuenow="${p.got}" aria-label="${esc(p.n)}"><i style="width:${Math.round(p.got / p.max * 100)}%"></i></div><p class="note">${esc(p.why)}</p></li>`).join("")}</ul>
-      <p class="note">Change an answer with Edit answers and the score follows.</p>`;
+      <p class="note">The grade is for the response, not the incident. A severity 1 incident handled well beats a severity 3 incident nobody led. Change an answer with Edit answers and the score follows.</p>`;
   }
   const v = d.docv === "legal" ? "legal" : "team";
   return `<div class="segs px-dv" role="group" aria-label="Which version">${[["team", "For the team"], ["legal", "For Legal"]].map(([k, n]) => `<button type="button" data-pxdocv="${k}" aria-pressed="${v === k}">${n}</button>`).join("")}</div>
-    ${pxDocHTML(d, v)}
+    <div data-pxdoc="team" ${v === "team" ? "" : "hidden"}>${pxDocHTML(d, "team")}</div><div data-pxdoc="legal" ${v === "legal" ? "" : "hidden"}>${pxDocHTML(d, "legal")}</div>
     <div class="card px-redact"><b>Before this leaves the team</b><ul>${PX_REDACT_LIST.map(x => `<li>${esc(x)}</li>`).join("")}</ul><p class="note">Downloads are not redacted. Use the checklist before sharing outside the team.</p></div>`;
 }
 function pxReportHTML(d, s, acts){
@@ -535,13 +592,13 @@ function pxReportHTML(d, s, acts){
   const tabs = [["doc", "Document"], ["timeline", "Timeline"], ["layers", "Layers"], ["duties", "Duties"], ["promises", "Promises"], ["score", "Score"]];
   return `<div class="pol-report px-report">
     ${d.shared ? shareBannerHTML('data-px="unshare"') : ""}
-    ${ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, a photo and short-video app, after a comment pile-on on a creator's post. Start over to write yours.</span><button type="button" class="btn sm" data-px="reset">Start over</button></div>` : ""}
+    ${ex ? `<div class="banner"><span><strong>Example:</strong> Pixelry, a photo and video app, after a comment pile-on. Start over to write yours.</span><button type="button" class="btn sm" data-px="reset">Start over</button></div>` : ""}
     ${pxVerdictHTML(d, s, acts, true)}
     ${pxActionsListHTML(acts)}
     ${chapterLinkHTML("postmortem")}
-    <details class="ev-details"><summary>Details <span class="note">The document, the timeline, the four layers, duties and promises</span></summary>
-    <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">${tabs.map(([k, n]) => `<button type="button" data-pxtab="${k}" aria-pressed="${tab === k}">${n}</button>`).join("")}</div></div>
-      <div class="card-b">${pxTabHTML(d, s, tab)}</div></div>
+    <details class="ev-details"><summary>Details <span class="note">The document, timeline, layers, duties and promises</span></summary>
+    <div class="card pol-tabs"><div class="card-h"><div class="px-tabs" role="tablist" aria-label="Report sections">${tabs.map(([k, n]) => `<button type="button" role="tab" id="px-tab-${k}" data-pxtab="${k}" aria-selected="${tab === k}" aria-controls="px-pan-${k}" tabindex="${tab === k ? 0 : -1}">${n}</button>`).join("")}</div></div>
+      <div class="card-b">${tabs.map(([k]) => `<div role="tabpanel" id="px-pan-${k}" data-pxpan="${k}" aria-labelledby="px-tab-${k}" tabindex="0" ${tab === k ? "" : "hidden"}>${pxTabHTML(d, s, k)}</div>`).join("")}</div></div>
     </details>
     <p class="note">Follows the post-incident review in chapter 13 of the T&amp;S Handbook and the blameless practice in Google's SRE book. A record for your team and a starting point for Legal, not legal advice.</p>
   </div>`;
@@ -552,14 +609,14 @@ function renderPostmortem(){
   const s = pxScore(px), acts = pxLiveActions(px);
   view.innerHTML = headCompact("Incident post-mortem", esc((px.name || "").trim() || "Untitled incident"),
     reportHeaderActions({
-      example:px.ex ? null : {attrs:'data-px="example"', label:SEE_EXAMPLE_LABEL},
-      edit:{attrs:'data-px="edit"', label:EDIT_ANSWERS_LABEL},
-      reset:{attrs:'data-px="reset"', label:START_OVER_LABEL},
-      save:{attrs:'data-px="save"', label:wsSaveLabel("postmortem", px), icon:"save"},
-      download:{attrs:'data-px="download"', label:DOWNLOAD_LABEL, icon:"download"},
-      tracker:acts.length ? {attrs:'data-px="tracker"', label:SEND_TRACKER_LABEL, icon:"send"} : null,
-      extra:[{attrs:'data-px="legal"', label:"For Legal", icon:"download"}, {attrs:'data-px="slack"', label:"Copy as Slack message", icon:"copy"}]
-    }, `<button type="button" class="btn sm" data-px="sharelink">${COPY_LINK_LABEL}</button>`))
+      example:px.ex ? null : {attrs:'data-px="example"', label:"Example"},
+      edit:{attrs:'data-px="edit"', label:"Edit answers"},
+      reset:{attrs:'data-px="reset"', label:"Start over"},
+      save:{attrs:'data-px="save"', label:wsSaveLabel("postmortem", px).replace("Save to workspace", "Save"), icon:"save"},
+      download:{attrs:'data-px="download"', label:"Download", icon:"download"},
+      tracker:acts.length ? {attrs:'data-px="tracker"', label:"Tracker tasks", icon:"send"} : null,
+      extra:[{attrs:'data-px="legal"', label:"For Legal", icon:"download"}, {attrs:'data-px="slack"', label:"Slack message", icon:"copy"}]
+    }, `<button type="button" class="btn sm" data-px="sharelink">Copy link</button>`))
     + `<div class="px-root">${pxReportHTML(px, s, acts)}</div>`;
 }
 
@@ -571,7 +628,7 @@ const PX_EXAMPLE = {
   tl:[
     {k:"first", t:"2026-10-03T22:40", w:"The first cluster of abusive comments on the trending video"},
     {k:"signal", t:"2026-10-03T23:30", w:"Report spike on one post: 180 reports in 30 minutes, mostly from her followers"},
-    {k:"declared", t:"2026-10-04T02:10", w:"On-call lead reads the queue, declares Sev 2 and takes the incident lead role"},
+    {k:"declared", t:"2026-10-04T02:10", w:"On-call lead reads the queue, declares severity 2 and takes the incident lead role"},
     {k:"contained", t:"2026-10-04T02:40", w:"Comments on the post limited to followers; commenting slowed for accounts under a week old on her profile; evidence exported first"},
     {k:"resolved", t:"2026-10-05T11:00", w:"Organising accounts and the accounts linked to them banned; comment removals with a statement of reasons sent"},
     {k:"more", t:"2026-10-04T09:00", w:"Comms replies to the creator directly and posts a short note on what changed"}
@@ -582,7 +639,7 @@ const PX_EXAMPLE = {
   promises:[{to:"affected", w:"A direct update on the accounts actioned and what changed", by:"2026-10-06"}, {to:"users", w:"A short note on comment limits for new accounts on trending posts", by:"2026-10-07"}],
   acts:[
     {w:"Add an alert on the rate of harassment reports per post per hour, so a pile-on pages on-call at the first spike, not three hours later", owner:"eng", by:"2026-10-17", src:"detection.no_alert"},
-    {w:"Write the declaration threshold into the playbook: a report spike on one post is a Sev 2 until proven otherwise; declare early, downgrade later", owner:"lead", by:"2026-10-10", src:"response.late"},
+    {w:"Write the declaration threshold into the playbook: a report spike on one post is severity 2 until proven otherwise; declare early, downgrade later", owner:"lead", by:"2026-10-10", src:"response.late"},
     {w:"Slow commenting for accounts under a week old on posts that reach trending, pre-approved with Product so on-call can switch it on", owner:"product", by:"2026-11-02", src:"prevention.new_accounts"}
   ],
   actsSeeded:true, date:"2026-10-03", view:"report", tab:"doc", docv:"team", ex:true
@@ -608,8 +665,15 @@ function pxCurStep(){ if(!gdCur || gdCur.k !== "postmortem") return null; const 
 // After a typed change inside a custom step: keep Continue and the gaps card honest without redrawing (a redraw would drop the cursor)
 function pxLive(){
   px.ex = false; pxSave(); const s = pxCurStep(); if(!s || !view.querySelector) return;
-  const nb = view.querySelector('[data-gd="next"]'); if(nb) nb.disabled = !s.opt && !gdAnswered(s);
-  const a = view.querySelector("#px-aside-gaps"); if(a) a.innerHTML = pxGapsAsideHTML();
+  const nb = view.querySelector('[data-gd="next"]'); if(nb){ nb.disabled = !s.opt && !gdAnswered(s); if(s.opt && nb.childNodes[0] && nb.childNodes[0].nodeType === 3) nb.childNodes[0].nodeValue = s.next + " "; }
+  const g = view.querySelector("#px-gaps"); if(g) g.textContent = pxGapWords();
+  const dn = view.querySelector("#px-duty-n"); if(dn) dn.textContent = `Optional · ${px.duties.length} chosen`;
+}
+// Keep the day pickers and the exclusive "Nothing failed here" boxes in step with the answers, without redrawing
+function pxSync(){
+  if(!view.querySelectorAll) return;
+  view.querySelectorAll("[data-pxtl-d]").forEach(sel => { const r = px.tl[+sel.dataset.pxtlD]; if(!r) return; sel.disabled = !r.t; if(r.t){ if(![...sel.options].some(o => o.value === r.t.slice(0, 10))) sel.add(new Option(pxDayLabel(r.t.slice(0, 10)), r.t.slice(0, 10))); sel.value = r.t.slice(0, 10); } });
+  view.querySelectorAll("[data-pxfail]").forEach(c => { const [l, k] = c.dataset.pxfail.split("|"), f = px.fail[l] || []; c.checked = f.includes(k); });
 }
 function pxRedraw(focusSel){
   px.ex = false; pxSave(); if(gdCur && gdCur.k === "postmortem") gdRender(pxSpec());
@@ -617,10 +681,10 @@ function pxRedraw(focusSel){
 }
 function pxAct(a, arg){
   switch(a){
-    case "example": px = Object.assign(PX_BLANK(), JSON.parse(JSON.stringify(PX_EXAMPLE))); pxView = null; gdReset("postmortem"); store.set("ws:cur:postmortem", null); pxSave(); renderPostmortem(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, after a comment pile-on");
+    case "example": pxResetDays(); px = Object.assign(PX_BLANK(), JSON.parse(JSON.stringify(PX_EXAMPLE))); pxView = null; gdReset("postmortem"); store.set("ws:cur:postmortem", null); pxSave(); renderPostmortem(); window.scrollTo(0, 0); return gsay("Example loaded");
     case "build": px.view = "report"; px.tab = "doc"; px.docv = "team"; px.date = pxDateOf(px); pxSave(); renderPostmortem(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": { px.view = "setup"; pxView = null; pxSave(); const sp = pxSpec(), p = gdPos("postmortem"), i = gdFirstOpen(sp); p.scr = "q"; p.i = i === null ? 0 : i; renderPostmortem(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1")); }
-    case "reset": { const snap = JSON.parse(JSON.stringify(px)); px = PX_BLANK(); pxView = null; gdReset("postmortem"); store.set("ws:cur:postmortem", null); pxSave(); renderPostmortem(); window.scrollTo(0, 0);
+    case "reset": { pxResetDays(); const snap = JSON.parse(JSON.stringify(px)); px = PX_BLANK(); pxView = null; gdReset("postmortem"); store.set("ws:cur:postmortem", null); pxSave(); renderPostmortem(); window.scrollTo(0, 0);
       withUndo("Cleared", snap, s2 => { px = s2; pxSave(); renderPostmortem(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "save": { const msg = wsSaveTool("postmortem", px, pxTitle(px)); renderPostmortem(); return flashIn($("#px-toast"), msg); }
     case "tracker": return tkOpen("postmortem");
@@ -630,7 +694,7 @@ function pxAct(a, arg){
     case "sharelink": return shareCopy("postmortem", pxShareState(), `Post-mortem: ${px.name || "Untitled incident"}`, $("#px-toast"));
     case "unshare": px.shared = false; pxSave(); return pxAct("save");
     case "tladd": if(px.tl.length < 8) px.tl.push({k:"more", t:"", w:""}); return pxRedraw(`[data-pxtl-w="${px.tl.length - 1}"]`);
-    case "tlrm": if(px.tl[+arg] && px.tl[+arg].k === "more") px.tl.splice(+arg, 1); return pxRedraw('[data-px="tladd"]');
+    case "tlrm": pxResetDays(); if(px.tl[+arg] && px.tl[+arg].k === "more") px.tl.splice(+arg, 1); return pxRedraw('[data-px="tladd"]');
     case "pradd": if(px.promises.length < 6) px.promises.push({to:"users", w:"", by:""}); return pxRedraw(`[data-pxpr-w="${px.promises.length - 1}"]`);
     case "prrm": px.promises.splice(+arg, 1); return pxRedraw('[data-px="pradd"]');
     case "actseed": { const snap = JSON.parse(JSON.stringify(px.acts)); px.acts = pxDraftActions(px); px.actsSeeded = true; pxRedraw('[data-px="actseed"]');
@@ -638,33 +702,61 @@ function pxAct(a, arg){
   }
 }
 const pxHere = () => hashNow().split("/")[0] === "postmortem";
+// Switch report tabs in place: only the chosen part is shown, and the Details stay open
+function pxTabSet(k, focus){
+  px.tab = k; pxSave(); if(!view.querySelectorAll) return;
+  view.querySelectorAll("[data-pxtab]").forEach(b => { const on = b.dataset.pxtab === k; b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1; if(on && focus) b.focus(); });
+  view.querySelectorAll("[data-pxpan]").forEach(p => { p.hidden = p.dataset.pxpan !== k; });
+}
+function pxDocSet(v){
+  px.docv = v; pxSave(); if(!view.querySelectorAll) return;
+  view.querySelectorAll("[data-pxdocv]").forEach(b => b.setAttribute("aria-pressed", b.dataset.pxdocv === v));
+  view.querySelectorAll("[data-pxdoc]").forEach(p => { p.hidden = p.dataset.pxdoc !== v; });
+}
 document.addEventListener("click", e => {
   const b = e.target.closest && e.target.closest("[data-px],[data-pxtab],[data-pxdocv]");
   if(!b || !pxHere() || !view.contains(b)) return;
   const d = b.dataset;
-  if(d.pxtab){ px.tab = d.pxtab; pxSave(); renderPostmortem(); const t = document.querySelector(`[data-pxtab="${d.pxtab}"]`); if(t) t.focus(); const dt = document.querySelector(".px-root .ev-details"); if(dt) dt.open = true; return; }
-  if(d.pxdocv){ px.docv = d.pxdocv; pxSave(); renderPostmortem(); const t = document.querySelector(`[data-pxdocv="${d.pxdocv}"]`); if(t) t.focus(); const dt = document.querySelector(".px-root .ev-details"); if(dt) dt.open = true; return; }
+  if(d.pxtab) return pxTabSet(d.pxtab, true);
+  if(d.pxdocv) return pxDocSet(d.pxdocv);
   if(d.px) pxAct(d.px, d.i);
 });
-document.addEventListener("input", e => {
-  const t = e.target; if(!t || !t.dataset || !pxHere() || !view.contains(t)) return;
+function pxField(t){
   const d = t.dataset;
-  if(d.pxtlT !== undefined && px.tl[+d.pxtlT]){ px.tl[+d.pxtlT].t = t.value; return pxLive(); }
-  if(d.pxtlW !== undefined && px.tl[+d.pxtlW]){ px.tl[+d.pxtlW].w = t.value.slice(0, 140); return pxLive(); }
-  if(d.pxprW !== undefined && px.promises[+d.pxprW]){ px.promises[+d.pxprW].w = t.value.slice(0, 140); return pxLive(); }
-  if(d.pxactW !== undefined && px.acts[+d.pxactW]){ px.acts[+d.pxactW].w = t.value.slice(0, 240); return pxLive(); }
-});
+  if(d.pxf){ const k = d.pxf; px[k] = k === "name" ? t.value.slice(0, 80) : k === "what" ? t.value.slice(0, 600) : t.value; return true; }
+  if(d.pxtlT !== undefined && px.tl[+d.pxtlT]){ pxTlTime(+d.pxtlT, t.value); pxSync(); return true; }
+  if(d.pxtlD !== undefined && px.tl[+d.pxtlD] && px.tl[+d.pxtlD].t){ const r = px.tl[+d.pxtlD]; r.t = t.value + "T" + r.t.slice(11); pxManualDay[+d.pxtlD] = true; return true; }
+  if(d.pxtlW !== undefined && px.tl[+d.pxtlW]){ px.tl[+d.pxtlW].w = t.value.slice(0, 140); return true; }
+  if(d.pxprW !== undefined && px.promises[+d.pxprW]){ px.promises[+d.pxprW].w = t.value.slice(0, 140); return true; }
+  if(d.pxprTo !== undefined && px.promises[+d.pxprTo]){ px.promises[+d.pxprTo].to = t.value; return true; }
+  if(d.pxprBy !== undefined && px.promises[+d.pxprBy]){ px.promises[+d.pxprBy].by = t.value; return true; }
+  if(d.pxactW !== undefined && px.acts[+d.pxactW]){ px.acts[+d.pxactW].w = t.value.slice(0, 240); return true; }
+  if(d.pxactOwner !== undefined && px.acts[+d.pxactOwner]){ px.acts[+d.pxactOwner].owner = t.value; return true; }
+  if(d.pxactBy !== undefined && px.acts[+d.pxactBy]){ px.acts[+d.pxactBy].by = t.value; return true; }
+  if(d.pxwho){ px.who = t.checked ? [...new Set(px.who.concat(t.value))] : px.who.filter(x => x !== t.value); return true; }
+  if(d.pxreach){ px.reach = t.value; return true; }
+  if(d.pxsev){ px.sev = t.value; return true; }
+  if(d.pxduty){ px.duties = t.checked ? [...new Set(px.duties.concat(t.value))] : px.duties.filter(x => x !== t.value); px.dutiesSet = true; return true; }
+  if(d.pxfail){ const [l, k] = d.pxfail.split("|"), cur = (px.fail[l] || []).filter(x => x !== "ok");
+    px.fail = Object.assign({}, px.fail, {[l]:k === "ok" ? (t.checked ? ["ok"] : []) : t.checked ? [...new Set(cur.concat(k))] : cur.filter(x => x !== k)}); pxSync(); return true; }
+  return false;
+}
+document.addEventListener("input", e => { const t = e.target; if(t && t.dataset && pxHere() && view.contains(t) && pxField(t)) pxLive(); });
 document.addEventListener("change", e => {
   const t = e.target; if(!t || !t.dataset || !pxHere() || !view.contains(t)) return;
-  const d = t.dataset;
-  if(d.pxtlT !== undefined && px.tl[+d.pxtlT]){ px.tl[+d.pxtlT].t = t.value; return pxLive(); }
-  if(d.pxprTo !== undefined && px.promises[+d.pxprTo]){ px.promises[+d.pxprTo].to = t.value; return pxLive(); }
-  if(d.pxprBy !== undefined && px.promises[+d.pxprBy]){ px.promises[+d.pxprBy].by = t.value; return pxLive(); }
-  if(d.pxactOwner !== undefined && px.acts[+d.pxactOwner]){ px.acts[+d.pxactOwner].owner = t.value; return pxLive(); }
-  if(d.pxactBy !== undefined && px.acts[+d.pxactBy]){ px.acts[+d.pxactBy].by = t.value; return pxLive(); }
+  if(!pxField(t)) return;
+  if(t.dataset.pxtlT !== undefined){ const r = px.tl[+t.dataset.pxtlT]; if(r && r.t) t.value = r.t.slice(11, 16); }
+  pxLive();
 });
-// Enter in a timeline row moves to the next row's text field (the engine's Enter rule only covers plain text questions)
+// Enter moves along the timeline: time, then what happened, then the next row (the engine's Enter rule only covers plain text questions)
 document.addEventListener("keydown", e => {
-  const t = e.target; if(e.key !== "Enter" || !t || !t.dataset || t.dataset.pxtlW === undefined || !pxHere() || !view.contains(t)) return;
-  e.preventDefault(); const nx = view.querySelector(`[data-pxtl-w="${+t.dataset.pxtlW + 1}"]`); if(nx) nx.focus();
+  const t = e.target; if(!t || !t.dataset || !pxHere() || !view.contains(t)) return;
+  if(e.key === "Enter" && (t.dataset.pxtlT !== undefined || t.dataset.pxtlW !== undefined)){
+    e.preventDefault(); const i = +(t.dataset.pxtlT !== undefined ? t.dataset.pxtlT : t.dataset.pxtlW);
+    const nx = t.dataset.pxtlT !== undefined ? view.querySelector(`[data-pxtl-w="${i}"]`) : view.querySelector(`[data-pxtl-t="${i + 1}"]`); if(nx) nx.focus(); return;
+  }
+  if(t.dataset.pxtab && (e.key === "ArrowRight" || e.key === "ArrowLeft")){
+    const ks = [...view.querySelectorAll("[data-pxtab]")].map(b => b.dataset.pxtab), j = ks.indexOf(t.dataset.pxtab) + (e.key === "ArrowRight" ? 1 : -1);
+    e.preventDefault(); pxTabSet(ks[(j + ks.length) % ks.length], true);
+  }
 });

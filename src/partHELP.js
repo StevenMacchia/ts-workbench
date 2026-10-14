@@ -148,8 +148,8 @@ const PAGE_TOURS = {
     [".tr-report .pol-tabs", "Three views", "The report as readers will see it, a checklist of what the DSA asks for, and a summary Claude writes from your numbers only."]
   ],
   postmortem:[
-    [".gd-intro h1", "One question at a time", "What happened, who it reached, how you found out, the timeline, what worked and what failed in each layer. Every answer can be changed."],
-    [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .px-tl, .gd-q .px-acts", "Answer, then continue", "Pick or type. Number keys work for choices, and Back lets you change anything."],
+    [".gd-intro h1", "Nine short screens", "What happened, who it reached, how you found out, the timeline, what worked and what failed in each layer. Every answer can be changed."],
+    [".gd-q .gd-opts, .gd-q .px-form, .gd-q .px-tl, .gd-q .px-layers-in, .gd-q .px-acts", "Answer, then continue", "Pick or type. Number keys work for choices, and Back lets you change anything."],
     [".px-root .pol-sum", "Where the response stands", "A grade for the response, never the incident, with the three actions under it."],
     [".px-root .ev-details", "The document", "The one-page review in the handbook's shape, for the team or for Legal, plus the timeline, the four layers, duties and promises."]
   ],

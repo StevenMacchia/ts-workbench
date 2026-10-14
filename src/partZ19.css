@@ -13,7 +13,7 @@
 .px-tlab{display:flex;align-items:center;gap:10px;font-size:14px}
 .px-tlab .btn{margin-left:auto}
 .px-n{flex:none;width:24px;height:24px;border-radius:50%;display:inline-grid;place-content:center;font:600 12px/1 var(--mono);color:var(--accent);background:color-mix(in oklab, var(--accent) 12%, transparent)}
-.px-tf{display:grid;grid-template-columns:minmax(0,248px) minmax(0,1fr);gap:8px}
+.px-tf{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);gap:8px}
 .px-tf .input,.px-prow .input,.px-prow .select,.px-arow .input,.px-arow .select{width:100%;min-width:0;font-size:16px}
 .px-tlx{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-top:10px}
 .px-tlx .note{margin:0}
@@ -65,3 +65,77 @@
 .px-parts .pol-meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
 .px-parts .pol-meter i{display:block;height:100%;border-radius:99px;background:var(--accent)}
 .px-parts .note{margin:6px 0 0}
+
+/* Grouped screens: a form, fieldsets of checkboxes, the time and day pair on a timeline row */
+.px-form{display:grid;gap:16px}
+.px-form .field{margin:0}
+.px-form label:not(.tr-chk){display:block;font-size:13.5px;font-weight:600;margin-bottom:5px}
+.px-form .input,.px-form .select{width:100%;font-size:16px}
+.px-form textarea.input{min-height:110px;line-height:1.5;font-family:inherit;resize:vertical}
+.px-form .note{margin:5px 0 0}
+.px-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,200px);gap:12px}
+.px-fs{border:0;margin:0;padding:0;display:grid;gap:9px;min-width:0}
+.px-fs legend{font-weight:600;font-size:14.5px;padding:0;margin-bottom:8px}
+.px-fs legend .note{font-weight:400}
+.px-fs small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.px-fs.card{padding:14px 16px}
+.px-layers-in{display:grid;gap:12px}
+.px-none{margin-top:4px;padding-top:9px;border-top:1px dashed var(--line)}
+.px-det{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surface)}
+.px-det summary{cursor:pointer;font-weight:600;font-size:14px}
+.px-det summary .note{font-weight:400;margin-left:6px}
+.px-det[open] summary{margin-bottom:10px}
+.px-det .tr-chk{margin:8px 0}
+.px-tt{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.px-gap{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:color-mix(in oklab, var(--accent) 8%, transparent);color:var(--ink);font-size:14px;line-height:1.5}
+.px-left{margin:0 0 12px;font-weight:600}
+
+/* The report: real tabs, one part at a time */
+.px-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+.px-tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:11px 14px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.px-tabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+.px-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+[data-pxpan]:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+[data-pxpan][hidden],[data-pxdoc][hidden]{display:none}
+.px-root .ev-details summary{cursor:pointer}
+
+@media (max-width:640px){
+  .px-two{grid-template-columns:1fr}
+  .px-tt{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  /* Phone: one scrolling row of buttons above the verdict, a smaller ring, so the verdict and the three actions come first */
+  .pagehead:has(+ .px-root) .headmeta{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:4px;margin-right:-16px;padding-right:16px;scrollbar-width:none}
+  .pagehead:has(+ .px-root) .headmeta .btn{flex:none;white-space:nowrap}
+  .pagehead:has(+ .px-root){padding-bottom:6px}
+  .pagehead:has(+ .px-root) .ph-main{display:none}
+  .pagehead:has(+ .px-root) .headmeta{margin-top:0}
+  .px-report{display:flex;flex-direction:column}
+  .px-report > *{order:2}
+  .px-report > .share-banner,.px-report > .tr-sum,.px-report > .pk-list{order:1}
+  .px-report > .banner{order:3;padding:8px 12px;font-size:13px}
+  .px-report > .banner .btn{display:none}
+  .px-root .tr-sum{grid-template-columns:minmax(0,1fr);gap:6px;padding:12px 14px}
+  .px-root .tr-sum .px-ring{display:none}
+  .px-root .tr-sum .eyebrow{font-size:11.5px;padding-right:0}
+  .px-root .verdict-row{display:flex;align-items:flex-start;gap:10px}
+  .px-root .verdict-row .grade{margin:0;order:-1;flex:none;width:44px;height:44px;font-size:22px;border-radius:12px}
+  .px-root .pol-verdict{font-size:16.5px;line-height:1.3;margin:0;flex:1;min-width:0}
+  .px-root .px-gnote,.px-root .cp-kpis{display:none}
+  .px-root .pk-list{margin:4px 0 0;gap:10px;font-size:13.5px;line-height:1.45;padding-left:18px}
+  .px-aw{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .px-am{display:block;color:var(--muted);font-size:12.5px}
+  .px-report .chapter-line,.px-report .ev-details{margin-top:12px}
+}
+
+@media (max-width:640px){
+  .px-root .pol-tabs .card-h{padding:0 6px}
+  .px-root .pol-tabs .card-b{padding:12px 10px}
+  .px-doc{padding:12px 12px;border-radius:10px}
+  .px-tw{overflow:visible}
+  .px-tw .ln-t{min-width:0;width:100%;display:block}
+  .px-tw .ln-t thead{display:none}
+  .px-tw .ln-t tbody,.px-tw .ln-t tr,.px-tw .ln-t td{display:block;width:auto;box-sizing:border-box}
+  .px-tw .ln-t tr{padding:8px 0;border:0;border-bottom:1px solid var(--line);background:none;box-shadow:none;margin:0;border-radius:0}
+  .px-tw .ln-t td{padding:1px 0;border:0;white-space:normal;overflow-wrap:anywhere;text-align:left;font-weight:400}
+  .px-tw .ln-t td:first-child{font-weight:600}
+  .px-redact{padding:12px}
+}

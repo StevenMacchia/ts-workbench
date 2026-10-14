@@ -113,7 +113,7 @@ const INTRO_SPECS = {
     leave:"a one-page blameless document, a grade for the response, and three actions with owners and dates.",
     mins:"about 15 minutes, with the timeline in front of you.",
     walk:[
-      {title:"Fifteen plain questions", line:"What happened, who it reached, how you found out, and what failed in each layer: prevention, detection, response, communication.",
+      {title:"Nine short screens", line:"What happened, who it reached, how you found out, and what failed in each layer: prevention, detection, response, communication.",
         preview:() => `<div class="gd-opts" role="group" aria-label="Example question"><button type="button" class="gd-opt on" tabindex="-1"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><b>No alert fires for this kind of harm</b></span><kbd aria-hidden="true">1</kbd></button></div>`},
       {title:"A timeline with the gaps", line:"Five moments in the handbook's order. The gap from first signal to a declared incident is usually the fastest to fix.",
         preview:() => `<ul class="tline" style="margin:0"><li class="now"><span class="tdot">2</span><span class="tlab"><b>First internal signal</b><span>Report spike, 23:30</span></span></li></ul>`},
