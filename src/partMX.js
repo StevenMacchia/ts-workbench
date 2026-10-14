@@ -19,7 +19,7 @@ const MX_BAND = {
 // One line per tab, so what's behind it is known before clicking. Reuses the band and review-cadence
 // copy already written for MX_BAND and MX_RV instead of writing new explanations
 const MX_TAB_SUB = {
-  card:`${MX_BAND.ns[1]} Then health metrics and diagnostics, in that order.`,
+  card:"",
   data:"The event types every metric above is built from, and what one row of each should hold.",
   run:`${MX_RV.w[0]}, ${MX_RV.m[0].toLowerCase()}, ${MX_RV.q[0].toLowerCase()} and ${MX_RV.r[0].toLowerCase()} — who looks at which numbers, and how often.`,
   mine:"Enter this period's numbers against your targets and see where you stand."
@@ -159,56 +159,48 @@ function mxStatusChip(m){
   if(!st) return mx.have[m.n] ? `<span class="mxm-st">✓ Tracked</span>` : "";
   return `<span class="mxm-st ${MX_STAT[st][1]}"><i></i>${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>`;
 }
-// A metric's tile, as a row (diagnostics) or a card (north star / health). nextUp marks the one the next-up flag goes on
-function mxRowHTML(m, nextUp){
-  const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), up = m === nextUp;
-  const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
-  return `<button type="button" class="mxm-row${up ? " is-next" : ""}" data-open="${i}"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span><span class="mxm-rt"><b>${esc(m.n)}</b><span>${esc(MX_Q[m.n])}</span></span><span class="mxm-rs">${mxStatusChip(m)}${flag}</span><span class="mxm-go">${mxIco("next", "mx-ico sm")}</span></button>`;
+// The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
+const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
+const mxEyebrow = m => `<span class="mxg-eb">${mxTile(m.l)}${esc(LAYERS.find(x => x.k === m.l).n)}</span>`;
+// The few metrics most worth adopting first: the north stars for this platform and stage (3 to 5). When a
+// profile has fewer than three, the first health metrics fill the row so there is always something to start with
+function mxStartList(list){
+  const ns = list.filter(m => m.t === "ns");
+  return ns.length >= 3 ? ns.slice(0, 5) : ns.concat(list.filter(m => m.t === "health")).slice(0, 3);
 }
-function mxCardHTML(m, nextUp){
-  const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
-  const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
-  // North-star metrics show the no-tooling-team version right in the list: the line most useful
-  // to the audience least likely to open the full article first
-  const mvp = m.t === "ns" && H.mvp ? `<span class="mxm-mvp"><b>No data team yet?</b> ${esc(H.mvp)}</span>` : "";
-  return `<button type="button" class="mxm-card${up ? " is-next" : ""}" data-open="${i}">
-      <span class="mxm-top"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span>${flag}</span>
-      <b class="mxm-name">${esc(m.n)}</b>
-      <span class="mxm-q">${esc(MX_Q[m.n])}</span>
-      ${mvp}
-      <span class="mxm-foot"><span class="mxm-dir">${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1]}</span>${mxStatusChip(m)}<span class="mxm-go">${mx.read[m.n] ? "Open" : "Start"} ${mxIco("next", "mx-ico sm")}</span></span>
-    </button>`;
+const mxTierPill = m => `<span class="pill ${TIER[m.t][1]}">${TIER[m.t][0]}</span>`;
+function mxStartCard(m){
+  const i = METRICS.indexOf(m), why = m.w || MX_BAND[m.t][1];
+  return `<article class="card mxg-card mxm-${m.t}">
+      <div class="mxg-top">${mxEyebrow(m)}${mxTierPill(m)}</div>
+      <h3 class="mxg-name">${esc(m.n)}</h3>
+      <p class="mxg-q">${esc(MX_Q[m.n])}</p>
+      <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
+      <div class="mxg-go"><button type="button" class="btn sm primary" data-open="${i}" aria-label="How to measure ${esc(m.n)}">How to measure it${mxIco("next", "mx-ico sm")}</button>${mxStatusChip(m)}</div>
+    </article>`;
+}
+function mxRowHTML(m){
+  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]];
+  return `<li class="mxg-row"><span class="mxg-rc">${mxEyebrow(m)}</span>
+      <span class="mxg-rt"><button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
+      <span class="mxg-rs">${mxStatusChip(m)}</span>
+      <span class="mxg-rl">${lg ? `<button type="button" class="mx-link" data-log="${H.src[0]}" aria-label="What to log for ${esc(m.n)}">What to log</button>` : ""}</span>
+      <span class="mxg-tick${mx.read[m.n] ? " on" : ""}">${mx.read[m.n] ? "✓ Read" : ""}</span></li>`;
 }
 function mxMap(list){
-  const read = list.filter(m => mx.read[m.n]).length, nextUp = list.find(m => !mx.read[m.n]);
-  const pct = list.length ? Math.round(100 * read / list.length) : 0;
-  const how = `<div class="mxm-how mxm-how-line">
-    <p class="note">A reference to learn from and build with, not part of the assessment. Open any metric for the question it answers, the formula, how to measure it on your platform and starter SQL.</p>
-    <div class="mxm-prog"><span><b>${read}</b> of ${list.length} read</span><div class="mxm-bar"><i style="width:${pct}%"></i></div></div>
-  </div>`;
-  return how + mxOnrampBannerHTML() + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + MX_TORD.map((t, bi) => {
-    const ms = list.filter(m => m.t === t); if(!ms.length) return "";
-    const done = ms.filter(m => mx.read[m.n]).length;
-    const card = m => t === "diag" ? mxRowHTML(m, nextUp) : mxCardHTML(m, nextUp);
-    return `<section class="mxm-band mxm-${t}">
-      <div class="mxm-bh"><span class="mxm-n">${bi + 1}</span><div><h3>${MX_BAND[t][0]} <span class="mxm-count">${done ? `${done} of ${ms.length} read` : ms.length}</span></h3><p>${MX_BAND[t][1]}</p></div></div>
-      <div class="${t === "diag" ? "mxm-rows" : "mxm-grid"}">${ms.map(card).join("")}</div>
-    </section>`;
-  }).join("");
-}
-// A newcomer's landing: just the north-star metrics for their platform and stage, with the full catalog one click away
-function mxNsHTML(list){
-  const ns = list.filter(m => m.t === "ns"), nextUp = ns.find(m => !mx.read[m.n]);
-  return `<div class="banner cvt-b mxm-onramp"><span><strong>Recommended for you:</strong> ${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}. ${ns.length ? `Start with these ${ns.length} north-star metric${ns.length === 1 ? "" : "s"}` : "No north-star metric fits this combination yet"} — everything else is one click away.</span><button type="button" class="btn sm" id="mx-ns-full">See the full catalog (${list.length})</button></div>
-  <section class="mxm-band mxm-ns">
-    <div class="mxm-bh"><span class="mxm-n">1</span><div><h3>${MX_BAND.ns[0]}</h3><p>${MX_BAND.ns[1]}</p></div></div>
-    <div class="mxm-grid">${ns.map(m => mxCardHTML(m, nextUp)).join("")}</div>
-  </section>`;
-}
-// A banner inviting a true newcomer (nothing onramped, filtered or already tracked) to the filtered view
-function mxOnrampBannerHTML(){
-  if(mx.onramped || mx.nsOnly || Object.keys(mx.have || {}).length) return "";
-  return `<div class="banner cvt-b"><span><strong>New here?</strong> See the 3 to 5 metrics most worth starting with for your platform, instead of the full list.</span><button type="button" class="btn sm primary" id="mx-onramp">Show me the few that matter</button></div>`;
+  const read = list.filter(m => mx.read[m.n]).length, start = mxStartList(list), fold = mx.fold || {};
+  const tiers = MX_TORD.filter(t => list.some(m => m.t === t));
+  const startH = start.length ? `<section class="mxg-start" aria-labelledby="mxg-start-h">
+    <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">For ${esc(MX_PLATFORMS[mx.platform])} at the ${MX_STAGE[mx.stage].toLowerCase()} stage</span></div>
+    <div class="mxg-cards">${start.map(mxStartCard).join("")}</div></section>` : "";
+  const foldH = `<section class="mxg-full" aria-labelledby="mxg-full-h">
+    <div class="mxg-sh"><h2 id="mxg-full-h">All ${list.length} metrics</h2>${read ? `<span class="mxg-readn note">${read} of ${list.length} read</span>` : ""}</div>
+    <nav class="mxg-jump" aria-label="Jump to a tier">${tiers.map(t => `<button type="button" data-tier-jump="${t}">${TIER[t][0]} · ${list.filter(m => m.t === t).length}</button>`).join("")}</nav>
+    ${tiers.map(t => { const ms = list.filter(m => m.t === t), open = fold[t] != null ? fold[t] : t === "ns";
+      return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
+        <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${MX_BAND[t][1]}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
+        <ul class="mxg-rows">${ms.map(mxRowHTML).join("")}</ul></details>`; }).join("")}</section>`;
+  return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
 
 /* ----- Metrics tab: one metric, in three parts ----- */
@@ -227,7 +219,7 @@ function mxArticle(m, list){
       <span class="mxa-arrows"><button type="button" class="mxa-arrow" data-step="-1" aria-label="Previous metric" ${prev ? "" : "disabled"}>${mxIco("back", "mx-ico sm")}</button><button type="button" class="mxa-arrow" data-step="1" aria-label="Next metric" ${next ? "" : "disabled"}>${mxIco("next", "mx-ico sm")}</button></span>
     </div>
     <header class="mxa-head">
-      <div class="mxa-eyebrow"><span class="mxa-area">${mxIco(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
+      <div class="mxa-eyebrow"><span class="mxg-eb">${mxTile(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
       <h2>${esc(m.n)}</h2>
       <p class="mxa-q">${esc(MX_Q[m.n])}</p>
       <p class="mxa-lead">${lead}</p>
@@ -329,7 +321,7 @@ function mxTabMine(list){
     <p>An optional worksheet. For each metric you track, enter this period's number, your target, and the point where it counts as off track. Save the period when it closes, and each metric builds a trend line you can show leadership. It stays in this browser and doesn't affect your assessment.</p>
     ${mx.demo ? "" : `<p><button type="button" class="btn sm" id="mx-guide">Fill it in one metric at a time</button></p>`}</div>
   ${mx.demo ? `<div class="mxs-demo">${mxIco("warn")}<span>You're looking at <b>example numbers</b> for a ${esc(MX_PLATFORMS[mx.platform].toLowerCase())} program, so you can see how a full scorecard reads.</span><button type="button" class="btn sm" id="mx-demo-clear">Clear example numbers</button></div>` : ""}
-  <div class="mxs-top">
+  <div class="mxg-top">
     <label class="mxa-y mxs-period"><span>Reporting period</span><input class="input" id="mx-period" value="${esc(mx.period || "")}" placeholder="For example Q3 2026"></label>
     <div class="mxs-sum" id="mx-sc-sum" aria-live="polite">${mxSumHTML(list)}</div>
     <button type="button" class="btn primary mxs-op" id="mx-op">${mxIco("page", "mx-ico")}Leadership one-pager</button>
@@ -547,24 +539,7 @@ function mxBindGloss(){
 let mxView = null;
 // Guided for a fresh scorecard; the framework and the tabs once there are numbers, an example, or a metric opened by link
 // The library is the front door. The guided setup is only for the optional worksheet, from its own button
-function mxMode(){ return mxView === "guide" ? "guide" : mxView === "onramp" ? "onramp" : "page"; }
-// A short on-ramp for a newcomer: platform and stage, then the north-star metrics for that combination.
-// Distinct from mxSpec()'s guided worksheet, which fills in numbers for every metric you track
-function mxOnrampSpec(){
-  const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
-  const steps = [
-    {id:"platform", eb:"Your platform", title:"What kind of platform is it?", why:"The list of metrics changes with it: a marketplace watches fraud loss, a social app watches prevalence and reach.", kind:"single",
-      opts:() => Object.entries(MX_PLATFORMS).map(([k, v]) => ({k, n:v})), get:() => mx.platformSet || mx.orgSet ? mx.platform : "", set:v => { mx.platformSet = true; setV("platform", v); }},
-    {id:"stage", eb:"Your stage", title:"How far along is your program?", why:"Early programs start with a few metrics they can actually measure. Later stages add more.", kind:"single",
-      opts:() => Object.entries(MX_STAGE).map(([k, v]) => ({k, n:v, h:MX_STAGE_HELP[k]})), get:() => mx.stageSet || mx.orgSet ? mx.stage : "", set:v => { mx.stageSet = true; setV("stage", v); }}
-  ];
-  return {k:"metrics-onramp", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
-    intro:{title:"Start with the few numbers that matter most", lead:"Two quick questions, then the three to five north-star metrics picked for your platform and stage. Every other metric, and the full reference, stays one click away.",
-      facts:[["About 1 minute", "Two questions, then your recommended metrics."], ["North stars first", "The few numbers that show whether users are actually safer."], ["Nothing is final", "Change your platform or stage, or browse the full catalog, any time."]], start:"Start"},
-    alt:[{n:"See the full catalog instead", run:() => { mxView = null; mx.tab = "card"; mx.nsOnly = false; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}],
-    steps, finish:"See my recommended metrics",
-    done:() => { mxView = null; mx.tab = "card"; mx.nsOnly = true; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
-}
+function mxMode(){ return mxView === "guide" ? "guide" : "page"; }
 function mxSpec(){
   const list = mxList(), tracked = () => list.filter(m => mx.have[m.n]);
   const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
@@ -600,7 +575,6 @@ function renderMetrics(){
   const list = mxList();
   mxFromHash(list);
   if(typeof gdRender === "function" && mxMode() === "guide"){ mxGuideStart(); return gdRender(mxSpec()); }
-  if(typeof gdRender === "function" && mxMode() === "onramp") return gdRender(mxOnrampSpec());
   mxView = null;
   if(typeof gdCur !== "undefined") gdCur = null;
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
@@ -608,44 +582,41 @@ function renderMetrics(){
   if(!open) mx.open = null;
   if(open && !mx.read[open.n]) mx.read[open.n] = true;
   store.set("mx", mx);
-  const tabs = {card:() => open ? mxArticle(open, list) : mx.nsOnly ? mxNsHTML(list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
-  const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
+  const tabs = {card:() => open ? mxArticle(open, list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm primary" id="mx-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button class="btn sm ${DL ? "" : "primary"}" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}</div></div>`
     : head("Metrics framework",
-      "A reference for the numbers a T&S program runs on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform. For learning and building your own, outside the assessment.",
-      "Run the program", actions) + `
+      "Open any metric for its question, formula, how to measure it and starter SQL.",
+      "Run the program", mx.tab === "mine" ? actions : "") + `
     <div class="mxm-filter">
-      <span>Showing <b>${list.length} metrics</b> for</span>
       <select class="mxm-sel" id="mx-platform" aria-label="Platform">${Object.entries(MX_PLATFORMS).map(([k, v]) => `<option value="${k}" ${mx.platform === k ? "selected" : ""}>${v}</option>`).join("")}</select>
-      <span>·</span>
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
-      <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
+      <span class="mxm-note">${list.length} metrics for this profile</span>
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>
-    <p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab] || "")}</p>`;
+    ${MX_TAB_SUB[mx.tab] ? `<p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab])}</p>` : ""}`;
   view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" role="status" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
 
   const save = () => { store.set("mx", mx); renderMetrics(); };
   const tabSub = k => (MX_TABS.find(t => t[0] === k) || [])[2] || "";
   const bind = (sel, fn) => view.querySelectorAll(sel).forEach(fn);
   const p = $("#mx-platform"); if(p && !open){ p.onchange = e => { mx.platform = e.target.value; save(); }; $("#mx-stage").onchange = e => { mx.stage = e.target.value; save(); }; $("#mx-reg").onchange = e => { mx.reg = e.target.checked; save(); }; }
-  $("#mx-save").onclick = () => { const msg = wsSaveTool("metrics", mx, metricsTitle(mx)); renderMetrics(); flashIn($("#mx-toast"), msg); };
-  $("#mx-copy").onclick = () => copyText(mxPlanText(list), $("#mx-toast"));
+  const sv = $("#mx-save"), cp = $("#mx-copy"); if(sv) sv.onclick = () => { const msg = wsSaveTool("metrics", mx, metricsTitle(mx)); renderMetrics(); flashIn($("#mx-toast"), msg); };
+  if(cp) cp.onclick = () => copyText(mxPlanText(list), $("#mx-toast"));
   const dl = $("#mx-dl"); if(dl && DL) dl.onclick = () => { const md = mxPlanText(list); offerFile("ts-metrics-plan.md", md, md, $("#mx-toast")); };
   bind("[data-tab]", b => b.onclick = () => mxGo(tabSub(b.dataset.tab)));
   bind("[data-open]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.open])));
   bind("[data-go]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.go])));
-  bind("[data-back]", b => b.onclick = () => { const was = mx.open; mxGo(""); setTimeout(() => mxFlash(view.querySelector(`[data-open="${METRICS.findIndex(m => m.n === was)}"]`)), 120); });
+  bind("[data-back]", b => b.onclick = () => { const was = mx.open; mxGo(""); setTimeout(() => { const el = view.querySelector(`[data-open="${METRICS.findIndex(m => m.n === was)}"]`), d = el && el.closest("details"); if(d && !d.open) d.open = true; mxFlash(el); }, 120); });
   bind("[data-step]", b => b.onclick = () => { const n = list[list.indexOf(open) + +b.dataset.step]; if(n) mxGo(mxSlug(n)); });
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
-  bind("#mx-onramp", b => b.onclick = () => { mxView = "onramp"; gdReset("metrics-onramp"); renderMetrics(); window.scrollTo(0, 0); });
-  bind("#mx-ns-full", b => b.onclick = () => { mx.nsOnly = false; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); });
+  bind("[data-tier-jump]", b => b.onclick = () => { const d = document.getElementById("mxg-" + b.dataset.tierJump); if(!d) return; d.open = true; mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:true}); store.set("mx", mx); if(d.scrollIntoView) d.scrollIntoView({behavior:"smooth", block:"start"}); });
+  bind("details.mxg-tier", d => d.ontoggle = () => { mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:d.open}); store.set("mx", mx); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();

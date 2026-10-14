@@ -39,29 +39,35 @@ const body = function(){
 
   // a reference, not an assessment: a fresh visit opens on the metrics; the worksheet's guided fill-in is behind its own button
   mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; mxView = null; gdReset("metrics"); renderMetrics();
-  eq(/not part of the assessment/.test(view.innerHTML) && (view.innerHTML.match(/class="mxm-card/g) || []).length > 0, true, "the metrics are the front door");
+  eq(/id="mxg-start-h"/.test(view.innerHTML) && (view.innerHTML.match(/class="card mxg-card/g) || []).length > 0, true, "the metrics are the front door, opening on Start with these");
   eq(MX_TABS.map(t => t[1]).join(" · "), "The metrics · What to log · Who reviews what · Your numbers", "plain tab names, the worksheet last");
   mx.tab = "mine"; renderMetrics(); eq(/optional worksheet/.test(view.innerHTML) && /id="mx-guide"/.test(view.innerHTML), true, "the worksheet says it's optional and offers the guided fill-in");
   mxView = "guide"; gdReset("metrics"); renderMetrics(); eq(/data-gd="start"/.test(view.innerHTML), true, "guided fill-in on request"); eq(mxList().filter(m => m.t === "ns").every(m => mx.have[m.n]), true, "north stars pre-ticked");
   gdGo(gdCur, "start"); gdPick(gdCur, "market"); const live = gdLive(gdCur); eq(live.filter(z => /^m-/.test(z.id)).length, mxList().filter(m => mx.have[m.n]).length, "one screen per tracked metric");
   out.push("reference first: the metrics, then what to log and who reviews what; the worksheet is optional, with a guided fill-in");
 
-  // a short on-ramp lands a newcomer on 3 to 5 north-star metrics instead of the full catalog, with the full catalog one click away
-  mx = {platform:"market", stage:"2", reg:false, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; mxView = null; gdReset("metrics"); gdReset("metrics-onramp"); renderMetrics();
-  eq(/New here\?/.test(view.innerHTML) && /id="mx-onramp"/.test(view.innerHTML), true, "the full catalog invites a newcomer to the on-ramp");
-  mxView = "onramp"; gdReset("metrics-onramp"); renderMetrics();
-  eq(/data-gd="start"/.test(view.innerHTML), true, "the on-ramp has its own short intro");
-  gdGo(gdCur, "start"); eq(/What kind of platform is it\?/.test(view.innerHTML), true, "first on-ramp question is the platform");
-  gdPick(gdCur, "market"); gdGo(gdCur, "next"); eq(/How far along is your program\?/.test(view.innerHTML), true, "second on-ramp question is the stage");
-  gdPick(gdCur, "2"); gdGo(gdCur, "next");
-  eq(!!mx.nsOnly && !!mx.onramped, true, "finishing the on-ramp lands on the filtered view");
-  const nsList = mxList().filter(m => m.t === "ns"), nsHtml = view.innerHTML;
-  eq(nsList.length >= 1 && nsList.length <= 5, true, "a market platform gets a handful of north-star metrics: " + nsList.length);
-  eq((nsHtml.match(/class="mxm-card/g) || []).length, nsList.length, "only the north-star metrics show, not the full catalog");
-  eq(/id="mx-ns-full"/.test(nsHtml), true, "the full catalog stays one click away");
-  mx.nsOnly = false; mx.onramped = true; renderMetrics(); // what the "#mx-ns-full" button's handler does
-  eq((view.innerHTML.match(/class="mxm-card/g) || []).length > nsList.length, true, "back to the full catalog, which stays reachable");
-  out.push(`on-ramp: platform and stage, then ${nsList.length} north-star metrics for a market platform; full catalog one click away`);
+  // The landing: Start with these (3 to 5 cards), then the full set folded by tier; no banner, no grey reference box
+  mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; mxView = null; gdReset("metrics"); renderMetrics();
+  let lh = view.innerHTML; const lst = mxList(), st = mxStartList(lst);
+  eq(/New here?|A reference to learn from|id="mx-onramp"/.test(lh), false, "the New here banner and the grey reference box are gone");
+  eq(st.length >= 3 && st.length <= 5, true, "default profile starts with 3 to 5 metrics: " + st.length);
+  eq((lh.match(/class="card mxg-card/g) || []).length, st.length, "one card per starter metric");
+  eq(st.every(m => lh.includes('<h3 class="mxg-name">' + esc(m.n) + '</h3>') && lh.includes(esc(MX_Q[m.n])) && lh.includes('data-open="' + METRICS.indexOf(m) + '"')), true, "cards title the metric and carry its question and the How to measure it action");
+  eq(/class="mxg-eb"><span class="tile tile-sm" data-tone="measure"/.test(lh), true, "the category is the eyebrow, on a measure .tile-sm");
+  eq((lh.match(/<details class="mxg-tier/g) || []).length, 3, "three tiers folded");
+  eq(/id="mxg-ns"[^>]* open/.test(lh) && !/id="mxg-health"[^>]* open/.test(lh) && !/id="mxg-diag"[^>]* open/.test(lh), true, "north star open, the others closed");
+  eq(["North star · " + lst.filter(m => m.t === "ns").length, "Health · " + lst.filter(m => m.t === "health").length, "Diagnostic · " + lst.filter(m => m.t === "diag").length].every(t => lh.includes('<span class="mxg-tt">' + t + "</span>")), true, "tier titles carry their counts");
+  eq((lh.match(/class="mxg-row"/g) || []).length, lst.length, "every metric has a row in the full set");
+  eq((lh.match(/data-log="/g) || []).length, lst.length, "every row links to what to log");
+  eq(/mxg-readn/.test(lh), false, "the read note is hidden until a metric is read");
+  mx.read = {[lst[0].n]:true}; renderMetrics(); eq(/class="mxg-readn note">1 of [0-9]+ read/.test(view.innerHTML) && /class="mxg-tick on">/.test(view.innerHTML), true, "reading a metric shows the note and the tick");
+  eq(/id="mx-save"|id="mx-dl"|id="mx-copy"/.test(view.innerHTML), false, "no save, download or copy on The metrics");
+  mx.tab = "mine"; renderMetrics(); eq(/id="mx-save"/.test(view.innerHTML) && /id="mx-copy"/.test(view.innerHTML), true, "save, download and copy plan sit on Your numbers");
+  mx.tab = "card"; mx.fold = {health:true, ns:false}; renderMetrics(); eq(/id="mxg-health"[^>]* open/.test(view.innerHTML) && !/id="mxg-ns"[^>]* open/.test(view.innerHTML), true, "folded state is remembered");
+  let minS = 9, maxS = 0;
+  Object.keys(MX_PLATFORMS).forEach(p => ["1","2","3"].forEach(sg => { mx = {platform:p, stage:sg, reg:true}; const n = mxStartList(mxList()).length; minS = Math.min(minS, n); maxS = Math.max(maxS, n); }));
+  eq(minS >= 3 && maxS <= 5, true, "every profile starts with 3 to 5: " + minS + " to " + maxS);
+  out.push("landing: " + st.length + " starter cards for social/growing, " + lst.length + " metrics in three folded tiers, no banner; 3 to 5 starters for every profile (" + minS + " to " + maxS + ")");
   mxView = "page";
   let combos = 0, guides = 0, minN = 99, maxN = 0, shownNotes = 0;
   Object.keys(MX_PLATFORMS).forEach(p => ["1","2","3"].forEach(st => [true,false].forEach(reg => {
@@ -69,7 +75,7 @@ const body = function(){
     minN = Math.min(minN, list.length); maxN = Math.max(maxN, list.length);
     MX_TABS.forEach(([t]) => { mx.tab = t; renderMetrics(); if(bad(view.innerHTML)) throw new Error("bad " + t + " " + p + st + reg + ": " + view.innerHTML.match(/.{60}(undefined|NaN|null).{40}/)); });
     mx.tab = "card"; renderMetrics(); const h = view.innerHTML;
-    if((h.match(/class="mxm-(card|row)[ "]/g)||[]).length !== list.length) throw new Error("map size " + p + st);
+    if((h.match(/class="mxg-row"/g)||[]).length !== list.length) throw new Error("map size " + p + st);
     list.forEach(m => { guides++; mx.open = m.n; const g = mxArticle(m, list); mx.open = null; if(bad(g)) throw new Error("bad guide " + m.n); if(g.includes('class="mxa-pf"')) shownNotes++; if(!g.includes('class="mxf"')) throw new Error("no formula " + m.n); });
     mx.tab = "mine"; renderMetrics(); if((view.innerHTML.match(/class="mx-sc-row"/g)||[]).length !== list.length) throw new Error("scorecard rows " + p + st);
   })));
@@ -100,11 +106,11 @@ const body = function(){
   // Addresses: each view has its own hash
   mx = {platform:"social", stage:"2", reg:true};
   const at = h => { location.hash = h; renderMetrics(); return view.innerHTML; };
-  eq(/class="mxm-card/.test(at("#metrics")), true, "#metrics shows the map");
+  eq(/class="card mxg-card/.test(at("#metrics")), true, "#metrics shows the map");
   eq((at("#metrics/violating-content-prevalence").match(/<h2>([^<]+)/)||[])[1], "Violating-content prevalence", "metric link opens its page");
   eq(view.innerHTML.includes('class="mxc"'), true, "metric page uses the compact header");
   eq(at("#metrics/scorecard").includes('id="mx-sc-sum"'), true, "scorecard link"); eq(at("#metrics/data").includes('class="card mx-log"'), true, "data link");
-  eq(at("#metrics/program").includes("mx-rgrid"), true, "program link"); eq(/class="mxm-card/.test(at("#metrics/no-such-metric")), true, "unknown link falls back to the map");
+  eq(at("#metrics/program").includes("mx-rgrid"), true, "program link"); eq(/class="card mxg-card/.test(at("#metrics/no-such-metric")), true, "unknown link falls back to the map");
   eq(METRICS.every(m => METRICS.filter(x => mxSlug(x) === mxSlug(m)).length === 1), true, "slugs are unique");
   const cm = cmdkItems().filter(x => x.g === "Metrics"); eq(cm.length, mxList().length, "search lists every metric");
   out.push("addresses: map, " + METRICS.length + " metric pages and 3 tabs each have a link; bad links fall back; search lists " + cm.length + " metrics");
