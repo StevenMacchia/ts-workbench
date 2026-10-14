@@ -529,3 +529,6 @@ table:not([class]) tr:last-child td{border-bottom:0}
 .ai-opt{font-weight:400;font-size:12px;color:var(--faint);margin-left:4px}
 /* Guide progress counts are read as progress, not captions */
 .ln-tabs > .note,.lnh-b .note{color:color-mix(in oklab,var(--ink) 72%,var(--muted));font-weight:500}
+
+/* Tabletop intro: the same breathing room between the lead and the actions as the guided intros */
+.tt-one{margin-top:20px;margin-bottom:6px;align-items:center;gap:10px 16px}
