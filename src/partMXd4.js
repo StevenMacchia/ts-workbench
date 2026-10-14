@@ -3,7 +3,7 @@
 const MX_Q = {
   "Violating-content prevalence":"Out of everything people see, how much breaks our rules?",
   "Harmful reach before action":"How many people see harmful content before we take it down?",
-  "Fraud loss rate":"How much money do we lose to fraud for every dollar that moves through us?",
+  "Fraud loss rate":"How much money do we lose to fraud per dollar processed?",
   "Prohibited-listing prevalence":"How much of what's for sale shouldn't be?",
   "Toxicity per 1,000 match-hours":"How often do players run into abuse while they play?",
   "Churn after toxic exposure":"Do people quit after they've been abused?",
@@ -15,11 +15,11 @@ const MX_Q = {
   "User-report rate":"How often do users flag problems to us?",
   "Repeat-offender rate":"After we act, do people stop breaking the rules or keep going?",
   "Proactive detection rate":"How much harm do we catch before anyone has to report it?",
-  "Precision and recall by policy area":"When our systems act, are they right, and how much do they miss?",
-  "Time to detect emerging trends":"How long does a new kind of abuse run before we notice it?",
+  "Precision and recall by policy area":"When our systems act, are they right, and what do they miss?",
+  "Time to detect emerging trends":"How long does new abuse run before we notice it?",
   "Appeal overturn rate":"When someone appeals, how often were we wrong?",
   "QA agreement rate":"Do our reviewers make the same call an expert would?",
-  "Consistency across languages and markets":"Are we as accurate in every language as we are in our best one?",
+  "Consistency across languages and markets":"Are we equally accurate in every language and market?",
   "Time to action by severity (p90)":"How fast do we act on the most serious problems?",
   "SLA attainment":"Do we hit the response times we promised?",
   "Backlog age":"Is work piling up faster than we can handle it?",
@@ -32,7 +32,21 @@ const MX_Q = {
   "Account takeover rate":"How often do attackers take over our users' accounts?",
   "Unsafe-contact rate for minors":"How often do adults try to contact children inappropriately on our product?",
   "Age-assurance coverage":"Do we actually know which of our users are children?",
-  "Safety incidents per 10k trips":"How often is someone hurt or put in danger during a trip or booking?"
+  "Safety incidents per 10k trips":"How often is someone hurt or endangered on a trip or booking?"
+};
+
+// The short reason a metric is on the Start with these cards (14 words at most). The longer "why it matters" stays on the metric's page.
+const MX_FIRST = {
+  "Violating-content prevalence":"Measures what users actually see, not how busy your team is.",
+  "Unsafe-contact rate for minors":"Worst harm on any product children use; regulators check it first.",
+  "Proactive detection rate":"Shows how much harm you catch instead of waiting for reports.",
+  "Users who feel safe":"Captures harm your logs never see, and every executive understands it.",
+  "Fraud loss rate":"Finance already watches it. It puts T&S in the P&L conversation.",
+  "Account takeover rate":"Takeovers hit your most loyal users, and someone pays the loss.",
+  "Toxicity per 1,000 match-hours":"Normalizes for engagement, so a busy launch week doesn't look like a spike.",
+  "Romance-scam reports per 10k matches":"Scams are the defining harm on dating platforms, and losses are severe.",
+  "Violating-generation rate":"The core safety measure for a generative product.",
+  "Safety incidents per 10k trips":"The harm happens offline, and one serious incident can reach court."
 };
 
 // Jargon, explained on hover. Keys are matched case-insensitively as whole words.

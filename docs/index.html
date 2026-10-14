@@ -1294,7 +1294,7 @@ thead th{background:var(--surface-2)}
 .mxa-arrow[disabled]{opacity:.35;pointer-events:none}
 .mxa-head{max-width:760px;margin-bottom:32px}
 .mxa-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.mxa-area,.mxg-eb{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted)}
+.mxa-area{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--muted)}
 .mxa-tier{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;color:var(--band-c);background:color-mix(in oklab, var(--band-c) 12%, transparent)}
 .mxa-head h2{font-size:34px;line-height:1.12;letter-spacing:-.028em;margin:0 0 12px}
 .mxa-lead{font-size:17.5px;line-height:1.6;color:var(--muted);margin:0}
@@ -1743,24 +1743,29 @@ text.mxt-a{fill:var(--crit)}
 .section-title .segs{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
 .section-title .segs button{white-space:nowrap;flex:none}
 
-/* Metrics landing: Start with these, then the full set folded by tier. Card hierarchy: name is the title, the category is the eyebrow on a .tile-sm */
+/* Metrics landing: Start with these (each card is one link), then the full set folded by tier, all closed by default */
 .mxg-start{margin-top:22px}
-.mxg-full{margin-top:30px}
+.mxg-full{margin-top:28px}
 .mxg-sh{display:flex;align-items:baseline;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;margin:0 0 12px}
 .mxg-sh h2{font-size:20px;letter-spacing:-.015em;margin:0}
 .mxg-sh .note{margin:0;font-size:13.5px;color:var(--muted)}
 .mxg-readn{margin-left:auto}
-.mxg-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
-.mxg-card{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:16px 18px;border-radius:16px}
-.mxg-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.mxg-card .mxg-name{font-size:17px;font-weight:600;letter-spacing:-.012em;line-height:1.3;margin:0;color:var(--ink)}
-.mxg-card .mxg-q{margin:0;font-size:14.5px;line-height:1.5;color:var(--ink)}
-.mxg-why{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+.mxg-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+a.mxg-card{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:14px 16px;border-radius:16px;color:inherit;text-decoration:none;transition:border-color .15s,box-shadow .15s}
+a.mxg-card:hover{border-color:color-mix(in oklab, var(--accent) 45%, var(--line));box-shadow:0 10px 24px -16px rgba(0,0,0,.35)}
+a.mxg-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mxg-eb,.mxa-area{font-size:12.5px;font-weight:500;color:var(--muted)}
+.mxa-area{display:inline-flex;align-items:center;gap:8px}
+.mxg-hd{display:flex;align-items:flex-start;gap:8px}
+.mxg-card .mxg-name{flex:1 1 auto;min-width:0;font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.3;margin:0;color:var(--ink)}
+.mxg-hd .pill{flex:none;margin-top:1px}
+.mxg-go{flex:none;margin-top:3px;color:var(--faint)}
+a.mxg-card:hover .mxg-go{color:var(--accent)}
+.mxg-card .mxg-q,.mxg-why{margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mxg-card .mxg-q{font-size:14px;line-height:1.4;color:var(--ink)}
+.mxg-why{font-size:13px;line-height:1.4;color:var(--muted)}
 .mxg-why b{color:var(--ink);font-weight:600}
-.mxg-go{margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.mxg-go .btn svg{margin-left:2px}
-.mxg-jump{display:none}
-.mxg-tier{margin-top:12px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;scroll-margin-top:112px}
+.mxg-tier{margin-top:10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
 .mxg-tier > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) 18px;align-items:center;gap:4px 18px;padding:14px 18px}
 .mxg-tier > summary::-webkit-details-marker{display:none}
 .mxg-tier > summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:16px}
@@ -1770,30 +1775,42 @@ text.mxt-a{fill:var(--crit)}
 .mxg-chev{color:var(--faint);transition:transform .15s}
 .mxg-tier[open] > summary .mxg-chev{transform:rotate(90deg)}
 .mxg-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.mxg-row{display:grid;grid-template-columns:190px minmax(0,1fr) auto auto 58px;align-items:center;gap:6px 16px;padding:11px 18px;border-top:1px solid var(--line)}
+.mxg-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:baseline;column-gap:0;row-gap:1px;padding:9px 18px;border-top:1px solid var(--line)}
 .mxg-row:first-child{border-top:0}
 .mxg-row:hover{background:var(--sunk)}
-.mxg-rt{display:grid;gap:2px;min-width:0}
-.mxg-rt .mxg-name{all:unset;cursor:pointer;justify-self:start;font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.35}
-.mxg-rt .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
-.mxg-rt .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-.mxg-rt .mxg-q{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.mxg-tick{grid-column:1;grid-row:1;font-size:12px;font-weight:700;color:var(--good);line-height:1.3;margin-right:8px}
+.mxg-tick:empty{margin:0}
+.mxg-row .mxg-name{all:unset;grid-column:2;grid-row:1;cursor:pointer;display:block;min-width:0;justify-self:start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.mxg-row .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.mxg-row .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.mxg-rs{grid-column:3;grid-row:1;margin-left:10px}
+.mxg-rs:empty{margin:0}
+.mxg-rl{grid-column:4;grid-row:1;margin-left:12px}
+.mxg-rs,.mxg-rl{line-height:1.2}
 .mxg-rl .mx-link{font-size:12.5px;white-space:nowrap}
-.mxg-tick{font-size:12px;font-weight:500;color:var(--good);white-space:nowrap;text-align:right}
+.mxg-row .mxg-q{grid-column:1 / -1;grid-row:2;font-size:14px;line-height:1.3;color:var(--muted)}
 @media (max-width:760px){
-  .mxg-start{margin-top:18px}
-  .mxm-filter .mxm-sel{flex:1 1 110px;min-width:0;font-size:13.5px;padding:6px 4px}
-  .mxm-filter #mx-platform{flex:2 1 190px}
-  .mxm-filter #mx-stage{flex:1 1 110px}
+  .mxm-filter{padding:0;border:0;border-radius:0;background:none;box-shadow:none;margin-top:10px;gap:6px 12px}
+  /* the shell keeps selects at 16px (no iOS zoom), so the platform select gets the wider share to show its full name */
+  .mxm-filter .mxm-sel{min-width:0;padding:4px 2px 4px 6px}
+  .mxm-filter #mx-platform{flex:0 0 calc(58% - 6px);width:calc(58% - 6px)}
+  .mxm-filter #mx-stage{flex:0 0 calc(42% - 6px);width:calc(42% - 6px)}
+  .mxm-reg{padding:0;border-radius:0;background:none;font-size:12.5px;gap:6px;flex:0 1 auto;min-width:0}
+  .mxm-note{font-size:12.5px;flex:none}
+  .mxm-fp{display:none}
+  .mx-tabs{margin-top:10px;gap:0;overflow-x:auto}
+  .mx-tab{padding:9px 7px 10px;font-size:14px;gap:4px}
+  .mxg-start{margin-top:14px}
+  .mxg-full{margin-top:22px}
+  .mxg-sh h2{font-size:20px}
   .mxg-readn{margin-left:0}
-  .mxg-jump{display:flex;gap:8px;position:sticky;top:58px;z-index:6;margin:0 -4px 4px;padding:8px 4px;overflow-x:auto;scrollbar-width:none;background:color-mix(in oklab, var(--bg) 94%, transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-  .mxg-jump button{all:unset;cursor:pointer;flex:none;padding:6px 12px;border:1px solid var(--line-strong);border-radius:99px;background:var(--surface);font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
-  .mxg-jump button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:13px 14px}
+  a.mxg-card{padding:12px 14px}
+  .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:12px 14px}
   .mxg-td{grid-column:1/-1;grid-row:2}
-  .mxg-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:12px 14px}
-  .mxg-rc,.mxg-rt{flex:1 1 100%}
-  .mxg-tick{margin-left:auto}
+  .mxg-row{padding:7px 14px}
+  .mxg-row .mxg-name{line-height:1.25;font-size:14px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .mxg-rl .mx-link{font-size:12px}
+  .mxg-row .mxg-q{line-height:1.28}
   .mxa-sql pre{max-width:100%}
 }
 
@@ -10576,7 +10593,7 @@ function mxStatusCounts(d){
 const MX_Q = {
   "Violating-content prevalence":"Out of everything people see, how much breaks our rules?",
   "Harmful reach before action":"How many people see harmful content before we take it down?",
-  "Fraud loss rate":"How much money do we lose to fraud for every dollar that moves through us?",
+  "Fraud loss rate":"How much money do we lose to fraud per dollar processed?",
   "Prohibited-listing prevalence":"How much of what's for sale shouldn't be?",
   "Toxicity per 1,000 match-hours":"How often do players run into abuse while they play?",
   "Churn after toxic exposure":"Do people quit after they've been abused?",
@@ -10588,11 +10605,11 @@ const MX_Q = {
   "User-report rate":"How often do users flag problems to us?",
   "Repeat-offender rate":"After we act, do people stop breaking the rules or keep going?",
   "Proactive detection rate":"How much harm do we catch before anyone has to report it?",
-  "Precision and recall by policy area":"When our systems act, are they right, and how much do they miss?",
-  "Time to detect emerging trends":"How long does a new kind of abuse run before we notice it?",
+  "Precision and recall by policy area":"When our systems act, are they right, and what do they miss?",
+  "Time to detect emerging trends":"How long does new abuse run before we notice it?",
   "Appeal overturn rate":"When someone appeals, how often were we wrong?",
   "QA agreement rate":"Do our reviewers make the same call an expert would?",
-  "Consistency across languages and markets":"Are we as accurate in every language as we are in our best one?",
+  "Consistency across languages and markets":"Are we equally accurate in every language and market?",
   "Time to action by severity (p90)":"How fast do we act on the most serious problems?",
   "SLA attainment":"Do we hit the response times we promised?",
   "Backlog age":"Is work piling up faster than we can handle it?",
@@ -10605,7 +10622,21 @@ const MX_Q = {
   "Account takeover rate":"How often do attackers take over our users' accounts?",
   "Unsafe-contact rate for minors":"How often do adults try to contact children inappropriately on our product?",
   "Age-assurance coverage":"Do we actually know which of our users are children?",
-  "Safety incidents per 10k trips":"How often is someone hurt or put in danger during a trip or booking?"
+  "Safety incidents per 10k trips":"How often is someone hurt or endangered on a trip or booking?"
+};
+
+// The short reason a metric is on the Start with these cards (14 words at most). The longer "why it matters" stays on the metric's page.
+const MX_FIRST = {
+  "Violating-content prevalence":"Measures what users actually see, not how busy your team is.",
+  "Unsafe-contact rate for minors":"Worst harm on any product children use; regulators check it first.",
+  "Proactive detection rate":"Shows how much harm you catch instead of waiting for reports.",
+  "Users who feel safe":"Captures harm your logs never see, and every executive understands it.",
+  "Fraud loss rate":"Finance already watches it. It puts T&S in the P&L conversation.",
+  "Account takeover rate":"Takeovers hit your most loyal users, and someone pays the loss.",
+  "Toxicity per 1,000 match-hours":"Normalizes for engagement, so a busy launch week doesn't look like a spike.",
+  "Romance-scam reports per 10k matches":"Scams are the defining harm on dating platforms, and losses are severe.",
+  "Violating-generation rate":"The core safety measure for a generative product.",
+  "Safety incidents per 10k trips":"The harm happens offline, and one serious incident can reach court."
 };
 
 // Jargon, explained on hover. Keys are matched case-insensitively as whole words.
@@ -10980,7 +11011,7 @@ const MX_RV = {
 };
 const MX_STAGE = {"1":"Early","2":"Scaling","3":"Mature"};
 const MX_STAGE_HELP = {"1":"First T&S hires, mostly manual review", "2":"Vendors, classifiers and queues", "3":"Multi-market, audited, regulated"};
-const MX_TABS = [["card","The metrics",""],["data","What to log","data"],["run","Who reviews what","program"],["mine","Your numbers","scorecard"]];
+const MX_TABS = [["card","Metrics",""],["data","What to log","data"],["run","Reviews","program"],["mine","Your numbers","scorecard"]];
 const MX_TORD = ["ns","health","diag"];
 const MX_TIER_NAME = {ns:"North-star metrics", health:"Health metrics", diag:"Diagnostics"};
 const MX_BAND = {
@@ -11133,7 +11164,6 @@ function mxStatusChip(m){
 }
 // The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
 const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
-const mxEyebrow = m => `<span class="mxg-eb">${mxTile(m.l)}${esc(LAYERS.find(x => x.k === m.l).n)}</span>`;
 // The few metrics most worth adopting first: the north stars for this platform and stage (3 to 5). When a
 // profile has fewer than three, the first health metrics fill the row so there is always something to start with
 function mxStartList(list){
@@ -11141,36 +11171,41 @@ function mxStartList(list){
   return ns.length >= 3 ? ns.slice(0, 5) : ns.concat(list.filter(m => m.t === "health")).slice(0, 3);
 }
 const mxTierPill = m => `<span class="pill ${TIER[m.t][1]}">${TIER[m.t][0]}</span>`;
-function mxStartCard(m){
-  const i = METRICS.indexOf(m), why = m.w || MX_BAND[m.t][1];
-  return `<article class="card mxg-card mxm-${m.t}">
-      <div class="mxg-top">${mxEyebrow(m)}${mxTierPill(m)}</div>
-      <h3 class="mxg-name">${esc(m.n)}</h3>
+const MX_NUM = ["", "one", "two", "three", "four", "five"];
+// A card is one link: the metric, its tier, the question, one short reason it comes first. The category is said once
+// in the section subtitle when every card shares it, and as a small text line on the card when they differ
+function mxStartCard(m, showCat){
+  const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
+  return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
+      ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
       <p class="mxg-q">${esc(MX_Q[m.n])}</p>
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
-      <div class="mxg-go"><button type="button" class="btn sm primary" data-open="${i}" aria-label="How to measure ${esc(m.n)}">How to measure it${mxIco("next", "mx-ico sm")}</button>${mxStatusChip(m)}</div>
-    </article>`;
+    </a>`;
 }
 function mxRowHTML(m){
-  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]];
-  return `<li class="mxg-row"><span class="mxg-rc">${mxEyebrow(m)}</span>
-      <span class="mxg-rt"><button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
+  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]], rd = mx.read[m.n];
+  return `<li class="mxg-row"><span class="mxg-tick${rd ? " on" : ""}"${rd ? ' title="Read"' : ' aria-hidden="true"'}>${rd ? "✓" : ""}</span>
+      <button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button>
       <span class="mxg-rs">${mxStatusChip(m)}</span>
       <span class="mxg-rl">${lg ? `<button type="button" class="mx-link" data-log="${H.src[0]}" aria-label="What to log for ${esc(m.n)}">What to log</button>` : ""}</span>
-      <span class="mxg-tick${mx.read[m.n] ? " on" : ""}">${mx.read[m.n] ? "✓ Read" : ""}</span></li>`;
+      <span class="mxg-q">${esc(MX_Q[m.n])}</span></li>`;
 }
 function mxMap(list){
   const read = list.filter(m => mx.read[m.n]).length, start = mxStartList(list), fold = mx.fold || {};
   const tiers = MX_TORD.filter(t => list.some(m => m.t === t));
+  const cats = [...new Set(start.map(m => m.l))], one = cats.length === 1;
+  const nsAll = list.filter(m => m.t === "ns"), same = start.length === nsAll.length && start.every(m => m.t === "ns");
+  const sub = "Picked for this profile." + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
   const startH = start.length ? `<section class="mxg-start" aria-labelledby="mxg-start-h">
-    <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">For ${esc(MX_PLATFORMS[mx.platform])} at the ${MX_STAGE[mx.stage].toLowerCase()} stage</span></div>
-    <div class="mxg-cards">${start.map(mxStartCard).join("")}</div></section>` : "";
+    <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">${esc(sub)}</span></div>
+    <div class="mxg-cards">${start.map(m => mxStartCard(m, !one)).join("")}</div></section>` : "";
   const foldH = `<section class="mxg-full" aria-labelledby="mxg-full-h">
     <div class="mxg-sh"><h2 id="mxg-full-h">All ${list.length} metrics</h2>${read ? `<span class="mxg-readn note">${read} of ${list.length} read</span>` : ""}</div>
-    <nav class="mxg-jump" aria-label="Jump to a tier">${tiers.map(t => `<button type="button" data-tier-jump="${t}">${TIER[t][0]} · ${list.filter(m => m.t === t).length}</button>`).join("")}</nav>
-    ${tiers.map(t => { const ms = list.filter(m => m.t === t), open = fold[t] != null ? fold[t] : t === "ns";
+    ${tiers.map(t => { const ms = list.filter(m => m.t === t), open = !!fold[t];
+      const desc = MX_BAND[t][1] + (t === "ns" && same ? " The " + (MX_NUM[start.length] || start.length) + " above." : "");
       return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
-        <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${MX_BAND[t][1]}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
+        <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${desc}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
         <ul class="mxg-rows">${ms.map(mxRowHTML).join("")}</ul></details>`; }).join("")}</section>`;
   return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
@@ -11191,7 +11226,7 @@ function mxArticle(m, list){
       <span class="mxa-arrows"><button type="button" class="mxa-arrow" data-step="-1" aria-label="Previous metric" ${prev ? "" : "disabled"}>${mxIco("back", "mx-ico sm")}</button><button type="button" class="mxa-arrow" data-step="1" aria-label="Next metric" ${next ? "" : "disabled"}>${mxIco("next", "mx-ico sm")}</button></span>
     </div>
     <header class="mxa-head">
-      <div class="mxa-eyebrow"><span class="mxg-eb">${mxTile(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
+      <div class="mxa-eyebrow"><span class="mxa-area">${mxTile(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
       <h2>${esc(m.n)}</h2>
       <p class="mxa-q">${esc(MX_Q[m.n])}</p>
       <p class="mxa-lead">${lead}</p>
@@ -11566,7 +11601,7 @@ function renderMetrics(){
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
-      <span class="mxm-note">${list.length} metrics for this profile</span>
+      <span class="mxm-note">${list.length} metrics<span class="mxm-fp"> for this profile</span></span>
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>
     ${MX_TAB_SUB[mx.tab] ? `<p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab])}</p>` : ""}`;
@@ -11580,14 +11615,13 @@ function renderMetrics(){
   if(cp) cp.onclick = () => copyText(mxPlanText(list), $("#mx-toast"));
   const dl = $("#mx-dl"); if(dl && DL) dl.onclick = () => { const md = mxPlanText(list); offerFile("ts-metrics-plan.md", md, md, $("#mx-toast")); };
   bind("[data-tab]", b => b.onclick = () => mxGo(tabSub(b.dataset.tab)));
-  bind("[data-open]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.open])));
+  bind("[data-open]", b => b.onclick = e => { if(e && e.preventDefault) e.preventDefault(); mxGo(mxSlug(METRICS[+b.dataset.open])); });
   bind("[data-go]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.go])));
   bind("[data-back]", b => b.onclick = () => { const was = mx.open; mxGo(""); setTimeout(() => { const el = view.querySelector(`[data-open="${METRICS.findIndex(m => m.n === was)}"]`), d = el && el.closest("details"); if(d && !d.open) d.open = true; mxFlash(el); }, 120); });
   bind("[data-step]", b => b.onclick = () => { const n = list[list.indexOf(open) + +b.dataset.step]; if(n) mxGo(mxSlug(n)); });
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
-  bind("[data-tier-jump]", b => b.onclick = () => { const d = document.getElementById("mxg-" + b.dataset.tierJump); if(!d) return; d.open = true; mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:true}); store.set("mx", mx); if(d.scrollIntoView) d.scrollIntoView({behavior:"smooth", block:"start"}); });
   bind("details.mxg-tier", d => d.ontoggle = () => { mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:d.open}); store.set("mx", mx); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });

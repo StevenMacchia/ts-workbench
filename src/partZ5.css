@@ -76,7 +76,7 @@
 .mxa-arrow[disabled]{opacity:.35;pointer-events:none}
 .mxa-head{max-width:760px;margin-bottom:32px}
 .mxa-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.mxa-area,.mxg-eb{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted)}
+.mxa-area{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;color:var(--muted)}
 .mxa-tier{font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;color:var(--band-c);background:color-mix(in oklab, var(--band-c) 12%, transparent)}
 .mxa-head h2{font-size:34px;line-height:1.12;letter-spacing:-.028em;margin:0 0 12px}
 .mxa-lead{font-size:17.5px;line-height:1.6;color:var(--muted);margin:0}
@@ -525,24 +525,29 @@ text.mxt-a{fill:var(--crit)}
 .section-title .segs{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
 .section-title .segs button{white-space:nowrap;flex:none}
 
-/* Metrics landing: Start with these, then the full set folded by tier. Card hierarchy: name is the title, the category is the eyebrow on a .tile-sm */
+/* Metrics landing: Start with these (each card is one link), then the full set folded by tier, all closed by default */
 .mxg-start{margin-top:22px}
-.mxg-full{margin-top:30px}
+.mxg-full{margin-top:28px}
 .mxg-sh{display:flex;align-items:baseline;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;margin:0 0 12px}
 .mxg-sh h2{font-size:20px;letter-spacing:-.015em;margin:0}
 .mxg-sh .note{margin:0;font-size:13.5px;color:var(--muted)}
 .mxg-readn{margin-left:auto}
-.mxg-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
-.mxg-card{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:16px 18px;border-radius:16px}
-.mxg-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.mxg-card .mxg-name{font-size:17px;font-weight:600;letter-spacing:-.012em;line-height:1.3;margin:0;color:var(--ink)}
-.mxg-card .mxg-q{margin:0;font-size:14.5px;line-height:1.5;color:var(--ink)}
-.mxg-why{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+.mxg-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+a.mxg-card{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:14px 16px;border-radius:16px;color:inherit;text-decoration:none;transition:border-color .15s,box-shadow .15s}
+a.mxg-card:hover{border-color:color-mix(in oklab, var(--accent) 45%, var(--line));box-shadow:0 10px 24px -16px rgba(0,0,0,.35)}
+a.mxg-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mxg-eb,.mxa-area{font-size:12.5px;font-weight:500;color:var(--muted)}
+.mxa-area{display:inline-flex;align-items:center;gap:8px}
+.mxg-hd{display:flex;align-items:flex-start;gap:8px}
+.mxg-card .mxg-name{flex:1 1 auto;min-width:0;font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.3;margin:0;color:var(--ink)}
+.mxg-hd .pill{flex:none;margin-top:1px}
+.mxg-go{flex:none;margin-top:3px;color:var(--faint)}
+a.mxg-card:hover .mxg-go{color:var(--accent)}
+.mxg-card .mxg-q,.mxg-why{margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mxg-card .mxg-q{font-size:14px;line-height:1.4;color:var(--ink)}
+.mxg-why{font-size:13px;line-height:1.4;color:var(--muted)}
 .mxg-why b{color:var(--ink);font-weight:600}
-.mxg-go{margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.mxg-go .btn svg{margin-left:2px}
-.mxg-jump{display:none}
-.mxg-tier{margin-top:12px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;scroll-margin-top:112px}
+.mxg-tier{margin-top:10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
 .mxg-tier > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) 18px;align-items:center;gap:4px 18px;padding:14px 18px}
 .mxg-tier > summary::-webkit-details-marker{display:none}
 .mxg-tier > summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:16px}
@@ -552,29 +557,41 @@ text.mxt-a{fill:var(--crit)}
 .mxg-chev{color:var(--faint);transition:transform .15s}
 .mxg-tier[open] > summary .mxg-chev{transform:rotate(90deg)}
 .mxg-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.mxg-row{display:grid;grid-template-columns:190px minmax(0,1fr) auto auto 58px;align-items:center;gap:6px 16px;padding:11px 18px;border-top:1px solid var(--line)}
+.mxg-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:baseline;column-gap:0;row-gap:1px;padding:9px 18px;border-top:1px solid var(--line)}
 .mxg-row:first-child{border-top:0}
 .mxg-row:hover{background:var(--sunk)}
-.mxg-rt{display:grid;gap:2px;min-width:0}
-.mxg-rt .mxg-name{all:unset;cursor:pointer;justify-self:start;font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.35}
-.mxg-rt .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
-.mxg-rt .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-.mxg-rt .mxg-q{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.mxg-tick{grid-column:1;grid-row:1;font-size:12px;font-weight:700;color:var(--good);line-height:1.3;margin-right:8px}
+.mxg-tick:empty{margin:0}
+.mxg-row .mxg-name{all:unset;grid-column:2;grid-row:1;cursor:pointer;display:block;min-width:0;justify-self:start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.mxg-row .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.mxg-row .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.mxg-rs{grid-column:3;grid-row:1;margin-left:10px}
+.mxg-rs:empty{margin:0}
+.mxg-rl{grid-column:4;grid-row:1;margin-left:12px}
+.mxg-rs,.mxg-rl{line-height:1.2}
 .mxg-rl .mx-link{font-size:12.5px;white-space:nowrap}
-.mxg-tick{font-size:12px;font-weight:500;color:var(--good);white-space:nowrap;text-align:right}
+.mxg-row .mxg-q{grid-column:1 / -1;grid-row:2;font-size:14px;line-height:1.3;color:var(--muted)}
 @media (max-width:760px){
-  .mxg-start{margin-top:18px}
-  .mxm-filter .mxm-sel{flex:1 1 110px;min-width:0;font-size:13.5px;padding:6px 4px}
-  .mxm-filter #mx-platform{flex:2 1 190px}
-  .mxm-filter #mx-stage{flex:1 1 110px}
+  .mxm-filter{padding:0;border:0;border-radius:0;background:none;box-shadow:none;margin-top:10px;gap:6px 12px}
+  /* the shell keeps selects at 16px (no iOS zoom), so the platform select gets the wider share to show its full name */
+  .mxm-filter .mxm-sel{min-width:0;padding:4px 2px 4px 6px}
+  .mxm-filter #mx-platform{flex:0 0 calc(58% - 6px);width:calc(58% - 6px)}
+  .mxm-filter #mx-stage{flex:0 0 calc(42% - 6px);width:calc(42% - 6px)}
+  .mxm-reg{padding:0;border-radius:0;background:none;font-size:12.5px;gap:6px;flex:0 1 auto;min-width:0}
+  .mxm-note{font-size:12.5px;flex:none}
+  .mxm-fp{display:none}
+  .mx-tabs{margin-top:10px;gap:0;overflow-x:auto}
+  .mx-tab{padding:9px 7px 10px;font-size:14px;gap:4px}
+  .mxg-start{margin-top:14px}
+  .mxg-full{margin-top:22px}
+  .mxg-sh h2{font-size:20px}
   .mxg-readn{margin-left:0}
-  .mxg-jump{display:flex;gap:8px;position:sticky;top:58px;z-index:6;margin:0 -4px 4px;padding:8px 4px;overflow-x:auto;scrollbar-width:none;background:color-mix(in oklab, var(--bg) 94%, transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-  .mxg-jump button{all:unset;cursor:pointer;flex:none;padding:6px 12px;border:1px solid var(--line-strong);border-radius:99px;background:var(--surface);font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
-  .mxg-jump button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:13px 14px}
+  a.mxg-card{padding:12px 14px}
+  .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:12px 14px}
   .mxg-td{grid-column:1/-1;grid-row:2}
-  .mxg-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:12px 14px}
-  .mxg-rc,.mxg-rt{flex:1 1 100%}
-  .mxg-tick{margin-left:auto}
+  .mxg-row{padding:7px 14px}
+  .mxg-row .mxg-name{line-height:1.25;font-size:14px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .mxg-rl .mx-link{font-size:12px}
+  .mxg-row .mxg-q{line-height:1.28}
   .mxa-sql pre{max-width:100%}
 }

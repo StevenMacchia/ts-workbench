@@ -8,7 +8,7 @@ const MX_RV = {
 };
 const MX_STAGE = {"1":"Early","2":"Scaling","3":"Mature"};
 const MX_STAGE_HELP = {"1":"First T&S hires, mostly manual review", "2":"Vendors, classifiers and queues", "3":"Multi-market, audited, regulated"};
-const MX_TABS = [["card","The metrics",""],["data","What to log","data"],["run","Who reviews what","program"],["mine","Your numbers","scorecard"]];
+const MX_TABS = [["card","Metrics",""],["data","What to log","data"],["run","Reviews","program"],["mine","Your numbers","scorecard"]];
 const MX_TORD = ["ns","health","diag"];
 const MX_TIER_NAME = {ns:"North-star metrics", health:"Health metrics", diag:"Diagnostics"};
 const MX_BAND = {
@@ -161,7 +161,6 @@ function mxStatusChip(m){
 }
 // The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
 const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
-const mxEyebrow = m => `<span class="mxg-eb">${mxTile(m.l)}${esc(LAYERS.find(x => x.k === m.l).n)}</span>`;
 // The few metrics most worth adopting first: the north stars for this platform and stage (3 to 5). When a
 // profile has fewer than three, the first health metrics fill the row so there is always something to start with
 function mxStartList(list){
@@ -169,36 +168,41 @@ function mxStartList(list){
   return ns.length >= 3 ? ns.slice(0, 5) : ns.concat(list.filter(m => m.t === "health")).slice(0, 3);
 }
 const mxTierPill = m => `<span class="pill ${TIER[m.t][1]}">${TIER[m.t][0]}</span>`;
-function mxStartCard(m){
-  const i = METRICS.indexOf(m), why = m.w || MX_BAND[m.t][1];
-  return `<article class="card mxg-card mxm-${m.t}">
-      <div class="mxg-top">${mxEyebrow(m)}${mxTierPill(m)}</div>
-      <h3 class="mxg-name">${esc(m.n)}</h3>
+const MX_NUM = ["", "one", "two", "three", "four", "five"];
+// A card is one link: the metric, its tier, the question, one short reason it comes first. The category is said once
+// in the section subtitle when every card shares it, and as a small text line on the card when they differ
+function mxStartCard(m, showCat){
+  const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
+  return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
+      ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
       <p class="mxg-q">${esc(MX_Q[m.n])}</p>
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
-      <div class="mxg-go"><button type="button" class="btn sm primary" data-open="${i}" aria-label="How to measure ${esc(m.n)}">How to measure it${mxIco("next", "mx-ico sm")}</button>${mxStatusChip(m)}</div>
-    </article>`;
+    </a>`;
 }
 function mxRowHTML(m){
-  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]];
-  return `<li class="mxg-row"><span class="mxg-rc">${mxEyebrow(m)}</span>
-      <span class="mxg-rt"><button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
+  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]], rd = mx.read[m.n];
+  return `<li class="mxg-row"><span class="mxg-tick${rd ? " on" : ""}"${rd ? ' title="Read"' : ' aria-hidden="true"'}>${rd ? "✓" : ""}</span>
+      <button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button>
       <span class="mxg-rs">${mxStatusChip(m)}</span>
       <span class="mxg-rl">${lg ? `<button type="button" class="mx-link" data-log="${H.src[0]}" aria-label="What to log for ${esc(m.n)}">What to log</button>` : ""}</span>
-      <span class="mxg-tick${mx.read[m.n] ? " on" : ""}">${mx.read[m.n] ? "✓ Read" : ""}</span></li>`;
+      <span class="mxg-q">${esc(MX_Q[m.n])}</span></li>`;
 }
 function mxMap(list){
   const read = list.filter(m => mx.read[m.n]).length, start = mxStartList(list), fold = mx.fold || {};
   const tiers = MX_TORD.filter(t => list.some(m => m.t === t));
+  const cats = [...new Set(start.map(m => m.l))], one = cats.length === 1;
+  const nsAll = list.filter(m => m.t === "ns"), same = start.length === nsAll.length && start.every(m => m.t === "ns");
+  const sub = "Picked for this profile." + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
   const startH = start.length ? `<section class="mxg-start" aria-labelledby="mxg-start-h">
-    <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">For ${esc(MX_PLATFORMS[mx.platform])} at the ${MX_STAGE[mx.stage].toLowerCase()} stage</span></div>
-    <div class="mxg-cards">${start.map(mxStartCard).join("")}</div></section>` : "";
+    <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">${esc(sub)}</span></div>
+    <div class="mxg-cards">${start.map(m => mxStartCard(m, !one)).join("")}</div></section>` : "";
   const foldH = `<section class="mxg-full" aria-labelledby="mxg-full-h">
     <div class="mxg-sh"><h2 id="mxg-full-h">All ${list.length} metrics</h2>${read ? `<span class="mxg-readn note">${read} of ${list.length} read</span>` : ""}</div>
-    <nav class="mxg-jump" aria-label="Jump to a tier">${tiers.map(t => `<button type="button" data-tier-jump="${t}">${TIER[t][0]} · ${list.filter(m => m.t === t).length}</button>`).join("")}</nav>
-    ${tiers.map(t => { const ms = list.filter(m => m.t === t), open = fold[t] != null ? fold[t] : t === "ns";
+    ${tiers.map(t => { const ms = list.filter(m => m.t === t), open = !!fold[t];
+      const desc = MX_BAND[t][1] + (t === "ns" && same ? " The " + (MX_NUM[start.length] || start.length) + " above." : "");
       return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
-        <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${MX_BAND[t][1]}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
+        <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${desc}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
         <ul class="mxg-rows">${ms.map(mxRowHTML).join("")}</ul></details>`; }).join("")}</section>`;
   return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
@@ -219,7 +223,7 @@ function mxArticle(m, list){
       <span class="mxa-arrows"><button type="button" class="mxa-arrow" data-step="-1" aria-label="Previous metric" ${prev ? "" : "disabled"}>${mxIco("back", "mx-ico sm")}</button><button type="button" class="mxa-arrow" data-step="1" aria-label="Next metric" ${next ? "" : "disabled"}>${mxIco("next", "mx-ico sm")}</button></span>
     </div>
     <header class="mxa-head">
-      <div class="mxa-eyebrow"><span class="mxg-eb">${mxTile(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
+      <div class="mxa-eyebrow"><span class="mxa-area">${mxTile(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
       <h2>${esc(m.n)}</h2>
       <p class="mxa-q">${esc(MX_Q[m.n])}</p>
       <p class="mxa-lead">${lead}</p>
@@ -594,7 +598,7 @@ function renderMetrics(){
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
-      <span class="mxm-note">${list.length} metrics for this profile</span>
+      <span class="mxm-note">${list.length} metrics<span class="mxm-fp"> for this profile</span></span>
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>
     ${MX_TAB_SUB[mx.tab] ? `<p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab])}</p>` : ""}`;
@@ -608,14 +612,13 @@ function renderMetrics(){
   if(cp) cp.onclick = () => copyText(mxPlanText(list), $("#mx-toast"));
   const dl = $("#mx-dl"); if(dl && DL) dl.onclick = () => { const md = mxPlanText(list); offerFile("ts-metrics-plan.md", md, md, $("#mx-toast")); };
   bind("[data-tab]", b => b.onclick = () => mxGo(tabSub(b.dataset.tab)));
-  bind("[data-open]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.open])));
+  bind("[data-open]", b => b.onclick = e => { if(e && e.preventDefault) e.preventDefault(); mxGo(mxSlug(METRICS[+b.dataset.open])); });
   bind("[data-go]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.go])));
   bind("[data-back]", b => b.onclick = () => { const was = mx.open; mxGo(""); setTimeout(() => { const el = view.querySelector(`[data-open="${METRICS.findIndex(m => m.n === was)}"]`), d = el && el.closest("details"); if(d && !d.open) d.open = true; mxFlash(el); }, 120); });
   bind("[data-step]", b => b.onclick = () => { const n = list[list.indexOf(open) + +b.dataset.step]; if(n) mxGo(mxSlug(n)); });
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
-  bind("[data-tier-jump]", b => b.onclick = () => { const d = document.getElementById("mxg-" + b.dataset.tierJump); if(!d) return; d.open = true; mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:true}); store.set("mx", mx); if(d.scrollIntoView) d.scrollIntoView({behavior:"smooth", block:"start"}); });
   bind("details.mxg-tier", d => d.ontoggle = () => { mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:d.open}); store.set("mx", mx); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
