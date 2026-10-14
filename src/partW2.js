@@ -11,6 +11,8 @@ const KINDS = {
   coverage:{n:"Coverage radar", plural:"Coverage", icon:"i-cover", route:"coverage", prefix:"CV"},
   coppa:{n:"COPPA readiness", plural:"COPPA checks", icon:"i-coppa", route:"coppa", prefix:"CP"},
   dsa:{n:"DSA readiness", plural:"DSA checks", icon:"i-dsa", route:"dsa", prefix:"DS"},
+  grooming:{n:"Grooming pathway review", plural:"Grooming pathways", icon:"i-route", route:"grooming", prefix:"GP"},
+  reporting:{n:"Child-safety reporting", plural:"Reporting checks", icon:"i-flag", route:"reporting", prefix:"CR"},
   redteam:{n:"Red team studio", plural:"Red teams", icon:"i-shield", route:"redteam", prefix:"RT"},
   eval:{n:"Classifier eval", plural:"Classifier evals", icon:"i-eval", route:"eval", prefix:"EV"},
   transparency:{n:"Transparency report", plural:"Transparency reports", icon:"i-chart", route:"transparency", prefix:"TR"},
@@ -61,6 +63,12 @@ function itemSummary(it){
     const cls = s4 ? "crit" : open ? "high" : "good", label = s4 ? "Open S4" : open + " open finding" + (open === 1 ? "" : "s");
     return {html:`<span class="pill ${cls}">${label}</span><span class="note">${d.model === "world" ? "World model" : d.model === "both" ? "Language and world model" : "Language model"}${d.langs ? " · " + esc(d.langs) : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="coppa" && typeof cpScore === "function"){ const dd = Object.assign(CP_BLANK(), d), x = cpCtx(dd), ap = cpApplies(dd), s = cpScore(dd, x, ap);
+    const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
+  if(it.kind==="grooming" && typeof gpScore === "function"){ const dd = Object.assign(GP_BLANK(), d), s = gpScore(dd, gpCtx(dd));
+    const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% in place`;
+    return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(s.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
+  if(it.kind==="reporting" && typeof crScore === "function"){ const dd = Object.assign(CR_BLANK(), d), x = crCtx(dd), ap = crApplies(dd, x), s = crScore(dd, x);
     const cls = s.crit ? "crit" : s.pct >= 80 ? "good" : "high", label = `${s.pct}% ready`;
     return {html:`<span class="pill ${cls}">${label}</span><span class="note">${esc(ap.h)}${s.crit ? ` · ${s.crit} critical` : ""}</span>`, chip:{cls, label}}; }
   if(it.kind==="eval" && typeof evMetrics === "function"){ const dd = Object.assign(EV_BLANK(), d), m = evMetrics(dd, dd.preds);
@@ -247,6 +255,8 @@ function bindWorkspace(){
       if(k==="transparency"){ store.set("ws:cur:transparency", null); tr = TR_BLANK(); store.set("tr", tr); }
       if(k==="coppa"){ store.set("ws:cur:coppa", null); cp = CP_BLANK(); cpSave(); }
       if(k==="dsa"){ store.set("ws:cur:dsa", null); ds = DS_BLANK(); dsSave(); }
+      if(k==="grooming"){ store.set("ws:cur:grooming", null); gp = GP_BLANK(); gpSave(); }
+      if(k==="reporting"){ store.set("ws:cur:reporting", null); cr = CR_BLANK(); crSave(); }
       if(k==="redteam"){ store.set("ws:cur:redteam", null); rt = RT_BLANK(); rtSave(); }
       if(k==="eval"){ store.set("ws:cur:eval", null); ev = EV_BLANK(); evSave(); }
       return goRoute(KINDS[k].route); }
@@ -257,7 +267,7 @@ function bindWorkspace(){
     if(d.wsDel){ wsUI.confirm = "item:"+d.wsDel; return re(); }
     if(d.wsDelok){ wsDel(d.wsDelok);
       if(pm.id===d.wsDelok){ pm.saved = false; pm.id = null; store.set("pm3", pm); }
-      ["metrics","vendors","policy","maturity","coverage","transparency","coppa","dsa","eval"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
+      ["metrics","vendors","policy","maturity","coverage","transparency","coppa","dsa","grooming","reporting","eval"].forEach(k => { if(store.get("ws:cur:"+k,null)===d.wsDelok) store.set("ws:cur:"+k, null); });
       wsUI.confirm = null; re(); return toast("Deleted"); }
     if(d.wsRename){ wsUI.rename = d.wsRename; re(); const el = document.getElementById("wr-"+d.wsRename); if(el) el.focus(); return; }
     if(d.wsRenameok){ const it = items[d.wsRenameok], t = val("wr-"+d.wsRenameok); if(it && t){ it.title = t; it.updated = Date.now();

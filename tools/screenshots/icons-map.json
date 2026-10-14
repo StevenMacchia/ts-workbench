@@ -72,5 +72,7 @@
   "c-integrity": "bot",
   "c-illegal": "ban",
   "c-ai": "cpu",
-  "c-readiness": "clipboard-check"
+  "c-readiness": "clipboard-check",
+  "i-route": "route",
+  "i-flag": "flag"
 }

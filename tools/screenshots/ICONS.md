@@ -28,6 +28,8 @@ Tools
 | `i-eval` | `flask-conical` | Classifier eval |
 | `i-doc` | `file-check-2` | Policy stress-tester |
 | `i-coppa` | `baby` | COPPA readiness |
+| `i-route` | `route` | Grooming pathway review |
+| `i-flag` | `flag` | Child-safety reporting |
 | `i-dsa` | `landmark` | DSA readiness |
 | `i-mail` | `mail` | Enforcement notice writer |
 | `i-appeal` | `gavel` | Appeal reviewer |

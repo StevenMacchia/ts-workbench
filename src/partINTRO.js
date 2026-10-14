@@ -2,8 +2,8 @@
    INTRO: a purpose card before any tool's own first screen, the first time anyone opens it, plus a
    "How this works" walkthrough one click away afterwards. The red team studio already has this
    pattern (rtfIntro, RT_WALK in partRT9.js); this is the same pattern, as one shared component, for
-   every other tool: premortem, tabletop, maturity, coverage, metrics, vendors, policy, coppa, dsa,
-   eval, notice, appeal, transparency, plan, review, workspace.
+   every other tool: premortem, tabletop, maturity, coverage, metrics, vendors, policy, coppa, grooming,
+   reporting, dsa, eval, notice, appeal, transparency, plan, review, workspace.
    Saved under tswb:intro:<route>, a plain boolean per route. No other saved shape changes.
    Four tools already open on their own guided intro (gdRender's gdIntroHTML, or maturity's own
    maIntroHTML): COPPA, DSA, vendors, maturity. For those the purpose card sits in front of that
@@ -119,6 +119,34 @@ const INTRO_SPECS = {
         preview:() => `<div class="gd-opts" role="group"><button type="button" class="gd-opt on" tabindex="-1"><b>Name, email, location</b></button></div>`},
       {title:"Gaps, then four drafts", line:"Your gaps against the Rule, each with an owner, plus a parent notice, a retention policy and more, ready to edit.",
         preview:() => `<div class="cp-gaps" style="padding:10px 12px"><span class="pill crit">No verifiable parental consent</span></div>`}
+    ]},
+  grooming:{
+    heading:"See how an adult could reach a child on your product, and what's in the way",
+    who:"any product where minors and adults can meet: social, gaming, messaging, creator and live apps.",
+    leave:"a six-stage map of the pathway, the safeguards that apply, and five drafts: a product brief, a response ladder, a leadership page, a memo for Legal and starter rules.",
+    mins:"about 7 minutes. Nothing here describes how grooming is done, only what a platform can see.",
+    walk:[
+      {title:"Who can use it, and how you know", line:"Whether minors are on the product by design or in practice, and what you know about ages. Every safeguard assumes you can tell who's a child.",
+        preview:() => `<div class="gd-opts" role="group"><button type="button" class="gd-opt on" tabindex="-1"><b>Teens can join</b></button></div>`},
+      {title:"What the product allows", line:"How a stranger could find a user, start a conversation, what can happen in private and whether value moves. The honest answers are the useful ones.",
+        preview:() => `<div class="gd-opts" role="group"><button type="button" class="gd-opt on" tabindex="-1"><b>A private message to anyone</b></button></div>`},
+      {title:"Six stages, each open or covered", line:"Find, reach, bond, isolate, exchange, exploit. Each gets an exposure from your features and a protection from your safeguards, and the first open stage names the verdict.",
+        preview:() => `<ol class="gp-strip" style="padding:10px 12px"><li class="gp-st open"><span class="gp-stn">2</span><b>Reach</b><small>Open</small></li><li class="gp-st covered"><span class="gp-stn">5</span><b>Exchange</b><small>Covered</small></li></ol>`},
+      {title:"A plan and five drafts", line:"Gaps in order, earliest stage first, with an owner, the effort and the source. Then a product brief, a response ladder, a leadership page, a memo and starter rules.",
+        preview:() => `<div class="cp-gaps" style="padding:10px 12px"><span class="pill crit">Adults can message minors they aren't connected to</span></div>`}
+    ]},
+  reporting:{
+    heading:"Find out whether you could handle the first hour after finding child sexual exploitation",
+    who:"any service where users share images, video or messages, in any market.",
+    leave:"the duties that apply to your markets, the gaps against them, and four drafts: the first-hour procedure, a preservation policy, a law-enforcement procedure and a memo for Legal.",
+    mins:"about 8 minutes. Nothing here describes the material; it is only ever a thing to detect, preserve and report.",
+    walk:[
+      {title:"Your size, your markets and your content", line:"Size sets the penalty tier. Where your users are decides which duties apply: NCMEC in the US, the NCA in the UK, C3P in Canada, eSafety in Australia. What users can share decides which requirements do.",
+        preview:() => `<div class="gd-opts" role="group"><button type="button" class="gd-opt on" tabindex="-1"><b>United States</b></button><button type="button" class="gd-opt on" tabindex="-1"><b>United Kingdom</b></button></div>`},
+      {title:"The first hour, part by part", line:"Registration and the procedure, preservation and access, finding it, danger and law enforcement, the account, the person harmed, people, measurement. Tick what's true today.",
+        preview:() => `<div class="gd-opts" role="group"><button type="button" class="gd-opt on" tabindex="-1"><b>Registered with NCMEC's CyberTipline</b></button></div>`},
+      {title:"Gaps, then four drafts", line:"Your gaps against the law, most urgent first, each with the section behind it and an owner. Then the procedure, the policies and the memo, ready to edit.",
+        preview:() => `<div class="cp-gaps" style="padding:10px 12px"><span class="pill crit">Preservation still set to 90 days</span></div>`}
     ]},
   dsa:{
     heading:"Find out which EU rules apply to you, and what's missing",
@@ -301,6 +329,8 @@ const renderVendors9 = renderVendors; renderVendors = introGate("vendors", rende
 const renderPolicy9 = renderPolicy; renderPolicy = introGate("policy", renderPolicy9);
 const renderCoppa9 = renderCoppa; renderCoppa = introGate("coppa", renderCoppa9);
 const renderDsa9 = renderDsa; renderDsa = introGate("dsa", renderDsa9);
+const renderGrooming9 = renderGrooming; renderGrooming = introGate("grooming", renderGrooming9);
+const renderReporting9 = renderReporting; renderReporting = introGate("reporting", renderReporting9);
 const renderEval9 = renderEval; renderEval = introGate("eval", renderEval9);
 const renderPlan9 = renderPlan; renderPlan = introGate("plan", renderPlan9);
 const renderReview9 = renderReview; renderReview = introGate("review", renderReview9);

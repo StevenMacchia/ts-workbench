@@ -111,7 +111,7 @@ async function settle(page) {
 // localStorage.removeItem calls only ever target their own tool's keys.
 const INTRO_ROUTES = [
   "premortem", "tabletop", "maturity", "coverage", "metrics", "vendors", "policy",
-  "coppa", "dsa", "eval", "notice", "appeal", "transparency", "plan", "review", "workspace",
+  "coppa", "grooming", "reporting", "dsa", "eval", "notice", "appeal", "transparency", "plan", "review", "workspace",
 ];
 async function markIntrosSeen(page) {
   await page.evaluate((routes) => {
@@ -541,6 +541,26 @@ const builders = {
     await gotoHash(page, "coppa");
     await clickByText(page, "button", "See a finished example", 400);
   },
+  async groomingExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:gp");
+      localStorage.removeItem("tswb:ws:cur:grooming");
+    });
+    await reloadRoot(page);
+    await gotoHash(page, "grooming");
+    await clickByText(page, "button", "See a finished example", 400);
+  },
+  async reportingExample(page) {
+    await ensureDemoOff(page);
+    await page.evaluate(() => {
+      localStorage.removeItem("tswb:cr");
+      localStorage.removeItem("tswb:ws:cur:reporting");
+    });
+    await reloadRoot(page);
+    await gotoHash(page, "reporting");
+    await clickByText(page, "button", "See a finished example", 400);
+  },
   async dsaExample(page) {
     await ensureDemoOff(page);
     await page.evaluate(() => {
@@ -632,6 +652,8 @@ const REVIEW_ROUTES = [
   { name: "coverage", build: builders.coverageExample },
   { name: "policy", build: builders.policyExample },
   { name: "coppa", build: builders.coppaExample },
+  { name: "grooming", build: builders.groomingExample },
+  { name: "reporting", build: builders.reportingExample },
   { name: "dsa", build: builders.dsaExample },
   { name: "eval", build: builders.evalReport },
   { name: "transparency", build: builders.transparencyExample },

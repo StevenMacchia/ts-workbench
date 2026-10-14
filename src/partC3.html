@@ -75,6 +75,8 @@ const HEAD_META = () => {
     maturity:["steps", () => [MA_AREAS.length + " program areas", MA_LEVELS.length + " maturity levels", "A phased roadmap"]],
     policy:["doc", () => ai], notice:["mail", () => ai], appeal:["appeal", () => ai], transparency:["chart", () => []],
     coppa:["coppa", () => ["The 2025 amended Rule", "4 ready-to-edit drafts", "The rule behind every requirement"]],
+    grooming:["route", () => ["6 stages, find to exploit", (typeof GP_SG !== "undefined" ? GP_SG.length : 27) + " safeguards with sources", "No scripts, only what a platform can see"]],
+    reporting:["flag", () => ["5 markets, duty by duty", "4 ready-to-edit drafts", "The first hour, in order"]],
     dsa:["dsa", () => ["Every duty, article by article", "4 ready-to-edit drafts", "Enforcement to learn from"]],
     eval:["eval", () => [EV_CATS.length + " kinds of hard case", "Precision and recall by kind", "Works with any classifier"]],
     tools:["layers", () => ["Use any tool on its own", "Free and private", "No sign-up"]],
@@ -91,7 +93,7 @@ const HEAD_META = () => {
   return {icon:m[0], stats};
 };
 // Which part of the workbench a page belongs to, as the sidebar groups it
-const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
+const HEAD_GROUP = {redteam:"Prepare", plan:"Assess", maturity:"Assess", coverage:"Assess", premortem:"Assess", coppa:"Assess", grooming:"Assess", reporting:"Assess", dsa:"Assess", eval:"Measure", tabletop:"Prepare", vendors:"Prepare", policy:"Prepare", metrics:"Measure", notice:"AI assistant", appeal:"AI assistant", transparency:"AI assistant", about:"Project"};
 const headRoute = () => hashNow().split("/")[0] || "overview";
 // Tool pages carry the assessment strip above the header, with the help button in it
 const headStrip = () => { const r = headRoute(); return HEAD_GROUP[r] && r !== "about" && typeof asStepBar === "function" ? asStepBar(r, typeof asRoutePct === "function" ? asRoutePct(r) : null, true) : ""; };

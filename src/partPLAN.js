@@ -4,13 +4,15 @@
    tickable where the tool tracks it, and sent to a tracker in one go.
    ========================================================= */
 const PLAN_GROUPS = [["do", "Do first", "Launch blockers, exposed harm areas, this quarter's roadmap and critical COPPA and DSA gaps"], ["next", "Next", "Coverage gaps, next quarter's roadmap and the rest of the COPPA and DSA gaps"], ["later", "Later", "Roadmap items for after that"]];
-const PLAN_KIND = {premortem:"Pre-mortem", coverage:"Coverage", maturity:"Maturity", coppa:"COPPA", dsa:"DSA"};
+const PLAN_KIND = {premortem:"Pre-mortem", coverage:"Coverage", maturity:"Maturity", coppa:"COPPA", dsa:"DSA", grooming:"Grooming", reporting:"Reporting"};
 function planItems(){
   const out = [], J = typeof JOURNEY !== "undefined" ? JOURNEY : [];
   try{ ovSavedPMs().forEach(p => p.r.safeguards.filter(s => s.rank === 3).forEach(s => out.push({g:"do", kind:"premortem", text:s.t, ctx:`${p.name} · launch blocker`, tick:"pm:" + p.it.id + "|" + s.id, done:!!(p.it.data.done && p.it.data.done[s.id])}))); }catch(e){}
   try{ if(!cv.ex && !cv.est) cvActions(cv).forEach(x => out.push({g:x.row.status === "exposed" ? "do" : "next", kind:"coverage", text:x.text, ctx:`${x.row.a.n} · ${x.layer.n.toLowerCase()} · ${x.row.status === "exposed" ? "exposed" : "gap"}`, go:"coverage", done:false})); }catch(e){}
   try{ if(!ma.ex && maAllRated(ma)) maRoadmap(ma).forEach(s => s.acts.forEach((a, i) => { const id = s.id + "-" + i; out.push({g:s.phase === "now" ? "do" : s.phase === "next" ? "next" : "later", kind:"maturity", text:a, ctx:`${s.a.n} · level ${s.from} → ${s.to}`, tick:"ma:" + id, done:!!ma.done[id]}); })); }catch(e){}
   try{ if(J.some(s => s.k === "coppa") && cp.view === "report" && cp.aud && !cp.ex) cpScore(cp, cpCtx(cp), cpApplies(cp)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"coppa", text:g.fix || g.t, ctx:`COPPA · ${g.cite}`, fix:g.k, done:false})); }catch(e){}
+  try{ if(J.some(s => s.k === "grooming") && gp.view === "report" && gp.youth && !gp.ex) gpScore(gp, gpCtx(gp)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"grooming", text:g.how || g.t, ctx:`Grooming · ${GP_STAGES.find(z => z.k === g.st).n.toLowerCase()} stage`, go:"grooming", done:false})); }catch(e){}
+  try{ if(J.some(s => s.k === "reporting") && cr.view === "report" && (cr.regions || []).length && !cr.ex) crScore(cr, crCtx(cr)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"reporting", text:g.fix || g.t, ctx:`Reporting · ${g.cite}`, fix:"cr:" + g.k, done:false})); }catch(e){}
   try{ if(J.some(s => s.k === "dsa") && ds.view === "report" && ds.tier && !ds.ex) dsScore(ds, dsCtx(ds)).gaps.forEach(g => out.push({g:g.sev === "crit" ? "do" : "next", kind:"dsa", text:g.fix || g.t, ctx:`DSA · ${g.cite}`, fix:"ds:" + g.k, done:false})); }catch(e){}
   return out;
 }
@@ -19,9 +21,9 @@ const PL_SHOW = 8, plMore = {};
 function planItemHTML(x, i){
   const color = TOOL_COLOR[x.kind] || "var(--accent)";
   return `<li class="nx-i pl-i ${x.done ? "done" : ""}">
-    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `${tileHTML({premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa", dsa:"dsa"}[x.kind], TOOL_TONE[x.kind], "sm")}`}
+    ${x.tick || x.fix ? `<input type="checkbox" class="nx-cb" ${x.tick ? `data-pltick="${esc(x.tick)}"` : `data-plfix="${esc(x.fix)}"`} ${x.done ? "checked" : ""} aria-label="Mark done: ${esc(x.text)}">` : `${tileHTML({premortem:"radar", coverage:"cover", maturity:"steps", coppa:"coppa", dsa:"dsa", grooming:"route", reporting:"flag"}[x.kind], TOOL_TONE[x.kind], "sm")}`}
     <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color} 65%, var(--ink))">${esc(PLAN_KIND[x.kind])}</span><span>${esc(x.ctx)}</span></small></div>
-    <a class="nx-open" href="#${x.go || {premortem:"premortem", maturity:"maturity", coppa:"coppa", dsa:"dsa"}[x.kind]}" aria-label="Open in ${esc(PLAN_KIND[x.kind])}">${icon("arrow")}</a></li>`;
+    <a class="nx-open" href="#${x.go || {premortem:"premortem", maturity:"maturity", coppa:"coppa", dsa:"dsa", grooming:"grooming", reporting:"reporting"}[x.kind]}" aria-label="Open in ${esc(PLAN_KIND[x.kind])}">${icon("arrow")}</a></li>`;
 }
 function renderPlan(){
   if(typeof gdCur !== "undefined") gdCur = null;
@@ -44,7 +46,7 @@ function renderPlan(){
         <div class="card nx-card"><ul class="nx-list">${shown.map(planItemHTML).join("")}${open.length > PL_SHOW ? `<li class="pl-more"><button type="button" class="ov-link" data-plmore="${g}">${all ? "Show fewer" : `Show all ${open.length}`}</button></li>` : ""}${done.length ? `<li class="pl-more"><button type="button" class="ov-link" data-pldone="${g}">${plMore[g + ":done"] ? "Hide" : "Show"} ${done.length} done</button></li>` : ""}${plMore[g + ":done"] ? done.map(planItemHTML).join("") : ""}</ul></div></section>`; }).join("")}
   </div>`;
   view.querySelectorAll("[data-pltick]").forEach(c => c.onchange = () => { const msg = nxTick(c.dataset.pltick, c.checked); setTimeout(() => { renderPlan(); gsay(msg); }, 300); });
-  view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
+  view.querySelectorAll("[data-plfix]").forEach(c => c.onchange = () => { const f = c.dataset.plfix; if(f.startsWith("ds:")){ ds.ctrl = Object.assign({}, ds.ctrl, {[f.slice(3)]:c.checked}); ds.ex = false; dsSave(); } else if(f.startsWith("cr:")){ cr.ctrl = Object.assign({}, cr.ctrl, {[f.slice(3)]:c.checked}); cr.ex = false; crSave(); } else { cp.ctrl = Object.assign({}, cp.ctrl, {[f]:c.checked}); cp.ex = false; cpSave(); } setTimeout(() => { renderPlan(); gsay(c.checked ? "Marked done" : "Marked not done"); }, 300); });
   view.querySelectorAll("[data-plmore],[data-pldone]").forEach(b => b.onclick = () => { const k = b.dataset.plmore || (b.dataset.pldone + ":done"); plMore[k] = !plMore[k]; const y = window.scrollY; renderPlan(); window.scrollTo(0, y); });
   view.querySelectorAll("[data-plan]").forEach(b => b.onclick = () => {
     if(b.dataset.plan === "tracker") return tkOpen("plan");

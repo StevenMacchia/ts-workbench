@@ -71,7 +71,7 @@ h1,h2,h3,h4{letter-spacing:-.022em}
 /* ---------- panels: frosted, rounded, a hint of depth ---------- */
 .card,.hero,.gd-done,.demo-welcome,.tour-card,.help-card,.offer,.ov-tool,.as-s.cur,.as-pic,.as-know,.as-rev,.as-rev-first,.as-six li,.gd-facts div,.gd-list,.gd-rad,.gd-lays,
 .ab-stats,.jn-next,.loop,.pol-sum,.starthere,.ttbar,.verdict,.live,.pol-note,.pol-empty-art,.wip-art,.mxm-card,.ma-plan,.ma-sum,.tt-card,.scen,.vd-card,.mx-card,.pl-card,.nx-card,.ov-pic,.wb,.helpcard,.dm-card,.op-tile,.pk-r,
-.ma-band,.ma-ladder,.ma-ad,.ma-ar,.ma-rm,.cv-mr,.cv-card,.cvr-card,.tr-card,.ds-card,.cp-card,.cp-gap,.rv-area,.rv-rad,.rv-grid .card,.pl-group,.pl-item,.nx-item,.tr-tier,.cp-row,.gd-pi .cp-row,.dm-welcome,.dm-exit,.area{border-radius:14px}
+.ma-band,.ma-ladder,.ma-ad,.ma-ar,.ma-rm,.cv-mr,.cv-card,.cvr-card,.tr-card,.ds-card,.cp-card,.cp-gap,.gp-stage,.cr-duty,.rv-area,.rv-rad,.rv-grid .card,.pl-group,.pl-item,.nx-item,.tr-tier,.cp-row,.gd-pi .cp-row,.dm-welcome,.dm-exit,.area{border-radius:14px}
 .card,.as-pic,.gd-done,.ov-tool,.scen,.as-s.cur{background:var(--panel);box-shadow:var(--shadow);border:1px solid var(--line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .card .card,.gd-facts div,.gd-opts .card{background:var(--surface);box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .as-pic{border:1px solid var(--line)}
@@ -95,8 +95,8 @@ h1,h2,h3,h4{letter-spacing:-.022em}
 .input,.select,textarea.input,.field input,.field select,.field textarea,.dq textarea{border-radius:10px;border-color:var(--line-strong);background:var(--surface);transition:border-color .14s ease, box-shadow .14s ease}
 .select:focus,.input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:var(--glow)}
 .segs button[aria-pressed="true"]{border-bottom-color:var(--accent)}
-input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup .tr-chk input,.ds-setup .tr-chk input{accent-color:var(--accent)}
-.tr-tier.on,.cp-setup .tr-tier.on,.ds-setup .tr-tier.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup .tr-chk input,.ds-setup .tr-chk input,.gp-setup .tr-chk input,.cr-setup .tr-chk input{accent-color:var(--accent)}
+.tr-tier.on,.cp-setup .tr-tier.on,.ds-setup .tr-tier.on,.gp-setup .tr-tier.on,.cr-setup .tr-tier.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
 .ocard[aria-pressed="true"]{border-color:var(--accent)}
 .starthere{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
 .tour-card,.tour{border-radius:16px;box-shadow:var(--shadow-lift)}
@@ -128,8 +128,8 @@ input[type="checkbox"],input[type="radio"],.gd-ar input,.tr-chk input,.cp-setup 
 .mini-radar polygon:last-of-type{fill:var(--accent);stroke:var(--accent)}
 
 /* ---------- sweep: the per-tool colors, the icon tiles, previous-run outlines, radar dots, the guided radio ---------- */
-:root, :root[data-mode="light"], :root[data-theme="dark"], :root[data-mode="dark"]{--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent)}}
+:root, :root[data-mode="light"], :root[data-theme="dark"], :root[data-mode="dark"]{--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent);--t-gp:var(--accent);--t-cr:var(--accent)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-pm:var(--accent);--t-tt:var(--accent);--t-mx:var(--accent);--t-vd:var(--accent);--t-ma:var(--accent);--t-cv:var(--accent);--t-pol:var(--accent);--t-ai:var(--accent);--t-cp:var(--accent);--t-ds:var(--accent);--t-gp:var(--accent);--t-cr:var(--accent)}}
 .sb-mark,.sb-av,.brand .mark{background:linear-gradient(135deg,#6D5DF6,#9B6BFF)!important;color:#fff}
 .brand .mark svg{color:#fff}
 .ma-lg-old,.rv-lg-dot{border-color:var(--accent)!important}

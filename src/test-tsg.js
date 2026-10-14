@@ -11,7 +11,7 @@ const body = function(){
 
   // Routes this build actually registers (build-ws.js's ROUTES patch plus partR.js's base routes),
   // kept here as a flat list since the test harness doesn't assemble the real ROUTES object.
-  const VALID_ROUTES = ["overview", "premortem", "tabletop", "metrics", "vendors", "workspace", "tools", "plan", "review", "dsa", "eval", "about", "roost", "credits", "learn", "redteamllm", "redteamworld", "glossary", "tsglossary", "redteam", "policy", "coppa", "maturity", "coverage", "notice", "appeal", "transparency"];
+  const VALID_ROUTES = ["overview", "premortem", "tabletop", "metrics", "vendors", "workspace", "tools", "plan", "review", "dsa", "eval", "about", "roost", "credits", "learn", "redteamllm", "redteamworld", "glossary", "tsglossary", "redteam", "policy", "coppa", "grooming", "reporting", "maturity", "coverage", "notice", "appeal", "transparency"];
 
   // 1) Term count, definitions, groups, duplicate names, tool routes, related terms
   eq(TSG_TERMS.length >= 90 && TSG_TERMS.length <= 120, true, "term count is between 90 and 120, got " + TSG_TERMS.length);

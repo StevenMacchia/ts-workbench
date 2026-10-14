@@ -122,6 +122,9 @@ function demoFill(){
   store.set("rc:hist", [{d:iso(-90), s:44}, {d:iso(-60), s:50}, {d:iso(-30), s:56}]);
   // The DSA readiness check, partway there
   if(d.ds){ ds = d.ds; dsSave(); wsSaveTool("dsa", ds, "DSA readiness: Pixelry"); }
+  // The grooming pathway and the reporting check, both partway there
+  if(typeof GP_EXAMPLE !== "undefined"){ gp = Object.assign(GP_BLANK(), JSON.parse(JSON.stringify(GP_EXAMPLE)), {ex:false, view:"report"}); gpSave(); wsSaveTool("grooming", gp, "Grooming pathway: Pixelry"); }
+  if(typeof CR_EXAMPLE !== "undefined"){ cr = Object.assign(CR_BLANK(), JSON.parse(JSON.stringify(CR_EXAMPLE)), {ex:false, view:"report"}); crSave(); wsSaveTool("reporting", cr, "Child-safety reporting: Pixelry"); }
   // Last year's DSA transparency report, ready to review
   if(typeof TR_EXAMPLE !== "undefined"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)), {view:"report"}); trSave(); wsSaveTool("transparency", tr, "Transparency report: Pixelry 2025"); }
 }

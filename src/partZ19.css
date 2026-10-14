@@ -1,0 +1,56 @@
+/* =========================================================
+   GROOMING PATHWAY REVIEW and CHILD-SAFETY REPORTING (2026-10-14). Tokens for the two tools, the
+   six-stage strip and stage cards, the duties cards, and the code draft. Everything else reuses the
+   cp-* report classes. Declared after partZ18.css; Aurora (partZ13.css) collapses the tokens to the accent.
+   ========================================================= */
+:root{--t-gp:#6E5BC9;--t-cr:#B5473C}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]):not([data-mode="light"]){--t-gp:#A99BF0;--t-cr:#F0978C} }
+:root[data-theme="dark"],:root[data-mode="dark"]{--t-gp:#A99BF0;--t-cr:#F0978C}
+:root[data-mode="light"]{--t-gp:#6E5BC9;--t-cr:#B5473C}
+.gp-setup .tr-tier.on{border-color:var(--t-gp);box-shadow:inset 0 0 0 1px var(--t-gp)}
+.cr-setup .tr-tier.on{border-color:var(--t-cr);box-shadow:inset 0 0 0 1px var(--t-cr)}
+.gp-tag{display:inline-block;padding:0 6px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--muted);background:var(--sunk);vertical-align:middle;white-space:nowrap}
+/* the six-stage strip under the verdict */
+.gp-strip{list-style:none;margin:14px 0 4px;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.gp-st{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;gap:0 8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);min-width:0}
+.gp-st .gp-stn{grid-row:1/3;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:600 12px var(--mono);background:var(--sunk);color:var(--muted)}
+.gp-st b{font-size:13px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gp-st small{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gp-st.open{border-color:color-mix(in oklab, var(--crit) 55%, var(--line));box-shadow:inset 0 3px 0 var(--crit)}
+.gp-st.open .gp-stn{background:var(--crit-soft);color:var(--crit)}
+.gp-st.narrowed{border-color:color-mix(in oklab, var(--high) 55%, var(--line));box-shadow:inset 0 3px 0 var(--high)}
+.gp-st.narrowed .gp-stn{background:var(--high-soft);color:var(--high)}
+.gp-st.covered{border-color:color-mix(in oklab, var(--good) 45%, var(--line));box-shadow:inset 0 3px 0 var(--good)}
+.gp-st.covered .gp-stn{background:var(--good-soft);color:var(--good)}
+.gp-st.none{opacity:.6}
+@media (max-width:760px){.gp-strip{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:420px){.gp-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* stage cards on the Pathway tab */
+.gp-path{display:grid;gap:10px;margin-top:10px}
+.gp-stage{padding:14px 16px;display:grid;gap:8px}
+.gp-stage.open{box-shadow:inset 4px 0 0 var(--crit)}
+.gp-stage.narrowed{box-shadow:inset 4px 0 0 var(--high)}
+.gp-stage.covered{box-shadow:inset 4px 0 0 var(--good)}
+.gp-sh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start}
+.gp-sh .gp-stn{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:600 13px var(--mono);background:var(--sunk);color:var(--muted)}
+.gp-sh h4{margin:0;font-size:15.5px;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.gp-sh .note{margin:2px 0 0}
+.gp-meters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px}
+.gp-meters > div{display:grid;gap:3px}
+.gp-ml{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.gp-m{height:8px;border-radius:999px;background:var(--sunk);overflow:hidden}
+.gp-m i{display:block;height:100%;border-radius:999px}
+.gp-meters small{font-size:12px;color:var(--muted)}
+.gp-allow,.gp-have,.gp-open{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.gp-allow b,.gp-have b,.gp-open b{color:var(--ink)}
+.gp-open b{color:var(--crit)}
+.gp-have b{color:var(--good)}
+@media (max-width:560px){.gp-meters{grid-template-columns:1fr}.gp-sh{grid-template-columns:auto minmax(0,1fr)}.gp-sh .pill{grid-column:2}}
+/* the starter-rules draft */
+pre.gp-code{white-space:pre-wrap;word-break:break-word;font:12.5px/1.55 var(--mono);color:var(--ink);margin:0}
+/* duties by market */
+.cr-duties{display:grid;gap:10px;margin-top:10px}
+.cr-duty{padding:14px 16px;display:grid;gap:6px}
+.cr-duty h4{margin:0;font-size:15.5px}
+.cr-duty ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:13.5px;line-height:1.55}
+.cr-duty .note a{margin-right:6px}

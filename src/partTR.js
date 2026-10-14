@@ -256,7 +256,7 @@ function trReportHTML(ai){
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
     ${chapterLinkHTML("transparency")}
     ${trCatTableHTML() ? `<div class="card tr-cat-top"><span class="eyebrow">By category</span><h3 class="pol-lbl" style="margin:2px 0 10px">Notices and own-initiative measures</h3>${trCatTableHTML()}<p class="note">The DSA's own breakdown, straight from your numbers. The full report, in article order, is in the tabs below.</p></div>` : ""}
-    <details class="ev-details"><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
+    <details class="ev-details"${detailsOpenAttr()}><summary>Details <span class="note">The report, what the DSA asks for, and Claude's summary</span></summary>
     <div class="card pol-tabs"><div class="card-h"><div class="segs" role="group" aria-label="Report sections">
       ${[["report", "The report"], ["checklist", "What the DSA asks for"], ["summary", "Summary by Claude"]].map(([k, n]) => `<button type="button" data-trtab="${k}" aria-pressed="${tab === k}">${n}${k === "checklist" ? ` <span class="mono" style="opacity:.6">${secs.length - p.missing.length}/${secs.length}</span>` : ""}</button>`).join("")}</div></div>
       <div class="card-b">${tab === "checklist" ? trChecklistHTML() : tab === "summary" ? trSummaryHTML(ai) : trPreviewHTML()}</div></div>

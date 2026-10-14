@@ -19,7 +19,7 @@ const files = [
   "partNav.js", "partH4.js", "partH2.js", "partAbout.js", "partCredits.js", "partPol.js", "partPol2.js", "partAI.js",
   "partMAd.js", "partMA.js", "partCV.js", "partOV.js", "partRC.js", "partPF.js", "partTK.js", "partORG.js", "partJN.js",
   "partNX.js", "partTTF.js", "partTR.js", "partDEMO.js", "partHELP.js", "partTYPE.js", "partGD.js", "partCP.js",
-  "partDSA.js", "partEV.js", "partEV2.js", "partEVB.js", "partRX.js", "partLOOP.js", "partPLAN.js", "partREV.js"
+  "partDSA.js", "partGP.js", "partCR.js", "partEV.js", "partEV2.js", "partEVB.js", "partRX.js", "partLOOP.js", "partPLAN.js", "partREV.js"
 ];
 const src = stub + files.map(rd).join("\n") + `
 const routes = [
@@ -37,6 +37,8 @@ const routes = [
   ["policy", () => renderPolicy()],
   ["coppa", () => renderCoppa()],
   ["dsa", () => renderDsa()],
+  ["grooming", () => renderGrooming()],
+  ["reporting", () => renderReporting()],
   ["eval", () => renderEval()],
   ["notice", () => renderAI("notice")],
   ["appeal", () => renderAI("appeal")],
@@ -53,7 +55,9 @@ const filled = [
   ["metrics (filled)", () => { mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[]}; renderMetrics(); }],
   ["vendors (filled)", () => { vx = JSON.parse(JSON.stringify(DEFAULT_V)); renderVendors(); }],
   ["maturity (filled)", () => { ma = maExample(); renderMaturity(); }],
-  ["coverage (filled)", () => { cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); renderCoverage(); }]
+  ["coverage (filled)", () => { cv = JSON.parse(JSON.stringify(CV_EXAMPLE)); renderCoverage(); }],
+  ["grooming (filled)", () => { gp = Object.assign(GP_BLANK(), JSON.parse(JSON.stringify(GP_EXAMPLE))); renderGrooming(); }],
+  ["reporting (filled)", () => { cr = Object.assign(CR_BLANK(), JSON.parse(JSON.stringify(CR_EXAMPLE))); renderReporting(); }]
 ];
 
 const buttonViolations = [], imgViolations = [];

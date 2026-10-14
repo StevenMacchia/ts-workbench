@@ -281,14 +281,14 @@ function countUp(el, key){
 // Tone is the tool's group: assess, prepare, measure, ai, learn, or neutral. One map, used by every renderer.
 const TOOL_TONE = {
   maturity:"assess", premortem:"assess", coverage:"assess", tabletop:"assess",
-  policy:"prepare", coppa:"prepare", dsa:"prepare", vendors:"prepare",
+  policy:"prepare", coppa:"prepare", grooming:"assess", reporting:"prepare", dsa:"prepare", vendors:"prepare",
   metrics:"measure", eval:"measure",
   notice:"ai", appeal:"ai", transparency:"ai", redteam:"ai",
   learn:"learn", redteamllm:"learn", redteamworld:"learn", glossary:"learn", tsglossary:"learn",
   workspace:"neutral", plan:"neutral", about:"neutral", credits:"neutral", overview:"neutral", tools:"neutral", roost:"neutral", review:"neutral"
 };
 const TOOL_ICON = {
-  maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren", policy:"doc", coppa:"coppa", dsa:"dsa", vendors:"scale",
+  maturity:"steps", premortem:"radar", coverage:"cover", tabletop:"siren", policy:"doc", coppa:"coppa", grooming:"route", reporting:"flag", dsa:"dsa", vendors:"scale",
   metrics:"gauge", eval:"eval", notice:"mail", appeal:"appeal", transparency:"chart", redteam:"shield",
   learn:"book", redteamllm:"shield", redteamworld:"world", glossary:"glossary", tsglossary:"glossary",
   workspace:"folder", plan:"send", about:"info", credits:"wrench", overview:"home", tools:"layers", roost:"plug", review:"chart"
@@ -297,7 +297,7 @@ const TOOL_ICON = {
 function tileHTML(iconId, tone, size){
   return `<span class="tile tile-${size || "lg"}" data-tone="${tone || "neutral"}" aria-hidden="true"><svg><use href="#i-${String(iconId).replace(/^i-/, "")}"/></svg></span>`;
 }
-const COLOR_TONE = {"--t-ma":"assess","--t-pm":"assess","--t-cv":"assess","--t-tt":"assess","--t-pol":"prepare","--t-cp":"prepare","--t-ds":"prepare","--t-vd":"prepare","--t-mx":"measure","--t-ai":"ai","--t-rt":"ai"};
+const COLOR_TONE = {"--t-ma":"assess","--t-pm":"assess","--t-cv":"assess","--t-tt":"assess","--t-pol":"prepare","--t-cp":"prepare","--t-gp":"assess","--t-cr":"prepare","--t-ds":"prepare","--t-vd":"prepare","--t-mx":"measure","--t-ai":"ai","--t-rt":"ai"};
 function toneOfColor(c){ const m = /--[a-z-]+/.exec(String(c)); return (m && COLOR_TONE[m[0]]) || "neutral"; }
 function routeTile(route, size, iconId){ return tileHTML(iconId || TOOL_ICON[route] || "layers", TOOL_TONE[route], size); }
 
@@ -470,6 +470,8 @@ const CHAPTER_LINK = {
   metrics:["measuring-what-matters", "Measuring what matters"],
   premortem:["know-your-risks", "Know your risks"],
   coppa:["child-safety-and-age-assurance", "Child safety and age assurance"],
+  grooming:["child-safety-and-age-assurance", "Child safety and age assurance"],
+  reporting:["severe-harm-escalations", "Severe harm escalations"],
   dsa:["regulation-and-compliance", "Regulation and compliance"],
   transparency:["transparency-reports-and-notices", "Transparency reports and enforcement notices"],
   maturity:["budgets-roadmaps-and-making-the-case", "Budgets, roadmaps and making the case"],
@@ -491,3 +493,10 @@ function trapFocus(container, e){
   if(e.shiftKey){ if(i <= 0){ e.preventDefault(); f[f.length - 1].focus(); } }
   else if(i === f.length - 1 || i === -1){ e.preventDefault(); f[0].focus(); }
 }
+
+// ---------- Report Details disclosure: keep it open across the re-render a tab or draft click causes ----------
+// Every report re-renders its whole view on a tab click, and a fresh <details> starts closed, which would hide
+// the tab that was just clicked. The toggle event doesn't bubble, so it's caught in the capture phase.
+const DETAILS_OPEN = {};
+document.addEventListener("toggle", e => { const d = e.target; if(d && d.matches && d.matches("details.ev-details")) DETAILS_OPEN[hashNow().split("/")[0]] = !!d.open; }, true);
+const detailsOpenAttr = () => DETAILS_OPEN[hashNow().split("/")[0]] ? " open" : "";

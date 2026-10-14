@@ -1,8 +1,8 @@
 /* =========================================================
    SHELL: sidebar state, top bar, mobile nav, command palette
    ========================================================= */
-const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
-const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
+const TOOL_COLOR = {redteam:"var(--t-rt)", coppa:"var(--t-cp)", grooming:"var(--t-gp)", reporting:"var(--t-cr)", dsa:"var(--t-ds)", eval:"var(--t-ai)", transparency:"var(--t-ai)", premortem:"var(--t-pm)", tabletop:"var(--t-tt)", metrics:"var(--t-mx)", vendors:"var(--t-vd)", policy:"var(--t-pol)", maturity:"var(--t-ma)", coverage:"var(--t-cv)", learn:"var(--accent)"};
+const ROUTE_LABEL = {overview:"Your assessment", tools:"All tools", plan:"Your plan", review:"Quarter by quarter", dsa:"DSA readiness", eval:"Classifier eval", workspace:"My workspace", premortem:"Abuse pre-mortem", tabletop:"Incident tabletop", metrics:"Metrics framework", vendors:"Vendor scorecard", maturity:"Program maturity", coverage:"Coverage radar", policy:"Policy stress-tester", coppa:"COPPA readiness", grooming:"Grooming pathway review", reporting:"Child-safety reporting", notice:"Enforcement notice writer", appeal:"Appeal reviewer", transparency:"Transparency report", about:"About this project", roost:"Works with ROOST", credits:"Built with", learn:"Learn", redteam:"Red team studio", redteamllm:"Red teaming LLMs", redteamworld:"Red teaming world models", glossary:"Glossary and practice", tsglossary:"T&S glossary"};
 // One-line summaries for the page description, per route (the same lines as the All tools cards, plain
 // text). The three AI assistants take theirs from AI_TOOLS. Any route not listed here, and the home page,
 // fall back to the site description captured at load.
@@ -17,6 +17,8 @@ const ROUTE_DESC = {
   tabletop:"Rehearse a crisis and learn from every call, with the law behind it.",
   policy:"Paste a rule to find vague words, missing exceptions and hard edge cases.",
   coppa:"Check children's privacy against the amended COPPA Rule, with drafts for Legal.",
+  grooming:"See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",
+  reporting:"Check whether you can remove, preserve, report and handle the account when you find child sexual exploitation, market by market.",
   dsa:"Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",
   vendors:"Choose a moderation vendor on evidence, with RFP questions.",
   eval:"Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",
@@ -66,7 +68,7 @@ function seoUpdate(name){
 // The tools, one entry per route, in the order the About page lists them. The single source for "how many tools":
 // the About page counts it, the home-page heading and the READMEs read it from this line (_build/gen-readmes.js
 // parses it). The guides, glossaries, plan and review pages are not tools. Add a new tool here, to ROUTE_LABEL and to AB_GROUPS.
-const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","dsa","tabletop","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
+const TOOL_ROUTES = ["maturity","coverage","premortem","coppa","grooming","reporting","dsa","tabletop","vendors","redteam","policy","eval","metrics","notice","appeal","transparency"];
 const initials2 = s => (s||"").trim().split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase();
 function gsay(msg){ const t = $("#gtoast"); if(!t) return; t.textContent = msg; t.hidden = false; clearTimeout(gsay.t); gsay.t = setTimeout(()=>{ t.hidden = true; }, 2400); }
 function relTime(t){
@@ -86,6 +88,8 @@ function openSaved(id){
   if(it.kind==="transparency"){ tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); store.set("tr", tr); store.set("ws:cur:transparency", it.id); }
   if(it.kind==="coppa"){ cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); cpSave(); store.set("ws:cur:coppa", it.id); }
   if(it.kind==="dsa"){ ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); dsSave(); store.set("ws:cur:dsa", it.id); }
+  if(it.kind==="grooming"){ gp = Object.assign(GP_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); gpSave(); store.set("ws:cur:grooming", it.id); }
+  if(it.kind==="reporting"){ cr = Object.assign(CR_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); crSave(); store.set("ws:cur:reporting", it.id); }
   if(it.kind==="redteam"){ rt = Object.assign(RT_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); rtSave(); store.set("ws:cur:redteam", it.id); }
   if(it.kind==="eval"){ ev = Object.assign(EV_BLANK(), JSON.parse(JSON.stringify(it.data)), {view:"report"}); evView = "page"; evSave(); store.set("ws:cur:eval", it.id); }
   // learn: not a goRoute(KINDS[it.kind].route) case -- that fires ROUTES[r]() verbatim, with no "/" split, and
@@ -110,7 +114,7 @@ function shellUpdate(name){
     if(n) n.textContent = done ? `${done}/${JOURNEY.length}` : "";
     $$("#sb-assess .navlink[data-step]").forEach(a => { const st = JOURNEY[+a.dataset.step - 1]; let ok = false; try{ ok = !!(st && st.done()); }catch(e){} a.classList.toggle("done", ok); }); }
   const here = $("#tb-here"); if(here) here.textContent = ROUTE_LABEL[name] || "";
-  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", dsa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
+  const bg = {overview:"home", premortem:"assess", maturity:"assess", coverage:"assess", coppa:"assess", grooming:"assess", reporting:"assess", dsa:"assess", tabletop:"prepare", vendors:"prepare", policy:"prepare", workspace:"saved"}[name] || "more";
   $$(".bnav [data-bgroup]").forEach(a => { const on = a.dataset.bgroup === bg; if(a.tagName === "A"){ if(on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); } else a.classList.toggle("on", on); });
   const items = Object.values(wsItems()).filter(i=>KINDS[i.kind]).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const cw = $("#sb-cnt-ws"); if(cw) cw.textContent = items.length || "";
@@ -137,7 +141,7 @@ function cmdkItems(){
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
   go("Policy stress-tester","policy","var(--t-pol)","doc");
-  go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
+  go("COPPA readiness","coppa","var(--t-cp)","coppa"); go("Grooming pathway review","grooming","var(--t-gp)","route"); go("Child-safety reporting","reporting","var(--t-cr)","flag"); go("DSA readiness","dsa","var(--t-ds)","dsa"); go("Classifier eval","eval","var(--t-ai)","eval");
   go("Enforcement notice writer","notice","var(--t-ai)","mail"); go("Appeal reviewer","appeal","var(--t-ai)","appeal"); go("Transparency report","transparency","var(--t-ai)","chart");
   go("Red team studio","redteam","var(--t-rt)","shield");
   go("Learn","learn","var(--accent)","book"); go("Red teaming LLMs","redteamllm","var(--t-ai)","shield"); go("Red teaming world models","redteamworld","#E0532F","world"); go("Glossary and practice","glossary","var(--accent)","glossary"); go("T&S glossary","tsglossary","var(--accent)","glossary");

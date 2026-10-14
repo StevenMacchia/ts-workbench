@@ -11,7 +11,7 @@ function ovChip(it){
 }
 /* ---------- Your assessment: six guided steps that fill in one picture of the program ---------- */
 const AS_NEXT_LINE = {maturity:"Next, you'll see how mature each part of your program is.", premortem:"Next, you'll see how a product could be misused, and what to fix first.",
-  coverage:"Next, you'll see whether your defenses keep up with these risks.", coppa:"Next, you'll see whether COPPA applies to you and where the gaps are.", dsa:"Next, you'll see which DSA duties apply to you and where the gaps are.", crisis:"Next, you'll see how your team would handle a real incident.", transparency:"Next, you'll build the transparency report the EU asks for."};
+  coverage:"Next, you'll see whether your defenses keep up with these risks.", coppa:"Next, you'll see whether COPPA applies to you and where the gaps are.", grooming:"Next, you'll see how an adult could reach a child on your product, and what's in the way.", reporting:"Next, you'll see whether you could report child sexual exploitation the way the law and the child need.", dsa:"Next, you'll see which DSA duties apply to you and where the gaps are.", crisis:"Next, you'll see how your team would handle a real incident.", transparency:"Next, you'll build the transparency report the EU asks for."};
 const AS_PART_STEP = {maturity:"maturity", coverage:"coverage", launch:"premortem", crisis:"crisis"};
 const asLow = t => /^[A-Z]([a-z]| )/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
 const asMin = n => `${n} minute${n === 1 ? "" : "s"}`;
@@ -27,6 +27,8 @@ function asSum(k){
     if(k === "act") return "Sent to your tracker";
     if(k === "coppa"){ const s = cpScore(cp, cpCtx(cp), cpApplies(cp)); return `${s.pct}% ready · ${s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : "no critical gaps"}`; }
     if(k === "dsa"){ const s = dsScore(ds, dsCtx(ds)); return `${s.pct}% ready · ${s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : "no critical gaps"}`; }
+    if(k === "grooming"){ const s = gpScore(gp, gpCtx(gp)), o = s.stages.filter(z => z.status === "open").length; return `${s.pct}% in place · ${o} stage${o === 1 ? "" : "s"} open`; }
+    if(k === "reporting"){ const s = crScore(cr, crCtx(cr)); return `${s.pct}% ready · ${s.crit ? `${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : "no critical gaps"}`; }
     if(k === "transparency"){ const p = trProgress(); return `${p.got} of ${p.total} sections filled in for ${tr.year}`; }
   }catch(e){}
   return "";
@@ -53,6 +55,10 @@ function asKnow(){
       out.push({tag:"DSA", c:"var(--t-ds)", t:g ? `${dsApplies(ds).h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))} (${g.cite}).` : `${dsApplies(ds).h}, and every duty that applies is in place.`}); }
     if(isDone("coppa") && typeof cpScore === "function"){ const s = cpScore(cp, cpCtx(cp), cpApplies(cp)), g = s.gaps[0];
       out.push({tag:"COPPA", c:"var(--t-cp)", t:g ? `${cpApplies(cp).h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))}.` : `${cpApplies(cp).h}, and every requirement that applies is in place.`}); }
+    if(isDone("grooming") && typeof gpScore === "function"){ const s = gpScore(gp, gpCtx(gp)), g = s.gaps[0];
+      out.push({tag:"Grooming", c:"var(--t-gp)", t:g ? `${s.h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))}.` : `${s.h}.`}); }
+    if(isDone("reporting") && typeof crScore === "function"){ const s = crScore(cr, crCtx(cr)), g = s.gaps[0];
+      out.push({tag:"Reporting", c:"var(--t-cr)", t:g ? `${crApplies(cr).h}. The most urgent gap: ${asLow(g.t.replace(/\.$/, ""))}.` : `${crApplies(cr).h}, and every requirement that applies is in place.`}); }
     if(isDone("transparency") && typeof trProgress === "function"){ const p = trProgress();
       out.push({tag:"Transparency", c:"var(--t-ai)", t:p.missing.length ? `Your ${tr.year} report is missing ${p.missing.length} section${p.missing.length === 1 ? "" : "s"}, starting with ${p.missing[0].n.toLowerCase()}.` : `Your ${tr.year} transparency report has every section the DSA asks for.`}); }
     if(isDone("crisis")){ const runs = Object.entries(ttProgress()).map(([key, p]) => { const sc = SCENARIOS.find(s => s.id === key.split(":")[0]); return sc ? (p.best || 0) / sc.steps.length : null; }).filter(x => x !== null);
@@ -210,7 +216,7 @@ function asBind(){
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
 // Which stage each tool card belongs to, for the filter chips below. A tool keeps growing this
 // grid (Red Team Studio's modules among them), so the chips are a cheap way to keep it scannable
-const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
+const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", gp:"assess", cr:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
 const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI assistants"};
 let ovStage = "all";
 function renderTools(){
@@ -230,6 +236,8 @@ function renderTools(){
         ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios, ${typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.length} versions across ${typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8} sectors`)}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
+        ${typeof GP_SG !== "undefined" ? tool("gp","grooming","var(--t-gp)","route","Grooming pathway review <span class=\"wip-tag\">New</span>","See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",`${GP_STAGES.length} stages · ${GP_SG.length} safeguards · 5 drafts`) : ""}
+        ${typeof CR_CTRL !== "undefined" ? tool("cr","reporting","var(--t-cr)","flag","Child-safety reporting <span class=\"wip-tag\">New</span>","Check that you can remove, preserve, report and handle the account when you find child sexual exploitation, market by market.",`${CR_CTRL.reduce((n, g) => n + g.items.length, 0)} requirements · 5 markets · 4 drafts`) : ""}
         ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
         ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
@@ -298,6 +306,8 @@ function asRoutePct(r){
     if(r === "coverage"){ const s = cvSummary(cv); return Math.round(s.rated / Math.max(1, s.total) * 100); }
     if(r === "coppa") return cp.view === "report" && cp.aud ? 100 : cp.aud ? 50 : 0;
     if(r === "dsa") return ds.view === "report" && ds.tier ? 100 : ds.tier ? 50 : 0;
+    if(r === "grooming") return gp.view === "report" && gp.youth ? 100 : gp.youth ? 50 : 0;
+    if(r === "reporting") return cr.view === "report" && (cr.regions || []).length ? 100 : (cr.regions || []).length ? 50 : 0;
     if(r === "eval") return ev.preds ? 100 : ev.cases.length ? 66 : ev.policy ? 33 : 0;
     if(r === "transparency") return tr.view === "report" ? 100 : Math.round(trProgress().pct / 2);
   }catch(e){}

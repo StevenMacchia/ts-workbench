@@ -160,6 +160,27 @@ const PAGE_TOURS = {
     [".cp-report .pol-tabs", "Plan, data, drafts and requirements", "Your gaps in order, your data map, four drafts to edit, and every requirement that applies to your answers."],
     [".cp-gaps", "Close the gaps", "Each gap names the part of the Rule, who usually owns it and what to do. Mark it done once it's fixed."]
   ],
+  grooming:[
+    [".gd-intro h1", "One question at a time", "Who can use the product, how you know ages, what a stranger can do, what's in place. At the end you get the pathway, and every answer can be changed."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, start from your pre-mortem or your profile, or see the example."],
+    [".gd-q .gd-opts, .gd-q .gd-text", "Answer, then continue", "Pick what's true. Number keys work for choices, and Back lets you change anything."],
+    [".gp-youth", "Who can use it", "Whether minors are on the product by design or in practice. Everything else depends on it."],
+    ["#gp-s-find", "What the product allows", "How a stranger could find a user, start a conversation, what can happen in private, and whether value moves."],
+    ["#gp-s-have", "What's in place", "Defaults for minors, what you can detect without reading messages, and what happens when a case lands."],
+    [".gp-report .pol-sum", "Where you stand", "The first open stage names the verdict. The share of safeguards in place is the score."],
+    [".gp-strip", "The six stages", "Find, reach, bond, isolate, exchange, exploit. Each is open, narrowed, covered, or not on your product."],
+    [".gp-report .pol-tabs", "Plan, pathway, drafts and safeguards", "Gaps earliest stage first, each stage card, five drafts to edit, and every safeguard with its source."]
+  ],
+  reporting:[
+    [".gd-intro h1", "One question at a time", "Your markets, your content, your size, then one screen per part of the first hour. Only the duties that apply to your markets."],
+    [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, start from your profile or your pre-mortem, or see the example."],
+    [".gd-q .gd-opts, .gd-q .gd-text", "Answer, then continue", "Tick what's true today. Number keys work for choices, and Back lets you change anything."],
+    ["#cr-s-svc", "Markets and content", "Where your users are decides which duties apply. What they can share decides which requirements do."],
+    ["#cr-s-ctrl", "What you have in place", "Registration and the procedure, preservation, finding it, law enforcement, the account, the person harmed, people, measurement."],
+    [".cr-report .pol-sum", "Where you stand", "Which duties apply, how ready you are, and how many critical gaps are left."],
+    [".cr-report .pol-tabs", "Plan, duties, drafts and requirements", "Gaps most urgent first, each market's duties with the source, four drafts to edit, and every requirement."],
+    [".cp-gaps", "Close the gaps", "Each gap names the law or the practice behind it, who usually owns it and what to do. Mark it done once it's fixed."]
+  ],
   dsa:[
     [".gd-intro, .ds-setup", "Four questions, then the duties", "What kind of service, how big, where established, what it does. Only the duties that apply to your answers show up."],
     [".ds-report .pol-sum, .ds-sum", "Where you stand", "Which tier you're in, how ready you are, and how many critical gaps are left."],

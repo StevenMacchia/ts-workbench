@@ -65,6 +65,8 @@ const NEW_ITEMS = [
   ["tabletop", "siren", "var(--t-tt)", "Incident tabletop", "Rehearse a crisis, step by step", () => { tt = null; store.set("tt", null); goRoute("tabletop"); }],
   ["policy", "doc", "var(--t-pol)", "Policy stress-tester", "Find where a rule is unclear", () => goRoute("policy")],
   ["coppa", "coppa", "var(--t-cp)", "COPPA readiness", "Check children's privacy against the amended Rule", () => { if(cp.ex){ cp = CP_BLANK(); cpSave(); store.set("ws:cur:coppa", null); } goRoute("coppa"); }],
+  ["grooming", "route", "var(--t-gp)", "Grooming pathway review", "See how an adult could reach a child on your product", () => { if(gp.ex){ gp = GP_BLANK(); gpSave(); store.set("ws:cur:grooming", null); } goRoute("grooming"); }],
+  ["reporting", "flag", "var(--t-cr)", "Child-safety reporting", "Check the first hour after you find child sexual exploitation", () => { if(cr.ex){ cr = CR_BLANK(); crSave(); store.set("ws:cur:reporting", null); } goRoute("reporting"); }],
   ["dsa", "dsa", "var(--t-ds)", "DSA readiness", "Find which EU Digital Services Act duties apply", () => { if(ds.ex){ ds = DS_BLANK(); dsSave(); store.set("ws:cur:dsa", null); } goRoute("dsa"); }],
   ["eval", "eval", "var(--t-ai)", "Classifier eval", "Test a moderation classifier against your rule", () => { if(ev.ex){ ev = EV_BLANK(); evSave(); store.set("ws:cur:eval", null); } goRoute("eval"); }],
   ["vendors", "scale", "var(--t-vd)", "Vendor scorecard", "Score moderation vendors on evidence", () => goRoute("vendors")]
