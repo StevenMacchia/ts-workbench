@@ -293,12 +293,18 @@ const TOOL_ICON = {
   learn:"book", redteamllm:"shield", redteamworld:"world", glossary:"glossary", tsglossary:"glossary",
   workspace:"folder", plan:"send", about:"info", credits:"wrench", overview:"home", tools:"layers", roost:"plug", review:"chart"
 };
+// iconId: a tool icon ("cover" or "i-cover"), or a platform or harm-area symbol ("p-social", "c-violent")
 // size: "lg" (48px, cards), "md" (36px) or "sm" (22px, sidebar and palette rows)
 function tileHTML(iconId, tone, size){
-  return `<span class="tile tile-${size || "lg"}" data-tone="${tone || "neutral"}" aria-hidden="true"><svg><use href="#i-${String(iconId).replace(/^i-/, "")}"/></svg></span>`;
+  return `<span class="tile tile-${size || "lg"}" data-tone="${tone || "neutral"}" aria-hidden="true"><svg><use href="#${/^[pc]-/.test(iconId) ? iconId : "i-" + String(iconId).replace(/^i-/, "")}"/></svg></span>`;
 }
 const COLOR_TONE = {"--t-ma":"assess","--t-pm":"assess","--t-cv":"assess","--t-tt":"assess","--t-pol":"prepare","--t-cp":"prepare","--t-ds":"prepare","--t-vd":"prepare","--t-mx":"measure","--t-ai":"ai","--t-rt":"ai"};
 function toneOfColor(c){ const m = /--[a-z-]+/.exec(String(c)); return (m && COLOR_TONE[m[0]]) || "neutral"; }
+// Empty and all-clear states: one neutral tile above the message. check = good news, inbox = nothing here yet.
+function emptyMark(iconId, size){ return tileHTML(iconId, "neutral", size || "md"); }
+const GD_FACT_ICON = ["i-clock", "i-layers", "i-lock"];
+// One small tile per position in the intro fact row, in the tool's own tone
+function gdFactTile(i, tone){ return tileHTML(GD_FACT_ICON[i] || "i-info", tone, "md"); }
 function routeTile(route, size, iconId){ return tileHTML(iconId || TOOL_ICON[route] || "layers", TOOL_TONE[route], size); }
 
 // Toast with an Undo action, shared by every "Start over" handler.

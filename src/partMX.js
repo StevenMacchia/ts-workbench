@@ -434,7 +434,7 @@ function mxPlanText(list){
 /* ----- leadership one-pager ----- */
 function mxOnePagerInner(list){
   const measured = list.filter(m => { const s = mxStatus(m, mx.vals); return s; });
-  if(!measured.length) return `<div class="op-empty"><h1>Nothing to show yet</h1><p>Enter at least one value in My scorecard, or try the example numbers.</p></div>`;
+  if(!measured.length) return `<div class="op-empty">${emptyMark("inbox")}<h1>Nothing to show yet</h1><p>Enter at least one value in My scorecard, or try the example numbers.</p></div>`;
   const c = {on:0, watch:0, off:0}; measured.forEach(m => { const s = mxStatus(m, mx.vals); if(c[s] != null) c[s]++; });
   const cls = s => s && s !== "set" ? MX_STAT[s][1] : "";
   const att = measured.filter(m => ["off", "watch"].includes(mxStatus(m, mx.vals))).sort((a, b) => (mxStatus(a, mx.vals) === "off" ? 0 : 1) - (mxStatus(b, mx.vals) === "off" ? 0 : 1));

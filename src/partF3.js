@@ -111,7 +111,7 @@ function pmChanges(r){
   return lines;
 }
 function renderReport(r){
-  if(!r.risks.length) return `<div class="card"><div class="empty"><strong style="color:var(--ink)">Nothing to assess yet</strong><span>Tell us what people can do in your product to see its risks.</span><button type="button" class="btn primary" data-goq="features">Choose capabilities</button></div></div>`;
+  if(!r.risks.length) return `<div class="card"><div class="empty">${emptyMark("inbox")}<strong style="color:var(--ink)">Nothing to assess yet</strong><span>Tell us what people can do in your product to see its risks.</span><button type="button" class="btn primary" data-goq="features">Choose capabilities</button></div></div>`;
   const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length;
   const allDone = r.safeguards.filter(s=>pm.done[s.id]).length;
   const applies = r.obligations.filter(o=>o.status==="applies").length;

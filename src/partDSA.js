@@ -416,7 +416,7 @@ function dsReportHTML(x, ap, s){
   </div>`;
 }
 function dsPlanHTML(x, s){
-  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Every duty that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck when you add a feature, grow past the size thresholds or expand to new member states. The drafts are ready if you need them." : "Choose what kind of service you run to see which duties apply."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Every duty that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck when you add a feature, grow past the size thresholds or expand to new member states. The drafts are ready if you need them." : "Choose what kind of service you run to see which duties apply."}</p></div>`;
   return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the article, who usually owns it and what to do.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc((DS_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(DS_SEVN[r.sev][1], DS_SEVN[r.sev][0])}</h4>

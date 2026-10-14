@@ -227,7 +227,7 @@ function cvWhy(){
 }
 function cvGapsHTML(){
   const acts = cvActions(cv), seen = new Set();
-  if(!acts.length) return `<div class="card ma-none"><b>${cvRisk(cv) ? "No gaps where risk is high." : "Choose a risk to compare against."}</b><p class="note">${cvRisk(cv) ? "Every high-risk area has coverage at or above its risk, or its weakest layers are already solid." : "Gaps appear where a harm area's risk is higher than your coverage."}</p></div>`;
+  if(!acts.length) return `<div class="card ma-none">${emptyMark(cvRisk(cv) ? "check" : "inbox")}<b>${cvRisk(cv) ? "No gaps where risk is high." : "Choose a risk to compare against."}</b><p class="note">${cvRisk(cv) ? "Every high-risk area has coverage at or above its risk, or its weakest layers are already solid." : "Gaps appear where a harm area's risk is higher than your coverage."}</p></div>`;
   return `<div class="cv-gaps">${acts.slice(0, 8).map((x, i) => `<article class="card cv-gap ${x.row.status}">
       <div class="cv-gh"><span class="cv-gn mono">${i + 1}</span><b>${esc(x.row.a.n)}</b><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div>
       <span class="cv-gl">${esc(x.layer.n)}: ${x.level === undefined ? "not rated" : CV_LEVELS[x.level].toLowerCase()}. ${esc(cvRiskWords(x.row).replace(/^./, c => c.toUpperCase()))}, ${x.row.cov}% coverage.</span>
@@ -338,7 +338,7 @@ function cvIntroHTML(){
     <span class="gd-tool">${tileHTML("cover", "assess", "sm")}Coverage radar</span>
     <h1>Do your defenses keep up with your risk?</h1>
     <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
-    <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><svg class="gd-fi"><use href="#i-lock"/></svg><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
+    <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div>${gdFactTile(2, "assess")}<b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span>${!src ? `<button type="button" class="ov-link" data-ov="new">Run a pre-mortem first, to compare against real risk</button>` : ""}<button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
   </div>${cvPreviewHTML()}`;

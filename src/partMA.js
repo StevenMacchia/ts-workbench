@@ -172,7 +172,7 @@ function maRoadmapHTML(){
   const more = unrated.length ? `<div class="banner ma-more"><span>Rate the remaining ${unrated.length === 1 ? "area" : unrated.length + " areas"} (${unrated.map(a => esc(a.s.toLowerCase())).join(", ")}) to complete your roadmap. The roadmap below is already valid for what you've rated so far.</span><button type="button" class="btn sm" data-open="${unrated[0].k}" data-scroll="1">Rate ${esc(unrated[0].n.toLowerCase())}</button></div>` : "";
   if(!steps.length) {
     const stretch = MA_AREAS.filter(a => ma.lv[a.k] && maLevelOf(ma, a.k) < 5).sort((x, y) => maLevelOf(ma, x.k) - maLevelOf(ma, y.k) || MA_ORDER.indexOf(x.k) - MA_ORDER.indexOf(y.k)).slice(0, 3);
-    return more + (MA_AREAS.some(a => ma.lv[a.k]) ? `<div class="card ma-none"><b>No gaps against your targets.</b><p class="note">${stretch.length ? "Stretch goals, if you want to go further. Find them under By area." : "Every area is at the top level."}</p>
+    return more + (MA_AREAS.some(a => ma.lv[a.k]) ? `<div class="card ma-none">${emptyMark("check")}<b>No gaps against your targets.</b><p class="note">${stretch.length ? "Stretch goals, if you want to go further. Find them under By area." : "Every area is at the top level."}</p>
       ${stretch.length ? `<ul class="ma-acts">${stretch.map(a => `<li>${mxGloss(a.next[maLevelOf(ma, a.k) - 1][0], seen)} <span class="note">(${esc(a.n)})</span></li>`).join("")}</ul>` : ""}</div>` : "");
   }
   const plan = maAllRated(ma);
@@ -329,8 +329,8 @@ function maIntroHTML(){
     <span class="gd-tool">${tileHTML("steps", "assess", "sm")}Program maturity</span>
     <h1>How strong is your Trust &amp; Safety program?</h1>
     <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
-    <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
-      <div><svg class="gd-fi"><use href="#i-lock"/></svg><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
+    <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
+      <div>${gdFactTile(2, "assess")}<b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Fill everything in on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
   </div>${maPreviewHTML()}`;

@@ -539,7 +539,7 @@ function cpReportHTML(x, ap, s){
   </div>`;
 }
 function cpPlanHTML(x, s){
-  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
   return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the part of the Rule, who usually owns it and what to do.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc((CP_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(CP_SEVN[r.sev][1], CP_SEVN[r.sev][0])}${r.isNew ? `<span class="cp-new">New in 2025</span>` : ""}</h4>

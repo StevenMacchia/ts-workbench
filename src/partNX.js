@@ -59,7 +59,7 @@ function nxHTML(){
         <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span></small></div>
         ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.loop !== undefined ? `<button type="button" class="btn sm" data-loopgo="tt:${x.loop}">Start</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
       </li>`).join("")}</ul>`
-      : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing urgent on your roadmap, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
+      : `<div class="nx-empty">${emptyMark("check")}<b>You're all caught up.</b><span class="note">Nothing urgent on your roadmap, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
     </div></section>`;
 }
 // Ticking an item here does exactly what ticking it in its tool does, then the report card moves

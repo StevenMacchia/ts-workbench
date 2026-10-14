@@ -427,7 +427,7 @@ table:not([class]) tr:last-child td{border-bottom:0}
    position, and a feature-stat row are three different jobs, not one component in three
    costumes. What they can share is a visual grammar, so the fact row gets the same icon
    treatment as every other feature-summary row in the app (gdIntroHTML, src/partGD.js). */
-.gd-fi{width:18px;height:18px;color:var(--accent);margin-bottom:2px}
+.gd-facts > div > .tile{margin-bottom:6px}
 
 /* 2. Red team studio's 0-4 grade picks (the 60-second try, every drill's "what did it do?") get
    the same visual weight tabletop's A/B/C decisions use: a bigger, round, filled number and a
@@ -511,3 +511,21 @@ table:not([class]) tr:last-child td{border-bottom:0}
 
 /* the page title takes focus after navigation for screen readers; no visible ring on it */
 .pagehead h1:focus,.pagehead h1:focus-visible,h1[tabindex="-1"]:focus{outline:none;box-shadow:none}
+
+/* Empty and all-clear states carry one neutral tile above the message (emptyMark in partD.js). */
+.ma-none > .tile,.wsempty > .tile,.ov-empty > .tile,.op-empty > .tile,.empty > .tile{margin-bottom:6px}
+.empty,.op-empty{display:grid;gap:6px;justify-items:start}
+.op-empty{padding:6px 4px}
+.op-empty h1{margin:0}.op-empty p{margin:0}
+.ln-empty > .tile{margin:0 auto 10px}
+.libempty{align-items:center}
+.pl-head > .tile{margin-bottom:12px}
+.rtf-opts.rtf-big{margin-top:14px}
+.as-lk{width:12px;height:12px;margin-right:5px;vertical-align:-1.5px;color:var(--faint)}
+
+/* Appeal reviewer confidence reads as a scale: high is green, medium is plain, low is amber. Optional fields say so, to match Required. */
+.ai-conf-high{background:var(--good-soft);color:var(--good)}
+.ai-conf-low{background:var(--med-soft);color:var(--med)}
+.ai-opt{font-weight:400;font-size:12px;color:var(--faint);margin-left:4px}
+/* Guide progress counts are read as progress, not captions */
+.ln-tabs > .note,.lnh-b .note{color:color-mix(in oklab,var(--ink) 72%,var(--muted));font-weight:500}

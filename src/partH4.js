@@ -105,7 +105,7 @@ function asPictureHTML(empty){
         ${empty || o.score === null ? "" : rcTrend(rcRecord(o))}
         ${delta ? `<span class="as-delta ${delta.startsWith("Up") ? "up" : ""}">${esc(delta)}</span>` : ""}</div>
       <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
-        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
+        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${p.score === null ? `<svg class="as-lk" aria-hidden="true"><use href="#i-lock"/></svg>` : ""}${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
     ${o.score === null ? "" : `<p class="note as-pic-weight">${typeof rcWeightLine === "function" ? rcWeightLine() : ""}</p>`}
     ${asRadarsHTML()}
@@ -243,7 +243,7 @@ function renderTools(){
     </section>` : ""}
     ${typeof templateItems === "function" ? `<section class="rise">
       <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
-      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}">${tileHTML("layers", "neutral", "md")}<span class="tpl-t"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("")}</div>
+      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}">${tileHTML(t.icon || "layers", "neutral", "md")}<span class="tpl-t"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("")}</div>
     </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
@@ -260,7 +260,7 @@ function renderTools(){
           ${tileHTML(KINDS[it.kind].icon, TOOL_TONE[it.kind], "md")}
           <span style="min-width:0"><b>${esc(it.title || "Untitled")}</b><small>${KINDS[it.kind].n}${it.projectId && projName(it.projectId) ? " · " + esc(projName(it.projectId)) : ""}</small></span>
           ${ovChip(it)}<span class="when">${relTime(it.updated)}</span></button>`).join("")
-        : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span></div>`}</div>
+        : `<div class="ov-empty">${emptyMark("inbox")}<b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span></div>`}</div>
     </section>
     ${asFootHTML()}
   </div>`;

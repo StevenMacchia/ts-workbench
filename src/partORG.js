@@ -74,8 +74,10 @@ const NEW_ITEMS = [
 const TEMPLATE_YOUTH = {social:"teens", marketplace:"adult_self", fintech:"adult_verified", gaming:"teens", dating:"adult_self", genai:"adult_self", gig:"adult_verified", kids:"kids"};
 function templateItems(){
   return [{k:"demo", n:"Pixelry (full demo)", d:"Every tool filled in for a fictional social app, ready to explore", icon:"layers", run:() => demoStart()}]
-    .concat(TT_TYPES.filter(t => t.k !== "all").map(t => ({k:t.k, n:t.n, d:`Set your workspace up for a ${t.s} company and start your assessment`, icon:"shield", run:() => templateStart(t.k)})));
+    .concat(TT_TYPES.filter(t => t.k !== "all").map(t => ({k:t.k, n:t.n, d:`Set your workspace up for a ${t.s} company and start your assessment`, icon:TEMPLATE_ICON[t.k] || "layers", run:() => templateStart(t.k)})));
 }
+// Platform symbols from the sprite (Lucide), one per company type
+const TEMPLATE_ICON = {social:"p-social", marketplace:"p-marketplace", fintech:"p-fintech", gaming:"p-gaming", dating:"p-dating", genai:"p-genai", gig:"p-gig", kids:"p-edtech"};
 function templateStart(k){
   const t = TT_TYPES.find(x => x.k === k); if(!t) return;
   const o = orgGet();
@@ -95,7 +97,7 @@ function newMenuToggle(open){
   if(m && m.innerHTML !== undefined){
     m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}">${tileHTML(ic, TOOL_TONE[k], "md")}<span><b>${n}</b><small>${d}</small></span></button>`).join("")
       + `<div class="tb-newsep" role="separator">Start from a template</div>`
-      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}">${tileHTML("layers", "neutral", "md")}<span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
+      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}">${tileHTML(t.icon || "layers", "neutral", "md")}<span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
     m.addEventListener("click", e => { const nb = e.target.closest("[data-new]"); const tb = e.target.closest("[data-tpl]");
       if(nb){ newMenuToggle(false); NEW_ITEMS[+nb.dataset.new][5](); return; }
       if(tb){ newMenuToggle(false); templateItems()[+tb.dataset.tpl].run(); return; } });

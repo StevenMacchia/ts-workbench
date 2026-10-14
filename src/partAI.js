@@ -169,7 +169,7 @@ Return ONLY a JSON object with exactly these keys:
     "Decision: [uphold / overturn / change to a lesser action / escalate to a specialist]", "Reply to the user: [write your reply here]"].join("\n"),
   render:r => { const R = AI_REC[r.recommendation], met = {yes:["Met","crit"], no:["Not met","good"], unclear:["Unclear","med"]};
     return `
-    <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
+    <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill ai-conf ai-conf-${esc(r.confidence)}">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
     ${(r.steering_attempts || []).length ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Text in the case tried to steer this review</h3><span class="note">Claude was told to ignore it. Check this recommendation with extra care.</span></div><ul class="ai-warn">${r.steering_attempts.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
     <div class="ai-sec"><div class="ai-sec-h"><h3>Does the rule apply?</h3><span class="note">Every element must be met for a violation</span></div>
       <div class="ai-els">${r.elements.map(e => `<div class="ai-el"><span class="pill ${met[e.met][1]}">${met[e.met][0]}</span><div><b>${esc(e.element)}</b><span>${esc(e.reasoning)}</span></div></div>`).join("")}</div></div>
@@ -292,7 +292,7 @@ const aiTier = s => s.depth === "deep" ? "complex" : "default";
 const aiPut = (k, s) => store.set("ai:" + k, s);
 
 function aiField(T, fd, v){
-  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ""}</span>`;
+  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ` <span class="ai-opt">optional</span>`}</span>`;
   const help = fd.help ? `<small class="ai-help">${esc(fd.help)}</small>` : "";
   if(fd.type === "select") return `<label class="mxa-y ai-f">${lab}<select class="select" id="${id}" data-fk="${fd.k}">${fd.opts.map(o => `<option ${v === o ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>${help}</label>`;
   if(fd.type === "checks") return `<fieldset class="ai-f ai-checks"><legend>${esc(fd.lab)}</legend><div>${fd.opts.map(([ov, ol]) => `<label class="ai-chk"><input type="checkbox" data-fk="${fd.k}" value="${ov}" ${(v || []).includes(ov) ? "checked" : ""}><span>${esc(ol)}</span></label>`).join("")}</div>${help}</fieldset>`;
