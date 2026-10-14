@@ -108,3 +108,41 @@ Counts: **10 P1, 43 P2, 23 P3** (76 rows).
 4. **All-caps/letter-spaced labels are a leftover from an earlier pass, not the current style** — the app is sentence-case everywhere except the +New menu's "START FROM A TEMPLATE" and the overview's "FROM THE EXAMPLE COMPANY, PIXELRY:" banner. **Fix once:** grep for `text-transform:uppercase` / hand-typed all-caps strings in `partORG.js` and the overview banner and convert both to sentence case — there are only these two left.
 
 5. **Long reference pages (both glossaries, the metrics one-pager) have no in-page navigation**, relying entirely on browser scroll over 6,000–14,000px of content with no sticky search bar, jump links, or back-to-top control. This is the same underlying gap (nothing to anchor a long scroll) showing up on every "big list" page in the app. **Fix once:** build one `stickyFilterBar()`/`sectionJumpLinks()` helper and apply it to the three long pages (`partLearn.js`'s glossary, `partTSG.js`, and `partMXd3.js`'s one-pager).
+
+## Resolution log
+
+Rows are named by their element. Commits: 0c0540c (P1 and systemic), e6fb3fe (P2), 112b3f9 (P3), ff6b750 (the six items left ambiguous), 91026ef and 3b626e8 (Lucide set and tiles), 4446176 (this pass: artwork and the rows that needed a look).
+
+| Row | Status | Commit or reason |
+|---|---|---|
+| P1 coverage example actions, workspace/plan/review intro in demo, eval example link, status pills, workspace filter fade, maturity header actions, vendor primary button, "Clear it and start yours", notice/appeal collapse, +New caps label | Done | 0c0540c |
+| P2 policy/transparency Copy, WIP label, dead `.grade`, about arrow, appeal feedback box, coverage pre-mortem link, policy legend, transparency table width, both glossaries sticky, metrics jump links, workspace tab row, "what to fix" period, vendor labels, eval card chip, red-team scale caption, tabletop baseline caption, Pixelry banner caps | Done | e6fb3fe |
+| P3 tabletop count tooltip, palette search icon, starter-untested color, ruled-out bar, AI assistants tab, policy edit link, transparency service type, citation card, maturity one-page copy, notice Copy label | Done | 112b3f9 |
+| P2 orientation strips, red-team grade picks, Engineers' view, notice/appeal jump-list, Run with Claude disabled state | Done | ff6b750 (jump-list: no structural difference found, no change) |
+| P2 Learn hub card icons; P2 All tools icon style | Done | 91026ef, 3b626e8 (one tile per card, Lucide glyph on a tone gradient) |
+| P2 coverage and maturity three-up cards have no icons | Done | ff6b750 gave them outline glyphs; 4446176 makes them tiles in the tool's tone (`gdFactTile`, all guided tools) |
+| P3 red-team "What are you building?" cards | Done | 4446176 (headset, search, mouse-pointer-click, clapperboard tiles; new ids i-headset, i-act, i-media) |
+| P2 overview "Your program picture" placeholders read as broken | Done | 4446176 (a small lock before "Step N" on parts not yet graded) |
+| Empty states with no mark (workspace, jump back in, saved pre-mortems, plan, quarter by quarter, metrics one-pager, no-gap cards, glossary no-match, tabletop filters) | Done | 4446176 (`emptyMark`; ids i-inbox, i-plan, i-quarter, i-nomatch) |
+| All tools and +New template cards all used the same glyph | Done | 4446176 (platform tile per company type) |
+| P3 appeal confidence scale | Done | 4446176 (high green, medium plain, low amber) |
+| P3 Required tag without an Optional counterpart | Done | 4446176 (one-page form fields say "optional"; the one-question screen already did) |
+| P3 Learn guide progress counters easy to miss | Done | 4446176 (more contrast and weight) |
+| P3 workspace "New project" plus icon weight | Done | Both use the one `i-plus` symbol (Lucide, 91026ef); only the button size differs |
+| P2 vendor and eval have no "Read the chapter" link | Done | Already on main: `chapterLinkHTML("vendors")` in partVD.js, `("eval")` in partEV.js |
+| P2 tracker dialog may close on phone resize | Done | No resize listener in partTK.js; the capture tool reloaded the page when it switched viewport |
+| P2 workspace file buttons crowd at 1024 to 1280 | Won't | Looked at 1100px: the pair wraps cleanly under the intro |
+| P2 All tools section captions collide on narrow widths | Won't | Looked at 1280px: none collide |
+| P3 step dots far from the count | Won't | The dots are the card pager for the open step ("1 of 4" sits beside the heading), not overall progress |
+| P3 "I know this" has no visible result | Won't | The button turns into "Known" with a check and the term gets a green dot |
+| P3 credits badge wraps alone | Won't | Badges are inline and wrap with the title text; none sit alone |
+| P3 about stat gutter | Won't | The stats are one ruled panel, not a gapped grid |
+| P3 coverage numerals vs COPPA list | Won't | Coverage rows are cards with status chips; the number chip belongs to the card layout |
+| P3 tabletop chip fills | Won't | Position chip and answer-letter chip are different controls; not reproduced on the play screen in this pass |
+| P2 selects vs pills on workspace | Won't | Selects hold long single-choice lists, pills hold short multi-choice sets; the split is by task |
+| P2 Memo for Legal label | Won't | The audit calls it fine as a one-off; the download icon carries the action |
+| P2 shared "How this works" aside for AI tools | Won't | Code refactor, not a visual row |
+| P2 guide header WIP pill beside nav buttons | Won't | It reads as status (tinted, not outlined) and matches every other header |
+| P2 red-team eyebrow chip | Won't | The header row already has the tile, the name and the status |
+| P2 workspace intro copy, P3 red-team eyebrow time, P2 premortem header, P2 eval "classifier" term, P2 notice Duration action, P3 sparkline size on phone | Won't | Copy or content decisions (or model output) for the owner, not artwork |
+| P2 notice/appeal Back and Continue spacing | Won't | Same `gdRender` engine as the assessment tools (ff6b750) |
