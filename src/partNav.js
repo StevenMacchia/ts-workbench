@@ -219,3 +219,55 @@ document.addEventListener("keydown", e => {
 $("#nav-toggle").addEventListener("click", () => $("#app").classList.toggle("nav-open"));
 $("#sb-scrim").addEventListener("click", () => $("#app").classList.remove("nav-open"));
 $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(); });
+
+/* ---------- Phones: one bar (2026-10-14) ----------
+   On a phone the page's own strip (.asb: back link, tool name, progress, help) and the app top bar are
+   one sticky bar. The strip stays in the page as the source of truth (it is hidden by CSS on phones, and
+   desktop is untouched); this copies its back link, name, progress and help button into #topbar, so every
+   tool that renders an asStepBar gets the merged bar without changing. Routes with no strip show a hamburger,
+   a title and search. */
+let phSig = "";
+function phSync(){
+  const body = document.body, tn = $("#tb-tname"); if(!body || !tn || !view || typeof view.querySelector !== "function") return;
+  const asb = view.querySelector(".asb"), r = (body.dataset && body.dataset.route) || "", prog = $("#tb-prog"), back = $("#tb-back"), help = $("#tb-help");
+  let name, segs = "", label = "", href = "", hasHelp = false;
+  if(asb){
+    const bk = asb.querySelector(".asb-back"), nm = asb.querySelector(".asb-mid b"), sg = asb.querySelector(".asb-segs");
+    name = nm ? nm.textContent.trim() : (ROUTE_LABEL[r] || "");
+    segs = sg ? sg.innerHTML : "";
+    label = bk ? bk.textContent.trim().replace(/^Your assessment$/, "Assessment") : "All tools";
+    href = bk ? bk.getAttribute("href") : "#tools";
+    hasHelp = !!asb.querySelector(".ph-help");
+  }else name = r === "overview" || r === "tools" || !ROUTE_LABEL[r] ? "T&S Workbench" : ROUTE_LABEL[r];
+  const sig = [!!asb, name, segs, label, href, hasHelp].join("\u0001");
+  if(sig === phSig) return;
+  phSig = sig;
+  body.classList.toggle("ph-tool", !!asb);
+  tn.textContent = name;
+  if(prog){ prog.innerHTML = segs; prog.hidden = !segs; prog.classList.toggle("solo", /class="solo"/.test(segs)); }
+  if(back){ back.hidden = !asb; if(asb){ back.setAttribute("href", href); const sp = back.querySelector("span"); if(sp) sp.textContent = label; } }
+  if(help) help.hidden = !(asb && hasHelp);
+}
+if(typeof MutationObserver !== "undefined" && view && typeof view.querySelector === "function"){
+  let phQueued = false;
+  new MutationObserver(() => { if(phQueued) return; phQueued = true; requestAnimationFrame(() => { phQueued = false; phSync(); }); })
+    .observe(view, {childList:true, subtree:true});
+}
+try{ phSync(); }catch(e){}
+// The (i) button in the bar presses the strip's own "How this works" button, so the tour or walkthrough is
+// whichever one that page already offers
+{ const hb = $("#tb-help"); if(hb && hb.addEventListener) hb.addEventListener("click", () => { const b = view.querySelector(".asb .ph-help"); if(b) b.click(); }); }
+// "Saved as you go" used to sit in the strip as a permanent label; on a phone it is one toast, the first time
+// a tool writes its answers in a session
+let phSaved = false;
+const phQuiet = /^(intro:|firstrun|theme|ui:|help|gloss|learn:|rt:seen|org|demo|ws|proj|sync|pf)/;
+{
+  const set0 = store.set;
+  if(typeof set0 === "function") store.set = function(k, v){
+    set0.apply(this, arguments);
+    try{
+      if(phSaved || !document.body.classList.contains("ph-tool") || phQuiet.test(String(k))) return;
+      if(window.matchMedia && window.matchMedia("(max-width:640px)").matches){ phSaved = true; gsay("Saved as you go"); }
+    }catch(e){}
+  };
+}

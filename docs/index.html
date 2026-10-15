@@ -5614,6 +5614,78 @@ details.ev-details[open] > summary{margin-bottom:12px}
   .px-tw .ln-t td:first-child{font-weight:600}
   .px-redact{padding:12px}
 }
+/* =========================================================
+   PHONE: ONE BAR (2026-10-14). Up to 640px a tool page opened with three bars (the site bar, the app bar and
+   the tool's own strip) before any content. Now there is one sticky 56px bar: back, the tool's name with its
+   progress, search and "How this works". The site's links move to the end of the More sheet. Desktop and
+   tablet are untouched: everything that changes is inside the 640px query, and the new bar parts are hidden
+   outside it. Declared last.
+   ========================================================= */
+.tb-back,.tb-title,.tb-help,.sb-site-h,.sb-site{display:none}
+:root{--ph-bar:56px}
+
+@media (max-width:640px){
+  /* 1. the site bar goes; its links live in the More sheet. The page runs edge to edge (the 8px body margin and the rounded frame are for desktop) */
+  body{margin:0}
+  .app{border-radius:0}
+  .sitetop{display:none}
+  .app{min-height:100vh}
+  .side{top:0;height:auto;background:var(--canvas)!important}
+  .sb-site-h{display:block}
+  .sb-site{display:grid;gap:1px;padding-bottom:12px}
+  .sb-site .navlink{font-size:14px;padding-left:46px}
+
+  /* 2. the bar: left (hamburger, or back on a tool), centre (title), right (search, help) */
+  .topbar{display:flex;align-items:center;gap:8px;height:var(--ph-bar);box-sizing:border-box;padding:0 6px 0 8px;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:30;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .tb-crumb,.brandbtn,#tb-new,#tb-menu{display:none}
+  #nav-toggle{width:44px;height:44px;flex:none;border-radius:12px}
+  .tb-title{display:grid;justify-items:center;align-content:center;gap:4px;position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);min-width:0;max-width:50%;pointer-events:none}
+  .tb-title b{font:600 15px/1.2 var(--body);letter-spacing:-.01em;color:var(--ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tb-actions{margin-left:auto;justify-content:flex-end;gap:2px}
+  .tb-k.btn,.tb-help{display:grid;place-items:center;width:44px;height:44px;min-width:44px;padding:0;border:0;border-radius:12px;background:none;box-shadow:none;color:var(--ink)}
+  .tb-k.btn:hover,.tb-help:hover{background:var(--hover);box-shadow:none}
+  .tb-k.btn svg,.tb-help svg{width:21px;height:21px}
+  .tb-help[hidden]{display:none}
+  .tb-back:not([hidden]){display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 8px 0 2px;border-radius:12px;color:var(--ink);font-size:14px;font-weight:500;text-decoration:none;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+  .tb-back svg{width:20px;height:20px;transform:scaleX(-1);color:var(--muted)}
+  /* tool routes: the strip's own copy is hidden, the bar carries it */
+  body.ph-tool #nav-toggle{display:none}
+  body.ph-tool .asb{display:none}
+  body.ph-tool .asb + .pagehead{margin-top:0}
+  .tb-prog{display:flex;gap:3px}
+  .tb-prog[hidden]{display:none}
+  #tb-prog.asb-segs i{width:14px;height:3px;box-shadow:none}
+  #tb-prog.asb-segs i.solo{width:56px}
+  /* the demo pill needs the room the title has */
+  body:has(.tb-demo) .tb-title{display:none}
+
+  /* 3. page head: tighter, so the first block starts near the top */
+  .page{padding:12px 16px 44px}
+  .pagehead,.pagehead.ph-compact{padding:2px 0 14px;margin-bottom:14px}
+  .ph-eb{margin-bottom:6px;gap:8px;font-size:13px}
+  .ph-eb > .tile.tile-sm,.tile-sm{width:24px;height:24px;border-radius:7px}
+  .pagehead h1{font-size:26px;line-height:1.12}
+  .pagehead p{font-size:15px;line-height:1.4;margin-top:4px}
+  .pagehead .headmeta{gap:5px;margin-top:2px}
+  .pagehead .headmeta .btn{height:38px;padding:0 10px;gap:6px;font-size:13.5px}
+  .pagehead .headmeta .btn svg{width:15px;height:15px}
+  .ov-greet h1{font-size:26px}
+  /* guided tools' own intro screens use the same head */
+  .gd-intro{padding-top:0}
+  .gd-w.gd-intro{gap:14px}
+  .gd-intro h1,.gd h1{font-size:26px;line-height:1.12}
+  .gd-lead{font-size:15px;line-height:1.45}
+  .gd-tool{padding:3px 10px 3px 3px;gap:7px}
+  .gd-tool .tile-sm{width:24px;height:24px}
+
+  /* 4. anything sticky sits under the bar, and anchors and focus land below it */
+  html{scroll-padding-top:calc(var(--ph-bar) + 12px)}
+  .pol-dots{top:calc(var(--ph-bar) + 4px)}
+  .mxop-bar,.ln-gl-tools{top:calc(var(--ph-bar) + 4px)}
+  .live,.ttf-side,.pol-in,.mxa-rail,.vd-rail,.ai-rail,.ma-alist,.pol-out.is-empty{top:calc(var(--ph-bar) + 12px)}
+  /* the toast clears the bottom bar and its safe area */
+  .gtoast{bottom:calc(var(--ph-bnav, 64px) + 14px + env(safe-area-inset-bottom, 0px));max-width:calc(100vw - 32px);text-align:center}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5769,6 +5841,16 @@ details.ev-details[open] > summary{margin-bottom:12px}
       <a class="navlink" href="#credits" data-route="credits"><svg><use href="#i-wrench"/></svg>Built with</a>
       <div class="sb-h" id="sb-pin-h">Recent</div>
       <div id="sb-pins" class="sb-pins"></div>
+      <div class="sb-h sb-site-h">Steven Macchia</div>
+      <div class="sb-site" role="group" aria-label="stevenmacchia.com">
+        <a class="navlink" href="https://stevenmacchia.com/">Home page</a>
+        <a class="navlink" href="https://stevenmacchia.com/#projects">Projects</a>
+        <a class="navlink" href="https://stevenmacchia.com/ts-handbook/">Handbook</a>
+        <a class="navlink" href="https://stevenmacchia.com/writing/">Writing</a>
+        <a class="navlink" href="https://stevenmacchia.com/#experience">Experience</a>
+        <a class="navlink" href="https://www.linkedin.com/in/stevenmacchia">LinkedIn</a>
+        <a class="navlink" href="https://stevenmacchia.com/Steven_Macchia_Resume.pdf" download>Download resume</a>
+      </div>
     </nav>
     <div class="sb-foot">
       <a class="sb-me" href="#workspace" id="sb-me"></a>
@@ -5785,8 +5867,11 @@ details.ev-details[open] > summary{margin-bottom:12px}
     <header class="topbar">
       <button type="button" class="tb-icon tb-menu" id="nav-toggle" aria-label="Open navigation"><svg><use href="#i-menu"/></svg></button>
       <div class="tb-crumb"><a href="#overview">Workbench</a><svg><use href="#i-chev"/></svg><b id="tb-here">Overview</b></div>
+      <a class="tb-back" id="tb-back" href="#tools" hidden><svg aria-hidden="true"><use href="#i-chev"/></svg><span>All tools</span></a>
+      <div class="tb-title" id="tb-title"><b id="tb-tname">T&amp;S Workbench</b><span class="tb-prog asb-segs" id="tb-prog" aria-hidden="true"></span></div>
       <div class="tb-actions">
         <button type="button" class="btn tb-k" data-cmdk="1" aria-label="Search"><svg><use href="#i-search"/></svg><kbd class="kbd">⌘K</kbd></button>
+        <button type="button" class="tb-icon tb-help" id="tb-help" aria-label="How this works" title="How this works" hidden><svg><use href="#i-info"/></svg></button>
         <button type="button" class="btn brandbtn" id="tb-new" aria-haspopup="menu" aria-expanded="false" aria-controls="tb-menu"><svg><use href="#i-plus"/></svg><span>New</span></button>
         <div class="tb-newmenu" id="tb-menu" role="menu" aria-label="Start something new" hidden></div>
       </div>
@@ -12700,6 +12785,58 @@ document.addEventListener("keydown", e => {
 $("#nav-toggle").addEventListener("click", () => $("#app").classList.toggle("nav-open"));
 $("#sb-scrim").addEventListener("click", () => $("#app").classList.remove("nav-open"));
 $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(); });
+
+/* ---------- Phones: one bar (2026-10-14) ----------
+   On a phone the page's own strip (.asb: back link, tool name, progress, help) and the app top bar are
+   one sticky bar. The strip stays in the page as the source of truth (it is hidden by CSS on phones, and
+   desktop is untouched); this copies its back link, name, progress and help button into #topbar, so every
+   tool that renders an asStepBar gets the merged bar without changing. Routes with no strip show a hamburger,
+   a title and search. */
+let phSig = "";
+function phSync(){
+  const body = document.body, tn = $("#tb-tname"); if(!body || !tn || !view || typeof view.querySelector !== "function") return;
+  const asb = view.querySelector(".asb"), r = (body.dataset && body.dataset.route) || "", prog = $("#tb-prog"), back = $("#tb-back"), help = $("#tb-help");
+  let name, segs = "", label = "", href = "", hasHelp = false;
+  if(asb){
+    const bk = asb.querySelector(".asb-back"), nm = asb.querySelector(".asb-mid b"), sg = asb.querySelector(".asb-segs");
+    name = nm ? nm.textContent.trim() : (ROUTE_LABEL[r] || "");
+    segs = sg ? sg.innerHTML : "";
+    label = bk ? bk.textContent.trim().replace(/^Your assessment$/, "Assessment") : "All tools";
+    href = bk ? bk.getAttribute("href") : "#tools";
+    hasHelp = !!asb.querySelector(".ph-help");
+  }else name = r === "overview" || r === "tools" || !ROUTE_LABEL[r] ? "T&S Workbench" : ROUTE_LABEL[r];
+  const sig = [!!asb, name, segs, label, href, hasHelp].join("\u0001");
+  if(sig === phSig) return;
+  phSig = sig;
+  body.classList.toggle("ph-tool", !!asb);
+  tn.textContent = name;
+  if(prog){ prog.innerHTML = segs; prog.hidden = !segs; prog.classList.toggle("solo", /class="solo"/.test(segs)); }
+  if(back){ back.hidden = !asb; if(asb){ back.setAttribute("href", href); const sp = back.querySelector("span"); if(sp) sp.textContent = label; } }
+  if(help) help.hidden = !(asb && hasHelp);
+}
+if(typeof MutationObserver !== "undefined" && view && typeof view.querySelector === "function"){
+  let phQueued = false;
+  new MutationObserver(() => { if(phQueued) return; phQueued = true; requestAnimationFrame(() => { phQueued = false; phSync(); }); })
+    .observe(view, {childList:true, subtree:true});
+}
+try{ phSync(); }catch(e){}
+// The (i) button in the bar presses the strip's own "How this works" button, so the tour or walkthrough is
+// whichever one that page already offers
+{ const hb = $("#tb-help"); if(hb && hb.addEventListener) hb.addEventListener("click", () => { const b = view.querySelector(".asb .ph-help"); if(b) b.click(); }); }
+// "Saved as you go" used to sit in the strip as a permanent label; on a phone it is one toast, the first time
+// a tool writes its answers in a session
+let phSaved = false;
+const phQuiet = /^(intro:|firstrun|theme|ui:|help|gloss|learn:|rt:seen|org|demo|ws|proj|sync|pf)/;
+{
+  const set0 = store.set;
+  if(typeof set0 === "function") store.set = function(k, v){
+    set0.apply(this, arguments);
+    try{
+      if(phSaved || !document.body.classList.contains("ph-tool") || phQuiet.test(String(k))) return;
+      if(window.matchMedia && window.matchMedia("(max-width:640px)").matches){ phSaved = true; gsay("Saved as you go"); }
+    }catch(e){}
+  };
+}
 /* =========================================================
    OVERVIEW (studio layout, live data)
    ========================================================= */
