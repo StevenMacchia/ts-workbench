@@ -4312,12 +4312,18 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .sitetop .st-name{font-weight:600;margin-right:auto}
 .sitetop .st-dl{padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
 .sitetop .st-dl:hover{text-decoration:none;border-color:var(--line-strong)}
-.sitetop .st-phone{display:none;margin-left:auto}
+.sitetop .st-dl .short{display:none}
 @media print{.sitetop{display:none}}
-@media (max-width:640px){
-  .sitetop{gap:12px;padding:0 14px}
-  .sitetop .st-full{display:none}
-  .sitetop .st-phone{display:inline}
+/* Under 900px the bar keeps the mark, the name, Handbook, Writing and the resume button, like stevenmacchia.com. Under 640px the phone shell (partZ20.css) hides the bar and the links live in the More sheet. */
+@media (max-width:900px){
+  .sitetop{gap:14px;padding:0 14px}
+  .sitetop a:not(.st-dl):not(.keep):not(.st-name){display:none}
+  .sitetop .st-dl{margin-left:auto}
+}
+@media (max-width:560px){
+  .sitetop .st-name{display:none}
+  .sitetop .st-dl .full{display:none}
+  .sitetop .st-dl .short{display:inline}
 }
 .app{min-height:calc(100vh - 16px - 44px)}
 .side{height:calc(100vh - 16px - 44px)}
@@ -5822,13 +5828,12 @@ details.ev-details[open] > summary{margin-bottom:12px}
 <nav class="sitetop" aria-label="stevenmacchia.com">
   <span class="st-mark" aria-hidden="true"></span>
   <a class="st-name" href="https://stevenmacchia.com/">Steven Macchia</a>
-  <a class="st-link st-full" href="https://stevenmacchia.com/#projects">Projects</a>
-  <a class="st-link st-full" href="https://stevenmacchia.com/ts-handbook/">Handbook</a>
-  <a class="st-link st-full" href="https://stevenmacchia.com/writing/">Writing</a>
-  <a class="st-link st-full" href="https://stevenmacchia.com/#experience">Experience</a>
-  <a class="st-link st-full" href="https://www.linkedin.com/in/stevenmacchia">LinkedIn</a>
-  <a class="st-link st-full st-dl" href="https://stevenmacchia.com/Steven_Macchia_Resume.pdf" download>Download resume</a>
-  <a class="st-link st-phone" href="https://stevenmacchia.com/">Site</a>
+  <a class="st-link" href="https://stevenmacchia.com/#projects">Projects</a>
+  <a class="st-link keep" href="https://stevenmacchia.com/ts-handbook/">Handbook</a>
+  <a class="st-link keep" href="https://stevenmacchia.com/writing/">Writing</a>
+  <a class="st-link" href="https://stevenmacchia.com/#experience">Experience</a>
+  <a class="st-link" href="https://www.linkedin.com/in/stevenmacchia">LinkedIn</a>
+  <a class="st-link st-dl" href="https://stevenmacchia.com/Steven_Macchia_Resume.pdf" download><span class="full">Download resume</span><span class="short">Resume</span></a>
 </nav>
 <div class="app" id="app">
   <aside class="side" id="side" aria-label="Sidebar">
