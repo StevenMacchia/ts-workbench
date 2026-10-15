@@ -78,7 +78,7 @@ function rtImportOpen(){
 }
 function rtResultsHTML(){
   const runs = rt.runs || [];
-  if(!runs.length) return `<h4 class="rt-h">Results</h4><div class="card ma-none"><b>No run imported yet.</b><p class="note">Export your seeds, run them with promptfoo, PyRIT or Inspect, then bring the results back here. The numbers below fill in and the gates decide.</p><div class="row" style="gap:8px;margin-top:8px"><button type="button" class="btn sm primary" data-rt="import"><svg><use href="#i-upload"/></svg>Import a run</button><button type="button" class="btn sm" data-rttab="exports">Exports</button></div></div>`;
+  if(!runs.length) return `<h4 class="rt-h">Results</h4><div class="card ma-none">${emptyMark("inbox")}<b>No run imported yet.</b><p class="note">Export your seeds, run them with promptfoo, PyRIT or Inspect, then bring the results back here. The numbers below fill in and the gates decide.</p><div class="row" style="gap:8px;margin-top:8px"><button type="button" class="btn sm primary" data-rt="import"><svg><use href="#i-upload"/></svg>Import a run</button><button type="button" class="btn sm" data-rttab="exports">Exports</button></div></div>`;
   const run = runs[runs.length - 1], prev = runs.length > 1 ? runs[runs.length - 2] : null, a = run.agg, pct = (x, n) => n ? Math.round(1000 * x / n) / 10 : null, fmt = v => v == null ? "–" : v + "%";
   const trend = (k, f) => { if(!prev || !prev.agg.by[k]) return ""; const d = (f(a.by[k]) || 0) - (f(prev.agg.by[k]) || 0); return d ? `<span class="rt-trend ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : ""}${Math.round(d * 10) / 10}</span>` : `<span class="rt-trend">=</span>`; };
   const s3f = b => pct(b.s3, b.n - b.ng), s2f = b => pct(b.s2, b.n - b.ng);

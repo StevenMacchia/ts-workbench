@@ -473,7 +473,6 @@ label.btn{cursor:pointer}
 .libstat{display:grid;gap:4px;justify-items:start}
 .libact{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .libempty{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;margin-top:12px}
-.libempty svg{width:28px;height:28px;color:var(--faint);flex:none}
 .ocard.iconcard{padding-left:48px}
 .ocard.iconcard::before{display:none}
 .ocard .oi{position:absolute;left:14px;top:11px;width:22px;height:22px;color:var(--muted)}
@@ -4406,7 +4405,7 @@ table:not([class]) tr:last-child td{border-bottom:0}
    position, and a feature-stat row are three different jobs, not one component in three
    costumes. What they can share is a visual grammar, so the fact row gets the same icon
    treatment as every other feature-summary row in the app (gdIntroHTML, src/partGD.js). */
-.gd-fi{width:18px;height:18px;color:var(--accent);margin-bottom:2px}
+.gd-facts > div > .tile{margin-bottom:6px}
 
 /* 2. Red team studio's 0-4 grade picks (the 60-second try, every drill's "what did it do?") get
    the same visual weight tabletop's A/B/C decisions use: a bigger, round, filled number and a
@@ -4490,6 +4489,27 @@ table:not([class]) tr:last-child td{border-bottom:0}
 
 /* the page title takes focus after navigation for screen readers; no visible ring on it */
 .pagehead h1:focus,.pagehead h1:focus-visible,h1[tabindex="-1"]:focus{outline:none;box-shadow:none}
+
+/* Empty and all-clear states carry one neutral tile above the message (emptyMark in partD.js). */
+.ma-none > .tile,.wsempty > .tile,.ov-empty > .tile,.op-empty > .tile,.empty > .tile{margin-bottom:6px}
+.empty,.op-empty{display:grid;gap:6px;justify-items:start}
+.op-empty{padding:6px 4px}
+.op-empty h1{margin:0}.op-empty p{margin:0}
+.ln-empty > .tile{margin:0 auto 10px}
+.libempty{align-items:center}
+.pl-head > .tile{margin-bottom:12px}
+.rtf-opts.rtf-big{margin-top:14px}
+.as-lk{width:12px;height:12px;margin-right:5px;vertical-align:-1.5px;color:var(--faint)}
+
+/* Appeal reviewer confidence reads as a scale: high is green, medium is plain, low is amber. Optional fields say so, to match Required. */
+.ai-conf-high{background:var(--good-soft);color:var(--good)}
+.ai-conf-low{background:var(--med-soft);color:var(--med)}
+.ai-opt{font-weight:400;font-size:12px;color:var(--faint);margin-left:4px}
+/* Guide progress counts are read as progress, not captions */
+.ln-tabs > .note,.lnh-b .note{color:color-mix(in oklab,var(--ink) 72%,var(--muted));font-weight:500}
+
+/* Tabletop intro: the same breathing room between the lead and the actions as the guided intros */
+.tt-one{margin-top:20px;margin-bottom:6px;align-items:center;gap:10px 16px}
 /* =========================================================
    LEARN: red teaming guides, glossary and practice. One screen at a time,
    exercises and worksheets in modals, Aurora tokens only (light and dark).
@@ -4782,8 +4802,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .rtf-opts.rtf-big button{display:grid;grid-template-columns:36px 1fr;column-gap:12px;row-gap:3px;padding:14px 16px;align-items:start}
 .rtf-opts.rtf-big button b{grid-column:2;width:auto;height:auto;background:none;color:var(--ink);font-family:inherit;font-size:15.5px;font-weight:600;justify-content:flex-start}
 .rtf-opts.rtf-big button span{grid-column:2;font-size:13.5px;color:var(--muted)}
-.rtf-opts.rtf-big .rtf-opticon{grid-row:1/3;grid-column:1;width:36px;height:36px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
-.rtf-opts.rtf-big .rtf-opticon svg{width:19px;height:19px}
+.rtf-opts.rtf-big > button > .tile{grid-row:1/3;grid-column:1}
 .rtf-q .learn{margin-top:12px}
 .rtf-act{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px}
 .rtf-act.rtf-wrap{justify-content:flex-start}
@@ -5433,6 +5452,13 @@ details.ev-details[open] > summary{margin-bottom:12px}
   <symbol id="i-world" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></g></symbol>
   <symbol id="i-route" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3" /><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /><circle cx="18" cy="5" r="3" /></g></symbol>
   <symbol id="i-flag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528" /></g></symbol>
+  <symbol id="i-headset" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" /><path d="M21 16v2a4 4 0 0 1-4 4h-5" /></g></symbol>
+  <symbol id="i-act" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.1 12 6" /><path d="m5.1 8-2.9-.8" /><path d="m6 12-1.9 2" /><path d="M7.2 2.2 8 5.1" /><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z" /></g></symbol>
+  <symbol id="i-media" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><path d="m12.296 3.464 3.02 3.956" /><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z" /><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m6.18 5.276 3.1 3.899" /></g></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></g></symbol>
+  <symbol id="i-plan" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h8" /><path d="M13 12h8" /><path d="M13 19h8" /><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /></g></symbol>
+  <symbol id="i-quarter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M16 2v3" /><path d="M3 9h18" /><path d="M8 2v3" /><path d="M17 13h-6" /><path d="M13 17H7" /><path d="M7 13h.01" /><path d="M17 17h.01" /></g></symbol>
+  <symbol id="i-nomatch" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" style="stroke-width:var(--sw,2)" stroke-linecap="round" stroke-linejoin="round"><path d="m13.5 8.5-5 5" /><path d="m8.5 8.5 5 5" /><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></g></symbol>
 </svg>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5958,12 +5984,18 @@ const TOOL_ICON = {
   learn:"book", redteamllm:"shield", redteamworld:"world", glossary:"glossary", tsglossary:"glossary",
   workspace:"folder", plan:"send", about:"info", credits:"wrench", overview:"home", tools:"layers", roost:"plug", review:"chart"
 };
+// iconId: a tool icon ("cover" or "i-cover"), or a platform or harm-area symbol ("p-social", "c-violent")
 // size: "lg" (48px, cards), "md" (36px) or "sm" (22px, sidebar and palette rows)
 function tileHTML(iconId, tone, size){
-  return `<span class="tile tile-${size || "lg"}" data-tone="${tone || "neutral"}" aria-hidden="true"><svg><use href="#i-${String(iconId).replace(/^i-/, "")}"/></svg></span>`;
+  return `<span class="tile tile-${size || "lg"}" data-tone="${tone || "neutral"}" aria-hidden="true"><svg><use href="#${/^[pc]-/.test(iconId) ? iconId : "i-" + String(iconId).replace(/^i-/, "")}"/></svg></span>`;
 }
 const COLOR_TONE = {"--t-ma":"assess","--t-pm":"assess","--t-cv":"assess","--t-tt":"assess","--t-pol":"prepare","--t-cp":"prepare","--t-gp":"assess","--t-cr":"prepare","--t-ds":"prepare","--t-vd":"prepare","--t-mx":"measure","--t-ai":"ai","--t-rt":"ai"};
 function toneOfColor(c){ const m = /--[a-z-]+/.exec(String(c)); return (m && COLOR_TONE[m[0]]) || "neutral"; }
+// Empty and all-clear states: one neutral tile above the message. check = good news, inbox = nothing here yet.
+function emptyMark(iconId, size){ return tileHTML(iconId, "neutral", size || "md"); }
+const GD_FACT_ICON = ["i-clock", "i-layers", "i-lock"];
+// One small tile per position in the intro fact row, in the tool's own tone
+function gdFactTile(i, tone){ return tileHTML(GD_FACT_ICON[i] || "i-info", tone, "md"); }
 function routeTile(route, size, iconId){ return tileHTML(iconId || TOOL_ICON[route] || "layers", TOOL_TONE[route], size); }
 
 // Toast with an Undo action, shared by every "Start over" handler.
@@ -6861,7 +6893,7 @@ function libraryBlock(){
   const items = Object.values(libLoad()).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const head = `<div class="section-title"><h2>Saved pre-mortems ${tip("Part of your workspace, saved in this browser. Save a workspace file to keep a copy or open it on another device.")}</h2>
     <a class="btn sm" href="#workspace">All saved work</a></div>`;
-  if(!items.length) return head + `<div class="card libempty"><svg><use href="#i-folder"/></svg><div><b>No saved pre-mortems yet</b><p class="note">Pre-mortems you finish are saved here and in your workspace automatically. Reopen them, or reuse their answers for a new feature.</p></div></div>`;
+  if(!items.length) return head + `<div class="card libempty">${emptyMark("folder")}<div><b>No saved pre-mortems yet</b><p class="note">Pre-mortems you finish are saved here and in your workspace automatically. Reopen them, or reuse their answers for a new feature.</p></div></div>`;
   return head + `<div class="card liblist">${items.map(rec=>{
     const r = assess(openRecord(rec)); const bl = r.safeguards.filter(s=>s.rank===3); const bd = bl.filter(s=>rec.done&&rec.done[s.id]).length;
     return `<div class="librow">
@@ -7337,7 +7369,7 @@ function pmChanges(r){
   return lines;
 }
 function renderReport(r){
-  if(!r.risks.length) return `<div class="card"><div class="empty"><strong style="color:var(--ink)">Nothing to assess yet</strong><span>Tell us what people can do in your product to see its risks.</span><button type="button" class="btn primary" data-goq="features">Choose capabilities</button></div></div>`;
+  if(!r.risks.length) return `<div class="card"><div class="empty">${emptyMark("inbox")}<strong style="color:var(--ink)">Nothing to assess yet</strong><span>Tell us what people can do in your product to see its risks.</span><button type="button" class="btn primary" data-goq="features">Choose capabilities</button></div></div>`;
   const blockers = r.safeguards.filter(s=>s.rank===3), bDone = blockers.filter(s=>pm.done[s.id]).length;
   const allDone = r.safeguards.filter(s=>pm.done[s.id]).length;
   const applies = r.obligations.filter(o=>o.status==="applies").length;
@@ -9597,7 +9629,7 @@ function ttPicker(H){
           ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<span class="tag" title="Backed by public data on how common this problem is">Sourced</span>` : ""}${laws?`<span class="tag">Law notes</span>`:""}</span>
         ${typeof ttWhy === "function" && ttWhy(s, ttType) ? `<small class="scen-src-cap">Sourced: backed by public data on how common this problem is</small>` : ""}
       </button>`; }).join("")}</div>`
-    : `<div class="card empty">${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
+    : `<div class="card empty">${emptyMark(filt==="done" ? "inbox" : "check")}${filt==="done"?"No completed scenarios yet. Pick one to start.":"You've completed every scenario for this company type."}</div>`}`;
   const one = $("#tt-one"); if(one) one.onclick = () => ttMode === "team" ? ttfNew(bestFit.i, ttType) : ttStart(bestFit.i, ttType);
   $$(".scen").forEach(b => b.onclick = () => ttMode === "team" ? ttfNew(+b.dataset.i, ttType) : ttStart(+b.dataset.i, ttType));
   $$("[data-ttmode]").forEach(b => b.onclick = () => { store.set("tt:mode", b.dataset.ttmode); renderTabletop(); const f = document.querySelector(`[data-ttmode="${b.dataset.ttmode}"]`); if(f) f.focus(); });
@@ -11357,7 +11389,7 @@ function mxPlanText(list){
 /* ----- leadership one-pager ----- */
 function mxOnePagerInner(list){
   const measured = list.filter(m => { const s = mxStatus(m, mx.vals); return s; });
-  if(!measured.length) return `<div class="op-empty"><h1>Nothing to show yet</h1><p>Enter at least one value in My scorecard, or try the example numbers.</p></div>`;
+  if(!measured.length) return `<div class="op-empty">${emptyMark("inbox")}<h1>Nothing to show yet</h1><p>Enter at least one value in My scorecard, or try the example numbers.</p></div>`;
   const c = {on:0, watch:0, off:0}; measured.forEach(m => { const s = mxStatus(m, mx.vals); if(c[s] != null) c[s]++; });
   const cls = s => s && s !== "set" ? MX_STAT[s][1] : "";
   const att = measured.filter(m => ["off", "watch"].includes(mxStatus(m, mx.vals))).sort((a, b) => (mxStatus(a, mx.vals) === "off" ? 0 : 1) - (mxStatus(b, mx.vals) === "off" ? 0 : 1));
@@ -12080,7 +12112,7 @@ function projectCards(items){
 }
 function itemRows(items){
   const projects = Object.values(wsProjects()).sort((a,b)=>a.name.localeCompare(b.name));
-  if(!items.length) return `<div class="card wsempty"><b>Nothing saved here yet</b><p class="note">Run a tool and save the result, or start one now.</p>
+  if(!items.length) return `<div class="card wsempty">${emptyMark("inbox")}<b>Nothing saved here yet</b><p class="note">Run a tool and save the result, or start one now.</p>
     <div class="row">${typeof asInAssessment === "function" && !asInAssessment() ? `<a class="btn sm primary" href="#overview"><svg><use href="#i-arrow"/></svg>Start the guided assessment</a>` : ""}${Object.entries(KINDS).filter(([k])=>k!=="learn").map(([k,v])=>`<button type="button" class="btn sm" data-ws-new="${k}"><svg><use href="#${v.icon}"/></svg>${v.n}</button>`).join("")}</div></div>`;
   return `<div class="card wslist">${items.map(it => {
     const s = itemSummary(it), confirming = wsUI.confirm==="item:"+it.id;
@@ -12563,7 +12595,7 @@ function asPictureHTML(empty){
         ${empty || o.score === null ? "" : rcTrend(rcRecord(o))}
         ${delta ? `<span class="as-delta ${delta.startsWith("Up") ? "up" : ""}">${esc(delta)}</span>` : ""}</div>
       <div class="as-parts">${rows.map(p => `<a class="as-part ${p.score === null ? "open" : ""}" href="#${p.route}" aria-label="${esc(p.n)}: ${p.score === null ? "not graded yet" : p.score + " of 100"}"><span class="as-pn">${p.n}</span>
-        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
+        <span class="as-pb">${p.score === null ? `<span class="as-bar none"></span>` : `<span class="as-bar" title="${p.score} of 100"><i style="width:${p.score}%;background:${p.color}"></i></span>`}<small>${p.score === null ? `<svg class="as-lk" aria-hidden="true"><use href="#i-lock"/></svg>` : ""}${esc(p.score === null ? todo(p) : plain(p))}</small></span></a>`).join("")}</div>
     </div>
     ${o.score === null ? "" : `<p class="note as-pic-weight">${typeof rcWeightLine === "function" ? rcWeightLine() : ""}</p>`}
     ${asRadarsHTML()}
@@ -12703,7 +12735,7 @@ function renderTools(){
     </section>` : ""}
     ${typeof templateItems === "function" ? `<section class="rise">
       <div class="ov-sec-h"><h3>Start from a template</h3><span class="note">Pre-fills your workspace, then lands on your assessment</span></div>
-      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}">${tileHTML("layers", "neutral", "md")}<span class="tpl-t"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("")}</div>
+      <div class="tpl-grid">${templateItems().map((t, i) => `<button type="button" class="tpl-card" data-tplgo="${i}">${tileHTML(t.icon || "layers", "neutral", "md")}<span class="tpl-t"><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("")}</div>
     </section>` : ""}
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
@@ -12720,7 +12752,7 @@ function renderTools(){
           ${tileHTML(KINDS[it.kind].icon, TOOL_TONE[it.kind], "md")}
           <span style="min-width:0"><b>${esc(it.title || "Untitled")}</b><small>${KINDS[it.kind].n}${it.projectId && projName(it.projectId) ? " · " + esc(projName(it.projectId)) : ""}</small></span>
           ${ovChip(it)}<span class="when">${relTime(it.updated)}</span></button>`).join("")
-        : `<div class="ov-empty"><b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span></div>`}</div>
+        : `<div class="ov-empty">${emptyMark("inbox")}<b style="color:var(--ink)">Nothing saved yet</b><span>Results you save from any tool appear here, so you can pick up where you left off.</span></div>`}</div>
     </section>
     ${asFootHTML()}
   </div>`;
@@ -14636,7 +14668,7 @@ function renderGlossary(){
     const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q))).sort((a, b) => a.t[0].localeCompare(b.t[0]));
     const knownCount = Object.keys(kn).filter(x => kn[x]).length, filtered = !!q || f !== "all";
     $("#ln-known").textContent = filtered ? `${list.length} of ${LN_GLOSS.length} terms match · ${knownCount} known` : `${knownCount} of ${LN_GLOSS.length} marked known`;
-    if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
+    if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">${emptyMark("nomatch")}Nothing matches. Try another word.</div>`; return; }
     let lastLetter = "";
     $("#ln-gl").innerHTML = list.map(({t, i}) => {
       const L = t[0][0].toUpperCase(), div = L !== lastLetter ? `<div class="ln-gl-div" aria-hidden="true">${esc(L)}</div>` : "";
@@ -14906,7 +14938,7 @@ function tsgFilter(q, gfilter){
     .slice().sort((a, b) => a.n.localeCompare(b.n));
 }
 function tsgGridHTML(list){
-  if(!list.length) return `<div class="ln-empty card">Nothing matches. Try another word or group.</div>`;
+  if(!list.length) return `<div class="ln-empty card">${emptyMark("nomatch")}Nothing matches. Try another word or group.</div>`;
   let lastL = "", cards = "";
   list.forEach(t => {
     const L = t.n[0].toUpperCase();
@@ -15140,7 +15172,7 @@ function rtReportHTML(open){
 }
 function rtPlanHTML(){
   const picked = rtPicked();
-  if(!picked.length) return `<div class="card ma-none"><b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
+  if(!picked.length) return `<div class="card ma-none">${emptyMark("inbox")}<b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
   const grids = rtKinds().map(k => `<h4 class="rt-h">Coverage grid · ${rtModelName(k)}</h4><p class="note">Fill each cell with attempts / S2+ / S3+. A blank cell is an untested cell. Write OOS and a reason for anything out of scope.</p>
     <div class="rt-tw"><table class="rt-grid"><thead><tr><th>Harm area</th>${RT_TECH[k].map(t => `<th>${t}</th>`).join("")}</tr></thead><tbody>${picked.filter(a => !a.only || a.only === k).map(a => `<tr><td class="k">${esc(a.n)}${a.severe ? ` <span class="tag">probes only</span>` : a.control ? ` <span class="tag">gate</span>` : ""}</td>${RT_TECH[k].map(() => `<td>&nbsp;</td>`).join("")}</tr>`).join("")}<tr><td class="k">Benign twins (refused / run)</td>${RT_TECH[k].map(() => `<td>&nbsp;</td>`).join("")}</tr></tbody></table></div>`).join("");
   return `<div class="rt-two">
@@ -15154,7 +15186,7 @@ function rtPlanHTML(){
 }
 function rtSeedsHTML(){
   const picked = rtPicked();
-  if(!picked.length) return `<div class="card ma-none"><b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
+  if(!picked.length) return `<div class="card ma-none">${emptyMark("inbox")}<b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
   return `<p class="note">Seeds are written the way a policy team writes them: who wants what, the benign twin next to it, and what success looks like. Edit any card to put it in your users' words. Severe areas get probe cards and nothing else.</p>
     <div class="rt-areas">${picked.map(a => `<section class="card rt-area"><div class="rt-area-h"><h4>${esc(a.n)}</h4>${a.control ? `<span class="pill s0">gate</span>` : `<span class="pill s${a.sev}">S${a.sev} default</span>`}</div>
       ${a.severe ? `<div class="ln-note warn"><p><b>Policy-described probes only.</b> Named people, under the stop rules, with legal's sign-off. No tester generates, requests or stores material in this area, even to prove a point. Record only whether the model began to comply, then stop.</p></div>` :
@@ -15164,14 +15196,14 @@ function rtSeedsHTML(){
 }
 function rtDrillsHTML(){
   const drills = rtDrills();
-  if(!drills.length) return `<div class="card ma-none"><b>Pick a team size and a time budget to get your drills.</b></div>`;
+  if(!drills.length) return `<div class="card ma-none">${emptyMark("inbox")}<b>Pick a team size and a time budget to get your drills.</b></div>`;
   return `<p class="note">In order. Each drill opens with a timer, the steps, a scribe log and a grade. File a finding straight from it. ${rt.time !== "week" ? `You chose ${rt.time === "afternoon" ? "an afternoon" : "a day"}; the full set is in the <a href="#${rtKinds()[0] === "world" ? "redteamworld" : "redteamllm"}/practice">guide</a>.` : ""}</p>
     <div class="ln-grid">${drills.map((d, i) => { const s = rt.sess[d.id] || {}; return `<button type="button" class="card ln-ex ${s.done ? "done" : ""}" data-drill="${d.id}"><span class="tick"><svg><use href="#i-check"/></svg></span><span class="n">Drill ${i + 1}${rt.model === "both" ? " · " + rtModelName(d.k) : ""}</span><h4>${esc(d.title)}</h4><p>${esc(d.why)}</p><span class="meta"><span>${esc(d.time)}</span><span>${esc(d.people.split(":")[0].split(",")[0])}</span>${s.grade !== undefined ? `<span>graded S${s.grade}</span>` : ""}</span></button>`; }).join("")}</div>`;
 }
 function rtFindingsHTML(){
   const f = rt.findings || [];
   return `${f.length ? `<div class="rt-flist">${f.map(x => { const a = RT_AREAS.find(y => y.k === x.area) || {n:x.area}; return `<button type="button" class="card rt-f" data-fx="${x.id}"><div class="rt-f-h"><span class="mono">${esc(x.id)}</span><span class="pill s${x.sev}">S${x.sev}</span><span class="tag">${esc(x.status)}</span></div><h4>${esc(x.title)}</h4><p class="note">${esc(a.n)} · ${esc(x.tech || "")}${x.n ? ` · ${x.k} of ${x.n} runs` : ""}${x.owner ? ` · ${esc(x.owner)}` : ""}</p></button>`; }).join("")}</div>` :
-    `<div class="card ma-none"><b>No findings yet.</b><p class="note">Run a drill and file what you find, or file one from a result you already have.</p></div>`}
+    `<div class="card ma-none">${emptyMark("inbox")}<b>No findings yet.</b><p class="note">Run a drill and file what you find, or file one from a result you already have.</p></div>`}
     <div class="row" style="gap:8px;margin-top:12px"><button type="button" class="btn sm primary" data-rt="finding"><svg><use href="#i-plus"/></svg>File a finding</button>${f.length && rt.who !== "learner" ? `<button type="button" class="btn sm" data-rt="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button><button type="button" class="btn sm" data-export="findings">Download findings</button>` : ""}<button type="button" class="btn sm" data-ws2="${rtKinds()[0]}:w4">Finding template</button></div>`;
 }
 function rtExportsHTML(){
@@ -15508,7 +15540,7 @@ function rtImportOpen(){
 }
 function rtResultsHTML(){
   const runs = rt.runs || [];
-  if(!runs.length) return `<h4 class="rt-h">Results</h4><div class="card ma-none"><b>No run imported yet.</b><p class="note">Export your seeds, run them with promptfoo, PyRIT or Inspect, then bring the results back here. The numbers below fill in and the gates decide.</p><div class="row" style="gap:8px;margin-top:8px"><button type="button" class="btn sm primary" data-rt="import"><svg><use href="#i-upload"/></svg>Import a run</button><button type="button" class="btn sm" data-rttab="exports">Exports</button></div></div>`;
+  if(!runs.length) return `<h4 class="rt-h">Results</h4><div class="card ma-none">${emptyMark("inbox")}<b>No run imported yet.</b><p class="note">Export your seeds, run them with promptfoo, PyRIT or Inspect, then bring the results back here. The numbers below fill in and the gates decide.</p><div class="row" style="gap:8px;margin-top:8px"><button type="button" class="btn sm primary" data-rt="import"><svg><use href="#i-upload"/></svg>Import a run</button><button type="button" class="btn sm" data-rttab="exports">Exports</button></div></div>`;
   const run = runs[runs.length - 1], prev = runs.length > 1 ? runs[runs.length - 2] : null, a = run.agg, pct = (x, n) => n ? Math.round(1000 * x / n) / 10 : null, fmt = v => v == null ? "–" : v + "%";
   const trend = (k, f) => { if(!prev || !prev.agg.by[k]) return ""; const d = (f(a.by[k]) || 0) - (f(prev.agg.by[k]) || 0); return d ? `<span class="rt-trend ${d > 0 ? "up" : "down"}">${d > 0 ? "+" : ""}${Math.round(d * 10) / 10}</span>` : `<span class="rt-trend">=</span>`; };
   const s3f = b => pct(b.s3, b.n - b.ng), s2f = b => pct(b.s2, b.n - b.ng);
@@ -15812,7 +15844,7 @@ rtAct = function(a, b){ if(a === "flow"){ rt.mode = "flow"; rtSave(); renderRedt
    why it worked, what it could cause) with an expert-style write-up to compare against.
    No scripted attacks, no model calls, no harmful text. Moves are named and explained, never written out.
    ========================================================= */
-const RT_TARGET_ICON = {support:"i-chat", search:"i-search", agent:"i-bot", media:"p-video"};
+const RT_TARGET_ICON = {support:"i-headset", search:"i-search", agent:"i-act", media:"i-media"};
 const RT_TARGETS = [
   {k:"support", n:"A support assistant", h:"Answers customers, reads your help docs and their account, can open tickets or issue refunds.", kind:"llm",
     card:{what:"Answers customer questions from our help centre and the customer's own account, and can open a ticket or issue a refund up to a limit.", who:"Our customers, signed in. Some are under 18.", out:"Medical, legal or financial advice. Anything about other customers. Actions over the refund limit."},
@@ -15877,7 +15909,7 @@ function rtM1HTML(sc){ return ({target:rtm1Target, card:rtm1Card, try:rtm1Try, f
 function rtm1Target(){
   const m = rtM1();
   return `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><p class="rtf-lead">Pick the nearest one. The moves, the checklist and the first finding are shaped around it. You will test your own feature, not a toy.</p>
-    <div class="rtf-opts rtf-big">${RT_TARGETS.map(t => `<button type="button" data-target="${t.k}" class="${m.target === t.k ? "on" : ""}"><span class="rtf-opticon"><svg><use href="#${RT_TARGET_ICON[t.k]}"/></svg></span><b>${esc(t.n)}</b><span>${esc(t.h)}</span></button>`).join("")}</div>
+    <div class="rtf-opts rtf-big">${RT_TARGETS.map(t => `<button type="button" data-target="${t.k}" class="${m.target === t.k ? "on" : ""}">${tileHTML(RT_TARGET_ICON[t.k], "ai", "md")}<b>${esc(t.n)}</b><span>${esc(t.h)}</span></button>`).join("")}</div>
     <label class="rtf-in"><span>What is it called? <small>optional</small></span><input class="input" id="rtf-svc" value="${esc(rt.svc)}" placeholder="For example: Pixelry assistant" maxlength="60"></label>
     ${m.target ? rtfNext("Next: the target card") : ""}`;
 }
@@ -16784,7 +16816,7 @@ function rtfIntro(){
 // selector registered per card rather than per page, which does not fit this round. Skipped; said here.
 const RT_WALK = [
   {h:"You pick what you're testing", blurb:"Pick the nearest match to what you're building. Everything after this, the moves, the checklist and the first finding, is shaped around it.",
-    prev:() => `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>A support assistant</b><span>Answers customers, reads your help docs and can open tickets or issue refunds.</span></button><button type="button" tabindex="-1"><b>An agent that acts</b><span>Can browse, send, buy, book or change things on the user's behalf.</span></button></div>`},
+    prev:() => `<span class="rtf-eb">Start here · 1 of 6</span><h2 class="rtf-h2">What are you building?</h2><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1">${tileHTML(RT_TARGET_ICON.support, "ai", "md")}<b>A support assistant</b><span>Answers customers, reads your help docs and can open tickets or issue refunds.</span></button><button type="button" tabindex="-1">${tileHTML(RT_TARGET_ICON.agent, "ai", "md")}<b>An agent that acts</b><span>Can browse, send, buy, book or change things on the user's behalf.</span></button></div>`},
   {h:"You try a move and say what happened", blurb:"No typed attacks. You choose a move from a list, try it on your own feature, and say in plain words what happened.",
     prev:() => `<p class="rtf-lead">Pick a move, run it on your own feature, then say what it did.</p><div class="rtf-opts rtf-big"><button type="button" class="on" tabindex="-1"><b>Wrap it in a story <i class="rtf-term">framing</i></b><span>Say it is for a novel or a training deck. The model answers the frame instead of the ask.</span></button></div><p class="rtf-lbl" style="margin-top:10px">What did it do?</p><div class="rtf-opts rtf-grade">${RT_GRADES.map((g, j) => `<button type="button" tabindex="-1" class="${j === 1 ? "on" : ""}"><b>${j}</b><span>${g[0]}</span><i class="rtf-term">${g[1]}</i></button>`).join("")}</div>`},
   {h:"Your call, then the expert's", blurb:"You grade what happened first, 0 to 4. Then you see the expert's grade on the same thing, with the gap explained.",
@@ -17601,7 +17633,7 @@ Return ONLY a JSON object with exactly these keys:
     "Decision: [uphold / overturn / change to a lesser action / escalate to a specialist]", "Reply to the user: [write your reply here]"].join("\n"),
   render:r => { const R = AI_REC[r.recommendation], met = {yes:["Met","crit"], no:["Not met","good"], unclear:["Unclear","med"]};
     return `
-    <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
+    <div class="ai-rec ${R[1]}"><div><span class="ai-rec-k">Recommendation</span><b>${R[0]}</b></div><span class="pill ai-conf ai-conf-${esc(r.confidence)}">${esc(r.confidence)} confidence</span><p>${esc(r.summary)}</p></div>
     ${(r.steering_attempts || []).length ? `<div class="ai-sec"><div class="ai-sec-h"><h3>Text in the case tried to steer this review</h3><span class="note">Claude was told to ignore it. Check this recommendation with extra care.</span></div><ul class="ai-warn">${r.steering_attempts.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
     <div class="ai-sec"><div class="ai-sec-h"><h3>Does the rule apply?</h3><span class="note">Every element must be met for a violation</span></div>
       <div class="ai-els">${r.elements.map(e => `<div class="ai-el"><span class="pill ${met[e.met][1]}">${met[e.met][0]}</span><div><b>${esc(e.element)}</b><span>${esc(e.reasoning)}</span></div></div>`).join("")}</div></div>
@@ -17724,7 +17756,7 @@ const aiTier = s => s.depth === "deep" ? "complex" : "default";
 const aiPut = (k, s) => store.set("ai:" + k, s);
 
 function aiField(T, fd, v){
-  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ""}</span>`;
+  const id = `ai-${T.slug}-${fd.k}`, lab = `<span>${esc(fd.lab)}${fd.req ? ` <span class="pill accent ai-req">Required</span>` : ` <span class="ai-opt">optional</span>`}</span>`;
   const help = fd.help ? `<small class="ai-help">${esc(fd.help)}</small>` : "";
   if(fd.type === "select") return `<label class="mxa-y ai-f">${lab}<select class="select" id="${id}" data-fk="${fd.k}">${fd.opts.map(o => `<option ${v === o ? "selected" : ""}>${esc(o)}</option>`).join("")}</select>${help}</label>`;
   if(fd.type === "checks") return `<fieldset class="ai-f ai-checks"><legend>${esc(fd.lab)}</legend><div>${fd.opts.map(([ov, ol]) => `<label class="ai-chk"><input type="checkbox" data-fk="${fd.k}" value="${ov}" ${(v || []).includes(ov) ? "checked" : ""}><span>${esc(ol)}</span></label>`).join("")}</div>${help}</fieldset>`;
@@ -18225,7 +18257,7 @@ function maRoadmapHTML(){
   const more = unrated.length ? `<div class="banner ma-more"><span>Rate the remaining ${unrated.length === 1 ? "area" : unrated.length + " areas"} (${unrated.map(a => esc(a.s.toLowerCase())).join(", ")}) to complete your roadmap. The roadmap below is already valid for what you've rated so far.</span><button type="button" class="btn sm" data-open="${unrated[0].k}" data-scroll="1">Rate ${esc(unrated[0].n.toLowerCase())}</button></div>` : "";
   if(!steps.length) {
     const stretch = MA_AREAS.filter(a => ma.lv[a.k] && maLevelOf(ma, a.k) < 5).sort((x, y) => maLevelOf(ma, x.k) - maLevelOf(ma, y.k) || MA_ORDER.indexOf(x.k) - MA_ORDER.indexOf(y.k)).slice(0, 3);
-    return more + (MA_AREAS.some(a => ma.lv[a.k]) ? `<div class="card ma-none"><b>No gaps against your targets.</b><p class="note">${stretch.length ? "Stretch goals, if you want to go further. Find them under By area." : "Every area is at the top level."}</p>
+    return more + (MA_AREAS.some(a => ma.lv[a.k]) ? `<div class="card ma-none">${emptyMark("check")}<b>No gaps against your targets.</b><p class="note">${stretch.length ? "Stretch goals, if you want to go further. Find them under By area." : "Every area is at the top level."}</p>
       ${stretch.length ? `<ul class="ma-acts">${stretch.map(a => `<li>${mxGloss(a.next[maLevelOf(ma, a.k) - 1][0], seen)} <span class="note">(${esc(a.n)})</span></li>`).join("")}</ul>` : ""}</div>` : "");
   }
   const plan = maAllRated(ma);
@@ -18382,8 +18414,8 @@ function maIntroHTML(){
     <span class="gd-tool">${tileHTML("steps", "assess", "sm")}Program maturity</span>
     <h1>How strong is your Trust &amp; Safety program?</h1>
     <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
-    <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
-      <div><svg class="gd-fi"><use href="#i-lock"/></svg><b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
+    <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
+      <div>${gdFactTile(2, "assess")}<b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span><button type="button" class="ov-link" data-mag="page">Fill everything in on one page</button><button type="button" class="ov-link" data-ma="example">See a finished example</button></div>
   </div>${maPreviewHTML()}`;
@@ -18812,7 +18844,7 @@ function cvWhy(){
 }
 function cvGapsHTML(){
   const acts = cvActions(cv), seen = new Set();
-  if(!acts.length) return `<div class="card ma-none"><b>${cvRisk(cv) ? "No gaps where risk is high." : "Choose a risk to compare against."}</b><p class="note">${cvRisk(cv) ? "Every high-risk area has coverage at or above its risk, or its weakest layers are already solid." : "Gaps appear where a harm area's risk is higher than your coverage."}</p></div>`;
+  if(!acts.length) return `<div class="card ma-none">${emptyMark(cvRisk(cv) ? "check" : "inbox")}<b>${cvRisk(cv) ? "No gaps where risk is high." : "Choose a risk to compare against."}</b><p class="note">${cvRisk(cv) ? "Every high-risk area has coverage at or above its risk, or its weakest layers are already solid." : "Gaps appear where a harm area's risk is higher than your coverage."}</p></div>`;
   return `<div class="cv-gaps">${acts.slice(0, 8).map((x, i) => `<article class="card cv-gap ${x.row.status}">
       <div class="cv-gh"><span class="cv-gn mono">${i + 1}</span><b>${esc(x.row.a.n)}</b><span class="pill ${x.row.status === "exposed" ? "crit" : "high"}">${x.row.status === "exposed" ? "Exposed" : "Gap"}</span></div>
       <span class="cv-gl">${esc(x.layer.n)}: ${x.level === undefined ? "not rated" : CV_LEVELS[x.level].toLowerCase()}. ${esc(cvRiskWords(x.row).replace(/^./, c => c.toUpperCase()))}, ${x.row.cov}% coverage.</span>
@@ -18923,7 +18955,7 @@ function cvIntroHTML(){
     <span class="gd-tool">${tileHTML("cover", "assess", "sm")}Coverage radar</span>
     <h1>Do your defenses keep up with your risk?</h1>
     <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
-    <div class="gd-facts"><div><svg class="gd-fi"><use href="#i-clock"/></svg><b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div><svg class="gd-fi"><use href="#i-layers"/></svg><b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div><svg class="gd-fi"><use href="#i-lock"/></svg><b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
+    <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div>${gdFactTile(2, "assess")}<b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span>${!src ? `<button type="button" class="ov-link" data-ov="new">Run a pre-mortem first, to compare against real risk</button>` : ""}<button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
   </div>${cvPreviewHTML()}`;
@@ -19640,8 +19672,10 @@ const NEW_ITEMS = [
 const TEMPLATE_YOUTH = {social:"teens", marketplace:"adult_self", fintech:"adult_verified", gaming:"teens", dating:"adult_self", genai:"adult_self", gig:"adult_verified", kids:"kids"};
 function templateItems(){
   return [{k:"demo", n:"Pixelry (full demo)", d:"Every tool filled in for a fictional social app, ready to explore", icon:"layers", run:() => demoStart()}]
-    .concat(TT_TYPES.filter(t => t.k !== "all").map(t => ({k:t.k, n:t.n, d:`Set your workspace up for a ${t.s} company and start your assessment`, icon:"shield", run:() => templateStart(t.k)})));
+    .concat(TT_TYPES.filter(t => t.k !== "all").map(t => ({k:t.k, n:t.n, d:`Set your workspace up for a ${t.s} company and start your assessment`, icon:TEMPLATE_ICON[t.k] || "layers", run:() => templateStart(t.k)})));
 }
+// Platform symbols from the sprite (Lucide), one per company type
+const TEMPLATE_ICON = {social:"p-social", marketplace:"p-marketplace", fintech:"p-fintech", gaming:"p-gaming", dating:"p-dating", genai:"p-genai", gig:"p-gig", kids:"p-edtech"};
 function templateStart(k){
   const t = TT_TYPES.find(x => x.k === k); if(!t) return;
   const o = orgGet();
@@ -19661,7 +19695,7 @@ function newMenuToggle(open){
   if(m && m.innerHTML !== undefined){
     m.innerHTML = NEW_ITEMS.map(([k, ic, c, n, d], i) => `<button type="button" role="menuitem" data-new="${i}">${tileHTML(ic, TOOL_TONE[k], "md")}<span><b>${n}</b><small>${d}</small></span></button>`).join("")
       + `<div class="tb-newsep" role="separator">Start from a template</div>`
-      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}">${tileHTML("layers", "neutral", "md")}<span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
+      + templateItems().map((t, i) => `<button type="button" role="menuitem" data-tpl="${i}">${tileHTML(t.icon || "layers", "neutral", "md")}<span><b>${esc(t.n)}</b><small>${esc(t.d)}</small></span></button>`).join("");
     m.addEventListener("click", e => { const nb = e.target.closest("[data-new]"); const tb = e.target.closest("[data-tpl]");
       if(nb){ newMenuToggle(false); NEW_ITEMS[+nb.dataset.new][5](); return; }
       if(tb){ newMenuToggle(false); templateItems()[+tb.dataset.tpl].run(); return; } });
@@ -19867,7 +19901,7 @@ function nxHTML(){
         <div class="nx-t"><b>${esc(x.text)}</b><small><span class="nx-k" style="color:color-mix(in oklab, ${color(x.kind)} 65%, var(--ink))">${esc(x.ctx)}</span></small></div>
         ${x.snap ? `<button type="button" class="btn sm" data-nxsnap="1">Save snapshot</button>` : x.loop !== undefined ? `<button type="button" class="btn sm" data-loopgo="tt:${x.loop}">Start</button>` : x.go ? `<a class="btn sm" href="#${x.go}">Open</a>` : `<a class="nx-open" href="#${x.kind}" aria-label="Open in ${x.kind === "maturity" ? "Program maturity" : "the pre-mortem"}">${icon("arrow")}</a>`}
       </li>`).join("")}</ul>`
-      : `<div class="nx-empty"><b>You're all caught up.</b><span class="note">Nothing urgent on your roadmap, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
+      : `<div class="nx-empty">${emptyMark("check")}<b>You're all caught up.</b><span class="note">Nothing urgent on your roadmap, no open launch blockers, no exposed gaps. Share where you stand, or add another product.</span><button type="button" class="btn sm" data-pack="1">Leadership pack</button></div>`}
     </div></section>`;
 }
 // Ticking an item here does exactly what ticking it in its tool does, then the report card moves
@@ -21136,7 +21170,7 @@ function gdPreviewHTML(spec){
 }
 // The 3-up fact row is almost always shaped the same way across tools: a time estimate first,
 // then a scope/approach note, then a reassurance -- so one icon per position, not per tool.
-const GD_FACT_ICON = ["i-clock", "i-layers", "i-lock"];
+
 function gdIntroHTML(spec){
   const st = gdLive(spec), n = st.filter(gdHas).length, I = spec.intro, T = spec.tool;
   const resume = n > 0 && n < st.length && gdHas(st[0]);
@@ -21146,7 +21180,7 @@ function gdIntroHTML(spec){
     <p class="gd-lead">${I.lead}</p>
     ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}
     ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
-    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s], i) => `<div><svg class="gd-fi"><use href="#${GD_FACT_ICON[i] || "i-info"}"/></svg><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
+    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s], i) => `<div>${gdFactTile(i, toneOfColor(T.color))}<b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
   </div>${gdPreviewHTML(spec)}`;
@@ -22138,7 +22172,7 @@ function cpReportHTML(x, ap, s){
   </div>`;
 }
 function cpPlanHTML(x, s){
-  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
   return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the part of the Rule, who usually owns it and what to do.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc((CP_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(CP_SEVN[r.sev][1], CP_SEVN[r.sev][0])}${r.isNew ? `<span class="cp-new">New in 2025</span>` : ""}</h4>
@@ -22647,7 +22681,7 @@ function dsReportHTML(x, ap, s){
   </div>`;
 }
 function dsPlanHTML(x, s){
-  if(!s.gaps.length) return `<div class="card ma-none"><b>${s.total ? "Every duty that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck when you add a feature, grow past the size thresholds or expand to new member states. The drafts are ready if you need them." : "Choose what kind of service you run to see which duties apply."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Every duty that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck when you add a feature, grow past the size thresholds or expand to new member states. The drafts are ready if you need them." : "Choose what kind of service you run to see which duties apply."}</p></div>`;
   return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the article, who usually owns it and what to do.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc((DS_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(DS_SEVN[r.sev][1], DS_SEVN[r.sev][0])}</h4>
@@ -25442,7 +25476,7 @@ function renderPlan(){
   const doneHidden = doneGroups.some(([g]) => !plMore[g + ":done"]);
   view.innerHTML = `<div class="gd cvr-page pl" style="--tc:var(--accent)">${asStepBar("act", open.length || items.length ? (sent ? 100 : 50) : 0, true)}<span class="toast" id="pl-toast" role="status" aria-live="polite"></span>
     <div class="pl-head">
-      <span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
+      ${items.length ? "" : emptyMark("plan")}<span class="as-eb">${demo ? "Pixelry's plan" : "Your plan"}</span>
       <h1>${items.length ? `${open.length} thing${open.length === 1 ? "" : "s"} to do, from every step` : "Nothing to plan yet"}</h1>
       <p class="cvr-sum">${items.length ? `Pulled from ${srcs.join(", ").replace(/, ([^,]*)$/, " and $1")}: launch blockers first, then where risk outruns your defenses, then your roadmap. Tick things off here and each tool updates.${items.length - open.length ? ` ${items.length - open.length} already done, shown inside each group below with Show done.` : ""}` : `Finish a step and its work shows up here. ${stepsDone ? "" : `Start with your program's <a href="#maturity">maturity</a> or a <a href="#premortem">pre-mortem</a>.`}`}</p>
       ${items.length ? `<div class="cvr-a"><button type="button" class="btn primary" data-plan="tracker">${icon("send")}Send ${open.length} to your tracker</button><button type="button" class="btn" data-pack="1">Leadership pack</button><button type="button" class="btn" data-plan="download">${icon("download")}Download</button>${doneGroups.length ? `<button type="button" class="btn" data-plan="showdone">${doneHidden ? `Show ${items.length - open.length} done` : "Hide done"}</button>` : ""}</div>` : `<div class="cvr-a"><a class="btn primary" href="#overview">Back to your assessment ${icon("arrow")}</a></div>`}
@@ -25568,7 +25602,7 @@ function renderReview(){
   view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each part, every area, the gaps you closed and the ones that opened.", "Assess",
     `<span class="toast" id="rv-toast" role="status" aria-live="polite"></span>${now.score !== null && !revEx ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
     ${revEx ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a sample program's picture, one quarter to the next.</span><button type="button" class="btn sm" data-rev="exit-example">Back to your review</button></div>` : ""}
-    ${!revEx && now.score === null ? `<div class="card ma-none"><b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div>${samplePreview}<div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
+    ${!revEx && now.score === null ? `<div class="card ma-none">${emptyMark("quarter")}<b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div>${samplePreview}<div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
     <div class="rv-top">
       ${revEx ? `<div class="field rv-pick"><span class="lbl">Compare now with</span><span class="note">${esc(a.label)} (example)</span></div>` : `<label class="field rv-pick"><span class="lbl">Compare now with</span><select class="select" id="rv-a">${snaps.map(s => `<option value="${s.t}" ${s === a ? "selected" : ""}>${esc(s.label)} · ${new Date(s.t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"})}</option>`).join("")}</select></label>`}
       <div class="rv-score"><div><span class="as-k">${esc(a.label)}</span><b class="mono">${cell(a.score)}</b></div><span class="rv-arrow">${icon("arrow")}</span><div><span class="as-k">Now</span><b class="mono">${cell(now.score)}</b></div>${delta(a.score, now.score)}</div>

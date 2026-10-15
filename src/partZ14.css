@@ -290,8 +290,7 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .rtf-opts.rtf-big button{display:grid;grid-template-columns:36px 1fr;column-gap:12px;row-gap:3px;padding:14px 16px;align-items:start}
 .rtf-opts.rtf-big button b{grid-column:2;width:auto;height:auto;background:none;color:var(--ink);font-family:inherit;font-size:15.5px;font-weight:600;justify-content:flex-start}
 .rtf-opts.rtf-big button span{grid-column:2;font-size:13.5px;color:var(--muted)}
-.rtf-opts.rtf-big .rtf-opticon{grid-row:1/3;grid-column:1;width:36px;height:36px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center}
-.rtf-opts.rtf-big .rtf-opticon svg{width:19px;height:19px}
+.rtf-opts.rtf-big > button > .tile{grid-row:1/3;grid-column:1}
 .rtf-q .learn{margin-top:12px}
 .rtf-act{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px}
 .rtf-act.rtf-wrap{justify-content:flex-start}

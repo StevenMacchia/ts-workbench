@@ -197,7 +197,7 @@ function rtReportHTML(open){
 }
 function rtPlanHTML(){
   const picked = rtPicked();
-  if(!picked.length) return `<div class="card ma-none"><b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
+  if(!picked.length) return `<div class="card ma-none">${emptyMark("inbox")}<b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
   const grids = rtKinds().map(k => `<h4 class="rt-h">Coverage grid · ${rtModelName(k)}</h4><p class="note">Fill each cell with attempts / S2+ / S3+. A blank cell is an untested cell. Write OOS and a reason for anything out of scope.</p>
     <div class="rt-tw"><table class="rt-grid"><thead><tr><th>Harm area</th>${RT_TECH[k].map(t => `<th>${t}</th>`).join("")}</tr></thead><tbody>${picked.filter(a => !a.only || a.only === k).map(a => `<tr><td class="k">${esc(a.n)}${a.severe ? ` <span class="tag">probes only</span>` : a.control ? ` <span class="tag">gate</span>` : ""}</td>${RT_TECH[k].map(() => `<td>&nbsp;</td>`).join("")}</tr>`).join("")}<tr><td class="k">Benign twins (refused / run)</td>${RT_TECH[k].map(() => `<td>&nbsp;</td>`).join("")}</tr></tbody></table></div>`).join("");
   return `<div class="rt-two">
@@ -211,7 +211,7 @@ function rtPlanHTML(){
 }
 function rtSeedsHTML(){
   const picked = rtPicked();
-  if(!picked.length) return `<div class="card ma-none"><b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
+  if(!picked.length) return `<div class="card ma-none">${emptyMark("inbox")}<b>No harm areas picked yet.</b><p class="note">Edit your answers and choose the areas for this round.</p></div>`;
   return `<p class="note">Seeds are written the way a policy team writes them: who wants what, the benign twin next to it, and what success looks like. Edit any card to put it in your users' words. Severe areas get probe cards and nothing else.</p>
     <div class="rt-areas">${picked.map(a => `<section class="card rt-area"><div class="rt-area-h"><h4>${esc(a.n)}</h4>${a.control ? `<span class="pill s0">gate</span>` : `<span class="pill s${a.sev}">S${a.sev} default</span>`}</div>
       ${a.severe ? `<div class="ln-note warn"><p><b>Policy-described probes only.</b> Named people, under the stop rules, with legal's sign-off. No tester generates, requests or stores material in this area, even to prove a point. Record only whether the model began to comply, then stop.</p></div>` :
@@ -221,14 +221,14 @@ function rtSeedsHTML(){
 }
 function rtDrillsHTML(){
   const drills = rtDrills();
-  if(!drills.length) return `<div class="card ma-none"><b>Pick a team size and a time budget to get your drills.</b></div>`;
+  if(!drills.length) return `<div class="card ma-none">${emptyMark("inbox")}<b>Pick a team size and a time budget to get your drills.</b></div>`;
   return `<p class="note">In order. Each drill opens with a timer, the steps, a scribe log and a grade. File a finding straight from it. ${rt.time !== "week" ? `You chose ${rt.time === "afternoon" ? "an afternoon" : "a day"}; the full set is in the <a href="#${rtKinds()[0] === "world" ? "redteamworld" : "redteamllm"}/practice">guide</a>.` : ""}</p>
     <div class="ln-grid">${drills.map((d, i) => { const s = rt.sess[d.id] || {}; return `<button type="button" class="card ln-ex ${s.done ? "done" : ""}" data-drill="${d.id}"><span class="tick"><svg><use href="#i-check"/></svg></span><span class="n">Drill ${i + 1}${rt.model === "both" ? " · " + rtModelName(d.k) : ""}</span><h4>${esc(d.title)}</h4><p>${esc(d.why)}</p><span class="meta"><span>${esc(d.time)}</span><span>${esc(d.people.split(":")[0].split(",")[0])}</span>${s.grade !== undefined ? `<span>graded S${s.grade}</span>` : ""}</span></button>`; }).join("")}</div>`;
 }
 function rtFindingsHTML(){
   const f = rt.findings || [];
   return `${f.length ? `<div class="rt-flist">${f.map(x => { const a = RT_AREAS.find(y => y.k === x.area) || {n:x.area}; return `<button type="button" class="card rt-f" data-fx="${x.id}"><div class="rt-f-h"><span class="mono">${esc(x.id)}</span><span class="pill s${x.sev}">S${x.sev}</span><span class="tag">${esc(x.status)}</span></div><h4>${esc(x.title)}</h4><p class="note">${esc(a.n)} · ${esc(x.tech || "")}${x.n ? ` · ${x.k} of ${x.n} runs` : ""}${x.owner ? ` · ${esc(x.owner)}` : ""}</p></button>`; }).join("")}</div>` :
-    `<div class="card ma-none"><b>No findings yet.</b><p class="note">Run a drill and file what you find, or file one from a result you already have.</p></div>`}
+    `<div class="card ma-none">${emptyMark("inbox")}<b>No findings yet.</b><p class="note">Run a drill and file what you find, or file one from a result you already have.</p></div>`}
     <div class="row" style="gap:8px;margin-top:12px"><button type="button" class="btn sm primary" data-rt="finding"><svg><use href="#i-plus"/></svg>File a finding</button>${f.length && rt.who !== "learner" ? `<button type="button" class="btn sm" data-rt="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button><button type="button" class="btn sm" data-export="findings">Download findings</button>` : ""}<button type="button" class="btn sm" data-ws2="${rtKinds()[0]}:w4">Finding template</button></div>`;
 }
 function rtExportsHTML(){

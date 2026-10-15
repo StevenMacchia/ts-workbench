@@ -1557,7 +1557,7 @@ function renderGlossary(){
     const kn = known(), list = LN_GLOSS.map((t, i) => ({t, i})).filter(({t}) => (f === "all" || t[1] === f || t[1] === "both") && (!q || (t[0] + " " + t[2]).toLowerCase().includes(q))).sort((a, b) => a.t[0].localeCompare(b.t[0]));
     const knownCount = Object.keys(kn).filter(x => kn[x]).length, filtered = !!q || f !== "all";
     $("#ln-known").textContent = filtered ? `${list.length} of ${LN_GLOSS.length} terms match · ${knownCount} known` : `${knownCount} of ${LN_GLOSS.length} marked known`;
-    if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">Nothing matches. Try another word.</div>`; return; }
+    if(!list.length){ $("#ln-gl").innerHTML = `<div class="ln-empty card">${emptyMark("nomatch")}Nothing matches. Try another word.</div>`; return; }
     let lastLetter = "";
     $("#ln-gl").innerHTML = list.map(({t, i}) => {
       const L = t[0][0].toUpperCase(), div = L !== lastLetter ? `<div class="ln-gl-div" aria-hidden="true">${esc(L)}</div>` : "";

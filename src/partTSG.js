@@ -160,7 +160,7 @@ function tsgFilter(q, gfilter){
     .slice().sort((a, b) => a.n.localeCompare(b.n));
 }
 function tsgGridHTML(list){
-  if(!list.length) return `<div class="ln-empty card">Nothing matches. Try another word or group.</div>`;
+  if(!list.length) return `<div class="ln-empty card">${emptyMark("nomatch")}Nothing matches. Try another word or group.</div>`;
   let lastL = "", cards = "";
   list.forEach(t => {
     const L = t.n[0].toUpperCase();

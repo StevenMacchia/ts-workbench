@@ -50,8 +50,22 @@ Interface
 
 `i-search` search, `i-plus` plus, `i-save` save, `i-download` download, `i-upload` upload, `i-copy` copy, `i-send` send, `i-trash` trash-2, `i-check` check, `i-lock` lock, `i-arrow` arrow-right, `i-chev` chevron-right, `i-menu` menu, `i-x` x, `i-clock` clock, `i-sun` sun, `i-moon` moon, `i-monitor` monitor, `i-layers` layers, `i-home` house, `i-user` user.
 
+Added with the empty-state and option-card pass
+
+| Symbol id | Lucide | Used for |
+|---|---|---|
+| `i-headset` | `headset` | Red team studio starter: a support assistant |
+| `i-act` | `mouse-pointer-click` | Red team studio starter: an agent that acts |
+| `i-media` | `clapperboard` | Red team studio starter: an image or video generator |
+| `i-inbox` | `inbox` | Empty states (nothing saved, nothing to show) via `emptyMark("inbox")` |
+| `i-plan` | `list-checks` | Your plan, empty |
+| `i-quarter` | `calendar-range` | Quarter by quarter, empty |
+| `i-nomatch` | `search-x` | Glossary searches with no match |
+
+`tileHTML` also takes platform and harm symbols (`p-…`, `c-…`); the template cards use `p-social`, `p-marketplace` and so on. `emptyMark(icon)` (partD.js) is one neutral 36px tile for empty and all-clear states (`check` for good news). `gdFactTile(i, tone)` is the tile in every guided tool's three-up intro row.
+
 Platforms (`p-…`) and harm areas (`c-…`) are in `icons-map.json`; they were hand-drawn before and are Lucide now.
 
 ## Not used
 
-No call site needs `list-checks` (plan), `calendar-range` (quarter review) or `triangle-alert` (warn as its own id) yet. The harm-area icon `c-violent` already uses `triangle-alert`. Add an id to `icons-map.json` when a page needs one.
+No call site needs `triangle-alert` (warn as its own id) yet. The harm-area icon `c-violent` already uses `triangle-alert`. Add an id to `icons-map.json` when a page needs one.

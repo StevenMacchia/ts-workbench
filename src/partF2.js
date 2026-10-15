@@ -109,7 +109,7 @@ function libraryBlock(){
   const items = Object.values(libLoad()).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const head = `<div class="section-title"><h2>Saved pre-mortems ${tip("Part of your workspace, saved in this browser. Save a workspace file to keep a copy or open it on another device.")}</h2>
     <a class="btn sm" href="#workspace">All saved work</a></div>`;
-  if(!items.length) return head + `<div class="card libempty"><svg><use href="#i-folder"/></svg><div><b>No saved pre-mortems yet</b><p class="note">Pre-mortems you finish are saved here and in your workspace automatically. Reopen them, or reuse their answers for a new feature.</p></div></div>`;
+  if(!items.length) return head + `<div class="card libempty">${emptyMark("folder")}<div><b>No saved pre-mortems yet</b><p class="note">Pre-mortems you finish are saved here and in your workspace automatically. Reopen them, or reuse their answers for a new feature.</p></div></div>`;
   return head + `<div class="card liblist">${items.map(rec=>{
     const r = assess(openRecord(rec)); const bl = r.safeguards.filter(s=>s.rank===3); const bd = bl.filter(s=>rec.done&&rec.done[s.id]).length;
     return `<div class="librow">
