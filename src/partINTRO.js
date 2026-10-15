@@ -290,6 +290,8 @@ function introWalkHTML(route, i){
 // case Start simply closes, since the visitor is already past the card.
 function walkOpen(route, onStart){
   const spec = INTRO_SPECS[route]; if(!spec || !spec.walk || !spec.walk.length) return;
+  // The walkthrough uses the Learn section's modal; on the public page that is a separate script
+  if(typeof lnModal === "undefined" && typeof lazyEnsure === "function") return lazyEnsure("learn").then(() => walkOpen(route, onStart), () => { if(typeof gsay === "function") gsay("Could not load that section. Check your connection and try again."); });
   let i = 0;
   const draw = () => {
     lnModal(introWalkHTML(route, i));

@@ -78,6 +78,9 @@ function relTime(t){
 }
 function openSaved(id){
   const it = wsItems()[id]; if(!it) return;
+  // On the public page the red team studio and the Learn guides are separate scripts; load the one this item needs first
+  if(typeof lazyEnsure === "function" && ((it.kind==="redteam" && typeof RT_BLANK === "undefined") || (it.kind==="learn" && typeof LN_GUIDES === "undefined")))
+    return lazyEnsure(it.kind==="redteam" ? "redteam" : "learn").then(() => openSaved(id), () => { if(typeof gsay === "function") gsay("Could not load that section. Check your connection and try again."); });
   if(it.kind==="premortem"){ pm = openRecord(Object.assign({}, it.data, {id:it.id}), {stage:"report"}); pm.base = typeof pmSnap === "function" ? pmSnap(pm) : null; savePM(); }
   if(it.kind==="tabletop"){ tt = JSON.parse(JSON.stringify(it.data)); store.set("tt", tt); }
   if(it.kind==="metrics"){ mx = JSON.parse(JSON.stringify(it.data)); store.set("mx", mx); store.set("ws:cur:metrics", it.id); }

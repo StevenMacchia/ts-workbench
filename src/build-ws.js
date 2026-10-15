@@ -189,6 +189,20 @@ fs.writeFileSync(path.join(D, "_L.js"), L); fs.writeFileSync(path.join(D, "_F2.j
 fs.writeFileSync(path.join(D, "_G.js"), G2);fs.writeFileSync(path.join(D, "_W2.js"), W2);
 console.log("v8 assembled");
 
+/* ---------- Lazy sections ----------
+   Parts that only one route needs are cut out of the public page's main script and written to docs/parts/<name>.js. The
+   router (src/partLazy.js) injects the file once, on the first visit to one of its routes. `needs` lists sections that must
+   run first. `routes` are the ROUTES keys that load it. The full bundle (src/ts-workbench-v9.html, which the tests read
+   through the parts themselves) keeps everything inline. Core code reaches a section only through functions that are
+   called after it loads, or through the guards in partNav.js, partW2.js, partINTRO.js and partLearn.js. */
+const CHUNKS = [
+  {name: "tsglossary", routes: ["tsglossary"], needs: [], parts: ["partTSG.js"]},
+  {name: "learn", routes: ["learn", "redteamllm", "redteamworld", "glossary"], needs: [], parts: ["partLearn.js"]},
+  {name: "redteam", routes: ["redteam"], needs: ["learn"], parts: ["partRT.js", "partRT2.js", "partRT3.js", "partRT4.js", "partRT5.js", "partRT6.js", "partRT7.js", "partRT8.js", "partRT9.js"]}
+];
+const CHUNK_FILES = {};   // name -> {file, text, hash}; filled by the v9 block, written by the standalone block
+let CORE9 = "";           // the public page's document body in global scope, without the lazy sections
+
 /* ---------- v9: studio redesign (new shell, theme layer, overview, command palette) ---------- */
 {
   const A9 = patch(rd("partA.html"), [[
@@ -209,8 +223,37 @@ console.log("v8 assembled");
     [`<div class="section-title" style="margin-top:28px"><h2>The detail</h2>`, `<div class="section-title rep-detail"><h2>The detail</h2>`]
   ], "partF3 report header");
   const css9 = [A9, rd("partB.css"), rd("partB2.css"), rd("partB3.css"), rd("partB4.css"), rd("partB5.css")].join("") + ttCss + rd("partZ.css") + rd("partZ2.css") + rd("partZ3.css") + rd("partZ4.css") + rd("partZ5.css") + rd("partZ6.css") + rd("partZ7.css") + rd("partZ8.css") + rd("partZ9.css") + rd("partZ10.css") + rd("partZ11.css") + rd("partZ12.css") + rd("partZ13.css") + rd("partZ14.css") + rd("partZ15.css") + rd("partZ16.css") + rd("partZ17.css") + rd("partZ18.css") + rd("partZ19.css");
-  const body9 = [I, C9, rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), F2, rd("partW1.js"), L, F3_9, G2, W9, rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partCredits.js"), rd("partLearn.js"), rd("partTSG.js"), rd("partRT.js"), rd("partRT2.js"), rd("partRT3.js"), rd("partRT4.js"), rd("partRT5.js"), rd("partRT6.js"), rd("partRT7.js"), rd("partRT8.js"), rd("partRT9.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partNX.js"), rd("partTTF.js"), rd("partTR.js"), rd("partDEMO.js"), rd("partHELP.js"), rd("partTYPE.js"), rd("partGD.js"), rd("partINTRO.js"), rd("partCP.js"), rd("partDSA.js"), rd("partGP.js"), rd("partCR.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js"), R9].join("");
+  // Every script part in load order: a file name is read from src/, {t: text} is a part built above.
+  const PARTS9 = [{t: I}, {t: C9}, "partT.js", "partD.js", "partE1.js", "partE2.js", "partF1.js", {t: F2}, "partW1.js", {t: L}, {t: F3_9}, {t: G2}, {t: W9}, "partNav.js", "partH4.js", "partH2.js", "partAbout.js", "partCredits.js", "partLearn.js", "partTSG.js", "partRT.js", "partRT2.js", "partRT3.js", "partRT4.js", "partRT5.js", "partRT6.js", "partRT7.js", "partRT8.js", "partRT9.js", "partPol.js", "partPol2.js", "partAI.js", "partMAd.js", "partMA.js", "partCV.js", "partOV.js", "partRC.js", "partPF.js", "partTK.js", "partORG.js", "partJN.js", "partNX.js", "partTTF.js", "partTR.js", "partDEMO.js", "partHELP.js", "partTYPE.js", "partGD.js", "partINTRO.js", "partCP.js", "partDSA.js", "partGP.js", "partCR.js", "partEV.js", "partEV2.js", "partEVB.js", "partRX.js", "partLOOP.js", "partPLAN.js", "partREV.js", {t: R9}];
+  const textOf = p => typeof p === "string" ? rd(p) : p.t;
+  const body9 = PARTS9.map(textOf).join("");
   fs.writeFileSync(path.join(D, "_F3_9.js"), F3_9);
+  // Public page: the same parts minus the lazy sections, plus the loader, in global scope (no wrapper function) so that
+  // the sections, which are separate scripts, share the app's bindings.
+  {
+    const NL = "\n", inChunk = new Set(CHUNKS.flatMap(c => c.parts));
+    for(const c of CHUNKS) for(const f of c.parts) if(!PARTS9.includes(f)) throw new Error("chunk " + c.name + ": " + f + " is not in the script parts");
+    const routeChunk = {}; CHUNKS.forEach(c => c.routes.forEach(r => { routeChunk[r] = c.name; }));
+    const hash = t => require("crypto").createHash("sha1").update(t).digest("hex").slice(0, 8);
+    for(const c of CHUNKS){
+      const text = "/* T&S Workbench section: " + c.name + " (" + c.parts.join(", ") + "). Loaded on demand by src/partLazy.js; generated by src/build-ws.js. */" + NL
+        + c.parts.map(rd).join("") + NL + "lazyDone(" + JSON.stringify(c.name) + ");" + NL;
+      CHUNK_FILES[c.name] = {file: "parts/" + c.name + ".js", text, hash: hash(text)};
+    }
+    const lazyPart = patch(rd("partLazy.js"), [
+      ["__LAZY_CHUNKS__", JSON.stringify(Object.fromEntries(CHUNKS.map(c => [c.name, {src: CHUNK_FILES[c.name].file + "?v=" + CHUNK_FILES[c.name].hash, needs: c.needs}])))],
+      ["__LAZY_ROUTE_CHUNK__", JSON.stringify(routeChunk)]
+    ], "partLazy");
+    // ROUTES: the section routes become stubs that load the section first
+    const routesFrom = `learn:renderLearn, redteamllm:()=>renderRedteam("llm"), redteamworld:()=>renderRedteam("world"), glossary:renderGlossary, tsglossary:renderTsGlossary, redteam:renderRedteamStudio, `;
+    const routesTo = `learn:lazyRoute("learn", () => renderLearn()), redteamllm:lazyRoute("learn", () => renderRedteam("llm")), redteamworld:lazyRoute("learn", () => renderRedteam("world")), glossary:lazyRoute("learn", () => renderGlossary()), tsglossary:lazyRoute("tsglossary", () => renderTsGlossary()), redteam:lazyRoute("redteam", () => renderRedteamStudio()), `;
+    for(const [r, c] of Object.entries(routeChunk)) if(!routesTo.includes(r + ":lazyRoute(" + JSON.stringify(c))) throw new Error("ROUTES stub for " + r + " does not point at " + c);
+    const R9core = patch(R9, [[routesFrom, routesTo], ["route();" + NL + "})();" + NL + "</script>", "route();" + NL + "</script>"]], "partR core");
+    const C9core = patch(C9, [["<script>" + NL + "(function(){", "<script>" + NL]], "partC3 core");
+    const parts = PARTS9.filter(p => !inChunk.has(p)).map(p => p.t === R9 ? {t: R9core} : p.t === C9 ? {t: C9core} : p);
+    parts.splice(parts.findIndex(p => p.t === R9core), 0, {t: lazyPart});
+    CORE9 = css9 + "</style>" + NL + parts.map(textOf).join("");
+  }
   const STANDALONE_BUILD = true;
 fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + body9);
   fs.writeFileSync(path.join(D, "_W9.js"), W9);
@@ -219,7 +262,7 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
 
 // Standalone copy for GitHub Pages: a full document with mobile, preview and icon tags
 {
-  const v9 = fs.readFileSync(path.join(D, "ts-workbench-v9.html"), "utf8");
+  const v9 = CORE9;
   const site = fs.existsSync(path.join(D, "site-url.txt")) ? fs.readFileSync(path.join(D, "site-url.txt"), "utf8").trim().replace(/\/$/, "") : "";
   const title = "T&amp;S Workbench: free Trust &amp; Safety tools";
   const desc = "Free, private tools for Trust &amp; Safety and product teams: abuse pre-mortems, incident tabletops, a metrics framework, vendor scoring, program maturity, a coverage radar and AI assistants. Built by Steven Macchia.";
@@ -254,6 +297,12 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
   const dir = path.join(D, "..", "docs");
   if(!fs.existsSync(dir)) fs.mkdirSync(dir);
   fs.writeFileSync(path.join(dir, "index.html"), out);
+  // Lazy sections: docs/parts/<name>.js, with no stale files left behind
+  const pdir = path.join(dir, "parts");
+  if(!fs.existsSync(pdir)) fs.mkdirSync(pdir);
+  fs.readdirSync(pdir).forEach(f => { if(!Object.values(CHUNK_FILES).some(c => c.file === "parts/" + f)) fs.unlinkSync(path.join(pdir, f)); });
+  Object.values(CHUNK_FILES).forEach(c => fs.writeFileSync(path.join(dir, c.file), c.text));
+  console.log("sections written: " + Object.entries(CHUNK_FILES).map(([n, c]) => n + " " + (Buffer.byteLength(c.text) / 1024).toFixed(0) + " KB").join(", "));
   // sitemap.xml and robots.txt, from ROUTE_LABEL so they stay in step with the tools. The home page is the
   // root; the personal views (workspace, plan, quarter review) are empty for a crawler and are left out.
   // Each tool has its own path (see APP_BASE in partD.js); GitHub Pages answers those with 404.html, whose first

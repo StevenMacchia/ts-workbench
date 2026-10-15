@@ -81,3 +81,12 @@ details.ev-details > summary:focus-visible{outline:2px solid var(--accent);outli
 details.ev-details > summary .note{font-weight:400;margin-left:0}
 details.ev-details[open] > summary{margin-bottom:12px}
 @media (max-width:560px){details.ev-details > summary{padding:11px 12px;font-size:14.5px}details.ev-details > summary .note{flex-basis:100%;margin-left:23px}}
+
+/* ---------- Lazy sections: the loading card (src/partLazy.js) ----------
+   It fades in after a short delay, so a section that arrives quickly never flashes it. */
+.lazy-load{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:48px auto;max-width:520px;padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--muted);font-size:14px;opacity:0;animation:lazyIn .25s ease .2s forwards}
+.lazy-load p{margin:0;color:var(--ink);flex:1 1 100%}
+.lazy-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:lazyPulse 1s ease-in-out infinite}
+@keyframes lazyIn{to{opacity:1}}
+@keyframes lazyPulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.lazy-load{animation:lazyIn .01s linear .2s forwards}.lazy-dot{animation:none}}
