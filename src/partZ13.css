@@ -267,12 +267,18 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .sitetop .st-name{font-weight:600;margin-right:auto}
 .sitetop .st-dl{padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
 .sitetop .st-dl:hover{text-decoration:none;border-color:var(--line-strong)}
-.sitetop .st-phone{display:none;margin-left:auto}
+.sitetop .st-dl .short{display:none}
 @media print{.sitetop{display:none}}
-@media (max-width:640px){
-  .sitetop{gap:12px;padding:0 14px}
-  .sitetop .st-full{display:none}
-  .sitetop .st-phone{display:inline}
+/* Under 900px the bar keeps the mark, the name, Handbook, Writing and the resume button, like stevenmacchia.com. Under 640px the phone shell (partZ20.css) hides the bar and the links live in the More sheet. */
+@media (max-width:900px){
+  .sitetop{gap:14px;padding:0 14px}
+  .sitetop a:not(.st-dl):not(.keep):not(.st-name){display:none}
+  .sitetop .st-dl{margin-left:auto}
+}
+@media (max-width:560px){
+  .sitetop .st-name{display:none}
+  .sitetop .st-dl .full{display:none}
+  .sitetop .st-dl .short{display:inline}
 }
 .app{min-height:calc(100vh - 16px - 44px)}
 .side{height:calc(100vh - 16px - 44px)}
