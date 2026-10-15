@@ -53,7 +53,7 @@ const body = function(){
   eq(st.length >= 3 && st.length <= 5, true, "default profile starts with 3 to 5 metrics: " + st.length);
   eq((lh.match(/class="card mxg-card/g) || []).length, st.length, "one card per starter metric");
   eq(st.every(m => lh.includes('<h3 class="mxg-name">' + esc(m.n) + '</h3>') && lh.includes(esc(MX_Q[m.n])) && lh.includes('data-open="' + METRICS.indexOf(m) + '"')), true, "cards title the metric and carry its question and the How to measure it action");
-  eq((lh.match(/<details class="mxg-tier/g) || []).length, 3, "three tiers folded");
+  eq((lh.match(/<details class="mxg-tier mxm-/g) || []).length, 3, "three tiers folded");
   eq(/<details class="mxg-tier[^>]* open/.test(lh), false, "all three tiers start closed");
   eq(/ The three above\./.test(lh), true, "the north-star row says the cards above are the same metrics");
   eq(/mxg-jump|data-tier-jump/.test(lh), false, "no redundant tier chips");
@@ -70,6 +70,26 @@ const body = function(){
   eq(/id="mx-save"|id="mx-dl"|id="mx-copy"/.test(view.innerHTML), false, "no save, download or copy on The metrics");
   mx.tab = "mine"; renderMetrics(); eq(/id="mx-save"/.test(view.innerHTML) && /id="mx-copy"/.test(view.innerHTML), true, "save, download and copy plan sit on Your numbers");
   mx.tab = "card"; mx.fold = {health:true}; renderMetrics(); eq(/id="mxg-health"[^>]* open/.test(view.innerHTML) && !/id="mxg-ns"[^>]* open/.test(view.innerHTML), true, "folded state is remembered");
+  // The platform's effect is legible: its metrics are tagged, the summary says what the choices did, and what's
+  // left out is listed with the chip that brings each metric in
+  mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; renderMetrics(); lh = view.innerHTML;
+  const pl = lst.filter(m => m.p !== "all"), outL = mxOut();
+  eq((lh.match(/class="tag mxg-pt"/g) || []).length, pl.length + st.filter(m => m.p !== "all").length, "a platform tag on every platform-specific row and card, none on the universal ones");
+  eq(pl.length > 0 && /class="tag mxg-pt" title="On the list because your platform is [^"]+\. Also for [A-Z][^"]*">Social</.test(lh), true, "the tag says why it is there and who else shares the metric");
+  eq(lh.includes(`<b>${lst.length} of ${METRICS.length} metrics.</b> Social adds `), true, "the summary counts the list against the framework and names what the platform added");
+  eq(outL.length, METRICS.length - lst.length, "left out = framework minus list");
+  eq((lh.match(/class="mxg-orow"/g) || []).length, outL.length, "every metric off the list is in the left-out section");
+  eq(/<span class="mxg-tt">Not on this list · \d+<\/span>/.test(lh) && /<h3>For other platforms · \d+<\/h3>/.test(lh) && /<h3>From a later stage · \d+<\/h3>/.test(lh), true, "left-out section folded under the tiers, grouped by reason");
+  eq(new RegExp(`data-out>${outL.length} left out</button>: ${outL.filter(m => mxWhyOut(m) === "plat").length} for other platforms, ${outL.filter(m => mxWhyOut(m) === "stage").length} from a later stage\\.`).test(lh), true, "the summary links to the left-out section with the reason counts");
+  eq(/data-set="platform" data-v="gaming" data-m="\d+"[^>]*>Gaming</.test(lh) && /data-set="stage" data-v="3"[^>]*><i>Stage<\/i>[^<]+</.test(lh), true, "left-out rows offer the platform or stage that brings them in");
+  eq(/data-set="reg"/.test(lh) && /for regulated services/.test(lh), false, "with regulation on, nothing asks for it");
+  eq(/<a class="card mxg-card[^>]*>[\s\S]*?class="tag mxg-pt"[^>]*>Social</.test(lh), true, "the starter card for a platform-specific metric carries the tag");
+  mx.reg = false; renderMetrics(); eq(/data-set="reg" data-v="1"[^>]*>DSA or OSA applies</.test(view.innerHTML) && /\d+ for regulated services\./.test(view.innerHTML), true, "with regulation off, the regulated metrics are listed with the way back");
+  mx = {platform:"gaming", stage:"3", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; renderMetrics();
+  eq(/ left out<\/button>, all for other platforms\./.test(view.innerHTML) && / Gaming adds [a-z][^.]+ and \d+ more\./.test(view.innerHTML), true, "a mature regulated gaming profile: the platform adds several, only other platforms' metrics are out");
+  eq(/<h3>From a later stage/.test(view.innerHTML) || /<h3>For regulated services/.test(view.innerHTML), false, "no empty reason groups");
+  mx.tab = "mine"; renderMetrics(); eq(/class="mxm-sum"/.test(view.innerHTML) && !/class="mxg-orow"/.test(view.innerHTML), true, "the summary sits on every tab; the left-out rows only on the metrics");
+  out.push("platform effect: " + pl.length + " tagged rows for social/growing, summary '" + (lh.match(/<p class="mxm-sum">([\s\S]*?)<\/p>/) || [])[1].replace(/<[^>]+>/g, "") + "', " + outL.length + " left out with a chip back in");
   let minS = 9, maxS = 0;
   Object.keys(MX_PLATFORMS).forEach(p => ["1","2","3"].forEach(sg => [true, false].forEach(rg => { mx = {platform:p, stage:sg, reg:rg}; const sl = mxStartList(mxList()), n = sl.length; minS = Math.min(minS, n); maxS = Math.max(maxS, n);
     sl.forEach(m => { if(!MX_FIRST[m.n] || words(MX_FIRST[m.n]) > 14) throw new Error("start card needs a why-first line of 14 words or fewer: " + m.n); }); })));

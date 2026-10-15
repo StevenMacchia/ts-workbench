@@ -14,7 +14,8 @@
 .mxm-sel:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
 .mxm-reg{display:inline-flex;align-items:center;gap:7px;margin-left:0;padding:5px 10px;border-radius:8px;background:var(--sunk);font-size:13.5px;color:var(--ink);cursor:pointer}
 .mxm-reg input{accent-color:var(--accent);width:15px;height:15px;margin:0}
-.mxm-note{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap}
+.mxm-sum{flex:1 0 100%;margin:0;font-size:13.5px;line-height:1.45;color:var(--muted)}
+.mxm-sum .mx-link{font-size:inherit}
 
 /* Tabs */
 .mx-tabs{display:flex;align-items:center;gap:4px;margin-top:16px;border-bottom:1px solid var(--line)}
@@ -246,7 +247,6 @@
   .mxa-rail{position:static;order:-1;grid-template-columns:1fr 1fr;align-items:start}
 }
 @media (max-width:760px){
-  .mxm-note{margin-left:0;white-space:normal}
   .mxm-row{grid-template-columns:minmax(0,1fr) auto 18px}
   .mxm-row .mxm-area{grid-column:1/-1}
   .mxa-head h2{font-size:27px}
@@ -565,12 +565,29 @@ a.mxg-card:hover .mxg-go{color:var(--accent)}
 .mxg-row .mxg-name{all:unset;grid-column:2;grid-row:1;cursor:pointer;display:block;min-width:0;justify-self:start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:600;line-height:1.3;color:var(--ink)}
 .mxg-row .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 .mxg-row .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-.mxg-rs{grid-column:3;grid-row:1;margin-left:10px}
+.mxg-rs{margin-left:10px}
 .mxg-rs:empty{margin:0}
 .mxg-rl{grid-column:4;grid-row:1;margin-left:12px}
 .mxg-rs,.mxg-rl{line-height:1.2}
 .mxg-rl .mx-link{font-size:12.5px;white-space:nowrap}
 .mxg-row .mxg-q{grid-column:1 / -1;grid-row:2;font-size:14px;line-height:1.3;color:var(--muted)}
+/* the platform tag: on the rows and cards that are here because of the chosen platform */
+.mxg-pt{flex:none;margin-top:2px;font-size:11px;padding:1px 6px;border-color:transparent;background:var(--accent-soft);color:var(--accent)}
+.mxg-row .mxg-pt{margin:0}
+/* the left-out metrics, grouped by reason, each with the chip that brings it in */
+.mxg-out{--band-c:var(--line-strong)}
+.mxg-og{border-top:1px solid var(--line)}
+.mxg-og h3{margin:0;padding:11px 18px 3px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.mxg-og .mxg-rows{border-top:0}
+.mxg-orow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;row-gap:1px;padding:9px 18px;border-top:1px solid var(--line)}
+.mxg-orow:first-child{border-top:0}
+.mxg-oname{font-size:14.5px;font-weight:600;line-height:1.3;color:var(--muted)}
+.mxg-ocs{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;margin-left:10px}
+.mxg-oc{all:unset;cursor:pointer;font-size:11.5px;font-weight:600;line-height:1.5;padding:1px 8px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink);white-space:nowrap}
+.mxg-oc i{font-style:normal;font-weight:500;color:var(--muted);margin-right:4px}
+.mxg-oc:hover{border-color:var(--accent);color:var(--accent)}
+.mxg-oc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mxg-orow .mxg-q{grid-column:1 / -1;font-size:14px;line-height:1.3;color:var(--muted)}
 @media (max-width:760px){
   .mxm-filter{padding:0;border:0;border-radius:0;background:none;box-shadow:none;margin-top:10px;gap:6px 12px}
   /* the shell keeps selects at 16px (no iOS zoom), so the platform select gets the wider share to show its full name */
@@ -578,8 +595,7 @@ a.mxg-card:hover .mxg-go{color:var(--accent)}
   .mxm-filter #mx-platform{flex:0 0 calc(58% - 6px);width:calc(58% - 6px)}
   .mxm-filter #mx-stage{flex:0 0 calc(42% - 6px);width:calc(42% - 6px)}
   .mxm-reg{padding:0;border-radius:0;background:none;font-size:12.5px;gap:6px;flex:0 1 auto;min-width:0}
-  .mxm-note{font-size:12.5px;flex:none}
-  .mxm-fp{display:none}
+  .mxm-sum{font-size:12.5px;line-height:1.4}
   .mx-tabs{margin-top:10px;gap:0;overflow-x:auto}
   .mx-tab{padding:9px 7px 10px;font-size:14px;gap:4px}
   .mxg-start{margin-top:14px}
@@ -591,6 +607,10 @@ a.mxg-card:hover .mxg-go{color:var(--accent)}
   .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:12px 14px}
   .mxg-td{grid-column:1/-1;grid-row:2}
   .mxg-row{padding:7px 14px}
+  .mxg-orow{padding:7px 14px}
+  .mxg-og h3{padding:9px 14px 2px}
+  .mxg-ocs{justify-content:flex-start;margin-left:0;grid-column:1 / -1;grid-row:3;margin-top:3px}
+  .mxg-orow .mxg-q{grid-row:2}
   .mxg-row .mxg-name{line-height:1.25;font-size:14px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
   .mxg-rl .mx-link{font-size:12px}
   .mxg-row .mxg-q{line-height:1.28}
