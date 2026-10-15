@@ -64,9 +64,9 @@ const body = function(){
   eq(METRICS.every(m => words(MX_Q[m.n]) <= 12), true, "every question is 12 words or fewer");
   eq(["North star · " + lst.filter(m => m.t === "ns").length, "Health · " + lst.filter(m => m.t === "health").length, "Diagnostic · " + lst.filter(m => m.t === "diag").length].every(t => lh.includes('<span class="mxg-tt">' + t + "</span>")), true, "tier titles carry their counts");
   eq((lh.match(/class="mxg-row"/g) || []).length, lst.length, "every metric has a row in the full set");
-  eq((lh.match(/data-log="/g) || []).length, lst.length, "every row links to what to log");
+  eq((lh.match(/data-log="/g) || []).length, 0, "rows carry no What to log link; it lives inside the metric"); eq((lh.match(/class="mxg-rowlink" href="#metrics\//g) || []).length, lst.length, "every row is a link to its metric"); eq((lh.match(/class="mxg-lh"/g) || []).length > 0, true, "long tiers are grouped by the question each category answers");
   eq(/mxg-readn/.test(lh), false, "the read note is hidden until a metric is read");
-  mx.read = {[lst[0].n]:true}; renderMetrics(); eq(/class="mxg-readn note">1 of [0-9]+ read/.test(view.innerHTML) && /class="mxg-tick on"/.test(view.innerHTML), true, "reading a metric shows the note and the tick");
+  mx.read = {[lst[0].n]:true}; renderMetrics(); eq(/class="mxg-readn note">1 of [0-9]+ read/.test(view.innerHTML) && /class="mxg-read">Read</.test(view.innerHTML), true, "reading a metric shows the note and the Read tag");
   eq(/id="mx-save"|id="mx-dl"|id="mx-copy"/.test(view.innerHTML), false, "no save, download or copy on The metrics");
   mx.tab = "mine"; renderMetrics(); eq(/id="mx-save"/.test(view.innerHTML) && /id="mx-copy"/.test(view.innerHTML), true, "save, download and copy plan sit on Your numbers");
   mx.tab = "card"; mx.fold = {health:true}; renderMetrics(); eq(/id="mxg-health"[^>]* open/.test(view.innerHTML) && !/id="mxg-ns"[^>]* open/.test(view.innerHTML), true, "folded state is remembered");

@@ -61,6 +61,40 @@
 .gp-mx li{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13.5px}
 .gp-radar{margin-top:4px}
 @media (max-width:640px){.gp-evrow{grid-template-columns:1fr}}
+/* ---------- Metrics list rows (2026-10-15): the whole row is a link, with a status edge, a trend line and the target on the chip ---------- */
+.mxg-rows{border-top:0;display:grid;gap:6px;padding:6px 0 2px}
+.mxg-row{display:block;padding:0;border-top:0}
+.mxg-row:hover{background:transparent}
+.mxg-rowlink{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;column-gap:14px;padding:11px 14px 11px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:inherit;text-decoration:none;box-shadow:inset 3px 0 0 var(--line-strong, var(--line));transition:transform .15s, box-shadow .15s, border-color .15s}
+.mxg-row[data-st="good"] .mxg-rowlink{box-shadow:inset 3px 0 0 var(--good)}
+.mxg-row[data-st="med"] .mxg-rowlink{box-shadow:inset 3px 0 0 var(--med)}
+.mxg-row[data-st="crit"] .mxg-rowlink{box-shadow:inset 3px 0 0 var(--crit)}
+.mxg-rowlink:hover{transform:translateY(-1px);border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent), var(--shadow)}
+.mxg-rowlink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mxg-main{min-width:0;display:grid;gap:2px}
+.mxg-row .mxg-name{all:unset;display:flex;align-items:center;gap:8px;min-width:0;font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.mxg-rowlink:hover .mxg-name{color:var(--accent)}
+.mxg-read{flex:none;font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--good);background:var(--good-soft);padding:1px 7px;border-radius:999px}
+.mxg-row .mxg-q{font-size:13.5px;line-height:1.35;color:var(--muted)}
+.mxg-spark{display:flex;align-items:center}
+.mxg-spark .mx-spark{display:block}
+.mxg-rs{margin:0}
+.mxm-st{flex-wrap:wrap;row-gap:2px}
+.mxm-st .mxm-tgt{font-size:11px;font-weight:500;opacity:.85;margin-left:4px;padding-left:6px;border-left:1px solid currentColor}
+.mxg-go{color:var(--muted);display:flex}
+.mxg-rowlink:hover .mxg-go{color:var(--accent)}
+.mxg-lh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:12px 4px 2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mxg-lh b{font-weight:700;color:var(--ink);font-size:12px;letter-spacing:.06em}
+.mxg-lh span{text-transform:none;letter-spacing:0;font-size:12.5px}
+.mxg-lh:first-child{padding-top:4px}
+@media (max-width:640px){
+  .mxg-rowlink{grid-template-columns:minmax(0,1fr) auto;row-gap:0;padding:10px 12px 10px 14px}
+  .mxg-spark,.mxg-rs{margin-top:6px}
+  .mxg-main{grid-column:1}.mxg-go{grid-column:2;grid-row:1}
+  .mxg-spark{grid-column:1;grid-row:2}.mxg-rs{grid-column:1 / -1;grid-row:3}
+  .mxg-rowlink .mxg-spark + .mxg-rs{grid-row:3}
+  .mxm-st{white-space:normal}
+}
 /* example numbers on the metrics page: dashed, so they never pass for real ones */
 .mxm-st.eg{border:1px dashed currentColor;background:transparent;font-style:italic}
 /* the starter-rules draft */

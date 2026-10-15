@@ -157,8 +157,10 @@ function mxInput(m, f, extra){
 function mxStatusChip(m){
   const st = mxStatus(m, mx.vals), s = mx.vals[m.n] || {};
   if(!st) return mx.have[m.n] ? `<span class="mxm-st">✓ Tracked</span>` : "";
-  // Example numbers say so on every chip, not only in the banner at the top
-  return `<span class="mxm-st ${MX_STAT[st][1]}${mx.demo ? " eg" : ""}"${mx.demo ? ' title="An example number, not yours"' : ""}><i></i>${mx.demo ? "e.g. " : ""}${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>`;
+  // Example numbers say so on every chip, not only in the banner at the top. The target rides along, so the
+  // colour has a reason: "1.8 · Watch · target ≤ 1.5" says what the number was measured against
+  const tgt = mxTargetText(m);
+  return `<span class="mxm-st ${MX_STAT[st][1]}${mx.demo ? " eg" : ""}"${mx.demo ? ' title="An example number, not yours"' : ""}><i></i>${mx.demo ? "e.g. " : ""}${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}${tgt && st !== "set" ? `<small class="mxm-tgt">target ${esc(tgt)}</small>` : ""}</span>`;
 }
 // The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
 const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
@@ -181,13 +183,21 @@ function mxStartCard(m, showCat){
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
     </a>`;
 }
+// One metric as a row: the whole row is the link, the chip carries the target, a trend line shows once
+// there are two periods, and "Read" is a word rather than a tick. What to log lives inside the metric.
 function mxRowHTML(m){
-  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]], rd = mx.read[m.n];
-  return `<li class="mxg-row"><span class="mxg-tick${rd ? " on" : ""}"${rd ? ' title="Read"' : ' aria-hidden="true"'}>${rd ? "✓" : ""}</span>
-      <button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button>
+  const i = METRICS.indexOf(m), rd = mx.read[m.n], st = mxStatus(m, mx.vals), spark = mxSpark(m, 72, 22);
+  return `<li class="mxg-row" data-st="${st && st !== "set" ? MX_STAT[st][1] : ""}"><a class="mxg-rowlink" href="#metrics/${mxSlug(m)}" data-open="${i}">
+      <span class="mxg-main"><span class="mxg-name">${esc(m.n)}${rd ? `<span class="mxg-read">Read</span>` : ""}</span><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
+      ${spark ? `<span class="mxg-spark">${spark}</span>` : ""}
       <span class="mxg-rs">${mxStatusChip(m)}</span>
-      <span class="mxg-rl">${lg ? `<button type="button" class="mx-link" data-log="${H.src[0]}" aria-label="What to log for ${esc(m.n)}">What to log</button>` : ""}</span>
-      <span class="mxg-q">${esc(MX_Q[m.n])}</span></li>`;
+      <span class="mxg-go">${mxIco("next", "mx-ico sm")}</span></a></li>`;
+}
+// A tier's rows, grouped by the question each category answers once the tier is long enough to need it
+function mxTierRowsHTML(ms){
+  if(ms.length < 5) return ms.map(mxRowHTML).join("");
+  return LAYERS.map(L => { const xs = ms.filter(m => m.l === L.k); if(!xs.length) return "";
+    return `<li class="mxg-lh"><b>${esc(L.n)}</b><span>${esc(L.d)}</span></li>` + xs.map(mxRowHTML).join(""); }).join("");
 }
 function mxMap(list){
   const read = list.filter(m => mx.read[m.n]).length, start = mxStartList(list), fold = mx.fold || {};
@@ -204,7 +214,7 @@ function mxMap(list){
       const desc = MX_BAND[t][1] + (t === "ns" && same ? " The " + (MX_NUM[start.length] || start.length) + " above." : "");
       return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
         <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${desc}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
-        <ul class="mxg-rows">${ms.map(mxRowHTML).join("")}</ul></details>`; }).join("")}</section>`;
+        <ul class="mxg-rows">${mxTierRowsHTML(ms)}</ul></details>`; }).join("")}</section>`;
   return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
 
