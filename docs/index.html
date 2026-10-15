@@ -5444,6 +5444,8 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .gp-mx li{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:13.5px}
 .gp-radar{margin-top:4px}
 @media (max-width:640px){.gp-evrow{grid-template-columns:1fr}}
+/* example numbers on the metrics page: dashed, so they never pass for real ones */
+.mxm-st.eg{border:1px dashed currentColor;background:transparent;font-style:italic}
 /* the starter-rules draft */
 pre.gp-code{white-space:pre-wrap;word-break:break-word;font:12.5px/1.55 var(--mono);color:var(--ink);margin:0}
 /* duties by market */
@@ -11449,7 +11451,8 @@ function mxInput(m, f, extra){
 function mxStatusChip(m){
   const st = mxStatus(m, mx.vals), s = mx.vals[m.n] || {};
   if(!st) return mx.have[m.n] ? `<span class="mxm-st">✓ Tracked</span>` : "";
-  return `<span class="mxm-st ${MX_STAT[st][1]}"><i></i>${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>`;
+  // Example numbers say so on every chip, not only in the banner at the top
+  return `<span class="mxm-st ${MX_STAT[st][1]}${mx.demo ? " eg" : ""}"${mx.demo ? ' title="An example number, not yours"' : ""}><i></i>${mx.demo ? "e.g. " : ""}${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>`;
 }
 // The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
 const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
@@ -11774,7 +11777,9 @@ function mxOpenOnePager(list){
 }
 
 /* ----- example numbers ----- */
+let mxDemoVisit = false;
 function mxLoadDemo(list){
+  mxDemoVisit = true;
   if(!mx.demo) mx.demoBackup = {vals:mx.vals, hist:mx.hist || [], period:mx.period || "", have:mx.have};
   mx.vals = {}; mx.have = Object.assign({}, mx.have); mx.hist = MX_DEMO_P.slice(0, 3).map(p => ({p, v:{}}));
   list.forEach(m => { const d = MX_DEMO[m.n]; if(!d) return;
@@ -11863,6 +11868,9 @@ function mxSpec(){
 function mxGuideStart(){ const list = mxList(); if(!list.some(m => mx.have[m.n])){ mx.have = Object.assign({}, mx.have); list.filter(m => m.t === "ns").forEach(m => { mx.have[m.n] = true; }); store.set("mx", mx); } }
 function renderMetrics(){
   mx.have = mx.have || {}; mx.vals = mx.vals || {}; mx.read = mx.read || {}; mx.hist = mx.hist || [];
+  // Example numbers last for the visit they were loaded in. A leftover example mode from an earlier visit (or an
+  // exited demo) is cleared here, so example values never read as real ones a day later
+  if(mx.demo && !mxDemoVisit && !(typeof demoOn === "function" && demoOn())){ mxClearDemo(); store.set("mx", mx); }
   if(!MX_PLATFORMS[mx.platform]) mx.platform = "social";
   // A fresh scorecard starts from the workspace settings
   if(!mx.orgSet && typeof orgGet === "function" && !Object.keys(mx.vals || {}).length && !Object.keys(mx.read || {}).length){ const o = orgGet();
