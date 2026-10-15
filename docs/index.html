@@ -1225,20 +1225,16 @@ thead th{background:var(--surface-2)}
 .mxm-diag{--band-c:var(--muted)}
 
 /* Filter sentence */
-.mxm-filter{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-top:18px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font-size:15px;color:var(--muted)}
+.mxm-filter{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-top:14px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font-size:15px;color:var(--muted)}
 .mxm-filter b{color:var(--ink);font-weight:600}
 .mxm-sel{font:500 14.5px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);border-radius:8px;padding:6px 8px;max-width:100%;cursor:pointer}
 .mxm-sel:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
-.mxm-reg{display:inline-flex;align-items:center;gap:7px;margin-left:6px;padding:5px 10px;border-radius:8px;background:var(--sunk);font-size:13.5px;color:var(--ink);cursor:pointer}
+.mxm-reg{display:inline-flex;align-items:center;gap:7px;margin-left:0;padding:5px 10px;border-radius:8px;background:var(--sunk);font-size:13.5px;color:var(--ink);cursor:pointer}
 .mxm-reg input{accent-color:var(--accent);width:15px;height:15px;margin:0}
-.mxm-mix{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:13px}
-.mxm-mix i{width:8px;height:8px;border-radius:50%;margin-left:6px}
-.mxm-mix i.mxm-ns{background:var(--accent)}
-.mxm-mix i.mxm-health{background:var(--good)}
-.mxm-mix i.mxm-diag{background:var(--faint)}
+.mxm-note{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap}
 
 /* Tabs */
-.mx-tabs{display:flex;align-items:center;gap:4px;margin-top:22px;border-bottom:1px solid var(--line)}
+.mx-tabs{display:flex;align-items:center;gap:4px;margin-top:16px;border-bottom:1px solid var(--line)}
 .mx-tab{all:unset;cursor:pointer;padding:10px 12px 11px;font-size:14.5px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .mx-tab:hover{color:var(--ink)}
 .mx-tab.on{color:var(--ink);border-bottom-color:var(--ink)}
@@ -1467,8 +1463,7 @@ thead th{background:var(--surface-2)}
   .mxa-rail{position:static;order:-1;grid-template-columns:1fr 1fr;align-items:start}
 }
 @media (max-width:760px){
-  .mxm-mix{margin-left:0}
-  .mxm-reg{margin-left:0}
+  .mxm-note{margin-left:0;white-space:normal}
   .mxm-row{grid-template-columns:minmax(0,1fr) auto 18px}
   .mxm-row .mxm-area{grid-column:1/-1}
   .mxa-head h2{font-size:27px}
@@ -1746,6 +1741,78 @@ text.mxt-a{fill:var(--crit)}
    (workspace's "All saved results" row). One line, consistently, reads better than that. */
 .section-title .segs{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}
 .section-title .segs button{white-space:nowrap;flex:none}
+
+/* Metrics landing: Start with these (each card is one link), then the full set folded by tier, all closed by default */
+.mxg-start{margin-top:22px}
+.mxg-full{margin-top:28px}
+.mxg-sh{display:flex;align-items:baseline;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;margin:0 0 12px}
+.mxg-sh h2{font-size:20px;letter-spacing:-.015em;margin:0}
+.mxg-sh .note{margin:0;font-size:13.5px;color:var(--muted)}
+.mxg-readn{margin-left:auto}
+.mxg-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+a.mxg-card{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:14px 14px;border-radius:16px;color:inherit;text-decoration:none;transition:border-color .15s,box-shadow .15s}
+a.mxg-card:hover{border-color:color-mix(in oklab, var(--accent) 45%, var(--line));box-shadow:0 10px 24px -16px rgba(0,0,0,.35)}
+a.mxg-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mxg-eb,.mxa-area{font-size:12.5px;font-weight:500;color:var(--muted)}
+.mxa-area{display:inline-flex;align-items:center;gap:8px}
+.mxg-hd{display:flex;align-items:flex-start;gap:5px}
+.mxg-card .mxg-name{flex:1 1 auto;min-width:0;font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.3;margin:0;color:var(--ink)}
+.mxg-hd .pill{flex:none;margin-top:1px;padding:2px 6px;font-size:11px}
+.mxg-go{flex:none;margin-top:3px;color:var(--faint)}
+a.mxg-card:hover .mxg-go{color:var(--accent)}
+.mxg-card .mxg-q,.mxg-why{margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mxg-card .mxg-q{font-size:14px;line-height:1.4;color:var(--ink)}
+.mxg-why{font-size:13px;line-height:1.4;color:var(--muted)}
+.mxg-why b{color:var(--ink);font-weight:600}
+.mxg-tier{margin-top:10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.mxg-tier > summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) 18px;align-items:center;gap:4px 18px;padding:14px 18px}
+.mxg-tier > summary::-webkit-details-marker{display:none}
+.mxg-tier > summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:16px}
+.mxg-tt{display:inline-flex;align-items:center;gap:9px;font-size:16px;font-weight:600;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+.mxg-tt::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--band-c)}
+.mxg-td{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.mxg-chev{color:var(--faint);transition:transform .15s}
+.mxg-tier[open] > summary .mxg-chev{transform:rotate(90deg)}
+.mxg-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.mxg-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:baseline;column-gap:0;row-gap:1px;padding:9px 18px;border-top:1px solid var(--line)}
+.mxg-row:first-child{border-top:0}
+.mxg-row:hover{background:var(--sunk)}
+.mxg-tick{grid-column:1;grid-row:1;font-size:12px;font-weight:700;color:var(--good);line-height:1.3;margin-right:8px}
+.mxg-tick:empty{margin:0}
+.mxg-row .mxg-name{all:unset;grid-column:2;grid-row:1;cursor:pointer;display:block;min-width:0;justify-self:start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.mxg-row .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.mxg-row .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.mxg-rs{grid-column:3;grid-row:1;margin-left:10px}
+.mxg-rs:empty{margin:0}
+.mxg-rl{grid-column:4;grid-row:1;margin-left:12px}
+.mxg-rs,.mxg-rl{line-height:1.2}
+.mxg-rl .mx-link{font-size:12.5px;white-space:nowrap}
+.mxg-row .mxg-q{grid-column:1 / -1;grid-row:2;font-size:14px;line-height:1.3;color:var(--muted)}
+@media (max-width:760px){
+  .mxm-filter{padding:0;border:0;border-radius:0;background:none;box-shadow:none;margin-top:10px;gap:6px 12px}
+  /* the shell keeps selects at 16px (no iOS zoom), so the platform select gets the wider share to show its full name */
+  .mxm-filter .mxm-sel{min-width:0;padding:4px 2px 4px 6px}
+  .mxm-filter #mx-platform{flex:0 0 calc(58% - 6px);width:calc(58% - 6px)}
+  .mxm-filter #mx-stage{flex:0 0 calc(42% - 6px);width:calc(42% - 6px)}
+  .mxm-reg{padding:0;border-radius:0;background:none;font-size:12.5px;gap:6px;flex:0 1 auto;min-width:0}
+  .mxm-note{font-size:12.5px;flex:none}
+  .mxm-fp{display:none}
+  .mx-tabs{margin-top:10px;gap:0;overflow-x:auto}
+  .mx-tab{padding:9px 7px 10px;font-size:14px;gap:4px}
+  .mxg-start{margin-top:14px}
+  .mxg-full{margin-top:22px}
+  .mxg-sh h2{font-size:20px}
+  .mxg-readn{margin-left:0}
+  a.mxg-card{padding:12px 12px 12px 14px}
+  .mxg-card .mxg-name{font-size:15px}
+  .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:12px 14px}
+  .mxg-td{grid-column:1/-1;grid-row:2}
+  .mxg-row{padding:7px 14px}
+  .mxg-row .mxg-name{line-height:1.25;font-size:14px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .mxg-rl .mx-link{font-size:12px}
+  .mxg-row .mxg-q{line-height:1.28}
+  .mxa-sql pre{max-width:100%}
+}
 
 /* ---------- AI assistants ---------- */
 :root{--t-ai:#8E4EC6}
@@ -10712,7 +10779,7 @@ function mxStatusCounts(d){
 const MX_Q = {
   "Violating-content prevalence":"Out of everything people see, how much breaks our rules?",
   "Harmful reach before action":"How many people see harmful content before we take it down?",
-  "Fraud loss rate":"How much money do we lose to fraud for every dollar that moves through us?",
+  "Fraud loss rate":"How much money do we lose to fraud per dollar processed?",
   "Prohibited-listing prevalence":"How much of what's for sale shouldn't be?",
   "Toxicity per 1,000 match-hours":"How often do players run into abuse while they play?",
   "Churn after toxic exposure":"Do people quit after they've been abused?",
@@ -10724,11 +10791,11 @@ const MX_Q = {
   "User-report rate":"How often do users flag problems to us?",
   "Repeat-offender rate":"After we act, do people stop breaking the rules or keep going?",
   "Proactive detection rate":"How much harm do we catch before anyone has to report it?",
-  "Precision and recall by policy area":"When our systems act, are they right, and how much do they miss?",
-  "Time to detect emerging trends":"How long does a new kind of abuse run before we notice it?",
+  "Precision and recall by policy area":"When our systems act, are they right, and what do they miss?",
+  "Time to detect emerging trends":"How long does new abuse run before we notice it?",
   "Appeal overturn rate":"When someone appeals, how often were we wrong?",
   "QA agreement rate":"Do our reviewers make the same call an expert would?",
-  "Consistency across languages and markets":"Are we as accurate in every language as we are in our best one?",
+  "Consistency across languages and markets":"Are we equally accurate in every language and market?",
   "Time to action by severity (p90)":"How fast do we act on the most serious problems?",
   "SLA attainment":"Do we hit the response times we promised?",
   "Backlog age":"Is work piling up faster than we can handle it?",
@@ -10741,7 +10808,21 @@ const MX_Q = {
   "Account takeover rate":"How often do attackers take over our users' accounts?",
   "Unsafe-contact rate for minors":"How often do adults try to contact children inappropriately on our product?",
   "Age-assurance coverage":"Do we actually know which of our users are children?",
-  "Safety incidents per 10k trips":"How often is someone hurt or put in danger during a trip or booking?"
+  "Safety incidents per 10k trips":"How often is someone hurt or endangered on a trip or booking?"
+};
+
+// The short reason a metric is on the Start with these cards (14 words at most). The longer "why it matters" stays on the metric's page.
+const MX_FIRST = {
+  "Violating-content prevalence":"Measures what users actually see, not how busy your team is.",
+  "Unsafe-contact rate for minors":"Worst harm on any product children use; regulators check it first.",
+  "Proactive detection rate":"Shows how much harm you catch instead of waiting for reports.",
+  "Users who feel safe":"Captures harm your logs never see, and every executive understands it.",
+  "Fraud loss rate":"Finance already watches it. It puts T&S in the P&L conversation.",
+  "Account takeover rate":"Takeovers hit your most loyal users, and someone pays the loss.",
+  "Toxicity per 1,000 match-hours":"Normalizes for engagement, so a busy launch week doesn't look like a spike.",
+  "Romance-scam reports per 10k matches":"Scams are the defining harm on dating platforms, and losses are severe.",
+  "Violating-generation rate":"The core safety measure for a generative product.",
+  "Safety incidents per 10k trips":"The harm happens offline, and one serious incident can reach court."
 };
 
 // Jargon, explained on hover. Keys are matched case-insensitively as whole words.
@@ -11116,7 +11197,7 @@ const MX_RV = {
 };
 const MX_STAGE = {"1":"Early","2":"Scaling","3":"Mature"};
 const MX_STAGE_HELP = {"1":"First T&S hires, mostly manual review", "2":"Vendors, classifiers and queues", "3":"Multi-market, audited, regulated"};
-const MX_TABS = [["card","The metrics",""],["data","What to log","data"],["run","Who reviews what","program"],["mine","Your numbers","scorecard"]];
+const MX_TABS = [["card","Metrics",""],["data","What to log","data"],["run","Reviews","program"],["mine","Your numbers","scorecard"]];
 const MX_TORD = ["ns","health","diag"];
 const MX_TIER_NAME = {ns:"North-star metrics", health:"Health metrics", diag:"Diagnostics"};
 const MX_BAND = {
@@ -11127,7 +11208,7 @@ const MX_BAND = {
 // One line per tab, so what's behind it is known before clicking. Reuses the band and review-cadence
 // copy already written for MX_BAND and MX_RV instead of writing new explanations
 const MX_TAB_SUB = {
-  card:`${MX_BAND.ns[1]} Then health metrics and diagnostics, in that order.`,
+  card:"",
   data:"The event types every metric above is built from, and what one row of each should hold.",
   run:`${MX_RV.w[0]}, ${MX_RV.m[0].toLowerCase()}, ${MX_RV.q[0].toLowerCase()} and ${MX_RV.r[0].toLowerCase()} — who looks at which numbers, and how often.`,
   mine:"Enter this period's numbers against your targets and see where you stand."
@@ -11267,56 +11348,52 @@ function mxStatusChip(m){
   if(!st) return mx.have[m.n] ? `<span class="mxm-st">✓ Tracked</span>` : "";
   return `<span class="mxm-st ${MX_STAT[st][1]}"><i></i>${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>`;
 }
-// A metric's tile, as a row (diagnostics) or a card (north star / health). nextUp marks the one the next-up flag goes on
-function mxRowHTML(m, nextUp){
-  const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), up = m === nextUp;
-  const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
-  return `<button type="button" class="mxm-row${up ? " is-next" : ""}" data-open="${i}"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span><span class="mxm-rt"><b>${esc(m.n)}</b><span>${esc(MX_Q[m.n])}</span></span><span class="mxm-rs">${mxStatusChip(m)}${flag}</span><span class="mxm-go">${mxIco("next", "mx-ico sm")}</span></button>`;
+// The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
+const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
+// The few metrics most worth adopting first: the north stars for this platform and stage (3 to 5). When a
+// profile has fewer than three, the first health metrics fill the row so there is always something to start with
+function mxStartList(list){
+  const ns = list.filter(m => m.t === "ns");
+  return ns.length >= 3 ? ns.slice(0, 5) : ns.concat(list.filter(m => m.t === "health")).slice(0, 3);
 }
-function mxCardHTML(m, nextUp){
-  const i = METRICS.indexOf(m), L = LAYERS.find(x => x.k === m.l), H = MX_HOW[m.n], up = m === nextUp;
-  const flag = up ? `<span class="mxm-next">Next up</span>` : mx.read[m.n] ? `<span class="mxm-read">✓ Read</span>` : "";
-  // North-star metrics show the no-tooling-team version right in the list: the line most useful
-  // to the audience least likely to open the full article first
-  const mvp = m.t === "ns" && H.mvp ? `<span class="mxm-mvp"><b>No data team yet?</b> ${esc(H.mvp)}</span>` : "";
-  return `<button type="button" class="mxm-card${up ? " is-next" : ""}" data-open="${i}">
-      <span class="mxm-top"><span class="mxm-area">${mxIco(m.l)}${esc(L.n)}</span>${flag}</span>
-      <b class="mxm-name">${esc(m.n)}</b>
-      <span class="mxm-q">${esc(MX_Q[m.n])}</span>
-      ${mvp}
-      <span class="mxm-foot"><span class="mxm-dir">${MX_DIR[H.dir][0]} ${MX_DIR[H.dir][1]}</span>${mxStatusChip(m)}<span class="mxm-go">${mx.read[m.n] ? "Open" : "Start"} ${mxIco("next", "mx-ico sm")}</span></span>
-    </button>`;
+const mxTierPill = m => `<span class="pill ${TIER[m.t][1]}">${TIER[m.t][0]}</span>`;
+const MX_NUM = ["", "one", "two", "three", "four", "five"];
+// A card is one link: the metric, its tier, the question, one short reason it comes first. The category is said once
+// in the section subtitle when every card shares it, and as a small text line on the card when they differ
+function mxStartCard(m, showCat){
+  const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
+  return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
+      ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
+      <p class="mxg-q">${esc(MX_Q[m.n])}</p>
+      <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
+    </a>`;
+}
+function mxRowHTML(m){
+  const i = METRICS.indexOf(m), H = MX_HOW[m.n], lg = MX_LOGS[H.src[0]], rd = mx.read[m.n];
+  return `<li class="mxg-row"><span class="mxg-tick${rd ? " on" : ""}"${rd ? ' title="Read"' : ' aria-hidden="true"'}>${rd ? "✓" : ""}</span>
+      <button type="button" class="mxg-name" data-open="${i}">${esc(m.n)}</button>
+      <span class="mxg-rs">${mxStatusChip(m)}</span>
+      <span class="mxg-rl">${lg ? `<button type="button" class="mx-link" data-log="${H.src[0]}" aria-label="What to log for ${esc(m.n)}">What to log</button>` : ""}</span>
+      <span class="mxg-q">${esc(MX_Q[m.n])}</span></li>`;
 }
 function mxMap(list){
-  const read = list.filter(m => mx.read[m.n]).length, nextUp = list.find(m => !mx.read[m.n]);
-  const pct = list.length ? Math.round(100 * read / list.length) : 0;
-  const how = `<div class="mxm-how mxm-how-line">
-    <p class="note">A reference to learn from and build with, not part of the assessment. Open any metric for the question it answers, the formula, how to measure it on your platform and starter SQL.</p>
-    <div class="mxm-prog"><span><b>${read}</b> of ${list.length} read</span><div class="mxm-bar"><i style="width:${pct}%"></i></div></div>
-  </div>`;
-  return how + mxOnrampBannerHTML() + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + MX_TORD.map((t, bi) => {
-    const ms = list.filter(m => m.t === t); if(!ms.length) return "";
-    const done = ms.filter(m => mx.read[m.n]).length;
-    const card = m => t === "diag" ? mxRowHTML(m, nextUp) : mxCardHTML(m, nextUp);
-    return `<section class="mxm-band mxm-${t}">
-      <div class="mxm-bh"><span class="mxm-n">${bi + 1}</span><div><h3>${MX_BAND[t][0]} <span class="mxm-count">${done ? `${done} of ${ms.length} read` : ms.length}</span></h3><p>${MX_BAND[t][1]}</p></div></div>
-      <div class="${t === "diag" ? "mxm-rows" : "mxm-grid"}">${ms.map(card).join("")}</div>
-    </section>`;
-  }).join("");
-}
-// A newcomer's landing: just the north-star metrics for their platform and stage, with the full catalog one click away
-function mxNsHTML(list){
-  const ns = list.filter(m => m.t === "ns"), nextUp = ns.find(m => !mx.read[m.n]);
-  return `<div class="banner cvt-b mxm-onramp"><span><strong>Recommended for you:</strong> ${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}. ${ns.length ? `Start with these ${ns.length} north-star metric${ns.length === 1 ? "" : "s"}` : "No north-star metric fits this combination yet"} — everything else is one click away.</span><button type="button" class="btn sm" id="mx-ns-full">See the full catalog (${list.length})</button></div>
-  <section class="mxm-band mxm-ns">
-    <div class="mxm-bh"><span class="mxm-n">1</span><div><h3>${MX_BAND.ns[0]}</h3><p>${MX_BAND.ns[1]}</p></div></div>
-    <div class="mxm-grid">${ns.map(m => mxCardHTML(m, nextUp)).join("")}</div>
-  </section>`;
-}
-// A banner inviting a true newcomer (nothing onramped, filtered or already tracked) to the filtered view
-function mxOnrampBannerHTML(){
-  if(mx.onramped || mx.nsOnly || Object.keys(mx.have || {}).length) return "";
-  return `<div class="banner cvt-b"><span><strong>New here?</strong> See the 3 to 5 metrics most worth starting with for your platform, instead of the full list.</span><button type="button" class="btn sm primary" id="mx-onramp">Show me the few that matter</button></div>`;
+  const read = list.filter(m => mx.read[m.n]).length, start = mxStartList(list), fold = mx.fold || {};
+  const tiers = MX_TORD.filter(t => list.some(m => m.t === t));
+  const cats = [...new Set(start.map(m => m.l))], one = cats.length === 1;
+  const nsAll = list.filter(m => m.t === "ns"), same = start.length === nsAll.length && start.every(m => m.t === "ns");
+  const sub = "Picked for this profile." + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
+  const startH = start.length ? `<section class="mxg-start" aria-labelledby="mxg-start-h">
+    <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">${esc(sub)}</span></div>
+    <div class="mxg-cards">${start.map(m => mxStartCard(m, !one)).join("")}</div></section>` : "";
+  const foldH = `<section class="mxg-full" aria-labelledby="mxg-full-h">
+    <div class="mxg-sh"><h2 id="mxg-full-h">All ${list.length} metrics</h2>${read ? `<span class="mxg-readn note">${read} of ${list.length} read</span>` : ""}</div>
+    ${tiers.map(t => { const ms = list.filter(m => m.t === t), open = !!fold[t];
+      const desc = MX_BAND[t][1] + (t === "ns" && same ? " The " + (MX_NUM[start.length] || start.length) + " above." : "");
+      return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
+        <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${desc}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
+        <ul class="mxg-rows">${ms.map(mxRowHTML).join("")}</ul></details>`; }).join("")}</section>`;
+  return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
 
 /* ----- Metrics tab: one metric, in three parts ----- */
@@ -11335,7 +11412,7 @@ function mxArticle(m, list){
       <span class="mxa-arrows"><button type="button" class="mxa-arrow" data-step="-1" aria-label="Previous metric" ${prev ? "" : "disabled"}>${mxIco("back", "mx-ico sm")}</button><button type="button" class="mxa-arrow" data-step="1" aria-label="Next metric" ${next ? "" : "disabled"}>${mxIco("next", "mx-ico sm")}</button></span>
     </div>
     <header class="mxa-head">
-      <div class="mxa-eyebrow"><span class="mxa-area">${mxIco(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
+      <div class="mxa-eyebrow"><span class="mxa-area">${mxTile(m.l)}${esc(L.n)}</span><span class="mxa-tier mxm-${m.t}">${TIER[m.t][0]}</span></div>
       <h2>${esc(m.n)}</h2>
       <p class="mxa-q">${esc(MX_Q[m.n])}</p>
       <p class="mxa-lead">${lead}</p>
@@ -11437,7 +11514,7 @@ function mxTabMine(list){
     <p>An optional worksheet. For each metric you track, enter this period's number, your target, and the point where it counts as off track. Save the period when it closes, and each metric builds a trend line you can show leadership. It stays in this browser and doesn't affect your assessment.</p>
     ${mx.demo ? "" : `<p><button type="button" class="btn sm" id="mx-guide">Fill it in one metric at a time</button></p>`}</div>
   ${mx.demo ? `<div class="mxs-demo">${mxIco("warn")}<span>You're looking at <b>example numbers</b> for a ${esc(MX_PLATFORMS[mx.platform].toLowerCase())} program, so you can see how a full scorecard reads.</span><button type="button" class="btn sm" id="mx-demo-clear">Clear example numbers</button></div>` : ""}
-  <div class="mxs-top">
+  <div class="mxg-top">
     <label class="mxa-y mxs-period"><span>Reporting period</span><input class="input" id="mx-period" value="${esc(mx.period || "")}" placeholder="For example Q3 2026"></label>
     <div class="mxs-sum" id="mx-sc-sum" aria-live="polite">${mxSumHTML(list)}</div>
     <button type="button" class="btn primary mxs-op" id="mx-op">${mxIco("page", "mx-ico")}Leadership one-pager</button>
@@ -11655,24 +11732,7 @@ function mxBindGloss(){
 let mxView = null;
 // Guided for a fresh scorecard; the framework and the tabs once there are numbers, an example, or a metric opened by link
 // The library is the front door. The guided setup is only for the optional worksheet, from its own button
-function mxMode(){ return mxView === "guide" ? "guide" : mxView === "onramp" ? "onramp" : "page"; }
-// A short on-ramp for a newcomer: platform and stage, then the north-star metrics for that combination.
-// Distinct from mxSpec()'s guided worksheet, which fills in numbers for every metric you track
-function mxOnrampSpec(){
-  const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
-  const steps = [
-    {id:"platform", eb:"Your platform", title:"What kind of platform is it?", why:"The list of metrics changes with it: a marketplace watches fraud loss, a social app watches prevalence and reach.", kind:"single",
-      opts:() => Object.entries(MX_PLATFORMS).map(([k, v]) => ({k, n:v})), get:() => mx.platformSet || mx.orgSet ? mx.platform : "", set:v => { mx.platformSet = true; setV("platform", v); }},
-    {id:"stage", eb:"Your stage", title:"How far along is your program?", why:"Early programs start with a few metrics they can actually measure. Later stages add more.", kind:"single",
-      opts:() => Object.entries(MX_STAGE).map(([k, v]) => ({k, n:v, h:MX_STAGE_HELP[k]})), get:() => mx.stageSet || mx.orgSet ? mx.stage : "", set:v => { mx.stageSet = true; setV("stage", v); }}
-  ];
-  return {k:"metrics-onramp", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
-    intro:{title:"Start with the few numbers that matter most", lead:"Two quick questions, then the three to five north-star metrics picked for your platform and stage. Every other metric, and the full reference, stays one click away.",
-      facts:[["About 1 minute", "Two questions, then your recommended metrics."], ["North stars first", "The few numbers that show whether users are actually safer."], ["Nothing is final", "Change your platform or stage, or browse the full catalog, any time."]], start:"Start"},
-    alt:[{n:"See the full catalog instead", run:() => { mxView = null; mx.tab = "card"; mx.nsOnly = false; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}],
-    steps, finish:"See my recommended metrics",
-    done:() => { mxView = null; mx.tab = "card"; mx.nsOnly = true; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }};
-}
+function mxMode(){ return mxView === "guide" ? "guide" : "page"; }
 function mxSpec(){
   const list = mxList(), tracked = () => list.filter(m => mx.have[m.n]);
   const setV = (k, v) => { mx[k] = v; mx.orgSet = true; store.set("mx", mx); };
@@ -11708,7 +11768,6 @@ function renderMetrics(){
   const list = mxList();
   mxFromHash(list);
   if(typeof gdRender === "function" && mxMode() === "guide"){ mxGuideStart(); return gdRender(mxSpec()); }
-  if(typeof gdRender === "function" && mxMode() === "onramp") return gdRender(mxOnrampSpec());
   mxView = null;
   if(typeof gdCur !== "undefined") gdCur = null;
   if(!MX_TABS.some(t => t[0] === mx.tab)) mx.tab = "card";
@@ -11716,44 +11775,40 @@ function renderMetrics(){
   if(!open) mx.open = null;
   if(open && !mx.read[open.n]) mx.read[open.n] = true;
   store.set("mx", mx);
-  const tabs = {card:() => open ? mxArticle(open, list) : mx.nsOnly ? mxNsHTML(list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
-  const counts = MX_TORD.map(t => list.filter(m => m.t === t).length);
+  const tabs = {card:() => open ? mxArticle(open, list) : mxMap(list), mine:() => mxTabMine(list), data:() => mxTabData(list), run:() => mxTabRun(list)};
   const actions = `<button class="btn sm" id="mx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("metrics")}</button>${DL ? `<button class="btn sm primary" id="mx-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button class="btn sm ${DL ? "" : "primary"}" id="mx-copy">${icon("copy")}Copy plan</button>`;
   const top = open
-    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}${actions}</div></div>`
+    ? `<div class="mxc"><button type="button" class="mxc-l" data-back><span class="mxc-t">Metrics framework</span><span class="mxc-ctx">${esc(MX_PLATFORMS[mx.platform])} · ${MX_STAGE[mx.stage]}${mx.reg ? " · Regulated" : ""}</span></button><div class="mxc-r">${typeof helpBtn === "function" ? helpBtn() : ""}</div></div>`
     : head("Metrics framework",
-      "A reference for the numbers a T&S program runs on, in the order to adopt them, with a step-by-step guide to measuring each one on your platform. For learning and building your own, outside the assessment.",
-      "Run the program", actions) + `
+      "Open any metric for its question, formula, how to measure it and starter SQL.",
+      "Run the program", mx.tab === "mine" ? actions : "") + `
     <div class="mxm-filter">
-      <span>Showing <b>${list.length} metrics</b> for</span>
       <select class="mxm-sel" id="mx-platform" aria-label="Platform">${Object.entries(MX_PLATFORMS).map(([k, v]) => `<option value="${k}" ${mx.platform === k ? "selected" : ""}>${v}</option>`).join("")}</select>
-      <span>·</span>
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
-      <span class="mxm-mix"><i class="mxm-ns"></i>${counts[0]} north star<i class="mxm-health"></i>${counts[1]} health<i class="mxm-diag"></i>${counts[2]} diagnostic</span>
+      <span class="mxm-note">${list.length} metrics<span class="mxm-fp"> for this profile</span></span>
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>
-    <p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab] || "")}</p>`;
+    ${MX_TAB_SUB[mx.tab] ? `<p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab])}</p>` : ""}`;
   view.innerHTML = top + `<div class="mx-body">${open ? `<span class="toast" id="mx-toast" role="status" aria-live="polite"></span>` : ""}${tabs[mx.tab]()}</div>`;
 
   const save = () => { store.set("mx", mx); renderMetrics(); };
   const tabSub = k => (MX_TABS.find(t => t[0] === k) || [])[2] || "";
   const bind = (sel, fn) => view.querySelectorAll(sel).forEach(fn);
   const p = $("#mx-platform"); if(p && !open){ p.onchange = e => { mx.platform = e.target.value; save(); }; $("#mx-stage").onchange = e => { mx.stage = e.target.value; save(); }; $("#mx-reg").onchange = e => { mx.reg = e.target.checked; save(); }; }
-  $("#mx-save").onclick = () => { const msg = wsSaveTool("metrics", mx, metricsTitle(mx)); renderMetrics(); flashIn($("#mx-toast"), msg); };
-  $("#mx-copy").onclick = () => copyText(mxPlanText(list), $("#mx-toast"));
+  const sv = $("#mx-save"), cp = $("#mx-copy"); if(sv) sv.onclick = () => { const msg = wsSaveTool("metrics", mx, metricsTitle(mx)); renderMetrics(); flashIn($("#mx-toast"), msg); };
+  if(cp) cp.onclick = () => copyText(mxPlanText(list), $("#mx-toast"));
   const dl = $("#mx-dl"); if(dl && DL) dl.onclick = () => { const md = mxPlanText(list); offerFile("ts-metrics-plan.md", md, md, $("#mx-toast")); };
   bind("[data-tab]", b => b.onclick = () => mxGo(tabSub(b.dataset.tab)));
-  bind("[data-open]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.open])));
+  bind("[data-open]", b => b.onclick = e => { if(e && e.preventDefault) e.preventDefault(); mxGo(mxSlug(METRICS[+b.dataset.open])); });
   bind("[data-go]", b => b.onclick = () => mxGo(mxSlug(METRICS[+b.dataset.go])));
-  bind("[data-back]", b => b.onclick = () => { const was = mx.open; mxGo(""); setTimeout(() => mxFlash(view.querySelector(`[data-open="${METRICS.findIndex(m => m.n === was)}"]`)), 120); });
+  bind("[data-back]", b => b.onclick = () => { const was = mx.open; mxGo(""); setTimeout(() => { const el = view.querySelector(`[data-open="${METRICS.findIndex(m => m.n === was)}"]`), d = el && el.closest("details"); if(d && !d.open) d.open = true; mxFlash(el); }, 120); });
   bind("[data-step]", b => b.onclick = () => { const n = list[list.indexOf(open) + +b.dataset.step]; if(n) mxGo(mxSlug(n)); });
   bind("[data-log]", b => b.onclick = () => { const k = b.dataset.log; mxGo("data"); setTimeout(() => mxFlash(document.getElementById("mx-log-" + k)), 140); });
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
-  bind("#mx-onramp", b => b.onclick = () => { mxView = "onramp"; gdReset("metrics-onramp"); renderMetrics(); window.scrollTo(0, 0); });
-  bind("#mx-ns-full", b => b.onclick = () => { mx.nsOnly = false; mx.onramped = true; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); });
+  bind("details.mxg-tier", d => d.ontoggle = () => { mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:d.open}); store.set("mx", mx); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();
