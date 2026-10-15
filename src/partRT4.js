@@ -197,7 +197,7 @@ rtfOpen = function(){
   const f = rtF(), picked = f.openPick;
   if(picked == null) return rtfOpen0();
   const q = RT_PRACTICE.grade[0];
-  return `<span class="rtf-eb">Free · private · a 60-second try</span><h1 class="rtf-h1">Find out what your AI model does when someone tries to make it cause harm</h1>
+  return `<span class="rtf-eb">Free · private · a 60-second try</span><h1 class="rtf-h1">What your model does when pushed to harm</h1>
     <p class="rtf-lead">Before your users do. You just graded one answer. Now do it for real.</p>
     <div class="rtf-q"><p>${esc(q.q)}</p><div class="learn ${picked === q.a ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${picked === q.a ? "That is it: a " + q.a : "Close: it is a " + q.a}</div><p>${esc(q.why)} That judgment is the whole skill. Everything else is method.</p></div></div>
     ${rtfNext("Test your own feature: one finding in 20 minutes", `<button type="button" class="btn" data-rtf="skipbasics">I know the basics</button><button type="button" class="btn" data-rtf="example">See a finished example</button>`)}`;

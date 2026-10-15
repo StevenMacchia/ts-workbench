@@ -11,7 +11,7 @@ const body = function(){
   if(bad(h)) throw new Error("first visit has bad values: " + where(h));
   eq(/See where your Trust &amp; Safety program stands/.test(h) && /data-as="start"/.test(h), true, "first visit invites you to start");
   eq((h.match(/<li style="--c:/g) || []).length, JOURNEY.length, "the six steps with what each gives you");
-  eq(/a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you/.test(h), true, "warns the six steps can grow, naming the true conditions from JOURNEY");
+  eq(/Extra steps appear if under-18s use your product or EU or UK rules apply/.test(h), true, "warns the six steps can grow, naming the true conditions from JOURNEY");
   eq(/id="as-pic-h"/.test(h), false, "no empty 'Your program picture' ghost card on a first fresh visit"); eq(waits(h), 0, "and no ghost radars either");
   eq(/href="#tools"/.test(h), true, "every tool is still one click away");
   out.push("first visit: calm hero and six steps, no empty picture card, start or see an example");

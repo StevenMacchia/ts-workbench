@@ -12,7 +12,7 @@ const MX_TABS = [["card","Metrics",""],["data","What to log","data"],["run","Rev
 const MX_TORD = ["ns","health","diag"];
 const MX_TIER_NAME = {ns:"North-star metrics", health:"Health metrics", diag:"Diagnostics"};
 const MX_BAND = {
-  ns:["Start here: north-star metrics", "The few numbers that show whether users are actually safer. Lead every executive review with these."],
+  ns:["Start here: north-star metrics", "The numbers that show whether users are safer. Lead every executive review with these."],
   health:["Health metrics", "Show whether your safety operation is working. Review them every month with your leads."],
   diag:["Diagnostics", "Explain why the numbers above moved. Your team uses them day to day."]
 };
@@ -559,7 +559,7 @@ function mxSpec(){
     html:() => `<div class="gd-mx"><label class="mxa-y"><span>This period${mxUnit(m) ? ` (${esc(mxUnit(m))})` : ""}</span>${mxInput(m, "v")}</label><label class="mxa-y"><span>Target</span>${mxInput(m, "t")}</label><label class="mxa-y"><span>Off track at</span>${mxInput(m, "a")}</label></div><p class="note gd-mx-st"><span data-st="${METRICS.indexOf(m)}">${mxPill(mxStatus(m, mx.vals))}</span> <button type="button" class="mx-link" data-open="${METRICS.indexOf(m)}">How to measure it</button></p>`,
     has:() => !!(mx.vals[m.n] && mx.vals[m.n].v)})));
   return {k:"metrics", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
-    intro:{title:"Build the scorecard you'd bring to an executive review", lead:"Tell it about your platform and stage, pick the metrics you'll track, and enter this period's numbers one metric at a time. Every metric has a formula, a way to measure it and starter SQL, and the scorecard turns into a one-pager for leadership.",
+    intro:{title:"The scorecard you'd bring to an executive review", lead:"Pick the metrics you'll track and enter this period's numbers, one at a time. The scorecard becomes a one-pager for leadership.",
       facts:[["About 10 minutes", "Five questions, then one screen per metric you track."], [`${METRICS.length} metrics`, "In the order to adopt them: north stars first."], ["Numbers you may not have yet", "Skip any metric. The framework tells you how to log it."]], start:"Start"},
     alt:[{n:"Back to the metrics", run:() => { mxView = "page"; mx.tab = "card"; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}, {n:"See example numbers", run:() => { mxView = "page"; mx.tab = "mine"; store.set("mx", mx); renderMetrics(); const b = $("#mx-demo"); if(b) b.click(); }}],
     steps, finish:"See my scorecard",

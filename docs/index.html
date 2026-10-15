@@ -5686,6 +5686,10 @@ details.ev-details[open] > summary{margin-bottom:12px}
   /* the toast clears the bottom bar and its safe area */
   .gtoast{bottom:calc(var(--ph-bnav, 64px) + 14px + env(safe-area-inset-bottom, 0px));max-width:calc(100vw - 32px);text-align:center}
 }
+
+/* Four fact tiles sit two by two, not three and an orphan */
+.gd-facts:has(> div:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:720px){.gd-facts:has(> div:nth-child(4)){grid-template-columns:1fr}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -7227,8 +7231,8 @@ function startScreen(){
     <div class="card hero ${cur ? "pm-new" : ""}">
       <div class="hero-main">
         <span class="pill accent" style="justify-self:start">About 3 minutes · ${QS.length} questions</span>
-        <h2>${cur ? "Assess another product or feature" : "See how your product could be misused, and what to do about it"}</h2>
-        <p>Answer a few plain-language questions about what you're building and who uses it. No trust &amp; safety background needed.</p>
+        <h2>${cur ? "Assess another product or feature" : "How your product could be misused"}</h2>
+        <p>A few plain questions about what you're building. No T&S background needed.</p>
         <div class="row"><button type="button" class="btn primary" data-act="new">Start a new assessment ${icon("arrow")}</button></div>
       </div>
       <div class="hero-side">
@@ -7236,7 +7240,7 @@ function startScreen(){
         <ul class="getlist">
           <li><b>Where to start</b><span>Your top five actions, in plain English</span></li>
           <li><b>Every risk, explained</b><span>How serious, how likely, and which answers drove it</span></li>
-          <li><b>A launch checklist and the laws that apply</b><span>With owners, effort and jurisdictions</span></li>
+          <li><b>A launch checklist and the laws</b><span>With owners, effort and jurisdictions</span></li>
         </ul>
       </div>
     </div>
@@ -9901,13 +9905,13 @@ function ttPicker(H){
   const completed = all.filter(pOf).length;
   const list = filt==="todo" ? all.filter(x=>!pOf(x)) : filt==="done" ? all.filter(pOf) : all;
   const bestFit = ttBestFit(all, pOf);
-  view.innerHTML = H("Rehearse a crisis before it happens. Each scenario is four timed decisions. Pick a weaker answer and you'll see why, how it compares with the strongest call and the law behind it, and you can try again.") + `
+  view.innerHTML = H("Rehearse a crisis before it happens: four timed decisions per scenario. A weaker answer shows why, and you can try again.") + `
     <p class="mxa-q tt-q">When something goes badly wrong, would your team make the right calls in the right order?</p>
     ${bestFit ? `<div class="gd-a tt-one"><button type="button" class="btn primary" id="tt-one">Just show me one ${icon("arrow")}</button><span class="note">Starts ${esc(bestFit.s.title)}, the scenario most worth rehearsing right now. Skips the choices below.</span></div>` : ""}
     <div class="mxm-how tt-how"><ol class="mxm-how-s">
       <li><b>1</b><span><em>Pick your company type.</em> Scenarios are written for the risks and regulators you face.</span></li>
-      <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as the incident unfolds. About 8 minutes each.</span></li>
-      <li><b>3</b><span><em>Learn from every call.</em> A weaker answer shows why, what strong looks like and the law behind it.</span></li>
+      <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as it unfolds. About 8 minutes.</span></li>
+      <li><b>3</b><span>A weaker answer shows why, what strong looks like and the law behind it.</span></li>
     </ol></div>
     <div class="card ttbar">
       <div class="field"><label for="tt-type">Your company type</label>
@@ -11286,7 +11290,7 @@ const MX_TABS = [["card","Metrics",""],["data","What to log","data"],["run","Rev
 const MX_TORD = ["ns","health","diag"];
 const MX_TIER_NAME = {ns:"North-star metrics", health:"Health metrics", diag:"Diagnostics"};
 const MX_BAND = {
-  ns:["Start here: north-star metrics", "The few numbers that show whether users are actually safer. Lead every executive review with these."],
+  ns:["Start here: north-star metrics", "The numbers that show whether users are safer. Lead every executive review with these."],
   health:["Health metrics", "Show whether your safety operation is working. Review them every month with your leads."],
   diag:["Diagnostics", "Explain why the numbers above moved. Your team uses them day to day."]
 };
@@ -11833,7 +11837,7 @@ function mxSpec(){
     html:() => `<div class="gd-mx"><label class="mxa-y"><span>This period${mxUnit(m) ? ` (${esc(mxUnit(m))})` : ""}</span>${mxInput(m, "v")}</label><label class="mxa-y"><span>Target</span>${mxInput(m, "t")}</label><label class="mxa-y"><span>Off track at</span>${mxInput(m, "a")}</label></div><p class="note gd-mx-st"><span data-st="${METRICS.indexOf(m)}">${mxPill(mxStatus(m, mx.vals))}</span> <button type="button" class="mx-link" data-open="${METRICS.indexOf(m)}">How to measure it</button></p>`,
     has:() => !!(mx.vals[m.n] && mx.vals[m.n].v)})));
   return {k:"metrics", tool:{name:"Metrics framework", icon:"gauge", color:"var(--t-mx)"},
-    intro:{title:"Build the scorecard you'd bring to an executive review", lead:"Tell it about your platform and stage, pick the metrics you'll track, and enter this period's numbers one metric at a time. Every metric has a formula, a way to measure it and starter SQL, and the scorecard turns into a one-pager for leadership.",
+    intro:{title:"The scorecard you'd bring to an executive review", lead:"Pick the metrics you'll track and enter this period's numbers, one at a time. The scorecard becomes a one-pager for leadership.",
       facts:[["About 10 minutes", "Five questions, then one screen per metric you track."], [`${METRICS.length} metrics`, "In the order to adopt them: north stars first."], ["Numbers you may not have yet", "Skip any metric. The framework tells you how to log it."]], start:"Start"},
     alt:[{n:"Back to the metrics", run:() => { mxView = "page"; mx.tab = "card"; store.set("mx", mx); renderMetrics(); window.scrollTo(0, 0); }}, {n:"See example numbers", run:() => { mxView = "page"; mx.tab = "mine"; store.set("mx", mx); renderMetrics(); const b = $("#mx-demo"); if(b) b.click(); }}],
     steps, finish:"See my scorecard",
@@ -12114,7 +12118,7 @@ function vdSpec(){
   ].concat(CRITERIA.map(c => ({id:"c-" + c.k, eb:c.n, title:esc(VD_Q[c.k]), why:`Rate each vendor from 1 to 5. The rubric says what 1, 3 and 5 look like${c.deal ? ", and this one has a minimum: a vendor scoring 2 or lower can't win" : ""}. The questions to ask are below.`, kind:"custom",
     html:() => vdCritHTML(c, new Set()), answered:() => vx.vendors.every(v => v.s[c.k]), has:() => vx.vendors.some(v => v.s[c.k]), next:"Continue"})));
   return {k:"vendors", tool:{name:"Vendor scorecard", icon:"scale", color:"var(--t-vd)"},
-    intro:{title:"Which moderation vendor should you trust with your users and your reviewers?", lead:"Say what matters, name your shortlist, then score each vendor against a plain rubric, one criterion at a time. The ranking builds as you go, and at the end you'll see who wins and exactly why.",
+    intro:{title:"Which vendor should you trust with your users?", lead:"Say what matters, name your shortlist, score each vendor one criterion at a time. The ranking builds as you go.",
       facts:[["About 10 minutes", `${CRITERIA.length} criteria, one per screen, with the questions to ask in an RFP.`], ["Evidence, not pitch", "Each score has a rubric, and wellness and security have minimums."], ["Two to four vendors", "Rename them any time. The math is shown."]], start:"Start"},
     alt:[{n:"Score everything on one page", run:() => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See a finished example", run:() => vdExample()}],
     steps, finish:"See who wins",
@@ -12190,10 +12194,10 @@ function renderVendors(){
   const seen = new Set();
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
-    "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
+    "Choose a moderation vendor on evidence, not the pitch. Weight what matters, score your shortlist, see who wins and why.",
     "Run the program", `<span class="toast" id="vx-toast" role="status" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
-    <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
+    <p class="mxa-q vd-q">Which vendor should you trust with your users?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="vd-grid">
       <div class="vd-main">
@@ -12436,7 +12440,7 @@ function renderWorkspace(){
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
   const p = wsProfile(), empty = all.length === 0, projCount = Object.keys(wsProjects()).length;
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
-    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved, in projects. It lives in this browser. Save a workspace file to open it anywhere.`, null,
     `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
      <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save workspace file</button>`) + `
     <span class="toast" id="ws-toast" role="status" aria-live="polite"></span>
@@ -12586,11 +12590,11 @@ const ROUTE_DESC = {
   coppa:"Check children's privacy against the amended COPPA Rule, with drafts for Legal.",
   grooming:"See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",
   reporting:"Check whether you can remove, preserve, report and handle the account when you find child sexual exploitation, market by market.",
-  dsa:"Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",
+  dsa:"Which EU DSA duties apply to you, article by article, with drafts for Legal.",
   vendors:"Choose a moderation vendor on evidence, with RFP questions.",
-  eval:"Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",
-  metrics:"A reference for learning: the numbers a T&S program runs on, and how to measure each one.",
-  redteam:"Test your own AI feature for harm the way real red teams do, one calm step at a time, ending in findings and a one-page summary.",
+  eval:"Build a labeled test set from a rule and see where a classifier fails.",
+  metrics:"The numbers a T&S program runs on, and how to measure each one.",
+  redteam:"Test your own AI feature for harm the way real red teams do, ending in findings and a one-page summary.",
   learn:"Guides, drills, worksheets and glossaries for Trust & Safety work, starting with red teaming AI.",
   redteamllm:"The method for red teaming language models in nine steps, with drills to run with your team, worksheets and sources.",
   redteamworld:"Red teaming video, image-to-video and interactive world models: uploads, scene steering, style and provenance.",
@@ -12979,7 +12983,7 @@ function firstRunHTML(){
     <div class="firstrun-t"><h2 id="firstrun-h">How do you want to start?</h2><p class="note">Pick one. You can always do the other later.</p></div>
     <div class="firstrun-opts">
       <button type="button" class="firstrun-opt" data-firstrun="assess"><b>Assess my program</b><span>The full guided assessment: one picture of your program, built up step by step.</span></button>
-      <button type="button" class="firstrun-opt" data-firstrun="tools"><b>Use one tool</b><span>Jump straight to any tool on its own, such as a pre-mortem or a vendor scorecard.</span></button>
+      <button type="button" class="firstrun-opt" data-firstrun="tools"><b>Use one tool</b><span>Go straight to one tool, such as a pre-mortem or a vendor scorecard.</span></button>
     </div>
   </div>`;
 }
@@ -12998,16 +13002,16 @@ function asWelcomeHTML(J){
       <div class="as-hero-t">
         <span class="as-eb">Free · no account · about ${Math.round(total / 5) * 5} minutes</span>
         <h1>See where your Trust &amp; Safety program stands</h1>
-        <p>${asCount(J.length, true)} guided steps, chosen for your kind of platform. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
+        <p>${asCount(J.length, true)} guided steps, a few plain questions each. The result is one picture: what's strong, what's exposed, what to do first.</p>
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
-        <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
+        <span class="note">Stop any time and pick up later. Your answers stay in this browser.</span>
       </div>
     </section>
     ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
-      <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
+      <p class="note as-six-note">Extra steps appear if under-18s use your product or EU or UK rules apply.</p>
     </section>
     ${asFootHTML()}
   </div>`;
@@ -13063,8 +13067,8 @@ function renderTools(){
       <div class="ov-tb">${tileHTML(iconId, TOOL_TONE[route], "lg")}<h4>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
-  view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
-    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
+  view.innerHTML = `<div class="ov">` + head("All tools", `Every tool, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order.`) + `
+    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment runs the main tools in order, into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
     <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
@@ -13078,11 +13082,11 @@ function renderTools(){
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof GP_SG !== "undefined" ? tool("gp","grooming","var(--t-gp)","route","Grooming pathway review <span class=\"wip-tag\">New</span>","See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",`${GP_STAGES.length} stages · ${GP_SG.length} safeguards · 5 drafts`) : ""}
         ${typeof CR_CTRL !== "undefined" ? tool("cr","reporting","var(--t-cr)","flag","Child-safety reporting <span class=\"wip-tag\">New</span>","Check that you can remove, preserve, report and handle the account when you find child sexual exploitation, market by market.",`${CR_CTRL.reduce((n, g) => n + g.items.length, 0)} requirements · 5 markets · 4 drafts`) : ""}
-        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
+        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Which EU DSA duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
-        ${typeof RT_AREAS !== "undefined" || typeof LAZY_COUNTS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">In progress</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${typeof RT_AREAS !== "undefined" ? RT_AREAS.length : LAZY_COUNTS.rtAreas} harm areas · drills, findings, exports`) : ""}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a classifier fails.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
+        ${typeof RT_AREAS !== "undefined" || typeof LAZY_COUNTS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">In progress</span>","Test your own AI feature for harm, one calm step at a time.",`${typeof RT_AREAS !== "undefined" ? RT_AREAS.length : LAZY_COUNTS.rtAreas} harm areas · drills, findings, exports`) : ""}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","The numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
@@ -13096,7 +13100,7 @@ function renderTools(){
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
-        <a class="ln-aic ov-aic" href="#redteamllm">${tileHTML("shield", "learn", "lg")}<div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamllm">${tileHTML("shield", "learn", "lg")}<div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#redteamworld">${tileHTML("world", "learn", "lg")}<div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#glossary">${tileHTML("glossary", "learn", "lg")}<div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         ${typeof TSG_TERMS !== "undefined" || typeof LAZY_COUNTS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary">${tileHTML("glossary", "learn", "lg")}<div><h4>T&amp;S glossary</h4><p>${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : LAZY_COUNTS.tsgTerms} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}
@@ -13781,7 +13785,7 @@ function polSpec(){
   const ai = !!SAMPLER && !polRun.aiOff, setV = (k, v) => { pol[k] = v; savePol(); };
   const multi = (k, list) => ({kind:"multi", opt:true, opts:() => list.map(([v, n]) => ({k:v, n})), get:() => pol[k] || [], toggle:v => setV(k, (pol[k] || []).includes(v) ? pol[k].filter(x => x !== v) : (pol[k] || []).concat(v))});
   const steps = [
-    {id:"rule", eb:"Your rule", title:"What's the rule you want to test?", why:"Paste it exactly as users would see it, with any definitions, examples and exceptions you already have. The more of the real rule you paste, the more precise the review.", kind:"text", rows:8,
+    {id:"rule", eb:"Your rule", title:"What's the rule you want to test?", why:"Paste it as users see it, with definitions, examples and exceptions. More of the real rule means a more precise review.", kind:"text", rows:8,
       placeholder:"For example: “Harassment means repeatedly targeting someone with insults, threats or unwanted sexual comments…”", get:() => pol.rule, set:v => setV("rule", v),
       hint:`Start from an example: ${POL_EXAMPLES.map(([n], i) => `<button type="button" class="pol-chip" data-polex="${i}">${esc(n)}</button>`).join(" ")}`},
     {id:"company", eb:"Your platform", title:"What's the company or product called?", why:ai ? "Claude can fill in the details that follow from what it already knows about the company. It can't browse the web, so check them." : "It's named in your report.", kind:"text", opt:true, max:80,
@@ -13798,9 +13802,9 @@ function polSpec(){
       placeholder:"For example: “Rival fans' trash talk keeps getting reported as harassment. We're unsure about jokes about someone's appearance.”", get:() => pol.concerns, set:v => setV("concerns", v)}
   ];
   return {k:"policy", tool:{name:"Policy stress-tester", icon:"doc", color:"var(--t-pol)"},
-    intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule, tell the test about your platform and what worries you, and it finds the words reviewers would read differently, the cases the rule forgets, and how it holds up against real edge cases.",
-      note:"Without a Claude account: instant checks against a public rubric. Open this page in Claude to add edge cases, a rewrite, a reviewer checklist and matching laws.",
-      facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
+    intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule and say what worries you. It finds the words reviewers read differently and the cases the rule forgets.",
+      note:"No Claude account? Instant rubric checks here. Open in Claude for the full review.",
+      facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
     steps, finish:ai ? "Run the test" : "Run the instant checks",
     preview:polPreviewHTML,
@@ -13825,7 +13829,7 @@ function renderPolicy(){
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}
          <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy as text</button>
          <button type="button" class="btn sm" id="pol-sharelink">Copy link</button>`)
-    : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
+    : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases.", "Build safely",
         `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
   polBind();
@@ -14023,8 +14027,8 @@ const AI_CLAUDE_URL = "https://claude.ai/artifact/5HCKtQAaNNuAw7VAtRikJj";
 /* ----- 1. Enforcement notice writer ----- */
 AI_TOOLS.notice = {
   n:"Enforcement notice writer", icon:"i-mail", slug:"notice",
-  desc:"Draft a clear, fair notice to a user whose content or account you actioned, and check it against what a statement of reasons needs to include.",
-  q:"When you take action against someone, will they understand what happened, why, and what they can do about it?",
+  desc:"A clear, fair notice to a user you actioned, checked against the statement-of-reasons rules.",
+  q:"Will they understand what happened and why?",
   steps:[["Describe the decision","What you did, which rule, and the facts."], ["Let Claude draft","A notice, a short version and a compliance check."], ["Review and send","Edit the draft. A person should always approve it."]],
   fields:[
     {k:"product", lab:"Your product", type:"text", ph:"For example: Pixelry, a photo and short-video app for adults"},
@@ -14108,8 +14112,8 @@ The checklist must cover: the action and what it means, the facts, the rule reli
 const AI_REC = {uphold:["Uphold the decision","crit"], overturn:["Overturn the decision","good"], modify:["Change to a lesser action","med"], escalate:["Escalate to a specialist",""]};
 AI_TOOLS.appeal = {
   n:"Appeal reviewer", icon:"i-appeal", slug:"appeal",
-  desc:"Get a structured second opinion on a user's appeal: each part of the rule tested against the facts, the user's arguments weighed fairly, and a suggested reply.",
-  q:"Did we get this decision right, and would we make the same call again?",
+  desc:"A second opinion on an appeal: the rule, the facts, and a suggested reply.",
+  q:"Did we get this decision right?",
   steps:[["Share the case","The rule, the decision, the content and the user's appeal."], ["Let Claude review","Each element of the rule is tested against the facts."], ["You decide","Claude recommends. A person makes the final call."]],
   fields:[
     {k:"policy", lab:"The rule that was applied", type:"area", req:true, rows:4, ph:"Paste the rule, including any exceptions. For example: We remove content that threatens violence against a person. We allow clearly joking statements between friends where no real threat is intended.", help:"Include the exceptions. Most wrong decisions come from missing one."},
@@ -14326,7 +14330,7 @@ function aiScoreFill(){
 // Tools still being rebuilt show a placeholder page instead of the form
 // The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
 AI_TOOLS.transparency.builder = true;
-AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
+AI_TOOLS.transparency.desc = "The DSA transparency report: the right sections for your service, a completeness check, a summary.";
 // AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
 // no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
 // above, so the placeholder path was unreachable dead code (audit §12 item 2).
@@ -14352,7 +14356,7 @@ function aiSpec(key){
     return Object.assign(base, {kind:"text", rows:fd.type === "area" ? (fd.rows || 4) + 1 : 1, placeholder:fd.ph || "", get:() => F()[fd.k] || "", set:v => setV(fd.k, v)});
   });
   return {k:key, tool:{name:T.n, icon:T.icon.replace(/^i-/, ""), color:"var(--t-ai)"},
-    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], note:"Without a Claude account: an example result, plus a plain template you fill in yourself. Open in Claude to run the real AI review on your own case.", facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
+    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], note:"No Claude account? An example and a template here; the real review runs in Claude.", facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example; the AI step runs in Claude."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { aiView[key] = "page"; renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }},
       {n:"Fill in an example", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; gdReset(key); renderAI(key); window.scrollTo(0, 0); }},
       {n:"See an example result", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; aiView[key] = "page"; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); }}],
@@ -14465,8 +14469,8 @@ const MA_LEVELS = [
 // Each area: the question it answers, why it matters, what levels 1 to 5 look like, and the steps from each level to the next
 const MA_AREAS = [
   {k:"policy", n:"Policy and standards", s:"Policy", tool:["policy", "Stress-test a policy"],
-    q:"Are your rules clear, written down and applied the same way every time?",
-    why:"Unclear rules lead to inconsistent decisions, frustrated users and weak answers when regulators ask how you decide.",
+    q:"Are your rules written down and applied the same way every time?",
+    why:"Unclear rules mean inconsistent decisions and weak answers when regulators ask.",
     lv:["Beyond a short terms of service there are no written rules. Decisions depend on who handles the case.",
       "Public community guidelines exist, but reviewers have little internal guidance and edge cases get settled in chat threads.",
       "Every public policy has internal enforcement guidelines with examples, a named owner and a change log.",
@@ -14750,7 +14754,7 @@ function maStagesHTML(){
   return `<div class="ma-stages" role="radiogroup" aria-label="Your stage">${MA_STAGES.map(s => `<button type="button" role="radio" aria-checked="${ma.stage === s.k}" class="card ma-stage ${ma.stage === s.k ? "on" : ""}" data-stage="${s.k}">
     <span class="ma-stage-h"><span class="ma-radio"></span><b>${s.n}</b></span><span class="ma-stage-d">${esc(s.d)}</span><span class="ma-stage-t">Target: ${esc(s.td)}</span></button>`).join("")}</div>
     ${typeof orgFromTag === "function" ? orgFromTag(!ma.stageSet && !!orgGet().stage && orgGet().stage === ma.stage) : ""}
-    <p class="note ma-why-t">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>`;
+    <p class="note ma-why-t">Some basics never scale down. Crisis response, compliance and reviewer wellbeing matter at any size.</p>`;
 }
 function maAreasHTML(){
   const t = maStage().t, seen = new Set();
@@ -14959,7 +14963,7 @@ function maIntroHTML(){
   return `<div class="gd-w gd-intro">
     <span class="gd-tool">${tileHTML("steps", "assess", "sm")}Program maturity</span>
     <h1>How strong is your Trust &amp; Safety program?</h1>
-    <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
+    <p class="gd-lead">Eight areas, one question each. Then a score, the gaps for your size, a roadmap.</p>
     <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
       <div>${gdFactTile(2, "assess")}<b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
@@ -14973,7 +14977,7 @@ function maStageStepHTML(){
       <p>Targets depend on your size and how regulated you are.${fromOrg ? " We've picked the one from your company profile." : ""}</p></div>
     <div class="gd-opts" role="group" aria-label="Your stage">${MA_STAGES.map((s, j) => `<button type="button" class="gd-opt ${ma.stage === s.k ? "on" : ""}" data-magstage="${s.k}" aria-pressed="${ma.stage === s.k}">
       <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><b>${esc(s.n)}</b><span>${esc(s.d)}</span><span class="gd-sub">Target: ${esc(s.td)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
-    <p class="note gd-note">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>
+    <p class="note gd-note">Some basics never scale down. Crisis response, compliance and reviewer wellbeing matter at any size.</p>
     <div class="gd-foot"><button type="button" class="btn" data-mag="intro">Back</button><button type="button" class="btn primary" data-mag="first">Continue ${icon("arrow")}</button></div>
   </div>`;
 }
@@ -14984,7 +14988,7 @@ function maQHTML(){
     <div class="gd-main">
       <div class="gd-crumb"><span class="gd-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Area ${i + 1} of ${MA_AREAS.length}</span></div>
       <h1>${esc(a.q)}</h1>
-      <p class="gd-why">${esc(a.why)} Pick the highest level where every statement is true today.</p>
+      <p class="gd-why">${esc(a.why)} Pick the highest level that is fully true today.</p>
       ${typeof typeArea === "function" && typeArea(a.k) ? `<p class="gd-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(a.k))}</p>` : ""}
       <div class="gd-opts" role="group" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" class="gd-opt ${lv === j + 1 ? "on" : ""}" data-magpick="${j + 1}" aria-pressed="${lv === j + 1}">
         <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><span class="gd-lvh"><span class="gd-lv lm">${j + 1} · ${MA_LEVELS[j].n}</span>${t[a.k] === j + 1 ? `<span class="ma-tg">Your target</span>` : ""}</span><span>${esc(txt)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
@@ -15063,7 +15067,7 @@ function renderMaturity(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Start over to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Start over</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
-    "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
+    "Rate your program across eight areas, see it against the targets for your stage, and plan the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
     <p class="mxa-q ma-q">How mature is your trust and safety program, and what should you fix first?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${MA_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
@@ -15500,7 +15504,7 @@ function cvIntroHTML(){
   return `<div class="gd-w gd-intro">
     <span class="gd-tool">${tileHTML("cover", "assess", "sm")}Coverage radar</span>
     <h1>Do your defenses keep up with your risk?</h1>
-    <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
+    <p class="gd-lead">Five short questions per harm. Then your risk beside your defenses, gaps first.</p>
     <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div>${gdFactTile(2, "assess")}<b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span>${!src ? `<button type="button" class="ov-link" data-ov="new">Run a pre-mortem first, to compare against real risk</button>` : ""}<button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
@@ -15510,7 +15514,7 @@ function cvApplyHTML(){
   const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
   return `<div class="gd-w">
     <div class="gd-hd"><span class="as-eb">Before you start</span><h1>Which of these can happen on ${esc((p && p.org) || "your platform")}?</h1>
-      <p>Untick anything your platform can't have. It won't count toward your grade. It's saved in your company profile, so you can add it back any time.</p></div>
+      <p>Untick what your platform can't have. It won't count toward your grade, and you can add it back any time.</p></div>
     <div class="card gd-list">${CV_AREAS.map(a => { const on = !off.includes(a.k), x = rk && rk[a.k];
       return `<div class="gd-ar ${on ? "" : "off"}"><label><input type="checkbox" data-cvapply="${a.k}" ${on ? "checked" : ""}><span class="gd-arn">${esc(a.n)}</span>${x ? `<span class="pill ${x.band ? BANDS[x.band][1] : ""}">${x.band ? BANDS[x.band][0] + " risk" : "No risk found"}</span>` : ""}</label>
         ${!on && x && x.score >= 8 ? `<p class="gd-warn">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Leave it out only if that risk isn't real.</p>` : ""}</div>`; }).join("")}</div>
@@ -15598,7 +15602,7 @@ function cvResultsRender(){
 function cvTableRender(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`, full = cvRatedAll();
   view.innerHTML = head("Coverage radar",
-    "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
+    "Rate how well your defenses cover each harm, then see it against your products' risk. Invest where risk outruns coverage.",
     "Run the program", cvHeadMeta()) + `
     ${cv.est ? "" : `<div class="banner cvt-b"><span>${full ? "<strong>Every defense is rated.</strong> See your radar and the gaps to close first." : "<strong>Prefer one question at a time?</strong> The guided version asks the same questions, with a result after each harm area."}</span><button type="button" class="btn sm ${full ? "primary" : ""}" data-cvg="${full ? "results" : "guide"}">${full ? "See your results" : "Switch to guided"}</button></div>`}
     <div class="vd-grid ma-grid cv-grid">
@@ -16177,7 +16181,7 @@ function orgPrefillPM(p){
 function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
   return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
-    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, coverage areas, metrics, policy tests and the AI assistants. Change it any time.</p></div>
+    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
     <div class="field"><label for="org-youth">Who can use it</label><select class="select" id="org-youth" data-org="youth"><option value="">Choose one</option>${YOUTH.map(y => `<option value="${y.k}" ${o.youth === y.k ? "selected" : ""}>${esc(y.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>
@@ -16280,18 +16284,18 @@ const JOURNEY_ALL = [
   {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"See how a product could be misused, and what to fix before launch.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
   {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"See whether your defenses keep up with the risks your pre-mortem found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
-  {k:"coppa", n:"COPPA readiness", d:"Children's privacy, about six minutes", min:6, get:"Whether COPPA applies to you, the gaps against the amended Rule, and drafts for parents and Legal.", icon:"coppa", c:"var(--t-cp)", route:"coppa",
+  {k:"coppa", n:"COPPA readiness", d:"Children's privacy, about six minutes", min:6, get:"Whether COPPA applies, the gaps against the amended Rule, and drafts for parents and Legal.", icon:"coppa", c:"var(--t-cp)", route:"coppa",
     when:() => ["kids", "teens"].includes(orgGet().youth), done:() => (typeof cp !== "undefined" && cp.view === "report" && !!cp.aud && !cp.ex) || Object.values(wsItems()).some(it => it.kind === "coppa")},
   {k:"grooming", n:"Grooming pathway", d:"How an adult could reach a child, about seven minutes", min:7, get:"How an adult could find, reach and exploit a child through your features, and what's in the way at each stage.", icon:"route", c:"var(--t-gp)", route:"grooming",
     when:() => ["kids", "teens"].includes(orgGet().youth), done:() => (typeof gp !== "undefined" && gp.view === "report" && !!gp.youth && !gp.ex) || Object.values(wsItems()).some(it => it.kind === "grooming")},
   {k:"reporting", n:"Child-safety reporting", d:"The first hour after a case, about eight minutes", min:8, get:"Whether you can remove, preserve, report and handle the account when you find child sexual exploitation, market by market.", icon:"flag", c:"var(--t-cr)", route:"reporting",
     when:() => ["kids", "teens"].includes(orgGet().youth), done:() => (typeof cr !== "undefined" && cr.view === "report" && (cr.regions || []).length > 0 && !cr.ex) || Object.values(wsItems()).some(it => it.kind === "reporting")},
-  {k:"dsa", n:"DSA readiness", d:"EU duties, about seven minutes", min:7, get:"Which Digital Services Act duties apply to you, article by article, the gaps, and drafts for Legal.", icon:"dsa", c:"var(--t-ds)", route:"dsa",
+  {k:"dsa", n:"DSA readiness", d:"EU duties, about seven minutes", min:7, get:"Which DSA duties apply, article by article, the gaps, and drafts for Legal.", icon:"dsa", c:"var(--t-ds)", route:"dsa",
     when:() => (orgGet().regions || []).includes("eu"), done:() => (typeof ds !== "undefined" && ds.view === "report" && !!ds.tier && !ds.ex) || Object.values(wsItems()).some(it => it.kind === "dsa")},
   {k:"crisis", n:"Incident tabletop", d:"Rehearse one crisis, about eight minutes", min:8, get:"Rehearse one realistic incident, decision by decision, with a debrief.", icon:"siren", c:"var(--t-tt)", route:"tabletop", done:() => Object.keys(ttProgress()).length > 0},
   {k:"transparency", n:"Transparency report", d:"The DSA report, about fifteen minutes", min:15, get:"The transparency report the EU asks for, with a check of what's missing.", icon:"chart", c:"var(--t-ai)", route:"transparency",
     when:() => (orgGet().regions || []).some(r => r === "eu" || r === "uk"), done:() => (typeof tr !== "undefined" && tr.view === "report" && !!tr.org) || Object.values(wsItems()).some(it => it.kind === "transparency")},
-  {k:"act", n:"Turn gaps into a plan", d:"One plan from every step, sent to your tracker", min:2, get:"One prioritized plan from every step: launch blockers, coverage gaps and your roadmap, sent to Jira, Asana, Linear or GitHub.", icon:"send", c:"var(--accent)", route:"plan", done:() => !!store.get("tk:used", false)}
+  {k:"act", n:"Turn gaps into a plan", d:"One plan from every step, sent to your tracker", min:2, get:"One plan from every step: blockers, gaps and roadmap, sent to your tracker.", icon:"send", c:"var(--accent)", route:"plan", done:() => !!store.get("tk:used", false)}
 ];
 const JOURNEY = [];
 // Rebuild the steps from the profile. Called at load and whenever the profile changes
@@ -16855,7 +16859,7 @@ function trSpec(){
     html:() => `<div class="tr-setup gd-tr"><div class="tr-fields">${s.f.map(trField).join("")}</div>${s.k === "own" ? trCatsHTML() : ""}</div>`, has:() => s.f.some(trHas)})));
   const p = trProgress();
   return {k:"transparency", tool:{name:"Transparency report", icon:"chart", color:"var(--t-ai)"},
-    intro:{title:"Build the transparency report the DSA asks for", powered:typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff) ? ["claude"] : [], lead:"Say what kind of service you are, then fill in one section at a time: only the sections the law asks for at your tier. At the end you get a readable report, a check of what's missing, and the numbers by category.",
+    intro:{title:"The transparency report the DSA asks for", powered:typeof SAMPLER !== "undefined" && !!SAMPLER && !(typeof polRun !== "undefined" && polRun.aiOff) ? ["claude"] : [], lead:"Only the sections the law asks for at your tier, one at a time. Then a readable report and what's missing.",
       facts:[["About 15 minutes", "Numbers you can look up as you go. Come back any time."], ["Only your sections", "Hosting services, platforms and very large platforms have different duties."], ["Checked against the DSA", `Articles 15, 24 and 42 and the EU templates, reviewed ${TR_REVIEWED}.`]], start:p.got ? "Continue" : "Start"},
     alt:[{n:"Fill everything in on one page", run:() => { trView = "page"; renderTransparency(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See an example", run:() => trAct("example")}],
     steps, finish:"Build the report",
@@ -16870,7 +16874,7 @@ function renderTransparency(){
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
     ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy as text</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
-    : head("Transparency report", "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a check of what's missing, and a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
+    : head("Transparency report", "The report the EU Digital Services Act asks for: the right sections for your service, what's missing, a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
 function trField(f){
@@ -17733,7 +17737,7 @@ function gdIntroHTML(spec){
     <p class="gd-lead">${I.lead}</p>
     ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}
     ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
-    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s], i) => `<div>${gdFactTile(i, toneOfColor(T.color))}<b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
+    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s, ttl], i) => `<div${ttl ? ` title="${esc(ttl)}"` : ""}>${gdFactTile(i, toneOfColor(T.color))}<b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
   </div>${gdPreviewHTML(spec)}`;
@@ -17840,9 +17844,9 @@ const introMark = route => store.set("intro:" + route, true);
 // own classes (non-interactive, tabindex -1, no attack content anywhere).
 const INTRO_SPECS = {
   premortem:{
-    heading:"Find out how your feature could be misused, before you launch it",
+    heading:"How your feature could be misused, before launch",
     who:"a team about to ship a product or feature.",
-    leave:"every risk that applies, how serious it is, and the five actions to do first.",
+    leave:"every risk that applies, how serious, and the five actions to do first.",
     mins:"about 3 minutes. No Trust &amp; Safety background needed.",
     walk:[
       {title:"Twelve plain questions", line:"What you're building, who uses it and how. No right answer is required to move on.",
@@ -17855,7 +17859,7 @@ const INTRO_SPECS = {
   tabletop:{
     heading:"Rehearse a crisis before it happens",
     who:"anyone who'd be in the room during a real incident.",
-    leave:"four timed decisions scored on safety, trust, legal standing and your team, plus a debrief.",
+    leave:"four timed decisions scored on safety, trust, legal standing and your team.",
     mins:"about 8 minutes solo; longer with your team.",
     walk:[
       {title:"Pick your company type and a scenario", line:"Scenarios are tailored to your kind of company, from the most common incidents to the most severe.",
@@ -17866,9 +17870,9 @@ const INTRO_SPECS = {
         preview:() => `<div class="cmp head" style="margin:0"><span>Score</span><span>Was</span><span>Now</span></div><div class="cmp"><span>User safety</span><span class="cv">60</span><span class="cv up">75</span></div>`}
     ]},
   maturity:{
-    heading:"See how strong your Trust &amp; Safety program really is",
+    heading:"How strong your Trust &amp; Safety program really is",
     who:"whoever owns the program, even a team of one.",
-    leave:"a level for each of 8 areas against a target for your size, and a roadmap for the biggest gaps.",
+    leave:"a level for each of 8 areas against your size's target, and a roadmap.",
     mins:"about 5 minutes, one area at a time.",
     walk:[
       {title:"Your size sets the target", line:"Smaller teams get a lighter target. A few things, like crisis response, never scale down.",
@@ -17879,9 +17883,9 @@ const INTRO_SPECS = {
         preview:() => `<div class="ma-road" style="padding:10px 12px"><label class="row"><input type="checkbox" disabled><span>Write down who owns each kind of decision</span></label></div>`}
     ]},
   coverage:{
-    heading:"See where your defenses don't match your risk",
+    heading:"Where your defenses don't match your risk",
     who:"whoever is deciding what to build or buy next.",
-    leave:"a radar of risk against your defenses, and the three weakest spots to close first.",
+    leave:"a radar of risk against defenses, and the three weakest spots to close first.",
     mins:"about 5 minutes across the harms that apply to you.",
     walk:[
       {title:"Only the harms that apply", line:"Untick anything your platform can't have. It's left out of the radar and your grade.",
@@ -17892,7 +17896,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="cv-cell" style="margin:0 auto"><p class="cv-cell-lv">Coverage: 2 of 4</p></div>`}
     ]},
   metrics:{
-    heading:"Pick the few numbers that show whether users are actually safer",
+    heading:"The few numbers that show users are safer",
     who:"anyone who has to report on the program's results.",
     leave:"the north-star metrics recommended for your platform, each with a formula and starter SQL.",
     mins:"about 1 minute to get started; a full scorecard takes longer.",
@@ -17905,9 +17909,9 @@ const INTRO_SPECS = {
         preview:() => `<div class="mx-sc" style="padding:10px 12px"><span class="pill good">On track</span></div>`}
     ]},
   vendors:{
-    heading:"Decide which moderation vendor to trust with your users",
+    heading:"Which moderation vendor to trust with your users",
     who:"whoever has to choose, or defend the choice of, a vendor.",
-    leave:"a ranked scorecard against a plain rubric, with the RFP questions to ask each one.",
+    leave:"a ranked scorecard against a plain rubric, and the RFP questions to ask.",
     mins:"about 10 minutes for two to four vendors.",
     walk:[
       {title:"Say what matters", line:"Weight cost, coverage, quality, wellness, security and more, or start from a preset.",
@@ -17918,7 +17922,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="vd-railc" style="padding:10px 12px"><span class="pill good">Vendor B leads</span></div>`}
     ]},
   policy:{
-    heading:"Find out where reviewers would disagree on your rule",
+    heading:"Where reviewers would disagree on your rule",
     who:"whoever writes or reviews the rules.",
     leave:"the words reviewers read differently, the cases your rule forgets, and a clearer rewrite.",
     mins:"about 4 minutes for the instant checks in your browser.",
@@ -17944,7 +17948,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="row" style="gap:8px;flex-wrap:wrap"><span class="grade grade-C">C</span><span class="pill high">Signal to declared 2h 40m</span><span class="pill">3 actions</span></div>`}
     ]},
   coppa:{
-    heading:"Find out whether COPPA applies to you, and if you're ready",
+    heading:"Whether COPPA applies, and if you're ready",
     who:"any service that could reach children under 13 in the US.",
     leave:"a readiness score, the gaps against the Rule, and four drafts ready to edit.",
     mins:"a few plain questions. Penalties run over $53,000 per violation.",
@@ -17985,7 +17989,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="cp-gaps" style="padding:10px 12px"><span class="pill crit">Preservation still set to 90 days</span></div>`}
     ]},
   dsa:{
-    heading:"Find out which EU rules apply to you, and what's missing",
+    heading:"Which EU rules apply, and what's missing",
     who:"any service with users in the EU.",
     leave:"every duty that applies, article by article, and four drafts ready to edit.",
     mins:"four plain questions about your service.",
@@ -17998,7 +18002,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="pol-tabs" style="padding:10px 12px"><span class="tag">Article 17</span></div>`}
     ]},
   eval:{
-    heading:"Check whether your classifier applies your rule the way you meant it",
+    heading:"Does your classifier apply your rule?",
     who:"whoever owns a classifier, or is choosing one.",
     leave:"what it got wrong, by kind, and what to change in the rule.",
     mins:"a few minutes once you have a rule and some cases.",
@@ -18011,7 +18015,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="pill high">Missed: sarcasm about age</div>`}
     ]},
   notice:{
-    heading:"Draft a notice a user will actually understand",
+    heading:"A notice a user will actually understand",
     who:"anyone who has to tell a user why they were actioned.",
     leave:"a clear draft, checked against what a statement of reasons needs to include.",
     mins:"a few short questions. Claude drafts; you still decide.",
@@ -18024,7 +18028,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="ai-about" style="padding:10px 12px"><p class="note">You stay the one who decides.</p></div>`}
     ]},
   appeal:{
-    heading:"Review an appeal the way a careful person would",
+    heading:"Review an appeal like a careful person",
     who:"anyone who handles appeals against a moderation decision.",
     leave:"a reasoned recommendation, with the gaps in the original decision called out.",
     mins:"a few short questions. Claude reviews; you still decide.",
@@ -18037,7 +18041,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="ai-about" style="padding:10px 12px"><p class="note">A person makes the final call.</p></div>`}
     ]},
   transparency:{
-    heading:"Build the transparency report the EU asks for",
+    heading:"The transparency report the EU asks for",
     who:"whoever owns the transparency report for your service.",
     leave:"the right sections for your tier, a completeness check, and a readable report.",
     mins:"fill in what you know; nothing is final until you build it.",
@@ -18050,7 +18054,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="pol-tabs" style="padding:10px 12px"><span class="tag">Report</span><span class="tag">Checklist</span></div>`}
     ]},
   plan:{
-    heading:"See every open gap from every tool, in one list",
+    heading:"Every open gap, in one list",
     who:"whoever has to decide what gets fixed first.",
     leave:"one prioritized list, sent to your tracker in one go.",
     mins:"instant. It's built from what you've already done.",
@@ -18063,7 +18067,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="row" style="gap:8px;padding:0 12px"><span class="pill">Jira</span><span class="pill">Linear</span></div>`}
     ]},
   review:{
-    heading:"See what changed in your program, quarter by quarter",
+    heading:"What changed, quarter by quarter",
     who:"whoever reports on the program's progress.",
     leave:"then-and-now numbers, what moved, and the story to tell leadership.",
     mins:"instant, once you've saved at least one earlier quarter.",
@@ -18655,8 +18659,8 @@ function cpSpec(){
     clear:() => { const c = Object.assign({}, cp.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   const src = typeof loopSource === "function" ? loopSource() : null;
   return {k:"coppa", tool:{name:"COPPA readiness", icon:"coppa", color:"var(--t-cp)"},
-    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal. Getting this right matters: civil penalties can run to $53,088 per violation (the FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98), and each child can count separately.",
-      facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
+    intro:{title:"Does COPPA apply, and are you ready?", lead:"A few plain questions, then which parts of the amended Rule apply, the gaps, and four drafts to edit.",
+      facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."], ["Penalties are real", "Up to $53,088 per violation, and each child can count separately.", "The FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98"]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
     steps, finish:"Build my plan",
@@ -18675,7 +18679,7 @@ function renderCoppa(){
           download:{attrs:'data-cp="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-cp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
         }, `<button type="button" class="btn sm" data-cp="sharelink">${COPY_LINK_LABEL}</button>`))
-    : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
+    : head("COPPA readiness", "Whether the US children's privacy law applies to you, the data you handle, and the gaps, with drafts to edit.", "Build safely",
         `<span class="toast" id="cp-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">${SEE_EXAMPLE_LABEL}</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">${START_OVER_LABEL}</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }
@@ -19182,7 +19186,7 @@ function dsSpec(){
     get:() => Object.keys(ds.ctrl || {}).filter(k => ds.ctrl[k]), toggle:k => { const c = Object.assign({}, ds.ctrl); if(c[k]) delete c[k]; else c[k] = true; setV("ctrl", c); },
     clear:() => { const c = Object.assign({}, ds.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   return {k:"dsa", tool:{name:"DSA readiness", icon:"dsa", color:"var(--t-ds)"},
-    intro:{title:"Which parts of the Digital Services Act apply to you, and what's missing?", lead:"Four plain questions about what kind of service you run, how big it is, where it's established and what it does. Then you'll see every duty that applies, article by article, where the gaps are, and get four drafts to edit: a statement of reasons, a notice-and-action procedure, a complaints process and a memo for Legal.",
+    intro:{title:"Which parts of the DSA apply to you?", lead:"Four plain questions about your service. Then every duty that applies, article by article, the gaps, and four drafts for Legal.",
       facts:[["About 7 minutes", "One question at a time. Only the duties that apply to your answers."], ["Article by article", "Every duty cites its article and names who usually owns it."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { dsView = "page"; renderDsa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(typeof orgGet === "function" && orgGet().confirmed ? [{n:"Start from your profile", run:() => dsAct("fromorg")}] : []).concat([{n:"See a finished example", run:() => dsAct("example")}]),
@@ -19202,7 +19206,7 @@ function renderDsa(){
           download:{attrs:'data-ds="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-ds="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
         }, `<button type="button" class="btn sm" data-ds="sharelink">${COPY_LINK_LABEL}</button>`))
-    : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
+    : head("DSA readiness", "Which EU Digital Services Act duties apply to your service, article by article, and the gaps, with drafts to edit.", "Build safely",
         `<span class="toast" id="ds-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">${SEE_EXAMPLE_LABEL}</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">${START_OVER_LABEL}</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }
@@ -21698,7 +21702,7 @@ function renderEval(){
   const media = evMediaView() && typeof evMediaHTML === "function", n = ev.cases.length && !!ev.media === media ? ev.cases.length : 0;
   const m = n && ev.preds ? evMetrics(ev, ev.preds) : null, fresh = !ev.policy && !ev.cases.length && !ev.preds && !media;
   const steps = evSteps(media, n, m);
-  view.innerHTML = head("Classifier eval", "Does your classifier apply your rule the way you meant it? Paste the rule and some cases, get labels from a classifier, and see what it gets wrong and what to change.", "Measure",
+  view.innerHTML = head("Classifier eval", "Paste the rule and some cases, get labels from a classifier, and see what it gets wrong.", "Measure",
       `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-ev="sharelink">Copy link</button>` : ""}`)
     + `<div class="ev-root cp-root">
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
@@ -21722,9 +21726,9 @@ function evSteps(media, n, m){
     {id:"ev-s3", n:"Results", t:"Results", st:m ? "done" : "todo", txt:m ? `${m.correct} of ${m.n} right` : "After step 2"}];
 }
 const evStepHTML = (s, i, body) => `<section class="card ev-step ${s.st}" id="${s.id}" aria-labelledby="${s.id}-h"><div class="ev-sh"><span class="pol-num" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span><div class="ev-sht"><h2 class="pol-lbl" id="${s.id}-h">${s.t}</h2><span class="note">${s.txt}</span></div></div><div class="ev-sb">${body}</div></section>`;
-const evHeroHTML = () => `<div class="card ev-hero"><span class="eyebrow">New here?</span><h2>Try the example</h2><p>A harassment rule as many platforms write it, 24 comments of the kinds classifiers get wrong, scored by a free model that runs in your browser. One click, a 24 MB download once, and nothing you see here leaves your browser.</p>
-    <p class="note ev-whatfree">Without a Claude account: score cases with the free in-browser model or your own classifier's pasted labels. Open in Claude to have it label the cases itself.</p>
-    <div class="pol-run"><button type="button" class="btn primary" data-ev="quick">Try the example</button><button type="button" class="btn" data-ev="example">See a finished example</button><span class="note">About a minute. Then change the right answers, add your own cases, or start with your own rule.</span></div></div>`;
+const evHeroHTML = () => `<div class="card ev-hero"><span class="eyebrow">New here?</span><h2>Try the example</h2><p>A harassment rule and 24 tricky comments, scored by a free model in your browser.</p>
+    <p class="note ev-whatfree">No Claude account? Use the free in-browser model or paste your own classifier's labels.</p>
+    <div class="pol-run"><button type="button" class="btn primary" data-ev="quick">Try the example</button><button type="button" class="btn" data-ev="example">See a finished example</button><span class="note">About a minute. Then change the answers, add cases, or start with your own rule.</span></div></div>`;
 const evWaitHTML = media => `<p class="note ev-wait">${media ? "Once the list is scored: how many it got right, the items it got wrong, and what to change." : "Once a classifier has labeled the cases: how many it got right, the cases it got wrong, and what to change."}</p>${media ? "" : `<button type="button" class="pol-add" data-ev="example">See a finished example first</button>`}`;
 
 /* ---------- step 1: the rule and the cases ---------- */
@@ -21736,7 +21740,7 @@ function evStep1HTML(n){
     <div class="ev-links">${polRule ? `<button type="button" class="pol-add" data-ev="usepol">Use the rule from the policy stress-tester</button>` : ""}<button type="button" class="pol-add" data-ev="useex">Use the example rule</button></div></div>`;
   const busy = EVRUN.busy && EVRUN.phase !== "Labeling" ? `<div class="ai-busy ev-busy"><span class="ai-spin" aria-hidden="true"></span><div><b id="ev-stage" aria-live="polite">${esc(EVRUN.phase)}…</b><span class="note">On your Claude account. Usually under a minute.</span></div><button type="button" class="btn sm" data-ev="stop">Stop</button></div>` : "";
   const empty = `<div class="ev-pick"><span class="lbl">Cases</span><div class="ev-case-a"><button type="button" class="btn primary" data-ev="excases">Use the example cases</button><button type="button" class="btn" data-ev="own">Paste my own</button>${ai ? `<button type="button" class="btn" data-ev="gen">Write ${ev.n || 24} with Claude</button>` : ""}</div>
-    <p class="note">The example set: 24 comments for the harassment rule, of the ten kinds classifiers get wrong. ${ai ? "Or Claude writes cases from your rule, on your account." : `Writing cases from your rule works in the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>.`} Real cases from your own queue, anonymized, are the best test.</p></div>`;
+    <p class="note">24 example comments, the kinds classifiers get wrong. ${ai ? "Or Claude writes cases from your rule, on your account." : `Writing cases from your rule works in the <a href="${AI_CLAUDE_URL}" target="_blank" rel="noopener">Claude version</a>.`} Your own anonymized cases test best.</p></div>`;
   const list = `<div class="ev-cases-h"><span class="lbl">Cases <span class="note">${has}</span></span><div class="ev-case-a"><button type="button" class="btn sm" data-ev="own">Add cases</button><button type="button" class="btn sm" data-ev="csv">${icon("copy")}Copy</button>${DL ? `<button type="button" class="btn sm" data-ev="dlcsv"><svg><use href="#i-download"/></svg>Download</button>` : ""}${ai ? `<button type="button" class="btn sm" data-ev="gen">Rewrite with Claude</button>` : ""}<button type="button" class="btn sm" data-ev="clearcases">Clear</button></div></div>
     <div class="ev-lh" aria-hidden="true"><span>Case</span><span>Kind${evTip("kind")}</span><span>Right answer${evTip("gold")}</span></div>
     <ol class="ev-list">${shown.map(row).join("")}</ol>
@@ -22930,7 +22934,7 @@ function renderReview(){
   const sampleBtn = `<button type="button" class="btn" data-rev="example">See a sample comparison</button>`;
   // The empty state shows the shape of the comparison, faded, instead of hiding it behind a click
   const samplePreview = `<div class="card rv-sample-preview" aria-hidden="true"><span class="pill">Sample</span><table><tbody>${PN.map(([k, n]) => `<tr><td>${n}</td><td class="mono">${REV_EX_A.parts[k]}</td><td class="rv-sample-arrow">${icon("arrow")}</td><td class="mono">${REV_EX_B.parts[k]}</td></tr>`).join("")}</tbody></table></div>`;
-  view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each part, every area, the gaps you closed and the ones that opened.", "Assess",
+  view.innerHTML = head("Quarter by quarter", "Save the picture each quarter and see what moved: the score, each area, gaps closed and gaps opened.", "Assess",
     `<span class="toast" id="rv-toast" role="status" aria-live="polite"></span>${now.score !== null && !revEx ? `<button type="button" class="btn sm primary" data-rev="save">Save ${esc(now.label)}</button>` : ""}`) + `<div class="rv">
     ${revEx ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a sample program's picture, one quarter to the next.</span><button type="button" class="btn sm" data-rev="exit-example">Back to your review</button></div>` : ""}
     ${!revEx && now.score === null ? `<div class="card ma-none">${emptyMark("quarter")}<b>Nothing to compare yet.</b><p class="note">Finish a step of the assessment, save the quarter, and come back next quarter.</p><div class="row" style="gap:8px"><a class="btn primary" href="#overview">Back to your assessment</a>${sampleBtn}</div></div>` : !revEx && !a ? `<div class="card as-rev-first"><div><b>No saved quarters yet.</b><p>Save ${esc(now.label)} now. Next quarter, retake any step and this page shows the difference.</p></div>${samplePreview}<div class="row" style="gap:8px"><button type="button" class="btn primary" data-rev="save">Save ${esc(now.label)}</button>${sampleBtn}</div></div>` : `
@@ -22963,7 +22967,7 @@ document.addEventListener("click", e => {
    LAZY_CHUNKS and LAZY_ROUTE_CHUNK from its CHUNKS table. The full bundle used by the tests keeps everything inline and
    never includes this part; code elsewhere asks for a section through lazyEnsure only when `typeof lazyEnsure` says
    it exists. */
-const LAZY_CHUNKS = {"tsglossary":{"src":"parts/tsglossary.js?v=35125f48","needs":[]},"learn":{"src":"parts/learn.js?v=c96a25f9","needs":[]},"redteam":{"src":"parts/redteam.js?v=8d7ad170","needs":["learn"]}};
+const LAZY_CHUNKS = {"tsglossary":{"src":"parts/tsglossary.js?v=6d6995e2","needs":[]},"learn":{"src":"parts/learn.js?v=0d0f5d78","needs":[]},"redteam":{"src":"parts/redteam.js?v=48adfd77","needs":["learn"]}};
 const LAZY_ROUTE_CHUNK = {"tsglossary":"tsglossary","learn":"learn","redteamllm":"learn","redteamworld":"learn","glossary":"learn","redteam":"redteam"};
 // How many things the sections hold, for the cards on the All tools page before a section is loaded.
 // test-chunks.js fails when one of these drifts from the data.

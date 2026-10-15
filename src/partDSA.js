@@ -348,7 +348,7 @@ function dsSpec(){
     get:() => Object.keys(ds.ctrl || {}).filter(k => ds.ctrl[k]), toggle:k => { const c = Object.assign({}, ds.ctrl); if(c[k]) delete c[k]; else c[k] = true; setV("ctrl", c); },
     clear:() => { const c = Object.assign({}, ds.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   return {k:"dsa", tool:{name:"DSA readiness", icon:"dsa", color:"var(--t-ds)"},
-    intro:{title:"Which parts of the Digital Services Act apply to you, and what's missing?", lead:"Four plain questions about what kind of service you run, how big it is, where it's established and what it does. Then you'll see every duty that applies, article by article, where the gaps are, and get four drafts to edit: a statement of reasons, a notice-and-action procedure, a complaints process and a memo for Legal.",
+    intro:{title:"Which parts of the DSA apply to you?", lead:"Four plain questions about your service. Then every duty that applies, article by article, the gaps, and four drafts for Legal.",
       facts:[["About 7 minutes", "One question at a time. Only the duties that apply to your answers."], ["Article by article", "Every duty cites its article and names who usually owns it."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { dsView = "page"; renderDsa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(typeof orgGet === "function" && orgGet().confirmed ? [{n:"Start from your profile", run:() => dsAct("fromorg")}] : []).concat([{n:"See a finished example", run:() => dsAct("example")}]),
@@ -368,7 +368,7 @@ function renderDsa(){
           download:{attrs:'data-ds="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-ds="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
         }, `<button type="button" class="btn sm" data-ds="sharelink">${COPY_LINK_LABEL}</button>`))
-    : head("DSA readiness", "Find out which duties under the EU Digital Services Act apply to your service, article by article, and close the gaps, with drafts ready to edit.", "Build safely",
+    : head("DSA readiness", "Which EU Digital Services Act duties apply to your service, article by article, and the gaps, with drafts to edit.", "Build safely",
         `<span class="toast" id="ds-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-ds="example">${SEE_EXAMPLE_LABEL}</button>${ds.tier ? `<button type="button" class="btn sm" data-ds="reset">${START_OVER_LABEL}</button>` : ""}${typeof orgGet === "function" && orgGet().confirmed ? `<button type="button" class="btn sm" data-ds="fromorg">Start from your profile</button>` : ""}`))
     + `<div class="ds-root cp-root">${report ? dsReportHTML(x, ap, s) : dsSetupHTML(x, ap, s)}</div>`;
 }

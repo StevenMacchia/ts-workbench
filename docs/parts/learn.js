@@ -281,9 +281,9 @@ const LN_GLOSS = [
 /* ---------- the two guides ---------- */
 const LN_GUIDES = {
   llm: {route:"redteamllm", name:"Red teaming LLMs", short:"language model", icon:"shield", color:"var(--t-ai)",
-    desc:"How to find the harm a chat or agent model can cause before users do. The method in nine steps, eleven drills to run with your team, worksheets to copy, and the sources.",
+    desc:"How to find the harm a chat or agent model can cause before users do: nine steps, eleven drills, worksheets, sources.",
     steps:[
-      {id:"scope", title:"Scope the exercise", why:"Decide what you are testing, who you are pretending to be, and what happens with the results, before anyone writes a prompt.", body:`
+      {id:"scope", title:"Scope the exercise", why:"Decide what you test, who you play and where results go before any prompt.", body:`
         <h3>Write down the target</h3><ul>
           <li><b>The model and version.</b> Name, version, settings (temperature, context length), and the system prompt that will be in front of it in production. Testing the raw model and testing the product are different exercises. Do the product.</li>
           <li><b>Every surface a user can reach.</b> Chat, API, voice, file upload, and any tools the model can call (search, code, email, payments). Each surface gets its own line in the coverage grid.</li>
@@ -501,9 +501,9 @@ Then change one number (fraud S3+ to 1.8%, or es over-refusal to 7%) and decide 
     checklist:["Target written down: model, version, system prompt, settings, every surface, every guardrail layer, who the users are.","At least three attacker profiles chosen and named in the plan.","Success criteria, release gates and thresholds agreed in writing, before testing starts.","Stop rules, escalation path, evidence vault and deletion schedule in place. CSAE process signed by legal.","Tester welfare rules set: time limits, rotation, support, nobody alone on severe material.","Seeds written for every harm area, each mapped to a policy line, each with a benign twin.","Seeds cover every shipped language plus unsupported ones, and every input format including uploads and voice.","Baseline run first, then one technique at a time, then combinations, then automated breadth, then human depth.","Every attempt logged with the same fields, every finding reproduced k of n.","Graded on the S0 to S4 scale against written rubrics. Humans on all S3 and S4. Grader agreement measured.","Every number reported says what it counts: which severity, which denominator, which surfaces.","Findings filed in the template, with vault references, owners and dates. No harmful output in tickets.","Exercise report gives the decision first, the gates pass or fail, the trend, and the residual risk with a signature.","Fixes retested: the finding, its variants, and the benign twins. Over-refusal before and after in the ticket.","Every finding and variant added to the regression suite, which runs on every build.","Graders calibrated on the gold set this round. Judge model audited by humans. Coverage audited by someone outside the team.","Records kept in the shape a regulator would ask for: scope, set version, results, decisions, sign-offs."]
   },
   world: {route:"redteamworld", name:"Red teaming world models", short:"world model", icon:"world", color:"#E0532F",
-    desc:"How to find the harm a video, image-to-video or interactive world model can cause before users do. What is different from text, the method in ten steps, twelve drills, worksheets and the sources.",
+    desc:"The harm a video or interactive world model can cause: what differs from text, ten steps, twelve drills, sources.",
     steps:[
-      {id:"different", title:"What is different from text", why:"The harm categories carry over from language models. Nine things about video and interactive models change how you test.", body:`${lnDo([
+      {id:"different", title:"What is different from text", why:"Harm categories carry over from text. Nine things about video change how you test.", body:`${lnDo([
         "<b>The output is believable.</b> A paragraph about an event is a claim. A video of it is evidence to most viewers. The same content lands a grade higher when it is rendered realistically, and realism classifiers become part of what you are testing.",
         "<b>Uploads are the main attack.</b> Most deepfake and NCII harm starts with an image of a real person being fed to an image-to-video or edit flow, not with a clever prompt. Test the upload path with photos of consenting testers, and test what the model does with partial, cropped and composited images.",
         "<b>The harm is built over time.</b> In an interactive world, no single action is the violation. The user places a character, changes the clothing, adds a prop, changes the setting, and the scene becomes the harm over several steps. Checks that look at one prompt or one frame miss it. Test sequences, not prompts.",
@@ -1545,7 +1545,7 @@ function renderGlossary(){
   let q = "", f = "all";
   const due0 = glDueCount();
   const meta = `<button type="button" class="btn sm primary" id="ln-practice">Practice the terms</button>${due0 ? `<button type="button" class="btn sm" id="ln-review-due">${due0} due for review</button>` : ""}<a class="btn sm" href="#redteamllm">LLM guide</a><a class="btn sm" href="#redteamworld">World model guide</a>`;
-  view.innerHTML = head("Glossary", `<span class="wip-tag">In progress</span> ${LN_GLOSS.length} terms from red teaming, in plain words, tagged by the kind of model they apply to. Open a term, or practise them as flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
+  view.innerHTML = head("Glossary", `<span class="wip-tag">In progress</span> ${LN_GLOSS.length} red-teaming terms in plain words, tagged by model type. Open a term, or practise with flashcards and a quiz.`, "Learn", meta) + `<div class="ln">
     <p class="note tsg-xlink">Looking for general Trust and Safety terms? <a href="#tsglossary">T&amp;S glossary</a></p>
     <div class="ln-gl-tools"><label class="ln-search"><svg><use href="#i-search"/></svg><input id="ln-q" type="search" placeholder="Search terms" autocomplete="off" aria-label="Search terms"></label>
       <div class="segs" role="group" aria-label="Filter"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="llm" aria-pressed="false">LLMs</button><button type="button" data-f="world" aria-pressed="false">World models</button></div>
@@ -1662,11 +1662,11 @@ function renderLearn(){
   const prog = k => { const g = LN_GUIDES[k]; return `${g.steps.filter(s => lnIsDone(k + ":s:" + s.id)).length} of ${g.steps.length} steps · ${g.exercises.filter(e => lnIsDone(k + ":e:" + e.id)).length} of ${g.exercises.length} drills`; };
   view.innerHTML = head("Learn", "Start in the studio. Read the guide when you want the reasons. Look up a word when one stops you.", "Learn") + `<div class="ln">
     <div class="ln-hub">
-      <a class="card" href="#redteam" style="--c:var(--t-rt)"><span class="lnh-b">${tileHTML("shield", "ai", "md")}<h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. Your first finding in about 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></span></a>
+      <a class="card" href="#redteam" style="--c:var(--t-rt)"><span class="lnh-b">${tileHTML("shield", "ai", "md")}<h3>Do it: the studio</h3><p>Test your own AI feature, one calm step at a time. A finding in 20 minutes.</p><span class="note">Start with one finding in twenty minutes</span><span class="go">Open the studio →</span></span></a>
       <div class="card" style="--c:var(--t-ai)"><span class="lnh-b">${tileHTML("book", "learn", "md")}<h3>Read why: the two guides</h3><p><a href="#redteamllm">Red teaming LLMs</a> — chat and agent models, nine steps, eleven drills.</p><p><a href="#redteamworld">Red teaming world models</a> — video and interactive models, ten steps, twelve drills.</p><span class="note">${prog("llm")} · ${prog("world")}</span></span></div>
       <div class="card" style="--c:var(--accent)"><span class="lnh-b">${tileHTML("glossary", "learn", "md")}<h3>Look up a word: two glossaries</h3><p><a href="#tsglossary">T&amp;S glossary</a> — ${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 103} everyday Trust and Safety terms, in plain words.</p><p><a href="#glossary">Red-teaming glossary</a> — ${LN_GLOSS.length} terms, with flashcards and a quiz.</p><span class="note">${due ? due + " due for review · " : ""}${known} of ${LN_GLOSS.length} red-teaming terms known</span></span></div>
     </div>
-    <p class="note">Methods and categories only, no attack strings; severe harm areas are policy-described probes under stop rules, never open drills.</p></div>`;
+    <p class="note">Methods and categories only, never attack strings. Severe areas stay as described probes.</p></div>`;
 }
 
 lazyDone("learn");

@@ -48,7 +48,7 @@ function gdIntroHTML(spec){
     <p class="gd-lead">${I.lead}</p>
     ${I.note ? `<p class="note gd-note">${I.note}</p>` : ""}
     ${I.powered && I.powered.length && typeof poweredBy === "function" ? `<div class="gd-pw">${poweredBy(I.powered)}</div>` : ""}
-    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s], i) => `<div>${gdFactTile(i, toneOfColor(T.color))}<b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
+    ${I.facts && I.facts.length ? `<div class="gd-facts">${I.facts.map(([b, s, ttl], i) => `<div${ttl ? ` title="${esc(ttl)}"` : ""}>${gdFactTile(i, toneOfColor(T.color))}<b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>` : ""}
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-gd="${resume ? "resume" : "start"}">${resume ? `Pick up where you left off (${n} of ${st.length})` : esc(I.start || "Start")} ${icon("arrow")}</button>${I.extra || ""}</div>
     ${spec.alt && spec.alt.length ? `<div class="gd-alt"><span>Other ways in:</span>${spec.alt.map((a, i) => `<button type="button" class="ov-link" data-gd="alt${i}">${esc(a.n)}</button>`).join("")}</div>` : ""}
   </div>${gdPreviewHTML(spec)}`;

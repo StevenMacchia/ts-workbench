@@ -337,7 +337,7 @@ function cvIntroHTML(){
   return `<div class="gd-w gd-intro">
     <span class="gd-tool">${tileHTML("cover", "assess", "sm")}Coverage radar</span>
     <h1>Do your defenses keep up with your risk?</h1>
-    <p class="gd-lead">For each kind of harm, you'll answer five short questions about how you handle it today. Then you'll see your risk next to your defenses, and the gaps to close first.</p>
+    <p class="gd-lead">Five short questions per harm. Then your risk beside your defenses, gaps first.</p>
     <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One question at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${n} kinds of harm</b><span>Skip any that can't happen on your platform.</span></div><div>${gdFactTile(2, "assess")}<b>${rk ? "Risk already known" : "Coverage only"}</b><span>${esc(from)}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-cvg="${s.rated ? "resume" : "start"}">${s.rated ? `Pick up where you left off (${s.rated} of ${s.total})` : "Start"} ${icon("arrow")}</button></div>
     <div class="gd-alt"><span>Other ways in:</span>${!src ? `<button type="button" class="ov-link" data-ov="new">Run a pre-mortem first, to compare against real risk</button>` : ""}<button type="button" class="ov-link" data-cvg="table">Answer everything in one table</button>${cvMaReady() ? `<button type="button" class="ov-link" data-cv="fillma">Start from your maturity ratings</button>` : ""}<button type="button" class="ov-link" data-cv="example">See a finished example</button></div>
@@ -347,7 +347,7 @@ function cvApplyHTML(){
   const rk = cvRisk(cv), off = cvOff(), p = typeof wsProfile === "function" ? wsProfile() : null, n = CV_AREAS.length - off.length;
   return `<div class="gd-w">
     <div class="gd-hd"><span class="as-eb">Before you start</span><h1>Which of these can happen on ${esc((p && p.org) || "your platform")}?</h1>
-      <p>Untick anything your platform can't have. It won't count toward your grade. It's saved in your company profile, so you can add it back any time.</p></div>
+      <p>Untick what your platform can't have. It won't count toward your grade, and you can add it back any time.</p></div>
     <div class="card gd-list">${CV_AREAS.map(a => { const on = !off.includes(a.k), x = rk && rk[a.k];
       return `<div class="gd-ar ${on ? "" : "off"}"><label><input type="checkbox" data-cvapply="${a.k}" ${on ? "checked" : ""}><span class="gd-arn">${esc(a.n)}</span>${x ? `<span class="pill ${x.band ? BANDS[x.band][1] : ""}">${x.band ? BANDS[x.band][0] + " risk" : "No risk found"}</span>` : ""}</label>
         ${!on && x && x.score >= 8 ? `<p class="gd-warn">${esc(cvRiskWho(x))} found ${esc(cvRiskWords(x))} here. Leave it out only if that risk isn't real.</p>` : ""}</div>`; }).join("")}</div>
@@ -435,7 +435,7 @@ function cvResultsRender(){
 function cvTableRender(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${CV_STEPS[n - 1][0]}</h3><p>${CV_STEPS[n - 1][1]}</p></div></div>`, full = cvRatedAll();
   view.innerHTML = head("Coverage radar",
-    "Rate how well your defenses cover each kind of harm, then see it against your products' risk. Where risk outruns coverage is where to invest next.",
+    "Rate how well your defenses cover each harm, then see it against your products' risk. Invest where risk outruns coverage.",
     "Run the program", cvHeadMeta()) + `
     ${cv.est ? "" : `<div class="banner cvt-b"><span>${full ? "<strong>Every defense is rated.</strong> See your radar and the gaps to close first." : "<strong>Prefer one question at a time?</strong> The guided version asks the same questions, with a result after each harm area."}</span><button type="button" class="btn sm ${full ? "primary" : ""}" data-cvg="${full ? "results" : "guide"}">${full ? "See your results" : "Switch to guided"}</button></div>`}
     <div class="vd-grid ma-grid cv-grid">

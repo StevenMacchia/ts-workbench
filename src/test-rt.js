@@ -100,7 +100,7 @@ const body2 = function(){
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
   store.set("rt:seen-intro", true); // the purpose card itself is covered in body12; this body starts past it
   rt = RT_BLANK(); renderRedteamStudio(); if(bad(H())) throw new Error("open card bad: " + where(H()));
-  eq(/Find out what your AI model does/.test(H()) && /data-pick="1"/.test(H()), true, "opens on a sixty-second try, not a form");
+  eq(/What your model does when pushed to harm/.test(H()) && /data-pick="1"/.test(H()), true, "opens on a sixty-second try, not a form");
   eq(/data-rtf="next"/.test(H()), false, "no next button until you try");
   rtF().openPick = 1; renderRedteamStudio(); eq(/That is it/.test(H()) && /one finding in 20 minutes/.test(H()), true, "a right pick explains and offers your own feature");
   rtF().skipBasics = false; rtF().path = "basics"; rtM1().target = "support"; rtM1().card = Object.assign({}, RT_TARGETS[0].card); rtGo(rtScreens().findIndex(x => x.k === "basic")); eq(/Lesson 1 of 5/.test(H()) && /red teaming/.test(H()), true, "lesson one: one idea, one try");
@@ -527,17 +527,17 @@ const body12 = function(){
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
   // first visit: the purpose card, before anything else, exactly three lines, two buttons and a skip line
   rt = RT_BLANK(); renderRedteamStudio(); if(bad(H())) throw new Error("intro bad: " + where(H()));
-  eq(/<span class="rtf-eb">Red team studio <span class="wip-tag">In progress<\/span><\/span>/.test(H()) && /Find out what your AI feature does when someone tries to misuse it, before a customer does/.test(H()), true, "the purpose card opens with its eyebrow and heading");
+  eq(/<span class="rtf-eb">Red team studio <span class="wip-tag">In progress<\/span><\/span>/.test(H()) && /What your AI does when misused/.test(H()), true, "the purpose card opens with its eyebrow and heading");
   eq((H().match(/<li>/g) || []).length, 3, "exactly three lines on the purpose card");
   eq(/Who it's for: a small team with no safety person and a deadline\./.test(H()), true, "who it's for");
-  eq(/What you leave with: a target card, graded tries, a finding, and a one-page summary you can send a customer\./.test(H()), true, "what you leave with");
+  eq(/You leave with graded tries, a finding, and a one-page summary for customers\./.test(H()), true, "what you leave with");
   eq(/How long: your first finding in about 20 minutes\./.test(H()), true, "how long");
   eq(/data-rtf="introstart"/.test(H()) && /data-rtf="introhow"/.test(H()), true, "a Start button and a Show me how it works button");
   eq(/Already know this\? .*Skip to the menu/.test(H()), true, "a quiet skip-to-menu line");
   eq(/data-rtf="how"/.test(H()), false, "the purpose card doesn't need its own how-this-works footer link, it already offers the walkthrough");
   // it shows once: Start marks it seen and lands on the existing first card; a fresh blank plan after that skips it
   rtIntroMark(); rtSave(); rtGo(0); if(bad(H())) throw new Error("after start bad: " + where(H()));
-  eq(/Find out what your AI model does/.test(H()), true, "Start lands on the existing first card, the sixty-second try");
+  eq(/What your model does when pushed to harm/.test(H()), true, "Start lands on the existing first card, the sixty-second try");
   rt = RT_BLANK(); renderRedteamStudio();
   eq(/<span class="rtf-eb">Red team studio<\/span>/.test(H()), false, "seen once, the purpose card does not show again on a fresh blank plan");
   // skip-to-menu jumps straight to the hub, and every other card carries the how-this-works link, including

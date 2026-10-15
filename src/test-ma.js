@@ -19,7 +19,7 @@ const body = function(){
   // guided: your size, then one area at a time, then the plan
   maGo("start"); h = view.innerHTML; eq((h.match(/data-magstage=/g) || []).length, 3, "asks your size first");
   maPickStage("scale", true); h = view.innerHTML; eq(ma.stage + "/" + ma.stageSet, "scale/true", "size saved");
-  eq(/Are your rules clear, written down and applied the same way every time\?/.test(h) && (h.match(/data-magpick=/g) || []).length, 5, "first area, five levels");
+  eq(/Are your rules written down and applied the same way every time\?/.test(h) && (h.match(/data-magpick=/g) || []).length, 5, "first area, five levels");
   eq(/data-magpick="4"[^>]*>[\s\S]{0,260}Your target/.test(h), true, "the target for your size is marked");
   maPick(2, true); eq(maG.i + "/" + ma.lv.policy, "1/2", "on to the next area"); maGo("back"); eq(maG.i, 0, "back to the first area"); maGo("back"); eq(maG.scr, "stage", "back to your size");
   maGo("page"); eq(maMode(), "page", "switch to one page any time"); eq(/Switch to guided/.test(view.innerHTML), true, "and back");

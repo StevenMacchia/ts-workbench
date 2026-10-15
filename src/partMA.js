@@ -119,7 +119,7 @@ function maStagesHTML(){
   return `<div class="ma-stages" role="radiogroup" aria-label="Your stage">${MA_STAGES.map(s => `<button type="button" role="radio" aria-checked="${ma.stage === s.k}" class="card ma-stage ${ma.stage === s.k ? "on" : ""}" data-stage="${s.k}">
     <span class="ma-stage-h"><span class="ma-radio"></span><b>${s.n}</b></span><span class="ma-stage-d">${esc(s.d)}</span><span class="ma-stage-t">Target: ${esc(s.td)}</span></button>`).join("")}</div>
     ${typeof orgFromTag === "function" ? orgFromTag(!ma.stageSet && !!orgGet().stage && orgGet().stage === ma.stage) : ""}
-    <p class="note ma-why-t">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>`;
+    <p class="note ma-why-t">Some basics never scale down. Crisis response, compliance and reviewer wellbeing matter at any size.</p>`;
 }
 function maAreasHTML(){
   const t = maStage().t, seen = new Set();
@@ -328,7 +328,7 @@ function maIntroHTML(){
   return `<div class="gd-w gd-intro">
     <span class="gd-tool">${tileHTML("steps", "assess", "sm")}Program maturity</span>
     <h1>How strong is your Trust &amp; Safety program?</h1>
-    <p class="gd-lead">Eight areas, one question each. Pick the level that matches your program today, and you'll get a score, the gaps against the targets for your size, and a roadmap that starts with the biggest ones.</p>
+    <p class="gd-lead">Eight areas, one question each. Then a score, the gaps for your size, a roadmap.</p>
     <div class="gd-facts"><div>${gdFactTile(0, "assess")}<b>About 5 minutes</b><span>One area at a time. Stop whenever you like.</span></div><div>${gdFactTile(1, "assess")}<b>${MA_AREAS.length} areas</b><span>From policy and detection to crisis response and reviewer wellbeing.</span></div>
       <div>${gdFactTile(2, "assess")}<b>Targets for your size</b><span>${o.stage ? `Set for ${esc(orgStageName(o.stage).toLowerCase())} programs, from your company profile.` : "You'll pick your size first."}</span></div></div>
     <div class="gd-a"><button type="button" class="btn primary gd-cta" data-mag="${rated ? "resume" : "start"}">${rated ? `Pick up where you left off (${rated} of ${MA_AREAS.length})` : "Start"} ${icon("arrow")}</button></div>
@@ -342,7 +342,7 @@ function maStageStepHTML(){
       <p>Targets depend on your size and how regulated you are.${fromOrg ? " We've picked the one from your company profile." : ""}</p></div>
     <div class="gd-opts" role="group" aria-label="Your stage">${MA_STAGES.map((s, j) => `<button type="button" class="gd-opt ${ma.stage === s.k ? "on" : ""}" data-magstage="${s.k}" aria-pressed="${ma.stage === s.k}">
       <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><b>${esc(s.n)}</b><span>${esc(s.d)}</span><span class="gd-sub">Target: ${esc(s.td)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
-    <p class="note gd-note">Some basics never scale down. Crisis response, legal compliance and reviewer wellbeing matter as much to a small team, because the harm is the same whatever your size.</p>
+    <p class="note gd-note">Some basics never scale down. Crisis response, compliance and reviewer wellbeing matter at any size.</p>
     <div class="gd-foot"><button type="button" class="btn" data-mag="intro">Back</button><button type="button" class="btn primary" data-mag="first">Continue ${icon("arrow")}</button></div>
   </div>`;
 }
@@ -353,7 +353,7 @@ function maQHTML(){
     <div class="gd-main">
       <div class="gd-crumb"><span class="gd-area">${esc(a.n)}</span><span aria-hidden="true">/</span><span>Area ${i + 1} of ${MA_AREAS.length}</span></div>
       <h1>${esc(a.q)}</h1>
-      <p class="gd-why">${esc(a.why)} Pick the highest level where every statement is true today.</p>
+      <p class="gd-why">${esc(a.why)} Pick the highest level that is fully true today.</p>
       ${typeof typeArea === "function" && typeArea(a.k) ? `<p class="gd-type"><b>For ${esc(typeName())} platforms:</b> ${esc(typeArea(a.k))}</p>` : ""}
       <div class="gd-opts" role="group" aria-label="${esc(a.n)} level">${a.lv.map((txt, j) => `<button type="button" class="gd-opt ${lv === j + 1 ? "on" : ""}" data-magpick="${j + 1}" aria-pressed="${lv === j + 1}">
         <span class="gd-radio" aria-hidden="true"></span><span class="gd-ot"><span class="gd-lvh"><span class="gd-lv lm">${j + 1} · ${MA_LEVELS[j].n}</span>${t[a.k] === j + 1 ? `<span class="ma-tg">Your target</span>` : ""}</span><span>${esc(txt)}</span></span><kbd aria-hidden="true">${j + 1}</kbd></button>`).join("")}</div>
@@ -432,7 +432,7 @@ function renderMaturity(){
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${MA_STEPS[n - 1][0]}</h3><p>${MA_STEPS[n - 1][1]}</p></div></div>`;
   const exBanner = (ma.shared ? shareBannerHTML('data-ma="unshare"') : "") + (ma.ex ? `<div class="banner ma-exb"><span><strong>This is an example:</strong> a growing marketplace preparing to expand into the EU, a quarter into its plan. Start over to rate your own program.</span><button type="button" class="btn sm" data-ma="clear">Start over</button></div>` : "");
   view.innerHTML = (maPlanMode() ? headCompact("Program maturity", ma.ex ? "Example plan" : "Your plan", maHeadMeta()) : head("Program maturity",
-    "Rate your trust and safety program across eight areas, see where it stands against the targets for your stage, and work a plan that tackles the biggest gaps first.",
+    "Rate your program across eight areas, see it against the targets for your stage, and plan the biggest gaps first.",
     "Run the program", maHeadMeta())) + (maPlanMode() ? `${exBanner}<div id="ma-plan" class="ma-plan">${maPlanHTML()}</div>` : `
     <p class="mxa-q ma-q">How mature is your trust and safety program, and what should you fix first?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${MA_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>

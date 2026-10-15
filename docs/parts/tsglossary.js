@@ -181,7 +181,7 @@ function renderTsGlossary(){
   let q = "", gfilter = "all";
   const meta = `<a class="btn sm" href="#glossary">Red-teaming glossary</a>`;
   const chipsHTML = fg => [["all","All"]].concat(TSG_GROUPS.map(g => [g, g])).map(([k, n]) => `<button type="button" class="tsg-chip" data-g="${esc(k)}" aria-pressed="${k === fg}">${esc(n)}</button>`).join("");
-  view.innerHTML = head("T&S glossary", `${TSG_TERMS.length} terms a person new to Trust and Safety meets in their first year, in plain words. Search, filter by group, or browse A to Z.`, "Learn", meta) + `<div class="ln">
+  view.innerHTML = head("T&S glossary", `${TSG_TERMS.length} terms you meet in your first year of Trust and Safety, in plain words. Search, filter, or browse A to Z.`, "Learn", meta) + `<div class="ln">
     <p class="note tsg-xlink">Looking for AI red-teaming terms, such as jailbreak or attack success rate? <a href="#glossary">Red-teaming glossary</a></p>
     <div class="ln-gl-tools"><label class="ln-search"><svg><use href="#i-search"/></svg><input id="tsg-q" type="search" placeholder="Search terms" autocomplete="off" aria-label="Search terms"></label>
       <span class="note" id="tsg-count">${TSG_TERMS.length} of ${TSG_TERMS.length} terms</span></div>

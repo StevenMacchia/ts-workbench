@@ -9,7 +9,7 @@ const body = function(){
   const gaps = () => dsScore(ds, dsCtx(ds)).gaps.map(r => r.k), reqs = () => dsScore(ds, dsCtx(ds)).reqs.map(r => r.k);
   // a blank check opens guided: an intro, then one question per screen, only the ones that apply
   ds = DS_BLANK(); dsView = null; gdReset("dsa"); renderDsa(); let h = view.innerHTML; if(bad(h)) throw new Error("blank intro bad: " + where(h));
-  eq(/Which parts of the Digital Services Act apply/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
+  eq(/Which parts of the DSA apply to you/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
   gdGo(gdCur, "start"); h = view.innerHTML; eq(/What's the service called/.test(h) && /Question 1 of 4/.test(h), true, "the name first, four questions before a tier is known");
   gdCur.steps[0].set("Pixelry"); gdGo(gdCur, "next"); h = view.innerHTML; eq(/Which best describes the service/.test(h) && (h.match(/data-gdpick=/g) || []).length, 4, "four tiers");
   eq(/Example: most apps with public posts or listings/.test(h) && /Example: an ISP, a VPN provider or a CDN\./.test(h), true, "each service tier has a worked example under it");

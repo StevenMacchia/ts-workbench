@@ -9,7 +9,7 @@ const body = function(){
   const gaps = () => cpScore(cp, cpCtx(cp), cpApplies(cp)).gaps.map(r => r.k);
   // a blank check opens guided: an intro, then one question per screen, only the ones that apply
   cp = CP_BLANK(); cpView = null; renderCoppa(); let h = view.innerHTML; if(bad(h)) throw new Error("blank intro bad: " + where(h));
-  eq(/Does COPPA apply to you/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
+  eq(/Does COPPA apply, and are you ready/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
   gdGo(gdCur, "start"); eq(/What's the service or product called?/.test(view.innerHTML), true, "first question: the name (optional)"); gdGo(gdCur, "next");
   eq(/Who is the service for?/.test(view.innerHTML) && (view.innerHTML.match(/data-gdpick=/g) || []).length, 4, "who it's for, four answers");
   gdPick(gdCur, "mixed"); gdGo(gdCur, "next"); eq(cp.aud, "mixed", "answer saved"); eq(/Which of these are true of the service?/.test(view.innerHTML), true, "a mixed audience gets the child-audience signs");

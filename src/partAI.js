@@ -13,8 +13,8 @@ const AI_CLAUDE_URL = "https://claude.ai/artifact/5HCKtQAaNNuAw7VAtRikJj";
 /* ----- 1. Enforcement notice writer ----- */
 AI_TOOLS.notice = {
   n:"Enforcement notice writer", icon:"i-mail", slug:"notice",
-  desc:"Draft a clear, fair notice to a user whose content or account you actioned, and check it against what a statement of reasons needs to include.",
-  q:"When you take action against someone, will they understand what happened, why, and what they can do about it?",
+  desc:"A clear, fair notice to a user you actioned, checked against the statement-of-reasons rules.",
+  q:"Will they understand what happened and why?",
   steps:[["Describe the decision","What you did, which rule, and the facts."], ["Let Claude draft","A notice, a short version and a compliance check."], ["Review and send","Edit the draft. A person should always approve it."]],
   fields:[
     {k:"product", lab:"Your product", type:"text", ph:"For example: Pixelry, a photo and short-video app for adults"},
@@ -98,8 +98,8 @@ The checklist must cover: the action and what it means, the facts, the rule reli
 const AI_REC = {uphold:["Uphold the decision","crit"], overturn:["Overturn the decision","good"], modify:["Change to a lesser action","med"], escalate:["Escalate to a specialist",""]};
 AI_TOOLS.appeal = {
   n:"Appeal reviewer", icon:"i-appeal", slug:"appeal",
-  desc:"Get a structured second opinion on a user's appeal: each part of the rule tested against the facts, the user's arguments weighed fairly, and a suggested reply.",
-  q:"Did we get this decision right, and would we make the same call again?",
+  desc:"A second opinion on an appeal: the rule, the facts, and a suggested reply.",
+  q:"Did we get this decision right?",
   steps:[["Share the case","The rule, the decision, the content and the user's appeal."], ["Let Claude review","Each element of the rule is tested against the facts."], ["You decide","Claude recommends. A person makes the final call."]],
   fields:[
     {k:"policy", lab:"The rule that was applied", type:"area", req:true, rows:4, ph:"Paste the rule, including any exceptions. For example: We remove content that threatens violence against a person. We allow clearly joking statements between friends where no real threat is intended.", help:"Include the exceptions. Most wrong decisions come from missing one."},
@@ -316,7 +316,7 @@ function aiScoreFill(){
 // Tools still being rebuilt show a placeholder page instead of the form
 // The transparency tool is now a structured report builder (partTR.js); Claude writes the summary on request
 AI_TOOLS.transparency.builder = true;
-AI_TOOLS.transparency.desc = "Build the transparency report the EU Digital Services Act asks for: the right sections for your type of service, a completeness check, and a summary written by Claude.";
+AI_TOOLS.transparency.desc = "The DSA transparency report: the right sections for your service, a completeness check, a summary.";
 // AI_WIP / renderAIWip (the old "this assistant is being rebuilt" placeholder) were removed 2026-10-08:
 // no AI_TOOLS entry ever sets .wip = true, and transparency is intercepted earlier by renderTransparency()
 // above, so the placeholder path was unreachable dead code (audit §12 item 2).
@@ -342,7 +342,7 @@ function aiSpec(key){
     return Object.assign(base, {kind:"text", rows:fd.type === "area" ? (fd.rows || 4) + 1 : 1, placeholder:fd.ph || "", get:() => F()[fd.k] || "", set:v => setV(fd.k, v)});
   });
   return {k:key, tool:{name:T.n, icon:T.icon.replace(/^i-/, ""), color:"var(--t-ai)"},
-    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], note:"Without a Claude account: an example result, plus a plain template you fill in yourself. Open in Claude to run the real AI review on your own case.", facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example result; the AI step runs in the Claude version."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
+    intro:{title:esc(T.q), lead:esc(T.desc), powered:ai ? ["claude"] : [], note:"No Claude account? An example and a template here; the real review runs in Claude.", facts:[[`${T.fields.length} short questions`, "One per screen. Only " + (T.fields.filter(f => f.req).length === 1 ? "one is" : T.fields.filter(f => f.req).length + " are") + " required."], [ai ? "Runs on your Claude account" : "Open in Claude to run", ai ? "Only when you click, and nothing is stored on a server." : "This public version shows an example; the AI step runs in Claude."], ["A person decides", "Claude drafts and reviews. Someone accountable checks the output."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { aiView[key] = "page"; renderAI(key); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }},
       {n:"Fill in an example", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; gdReset(key); renderAI(key); window.scrollTo(0, 0); }},
       {n:"See an example result", run:() => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; aiView[key] = "page"; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 60); }}],

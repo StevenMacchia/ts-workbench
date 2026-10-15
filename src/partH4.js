@@ -140,7 +140,7 @@ function firstRunHTML(){
     <div class="firstrun-t"><h2 id="firstrun-h">How do you want to start?</h2><p class="note">Pick one. You can always do the other later.</p></div>
     <div class="firstrun-opts">
       <button type="button" class="firstrun-opt" data-firstrun="assess"><b>Assess my program</b><span>The full guided assessment: one picture of your program, built up step by step.</span></button>
-      <button type="button" class="firstrun-opt" data-firstrun="tools"><b>Use one tool</b><span>Jump straight to any tool on its own, such as a pre-mortem or a vendor scorecard.</span></button>
+      <button type="button" class="firstrun-opt" data-firstrun="tools"><b>Use one tool</b><span>Go straight to one tool, such as a pre-mortem or a vendor scorecard.</span></button>
     </div>
   </div>`;
 }
@@ -159,16 +159,16 @@ function asWelcomeHTML(J){
       <div class="as-hero-t">
         <span class="as-eb">Free · no account · about ${Math.round(total / 5) * 5} minutes</span>
         <h1>See where your Trust &amp; Safety program stands</h1>
-        <p>${asCount(J.length, true)} guided steps, chosen for your kind of platform. Each one asks a few plain questions, then adds to one picture of your program: what's strong, what's exposed, and what to do first.</p>
+        <p>${asCount(J.length, true)} guided steps, a few plain questions each. The result is one picture: what's strong, what's exposed, what to do first.</p>
         <div class="as-hero-a"><button type="button" class="btn primary as-cta" data-as="start">Start the assessment ${icon("arrow")}</button>${typeof demoStart === "function" ? `<button type="button" class="btn as-cta" data-demo="start">See it with an example company</button>` : ""}</div>
-        <span class="note">Stop any time. The next visit picks up where you left off. Your answers stay in this browser.</span>
+        <span class="note">Stop any time and pick up later. Your answers stay in this browser.</span>
       </div>
     </section>
     ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
       <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></li>`).join("")}</ol>
-      <p class="note as-six-note">More can appear as you answer: a COPPA readiness step if under-18s use your product, and a DSA readiness or transparency-report step if EU or UK rules apply to you.</p>
+      <p class="note as-six-note">Extra steps appear if under-18s use your product or EU or UK rules apply.</p>
     </section>
     ${asFootHTML()}
   </div>`;
@@ -224,8 +224,8 @@ function renderTools(){
       <div class="ov-tb">${tileHTML(iconId, TOOL_TONE[route], "lg")}<h4>${name}</h4><p>${desc}</p>
         <div class="ov-foot"><span>${foot}</span><svg class="ov-go"><use href="#i-arrow"/></svg></div></div></a>`;
   const items = Object.values(wsItems()).filter(i => KINDS[i.kind]).sort((a, b) => (b.updated || 0) - (a.updated || 0)).slice(0, 5);
-  view.innerHTML = `<div class="ov">` + head("All tools", `Every tool in the workbench, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order and ties the results into one picture.`) + `
-    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment walks you through the main tools in order and ties the results into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
+  view.innerHTML = `<div class="ov">` + head("All tools", `Every tool, to use on its own. <a href="#overview">Your assessment</a> runs the main ones in order.`) + `
+    ${asInAssessment() ? "" : `<div class="banner"><span>New here? The guided assessment runs the main tools in order, into one picture.</span><a class="btn sm" href="#overview">Take the guided assessment →</a></div>`}
     <div class="segs ov-stagef" role="group" aria-label="Filter by stage">${["all","assess","prepare","measure","ai"].map(k => `<button type="button" data-ovstage="${k}" aria-pressed="${ovStage === k}">${OV_STAGE_NAME[k]}</button>`).join("")}</div>
     <section class="rise">
       <div class="ov-sec-h"><h3>Assess and prepare</h3><span class="note">Free, private, and nothing leaves your browser</span></div>
@@ -239,11 +239,11 @@ function renderTools(){
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof GP_SG !== "undefined" ? tool("gp","grooming","var(--t-gp)","route","Grooming pathway review <span class=\"wip-tag\">New</span>","See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",`${GP_STAGES.length} stages · ${GP_SG.length} safeguards · 5 drafts`) : ""}
         ${typeof CR_CTRL !== "undefined" ? tool("cr","reporting","var(--t-cr)","flag","Child-safety reporting <span class=\"wip-tag\">New</span>","Check that you can remove, preserve, report and handle the account when you find child sexual exploitation, market by market.",`${CR_CTRL.reduce((n, g) => n + g.items.length, 0)} requirements · 5 markets · 4 drafts`) : ""}
-        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Find which EU Digital Services Act duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
+        ${typeof DS_CTRL !== "undefined" ? tool("ds","dsa","var(--t-ds)","dsa","DSA readiness","Which EU DSA duties apply to you, article by article, with drafts for Legal.",`${DS_CTRL.reduce((n, g) => n + g.items.length, 0)} duties · 4 drafts`) : ""}
         ${tool("vd","vendors","var(--t-vd)","scale","Vendor scorecard","Choose a moderation vendor on evidence, with RFP questions.",`${CRITERIA.length} criteria · 2 minimums`)}
-        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a moderation classifier fails, with what to change.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
-        ${typeof RT_AREAS !== "undefined" || typeof LAZY_COUNTS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">In progress</span>","Test your own AI feature for harm the way real red teams do, one calm step at a time: a target card, tries graded beside an expert rubric, findings an engineer can act on, a week plan, and a one-page summary for the customer who asked whether you red team.",`${typeof RT_AREAS !== "undefined" ? RT_AREAS.length : LAZY_COUNTS.rtAreas} harm areas · drills, findings, exports`) : ""}
-        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","A reference for learning: the numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
+        ${typeof EV_CATS !== "undefined" ? tool("ev","eval","var(--t-ai)","eval","Classifier eval","Build a labeled test set from a rule and see where a classifier fails.",`${EV_CATS.length} kinds of hard case · what it gets right and wrong, precision and recall`) : ""}
+        ${typeof RT_AREAS !== "undefined" || typeof LAZY_COUNTS !== "undefined" ? tool("rt","redteam","var(--t-rt)","shield","Red team studio <span class=\"wip-tag\">In progress</span>","Test your own AI feature for harm, one calm step at a time.",`${typeof RT_AREAS !== "undefined" ? RT_AREAS.length : LAZY_COUNTS.rtAreas} harm areas · drills, findings, exports`) : ""}
+        ${tool("mx","metrics","var(--t-mx)","gauge","Metrics framework","The numbers a T&S program runs on, and how to measure each one.",`${METRICS.length} metrics · ${Object.keys(MX_PLATFORMS).length} sectors`)}
       </div>
     </section>
     ${typeof AI_TOOLS !== "undefined" ? `<section class="rise">
@@ -257,7 +257,7 @@ function renderTools(){
     <section class="rise">
       <div class="ov-sec-h"><h3>Learn</h3><span class="note">Guides, drills and a glossary. Progress saved in your browser</span></div>
       <div class="ov-ai">
-        <a class="ln-aic ov-aic" href="#redteamllm">${tileHTML("shield", "learn", "lg")}<div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills to run with your team, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
+        <a class="ln-aic ov-aic" href="#redteamllm">${tileHTML("shield", "learn", "lg")}<div><h4>Red teaming LLMs <span class="wip-tag">In progress</span></h4><p>The method in nine steps, eleven drills, worksheets and sources.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#redteamworld">${tileHTML("world", "learn", "lg")}<div><h4>Red teaming world models <span class="wip-tag">In progress</span></h4><p>Video, image-to-video and interactive worlds: uploads, scene steering, style, provenance. Twelve drills.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         <a class="ln-aic ov-aic" href="#glossary">${tileHTML("glossary", "learn", "lg")}<div><h4>Glossary and practice <span class="wip-tag">In progress</span></h4><p>The terms in plain words, with flashcards and a quiz.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>
         ${typeof TSG_TERMS !== "undefined" || typeof LAZY_COUNTS !== "undefined" ? `<a class="ln-aic ov-aic" href="#tsglossary">${tileHTML("glossary", "learn", "lg")}<div><h4>T&amp;S glossary</h4><p>${typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : LAZY_COUNTS.tsgTerms} everyday Trust and Safety terms, from strike to statement of reasons, in plain words.</p></div><svg class="ov-go"><use href="#i-arrow"/></svg></a>` : ""}

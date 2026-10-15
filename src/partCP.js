@@ -453,8 +453,8 @@ function cpSpec(){
     clear:() => { const c = Object.assign({}, cp.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   const src = typeof loopSource === "function" ? loopSource() : null;
   return {k:"coppa", tool:{name:"COPPA readiness", icon:"coppa", color:"var(--t-cp)"},
-    intro:{title:"Does COPPA apply to you, and are you ready for it?", lead:"A few plain questions about who your service is for and what you collect. Then you'll see which parts of the amended Rule apply, where the gaps are, and get four drafts to edit: a notice to parents, a retention policy, a security program and a memo for Legal. Getting this right matters: civil penalties can run to $53,088 per violation (the FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98), and each child can count separately.",
-      facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."]], start:"Start"},
+    intro:{title:"Does COPPA apply, and are you ready?", lead:"A few plain questions, then which parts of the amended Rule apply, the gaps, and four drafts to edit.",
+      facts:[["About 6 minutes", "One question at a time. Only the questions that apply to your answers."], ["The 2025 amendments", "Checked against the Rule as amended, with the new parts marked."], ["Not legal advice", "A starting point for your conversation with counsel."], ["Penalties are real", "Up to $53,088 per violation, and each child can count separately.", "The FTC's 2025 inflation-adjusted maximum, 16 CFR 1.98"]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { cpView = "page"; renderCoppa(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(src ? [{n:"Start from your pre-mortem", run:() => cpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => cpAct("example")}]),
     steps, finish:"Build my plan",
@@ -473,7 +473,7 @@ function renderCoppa(){
           download:{attrs:'data-cp="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-cp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
         }, `<button type="button" class="btn sm" data-cp="sharelink">${COPY_LINK_LABEL}</button>`))
-    : head("COPPA readiness", "Find out whether the US Children's Online Privacy Protection Act applies to you, map the children's data you handle, and close the gaps against the amended Rule, with drafts ready to edit.", "Build safely",
+    : head("COPPA readiness", "Whether the US children's privacy law applies to you, the data you handle, and the gaps, with drafts to edit.", "Build safely",
         `<span class="toast" id="cp-toast" role="status" aria-live="polite"></span><button type="button" class="btn sm" data-cp="example">${SEE_EXAMPLE_LABEL}</button>${cp.aud ? `<button type="button" class="btn sm" data-cp="reset">${START_OVER_LABEL}</button>` : ""}${typeof loopSource === "function" && loopSource() ? `<button type="button" class="btn sm" data-cp="frompm">Start from your pre-mortem</button>` : ""}`))
     + `<div class="cp-root">${report ? cpReportHTML(x, ap, s) : cpSetupHTML(x, ap, s)}</div>`;
 }

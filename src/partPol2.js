@@ -49,7 +49,7 @@ function polSpec(){
   const ai = !!SAMPLER && !polRun.aiOff, setV = (k, v) => { pol[k] = v; savePol(); };
   const multi = (k, list) => ({kind:"multi", opt:true, opts:() => list.map(([v, n]) => ({k:v, n})), get:() => pol[k] || [], toggle:v => setV(k, (pol[k] || []).includes(v) ? pol[k].filter(x => x !== v) : (pol[k] || []).concat(v))});
   const steps = [
-    {id:"rule", eb:"Your rule", title:"What's the rule you want to test?", why:"Paste it exactly as users would see it, with any definitions, examples and exceptions you already have. The more of the real rule you paste, the more precise the review.", kind:"text", rows:8,
+    {id:"rule", eb:"Your rule", title:"What's the rule you want to test?", why:"Paste it as users see it, with definitions, examples and exceptions. More of the real rule means a more precise review.", kind:"text", rows:8,
       placeholder:"For example: “Harassment means repeatedly targeting someone with insults, threats or unwanted sexual comments…”", get:() => pol.rule, set:v => setV("rule", v),
       hint:`Start from an example: ${POL_EXAMPLES.map(([n], i) => `<button type="button" class="pol-chip" data-polex="${i}">${esc(n)}</button>`).join(" ")}`},
     {id:"company", eb:"Your platform", title:"What's the company or product called?", why:ai ? "Claude can fill in the details that follow from what it already knows about the company. It can't browse the web, so check them." : "It's named in your report.", kind:"text", opt:true, max:80,
@@ -66,9 +66,9 @@ function polSpec(){
       placeholder:"For example: “Rival fans' trash talk keeps getting reported as harassment. We're unsure about jokes about someone's appearance.”", get:() => pol.concerns, set:v => setV("concerns", v)}
   ];
   return {k:"policy", tool:{name:"Policy stress-tester", icon:"doc", color:"var(--t-pol)"},
-    intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule, tell the test about your platform and what worries you, and it finds the words reviewers would read differently, the cases the rule forgets, and how it holds up against real edge cases.",
-      note:"Without a Claude account: instant checks against a public rubric. Open this page in Claude to add edge cases, a rewrite, a reviewer checklist and matching laws.",
-      facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open this page in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
+    intro:{title:"Would your reviewers agree on this rule?", lead:"Paste a rule and say what worries you. It finds the words reviewers read differently and the cases the rule forgets.",
+      note:"No Claude account? Instant rubric checks here. Open in Claude for the full review.",
+      facts:[["About 4 minutes", "Nine short questions. Only the rule is required."], [ai ? "Claude's review" : "Instant checks", ai ? "Runs on your own Claude account, only when you click." : "A transparent rubric runs in your browser. Open in Claude to unlock Claude's review."], ["Nothing leaves your browser", "Except the review you ask Claude for."]], start:"Start"},
     alt:[{n:"Fill everything in on one page", run:() => { polView = "page"; renderPolicy(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"Load a complete example", run:() => { pol = Object.assign(POL_BLANK(), JSON.parse(JSON.stringify(POL_FULL_EXAMPLE)), {depth:pol.depth}); polRun.err = ""; store.set("ws:cur:policy", null); savePol(); gdReset("policy"); renderPolicy(); window.scrollTo(0, 0); gsay("Complete example loaded. Run the test to see the full report"); }}],
     steps, finish:ai ? "Run the test" : "Run the instant checks",
     preview:polPreviewHTML,
@@ -93,7 +93,7 @@ function renderPolicy(){
          ${DL ? `<button type="button" class="btn sm primary" id="pol-dl"><svg><use href="#i-download"/></svg>Download</button>` : ""}
          <button type="button" class="btn sm" id="pol-copyrep">${icon("copy")}Copy as text</button>
          <button type="button" class="btn sm" id="pol-sharelink">Copy link</button>`)
-    : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases on your platform.", "Build safely",
+    : head("Policy stress-tester", "Find where reviewers would disagree, what your rule forgets, and how it holds up against real edge cases.", "Build safely",
         `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<span class="pill ${ai?"accent":""}" title="${ai?"Claude's review runs on your own Claude account, only when you click":"Open this page in Claude while signed in to unlock Claude's review"}"><span class="dot"></span>${ai?"Claude review available":"Instant checks only"}</span><button type="button" class="btn sm" id="pol-full">See an example</button>${pol.rule || pol.heur ? `<button type="button" class="btn sm" id="pol-reset">Start over</button>` : ""}`))
     + (report ? polReportHTML(ai) : polSetupHTML(ai));
   polBind();

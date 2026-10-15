@@ -138,8 +138,8 @@ function startScreen(){
     <div class="card hero ${cur ? "pm-new" : ""}">
       <div class="hero-main">
         <span class="pill accent" style="justify-self:start">About 3 minutes · ${QS.length} questions</span>
-        <h2>${cur ? "Assess another product or feature" : "See how your product could be misused, and what to do about it"}</h2>
-        <p>Answer a few plain-language questions about what you're building and who uses it. No trust &amp; safety background needed.</p>
+        <h2>${cur ? "Assess another product or feature" : "How your product could be misused"}</h2>
+        <p>A few plain questions about what you're building. No T&S background needed.</p>
         <div class="row"><button type="button" class="btn primary" data-act="new">Start a new assessment ${icon("arrow")}</button></div>
       </div>
       <div class="hero-side">
@@ -147,7 +147,7 @@ function startScreen(){
         <ul class="getlist">
           <li><b>Where to start</b><span>Your top five actions, in plain English</span></li>
           <li><b>Every risk, explained</b><span>How serious, how likely, and which answers drove it</span></li>
-          <li><b>A launch checklist and the laws that apply</b><span>With owners, effort and jurisdictions</span></li>
+          <li><b>A launch checklist and the laws</b><span>With owners, effort and jurisdictions</span></li>
         </ul>
       </div>
     </div>

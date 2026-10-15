@@ -17,9 +17,9 @@ const introMark = route => store.set("intro:" + route, true);
 // own classes (non-interactive, tabindex -1, no attack content anywhere).
 const INTRO_SPECS = {
   premortem:{
-    heading:"Find out how your feature could be misused, before you launch it",
+    heading:"How your feature could be misused, before launch",
     who:"a team about to ship a product or feature.",
-    leave:"every risk that applies, how serious it is, and the five actions to do first.",
+    leave:"every risk that applies, how serious, and the five actions to do first.",
     mins:"about 3 minutes. No Trust &amp; Safety background needed.",
     walk:[
       {title:"Twelve plain questions", line:"What you're building, who uses it and how. No right answer is required to move on.",
@@ -32,7 +32,7 @@ const INTRO_SPECS = {
   tabletop:{
     heading:"Rehearse a crisis before it happens",
     who:"anyone who'd be in the room during a real incident.",
-    leave:"four timed decisions scored on safety, trust, legal standing and your team, plus a debrief.",
+    leave:"four timed decisions scored on safety, trust, legal standing and your team.",
     mins:"about 8 minutes solo; longer with your team.",
     walk:[
       {title:"Pick your company type and a scenario", line:"Scenarios are tailored to your kind of company, from the most common incidents to the most severe.",
@@ -43,9 +43,9 @@ const INTRO_SPECS = {
         preview:() => `<div class="cmp head" style="margin:0"><span>Score</span><span>Was</span><span>Now</span></div><div class="cmp"><span>User safety</span><span class="cv">60</span><span class="cv up">75</span></div>`}
     ]},
   maturity:{
-    heading:"See how strong your Trust &amp; Safety program really is",
+    heading:"How strong your Trust &amp; Safety program really is",
     who:"whoever owns the program, even a team of one.",
-    leave:"a level for each of 8 areas against a target for your size, and a roadmap for the biggest gaps.",
+    leave:"a level for each of 8 areas against your size's target, and a roadmap.",
     mins:"about 5 minutes, one area at a time.",
     walk:[
       {title:"Your size sets the target", line:"Smaller teams get a lighter target. A few things, like crisis response, never scale down.",
@@ -56,9 +56,9 @@ const INTRO_SPECS = {
         preview:() => `<div class="ma-road" style="padding:10px 12px"><label class="row"><input type="checkbox" disabled><span>Write down who owns each kind of decision</span></label></div>`}
     ]},
   coverage:{
-    heading:"See where your defenses don't match your risk",
+    heading:"Where your defenses don't match your risk",
     who:"whoever is deciding what to build or buy next.",
-    leave:"a radar of risk against your defenses, and the three weakest spots to close first.",
+    leave:"a radar of risk against defenses, and the three weakest spots to close first.",
     mins:"about 5 minutes across the harms that apply to you.",
     walk:[
       {title:"Only the harms that apply", line:"Untick anything your platform can't have. It's left out of the radar and your grade.",
@@ -69,7 +69,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="cv-cell" style="margin:0 auto"><p class="cv-cell-lv">Coverage: 2 of 4</p></div>`}
     ]},
   metrics:{
-    heading:"Pick the few numbers that show whether users are actually safer",
+    heading:"The few numbers that show users are safer",
     who:"anyone who has to report on the program's results.",
     leave:"the north-star metrics recommended for your platform, each with a formula and starter SQL.",
     mins:"about 1 minute to get started; a full scorecard takes longer.",
@@ -82,9 +82,9 @@ const INTRO_SPECS = {
         preview:() => `<div class="mx-sc" style="padding:10px 12px"><span class="pill good">On track</span></div>`}
     ]},
   vendors:{
-    heading:"Decide which moderation vendor to trust with your users",
+    heading:"Which moderation vendor to trust with your users",
     who:"whoever has to choose, or defend the choice of, a vendor.",
-    leave:"a ranked scorecard against a plain rubric, with the RFP questions to ask each one.",
+    leave:"a ranked scorecard against a plain rubric, and the RFP questions to ask.",
     mins:"about 10 minutes for two to four vendors.",
     walk:[
       {title:"Say what matters", line:"Weight cost, coverage, quality, wellness, security and more, or start from a preset.",
@@ -95,7 +95,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="vd-railc" style="padding:10px 12px"><span class="pill good">Vendor B leads</span></div>`}
     ]},
   policy:{
-    heading:"Find out where reviewers would disagree on your rule",
+    heading:"Where reviewers would disagree on your rule",
     who:"whoever writes or reviews the rules.",
     leave:"the words reviewers read differently, the cases your rule forgets, and a clearer rewrite.",
     mins:"about 4 minutes for the instant checks in your browser.",
@@ -121,7 +121,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="row" style="gap:8px;flex-wrap:wrap"><span class="grade grade-C">C</span><span class="pill high">Signal to declared 2h 40m</span><span class="pill">3 actions</span></div>`}
     ]},
   coppa:{
-    heading:"Find out whether COPPA applies to you, and if you're ready",
+    heading:"Whether COPPA applies, and if you're ready",
     who:"any service that could reach children under 13 in the US.",
     leave:"a readiness score, the gaps against the Rule, and four drafts ready to edit.",
     mins:"a few plain questions. Penalties run over $53,000 per violation.",
@@ -162,7 +162,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="cp-gaps" style="padding:10px 12px"><span class="pill crit">Preservation still set to 90 days</span></div>`}
     ]},
   dsa:{
-    heading:"Find out which EU rules apply to you, and what's missing",
+    heading:"Which EU rules apply, and what's missing",
     who:"any service with users in the EU.",
     leave:"every duty that applies, article by article, and four drafts ready to edit.",
     mins:"four plain questions about your service.",
@@ -175,7 +175,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="pol-tabs" style="padding:10px 12px"><span class="tag">Article 17</span></div>`}
     ]},
   eval:{
-    heading:"Check whether your classifier applies your rule the way you meant it",
+    heading:"Does your classifier apply your rule?",
     who:"whoever owns a classifier, or is choosing one.",
     leave:"what it got wrong, by kind, and what to change in the rule.",
     mins:"a few minutes once you have a rule and some cases.",
@@ -188,7 +188,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="pill high">Missed: sarcasm about age</div>`}
     ]},
   notice:{
-    heading:"Draft a notice a user will actually understand",
+    heading:"A notice a user will actually understand",
     who:"anyone who has to tell a user why they were actioned.",
     leave:"a clear draft, checked against what a statement of reasons needs to include.",
     mins:"a few short questions. Claude drafts; you still decide.",
@@ -201,7 +201,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="ai-about" style="padding:10px 12px"><p class="note">You stay the one who decides.</p></div>`}
     ]},
   appeal:{
-    heading:"Review an appeal the way a careful person would",
+    heading:"Review an appeal like a careful person",
     who:"anyone who handles appeals against a moderation decision.",
     leave:"a reasoned recommendation, with the gaps in the original decision called out.",
     mins:"a few short questions. Claude reviews; you still decide.",
@@ -214,7 +214,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="ai-about" style="padding:10px 12px"><p class="note">A person makes the final call.</p></div>`}
     ]},
   transparency:{
-    heading:"Build the transparency report the EU asks for",
+    heading:"The transparency report the EU asks for",
     who:"whoever owns the transparency report for your service.",
     leave:"the right sections for your tier, a completeness check, and a readable report.",
     mins:"fill in what you know; nothing is final until you build it.",
@@ -227,7 +227,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="pol-tabs" style="padding:10px 12px"><span class="tag">Report</span><span class="tag">Checklist</span></div>`}
     ]},
   plan:{
-    heading:"See every open gap from every tool, in one list",
+    heading:"Every open gap, in one list",
     who:"whoever has to decide what gets fixed first.",
     leave:"one prioritized list, sent to your tracker in one go.",
     mins:"instant. It's built from what you've already done.",
@@ -240,7 +240,7 @@ const INTRO_SPECS = {
         preview:() => `<div class="row" style="gap:8px;padding:0 12px"><span class="pill">Jira</span><span class="pill">Linear</span></div>`}
     ]},
   review:{
-    heading:"See what changed in your program, quarter by quarter",
+    heading:"What changed, quarter by quarter",
     who:"whoever reports on the program's progress.",
     leave:"then-and-now numbers, what moved, and the story to tell leadership.",
     mins:"instant, once you've saved at least one earlier quarter.",

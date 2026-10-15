@@ -34,7 +34,7 @@ function orgPrefillPM(p){
 function orgCardHTML(cta){
   const o = orgGet(), regions = o.regions || [];
   return `<div class="card org-card" ${cta ? 'data-cta="1"' : ""}><div class="card-b org-b">
-    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it: new pre-mortems, tabletop scenarios, maturity targets, coverage areas, metrics, policy tests and the AI assistants. Change it any time.</p></div>
+    <div><h3>Your organization</h3><p class="note">Set it once and every tool starts from it. Change it any time.</p></div>
     <div class="field"><label for="org-type">Company type</label><select class="select" id="org-type" data-org="type"><option value="">Choose one</option>${ORG_TYPES.map(t => `<option value="${t.k}" ${o.type === t.k ? "selected" : ""}>${esc(t.n)}</option>`).join("")}</select></div>
     <div class="field"><label for="org-youth">Who can use it</label><select class="select" id="org-youth" data-org="youth"><option value="">Choose one</option>${YOUTH.map(y => `<option value="${y.k}" ${o.youth === y.k ? "selected" : ""}>${esc(y.n)}</option>`).join("")}</select></div>
     <div class="field"><span class="lbl">Stage</span><div class="org-stages" role="radiogroup" aria-label="Stage">${ORG_STAGES.map(s => `<button type="button" role="radio" aria-checked="${o.stage === s.k}" class="org-stage ${o.stage === s.k ? "on" : ""}" data-orgstage="${s.k}" title="${esc(s.d)}">${esc(s.n)}</button>`).join("")}</div></div>

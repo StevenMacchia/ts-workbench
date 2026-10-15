@@ -11,8 +11,8 @@ const MA_LEVELS = [
 // Each area: the question it answers, why it matters, what levels 1 to 5 look like, and the steps from each level to the next
 const MA_AREAS = [
   {k:"policy", n:"Policy and standards", s:"Policy", tool:["policy", "Stress-test a policy"],
-    q:"Are your rules clear, written down and applied the same way every time?",
-    why:"Unclear rules lead to inconsistent decisions, frustrated users and weak answers when regulators ask how you decide.",
+    q:"Are your rules written down and applied the same way every time?",
+    why:"Unclear rules mean inconsistent decisions and weak answers when regulators ask.",
     lv:["Beyond a short terms of service there are no written rules. Decisions depend on who handles the case.",
       "Public community guidelines exist, but reviewers have little internal guidance and edge cases get settled in chat threads.",
       "Every public policy has internal enforcement guidelines with examples, a named owner and a change log.",

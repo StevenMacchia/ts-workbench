@@ -55,13 +55,13 @@ function ttPicker(H){
   const completed = all.filter(pOf).length;
   const list = filt==="todo" ? all.filter(x=>!pOf(x)) : filt==="done" ? all.filter(pOf) : all;
   const bestFit = ttBestFit(all, pOf);
-  view.innerHTML = H("Rehearse a crisis before it happens. Each scenario is four timed decisions. Pick a weaker answer and you'll see why, how it compares with the strongest call and the law behind it, and you can try again.") + `
+  view.innerHTML = H("Rehearse a crisis before it happens: four timed decisions per scenario. A weaker answer shows why, and you can try again.") + `
     <p class="mxa-q tt-q">When something goes badly wrong, would your team make the right calls in the right order?</p>
     ${bestFit ? `<div class="gd-a tt-one"><button type="button" class="btn primary" id="tt-one">Just show me one ${icon("arrow")}</button><span class="note">Starts ${esc(bestFit.s.title)}, the scenario most worth rehearsing right now. Skips the choices below.</span></div>` : ""}
     <div class="mxm-how tt-how"><ol class="mxm-how-s">
       <li><b>1</b><span><em>Pick your company type.</em> Scenarios are written for the risks and regulators you face.</span></li>
-      <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as the incident unfolds. About 8 minutes each.</span></li>
-      <li><b>3</b><span><em>Learn from every call.</em> A weaker answer shows why, what strong looks like and the law behind it.</span></li>
+      <li><b>2</b><span><em>Choose a scenario</em> and make four decisions as it unfolds. About 8 minutes.</span></li>
+      <li><b>3</b><span>A weaker answer shows why, what strong looks like and the law behind it.</span></li>
     </ol></div>
     <div class="card ttbar">
       <div class="field"><label for="tt-type">Your company type</label>

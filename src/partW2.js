@@ -202,7 +202,7 @@ function renderWorkspace(){
   const openBlockers = all.filter(i=>i.kind==="premortem").reduce((a,i)=>a+(itemSummary(i).open||0),0);
   const p = wsProfile(), empty = all.length === 0, projCount = Object.keys(wsProjects()).length;
   view.innerHTML = `<div id="ws-root">` + head("My workspace",
-    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved from the tools, organized into projects. It lives in this browser. Save it to a workspace file to keep a copy, and open that file on any device.`, null,
+    `${p&&p.name?esc(p.name.split(" ")[0])+", here's":"Here's"} everything you've saved, in projects. It lives in this browser. Save a workspace file to open it anywhere.`, null,
     `<button type="button" class="btn sm" data-pf="open"><svg><use href="#i-upload"/></svg>Open workspace file</button>
      <button type="button" class="btn sm primary" data-pf="save"><svg><use href="#i-download"/></svg>Save workspace file</button>`) + `
     <span class="toast" id="ws-toast" role="status" aria-live="polite"></span>

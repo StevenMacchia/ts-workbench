@@ -159,7 +159,7 @@ function vdSpec(){
   ].concat(CRITERIA.map(c => ({id:"c-" + c.k, eb:c.n, title:esc(VD_Q[c.k]), why:`Rate each vendor from 1 to 5. The rubric says what 1, 3 and 5 look like${c.deal ? ", and this one has a minimum: a vendor scoring 2 or lower can't win" : ""}. The questions to ask are below.`, kind:"custom",
     html:() => vdCritHTML(c, new Set()), answered:() => vx.vendors.every(v => v.s[c.k]), has:() => vx.vendors.some(v => v.s[c.k]), next:"Continue"})));
   return {k:"vendors", tool:{name:"Vendor scorecard", icon:"scale", color:"var(--t-vd)"},
-    intro:{title:"Which moderation vendor should you trust with your users and your reviewers?", lead:"Say what matters, name your shortlist, then score each vendor against a plain rubric, one criterion at a time. The ranking builds as you go, and at the end you'll see who wins and exactly why.",
+    intro:{title:"Which vendor should you trust with your users?", lead:"Say what matters, name your shortlist, score each vendor one criterion at a time. The ranking builds as you go.",
       facts:[["About 10 minutes", `${CRITERIA.length} criteria, one per screen, with the questions to ask in an RFP.`], ["Evidence, not pitch", "Each score has a rubric, and wellness and security have minimums."], ["Two to four vendors", "Rename them any time. The math is shown."]], start:"Start"},
     alt:[{n:"Score everything on one page", run:() => { vdView = "page"; renderVendors(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}, {n:"See a finished example", run:() => vdExample()}],
     steps, finish:"See who wins",
@@ -235,10 +235,10 @@ function renderVendors(){
   const seen = new Set();
   const step = n => `<div class="mxa-ph"><span class="mxa-pnum">${n}</span><div><h3>${VD_STEPS[n - 1][0]}</h3><p>${VD_STEPS[n - 1][1]}</p></div></div>`;
   view.innerHTML = head("Vendor scorecard",
-    "Choose a content moderation vendor on evidence rather than on the sales pitch. Weight what matters, score your shortlist against a clear rubric, and see who wins and why.",
+    "Choose a moderation vendor on evidence, not the pitch. Weight what matters, score your shortlist, see who wins and why.",
     "Run the program", `<span class="toast" id="vx-toast" role="status" aria-live="polite"></span><button class="btn sm" id="vx-reset">See an example</button><button class="btn sm" id="vx-own">Start over</button><button class="btn sm primary" id="vx-save"><svg><use href="#i-save"/></svg>${wsSaveLabel("vendors", vx)}</button>`) + `
     ${vx.vendors.some(vdDone) ? `<div class="banner cvt-b"><span><strong>Every vendor is scored.</strong> See who wins and why.</span><button type="button" class="btn sm primary" data-vd="results">See the result</button></div>` : `<div class="banner cvt-b"><span><strong>Prefer one criterion at a time?</strong> The guided version scores the same rubric with the ranking filling in as you go.</span><button type="button" class="btn sm" data-vd="guide">Switch to guided</button></div>`}
-    <p class="mxa-q vd-q">Which moderation vendor should you trust with your users and your reviewers?</p>
+    <p class="mxa-q vd-q">Which vendor should you trust with your users?</p>
     <div class="mxm-how"><ol class="mxm-how-s">${VD_STEPS.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="vd-grid">
       <div class="vd-main">

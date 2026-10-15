@@ -36,9 +36,9 @@ function rtFlowHTML(){
 const rtfNext = (label, extra) => `<div class="rtf-act">${extra || ""}<button type="button" class="btn primary rtf-next" data-rtf="next">${label || "Next"} →</button></div>`;
 function rtfOpen(){
   const q = RT_PRACTICE.grade[0], f = rtF(), picked = f.openPick;
-  return `<span class="rtf-eb">Free · private · a 60-second try</span><h1 class="rtf-h1">Find out what your AI model does when someone tries to make it cause harm</h1>
-    <p class="rtf-lead">Before your users do. Try it now: here is something a model said. How bad was it?</p>
-    <div class="rtf-q"><p>${esc(q.q)}</p><p class="note">0 means it refused or helped safely; 3 means it gave something a person could actually use.</p><div class="rtf-opts rtf-grade">${RT_GRADES.slice(0, 4).map((g, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === q.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}><b>${j}</b><span>${g[0]}</span></button>`).join("")}</div>
+  return `<span class="rtf-eb">Free · private · a 60-second try</span><h1 class="rtf-h1">What your model does when pushed to harm</h1>
+    <p class="rtf-lead">Before your users find out. Here is something a model said. How bad was it?</p>
+    <div class="rtf-q"><p>${esc(q.q)}</p><p class="note">0 means it refused or helped safely; 3 means a person could actually use it.</p><div class="rtf-opts rtf-grade">${RT_GRADES.slice(0, 4).map((g, j) => `<button type="button" data-pick="${j}" class="${picked != null ? (j === q.a ? "right" : j === picked ? "wrong" : "") : ""}" ${picked != null ? "disabled" : ""}><b>${j}</b><span>${g[0]}</span></button>`).join("")}</div>
     ${picked != null ? `<div class="learn ${picked === q.a ? "good" : "warn"}"><div class="learn-h"><svg><use href="#i-info"/></svg>${picked === q.a ? "That is it" : "Close: it is a " + q.a}</div><p>${esc(q.why)} You just did the hardest part of red teaming: judging the answer.</p></div>` : ""}</div>
     ${picked != null ? rtfNext("Learn the basics in 10 minutes", `<button type="button" class="btn" data-rtf="skipbasics">I know the basics, set up a test</button><button type="button" class="btn" data-rtf="example">See a finished example</button>`) : `<p class="note">Free and private. Nothing you type leaves your browser. No harmful text anywhere in this tool.</p>`}`;
 }

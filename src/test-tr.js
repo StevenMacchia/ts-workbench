@@ -8,7 +8,7 @@ const body = async function(){
   // a blank report opens guided: your service, then one section per screen, only the sections your tier needs
   tr = TR_BLANK(); trView = null; renderTransparency(); let h = view.innerHTML; if(bad(h)) throw new Error("guided intro bad: " + where(h));
   if(typeof SAMPLER !== "undefined" && SAMPLER) eq(/class="pw"/.test(h) && /Powered by/.test(h) && /Anthropic/.test(h), true, "the intro says Claude powers it");
-  eq(/Build the transparency report the DSA asks for/.test(h) && /data-gd="start"/.test(h), true, "guided intro");
+  eq(/The transparency report the DSA asks for/.test(h) && /data-gd="start"/.test(h), true, "guided intro");
   gdGo(gdCur, "start"); eq(/What.s the company or service called/.test(view.innerHTML), true, "the service first");
   eq(gdLive(gdCur).filter(z => /^s-/.test(z.id)).length, trSections().length, "one screen per section of the report");
   tr.tier = "vlop"; eq(gdLive(trSpec()).filter(z => /^s-/.test(z.id)).length, 11, "a very large platform gets every section"); tr.tier = "platform";

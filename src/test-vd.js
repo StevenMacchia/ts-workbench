@@ -33,7 +33,7 @@ const body = function(){
   out.push("own comparison: blank vendors, 2 to 4 vendors, presets and normalizing");
   // guided: what matters, the shortlist, then one criterion per screen with the ranking beside it
   vx = {weights:{}, vendors:[vdBlank("Acme Trust"), vdBlank("Beta Review")], open:null}; vdView = null; gdReset("vendors"); renderVendors(); h = view.innerHTML;
-  eq(/Which moderation vendor should you trust/.test(h) && /data-gd="start"/.test(h), true, "guided intro for a blank comparison");
+  eq(/Which vendor should you trust with your users/.test(h) && /data-gd="start"/.test(h), true, "guided intro for a blank comparison");
   gdGo(gdCur, "start"); eq(/What matters most in this choice\?/.test(view.innerHTML), true, "what matters first"); gdPick(gdCur, "regulated"); eq(vdPresetOn(), "regulated", "preset sets the weights"); gdGo(gdCur, "next");
   eq(/Who are you comparing\?/.test(view.innerHTML) && (view.innerHTML.match(/class="input vname"/g) || []).length, 2, "the shortlist"); gdGo(gdCur, "next");
   eq(gdLive(gdCur).length, 2 + CRITERIA.length, "one screen per criterion"); eq(view.innerHTML.includes(esc(VD_Q.quality)) && /class="card vd-railc gd-rail"/.test(view.innerHTML), true, "the first criterion with the live ranking beside it");
