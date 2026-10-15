@@ -47,7 +47,7 @@ const PAGE_TOURS = {
     [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
     [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
     [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
-    [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The list reorders so the metrics that matter most come first."],
+    [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The line under them says what that did: how many of the 36 are on your list, what your platform added, and why the rest are out. Your platform's own metrics are tagged, and what's left out sits folded under the tiers, each with the setting that brings it in."],
     [".mx-tabs", "Four views", "Metrics is the framework. My scorecard holds your own numbers, trends and a one-pager for leadership. Data to log and Running the program cover the practical side."],
     [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."],
     [".mxa-head", "One metric at a time", "The question the metric answers, and what it measures."],

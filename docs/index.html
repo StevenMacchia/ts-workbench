@@ -1231,7 +1231,8 @@ thead th{background:var(--surface-2)}
 .mxm-sel:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
 .mxm-reg{display:inline-flex;align-items:center;gap:7px;margin-left:0;padding:5px 10px;border-radius:8px;background:var(--sunk);font-size:13.5px;color:var(--ink);cursor:pointer}
 .mxm-reg input{accent-color:var(--accent);width:15px;height:15px;margin:0}
-.mxm-note{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap}
+.mxm-sum{flex:1 0 100%;margin:0;font-size:13.5px;line-height:1.45;color:var(--muted)}
+.mxm-sum .mx-link{font-size:inherit}
 
 /* Tabs */
 .mx-tabs{display:flex;align-items:center;gap:4px;margin-top:16px;border-bottom:1px solid var(--line)}
@@ -1463,7 +1464,6 @@ thead th{background:var(--surface-2)}
   .mxa-rail{position:static;order:-1;grid-template-columns:1fr 1fr;align-items:start}
 }
 @media (max-width:760px){
-  .mxm-note{margin-left:0;white-space:normal}
   .mxm-row{grid-template-columns:minmax(0,1fr) auto 18px}
   .mxm-row .mxm-area{grid-column:1/-1}
   .mxa-head h2{font-size:27px}
@@ -1782,12 +1782,29 @@ a.mxg-card:hover .mxg-go{color:var(--accent)}
 .mxg-row .mxg-name{all:unset;grid-column:2;grid-row:1;cursor:pointer;display:block;min-width:0;justify-self:start;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px;font-weight:600;line-height:1.3;color:var(--ink)}
 .mxg-row .mxg-name:hover{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
 .mxg-row .mxg-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-.mxg-rs{grid-column:3;grid-row:1;margin-left:10px}
+.mxg-rs{margin-left:10px}
 .mxg-rs:empty{margin:0}
 .mxg-rl{grid-column:4;grid-row:1;margin-left:12px}
 .mxg-rs,.mxg-rl{line-height:1.2}
 .mxg-rl .mx-link{font-size:12.5px;white-space:nowrap}
 .mxg-row .mxg-q{grid-column:1 / -1;grid-row:2;font-size:14px;line-height:1.3;color:var(--muted)}
+/* the platform tag: on the rows and cards that are here because of the chosen platform */
+.mxg-pt{flex:none;margin-top:2px;font-size:11px;padding:1px 6px;border-color:transparent;background:var(--accent-soft);color:var(--accent)}
+.mxg-row .mxg-pt{margin:0}
+/* the left-out metrics, grouped by reason, each with the chip that brings it in */
+.mxg-out{--band-c:var(--line-strong)}
+.mxg-og{border-top:1px solid var(--line)}
+.mxg-og h3{margin:0;padding:11px 18px 3px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.mxg-og .mxg-rows{border-top:0}
+.mxg-orow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;row-gap:1px;padding:9px 18px;border-top:1px solid var(--line)}
+.mxg-orow:first-child{border-top:0}
+.mxg-oname{font-size:14.5px;font-weight:600;line-height:1.3;color:var(--muted)}
+.mxg-ocs{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;margin-left:10px}
+.mxg-oc{all:unset;cursor:pointer;font-size:11.5px;font-weight:600;line-height:1.5;padding:1px 8px;border-radius:999px;border:1px solid var(--line-strong);color:var(--ink);white-space:nowrap}
+.mxg-oc i{font-style:normal;font-weight:500;color:var(--muted);margin-right:4px}
+.mxg-oc:hover{border-color:var(--accent);color:var(--accent)}
+.mxg-oc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mxg-orow .mxg-q{grid-column:1 / -1;font-size:14px;line-height:1.3;color:var(--muted)}
 @media (max-width:760px){
   .mxm-filter{padding:0;border:0;border-radius:0;background:none;box-shadow:none;margin-top:10px;gap:6px 12px}
   /* the shell keeps selects at 16px (no iOS zoom), so the platform select gets the wider share to show its full name */
@@ -1795,8 +1812,7 @@ a.mxg-card:hover .mxg-go{color:var(--accent)}
   .mxm-filter #mx-platform{flex:0 0 calc(58% - 6px);width:calc(58% - 6px)}
   .mxm-filter #mx-stage{flex:0 0 calc(42% - 6px);width:calc(42% - 6px)}
   .mxm-reg{padding:0;border-radius:0;background:none;font-size:12.5px;gap:6px;flex:0 1 auto;min-width:0}
-  .mxm-note{font-size:12.5px;flex:none}
-  .mxm-fp{display:none}
+  .mxm-sum{font-size:12.5px;line-height:1.4}
   .mx-tabs{margin-top:10px;gap:0;overflow-x:auto}
   .mx-tab{padding:9px 7px 10px;font-size:14px;gap:4px}
   .mxg-start{margin-top:14px}
@@ -1808,6 +1824,10 @@ a.mxg-card:hover .mxg-go{color:var(--accent)}
   .mxg-tier > summary{grid-template-columns:minmax(0,1fr) 18px;padding:12px 14px}
   .mxg-td{grid-column:1/-1;grid-row:2}
   .mxg-row{padding:7px 14px}
+  .mxg-orow{padding:7px 14px}
+  .mxg-og h3{padding:9px 14px 2px}
+  .mxg-ocs{justify-content:flex-start;margin-left:0;grid-column:1 / -1;grid-row:3;margin-top:3px}
+  .mxg-orow .mxg-q{grid-row:2}
   .mxg-row .mxg-name{line-height:1.25;font-size:14px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
   .mxg-rl .mx-link{font-size:12px}
   .mxg-row .mxg-q{line-height:1.28}
@@ -11407,9 +11427,43 @@ const MX_ICO = {
 const mxIco = (k, cls) => `<svg class="${cls || "mx-ico"}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${MX_ICO[k]}</svg>`;
 
 /* ----- data helpers ----- */
+const mxFits = m => m.st <= +mx.stage && (m.p === "all" || m.p.includes(mx.platform)) && (!m.reg || mx.reg);
 function mxList(){
-  const l = METRICS.filter(m => m.st <= +mx.stage && (m.p === "all" || m.p.includes(mx.platform)) && (!m.reg || mx.reg));
+  const l = METRICS.filter(mxFits);
   return MX_TORD.flatMap(t => LAYERS.flatMap(L => l.filter(m => m.t === t && m.l === L.k)));
+}
+// Short platform names for the tag on a row or card and the summary under the filter bar
+const MX_PSHORT = {social:"Social", market:"Marketplace", gaming:"Gaming", dating:"Dating", genai:"Generative AI", fintech:"Fintech", gig:"Gig", kids:"Kids"};
+// The metrics the profile leaves out, each with one primary reason (platform first, then stage, then regulation),
+// so the reason counts add up to the number left out
+const mxOut = () => METRICS.filter(m => !mxFits(m));
+const mxWhyOut = m => m.p !== "all" && !m.p.includes(mx.platform) ? "plat" : m.st > +mx.stage ? "stage" : "reg";
+// A tag on the metrics that are on the list because of the chosen platform. The universal ones carry none, so the
+// platform's effect on the list can be seen at a glance
+const mxPlatTag = m => m.p === "all" ? "" : `<span class="tag mxg-pt" title="On the list because your platform is ${esc(MX_PLATFORMS[mx.platform])}${m.p.length > 1 ? ". Also for " + esc(m.p.filter(p => p !== mx.platform).map(p => MX_PSHORT[p]).join(", ")) : ""}">${esc(MX_PSHORT[mx.platform])}</span>`;
+const mxLow = s => s.charAt(0).toLowerCase() + s.slice(1);
+const mxJoin = a => a.length === 1 ? a[0] : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+// One line under the filter bar saying what the three choices did: how many of the 36 are on the list, what the
+// platform added, and why the rest are out, with a link to them
+function mxFitHTML(list){
+  const out = mxOut(), by = k => out.filter(m => mxWhyOut(m) === k).length, adds = list.filter(m => m.p !== "all").map(m => mxLow(m.n));
+  const addT = adds.length ? ` ${esc(MX_PSHORT[mx.platform])} adds ${esc(adds.length > 3 ? adds.slice(0, 2).join(", ") + " and " + (adds.length - 2) + " more" : mxJoin(adds))}.` : "";
+  const parts = [[by("plat"), "for other platforms"], [by("stage"), "from a later stage"], [by("reg"), "for regulated services"]].filter(x => x[0]);
+  const outT = out.length ? ` <button type="button" class="mx-link" data-out>${out.length} left out</button>${parts.length === 1 ? ", all " + parts[0][1] : ": " + parts.map(([n, w]) => n + " " + w).join(", ")}.` : "";
+  return `<p class="mxm-sum"><b>${list.length} of ${METRICS.length} metrics.</b>${addT}${outT}</p>`;
+}
+// The left-out metrics, folded under the tiers and grouped by reason. Each row offers the setting that would bring
+// it onto the list (a platform, a stage, or regulation) as a chip, so the full framework stays reachable
+function mxOutHTML(){
+  const out = mxOut(); if(!out.length) return "";
+  const groups = [["plat", "For other platforms"], ["stage", "From a later stage"], ["reg", "For regulated services"]].map(([k, t]) => [t, out.filter(m => mxWhyOut(m) === k)]).filter(g => g[1].length);
+  const chip = (m, k, v, label, title) => `<button type="button" class="mxg-oc" data-set="${k}" data-v="${v}" data-m="${METRICS.indexOf(m)}" title="${esc(title)}">${label}</button>`;
+  const chips = m => (m.p !== "all" && !m.p.includes(mx.platform) ? m.p.map(p => chip(m, "platform", p, esc(MX_PSHORT[p]), "Switch the platform to " + MX_PLATFORMS[p])) : [])
+    .concat(m.st > +mx.stage ? [chip(m, "stage", m.st, "<i>Stage</i>" + esc(MX_STAGE[m.st]), "Set the stage to " + MX_STAGE[m.st])] : [])
+    .concat(m.reg && !mx.reg ? [chip(m, "reg", "1", "DSA or OSA applies", "Turn on EU DSA or UK Online Safety Act")] : []).join("");
+  return `<details class="mxg-tier mxg-out" id="mxg-out" data-tier="out"${(mx.fold || {}).out ? " open" : ""}>
+        <summary><span class="mxg-tt">Not on this list · ${out.length}</span><span class="mxg-td">Metrics for other platforms, a later stage or regulated services. Pick a tag to add that setting to your profile.</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
+        ${groups.map(([t, ms]) => `<div class="mxg-og"><h3>${t} · ${ms.length}</h3><ul class="mxg-rows">${ms.map(m => `<li class="mxg-orow"><span class="mxg-oname">${esc(m.n)}</span><span class="mxg-ocs">${chips(m)}</span><span class="mxg-q">${esc(MX_Q[m.n])}</span></li>`).join("")}</ul></div>`).join("")}</details>`;
 }
 const mxSlug = m => m.n.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const mxTracked = list => `${list.filter(m => mx.have[m.n] || mxStatus(m, mx.vals)).length} tracked`;
@@ -11539,7 +11593,7 @@ function mxStartCard(m, showCat){
   const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
   return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
       ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
-      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxPlatTag(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
       <p class="mxg-q">${esc(MX_Q[m.n])}</p>
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
     </a>`;
@@ -11550,7 +11604,7 @@ function mxRowHTML(m){
   const i = METRICS.indexOf(m), rd = mx.read[m.n], st = mxStatus(m, mx.vals);
   return `<li class="mxg-row" data-st="${st && st !== "set" ? MX_STAT[st][1] : ""}"><a class="mxg-rowlink" href="#metrics/${mxSlug(m)}" data-open="${i}">
       <span class="mxg-main"><span class="mxg-name">${esc(m.n)}${rd ? `<span class="mxg-read">Read</span>` : ""}</span><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
-      <span class="mxg-rs">${mxStatusChip(m)}</span>
+      <span class="mxg-rs">${mxPlatTag(m)}${mxStatusChip(m)}</span>
       <span class="mxg-go">${mxIco("next", "mx-ico sm")}</span></a></li>`;
 }
 // A tier's rows, grouped by the question each category answers once the tier is long enough to need it
@@ -11574,7 +11628,8 @@ function mxMap(list){
       const desc = MX_BAND[t][1] + (t === "ns" && same ? " The " + (MX_NUM[start.length] || start.length) + " above." : "");
       return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
         <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${desc}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
-        <ul class="mxg-rows">${mxTierRowsHTML(ms)}</ul></details>`; }).join("")}</section>`;
+        <ul class="mxg-rows">${mxTierRowsHTML(ms)}</ul></details>`; }).join("")}
+    ${mxOutHTML()}</section>`;
   return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
 
@@ -11974,7 +12029,7 @@ function renderMetrics(){
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
-      <span class="mxm-note">${list.length} metrics<span class="mxm-fp"> for this profile</span></span>
+      ${mxFitHTML(list)}
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>
     ${MX_TAB_SUB[mx.tab] ? `<p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab])}</p>` : ""}`;
@@ -11996,6 +12051,11 @@ function renderMetrics(){
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
   bind("details.mxg-tier", d => d.ontoggle = () => { mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:d.open}); store.set("mx", mx); });
+  // A chip on a left-out row applies that one setting; the metric then lands in its tier, which opens to show it
+  bind("[data-set]", b => b.onclick = () => { const k = b.dataset.set, v = b.dataset.v, i = +b.dataset.m;
+    if(k === "platform") mx.platform = v; else if(k === "stage") mx.stage = v; else mx.reg = true;
+    save(); setTimeout(() => { const el = view.querySelector(`.mxg-row [data-open="${i}"]`), d = el && el.closest("details"); if(d && !d.open) d.open = true; mxFlash(el); }, 120); });
+  bind("[data-out]", b => b.onclick = () => { mx.fold = Object.assign({}, mx.fold, {out:true}); store.set("mx", mx); mxGo(""); setTimeout(() => mxFlash($("#mxg-out"), "start"), 120); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();
@@ -17464,7 +17524,7 @@ const PAGE_TOURS = {
     [".gd-intro .gd-alt", "Other ways in", "Fill everything in on one page, or start from an example."],
     [".gd-q .gd-opts, .gd-q .gd-text, .gd-q .gd-mx, .gd-q .cp-pi, .gd-q .vd-crit", "Answer, then continue", "Pick an answer or type one. Number keys work for choices, and Back lets you change anything."],
     [".gd-aside .gd-chips", "Where you are", "Every question, with the ones you have answered marked."],
-    [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The list reorders so the metrics that matter most come first."],
+    [".mxm-filter", "Fit the list to you", "Choose your platform and program stage, and whether EU or UK rules apply. The line under them says what that did: how many of the 36 are on your list, what your platform added, and why the rest are out. Your platform's own metrics are tagged, and what's left out sits folded under the tiers, each with the setting that brings it in."],
     [".mx-tabs", "Four views", "Metrics is the framework. My scorecard holds your own numbers, trends and a one-pager for leadership. Data to log and Running the program cover the practical side."],
     [".mxm-band", "Start with the north stars", "Open any metric to see the question it answers, the formula, how to measure it on your platform and starter SQL."],
     [".mxa-head", "One metric at a time", "The question the metric answers, and what it measures."],

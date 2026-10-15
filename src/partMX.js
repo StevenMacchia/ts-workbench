@@ -46,9 +46,43 @@ const MX_ICO = {
 const mxIco = (k, cls) => `<svg class="${cls || "mx-ico"}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${MX_ICO[k]}</svg>`;
 
 /* ----- data helpers ----- */
+const mxFits = m => m.st <= +mx.stage && (m.p === "all" || m.p.includes(mx.platform)) && (!m.reg || mx.reg);
 function mxList(){
-  const l = METRICS.filter(m => m.st <= +mx.stage && (m.p === "all" || m.p.includes(mx.platform)) && (!m.reg || mx.reg));
+  const l = METRICS.filter(mxFits);
   return MX_TORD.flatMap(t => LAYERS.flatMap(L => l.filter(m => m.t === t && m.l === L.k)));
+}
+// Short platform names for the tag on a row or card and the summary under the filter bar
+const MX_PSHORT = {social:"Social", market:"Marketplace", gaming:"Gaming", dating:"Dating", genai:"Generative AI", fintech:"Fintech", gig:"Gig", kids:"Kids"};
+// The metrics the profile leaves out, each with one primary reason (platform first, then stage, then regulation),
+// so the reason counts add up to the number left out
+const mxOut = () => METRICS.filter(m => !mxFits(m));
+const mxWhyOut = m => m.p !== "all" && !m.p.includes(mx.platform) ? "plat" : m.st > +mx.stage ? "stage" : "reg";
+// A tag on the metrics that are on the list because of the chosen platform. The universal ones carry none, so the
+// platform's effect on the list can be seen at a glance
+const mxPlatTag = m => m.p === "all" ? "" : `<span class="tag mxg-pt" title="On the list because your platform is ${esc(MX_PLATFORMS[mx.platform])}${m.p.length > 1 ? ". Also for " + esc(m.p.filter(p => p !== mx.platform).map(p => MX_PSHORT[p]).join(", ")) : ""}">${esc(MX_PSHORT[mx.platform])}</span>`;
+const mxLow = s => s.charAt(0).toLowerCase() + s.slice(1);
+const mxJoin = a => a.length === 1 ? a[0] : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+// One line under the filter bar saying what the three choices did: how many of the 36 are on the list, what the
+// platform added, and why the rest are out, with a link to them
+function mxFitHTML(list){
+  const out = mxOut(), by = k => out.filter(m => mxWhyOut(m) === k).length, adds = list.filter(m => m.p !== "all").map(m => mxLow(m.n));
+  const addT = adds.length ? ` ${esc(MX_PSHORT[mx.platform])} adds ${esc(adds.length > 3 ? adds.slice(0, 2).join(", ") + " and " + (adds.length - 2) + " more" : mxJoin(adds))}.` : "";
+  const parts = [[by("plat"), "for other platforms"], [by("stage"), "from a later stage"], [by("reg"), "for regulated services"]].filter(x => x[0]);
+  const outT = out.length ? ` <button type="button" class="mx-link" data-out>${out.length} left out</button>${parts.length === 1 ? ", all " + parts[0][1] : ": " + parts.map(([n, w]) => n + " " + w).join(", ")}.` : "";
+  return `<p class="mxm-sum"><b>${list.length} of ${METRICS.length} metrics.</b>${addT}${outT}</p>`;
+}
+// The left-out metrics, folded under the tiers and grouped by reason. Each row offers the setting that would bring
+// it onto the list (a platform, a stage, or regulation) as a chip, so the full framework stays reachable
+function mxOutHTML(){
+  const out = mxOut(); if(!out.length) return "";
+  const groups = [["plat", "For other platforms"], ["stage", "From a later stage"], ["reg", "For regulated services"]].map(([k, t]) => [t, out.filter(m => mxWhyOut(m) === k)]).filter(g => g[1].length);
+  const chip = (m, k, v, label, title) => `<button type="button" class="mxg-oc" data-set="${k}" data-v="${v}" data-m="${METRICS.indexOf(m)}" title="${esc(title)}">${label}</button>`;
+  const chips = m => (m.p !== "all" && !m.p.includes(mx.platform) ? m.p.map(p => chip(m, "platform", p, esc(MX_PSHORT[p]), "Switch the platform to " + MX_PLATFORMS[p])) : [])
+    .concat(m.st > +mx.stage ? [chip(m, "stage", m.st, "<i>Stage</i>" + esc(MX_STAGE[m.st]), "Set the stage to " + MX_STAGE[m.st])] : [])
+    .concat(m.reg && !mx.reg ? [chip(m, "reg", "1", "DSA or OSA applies", "Turn on EU DSA or UK Online Safety Act")] : []).join("");
+  return `<details class="mxg-tier mxg-out" id="mxg-out" data-tier="out"${(mx.fold || {}).out ? " open" : ""}>
+        <summary><span class="mxg-tt">Not on this list · ${out.length}</span><span class="mxg-td">Metrics for other platforms, a later stage or regulated services. Pick a tag to add that setting to your profile.</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
+        ${groups.map(([t, ms]) => `<div class="mxg-og"><h3>${t} · ${ms.length}</h3><ul class="mxg-rows">${ms.map(m => `<li class="mxg-orow"><span class="mxg-oname">${esc(m.n)}</span><span class="mxg-ocs">${chips(m)}</span><span class="mxg-q">${esc(MX_Q[m.n])}</span></li>`).join("")}</ul></div>`).join("")}</details>`;
 }
 const mxSlug = m => m.n.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const mxTracked = list => `${list.filter(m => mx.have[m.n] || mxStatus(m, mx.vals)).length} tracked`;
@@ -178,7 +212,7 @@ function mxStartCard(m, showCat){
   const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
   return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
       ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
-      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxPlatTag(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
       <p class="mxg-q">${esc(MX_Q[m.n])}</p>
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
     </a>`;
@@ -189,7 +223,7 @@ function mxRowHTML(m){
   const i = METRICS.indexOf(m), rd = mx.read[m.n], st = mxStatus(m, mx.vals);
   return `<li class="mxg-row" data-st="${st && st !== "set" ? MX_STAT[st][1] : ""}"><a class="mxg-rowlink" href="#metrics/${mxSlug(m)}" data-open="${i}">
       <span class="mxg-main"><span class="mxg-name">${esc(m.n)}${rd ? `<span class="mxg-read">Read</span>` : ""}</span><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
-      <span class="mxg-rs">${mxStatusChip(m)}</span>
+      <span class="mxg-rs">${mxPlatTag(m)}${mxStatusChip(m)}</span>
       <span class="mxg-go">${mxIco("next", "mx-ico sm")}</span></a></li>`;
 }
 // A tier's rows, grouped by the question each category answers once the tier is long enough to need it
@@ -213,7 +247,8 @@ function mxMap(list){
       const desc = MX_BAND[t][1] + (t === "ns" && same ? " The " + (MX_NUM[start.length] || start.length) + " above." : "");
       return `<details class="mxg-tier mxm-${t}" id="mxg-${t}" data-tier="${t}"${open ? " open" : ""}>
         <summary><span class="mxg-tt">${TIER[t][0]} · ${ms.length}</span><span class="mxg-td">${desc}</span>${mxIco("next", "mx-ico sm mxg-chev")}</summary>
-        <ul class="mxg-rows">${mxTierRowsHTML(ms)}</ul></details>`; }).join("")}</section>`;
+        <ul class="mxg-rows">${mxTierRowsHTML(ms)}</ul></details>`; }).join("")}
+    ${mxOutHTML()}</section>`;
   return startH + (typeof loopMxHTML === "function" ? loopMxHTML(list) : "") + foldH;
 }
 
@@ -613,7 +648,7 @@ function renderMetrics(){
       <select class="mxm-sel" id="mx-stage" aria-label="Program stage">${Object.entries(MX_STAGE).map(([k, v]) => `<option value="${k}" ${mx.stage === k ? "selected" : ""} title="${MX_STAGE_HELP[k]}">${v}</option>`).join("")}</select>
       <label class="mxm-reg"><input type="checkbox" id="mx-reg" ${mx.reg ? "checked" : ""}><span>EU DSA or UK Online Safety Act applies</span></label>
       ${typeof orgFromTag === "function" ? orgFromTag(!!orgGet().type && ORG_MAP.mx[orgGet().type] === mx.platform) : ""}
-      <span class="mxm-note">${list.length} metrics<span class="mxm-fp"> for this profile</span></span>
+      ${mxFitHTML(list)}
     </div>
     <div class="mx-tabs" role="tablist">${MX_TABS.map(([k, n]) => `<button type="button" role="tab" class="mx-tab${mx.tab === k ? " on" : ""}" aria-selected="${mx.tab === k}" data-tab="${k}">${n}${k === "mine" && Object.keys(mx.vals).length ? ` <span class="mx-tabn">${list.filter(m => mxStatus(m, mx.vals)).length}</span>` : ""}</button>`).join("")}<span class="toast" id="mx-toast" role="status" aria-live="polite"></span></div>
     ${MX_TAB_SUB[mx.tab] ? `<p class="note mx-tabs-sub">${esc(MX_TAB_SUB[mx.tab])}</p>` : ""}`;
@@ -635,6 +670,11 @@ function renderMetrics(){
   bind("[data-f]", inp => inp.oninput = () => mxSetVal(METRICS[+inp.dataset.i], inp, list));
   bind("#mx-guide", b => b.onclick = () => { mxView = "guide"; gdReset("metrics"); const p = gdPos("metrics"); p.scr = "q"; p.i = 0; renderMetrics(); window.scrollTo(0, 0); });
   bind("details.mxg-tier", d => d.ontoggle = () => { mx.fold = Object.assign({}, mx.fold, {[d.dataset.tier]:d.open}); store.set("mx", mx); });
+  // A chip on a left-out row applies that one setting; the metric then lands in its tier, which opens to show it
+  bind("[data-set]", b => b.onclick = () => { const k = b.dataset.set, v = b.dataset.v, i = +b.dataset.m;
+    if(k === "platform") mx.platform = v; else if(k === "stage") mx.stage = v; else mx.reg = true;
+    save(); setTimeout(() => { const el = view.querySelector(`.mxg-row [data-open="${i}"]`), d = el && el.closest("details"); if(d && !d.open) d.open = true; mxFlash(el); }, 120); });
+  bind("[data-out]", b => b.onclick = () => { mx.fold = Object.assign({}, mx.fold, {out:true}); store.set("mx", mx); mxGo(""); setTimeout(() => mxFlash($("#mxg-out"), "start"), 120); });
   bind(".mx-more", b => b.onclick = () => { b.parentNode.querySelectorAll("[hidden]").forEach(x => x.hidden = false); b.remove(); });
   bind("[data-jump]", b => b.onclick = () => { const el = $("#mxp-" + b.dataset.jump); if(el && el.scrollIntoView) el.scrollIntoView({behavior:"smooth", block:"start"}); });
   mxBindGloss();
