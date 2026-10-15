@@ -197,3 +197,13 @@
 .as-six b{line-height:1.25}
 .as-six-n{width:18px;height:18px;font-size:11.5px}
 .as-six small{line-height:1.35}
+
+/* home: the step number is a round badge on the icon tile's top-left corner; the minutes sit top-right of the card */
+.as-six li,.as-s.cur{position:relative}
+.as-six-i{position:relative;flex:none;display:block;line-height:0}
+.as-six-i .as-six-n{position:absolute;top:-6px;left:-6px;box-sizing:border-box;width:18px;height:18px;border-radius:999px;display:grid;place-items:center;font-size:11px;font-weight:600;line-height:1;background:var(--accent);color:#fff;box-shadow:0 0 0 2px var(--surface);margin:0;padding:0}
+.as-six-m{position:absolute;top:14px;right:16px;font-size:12px;line-height:18px;margin:0;color:var(--muted)}
+.as-six b{padding-right:44px;line-height:18px}
+.as-six-t{gap:4px}
+.as-cur-m{position:absolute;top:16px;right:18px;margin:0}
+.as-s.cur .as-cur-n{padding-right:0}

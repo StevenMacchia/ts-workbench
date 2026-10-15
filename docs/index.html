@@ -5234,6 +5234,16 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 .as-six b{line-height:1.25}
 .as-six-n{width:18px;height:18px;font-size:11.5px}
 .as-six small{line-height:1.35}
+
+/* home: the step number is a round badge on the icon tile's top-left corner; the minutes sit top-right of the card */
+.as-six li,.as-s.cur{position:relative}
+.as-six-i{position:relative;flex:none;display:block;line-height:0}
+.as-six-i .as-six-n{position:absolute;top:-6px;left:-6px;box-sizing:border-box;width:18px;height:18px;border-radius:999px;display:grid;place-items:center;font-size:11px;font-weight:600;line-height:1;background:var(--accent);color:#fff;box-shadow:0 0 0 2px var(--surface);margin:0;padding:0}
+.as-six-m{position:absolute;top:14px;right:16px;font-size:12px;line-height:18px;margin:0;color:var(--muted)}
+.as-six b{padding-right:44px;line-height:18px}
+.as-six-t{gap:4px}
+.as-cur-m{position:absolute;top:16px;right:18px;margin:0}
+.as-s.cur .as-cur-n{padding-right:0}
 /* =========================================================
    RED TEAM STUDIO: UX/UI polish pass (branch enh/rtpolish). Scoped to the studio's own classes
    (.rtf-*, .rt-*) wherever possible. A few rules reach .rtf-q/.rtf-opts/.rtf-next/.rtf-link, which
@@ -13078,8 +13088,8 @@ function asStepHTML(s, i, next){
     // "About your platform" is done on the workspace page itself, not its own report, so the button says where it actually goes
     const label = s.k === "setup" ? "Open workspace" : "Review";
     return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
-  if(cur) return `<div class="as-s cur" style="--c:${color}"><div class="as-cur-h"><span class="as-n cur">${i + 1}</span><span class="as-k">Up next · about ${asMin(s.min)}</span></div>
-    <div class="as-cur-t">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<b class="as-cur-n">${s.n}</b></div><p>${esc(s.get)}</p>
+  if(cur) return `<div class="as-s cur" style="--c:${color}"><span class="as-k as-cur-m">Up next · about ${asMin(s.min)}</span>
+    <div class="as-cur-t"><span class="as-six-i">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-n" aria-hidden="true">${i + 1}</span></span><b class="as-cur-n"><span class="visually-hidden">Step ${i + 1}: </span>${s.n}</b></div><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
   return `<button type="button" class="as-s todo" data-jgo="${s.k}"><span class="as-n">${i + 1}</span><span class="as-st"><b>${s.n}</b><small>About ${asMin(s.min)}</small></span><span class="as-go">Start</span></button>`;
 }
@@ -13117,7 +13127,7 @@ function asWelcomeHTML(J){
     ${typeof demoPreviewHTML === "function" ? demoPreviewHTML() : ""}
     <section class="rise" aria-labelledby="as-six-h">
       <div class="as-sec-h"><h2 id="as-six-h">The ${asCount(J.length)} steps</h2><span class="note">Want one tool on its own? They're all under <a href="#tools">All tools</a>.</span></div>
-      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-t"><span class="as-six-h"><span class="as-six-n">${i + 1}</span><span class="note">${s.min} min</span></span><b>${s.n}</b><small>${esc(s.get)}</small></span></li>`).join("")}</ol>
+      <ol class="as-six">${J.map((s, i) => `<li style="--c:${s.k === "setup" ? "var(--faint)" : s.c}"><span class="as-six-i">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-n" aria-hidden="true">${i + 1}</span></span><span class="as-six-m note">${s.min} min</span><span class="as-six-t"><b><span class="visually-hidden">Step ${i + 1}: </span>${s.n}</b><small>${esc(s.get)}</small></span></li>`).join("")}</ol>
       <p class="note as-six-note">Extra steps appear if under-18s use your product or EU or UK rules apply.</p>
     </section>
     ${asFootHTML()}
