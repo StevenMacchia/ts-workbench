@@ -519,8 +519,8 @@ function pxSpec(){
   ];
   return {k:"postmortem", tool:{name:"Incident post-mortem", icon:"doc", color:"var(--t-tt)"},
     intro:{title:"Write the post-mortem people will actually read",
-      lead:"Nine short screens about what happened and how you responded: about fifteen minutes with your timeline in front of you. At the end you get a one-page document in the handbook's shape, a grade for the response (never for the incident), and three actions with an owner and a date each, ready for your tracker.",
-      note:"Blameless by design: it asks what in the system failed, never who. Roles, not names.",
+      lead:"Nine screens on what happened and how you responded, then a one-page document, a grade and three actions.",
+      note:"Blameless by design: what in the system failed, never who. Roles, not names.",
       facts:[["About 15 minutes", "Facts and times. Come back any time."], ["The chapter 13 template", "Timeline, impact, what worked, what failed, actions, follow-up."], ["Stays in your browser", "Nothing leaves your device until you download it."]],
       start:"Start"},
     alt:[{n:"See example", run:() => pxAct("example")}],

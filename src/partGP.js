@@ -511,8 +511,8 @@ function gpSpec(){
   ];
   const src = typeof loopSource === "function" ? loopSource() : null, org = typeof orgGet === "function" && orgGet().confirmed && GP_YOUTH.some(y => y[0] === orgGet().youth);
   return {k:"grooming", tool:{name:"Grooming pathway review", icon:"route", color:"var(--t-gp)"},
-    intro:{title:"How could an adult reach a child on your product, and what's in the way?", lead:"Twelve plain questions about who can find whom, how a conversation starts, what happens in private, what you do when a case lands, and how you know each safeguard works. Then a map of the six stages contact moves through, the safeguards that apply to your product and whether each is in place and checked, and five drafts to edit: a product brief, a response ladder, a leadership page, a memo for Legal and starter rules.",
-      note:"Nothing on these pages describes how grooming is done. Stages are named by what a platform can see, never by what is said.",
+    intro:{title:"How could an adult reach a child, and what's in the way?", lead:"Twelve questions about who can reach whom and what happens in private. Then six stages, your safeguards and five drafts.",
+      note:"Nothing here describes how grooming is done, only what a platform can see.",
       facts:[["About 7 minutes", "One question at a time. Only the questions that apply to your answers."], ["Six stages", "Find, reach, bond, isolate, exchange, exploit. Each gets an exposure and a protection."], ["Not legal advice", "Where each market expects these defaults, with the source, for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { gpView = "page"; renderGrooming(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(org ? [{n:"Start from your workspace profile", run:() => gpAct("fromorg")}] : []).concat(src ? [{n:"Start from your pre-mortem", run:() => gpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => gpAct("example")}]),

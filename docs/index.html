@@ -5690,6 +5690,20 @@ details.ev-details[open] > summary{margin-bottom:12px}
 /* Four fact tiles sit two by two, not three and an orphan */
 .gd-facts:has(> div:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:720px){.gd-facts:has(> div:nth-child(4)){grid-template-columns:1fr}}
+
+/* the bar's (i) is the one "How this works" on a phone: the page's own pill steps aside */
+@media (max-width:640px){
+  body.ph-hb .pagehead .ph-help,body.ph-hb .as-ht .ph-help{display:none}
+}
+
+/* Classifier eval on a phone: the "Powered by" chips are a small line under the page, and Save waits for a result */
+.ev-pw-foot{display:none}
+@media (max-width:640px){
+  .ev-pw-head{display:none}
+  .ev-pw-foot{display:flex;justify-content:center;margin:18px 0 4px;font-size:12px}
+  .ev-pw-foot .pw{justify-content:center}
+  .headmeta .btn.ev-nores{display:none}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -11952,7 +11966,8 @@ const DEFAULT_V = {
     {name:'Vendor C', s:{quality:4,wellness:4,lang:4,surge:2,security:3,cost:4,tooling:3,reporting:3}}
   ], open:null
 };
-let vx = store.get('vx', null) || JSON.parse(JSON.stringify(DEFAULT_V));
+// A first visit starts blank (two empty vendors, no weights) so the guided intro shows; "See a finished example" loads DEFAULT_V
+let vx = store.get('vx', null) || {weights:{}, vendors:['Vendor A','Vendor B'].map(n => ({name:n, s:Object.fromEntries(CRITERIA.map(c=>[c.k,null]))})), open:null};
 function vendorScore(v){
   const tw = CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0),0) || 1;
   return CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0)*(v.s[c.k]||0),0)/tw;
@@ -12797,6 +12812,9 @@ $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(
    tool that renders an asStepBar gets the merged bar without changing. Routes with no strip show a hamburger,
    a title and search. */
 let phSig = "";
+// Pages with no strip of their own that still get the tool bar on a phone (back chevron, name, search, help)
+const PH_TOOLBAR = {review:true};
+const PH_PILL = ".pagehead .ph-help, .as-ht .ph-help";
 function phSync(){
   const body = document.body, tn = $("#tb-tname"); if(!body || !tn || !view || typeof view.querySelector !== "function") return;
   const asb = view.querySelector(".asb"), r = (body.dataset && body.dataset.route) || "", prog = $("#tb-prog"), back = $("#tb-back"), help = $("#tb-help");
@@ -12808,15 +12826,25 @@ function phSync(){
     label = bk ? bk.textContent.trim().replace(/^Your assessment$/, "Assessment") : "All tools";
     href = bk ? bk.getAttribute("href") : "#tools";
     hasHelp = !!asb.querySelector(".ph-help");
-  }else name = r === "overview" || r === "tools" || !ROUTE_LABEL[r] ? "T&S Workbench" : ROUTE_LABEL[r];
-  const sig = [!!asb, name, segs, label, href, hasHelp].join("\u0001");
+    // the bar names the tool the same way the sidebar and the title do (the strip may say a journey step's name)
+    if(ROUTE_LABEL[r]) name = ROUTE_LABEL[r];
+  }else if(PH_TOOLBAR[r]){
+    name = ROUTE_LABEL[r] || ""; label = asInAssessment() ? "Assessment" : "All tools"; href = asInAssessment() ? "#overview" : "#tools";
+    hasHelp = !!view.querySelector(PH_PILL);
+  }else{
+    name = r === "overview" || r === "tools" || !ROUTE_LABEL[r] ? "T&S Workbench" : ROUTE_LABEL[r];
+    hasHelp = !!view.querySelector(PH_PILL);
+  }
+  const bar = !!asb || !!PH_TOOLBAR[r];
+  const sig = [bar, name, segs, label, href, hasHelp].join("\u0001");
   if(sig === phSig) return;
   phSig = sig;
-  body.classList.toggle("ph-tool", !!asb);
+  body.classList.toggle("ph-tool", bar);
+  body.classList.toggle("ph-hb", hasHelp);
   tn.textContent = name;
   if(prog){ prog.innerHTML = segs; prog.hidden = !segs; prog.classList.toggle("solo", /class="solo"/.test(segs)); }
-  if(back){ back.hidden = !asb; if(asb){ back.setAttribute("href", href); const sp = back.querySelector("span"); if(sp) sp.textContent = label; } }
-  if(help) help.hidden = !(asb && hasHelp);
+  if(back){ back.hidden = !bar; if(bar){ back.setAttribute("href", href); const sp = back.querySelector("span"); if(sp) sp.textContent = label; } }
+  if(help) help.hidden = !hasHelp;
 }
 if(typeof MutationObserver !== "undefined" && view && typeof view.querySelector === "function"){
   let phQueued = false;
@@ -12826,7 +12854,7 @@ if(typeof MutationObserver !== "undefined" && view && typeof view.querySelector 
 try{ phSync(); }catch(e){}
 // The (i) button in the bar presses the strip's own "How this works" button, so the tour or walkthrough is
 // whichever one that page already offers
-{ const hb = $("#tb-help"); if(hb && hb.addEventListener) hb.addEventListener("click", () => { const b = view.querySelector(".asb .ph-help"); if(b) b.click(); }); }
+{ const hb = $("#tb-help"); if(hb && hb.addEventListener) hb.addEventListener("click", () => { const b = view.querySelector(".asb .ph-help") || view.querySelector(PH_PILL); if(b) b.click(); }); }
 // "Saved as you go" used to sit in the strip as a permanent label; on a phone it is one toast, the first time
 // a tool writes its answers in a session
 let phSaved = false;
@@ -19853,8 +19881,8 @@ function pxSpec(){
   ];
   return {k:"postmortem", tool:{name:"Incident post-mortem", icon:"doc", color:"var(--t-tt)"},
     intro:{title:"Write the post-mortem people will actually read",
-      lead:"Nine short screens about what happened and how you responded: about fifteen minutes with your timeline in front of you. At the end you get a one-page document in the handbook's shape, a grade for the response (never for the incident), and three actions with an owner and a date each, ready for your tracker.",
-      note:"Blameless by design: it asks what in the system failed, never who. Roles, not names.",
+      lead:"Nine screens on what happened and how you responded, then a one-page document, a grade and three actions.",
+      note:"Blameless by design: what in the system failed, never who. Roles, not names.",
       facts:[["About 15 minutes", "Facts and times. Come back any time."], ["The chapter 13 template", "Timeline, impact, what worked, what failed, actions, follow-up."], ["Stays in your browser", "Nothing leaves your device until you download it."]],
       start:"Start"},
     alt:[{n:"See example", run:() => pxAct("example")}],
@@ -20607,8 +20635,8 @@ function gpSpec(){
   ];
   const src = typeof loopSource === "function" ? loopSource() : null, org = typeof orgGet === "function" && orgGet().confirmed && GP_YOUTH.some(y => y[0] === orgGet().youth);
   return {k:"grooming", tool:{name:"Grooming pathway review", icon:"route", color:"var(--t-gp)"},
-    intro:{title:"How could an adult reach a child on your product, and what's in the way?", lead:"Twelve plain questions about who can find whom, how a conversation starts, what happens in private, what you do when a case lands, and how you know each safeguard works. Then a map of the six stages contact moves through, the safeguards that apply to your product and whether each is in place and checked, and five drafts to edit: a product brief, a response ladder, a leadership page, a memo for Legal and starter rules.",
-      note:"Nothing on these pages describes how grooming is done. Stages are named by what a platform can see, never by what is said.",
+    intro:{title:"How could an adult reach a child, and what's in the way?", lead:"Twelve questions about who can reach whom and what happens in private. Then six stages, your safeguards and five drafts.",
+      note:"Nothing here describes how grooming is done, only what a platform can see.",
       facts:[["About 7 minutes", "One question at a time. Only the questions that apply to your answers."], ["Six stages", "Find, reach, bond, isolate, exchange, exploit. Each gets an exposure and a protection."], ["Not legal advice", "Where each market expects these defaults, with the source, for your conversation with counsel."]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { gpView = "page"; renderGrooming(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(org ? [{n:"Start from your workspace profile", run:() => gpAct("fromorg")}] : []).concat(src ? [{n:"Start from your pre-mortem", run:() => gpAct("frompm")}] : []).concat([{n:"See a finished example", run:() => gpAct("example")}]),
@@ -21189,8 +21217,8 @@ function crSpec(){
     clear:() => { const c = Object.assign({}, cr.ctrl); g.items.forEach(it => delete c[it.k]); setV("ctrl", c); }})));
   const src = typeof loopSource === "function" ? loopSource() : null, org = typeof orgGet === "function" && orgGet().confirmed && (orgGet().regions || []).length;
   return {k:"reporting", tool:{name:"Child-safety reporting", icon:"flag", color:"var(--t-cr)"},
-    intro:{title:"When you find child sexual exploitation, can you remove, preserve, report and handle the account?", lead:"Five questions about your service, its size and its markets, then one screen per part of the first hour: registration and the procedure, preservation and access, finding it, danger and law enforcement, the account, the person harmed, people, and measurement. You'll see which duties apply where, the gaps against them, and four drafts to edit: the first-hour procedure, a preservation and access policy, a law-enforcement and emergency requests procedure, and a memo for Legal.",
-      note:"Nothing here describes the material. It is only ever a thing to detect, preserve and report.",
+    intro:{title:"Child sexual exploitation: can you remove, preserve and report it?", lead:"Five questions, then the first hour screen by screen: which duties apply where, the gaps, and four drafts.",
+      note:"Nothing here describes the material, only how to detect, preserve and report it.",
       facts:[["About 8 minutes", "One question at a time. Only the duties that apply to your markets."], ["Five markets", "US, UK, EU, Canada and Australia, with the law behind each requirement."], ["Not legal advice", `A starting point for counsel. In the US, knowing and willful failure to report is fined ${cr.size === "huge" ? "up to $850,000, then $1 million" : "up to $600,000, then $850,000"}.`]], start:"Start"},
     alt:[{n:"Answer everything on one page", run:() => { crView = "page"; renderReporting(); window.scrollTo(0, 0); focusQuiet(document.querySelector("#view h1")); }}]
       .concat(org ? [{n:"Start from your workspace profile", run:() => crAct("fromorg")}] : []).concat(src ? [{n:"Start from your pre-mortem", run:() => crAct("frompm")}] : []).concat([{n:"See a finished example", run:() => crAct("example")}]),
@@ -21703,7 +21731,7 @@ function renderEval(){
   const m = n && ev.preds ? evMetrics(ev, ev.preds) : null, fresh = !ev.policy && !ev.cases.length && !ev.preds && !media;
   const steps = evSteps(media, n, m);
   view.innerHTML = head("Classifier eval", "Paste the rule and some cases, get labels from a classifier, and see what it gets wrong.", "Measure",
-      `${poweredBy(evPowered())}<span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-ev="sharelink">Copy link</button>` : ""}`)
+      `<span class="ev-pw-head">${poweredBy(evPowered())}</span><span class="toast" id="ev-toast" aria-live="polite"></span>${fresh ? "" : `<button type="button" class="btn sm" data-ev="reset">Start over</button>`}<button type="button" class="btn sm${m ? "" : " ev-nores"}" data-ev="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("eval", ev)}</span></button>${m ? `<button type="button" class="btn sm primary" data-ev="dl"><svg><use href="#i-download"/></svg>Download</button><button type="button" class="btn sm" data-ev="sharelink">Copy link</button>` : ""}`)
     + `<div class="ev-root cp-root">
     <div class="ev-top"><div class="segs ev-kind" role="group" aria-label="What the classifier looks at"><button type="button" data-evkind="text" aria-pressed="${!media}">Text</button><button type="button" data-evkind="media" aria-pressed="${media}">Images &amp; video</button></div>
       <ol class="ev-steps" aria-label="Steps">${steps.map((s, i) => `<li class="${s.st}"><button type="button" data-evjump="${s.id}" aria-current="${s.st === "now" ? "step" : "false"}"><span class="ev-stn" aria-hidden="true">${s.st === "done" ? "✓" : i + 1}</span>${s.n}<span class="visually-hidden">: ${s.st === "done" ? "done" : s.st === "now" ? "current step" : "not yet"}</span></button></li>`).join("")}</ol></div>
@@ -21712,6 +21740,7 @@ function renderEval(){
     ${media ? evMediaHTML(steps[0]) : evStepHTML(steps[0], 0, evStep1HTML(n)) + evStepHTML(steps[1], 1, evStep2HTML(n))}
     ${evStepHTML(steps[steps.length - 1], steps.length - 1, m ? evResultsHTML(m, media) : evWaitHTML(media))}
     ${m && !media && typeof evLoopHTML === "function" ? evLoopHTML() : ""}
+    <div class="ev-pw-foot">${poweredBy(evPowered())}</div>
   </div>`;
   evBind();
 }
@@ -22967,7 +22996,7 @@ document.addEventListener("click", e => {
    LAZY_CHUNKS and LAZY_ROUTE_CHUNK from its CHUNKS table. The full bundle used by the tests keeps everything inline and
    never includes this part; code elsewhere asks for a section through lazyEnsure only when `typeof lazyEnsure` says
    it exists. */
-const LAZY_CHUNKS = {"tsglossary":{"src":"parts/tsglossary.js?v=6d6995e2","needs":[]},"learn":{"src":"parts/learn.js?v=0d0f5d78","needs":[]},"redteam":{"src":"parts/redteam.js?v=48adfd77","needs":["learn"]}};
+const LAZY_CHUNKS = {"tsglossary":{"src":"parts/tsglossary.js?v=114b41ad","needs":[]},"learn":{"src":"parts/learn.js?v=0d0f5d78","needs":[]},"redteam":{"src":"parts/redteam.js?v=48adfd77","needs":["learn"]}};
 const LAZY_ROUTE_CHUNK = {"tsglossary":"tsglossary","learn":"learn","redteamllm":"learn","redteamworld":"learn","glossary":"learn","redteam":"redteam"};
 // How many things the sections hold, for the cards on the All tools page before a section is loaded.
 // test-chunks.js fails when one of these drifts from the data.

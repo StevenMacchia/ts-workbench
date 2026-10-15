@@ -227,6 +227,9 @@ $("#tb-new").addEventListener("click", e => { e.preventDefault(); newMenuToggle(
    tool that renders an asStepBar gets the merged bar without changing. Routes with no strip show a hamburger,
    a title and search. */
 let phSig = "";
+// Pages with no strip of their own that still get the tool bar on a phone (back chevron, name, search, help)
+const PH_TOOLBAR = {review:true};
+const PH_PILL = ".pagehead .ph-help, .as-ht .ph-help";
 function phSync(){
   const body = document.body, tn = $("#tb-tname"); if(!body || !tn || !view || typeof view.querySelector !== "function") return;
   const asb = view.querySelector(".asb"), r = (body.dataset && body.dataset.route) || "", prog = $("#tb-prog"), back = $("#tb-back"), help = $("#tb-help");
@@ -238,15 +241,25 @@ function phSync(){
     label = bk ? bk.textContent.trim().replace(/^Your assessment$/, "Assessment") : "All tools";
     href = bk ? bk.getAttribute("href") : "#tools";
     hasHelp = !!asb.querySelector(".ph-help");
-  }else name = r === "overview" || r === "tools" || !ROUTE_LABEL[r] ? "T&S Workbench" : ROUTE_LABEL[r];
-  const sig = [!!asb, name, segs, label, href, hasHelp].join("\u0001");
+    // the bar names the tool the same way the sidebar and the title do (the strip may say a journey step's name)
+    if(ROUTE_LABEL[r]) name = ROUTE_LABEL[r];
+  }else if(PH_TOOLBAR[r]){
+    name = ROUTE_LABEL[r] || ""; label = asInAssessment() ? "Assessment" : "All tools"; href = asInAssessment() ? "#overview" : "#tools";
+    hasHelp = !!view.querySelector(PH_PILL);
+  }else{
+    name = r === "overview" || r === "tools" || !ROUTE_LABEL[r] ? "T&S Workbench" : ROUTE_LABEL[r];
+    hasHelp = !!view.querySelector(PH_PILL);
+  }
+  const bar = !!asb || !!PH_TOOLBAR[r];
+  const sig = [bar, name, segs, label, href, hasHelp].join("\u0001");
   if(sig === phSig) return;
   phSig = sig;
-  body.classList.toggle("ph-tool", !!asb);
+  body.classList.toggle("ph-tool", bar);
+  body.classList.toggle("ph-hb", hasHelp);
   tn.textContent = name;
   if(prog){ prog.innerHTML = segs; prog.hidden = !segs; prog.classList.toggle("solo", /class="solo"/.test(segs)); }
-  if(back){ back.hidden = !asb; if(asb){ back.setAttribute("href", href); const sp = back.querySelector("span"); if(sp) sp.textContent = label; } }
-  if(help) help.hidden = !(asb && hasHelp);
+  if(back){ back.hidden = !bar; if(bar){ back.setAttribute("href", href); const sp = back.querySelector("span"); if(sp) sp.textContent = label; } }
+  if(help) help.hidden = !hasHelp;
 }
 if(typeof MutationObserver !== "undefined" && view && typeof view.querySelector === "function"){
   let phQueued = false;
@@ -256,7 +269,7 @@ if(typeof MutationObserver !== "undefined" && view && typeof view.querySelector 
 try{ phSync(); }catch(e){}
 // The (i) button in the bar presses the strip's own "How this works" button, so the tour or walkthrough is
 // whichever one that page already offers
-{ const hb = $("#tb-help"); if(hb && hb.addEventListener) hb.addEventListener("click", () => { const b = view.querySelector(".asb .ph-help"); if(b) b.click(); }); }
+{ const hb = $("#tb-help"); if(hb && hb.addEventListener) hb.addEventListener("click", () => { const b = view.querySelector(".asb .ph-help") || view.querySelector(PH_PILL); if(b) b.click(); }); }
 // "Saved as you go" used to sit in the strip as a permanent label; on a phone it is one toast, the first time
 // a tool writes its answers in a session
 let phSaved = false;

@@ -284,7 +284,8 @@ const DEFAULT_V = {
     {name:'Vendor C', s:{quality:4,wellness:4,lang:4,surge:2,security:3,cost:4,tooling:3,reporting:3}}
   ], open:null
 };
-let vx = store.get('vx', null) || JSON.parse(JSON.stringify(DEFAULT_V));
+// A first visit starts blank (two empty vendors, no weights) so the guided intro shows; "See a finished example" loads DEFAULT_V
+let vx = store.get('vx', null) || {weights:{}, vendors:['Vendor A','Vendor B'].map(n => ({name:n, s:Object.fromEntries(CRITERIA.map(c=>[c.k,null]))})), open:null};
 function vendorScore(v){
   const tw = CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0),0) || 1;
   return CRITERIA.reduce((a,c)=>a+(+vx.weights[c.k]||0)*(v.s[c.k]||0),0)/tw;

@@ -10,8 +10,8 @@ const body = function(){
   const score = () => gpScore(gp, gpCtx(gp)), stage = k => score().stages.find(s => s.st.k === k);
   // a blank review opens guided: an intro, then one question per screen, only the ones that apply
   gp = GP_BLANK(); gpView = null; gdReset("grooming"); renderGrooming(); let h = view.innerHTML; if(bad(h)) throw new Error("blank intro bad: " + where(h));
-  eq(/How could an adult reach a child on your product/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h) && /See a finished example/.test(h), true, "guided intro with the one-page form and the example as ways in");
-  eq(/Nothing on these pages describes how grooming is done/.test(h), true, "the content rule is stated on the intro");
+  eq(/How could an adult reach a child, and what's in the way/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h) && /See a finished example/.test(h), true, "guided intro with the one-page form and the example as ways in");
+  eq(/Nothing here describes how grooming is done, only what a platform can see/.test(h), true, "the content rule is stated on the intro");
   gdGo(gdCur, "start"); eq(/What's the product or feature called\?/.test(view.innerHTML), true, "first question: the name (optional)"); gdGo(gdCur, "next");
   eq(/Who can use it\?/.test(view.innerHTML) && (view.innerHTML.match(/data-gdpick=/g) || []).length, 4, "who can use it, four answers");
   gdPick(gdCur, "teens"); gdGo(gdCur, "next"); eq(gp.youth, "teens", "answer saved"); eq(/How do you know how old someone is\?/.test(view.innerHTML), true, "a teen product is asked how it knows ages");

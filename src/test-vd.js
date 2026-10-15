@@ -5,6 +5,10 @@ const v9 = rd("test-v9.js"), s0 = v9.indexOf("const stub = `") + 14, stub = v9.s
 const body = function(){
   const out = [], bad = h => /undefined|NaN|\[object|null/.test(h), eq = (a, b, msg) => { if(a !== b) throw new Error(msg + ": got " + a + ", want " + b); };
   CRITERIA.forEach(c => { if(!VD_Q[c.k] || !VD_RUBRIC[c.k] || VD_RUBRIC[c.k].length !== 3) throw new Error("criterion missing guide: " + c.k); });
+  // a first visit (nothing stored) opens on the guided intro, not on a finished example
+  vdView = null; gdReset("vendors"); renderVendors(); let h0 = view.innerHTML; if(bad(h0)) throw new Error("bad fresh html");
+  eq(vx.vendors.length === 2 && vx.vendors.every(v => !vdScored(v)) && !vdTotal(), true, "a fresh profile starts with two empty vendors and no weights");
+  eq(/Which vendor should you trust with your users/.test(h0) && /data-gd="start"/.test(h0) && /See a finished example/.test(h0) && !/comes out ahead/.test(h0), true, "fresh start: intro with Start and 'See a finished example'");
   // the example is fully scored, so it opens on the result; the one-page scorecard is a click away
   vx = JSON.parse(JSON.stringify(DEFAULT_V)); vdView = null; renderVendors(); let h = view.innerHTML; if(bad(h)) throw new Error("bad result html");
   eq(/Vendor B comes out ahead/.test(h) && /data-vd="page"/.test(h), true, "result first for a scored example");

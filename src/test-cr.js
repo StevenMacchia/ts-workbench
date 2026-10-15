@@ -10,8 +10,8 @@ const body = function(){
   const score = () => crScore(cr, crCtx(cr)), gaps = () => score().gaps.map(r => r.k), lvl = o => crApplies(Object.assign(CR_BLANK(), o)).lvl;
   // a blank check opens guided: an intro, then one question per screen, only the ones that apply
   cr = CR_BLANK(); crView = null; gdReset("reporting"); renderReporting(); let h = view.innerHTML; if(bad(h)) throw new Error("blank intro bad: " + where(h));
-  eq(/can you remove, preserve, report and handle the account/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
-  eq(/Nothing here describes the material/.test(h), true, "the content rule is stated on the intro");
+  eq(/can you remove, preserve and report it/.test(h) && /data-gd="start"/.test(h) && /Answer everything on one page/.test(h), true, "guided intro with the one-page form as an option");
+  eq(/Nothing here describes the material, only how to detect, preserve and report it/.test(h), true, "the content rule is stated on the intro");
   gdGo(gdCur, "start"); eq(/What's the service called\?/.test(view.innerHTML), true, "first question: the name (optional)"); gdGo(gdCur, "next");
   eq(/Roughly how many monthly users\?/.test(view.innerHTML), true, "then size"); gdPick(gdCur, "huge"); gdGo(gdCur, "next");
   eq(/Have you handled a case yet\?/.test(view.innerHTML), true, "then cases"); gdPick(gdCur, "none"); gdGo(gdCur, "next");

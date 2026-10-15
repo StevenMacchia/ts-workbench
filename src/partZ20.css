@@ -74,3 +74,17 @@
 /* Four fact tiles sit two by two, not three and an orphan */
 .gd-facts:has(> div:nth-child(4)){grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:720px){.gd-facts:has(> div:nth-child(4)){grid-template-columns:1fr}}
+
+/* the bar's (i) is the one "How this works" on a phone: the page's own pill steps aside */
+@media (max-width:640px){
+  body.ph-hb .pagehead .ph-help,body.ph-hb .as-ht .ph-help{display:none}
+}
+
+/* Classifier eval on a phone: the "Powered by" chips are a small line under the page, and Save waits for a result */
+.ev-pw-foot{display:none}
+@media (max-width:640px){
+  .ev-pw-head{display:none}
+  .ev-pw-foot{display:flex;justify-content:center;margin:18px 0 4px;font-size:12px}
+  .ev-pw-foot .pw{justify-content:center}
+  .headmeta .btn.ev-nores{display:none}
+}

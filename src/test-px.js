@@ -19,7 +19,7 @@ const body = async function(){
   px = PX_BLANK(); pxView = null; gdReset("postmortem"); renderPostmortem(); let h = view.innerHTML;
   if(bad(h)) throw new Error("intro bad: " + where(h));
   eq(/Write the post-mortem people will actually read/.test(h) && /data-gd="start"/.test(h), true, "the intro and its Start button");
-  eq(/Nine short screens/.test(h) && /About 15 minutes/.test(h), true, "the intro says how long and how many screens");
+  eq(/Nine screens on what happened/.test(h) && /About 15 minutes/.test(h), true, "the intro says how long and how many screens");
   eq([...new Set(h.match(/data-gd="alt\d+"/g) || [])].length, 1, "one alternative way in"); eq(/See example/.test(h), true, "it is the example");
   eq(/gd-preview-frame/.test(h) && /grade-C/.test(h) && /<b>60<\/b>/.test(h), true, "the inert preview shows the example's grade");
   eq(gdLive(pxSpec()).length, 9, "nine screens (was sixteen)");
