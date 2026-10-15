@@ -160,7 +160,7 @@ function mxStatusChip(m){
   // Example numbers say so on every chip, not only in the banner at the top. The target rides along, so the
   // colour has a reason: "1.8 · Watch · target ≤ 1.5" says what the number was measured against
   const tgt = mxTargetText(m);
-  return `<span class="mxm-st ${MX_STAT[st][1]}${mx.demo ? " eg" : ""}"${mx.demo ? ' title="An example number, not yours"' : ""}><i></i>${mx.demo ? "e.g. " : ""}${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}${tgt && st !== "set" ? `<small class="mxm-tgt">target ${esc(tgt)}</small>` : ""}</span>`;
+  return `<span class="mxm-st ${MX_STAT[st][1]}${mx.demo ? " eg" : ""}"${mx.demo ? ' title="An example number, not yours"' : ""}><i></i>${mx.demo ? "e.g. " : ""}${esc(mxFmt(m, mxNum(s.v)))}${st !== "set" ? " · " + MX_STAT[st][0] : ""}</span>${tgt && st !== "set" ? `<span class="mxm-tgt">target ${esc(tgt)}</span>` : ""}`;
 }
 // The category's own icon on a .tile-sm (measure tone): the eyebrow every metric card and row on this route uses
 const mxTile = k => `<span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${MX_ICO[k]}</svg></span>`;
@@ -186,10 +186,9 @@ function mxStartCard(m, showCat){
 // One metric as a row: the whole row is the link, the chip carries the target, a trend line shows once
 // there are two periods, and "Read" is a word rather than a tick. What to log lives inside the metric.
 function mxRowHTML(m){
-  const i = METRICS.indexOf(m), rd = mx.read[m.n], st = mxStatus(m, mx.vals), spark = mxSpark(m, 72, 22);
+  const i = METRICS.indexOf(m), rd = mx.read[m.n], st = mxStatus(m, mx.vals);
   return `<li class="mxg-row" data-st="${st && st !== "set" ? MX_STAT[st][1] : ""}"><a class="mxg-rowlink" href="#metrics/${mxSlug(m)}" data-open="${i}">
       <span class="mxg-main"><span class="mxg-name">${esc(m.n)}${rd ? `<span class="mxg-read">Read</span>` : ""}</span><span class="mxg-q">${esc(MX_Q[m.n])}</span></span>
-      ${spark ? `<span class="mxg-spark">${spark}</span>` : ""}
       <span class="mxg-rs">${mxStatusChip(m)}</span>
       <span class="mxg-go">${mxIco("next", "mx-ico sm")}</span></a></li>`;
 }
