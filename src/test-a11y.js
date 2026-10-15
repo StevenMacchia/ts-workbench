@@ -19,7 +19,7 @@ const files = [
   "partNav.js", "partH4.js", "partH2.js", "partAbout.js", "partCredits.js", "partPol.js", "partPol2.js", "partAI.js",
   "partMAd.js", "partMA.js", "partCV.js", "partOV.js", "partRC.js", "partPF.js", "partTK.js", "partORG.js", "partJN.js",
   "partNX.js", "partTTF.js", "partTR.js", "partDEMO.js", "partHELP.js", "partTYPE.js", "partGD.js", "partCP.js",
-  "partDSA.js", "partGP.js", "partCR.js", "partEV.js", "partEV2.js", "partEVB.js", "partRX.js", "partLOOP.js", "partPLAN.js", "partREV.js"
+  "partDSA.js", "partPX.js", "partGP.js", "partCR.js", "partEV.js", "partEV2.js", "partEVB.js", "partRX.js", "partLOOP.js", "partPLAN.js", "partREV.js"
 ];
 const src = stub + files.map(rd).join("\n") + `
 const routes = [
@@ -36,6 +36,12 @@ const routes = [
   ["coverage", () => renderCoverage()],
   ["policy", () => renderPolicy()],
   ["coppa", () => renderCoppa()],
+  ["postmortem", () => { px = PX_BLANK(); pxView = null; renderPostmortem(); }],
+  ["postmortem (question)", () => { px = PX_BLANK(); pxView = null; gdReset("postmortem"); gdPos("postmortem").scr = "q"; gdPos("postmortem").i = 3; renderPostmortem(); }],
+  ["postmortem (layers question)", () => { px = PX_BLANK(); pxView = null; gdReset("postmortem"); gdPos("postmortem").scr = "q"; gdPos("postmortem").i = 5; renderPostmortem(); }],
+  ["postmortem (actions question)", () => { px = Object.assign(PX_BLANK(), JSON.parse(JSON.stringify(PX_EXAMPLE)), {view:"setup", ex:false}); gdReset("postmortem"); gdPos("postmortem").scr = "q"; gdPos("postmortem").i = 8; renderPostmortem(); }],
+  ["postmortem (promises question)", () => { px = Object.assign(PX_BLANK(), JSON.parse(JSON.stringify(PX_EXAMPLE)), {view:"setup", ex:false}); gdReset("postmortem"); gdPos("postmortem").scr = "q"; gdPos("postmortem").i = 7; renderPostmortem(); }],
+  ["postmortem (filled)", () => { px = Object.assign(PX_BLANK(), JSON.parse(JSON.stringify(PX_EXAMPLE))); renderPostmortem(); }],
   ["dsa", () => renderDsa()],
   ["grooming", () => renderGrooming()],
   ["reporting", () => renderReporting()],

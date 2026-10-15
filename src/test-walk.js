@@ -214,6 +214,6 @@ const rdSrc = "const rd_ = f => require('fs').readFileSync(require('path').join(
 const src = stub + extra + rdSrc + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"),
   rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partPol.js"), rd("partPol2.js"), rd("partAI.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"),
   rd("partOV.js"), rd("partRC.js"), rd("partPF.js"), rd("partTK.js"), rd("partORG.js"), rd("partJN.js"), rd("partTR.js"), rd("partHELP.js"), rd("partTYPE.js"), rd("partGD.js"),
-  rd("partINTRO.js"), rd("partCP.js"), rd("partDSA.js"), rd("partGP.js"), rd("partCR.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js")].join("\n")
+  rd("partINTRO.js"), rd("partCP.js"), rd("partDSA.js"), rd("partPX.js"), rd("partGP.js"), rd("partCR.js"), rd("partEV.js"), rd("partEV2.js"), rd("partEVB.js"), rd("partRX.js"), rd("partLOOP.js"), rd("partPLAN.js"), rd("partREV.js")].join("\n")
   + "\nreturn (" + body.toString() + ")();";
 new Function("require", src)(require).then(console.log);

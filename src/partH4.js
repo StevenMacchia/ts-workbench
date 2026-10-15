@@ -216,7 +216,7 @@ function asBind(){
 /* ---------- All tools: every tool on its own, plus recent work ---------- */
 // Which stage each tool card belongs to, for the filter chips below. A tool keeps growing this
 // grid (Red Team Studio's modules among them), so the chips are a cheap way to keep it scannable
-const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", gp:"assess", cr:"assess", ds:"assess", tt:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
+const OV_STAGE = {ma:"assess", pm:"assess", cv:"assess", cp:"assess", gp:"assess", cr:"assess", ds:"assess", tt:"prepare", px:"prepare", pol:"prepare", vd:"prepare", mx:"measure", ev:"measure", rt:"ai"};
 const OV_STAGE_NAME = {all:"All", assess:"Assess", prepare:"Prepare", measure:"Measure", ai:"AI assistants"};
 let ovStage = "all";
 function renderTools(){
@@ -234,6 +234,7 @@ function renderTools(){
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
         ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios, ${typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.length} versions across ${typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8} sectors`)}
+        ${typeof PX_FIX !== "undefined" ? tool("px","postmortem","var(--t-tt)","doc","Incident post-mortem","After a real incident, a blameless post-mortem in fifteen minutes: one page, a grade for the response, three owned actions.",`${Object.keys(PX_FIX).length} fixes · 4 layers · the chapter 13 template`) : ""}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof GP_SG !== "undefined" ? tool("gp","grooming","var(--t-gp)","route","Grooming pathway review <span class=\"wip-tag\">New</span>","See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",`${GP_STAGES.length} stages · ${GP_SG.length} safeguards · 5 drafts`) : ""}

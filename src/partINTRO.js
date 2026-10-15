@@ -107,6 +107,19 @@ const INTRO_SPECS = {
       {title:"Go further with Claude", line:"Optional: edge cases for your platform, enforcement risks and a rewrite, on your own Claude account.",
         preview:() => `<div class="pol-more" style="padding:10px 12px"><span class="pill accent">Claude review available</span></div>`}
     ]},
+  postmortem:{
+    heading:"Write the post-mortem people will actually read",
+    who:"whoever led the response, or the founder who wants it written down.",
+    leave:"a one-page blameless document, a grade for the response, and three actions with owners and dates.",
+    mins:"about 15 minutes, with the timeline in front of you.",
+    walk:[
+      {title:"Nine short screens", line:"What happened, who it reached, how you found out, and what failed in each layer: prevention, detection, response, communication.",
+        preview:() => `<div class="gd-opts" role="group" aria-label="Example question"><button type="button" class="gd-opt on" tabindex="-1"><span class="gd-radio sq" aria-hidden="true"></span><span class="gd-ot"><b>No alert fires for this kind of harm</b></span><kbd aria-hidden="true">1</kbd></button></div>`},
+      {title:"A timeline with the gaps", line:"Five moments in the handbook's order. The gap from first signal to a declared incident is usually the fastest to fix.",
+        preview:() => `<ul class="tline" style="margin:0"><li class="now"><span class="tdot">2</span><span class="tlab"><b>First internal signal</b><span>Report spike, 23:30</span></span></li></ul>`},
+      {title:"A grade for the response, never the incident", line:"A Sev 1 handled well scores higher than a Sev 3 nobody led. The document and three owned actions come out the other end.",
+        preview:() => `<div class="row" style="gap:8px;flex-wrap:wrap"><span class="grade grade-C">C</span><span class="pill high">Signal to declared 2h 40m</span><span class="pill">3 actions</span></div>`}
+    ]},
   coppa:{
     heading:"Find out whether COPPA applies to you, and if you're ready",
     who:"any service that could reach children under 13 in the US.",
@@ -329,6 +342,7 @@ const renderCoverage9 = renderCoverage; renderCoverage = introGate("coverage", r
 const renderMetrics9 = renderMetrics; renderMetrics = introGate("metrics", renderMetrics9);
 const renderVendors9 = renderVendors; renderVendors = introGate("vendors", renderVendors9);
 const renderPolicy9 = renderPolicy; renderPolicy = introGate("policy", renderPolicy9);
+const renderPostmortem9 = renderPostmortem; renderPostmortem = introGate("postmortem", renderPostmortem9);
 const renderCoppa9 = renderCoppa; renderCoppa = introGate("coppa", renderCoppa9);
 const renderDsa9 = renderDsa; renderDsa = introGate("dsa", renderDsa9);
 const renderGrooming9 = renderGrooming; renderGrooming = introGate("grooming", renderGrooming9);

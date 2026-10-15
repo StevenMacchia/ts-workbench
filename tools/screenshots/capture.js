@@ -111,7 +111,7 @@ async function settle(page) {
 // localStorage.removeItem calls only ever target their own tool's keys.
 const INTRO_ROUTES = [
   "premortem", "tabletop", "maturity", "coverage", "metrics", "vendors", "policy",
-  "coppa", "grooming", "reporting", "dsa", "eval", "notice", "appeal", "transparency", "plan", "review", "workspace",
+  "coppa", "grooming", "reporting", "dsa", "postmortem", "eval", "notice", "appeal", "transparency", "plan", "review", "workspace",
 ];
 async function markIntrosSeen(page) {
   await page.evaluate((routes) => {

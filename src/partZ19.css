@@ -90,3 +90,144 @@ details.ev-details[open] > summary{margin-bottom:12px}
 @keyframes lazyIn{to{opacity:1}}
 @keyframes lazyPulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.lazy-load{animation:lazyIn .01s linear .2s forwards}.lazy-dot{animation:none}}
+/* Incident post-mortem (partPX.js). The tool reuses the guided flow, the report cards, the segmented tabs and the tracker;
+   this file only adds the three custom rows (timeline, promises, actions), the verdict ring tones and the document. */
+.px-ring{border-color:color-mix(in oklab, var(--t-tt) 35%, var(--sunk))}
+.px-ring.good{border-color:color-mix(in oklab, var(--good) 40%, var(--sunk))}
+.px-ring.high{border-color:color-mix(in oklab, var(--high) 40%, var(--sunk))}
+.px-ring.crit{border-color:color-mix(in oklab, var(--crit) 40%, var(--sunk))}
+.px-ring.crit b,.px-ring.high b,.px-ring.good b{color:var(--ink)}
+
+/* Guided steps with more than one field per row */
+.px-tl,.px-prs,.px-acts{display:grid;gap:10px}
+.px-trow,.px-prow,.px-arow{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.px-trow{display:grid;gap:8px}
+.px-tlab{display:flex;align-items:center;gap:10px;font-size:14px}
+.px-tlab .btn{margin-left:auto}
+.px-n{flex:none;width:24px;height:24px;border-radius:50%;display:inline-grid;place-content:center;font:600 12px/1 var(--mono);color:var(--accent);background:color-mix(in oklab, var(--accent) 12%, transparent)}
+.px-tf{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr);gap:8px}
+.px-tf .input,.px-prow .input,.px-prow .select,.px-arow .input,.px-arow .select{width:100%;min-width:0;font-size:16px}
+.px-tlx{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-top:10px}
+.px-tlx .note{margin:0}
+.px-prow{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) minmax(0,150px) auto;gap:8px 10px;align-items:end}
+.px-prow .field,.px-arow .field{margin:0}
+.px-prow label,.px-arow label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.px-arow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;align-items:start}
+.px-arow .px-n{margin-top:2px}
+.px-af{display:grid;gap:8px;min-width:0}
+.px-arow textarea.input{min-height:96px;font-family:inherit;line-height:1.5;resize:vertical;overflow-wrap:anywhere}
+.px-ao{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,170px);gap:8px 10px}
+.px-aside{padding:12px 14px;margin-bottom:12px}
+.px-aside p{margin:6px 0 0;font-size:13.5px;line-height:1.5}
+@media (max-width:640px){
+  .px-tf{grid-template-columns:1fr}
+  .px-prow{grid-template-columns:minmax(0,1fr) minmax(0,150px)}
+  .px-prow .px-pw{grid-column:1 / -1;order:3}
+  .px-prow > .btn{justify-self:end}
+  .px-ao{grid-template-columns:1fr}
+  .px-arow{grid-template-columns:minmax(0,1fr)}
+  .px-arow > .px-n{display:none}
+}
+
+/* The report: the document, the tabs, the redaction checklist */
+.px-tw{overflow-x:auto;margin:6px 0 12px}
+.px-tw table{min-width:420px}
+.px-tw td{vertical-align:top;overflow-wrap:anywhere}
+.px-dv{margin-bottom:14px}
+.px-doc{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:18px 22px;font-size:14px;line-height:1.6}
+.px-doc h3{font-size:18px;margin:0 0 4px;letter-spacing:-.015em}
+.px-doc h4{font-size:15px;margin:18px 0 6px}
+.px-doc h5{font-size:14px;margin:12px 0 4px}
+.px-doc p{margin:0 0 8px}
+.px-doc .px-lab{margin:10px 0 4px}
+.px-doc ul{margin:0 0 8px;padding-left:20px}
+.px-doc li{margin:2px 0}
+.px-redact{margin-top:14px;padding:14px 18px}
+.px-redact ul{margin:8px 0;padding-left:20px;display:grid;gap:4px;font-size:13.5px}
+.px-redact .note{margin:6px 0 0}
+.px-layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.px-layer{padding:14px 16px}
+.px-lh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.px-layer p{margin:6px 0 0;display:grid;gap:4px;justify-items:start;font-size:13.5px}
+.px-layer .pill{white-space:normal;text-align:left}
+.px-duties{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:12px}
+.px-duties p{margin:4px 0 0;font-size:13.5px;line-height:1.5}
+.px-parts{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:14px}
+.px-ph{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px;font-size:14px}
+.px-parts .pol-meter{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.px-parts .pol-meter i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.px-parts .note{margin:6px 0 0}
+
+/* Grouped screens: a form, fieldsets of checkboxes, the time and day pair on a timeline row */
+.px-form{display:grid;gap:16px}
+.px-form .field{margin:0}
+.px-form label:not(.tr-chk){display:block;font-size:13.5px;font-weight:600;margin-bottom:5px}
+.px-form .input,.px-form .select{width:100%;font-size:16px}
+.px-form textarea.input{min-height:110px;line-height:1.5;font-family:inherit;resize:vertical}
+.px-form .note{margin:5px 0 0}
+.px-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,200px);gap:12px}
+.px-fs{border:0;margin:0;padding:0;display:grid;gap:9px;min-width:0}
+.px-fs legend{font-weight:600;font-size:14.5px;padding:0;margin-bottom:8px}
+.px-fs legend .note{font-weight:400}
+.px-fs small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.px-fs.card{padding:14px 16px}
+.px-layers-in{display:grid;gap:12px}
+.px-none{margin-top:4px;padding-top:9px;border-top:1px dashed var(--line)}
+.px-det{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--surface)}
+.px-det summary{cursor:pointer;font-weight:600;font-size:14px}
+.px-det summary .note{font-weight:400;margin-left:6px}
+.px-det[open] summary{margin-bottom:10px}
+.px-det .tr-chk{margin:8px 0}
+.px-tt{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.px-gap{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:color-mix(in oklab, var(--accent) 8%, transparent);color:var(--ink);font-size:14px;line-height:1.5}
+.px-left{margin:0 0 12px;font-weight:600}
+
+/* The report: real tabs, one part at a time */
+.px-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+.px-tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:11px 14px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.px-tabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+.px-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+[data-pxpan]:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+[data-pxpan][hidden],[data-pxdoc][hidden]{display:none}
+.px-root .ev-details summary{cursor:pointer}
+
+@media (max-width:640px){
+  .px-two{grid-template-columns:1fr}
+  .px-tt{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  /* Phone: one scrolling row of buttons above the verdict, a smaller ring, so the verdict and the three actions come first */
+  .pagehead:has(+ .px-root) .headmeta{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding-bottom:4px;margin-right:-16px;padding-right:16px;scrollbar-width:none}
+  .pagehead:has(+ .px-root) .headmeta .btn{flex:none;white-space:nowrap}
+  .pagehead:has(+ .px-root){padding-bottom:6px}
+  .pagehead:has(+ .px-root) .ph-main{display:none}
+  .pagehead:has(+ .px-root) .headmeta{margin-top:0}
+  .px-report{display:flex;flex-direction:column}
+  .px-report > *{order:2}
+  .px-report > .share-banner,.px-report > .tr-sum,.px-report > .pk-list{order:1}
+  .px-report > .banner{order:3;padding:8px 12px;font-size:13px}
+  .px-report > .banner .btn{display:none}
+  .px-root .tr-sum{grid-template-columns:minmax(0,1fr);gap:6px;padding:12px 14px}
+  .px-root .tr-sum .px-ring{display:none}
+  .px-root .tr-sum .eyebrow{font-size:11.5px;padding-right:0}
+  .px-root .verdict-row{display:flex;align-items:flex-start;gap:10px}
+  .px-root .verdict-row .grade{margin:0;order:-1;flex:none;width:44px;height:44px;font-size:22px;border-radius:12px}
+  .px-root .pol-verdict{font-size:16.5px;line-height:1.3;margin:0;flex:1;min-width:0}
+  .px-root .px-gnote,.px-root .cp-kpis{display:none}
+  .px-root .pk-list{margin:4px 0 0;gap:10px;font-size:13.5px;line-height:1.45;padding-left:18px}
+  .px-aw{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .px-am{display:block;color:var(--muted);font-size:12.5px}
+  .px-report .chapter-line,.px-report .ev-details{margin-top:12px}
+}
+
+@media (max-width:640px){
+  .px-root .pol-tabs .card-h{padding:0 6px}
+  .px-root .pol-tabs .card-b{padding:12px 10px}
+  .px-doc{padding:12px 12px;border-radius:10px}
+  .px-tw{overflow:visible}
+  .px-tw .ln-t{min-width:0;width:100%;display:block}
+  .px-tw .ln-t thead{display:none}
+  .px-tw .ln-t tbody,.px-tw .ln-t tr,.px-tw .ln-t td{display:block;width:auto;box-sizing:border-box}
+  .px-tw .ln-t tr{padding:8px 0;border:0;border-bottom:1px solid var(--line);background:none;box-shadow:none;margin:0;border-radius:0}
+  .px-tw .ln-t td{padding:1px 0;border:0;white-space:normal;overflow-wrap:anywhere;text-align:left;font-weight:400}
+  .px-tw .ln-t td:first-child{font-weight:600}
+  .px-redact{padding:12px}
+}
