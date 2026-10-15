@@ -793,6 +793,8 @@ async function main() {
       const outDir = t.dir === "assets" ? ASSETS_DIR : PORTFOLIO_IMG_DIR;
       const outPath = path.join(outDir, t.name);
       try {
+        // overview-dark leaves the dark theme stored; every other target is light
+        if (t.name !== "overview-dark.png") await ensureLightTheme(page);
         await t.build(page);
         await settle(page);
         if (t.kind === "png") {
