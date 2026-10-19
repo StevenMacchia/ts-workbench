@@ -264,6 +264,7 @@ a.ev-src:hover{border-color:var(--accent);text-decoration:none}
 .sitetop .st-mark{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,var(--accent),#FF9A7A);flex:none}
 .sitetop a{color:var(--ink);text-decoration:none;flex:none}
 .sitetop a:hover{text-decoration:underline}
+.sitetop a[aria-current="page"]{font-weight:600}
 .sitetop .st-name{font-weight:600;margin-right:auto}
 .sitetop .st-dl{padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
 .sitetop .st-dl:hover{text-decoration:none;border-color:var(--line-strong)}
