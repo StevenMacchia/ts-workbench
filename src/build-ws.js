@@ -315,6 +315,48 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
     fs.writeFileSync(path.join(dir, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(u => "  <url><loc>" + x(u) + "</loc></url>").join("\n") + "\n</urlset>\n");
     fs.writeFileSync(path.join(dir, "robots.txt"), "User-agent: *\nAllow: /\n\nSitemap: " + site + "/sitemap.xml\n");
     console.log("sitemap.xml written with " + urls.length + " URLs, robots.txt");
+    // One real page per tool: docs/<route>.html. GitHub Pages serves /ts-workbench/<route> from it with a 200, so
+    // crawlers get the route's own title, description and canonical (a 404.html answer never gets indexed). The page
+    // is a stub, not a copy of the app: it fetches index.html from the same directory and writes it over itself
+    // (document.write), so the address stays /ts-workbench/<route> and the router reads the path as usual. The beacon
+    // is not repeated here: the app's own copy loads once after the write, so each visit is counted once.
+    // Without JavaScript the stub shows the heading, the description and a link into the app.
+    const navSrc = fs.readFileSync(path.join(D, "partNav.js"), "utf8"), aiSrc = fs.readFileSync(path.join(D, "partAI.js"), "utf8");
+    const rdesc = new Function("return " + /const ROUTE_DESC = (\{[\s\S]*?\n\});/.exec(navSrc)[1])();
+    const aiDesc = k => { const set = [...aiSrc.matchAll(new RegExp("AI_TOOLS\\." + k + "\\.desc = \"([^\"]*)\"", "g"))].pop(); if(set) return set[1];
+      const i = aiSrc.indexOf("AI_TOOLS." + k + " = {"), m = /desc:"([^"]*)"/.exec(aiSrc.slice(i)); return m ? m[1] : ""; };
+    const siteDesc = desc.replace(/&amp;/g, "&");
+    const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    const fontTags = out.split("\n").filter(l => /fonts\.(googleapis|gstatic)\.com/.test(l)).join("\n");
+    const stale = new Set(fs.readdirSync(dir).filter(n => n.endsWith(".html") && !["index.html", "404.html"].includes(n)));
+    let routeBytes = 0, routeFiles = 0;
+    Object.keys(labels).filter(k => !skip.includes(k)).forEach(k => {
+      const t = labels[k] + " · T&S Workbench", d = rdesc[k] || aiDesc(k) || siteDesc, u = site + "/" + k, ti = esc(t), de = esc(d);
+      const page = [
+        '<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">',
+        '<meta name="viewport" content="width=device-width,initial-scale=1">',
+        '<title>' + ti + '</title>',
+        '<meta name="description" content="' + de + '">',
+        '<meta name="author" content="Steven Macchia">', '<meta name="theme-color" content="#5B5BD6">',
+        '<link rel="icon" href="' + icon + '">',
+        '<link rel="canonical" href="' + u + '">',
+        '<meta property="og:type" content="website">', '<meta property="og:site_name" content="T&amp;S Workbench">',
+        '<meta property="og:title" content="' + ti + '">', '<meta property="og:description" content="' + de + '">',
+        '<meta property="og:url" content="' + u + '">', '<meta property="og:image" content="' + img + '">',
+        '<meta property="og:image:width" content="1200">', '<meta property="og:image:height" content="627">',
+        '<meta name="twitter:card" content="summary_large_image">', '<meta name="twitter:image" content="' + img + '">',
+        fontTags,
+        '<script>try{var m=JSON.parse(localStorage.getItem("tswb:theme")||"null");document.documentElement.setAttribute("data-mode",m==="dark"?"dark":"light");}catch(e){}</script>',
+        '<style>html{background:#F7F8FC;color:#15172B;font-family:Inter,system-ui,sans-serif}html[data-mode=dark]{background:#0E1020;color:#E8E9F5}body{margin:0;padding:32px 20px;max-width:640px}a{color:#6D5DF6}</style>',
+        '<script>(function(){var r=' + JSON.stringify(k) + ';fetch("index.html",{credentials:"same-origin"}).then(function(x){if(!x.ok)throw 0;return x.text()}).then(function(h){document.open();document.write(h);document.close()}).catch(function(){location.replace("./#"+r+location.search)})})()</script>',
+        '</head>', '<body>',
+        '<noscript><h1>' + esc(labels[k]) + '</h1><p>' + de + '</p><p><a href="./#' + k + '">Open ' + esc(labels[k]) + ' in the T&amp;S Workbench</a></p></noscript>',
+        '</body>', '</html>', ''
+      ].join("\n");
+      fs.writeFileSync(path.join(dir, k + ".html"), page); stale.delete(k + ".html"); routeFiles++; routeBytes += Buffer.byteLength(page);
+    });
+    stale.forEach(n => fs.unlinkSync(path.join(dir, n)));
+    console.log("route pages written: " + routeFiles + " files, " + (routeBytes / 1024).toFixed(0) + " KB");
   }
   console.log("github-pages/index.html written" + (site ? " for " + site : " (preview image path is relative until site-url.txt is set)"));
 }

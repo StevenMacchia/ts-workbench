@@ -49,6 +49,25 @@ if(site){
   if(!docs("robots.txt").includes("Sitemap: " + site + "/sitemap.xml")) throw new Error("robots.txt does not point at the sitemap");
   if(!html.includes('<link rel="canonical" href="' + site + '/">')) throw new Error("static canonical missing");
   if(!html.includes('const APP_BASE = "' + new URL(site).pathname + '/";')) throw new Error("APP_BASE not filled in on the public page");
+  // One real page per sitemap path (docs/<route>.html), so GitHub Pages answers the path with a 200 and crawlers see the route's own head
+  const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const want2 = routes.filter(r => !skip.includes(r)), have = fs.readdirSync(path.join(D, "..", "docs")).filter(n => n.endsWith(".html") && n !== "index.html" && n !== "404.html").sort();
+  eq(have.join(","), want2.map(r => r + ".html").sort().join(","), "docs has one <route>.html per sitemap route and no others");
+  want2.forEach(r => {
+    const h = docs(r + ".html");
+    if(!h.includes("<title>" + esc(ROUTE_LABEL[r] + " · T&S Workbench") + "</title>")) throw new Error(r + ".html: wrong title");
+    if(!h.includes('<link rel="canonical" href="' + site + "/" + r + '">')) throw new Error(r + ".html: wrong canonical");
+    if(!h.includes('<meta property="og:url" content="' + site + "/" + r + '">')) throw new Error(r + ".html: wrong og:url");
+    if(!h.includes('<meta property="og:image" content="' + site + '/og-image.png">')) throw new Error(r + ".html: og:image missing");
+    const d = /<meta name="description" content="([^"]+)">/.exec(h);
+    if(!d) throw new Error(r + ".html: no description");
+    if(r in ROUTE_DESC && d[1] !== esc(ROUTE_DESC[r])) throw new Error(r + ".html: description differs from ROUTE_DESC");
+    if(!h.includes("<noscript><h1>" + esc(ROUTE_LABEL[r]) + "</h1>")) throw new Error(r + ".html: no noscript heading");
+    if(!h.includes('fetch("index.html"') || !h.includes("document.write(")) throw new Error(r + ".html: loader script missing");
+    if(h.includes("cloudflareinsights")) throw new Error(r + ".html: the beacon belongs to the app, not the stub (a visit would count twice)");
+    if(Buffer.byteLength(h) > 6000) throw new Error(r + ".html: stub grew past 6 KB, it should stay small");
+  });
+  console.log("route pages: " + want2.length + " files, each with its own title, description, canonical and og tags");
   console.log("sitemap: " + locs.length + " URLs as paths; robots.txt points at it; APP_BASE " + new URL(site).pathname + "/");
 }
 
