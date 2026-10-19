@@ -32,8 +32,9 @@
 
 /* Sidebar: the three Learn labels are too long to sit beside their tag on one line, so they wrap instead of
    pushing the tag out of the sidebar. Shorter labels keep one line. */
-.side .navlink:is([data-route="redteamllm"],[data-route="redteamworld"],[data-route="glossary"]){white-space:normal;line-height:1.3}
+.side .navlink:is([data-route="redteamllm"],[data-route="redteamworld"],[data-route="glossary"],[data-route="grooming"],[data-route="reporting"]){white-space:normal;line-height:1.3}
 .side .navlink .sb-new{flex:none;margin-left:auto}
+.sb-more{grid-template-columns:minmax(0,1fr)}
 
 /* One radius scale: 14px panels, 10px controls. */
 .card,.ov-tool,.firstrun,.firstrun-opt,.intro-card{border-radius:14px}

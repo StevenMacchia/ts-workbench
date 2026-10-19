@@ -5434,8 +5434,9 @@ table.rt-grid{border-collapse:collapse;font-size:12.5px;min-width:100%}
 
 /* Sidebar: the three Learn labels are too long to sit beside their tag on one line, so they wrap instead of
    pushing the tag out of the sidebar. Shorter labels keep one line. */
-.side .navlink:is([data-route="redteamllm"],[data-route="redteamworld"],[data-route="glossary"]){white-space:normal;line-height:1.3}
+.side .navlink:is([data-route="redteamllm"],[data-route="redteamworld"],[data-route="glossary"],[data-route="grooming"],[data-route="reporting"]){white-space:normal;line-height:1.3}
 .side .navlink .sb-new{flex:none;margin-left:auto}
+.sb-more{grid-template-columns:minmax(0,1fr)}
 
 /* One radius scale: 14px panels, 10px controls. */
 .card,.ov-tool,.firstrun,.firstrun-opt,.intro-card{border-radius:14px}
@@ -5919,8 +5920,8 @@ details.ev-details[open] > summary{margin-bottom:12px}
       <a class="navlink" href="#postmortem" data-route="postmortem"><span class="tile tile-sm" data-tone="assess" aria-hidden="true"><svg><use href="#i-doc"/></svg></span>Incident post-mortem<span class="sb-new">New</span></a>
       <a class="navlink" href="#policy" data-route="policy"><span class="tile tile-sm" data-tone="prepare" aria-hidden="true"><svg><use href="#i-doc"/></svg></span>Policy stress-tester<span class="sb-new sb-ai">AI</span></a>
       <a class="navlink" href="#coppa" data-route="coppa"><span class="tile tile-sm" data-tone="prepare" aria-hidden="true"><svg><use href="#i-coppa"/></svg></span>COPPA readiness</a>
-      <a class="navlink" href="#grooming" data-route="grooming"><span class="tile tile-sm" data-tone="assess" aria-hidden="true"><svg><use href="#i-route"/></svg></span>Grooming pathway review</a>
-      <a class="navlink" href="#reporting" data-route="reporting"><span class="tile tile-sm" data-tone="prepare" aria-hidden="true"><svg><use href="#i-flag"/></svg></span>Child-safety reporting</a>
+      <a class="navlink" href="#grooming" data-route="grooming"><span class="tile tile-sm" data-tone="assess" aria-hidden="true"><svg><use href="#i-route"/></svg></span>Grooming pathway review<span class="sb-new">New</span></a>
+      <a class="navlink" href="#reporting" data-route="reporting"><span class="tile tile-sm" data-tone="prepare" aria-hidden="true"><svg><use href="#i-flag"/></svg></span>Child-safety reporting<span class="sb-new">New</span></a>
       <a class="navlink" href="#dsa" data-route="dsa"><span class="tile tile-sm" data-tone="prepare" aria-hidden="true"><svg><use href="#i-dsa"/></svg></span>DSA readiness</a>
       <a class="navlink" href="#vendors" data-route="vendors"><span class="tile tile-sm" data-tone="prepare" aria-hidden="true"><svg><use href="#i-scale"/></svg></span>Vendor scorecard</a>
       <a class="navlink" href="#metrics" data-route="metrics"><span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg><use href="#i-gauge"/></svg></span>Metrics framework</a>
@@ -5935,7 +5936,7 @@ details.ev-details[open] > summary{margin-bottom:12px}
       <div class="sb-h sb-h-tag">Works with ROOST<span class="sb-new sb-wip">In progress</span></div>
       <div class="sb-more">
       <a class="navlink" href="#roost" data-route="roost"><span class="tile tile-sm" data-tone="neutral" aria-hidden="true"><svg><use href="#i-plug"/></svg></span>Overview</a>
-      <a class="navlink" href="#eval" data-route="eval"><span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg><use href="#i-eval"/></svg></span>Classifier eval<span class="sb-new">New</span></a>
+      <a class="navlink" href="#eval" data-route="eval"><span class="tile tile-sm" data-tone="measure" aria-hidden="true"><svg><use href="#i-eval"/></svg></span>Classifier eval</a>
       </div>
       <div class="sb-h sb-h-tag">Learn<span class="sb-new">New</span></div>
       <div class="sb-more">
@@ -6045,7 +6046,7 @@ const HEAD_META = () => {
     redteamworld:["world", () => [(typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.steps.length : 10) + " steps", (typeof LN_GUIDES !== "undefined" ? LN_GUIDES.world.exercises.length : 12) + " drills", "Uploads, steering, provenance"]],
     glossary:["glossary", () => [(typeof LN_GLOSS !== "undefined" ? LN_GLOSS.length : 46) + " terms", "Flashcards and a quiz", "Tagged by model type"]],
     tsglossary:["glossary", () => [(typeof TSG_TERMS !== "undefined" ? TSG_TERMS.length : 100) + " terms", "9 groups", "Search and browse A to Z"]],
-    workspace:["folder", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
+    workspace:["folder", () => []], roost:["info", () => []], about:["info", () => [(typeof AB_GROUPS !== "undefined" ? AB_GROUPS.reduce((n, g) => n + g[1].length, 0) : 10) + " tools", "Free and private", "No sign-up"]]
   }[r];
   if(!m) return {icon:"logo", stats:[]};
   let stats = []; try{ stats = m[1](); }catch(e){}
@@ -7321,7 +7322,25 @@ function libraryBlock(){
            <button type="button" class="btn sm icon" data-libdel="${esc(rec.id)}" aria-label="Delete" title="Delete"><svg><use href="#i-trash"/></svg></button>`}</div>
     </div>`;}).join("")}</div>`;
 }
+// A fresh profile (nothing saved, nothing of the person's own in progress) opens on the same intro every guided tool
+// uses: gdIntroHTML draws it from a spec, so the markup and classes are identical. Start and the example are wired
+// to this tool's own handlers (data-act="new" and data-preset) in place of the engine's data-gd buttons.
+const pmFresh = () => typeof gdIntroHTML === "function" && pm.stage === "start" && (pm.example || !pm.type) && !Object.keys(libLoad()).length;
+function pmPreviewHTML(){
+  const saved = pm;
+  try{ pm = fromPreset("teen_social"); return renderReport(assess(pm)); }
+  catch(e){ return ""; }
+  finally{ pm = saved; }
+}
+function pmIntroHTML(){
+  const spec = {k:"premortem", steps:[], tool:{name:"Abuse pre-mortem", icon:"radar", color:"var(--t-pm)"},
+    intro:{title:"How your product could be misused", lead:"Answer a few plain questions. Get the risks, the laws that apply and what to do first.",
+      facts:[["About 8 minutes", "One question at a time. No Trust & Safety background needed."], ["The risks and laws that apply", "Rated by how serious and how likely, with the answers that drove each."], ["Nothing leaves your browser", "Saved on this device only."]], start:"Start"},
+    alt:[{n:"See a finished example"}], preview:pmPreviewHTML};
+  return `<div class="gd gd-s-intro" style="--tc:var(--t-pm)">${gdIntroHTML(spec).replace(/data-gd="start"/g, 'data-act="new"').replace(/data-gd="alt0"/g, 'data-preset="teen_social"')}</div>`;
+}
 function startScreen(){
+  if(pmFresh()) return pmIntroHTML();
   const cur = pmCurrentHero(), libEmpty = !Object.keys(libLoad()).length;
   const exampleBlock = `<div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
     <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
@@ -7443,7 +7462,7 @@ function renderPremortem(){
     actions += `<button type="button" class="btn sm" data-act="sharelink">Copy link</button>`;
     actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
   }
-  view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
+  view.innerHTML = (pmFresh() ? (typeof headStrip === "function" ? headStrip() : "") : pm.stage === "start" ? head("Abuse pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
     "Build safely", actions) : headCompact("Abuse pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">
@@ -11447,11 +11466,8 @@ const mxJoin = a => a.length === 1 ? a[0] : a.slice(0, -1).join(", ") + " and " 
 // One line under the filter bar saying what the three choices did: how many of the 36 are on the list, what the
 // platform added, and why the rest are out, with a link to them
 function mxFitHTML(list){
-  const out = mxOut(), by = k => out.filter(m => mxWhyOut(m) === k).length, adds = list.filter(m => m.p !== "all").map(m => mxLow(m.n));
-  const addT = adds.length ? ` ${esc(MX_PSHORT[mx.platform])} adds ${esc(adds.length > 3 ? adds.slice(0, 2).join(", ") + " and " + (adds.length - 2) + " more" : mxJoin(adds))}.` : "";
-  const parts = [[by("plat"), "for other platforms"], [by("stage"), "from a later stage"], [by("reg"), "for regulated services"]].filter(x => x[0]);
-  const outT = out.length ? ` <button type="button" class="mx-link" data-out>${out.length} left out</button>${parts.length === 1 ? ", all " + parts[0][1] : ": " + parts.map(([n, w]) => n + " " + w).join(", ")}.` : "";
-  return `<p class="mxm-sum"><b>${list.length} of ${METRICS.length} metrics.</b>${addT}${outT}</p>`;
+  const n = mxOut().length;
+  return `<p class="mxm-sum"><b>${list.length} of ${METRICS.length}</b> for this profile${n ? ` · <button type="button" class="mx-link" data-out>${n} left out</button>` : ""}</p>`;
 }
 // The left-out metrics, folded under the tiers and grouped by reason. Each row offers the setting that would bring
 // it onto the list (a platform, a stage, or regulation) as a chip, so the full framework stays reachable
@@ -11594,7 +11610,7 @@ function mxStartCard(m, showCat){
   const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
   return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
       ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
-      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxPlatTag(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
       <p class="mxg-q">${esc(MX_Q[m.n])}</p>
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
     </a>`;
@@ -11619,7 +11635,8 @@ function mxMap(list){
   const tiers = MX_TORD.filter(t => list.some(m => m.t === t));
   const cats = [...new Set(start.map(m => m.l))], one = cats.length === 1;
   const nsAll = list.filter(m => m.t === "ns"), same = start.length === nsAll.length && start.every(m => m.t === "ns");
-  const sub = "Picked for this profile." + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
+  const spec = start.filter(m => m.p !== "all").length;
+  const sub = (spec ? "Picked for " + MX_PSHORT[mx.platform] + "." : "Picked for this profile.") + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
   const startH = start.length ? `<section class="mxg-start" aria-labelledby="mxg-start-h">
     <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">${esc(sub)}</span></div>
     <div class="mxg-cards">${start.map(m => mxStartCard(m, !one)).join("")}</div></section>` : "";
@@ -13250,7 +13267,7 @@ function renderTools(){
         ${tool("pm","premortem","var(--t-pm)","radar","Abuse pre-mortem","Profile a product and see how it will be misused before launch.",`${HARMS.length} risks · ${REGIONS.length} jurisdictions`)}
         ${typeof CV_AREAS !== "undefined" ? tool("cv","coverage","var(--t-cv)","cover","Coverage radar","See where your products' risk outruns the defenses you have in place.",`${CV_AREAS.length} harm areas · ${CV_LAYERS.length} layers`) : ""}
         ${tool("tt","tabletop","var(--t-tt)","siren","Incident tabletop","Rehearse a crisis and learn from every call, with the law behind it.",`${SCENARIOS.length} scenarios, ${typeof ttVersionCount === "function" ? ttVersionCount() : SCENARIOS.length} versions across ${typeof ALL_TYPES !== "undefined" ? ALL_TYPES.length : 8} sectors`)}
-        ${typeof PX_FIX !== "undefined" ? tool("px","postmortem","var(--t-tt)","doc","Incident post-mortem","After a real incident, a blameless post-mortem in fifteen minutes: one page, a grade for the response, three owned actions.",`${Object.keys(PX_FIX).length} fixes · 4 layers · the chapter 13 template`) : ""}
+        ${typeof PX_FIX !== "undefined" ? tool("px","postmortem","var(--t-tt)","doc","Incident post-mortem <span class=\"wip-tag\">New</span>","After a real incident, a blameless post-mortem in fifteen minutes: one page, a grade for the response, three owned actions.",`${Object.keys(PX_FIX).length} fixes · 4 layers · the chapter 13 template`) : ""}
         ${tool("pol","policy","var(--t-pol)","doc","Policy stress-tester","Paste a rule to find vague words, missing exceptions and hard edge cases.","AI-assisted · instant checks")}
         ${typeof CP_PI !== "undefined" ? tool("cp","coppa","var(--t-cp)","coppa","COPPA readiness","Check children's privacy against the amended Rule, with drafts for Legal.",`${CP_PI.length} kinds of data · 4 drafts`) : ""}
         ${typeof GP_SG !== "undefined" ? tool("gp","grooming","var(--t-gp)","route","Grooming pathway review <span class=\"wip-tag\">New</span>","See how an adult could reach a child through your product's features, and what's in the way at each of six stages.",`${GP_STAGES.length} stages · ${GP_SG.length} safeguards · 5 drafts`) : ""}
@@ -13303,9 +13320,10 @@ const asInAssessment = () => typeof JOURNEY !== "undefined" && (JOURNEY.some(s =
 // Where this step sits in the assessment, or just this tool when someone uses it on its own.
 // A tool that isn't one of the six steps (the policy test) shows as the optional part
 function asStepBar(k, pct, help){
+  const route = k === "act" ? "plan" : k === "crisis" ? "tabletop" : k;
   k = k === "tabletop" ? "crisis" : k === "plan" ? "act" : k;
   const J = typeof JOURNEY !== "undefined" ? JOURNEY : [], i = J.findIndex(s => s.k === k), inAs = asInAssessment() && (i >= 0 || k === "policy");
-  const name = i >= 0 ? J[i].n : (typeof ROUTE_LABEL !== "undefined" && ROUTE_LABEL[k]) || "", seq = inAs && i >= 0;
+  const RL = typeof ROUTE_LABEL !== "undefined" ? ROUTE_LABEL : {}, name = RL[route] || (i >= 0 ? J[i].n : RL[k]) || "", seq = inAs && i >= 0;
   return `<div class="asb"><a class="asb-back" href="#${inAs ? "overview" : "tools"}">${AS_BACK}${inAs ? "Your assessment" : "All tools"}</a>
     <div class="asb-mid"><span>${seq ? `Step ${i + 1} of ${J.length} · ` : inAs ? "Optional · " : ""}<b>${esc(name)}</b></span>
       ${pct === null ? "" : `<span class="asb-segs" aria-hidden="true">${seq ? J.map((s, j) => `<i><b style="width:${j === i ? pct : s.done() ? 100 : 0}%"></b></i>`).join("") : `<i class="solo"><b style="width:${pct}%"></b></i>`}</span>`}</div>
@@ -13536,7 +13554,7 @@ const RO_USES = [
 function renderRoost(){
   const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
   const meta = `<span class="wip-tag">In progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
-  view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
+  view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "About", meta) + `<article class="ab">
     <section class="ab-sec rise">
       <h2>What you can do today</h2>
       <div class="ab-tools">${RO_NOW.filter(x => !x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool">${tileHTML(ic, TOOL_TONE[r], "md")}<div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div>
@@ -23141,7 +23159,7 @@ document.addEventListener("click", e => {
    LAZY_CHUNKS and LAZY_ROUTE_CHUNK from its CHUNKS table. The full bundle used by the tests keeps everything inline and
    never includes this part; code elsewhere asks for a section through lazyEnsure only when `typeof lazyEnsure` says
    it exists. */
-const LAZY_CHUNKS = {"tsglossary":{"src":"parts/tsglossary.js?v=114b41ad","needs":[]},"learn":{"src":"parts/learn.js?v=0d0f5d78","needs":[]},"redteam":{"src":"parts/redteam.js?v=48adfd77","needs":["learn"]}};
+const LAZY_CHUNKS = {"tsglossary":{"src":"parts/tsglossary.js?v=114b41ad","needs":[]},"learn":{"src":"parts/learn.js?v=0d0f5d78","needs":[]},"redteam":{"src":"parts/redteam.js?v=be7e57cd","needs":["learn"]}};
 const LAZY_ROUTE_CHUNK = {"tsglossary":"tsglossary","learn":"learn","redteamllm":"learn","redteamworld":"learn","glossary":"learn","redteam":"redteam"};
 // How many things the sections hold, for the cards on the All tools page before a section is loaded.
 // test-chunks.js fails when one of these drifts from the data.

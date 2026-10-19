@@ -124,7 +124,25 @@ function libraryBlock(){
            <button type="button" class="btn sm icon" data-libdel="${esc(rec.id)}" aria-label="Delete" title="Delete"><svg><use href="#i-trash"/></svg></button>`}</div>
     </div>`;}).join("")}</div>`;
 }
+// A fresh profile (nothing saved, nothing of the person's own in progress) opens on the same intro every guided tool
+// uses: gdIntroHTML draws it from a spec, so the markup and classes are identical. Start and the example are wired
+// to this tool's own handlers (data-act="new" and data-preset) in place of the engine's data-gd buttons.
+const pmFresh = () => typeof gdIntroHTML === "function" && pm.stage === "start" && (pm.example || !pm.type) && !Object.keys(libLoad()).length;
+function pmPreviewHTML(){
+  const saved = pm;
+  try{ pm = fromPreset("teen_social"); return renderReport(assess(pm)); }
+  catch(e){ return ""; }
+  finally{ pm = saved; }
+}
+function pmIntroHTML(){
+  const spec = {k:"premortem", steps:[], tool:{name:"Abuse pre-mortem", icon:"radar", color:"var(--t-pm)"},
+    intro:{title:"How your product could be misused", lead:"Answer a few plain questions. Get the risks, the laws that apply and what to do first.",
+      facts:[["About 8 minutes", "One question at a time. No Trust & Safety background needed."], ["The risks and laws that apply", "Rated by how serious and how likely, with the answers that drove each."], ["Nothing leaves your browser", "Saved on this device only."]], start:"Start"},
+    alt:[{n:"See a finished example"}], preview:pmPreviewHTML};
+  return `<div class="gd gd-s-intro" style="--tc:var(--t-pm)">${gdIntroHTML(spec).replace(/data-gd="start"/g, 'data-act="new"').replace(/data-gd="alt0"/g, 'data-preset="teen_social"')}</div>`;
+}
 function startScreen(){
+  if(pmFresh()) return pmIntroHTML();
   const cur = pmCurrentHero(), libEmpty = !Object.keys(libLoad()).length;
   const exampleBlock = `<div class="section-title"><h2>Or explore an example</h2><span class="note">Pre-filled answers you can change</span></div>
     <div class="exgrid">${Object.entries(PRESETS).map(([k,p])=>{ const r = assess(Object.assign(blankPM(), p));
@@ -246,7 +264,7 @@ function renderPremortem(){
     actions += `<button type="button" class="btn sm" data-act="sharelink">Copy link</button>`;
     actions += `<button type="button" class="btn sm" data-act="tasks"><svg><use href="#i-send"/></svg>Send to tracker</button>`;
   }
-  view.innerHTML = (pm.stage === "start" ? head("Abuse pre-mortem",
+  view.innerHTML = (pmFresh() ? (typeof headStrip === "function" ? headStrip() : "") : pm.stage === "start" ? head("Abuse pre-mortem",
     "Find out how a product or feature could be misused before it launches, and what to do about it.",
     "Build safely", actions) : headCompact("Abuse pre-mortem", pm.stage === "ask" ? (pm.name ? esc(pm.name) : pm.fromProfile ? "New feature" : "New assessment") : esc(pm.name || "Untitled assessment"), actions)) + `
     <div id="pm-root">

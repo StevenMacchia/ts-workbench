@@ -65,11 +65,8 @@ const mxJoin = a => a.length === 1 ? a[0] : a.slice(0, -1).join(", ") + " and " 
 // One line under the filter bar saying what the three choices did: how many of the 36 are on the list, what the
 // platform added, and why the rest are out, with a link to them
 function mxFitHTML(list){
-  const out = mxOut(), by = k => out.filter(m => mxWhyOut(m) === k).length, adds = list.filter(m => m.p !== "all").map(m => mxLow(m.n));
-  const addT = adds.length ? ` ${esc(MX_PSHORT[mx.platform])} adds ${esc(adds.length > 3 ? adds.slice(0, 2).join(", ") + " and " + (adds.length - 2) + " more" : mxJoin(adds))}.` : "";
-  const parts = [[by("plat"), "for other platforms"], [by("stage"), "from a later stage"], [by("reg"), "for regulated services"]].filter(x => x[0]);
-  const outT = out.length ? ` <button type="button" class="mx-link" data-out>${out.length} left out</button>${parts.length === 1 ? ", all " + parts[0][1] : ": " + parts.map(([n, w]) => n + " " + w).join(", ")}.` : "";
-  return `<p class="mxm-sum"><b>${list.length} of ${METRICS.length} metrics.</b>${addT}${outT}</p>`;
+  const n = mxOut().length;
+  return `<p class="mxm-sum"><b>${list.length} of ${METRICS.length}</b> for this profile${n ? ` · <button type="button" class="mx-link" data-out>${n} left out</button>` : ""}</p>`;
 }
 // The left-out metrics, folded under the tiers and grouped by reason. Each row offers the setting that would bring
 // it onto the list (a platform, a stage, or regulation) as a chip, so the full framework stays reachable
@@ -212,7 +209,7 @@ function mxStartCard(m, showCat){
   const i = METRICS.indexOf(m), why = MX_FIRST[m.n] || MX_BAND[m.t][1], L = LAYERS.find(x => x.k === m.l);
   return `<a class="card mxg-card mxm-${m.t}" href="#metrics/${mxSlug(m)}" data-open="${i}">
       ${showCat ? `<span class="mxg-eb">${esc(L.n)}</span>` : ""}
-      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxPlatTag(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
+      <span class="mxg-hd"><h3 class="mxg-name">${esc(m.n)}</h3>${mxTierPill(m)}${mxIco("next", "mx-ico sm mxg-go")}</span>
       <p class="mxg-q">${esc(MX_Q[m.n])}</p>
       <p class="mxg-why"><b>Why first.</b> ${esc(why)}</p>
     </a>`;
@@ -237,7 +234,8 @@ function mxMap(list){
   const tiers = MX_TORD.filter(t => list.some(m => m.t === t));
   const cats = [...new Set(start.map(m => m.l))], one = cats.length === 1;
   const nsAll = list.filter(m => m.t === "ns"), same = start.length === nsAll.length && start.every(m => m.t === "ns");
-  const sub = "Picked for this profile." + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
+  const spec = start.filter(m => m.p !== "all").length;
+  const sub = (spec ? "Picked for " + MX_PSHORT[mx.platform] + "." : "Picked for this profile.") + (one ? " All " + (MX_NUM[start.length] || start.length) + " are " + LAYERS.find(x => x.k === cats[0]).n.toLowerCase() + "." : "");
   const startH = start.length ? `<section class="mxg-start" aria-labelledby="mxg-start-h">
     <div class="mxg-sh"><h2 id="mxg-start-h">Start with these</h2><span class="note">${esc(sub)}</span></div>
     <div class="mxg-cards">${start.map(m => mxStartCard(m, !one)).join("")}</div></section>` : "";

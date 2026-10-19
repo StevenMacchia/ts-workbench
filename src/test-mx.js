@@ -74,19 +74,19 @@ const body = function(){
   // left out is listed with the chip that brings each metric in
   mx = {platform:"social", stage:"2", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; renderMetrics(); lh = view.innerHTML;
   const pl = lst.filter(m => m.p !== "all"), outL = mxOut();
-  eq((lh.match(/class="tag mxg-pt"/g) || []).length, pl.length + st.filter(m => m.p !== "all").length, "a platform tag on every platform-specific row and card, none on the universal ones");
+  eq((lh.match(/class="tag mxg-pt"/g) || []).length, pl.length, "a platform tag on every platform-specific row, none on the universal ones and none on the starter cards");
   eq(pl.length > 0 && /class="tag mxg-pt" title="On the list because your platform is [^"]+\. Also for [A-Z][^"]*">Social</.test(lh), true, "the tag says why it is there and who else shares the metric");
-  eq(lh.includes(`<b>${lst.length} of ${METRICS.length} metrics.</b> Social adds `), true, "the summary counts the list against the framework and names what the platform added");
+  eq(lh.includes(`<b>${lst.length} of ${METRICS.length}</b> for this profile · <button type="button" class="mx-link" data-out>`), true, "the summary counts the list against the framework in one short line");
   eq(outL.length, METRICS.length - lst.length, "left out = framework minus list");
   eq((lh.match(/class="mxg-orow"/g) || []).length, outL.length, "every metric off the list is in the left-out section");
   eq(/<span class="mxg-tt">Not on this list · \d+<\/span>/.test(lh) && /<h3>For other platforms · \d+<\/h3>/.test(lh) && /<h3>From a later stage · \d+<\/h3>/.test(lh), true, "left-out section folded under the tiers, grouped by reason");
-  eq(new RegExp(`data-out>${outL.length} left out</button>: ${outL.filter(m => mxWhyOut(m) === "plat").length} for other platforms, ${outL.filter(m => mxWhyOut(m) === "stage").length} from a later stage\\.`).test(lh), true, "the summary links to the left-out section with the reason counts");
+  eq(lh.includes(`data-out>${outL.length} left out</button></p>`), true, "the summary links to the left-out section");
   eq(/data-set="platform" data-v="gaming" data-m="\d+"[^>]*>Gaming</.test(lh) && /data-set="stage" data-v="3"[^>]*><i>Stage<\/i>[^<]+</.test(lh), true, "left-out rows offer the platform or stage that brings them in");
   eq(/data-set="reg"/.test(lh) && /for regulated services/.test(lh), false, "with regulation on, nothing asks for it");
-  eq(/<a class="card mxg-card[^>]*>[\s\S]*?class="tag mxg-pt"[^>]*>Social</.test(lh), true, "the starter card for a platform-specific metric carries the tag");
-  mx.reg = false; renderMetrics(); eq(/data-set="reg" data-v="1"[^>]*>DSA or OSA applies</.test(view.innerHTML) && /\d+ for regulated services\./.test(view.innerHTML), true, "with regulation off, the regulated metrics are listed with the way back");
+  eq(/<a class="card mxg-card/.test(lh) && !/<a class="card mxg-card[^>]*>(?:(?!<\/a>)[\s\S])*mxg-pt/.test(lh), true, "starter cards carry the tier pill only; the platform note is in the section subtitle");
+  mx.reg = false; renderMetrics(); eq(/data-set="reg" data-v="1"[^>]*>DSA or OSA applies</.test(view.innerHTML) && /For regulated services · \d+/.test(view.innerHTML), true, "with regulation off, the regulated metrics are listed with the way back");
   mx = {platform:"gaming", stage:"3", reg:true, have:{}, vals:{}, read:{}, hist:[], tab:"card"}; renderMetrics();
-  eq(/ left out<\/button>, all for other platforms\./.test(view.innerHTML) && / Gaming adds [a-z][^.]+ and \d+ more\./.test(view.innerHTML), true, "a mature regulated gaming profile: the platform adds several, only other platforms' metrics are out");
+  eq(/ left out<\/button><\/p>/.test(view.innerHTML) && /<b>\d+ of \d+<\/b> for this profile/.test(view.innerHTML), true, "a mature regulated gaming profile: one short line, with the left-out link");
   eq(/<h3>From a later stage/.test(view.innerHTML) || /<h3>For regulated services/.test(view.innerHTML), false, "no empty reason groups");
   mx.tab = "mine"; renderMetrics(); eq(/class="mxm-sum"/.test(view.innerHTML) && !/class="mxg-orow"/.test(view.innerHTML), true, "the summary sits on every tab; the left-out rows only on the metrics");
   out.push("platform effect: " + pl.length + " tagged rows for social/growing, summary '" + (lh.match(/<p class="mxm-sum">([\s\S]*?)<\/p>/) || [])[1].replace(/<[^>]+>/g, "") + "', " + outL.length + " left out with a chip back in");

@@ -131,7 +131,7 @@ const RO_USES = [
 function renderRoost(){
   const ext = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text} ${icon("arrow")}</a>`;
   const meta = `<span class="wip-tag">In progress</span><a class="btn sm" href="https://roost.tools" target="_blank" rel="noopener">ROOST's site</a><a class="btn sm primary" href="#eval">Open the classifier eval</a>`;
-  view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "Overview", meta) + `<article class="ab">
+  view.innerHTML = head("Works with ROOST", "ROOST makes free, open-source trust and safety tools. The workbench helps you decide what to build; ROOST's tools are what you can build with. Here's where they meet.", "About", meta) + `<article class="ab">
     <section class="ab-sec rise">
       <h2>What you can do today</h2>
       <div class="ab-tools">${RO_NOW.filter(x => !x[5]).map(([t, r, c, ic, d]) => `<div class="ab-tool">${tileHTML(ic, TOOL_TONE[r], "md")}<div><h3><a href="#${r}">${t}</a></h3><p>${d}</p></div></div>`).join("")}</div>

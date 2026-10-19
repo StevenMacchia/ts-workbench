@@ -89,6 +89,14 @@ const body = function(){
   });
   out.push("all 19 routes: the card shows on first visit, and the tool's own first screen shows once introMark has run");
 
+  // the pre-mortem on a fresh profile opens on the guided intro, not on the built-in example
+  store.set("ws:items", {}); pm = Object.assign(fromPreset("teen_social"), {stage:"start"});
+  const fresh = startScreen();
+  eq(/class="gd-w gd-intro"/.test(fresh) && /How your product could be misused/.test(fresh) && /data-act="new"/.test(fresh) && /data-preset="teen_social"/.test(fresh) && /class="gd-facts"/.test(fresh), true, "pre-mortem: fresh profile opens on the house intro with Start and the example");
+  eq(/class="card excard"|Saved pre-mortems <|Saved pre-mortems<\/h2>/.test(fresh), false, "pre-mortem: no example cards or saved list on the intro");
+  eq(/data-gd=/.test(fresh), false, "pre-mortem: the intro's buttons are wired to this tool, not the engine");
+  out.push("pre-mortem: a fresh profile opens on the guided intro");
+
   return out.join("\n");
 };
 const src = stub + extra + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"),

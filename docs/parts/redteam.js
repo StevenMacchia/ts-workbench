@@ -1826,7 +1826,7 @@ rtFlowBind = function(){
 const rtIntroSeen = () => store.get("rt:seen-intro", false);
 const rtIntroMark = () => store.set("rt:seen-intro", true);
 function rtfIntro(){
-  return `<span class="rtf-eb">Red team studio <span class="wip-tag">In progress</span></span><h1 class="rtf-h1">What your AI does when misused</h1>
+  return `<h1 class="rtf-h1">What your AI does when misused</h1>
     <ul class="rtf-list rtf-intro-list">
       <li>Who it's for: a small team with no safety person and a deadline.</li>
       <li>You leave with graded tries, a finding, and a one-page summary for customers.</li>

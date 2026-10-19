@@ -527,7 +527,7 @@ const body12 = function(){
   const where = h => (h.match(/.{60}(undefined|NaN|\[object).{30}/) || [""])[0], H = () => view.innerHTML;
   // first visit: the purpose card, before anything else, exactly three lines, two buttons and a skip line
   rt = RT_BLANK(); renderRedteamStudio(); if(bad(H())) throw new Error("intro bad: " + where(H()));
-  eq(/<span class="rtf-eb">Red team studio <span class="wip-tag">In progress<\/span><\/span>/.test(H()) && /What your AI does when misused/.test(H()), true, "the purpose card opens with its eyebrow and heading");
+  eq(!/<span class="rtf-eb">Red team studio/.test(H()) && /What your AI does when misused/.test(H()), true, "the purpose card opens on its heading, without repeating the head's In progress tag");
   eq((H().match(/<li>/g) || []).length, 3, "exactly three lines on the purpose card");
   eq(/Who it's for: a small team with no safety person and a deadline\./.test(H()), true, "who it's for");
   eq(/You leave with graded tries, a finding, and a one-page summary for customers\./.test(H()), true, "what you leave with");
