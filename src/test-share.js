@@ -100,6 +100,12 @@ const body = async function(){
     T.set(); T.render(); T.edit(); const formHtml = view.innerHTML;
     undo = null; T.act("reset"); undo(); eq(view.innerHTML === formHtml, true, route + ": Undo from the form lands on the same form");
   }
+  // Transparency: See an example lands on the example's report with the example banner, not the guided intro
+  { store.set("intro:transparency", true); location.hash = "#transparency"; tr = TR_BLANK(); trView = null; gdReset("transparency"); renderTransparency(); trAct("example"); const h = view.innerHTML;
+    eq(/This is an example/.test(h) && /tr-report/.test(h), true, "transparency: the example opens its report with the example banner");
+    eq(/data-gd="start"|Pick up where you left off/.test(h), false, "transparency: not the guided intro");
+    eq(/>See an example</.test(h), false, "transparency: the header does not offer the example while showing it");
+    trAct("edit"); eq(tr.ex, false, "transparency: editing leaves example mode"); }
   // Notice and appeal: Clear gets the same Undo
   { store.set("intro:notice", true); aiPut("notice", Object.assign(aiGet("notice"), {f:clone(AI_TOOLS.notice.example)})); aiView.notice = "page"; location.hash = "#notice"; renderAI("notice");
     undo = null; $("#ai-clear").onclick(); eq(typeof undo, "function", "notice: Clear offers Undo"); eq(Object.keys(aiGet("notice").f).length, 0, "notice: Clear empties the form");

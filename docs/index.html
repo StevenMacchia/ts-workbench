@@ -17087,7 +17087,7 @@ function renderTransparency(){
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
     ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, reportHeaderActions({
-        example:{attrs:'data-tr="example"', label:SEE_EXAMPLE_LABEL},
+        example:tr.ex ? null : {attrs:'data-tr="example"', label:SEE_EXAMPLE_LABEL},
         edit:{attrs:'data-tr="edit"', label:EDIT_ANSWERS_LABEL},
         reset:{attrs:'data-tr="reset"', label:START_OVER_LABEL},
         save:{attrs:'data-tr="save"', label:wsSaveLabel("transparency", tr), icon:"save"},
@@ -17154,6 +17154,7 @@ function trReportHTML(ai){
   const bench = trBenchPct();
   return `<div class="pol-report tr-report">
     ${tr.shared ? shareBannerHTML('data-tr="unshare"') : ""}
+    ${tr.ex ? `<div class="banner"><span><strong>This is an example:</strong> Pixelry, an online platform, for 2025. Start over to write your own report.</span><button type="button" class="btn sm" data-tr="reset">Start over</button></div>` : ""}
     <div class="card pol-sum tr-sum">
       <div class="tr-ring"><b>${p.pct}%</b><span>complete</span></div>
       <div><span class="eyebrow">Service type: ${esc(TR_TIERS[trRank(tr.tier)][1])} · ${esc(String(tr.year))}</span>
@@ -17207,15 +17208,15 @@ function trSummaryHTML(ai){
 function trNum(el){ const raw = String(el.value).replace(/[, ]/g, "").trim(); if(raw === "") return ""; const n = +raw; if(isNaN(n) || n < 0) return undefined; return el.dataset.trt === "pct" ? Math.min(1, n / 100) : n; }
 function trAct(a, arg){
   switch(a){
-    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
+    case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE)), {view:"report", tab:"report", ex:true}); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
     case "reset": { const snap = {d:JSON.parse(JSON.stringify(tr)), v:trView, g:gdSnap("transparency")}; tr = TR_BLANK(); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); window.scrollTo(0, 0);
       withUndo("Cleared", snap, s2 => { tr = s2.d; trView = s2.v; gdRestore("transparency", s2.g); trSave(); renderTransparency(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "build": tr.view = "report"; tr.tab = "report"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": trView = null; gdReset("transparency"); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
-    case "edit": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
+    case "edit": tr.ex = false; tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "tab": tr.tab = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtab="${arg}"]`); if(b) b.focus(); } return;
     case "tier": tr.tier = arg; trSave(); renderTransparency(); { const b = document.querySelector(`[data-trtier="${arg}"]`); if(b) b.focus(); } return;
-    case "go": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
+    case "go": tr.ex = false; tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); { const el = document.getElementById("tr-s-" + arg); if(el){ el.scrollIntoView({block:"start"}); const f = el.querySelector("input,textarea"); if(f) f.focus({preventScroll:true}); } } return;
     case "write": return trWrite();
     case "copy": return copyText(trMarkdown(), $("#tr-toast"));
     case "download": { const md = trMarkdown(); return offerFile(`transparency-report-${slug(tr.org || "service")}-${tr.year}.md`, md, md, $("#tr-toast")); }
