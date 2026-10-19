@@ -468,7 +468,9 @@ function renderCoppa(){
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         reportHeaderActions({
+          example:cp.ex ? null : {attrs:'data-cp="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-cp="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-cp="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-cp="save"', label:wsSaveLabel("coppa", cp), icon:"save"},
           download:{attrs:'data-cp="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-cp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -518,16 +520,21 @@ function cpSetupHTML(x, ap, s){
 }
 function cpReportHTML(x, ap, s){
   const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
-  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
-  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
-  const bench = cpBenchPct();
+  // Nothing to grade: COPPA likely doesn't apply, or it applies but no children's data is mapped yet. Either way no percentage and no grade.
+  const outside = ap.lvl === "watch", none = !s.total || outside;
+  const record = {t:"Keep a dated record", sub:"Save this result so you can show when you looked and what you answered."};
+  const sentence = outside ? "COPPA doesn't apply to you on these answers." : !s.total ? "COPPA applies to you, but there is nothing to check yet." : `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : ", no critical gaps"}.`;
+  const actions = outside ? [{t:"Know what would change that", sub:"Recheck if you start aiming at children, learn that a user is under 13, or add features children are drawn to."}, record]
+    : !s.total ? [{t:"Map the children's data you collect", sub:"Mark each kind of personal information you collect from children, and the requirements that follow will appear here."}, record]
+    : s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
+  const bench = none ? null : cpBenchPct();
   return `<div class="pol-report cp-report">
     ${cp.shared ? shareBannerHTML('data-cp="unshare"') : ""}
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
-    <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
+    <div class="card pol-sum tr-sum">${none ? "" : `<div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>`}
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${none ? "" : gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
       ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
-        <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
+        ${none ? "" : `<div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>`}
         <span class="toast" id="cp-toast" role="status" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
     ${chapterLinkHTML("coppa")}
@@ -539,7 +546,7 @@ function cpReportHTML(x, ap, s){
   </div>`;
 }
 function cpPlanHTML(x, s){
-  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Everything that applies to your answers is in place." : cp.aud ? (cpApplies(cp).lvl === "watch" ? "Nothing applies to your answers." : "No requirements to check yet.") : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : cp.aud ? esc(cpApplies(cp).t) : "Mark the children's data you collect to see what applies."}</p></div>`;
   return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the part of the Rule, who usually owns it and what to do.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc((CP_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(CP_SEVN[r.sev][1], CP_SEVN[r.sev][0])}${r.isNew ? `<span class="cp-new">New in 2025</span>` : ""}</h4>
@@ -581,8 +588,8 @@ function cpAct(a){
   switch(a){
     case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
     case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); gdReset("coppa"); cpView = "page"; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
-    case "reset": { const snap = JSON.parse(JSON.stringify(cp)); cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cp = s2; cpSave(); renderCoppa(); }); return focusQuiet(document.querySelector("#view h1")); }
-    case "sharelink": return shareCopy("coppa", cp, {svc:cp.svc, aud:cp.aud, pct:s.pct, crit:s.crit}, $("#cp-toast"));
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(cp)), v:cpView, g:gdSnap("coppa")}; cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cp = s2.d; cpView = s2.v; gdRestore("coppa", s2.g); cpSave(); renderCoppa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": { const s = cpScore(cp, cpCtx(cp), cpApplies(cp)); return shareCopy("coppa", cp, {svc:cp.svc, aud:cp.aud, pct:s.pct, crit:s.crit}, $("#cp-toast")); }
     case "unshare": cp.shared = false; cpSave(); return cpAct("save");
     case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": cpView = null; gdReset("coppa"); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

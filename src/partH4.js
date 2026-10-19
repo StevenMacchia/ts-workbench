@@ -127,7 +127,7 @@ function asStepHTML(s, i, next){
   if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
     // "About your platform" is done on the workspace page itself, not its own report, so the button says where it actually goes
     const label = s.k === "setup" ? "Open workspace" : "Review";
-    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" data-jreview="1" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><span class="as-k as-cur-m">Up next · about ${asMin(s.min)}</span>
     <div class="as-cur-t"><span class="as-six-i">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-n" aria-hidden="true">${i + 1}</span></span><b class="as-cur-n"><span class="visually-hidden">Step ${i + 1}: </span>${s.n}</b></div><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;

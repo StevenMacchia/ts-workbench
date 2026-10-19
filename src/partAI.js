@@ -400,7 +400,8 @@ function renderAI(key){
   view.querySelectorAll("[data-fk]").forEach(el => { el.oninput = persist; el.onchange = persist; });
   $("#ai-ex").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; renderAI(key); };
   $("#ai-sample").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 30); };
-  $("#ai-clear").onclick = () => { aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; aiView[key] = null; gdReset(key); renderAI(key); window.scrollTo(0, 0); };
+  $("#ai-clear").onclick = () => { const snap = {rec:JSON.parse(JSON.stringify(aiGet(key))), v:aiView[key], g:gdSnap(key)}; aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; aiView[key] = null; gdReset(key); renderAI(key); window.scrollTo(0, 0);
+    withUndo("Cleared", snap, s2 => { aiPut(key, s2.rec); aiView[key] = s2.v; gdRestore(key, s2.g); renderAI(key); }); };
   const gb = $("#ai-guide"); if(gb) gb.onclick = () => { persist(); aiView[key] = null; renderAI(key); window.scrollTo(0, 0); };
   view.querySelectorAll("[data-aidepth]").forEach(b => b.onclick = () => { const s = aiGet(key); s.f = aiRead(T); s.depth = b.dataset.aidepth; aiPut(key, s); renderAI(key); });
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };

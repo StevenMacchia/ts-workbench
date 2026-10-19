@@ -421,7 +421,7 @@ function cvResultsRender(){
       <div class="cvr-more">${cv.ex ? "" : `<button type="button" class="ov-link" data-cvg="again">Go through the questions again</button>`}<button type="button" class="ov-link" data-cv="${cv.ex ? "clear" : "reset"}">Start over</button></div>
     </div>
     ${chapterLinkHTML("coverage")}
-    <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
+    <details class="ev-details"${detailsOpenAttr()}><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
     </div>

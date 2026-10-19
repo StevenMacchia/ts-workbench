@@ -396,7 +396,9 @@ function renderReporting(){
   view.innerHTML = (report
     ? headCompact("Child-safety reporting", `${esc(cr.svc || "Your service")} · ${esc(ap.h)}`,
         reportHeaderActions({
+          example:cr.ex ? null : {attrs:'data-cr="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-cr="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-cr="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-cr="save"', label:wsSaveLabel("reporting", cr), icon:"save"},
           download:{attrs:'data-cr="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-cr="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -493,7 +495,7 @@ function crAct(a){
     case "example": cr = Object.assign(CR_BLANK(), JSON.parse(JSON.stringify(CR_EXAMPLE))); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, with US, UK and EU users");
     case "frompm": { const src = loopSource(); if(!src) return; cr = Object.assign(CR_BLANK(), crFromPM(src)); gdReset("reporting"); crView = "page"; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
     case "fromorg": cr = Object.assign(CR_BLANK(), crFromOrg()); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); gdGo(gdCur, "start"); return gsay("Markets filled in from your workspace profile");
-    case "reset": { const snap = JSON.parse(JSON.stringify(cr)); cr = CR_BLANK(); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cr = s2; crSave(); renderReporting(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(cr)), v:crView, g:gdSnap("reporting")}; cr = CR_BLANK(); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cr = s2.d; crView = s2.v; gdRestore("reporting", s2.g); crSave(); renderReporting(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "sharelink": { const s = crScore(cr, crCtx(cr)); return shareCopy("reporting", cr, {svc:cr.svc, regions:cr.regions, pct:s.pct, crit:s.crit}, $("#cr-toast")); }
     case "unshare": cr.shared = false; crSave(); return crAct("save");
     case "build": cr.view = "report"; cr.tab = "plan"; crSave(); renderReporting(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

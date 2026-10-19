@@ -183,7 +183,14 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy as text</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, reportHeaderActions({
+        example:{attrs:'data-tr="example"', label:SEE_EXAMPLE_LABEL},
+        edit:{attrs:'data-tr="edit"', label:EDIT_ANSWERS_LABEL},
+        reset:{attrs:'data-tr="reset"', label:START_OVER_LABEL},
+        save:{attrs:'data-tr="save"', label:wsSaveLabel("transparency", tr), icon:"save"},
+        download:DL ? {attrs:'data-tr="download"', label:DOWNLOAD_LABEL, icon:"download"} : null,
+        extra:[{attrs:'data-tr="copy"', label:"Copy as text", icon:"copy"}, {attrs:'data-tr="sharelink"', label:COPY_LINK_LABEL}]
+      }))
     : head("Transparency report", "The report the EU Digital Services Act asks for: the right sections for your service, what's missing, a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -298,6 +305,8 @@ function trNum(el){ const raw = String(el.value).replace(/[, ]/g, "").trim(); if
 function trAct(a, arg){
   switch(a){
     case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(tr)), v:trView, g:gdSnap("transparency")}; tr = TR_BLANK(); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); window.scrollTo(0, 0);
+      withUndo("Cleared", snap, s2 => { tr = s2.d; trView = s2.v; gdRestore("transparency", s2.g); trSave(); renderTransparency(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "build": tr.view = "report"; tr.tab = "report"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": trView = null; gdReset("transparency"); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

@@ -9,6 +9,8 @@ const JOURNEY_ALL = [
   {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
   {k:"maturity", n:"Program maturity", d:"Rate eight areas, about five minutes", min:5, get:"Rate eight areas and get a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
   {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"How a product could be misused, and what to fix first.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
+    // "Review" on a finished step opens the saved report, not a blank new assessment
+    review:() => { const it = Object.values(wsItems()).filter(i => i.kind === "premortem").sort((a, b) => (b.updated || 0) - (a.updated || 0))[0]; if(it) openSaved(it.id); else newAssessment(); },
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
   {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"Whether your defenses keep up with the risks you found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
   {k:"coppa", n:"COPPA readiness", d:"Children's privacy, about six minutes", min:6, get:"Whether COPPA applies, your gaps, and drafts for Legal.", icon:"coppa", c:"var(--t-cp)", route:"coppa",
@@ -29,7 +31,8 @@ const JOURNEY = [];
 function jnSync(){ JOURNEY.length = 0; JOURNEY_ALL.filter(s => { try{ return !s.when || s.when(); }catch(e){ return false; } }).forEach(s => JOURNEY.push(s)); return JOURNEY; }
 jnSync();
 const jnNext = skip => JOURNEY.find(s => s.k !== skip && !s.done());
-function jnGo(k){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
+function jnGo(k, review){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
+  if(review && s.review) return s.review();
   if(k === "maturity" && ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
   if(k === "coverage" && cv.ex){ cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
   if(s.go) s.go(); else goRoute(s.route); }
@@ -42,7 +45,7 @@ function journeyNextHTML(cur){
     <div class="jn-next-a"><button type="button" class="btn primary" data-jgo="${next.k}">Continue ${icon("arrow")}</button><a class="btn" href="#overview">Back to overview</a></div></div>`;
 }
 document.addEventListener("click", e => {
-  const g = e.target.closest && e.target.closest("[data-jgo]"); if(g){ e.preventDefault(); return jnGo(g.dataset.jgo); }
+  const g = e.target.closest && e.target.closest("[data-jgo]"); if(g){ e.preventDefault(); return jnGo(g.dataset.jgo, g.dataset.jreview === "1"); }
   const p = e.target.closest && e.target.closest("[data-pack]"); if(p){ e.preventDefault(); packOpen(); }
 });
 

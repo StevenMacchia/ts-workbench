@@ -363,7 +363,9 @@ function renderDsa(){
   view.innerHTML = (report
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
         reportHeaderActions({
+          example:ds.ex ? null : {attrs:'data-ds="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-ds="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-ds="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-ds="save"', label:wsSaveLabel("dsa", ds), icon:"save"},
           download:{attrs:'data-ds="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-ds="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -454,8 +456,8 @@ function dsAct(a){
   switch(a){
     case "example": ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE))); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, a social video platform with EU users");
     case "fromorg": ds = Object.assign(DS_BLANK(), dsFromOrg()); gdReset("dsa"); dsView = "page"; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Filled in from your profile. Check each answer");
-    case "reset": { const snap = JSON.parse(JSON.stringify(ds)); ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ds = s2; dsSave(); renderDsa(); }); return focusQuiet(document.querySelector("#view h1")); }
-    case "sharelink": return shareCopy("dsa", ds, {svc:ds.svc, tier:ds.tier, pct:s.pct, crit:s.crit}, $("#ds-toast"));
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(ds)), v:dsView, g:gdSnap("dsa")}; ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ds = s2.d; dsView = s2.v; gdRestore("dsa", s2.g); dsSave(); renderDsa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": { const s = dsScore(ds, dsCtx(ds)); return shareCopy("dsa", ds, {svc:ds.svc, tier:ds.tier, pct:s.pct, crit:s.crit}, $("#ds-toast")); }
     case "unshare": ds.shared = false; dsSave(); return dsAct("save");
     case "build": ds.view = "report"; ds.tab = "plan"; dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": dsView = null; gdReset("dsa"); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

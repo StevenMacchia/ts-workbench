@@ -66,12 +66,19 @@ function vdRank(){
   const sorted = scored.slice().sort((a, b) => (a.done ? 0 : 1) - (b.done ? 0 : 1) || (a.flags.length ? 1 : 0) - (b.flags.length ? 1 : 0) || b.score - a.score);
   return {scored, sorted, top:sorted.find(x => x.done && !x.flags.length) || null};
 }
+// Fully scored vendors that clear the minimums and land on the same score (to two places) as the leader, or null
+function vdTie(){
+  const {sorted, top} = vdRank(); if(!top) return null;
+  const t = sorted.filter(x => x.done && !x.flags.length && x.score.toFixed(2) === top.score.toFixed(2));
+  return t.length > 1 ? t : null;
+}
+const vdNames = xs => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
 function vdRailHTML(){
-  const {sorted, top} = vdRank(), tw = vdTotal();
+  const {sorted, top} = vdRank(), tw = vdTotal(), tie = vdTie(), tied = x => !!tie && tie.some(y => y.i === x.i);
   return `<div class="vd-rail-h"><h4>Live result</h4><span class="note">Updates as you score</span></div>
-    ${sorted.map((x, r) => `<div class="vd-rk ${x === top ? "top" : ""} ${x.flags.length ? "out" : ""}">
+    ${sorted.map((x, r) => `<div class="vd-rk ${x === top || tied(x) ? "top" : ""} ${x.flags.length ? "out" : ""}">
       <span class="vd-rk-n">${r + 1}</span>
-      <div class="vd-rk-b"><div class="vd-rk-t"><b>${esc(x.v.name)}</b>${x === top ? `<span class="pill accent">${sorted.every(y => y.done) ? "Recommended" : "Leading so far"}</span>` : x.flags.length ? `<span class="pill crit">Ruled out</span>` : !x.done ? `<span class="pill">Scoring</span>` : ""}</div>
+      <div class="vd-rk-b"><div class="vd-rk-t"><b>${esc(x.v.name)}</b>${x === top || tied(x) ? `<span class="pill accent">${tied(x) ? "Tied" : sorted.every(y => y.done) ? "Recommended" : "Leading so far"}</span>` : x.flags.length ? `<span class="pill crit">Ruled out</span>` : !x.done ? `<span class="pill">Scoring</span>` : ""}</div>
         ${x.done ? `<div class="vd-rk-s"><span class="mono">${x.score.toFixed(2)}</span><span class="note">/ 5</span><div class="vd-bar"><i style="width:${x.score / 5 * 100}%"></i></div></div>`
           : `<div class="vd-rk-s"><span class="note">${vdScored(x.v)} of ${CRITERIA.length} scored</span><div class="vd-bar"><i style="width:${vdScored(x.v) / CRITERIA.length * 100}%;background:var(--faint)"></i></div></div>`}
         ${x.flags.length ? `<small>Scores 2 or lower on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.</small>` : ""}</div>
@@ -88,6 +95,13 @@ function vdWhy(){
   const diffs = CRITERIA.map(c => ({c, d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - other.v.s[c.k]), raw:top.v.s[c.k] - other.v.s[c.k]})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
   const plus = diffs.filter(x => x.d > 0).slice(0, 2), minus = diffs.filter(x => x.d < 0).slice(-1);
   const list = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
+  const tie = vdTie();
+  if(tie){
+    const o = tie[1], d2 = CRITERIA.map(c => ({c, raw:top.v.s[c.k] - o.v.s[c.k], d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - o.v.s[c.k])})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
+    const p2 = d2.filter(x => x.d > 0).slice(0, 2), m2 = d2.filter(x => x.d < 0).slice(-1), l2 = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
+    return `<p>${vdNames(tie.map(x => `<b>${esc(x.v.name)}</b>`))} tie at ${top.score.toFixed(2)} out of 5.</p>
+      <p>${p2.length ? `${esc(top.v.name)} is stronger on ${l2(p2)}${m2.length ? `, while ${esc(o.v.name)} is stronger on ${l2(m2.map(x => ({c:x.c, raw:-x.raw})))}` : ""}. ` : ""}Break the tie on the criterion you weight most.</p>`;
+  }
   return `<p><b>${esc(top.v.name)}</b> ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and <b>${esc(other.v.name)}</b> is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of <b>${esc(other.v.name)}</b> at ${other.score.toFixed(2)}`}.</p>
     ${plus.length ? `<p>It wins mainly on ${list(plus)}${minus.length ? `, while ${esc(other.v.name)} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}. If those weights change, check whether the ranking does.</p>` : ""}`;
 }
@@ -186,8 +200,10 @@ function vdMarkdown(){
       const diffs = CRITERIA.map(c => ({c, d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - other.v.s[c.k]), raw:top.v.s[c.k] - other.v.s[c.k]})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
       const plus = diffs.filter(x => x.d > 0).slice(0, 2), minus = diffs.filter(x => x.d < 0).slice(-1);
       const list = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
-      lines.push(`${top.v.name} ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and ${other.v.name} is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of ${other.v.name} at ${other.score.toFixed(2)}`}.`);
-      if(plus.length) lines.push(`It wins mainly on ${list(plus)}${minus.length ? `, while ${other.v.name} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}.`);
+      const tie = vdTie();
+      if(tie) lines.push(`${vdNames(tie.map(x => x.v.name))} tie at ${top.score.toFixed(2)} out of 5. Break the tie on the criterion you weight most.`);
+      else lines.push(`${top.v.name} ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and ${other.v.name} is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of ${other.v.name} at ${other.score.toFixed(2)}`}.`);
+      if(plus.length && !tie) lines.push(`It wins mainly on ${list(plus)}${minus.length ? `, while ${other.v.name} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}.`);
     }
   }
   lines.push(``, `## Every score`, ``, `Each vendor rated 1 to 5 against the rubric. Weight is out of 100.`, ``,
@@ -200,8 +216,9 @@ function vdOwn(){ const snap = JSON.parse(JSON.stringify(vx)); vx = {weights:{},
 // The result: who wins and why, the heat map, and the ways back in
 function vdResultsRender(){
   const {sorted, top} = vdRank(), all = sorted.every(x => x.done), bench = vdBenchRange();
-  const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
-  const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
+  const tie = all ? vdTie() : null;
+  const headline = !all ? "Finish scoring to see who wins" : top ? (tie ? `${vdNames(tie.map(x => x.v.name))} tie at ${top.score.toFixed(2)}` : `${top.v.name} comes out ahead`) : "No vendor clears the minimums";
+  const failed = (tie ? [{t:"Break the tie on the criterion you weight most", sub:"Look at which vendor scores higher on it, and ask each one for evidence on that criterion."}] : []).concat(sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`})));
   view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" role="status" aria-live="polite"></span>
     ${vx.shared ? shareBannerHTML('id="vx-unshare"') : ""}
     <div class="cvr">

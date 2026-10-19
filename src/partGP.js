@@ -534,7 +534,9 @@ function renderGrooming(){
   view.innerHTML = (report
     ? headCompact("Grooming pathway review", `${esc(gp.svc || "Your product")} · ${esc(s.h)}`,
         reportHeaderActions({
+          example:gp.ex ? null : {attrs:'data-gp="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-gp="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-gp="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-gp="save"', label:wsSaveLabel("grooming", gp), icon:"save"},
           download:{attrs:'data-gp="brief"', label:"Product brief", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-gp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -673,7 +675,7 @@ function gpAct(a){
     case "example": gp = Object.assign(GP_BLANK(), JSON.parse(JSON.stringify(GP_EXAMPLE))); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, a photo and short-video app for teens and young adults");
     case "frompm": { const src = loopSource(); if(!src) return; gp = Object.assign(GP_BLANK(), gpFromPM(src)); gdReset("grooming"); gpView = "page"; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
     case "fromorg": { const o = orgGet(); gp = Object.assign(GP_BLANK(), {youth:o.youth, age:o.youth === "adult_verified" ? "verified" : ""}); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); gdGo(gdCur, "start"); return gsay("Audience filled in from your workspace profile"); }
-    case "reset": { const snap = JSON.parse(JSON.stringify(gp)); gp = GP_BLANK(); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { gp = s2; gpSave(); renderGrooming(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(gp)), v:gpView, g:gdSnap("grooming")}; gp = GP_BLANK(); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { gp = s2.d; gpView = s2.v; gdRestore("grooming", s2.g); gpSave(); renderGrooming(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "sharelink": { const s = gpScore(gp, gpCtx(gp)); return shareCopy("grooming", gp, {svc:gp.svc, youth:gp.youth, pct:s.pct, crit:s.crit}, $("#gp-toast")); }
     case "unshare": gp.shared = false; gpSave(); return gpAct("save");
     case "build": gp.view = "report"; gp.tab = "plan"; gp.at = Date.now(); gpSave(); renderGrooming(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));

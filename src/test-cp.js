@@ -66,6 +66,17 @@ const body = function(){
   const pre = cpFromPM(loopSource()); eq(pre.aud, "primary", "a product built for children is primary audience"); eq(pre.svc, "Kids clubhouse", "service name carried over");
   eq(!!pre.pi.persist && !!pre.pi.contact, true, "data map starts from the product's features");
   out.push("pre-fill from a pre-mortem: audience, name and " + Object.keys(pre.pi).length + " kinds of data");
+  // nothing to grade: no percentage, no ring, no grade, two actions, the reasoning still in Details
+  const noGrade = h => /\d+% ready/.test(h) === false && /class="grade /.test(h) === false && /tr-ring/.test(h) === false;
+  const twoActs = h => ((h.match(/<ol class="pk-list gd-vacts">([\s\S]*?)<\/ol>/) || ["", ""])[1].match(/<li>/g) || []).length;
+  cp = Object.assign(CP_BLANK(), {aud:"adult", view:"report"}); cpView = null; renderCoppa(); h = view.innerHTML; if(bad(h)) throw new Error("none bad: " + where(h));
+  eq(/COPPA doesn't apply to you on these answers\./.test(h), true, "an adults-only service: the verdict says COPPA doesn't apply"); eq(noGrade(h), true, "no percentage, ring or grade"); eq(twoActs(h), 2, "two actions");
+  eq(/Know what would change that/.test(h) && /Keep a dated record/.test(h), true, "what would change it, and keep a record");
+  eq(/<details class="ev-details"/.test(h) && h.indexOf(esc(cpApplies(cp).t)) > -1, true, "the Details disclosure is there and the reasoning is on the page");
+  cp = Object.assign(CP_BLANK(), {aud:"primary", view:"report"}); renderCoppa(); h = view.innerHTML; s = cpScore(cp, cpCtx(cp), cpApplies(cp));
+  eq(s.total, 0, "a children's service with no data mapped has no requirements yet"); eq(/COPPA applies to you, but there is nothing to check yet\./.test(h), true, "it applies, so the verdict does not say it doesn't");
+  eq(noGrade(h), true, "and shows no grade"); eq(twoActs(h), 2, "two actions"); eq(/Map the children's data you collect/.test(h), true, "the first is to map the data");
+  out.push("nothing to grade: no percentage or grade when COPPA likely doesn't apply, or applies with no data mapped yet; two actions each");
   return out.join("\n");
 };
 const src = stub + "const GT_MORE = {};\n" + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partCV.js"), rd("partTK.js"), rd("partGD.js"), rd("partCP.js"), rd("partLOOP.js")].join("\n")

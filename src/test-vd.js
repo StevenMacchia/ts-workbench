@@ -50,6 +50,15 @@ const body = function(){
   eq(/Weights add up to 100/.test(vdRailHTML()), true, "weights total check");
   vx.weights.cost = 40; eq(/Weights add up to 130/.test(vdRailHTML()), true, "flags weights not totalling 100");
   out.push("dealbreakers and weight totals handled; workspace summary: " + (vendorResult(vx) ? "has winner" : "none qualify"));
+  // a tie is called a tie, not a win
+  vx = {weights:JSON.parse(JSON.stringify(DEFAULT_V.weights)), vendors:[vdBlank("Vendor A"), vdBlank("Vendor B")], open:null}; CRITERIA.forEach(c => { vx.vendors[0].s[c.k] = 3; vx.vendors[1].s[c.k] = 3; });
+  vdView = "results"; renderVendors(); h = view.innerHTML; if(bad(h)) throw new Error("bad tie html");
+  eq(vdTie().length, 2, "two vendors on the same score are a tie");
+  eq(/Vendor A and Vendor B tie at 3\.00/.test(h) && !/comes out ahead/.test(h) && !/ranks first/.test(h), true, "the headline says they tie, not that one is ahead");
+  eq(/<ol class="pk-list gd-vacts"><li><b>Break the tie on the criterion you weight most\./.test(h), true, "the first action is to break the tie");
+  eq(/tie at 3\.00/.test(vdMarkdown()) && !/ranks first/.test(vdMarkdown()), true, "the download says it too");
+  vx.vendors[1].s[CRITERIA[0].k] = 4; renderVendors(); eq(vdTie(), null, "a different score is not a tie"); eq(/comes out ahead/.test(view.innerHTML), true, "and the leader is named again");
+  out.push("vendors: a 3.00 vs 3.00 tie is reported as a tie, with 'break the tie' first");
   return out.join("\n");
 };
 const src = stub + [rd("partT.js"), rd("partD.js"), rd("partE1.js"), rd("partE2.js"), rd("partF1.js"), rd("_F2.js"), rd("partW1.js"), rd("_L.js"), rd("_F3_9.js"), rd("_G.js"), rd("_W9.js"), rd("partNav.js"), rd("partH4.js"), rd("partH2.js"), rd("partAbout.js"), rd("partMAd.js"), rd("partMA.js"), rd("partCV.js"), rd("partOV.js"), rd("partGD.js")].join("\n")

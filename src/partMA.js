@@ -261,7 +261,7 @@ function maPlanHTML(){
     </section>
     ${chapterLinkHTML("maturity")}
     ${maAllRated(ma) && !hist.length && !ma.ex ? `<div class="banner ma-snapq"><span><strong>All ${MA_AREAS.length} areas rated.</strong> Save a snapshot now, so the next time you check in you can show how far you've come.</span><button type="button" class="btn sm primary" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button></div>` : ""}
-    <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
+    <details class="ev-details"${detailsOpenAttr()}><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
     <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
     <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>

@@ -7,6 +7,9 @@
 let gdCur = null;
 const gdS = {};
 const gdPos = k => gdS[k] || (gdS[k] = {scr:"intro", i:0});
+// A copy of a guided tool's screen position, so Undo after Start over can put the visitor back on the same screen
+const gdSnap = k => gdS[k] ? JSON.parse(JSON.stringify(gdS[k])) : null;
+const gdRestore = (k, snap) => { delete gdS[k]; if(snap) gdS[k] = snap; };
 const gdReset = k => { delete gdS[k]; if(gdCur && gdCur.k === k) gdCur = null; };
 const gdLive = spec => spec.steps.filter(s => !s.skip || !s.skip());
 function gdAnswered(s){

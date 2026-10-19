@@ -22,7 +22,8 @@ function route(){
   if(shareHit && PATHMODE) SHARE_STASH = null;
   if(shareHit && typeof SHARE_APPLY !== "undefined" && SHARE_APPLY[shareHit.route]){
     shareDecode(shareHit.s).catch(() => null).then(data => {
-      if(data) SHARE_APPLY[shareHit.route](data);
+      // Someone opening a shared result wants the result, not the tool's purpose card
+      if(data){ SHARE_APPLY[shareHit.route](data); if(typeof introMark === "function") introMark(shareHit.route); }
       if(!PATHMODE) history.replaceState(null, "", location.pathname + "#" + shareHit.route);
       route();
     });

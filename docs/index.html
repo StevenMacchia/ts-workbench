@@ -12201,12 +12201,19 @@ function vdRank(){
   const sorted = scored.slice().sort((a, b) => (a.done ? 0 : 1) - (b.done ? 0 : 1) || (a.flags.length ? 1 : 0) - (b.flags.length ? 1 : 0) || b.score - a.score);
   return {scored, sorted, top:sorted.find(x => x.done && !x.flags.length) || null};
 }
+// Fully scored vendors that clear the minimums and land on the same score (to two places) as the leader, or null
+function vdTie(){
+  const {sorted, top} = vdRank(); if(!top) return null;
+  const t = sorted.filter(x => x.done && !x.flags.length && x.score.toFixed(2) === top.score.toFixed(2));
+  return t.length > 1 ? t : null;
+}
+const vdNames = xs => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
 function vdRailHTML(){
-  const {sorted, top} = vdRank(), tw = vdTotal();
+  const {sorted, top} = vdRank(), tw = vdTotal(), tie = vdTie(), tied = x => !!tie && tie.some(y => y.i === x.i);
   return `<div class="vd-rail-h"><h4>Live result</h4><span class="note">Updates as you score</span></div>
-    ${sorted.map((x, r) => `<div class="vd-rk ${x === top ? "top" : ""} ${x.flags.length ? "out" : ""}">
+    ${sorted.map((x, r) => `<div class="vd-rk ${x === top || tied(x) ? "top" : ""} ${x.flags.length ? "out" : ""}">
       <span class="vd-rk-n">${r + 1}</span>
-      <div class="vd-rk-b"><div class="vd-rk-t"><b>${esc(x.v.name)}</b>${x === top ? `<span class="pill accent">${sorted.every(y => y.done) ? "Recommended" : "Leading so far"}</span>` : x.flags.length ? `<span class="pill crit">Ruled out</span>` : !x.done ? `<span class="pill">Scoring</span>` : ""}</div>
+      <div class="vd-rk-b"><div class="vd-rk-t"><b>${esc(x.v.name)}</b>${x === top || tied(x) ? `<span class="pill accent">${tied(x) ? "Tied" : sorted.every(y => y.done) ? "Recommended" : "Leading so far"}</span>` : x.flags.length ? `<span class="pill crit">Ruled out</span>` : !x.done ? `<span class="pill">Scoring</span>` : ""}</div>
         ${x.done ? `<div class="vd-rk-s"><span class="mono">${x.score.toFixed(2)}</span><span class="note">/ 5</span><div class="vd-bar"><i style="width:${x.score / 5 * 100}%"></i></div></div>`
           : `<div class="vd-rk-s"><span class="note">${vdScored(x.v)} of ${CRITERIA.length} scored</span><div class="vd-bar"><i style="width:${vdScored(x.v) / CRITERIA.length * 100}%;background:var(--faint)"></i></div></div>`}
         ${x.flags.length ? `<small>Scores 2 or lower on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.</small>` : ""}</div>
@@ -12223,6 +12230,13 @@ function vdWhy(){
   const diffs = CRITERIA.map(c => ({c, d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - other.v.s[c.k]), raw:top.v.s[c.k] - other.v.s[c.k]})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
   const plus = diffs.filter(x => x.d > 0).slice(0, 2), minus = diffs.filter(x => x.d < 0).slice(-1);
   const list = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
+  const tie = vdTie();
+  if(tie){
+    const o = tie[1], d2 = CRITERIA.map(c => ({c, raw:top.v.s[c.k] - o.v.s[c.k], d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - o.v.s[c.k])})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
+    const p2 = d2.filter(x => x.d > 0).slice(0, 2), m2 = d2.filter(x => x.d < 0).slice(-1), l2 = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
+    return `<p>${vdNames(tie.map(x => `<b>${esc(x.v.name)}</b>`))} tie at ${top.score.toFixed(2)} out of 5.</p>
+      <p>${p2.length ? `${esc(top.v.name)} is stronger on ${l2(p2)}${m2.length ? `, while ${esc(o.v.name)} is stronger on ${l2(m2.map(x => ({c:x.c, raw:-x.raw})))}` : ""}. ` : ""}Break the tie on the criterion you weight most.</p>`;
+  }
   return `<p><b>${esc(top.v.name)}</b> ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and <b>${esc(other.v.name)}</b> is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of <b>${esc(other.v.name)}</b> at ${other.score.toFixed(2)}`}.</p>
     ${plus.length ? `<p>It wins mainly on ${list(plus)}${minus.length ? `, while ${esc(other.v.name)} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}. If those weights change, check whether the ranking does.</p>` : ""}`;
 }
@@ -12321,8 +12335,10 @@ function vdMarkdown(){
       const diffs = CRITERIA.map(c => ({c, d:(+vx.weights[c.k] || 0) / tw * (top.v.s[c.k] - other.v.s[c.k]), raw:top.v.s[c.k] - other.v.s[c.k]})).filter(x => x.raw !== 0).sort((a, b) => b.d - a.d);
       const plus = diffs.filter(x => x.d > 0).slice(0, 2), minus = diffs.filter(x => x.d < 0).slice(-1);
       const list = xs => xs.map(x => `${x.c.n.toLowerCase()} (${x.raw > 0 ? "+" : ""}${x.raw})`).join(" and ");
-      lines.push(`${top.v.name} ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and ${other.v.name} is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of ${other.v.name} at ${other.score.toFixed(2)}`}.`);
-      if(plus.length) lines.push(`It wins mainly on ${list(plus)}${minus.length ? `, while ${other.v.name} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}.`);
+      const tie = vdTie();
+      if(tie) lines.push(`${vdNames(tie.map(x => x.v.name))} tie at ${top.score.toFixed(2)} out of 5. Break the tie on the criterion you weight most.`);
+      else lines.push(`${top.v.name} ranks first with ${top.score.toFixed(2)} out of 5${other.flags.length ? `, and ${other.v.name} is ruled out on ${other.flags.map(f => f.n.toLowerCase()).join(" and ")}` : `, ahead of ${other.v.name} at ${other.score.toFixed(2)}`}.`);
+      if(plus.length && !tie) lines.push(`It wins mainly on ${list(plus)}${minus.length ? `, while ${other.v.name} is stronger on ${list(minus.map(x => ({c:x.c, raw:-x.raw})))}` : ""}.`);
     }
   }
   lines.push(``, `## Every score`, ``, `Each vendor rated 1 to 5 against the rubric. Weight is out of 100.`, ``,
@@ -12335,8 +12351,9 @@ function vdOwn(){ const snap = JSON.parse(JSON.stringify(vx)); vx = {weights:{},
 // The result: who wins and why, the heat map, and the ways back in
 function vdResultsRender(){
   const {sorted, top} = vdRank(), all = sorted.every(x => x.done), bench = vdBenchRange();
-  const headline = !all ? "Finish scoring to see who wins" : top ? `${top.v.name} comes out ahead` : "No vendor clears the minimums";
-  const failed = sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`}));
+  const tie = all ? vdTie() : null;
+  const headline = !all ? "Finish scoring to see who wins" : top ? (tie ? `${vdNames(tie.map(x => x.v.name))} tie at ${top.score.toFixed(2)}` : `${top.v.name} comes out ahead`) : "No vendor clears the minimums";
+  const failed = (tie ? [{t:"Break the tie on the criterion you weight most", sub:"Look at which vendor scores higher on it, and ask each one for evidence on that criterion."}] : []).concat(sorted.filter(x => x.flags.length).map(x => ({t:x.v.name, sub:`Fails the minimum on ${x.flags.map(f => f.n.toLowerCase()).join(" and ")}.`})));
   view.innerHTML = `<div class="gd cvr-page" style="--tc:var(--t-vd)">${asStepBar("vendors", 100, true)}<span class="toast" id="vx-toast" role="status" aria-live="polite"></span>
     ${vx.shared ? shareBannerHTML('id="vx-unshare"') : ""}
     <div class="cvr">
@@ -12887,7 +12904,7 @@ function shellUpdate(name){
 /* ---------- command palette ---------- */
 function cmdkItems(){
   const out = [];
-  const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, tone:TOOL_TONE[route] || "neutral", icon:iconId, run:()=>goRoute(route)});
+  const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", keys:route, color, tone:TOOL_TONE[route] || "neutral", icon:iconId, run:()=>goRoute(route)});
   go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("Your plan","plan","var(--accent)","send"); go("Quarter by quarter","review","var(--faint)","chart"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren"); go("Incident post-mortem","postmortem","var(--t-tt)","doc");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
@@ -12934,7 +12951,9 @@ function cmdkHbLoad(){
 let cmdk = {items:[], shown:[], sel:0, prevFocus:null};
 function cmdkDraw(){
   const q = $("#cmdk-q").value.trim().toLowerCase();
-  cmdk.shown = cmdk.items.filter(x => !q || (x.label+" "+x.sub+" "+x.g).toLowerCase().includes(q)).slice(0, 60);
+  // Matches the label, the group, the route name ("premortem") and a copy with hyphens taken out, so "premortem" finds "Abuse pre-mortem"
+  const hay = x => { const s = (x.label+" "+x.sub+" "+x.g+" "+(x.keys || "")).toLowerCase(); return s + " " + s.replace(/-/g, ""); };
+  cmdk.shown = cmdk.items.filter(x => !q || hay(x).includes(q)).slice(0, 60);
   cmdk.sel = Math.min(cmdk.sel, Math.max(0, cmdk.shown.length-1));
   let g = "", h = "";
   cmdk.shown.forEach((x,i) => { if(x.g!==g){ g = x.g; h += `<li class="grp" role="presentation">${esc(g)}</li>`; }
@@ -13159,7 +13178,7 @@ function asStepHTML(s, i, next){
   if(ok){ const sum = asSum(s.k), at = asTouch(s.k, sum), rel = relTime(at), upd = rel === "now" ? "updated just now" : `updated ${rel} ago`;
     // "About your platform" is done on the workspace page itself, not its own report, so the button says where it actually goes
     const label = s.k === "setup" ? "Open workspace" : "Review";
-    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
+    return `<div class="as-s ok"><span class="as-n ok">${icon("check")}</span><span class="as-st"><b>${s.n}</b><small>${esc(sum)}${sum ? " · " : ""}${upd}</small></span><button type="button" class="as-rv" data-jgo="${s.k}" data-jreview="1" aria-label="${esc(label)} ${esc(s.n)}">${esc(label)}</button></div>`; }
   if(cur) return `<div class="as-s cur" style="--c:${color}"><span class="as-k as-cur-m">Up next · about ${asMin(s.min)}</span>
     <div class="as-cur-t"><span class="as-six-i">${tileHTML(s.icon, TOOL_TONE[s.route], "md")}<span class="as-six-n" aria-hidden="true">${i + 1}</span></span><b class="as-cur-n"><span class="visually-hidden">Step ${i + 1}: </span>${s.n}</b></div><p>${esc(s.get)}</p>
     ${s.k === "setup" && typeof orgCardHTML === "function" ? `<div class="jn-setup as-setup">${orgCardHTML(true)}</div>` : `<button type="button" class="btn primary" data-jgo="${s.k}">Continue ${icon("arrow")}</button>`}</div>`;
@@ -14604,7 +14623,8 @@ function renderAI(key){
   view.querySelectorAll("[data-fk]").forEach(el => { el.oninput = persist; el.onchange = persist; });
   $("#ai-ex").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); aiPut(key, s); run.err = ""; renderAI(key); };
   $("#ai-sample").onclick = () => { const s = aiGet(key); s.f = JSON.parse(JSON.stringify(T.example)); s.r = JSON.parse(JSON.stringify(T.sample)); s.sample = true; s.ts = Date.now(); aiPut(key, s); run.err = ""; renderAI(key); setTimeout(() => { const r = $("#ai-results"); if(r && r.scrollIntoView) r.scrollIntoView({behavior:"smooth", block:"start"}); }, 30); };
-  $("#ai-clear").onclick = () => { aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; aiView[key] = null; gdReset(key); renderAI(key); window.scrollTo(0, 0); };
+  $("#ai-clear").onclick = () => { const snap = {rec:JSON.parse(JSON.stringify(aiGet(key))), v:aiView[key], g:gdSnap(key)}; aiPut(key, {f:{}, r:null, ts:0, sample:false, depth:aiGet(key).depth}); run.err = ""; aiView[key] = null; gdReset(key); renderAI(key); window.scrollTo(0, 0);
+    withUndo("Cleared", snap, s2 => { aiPut(key, s2.rec); aiView[key] = s2.v; gdRestore(key, s2.g); renderAI(key); }); };
   const gb = $("#ai-guide"); if(gb) gb.onclick = () => { persist(); aiView[key] = null; renderAI(key); window.scrollTo(0, 0); };
   view.querySelectorAll("[data-aidepth]").forEach(b => b.onclick = () => { const s = aiGet(key); s.f = aiRead(T); s.depth = b.dataset.aidepth; aiPut(key, s); renderAI(key); });
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
@@ -15086,7 +15106,7 @@ function maPlanHTML(){
     </section>
     ${chapterLinkHTML("maturity")}
     ${maAllRated(ma) && !hist.length && !ma.ex ? `<div class="banner ma-snapq"><span><strong>All ${MA_AREAS.length} areas rated.</strong> Save a snapshot now, so the next time you check in you can show how far you've come.</span><button type="button" class="btn sm primary" data-ma="snapshot"><svg><use href="#i-save"/></svg>Save a snapshot</button></div>` : ""}
-    <details class="ev-details"><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
+    <details class="ev-details"${detailsOpenAttr()}><summary>Details <span class="note">Radar, by area, roadmap and progress</span></summary>
     <div class="card ma-band-r ma-band-radc">${maRadar(ma, true, prev)}${maLegend(ma, prev)}</div>
     <div class="segs ma-tabs" role="tablist" aria-label="Your plan">${tabs}</div>
     <div id="ma-tab" role="tabpanel">${ma.tab === "areas" ? maAreaTabHTML() : ma.tab === "progress" ? maProgressTabHTML() : `<p class="note ma-tabnote">Tick items off as you finish them. When both are done, that area moves up a level on the radar.</p>${maRoadmapHTML()}`}</div>
@@ -15778,7 +15798,7 @@ function cvResultsRender(){
       <div class="cvr-more">${cv.ex ? "" : `<button type="button" class="ov-link" data-cvg="again">Go through the questions again</button>`}<button type="button" class="ov-link" data-cv="${cv.ex ? "clear" : "reset"}">Start over</button></div>
     </div>
     ${chapterLinkHTML("coverage")}
-    <details class="ev-details"><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
+    <details class="ev-details"${detailsOpenAttr()}><summary>Details <span class="note">Radar, every gap, your answers and what you compared against</span></summary>
     <div class="cvr">
       <div class="card cvr-radar"><div class="cvr-rh"><b>Risk against coverage</b>${cvLegend(cv)}</div>${cvRadar(cv, true)}</div>
     </div>
@@ -16472,6 +16492,8 @@ const JOURNEY_ALL = [
   {k:"setup", n:"About your platform", d:"Company type, stage and regions, once", min:1, get:"Type, size and where your users are. Every step uses it.", icon:"user", c:"var(--faint)", route:"workspace", done:() => orgConfirmed()},
   {k:"maturity", n:"Program maturity", d:"Rate eight areas, about five minutes", min:5, get:"Rate eight areas and get a roadmap for the gaps.", icon:"steps", c:"var(--t-ma)", route:"maturity", done:() => MA_AREAS.every(a => ma.lv[a.k]) && !ma.ex},
   {k:"premortem", n:"Abuse pre-mortem", d:"How a product could be misused, and what to do first", min:8, get:"How a product could be misused, and what to fix first.", icon:"radar", c:"var(--t-pm)", route:"premortem", go:() => newAssessment(),
+    // "Review" on a finished step opens the saved report, not a blank new assessment
+    review:() => { const it = Object.values(wsItems()).filter(i => i.kind === "premortem").sort((a, b) => (b.updated || 0) - (a.updated || 0))[0]; if(it) openSaved(it.id); else newAssessment(); },
     done:() => Object.values(wsItems()).some(it => it.kind === "premortem")},
   {k:"coverage", n:"Coverage radar", d:"Your defenses against that risk", min:5, get:"Whether your defenses keep up with the risks you found.", icon:"cover", c:"var(--t-cv)", route:"coverage", done:() => { const s = cvSummary(cv); return !cv.ex && !cv.est && s.rated === s.total; }},
   {k:"coppa", n:"COPPA readiness", d:"Children's privacy, about six minutes", min:6, get:"Whether COPPA applies, your gaps, and drafts for Legal.", icon:"coppa", c:"var(--t-cp)", route:"coppa",
@@ -16492,7 +16514,8 @@ const JOURNEY = [];
 function jnSync(){ JOURNEY.length = 0; JOURNEY_ALL.filter(s => { try{ return !s.when || s.when(); }catch(e){ return false; } }).forEach(s => JOURNEY.push(s)); return JOURNEY; }
 jnSync();
 const jnNext = skip => JOURNEY.find(s => s.k !== skip && !s.done());
-function jnGo(k){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
+function jnGo(k, review){ const s = JOURNEY.find(x => x.k === k); if(!s) return;
+  if(review && s.review) return s.review();
   if(k === "maturity" && ma.ex){ ma = maInit({stage:ma.stage, lv:{}, done:{}, ex:false, open:"policy"}); store.set("ma", ma); }
   if(k === "coverage" && cv.ex){ cv = {src:null, ex:false, r:{}}; store.set("cv", cv); }
   if(s.go) s.go(); else goRoute(s.route); }
@@ -16505,7 +16528,7 @@ function journeyNextHTML(cur){
     <div class="jn-next-a"><button type="button" class="btn primary" data-jgo="${next.k}">Continue ${icon("arrow")}</button><a class="btn" href="#overview">Back to overview</a></div></div>`;
 }
 document.addEventListener("click", e => {
-  const g = e.target.closest && e.target.closest("[data-jgo]"); if(g){ e.preventDefault(); return jnGo(g.dataset.jgo); }
+  const g = e.target.closest && e.target.closest("[data-jgo]"); if(g){ e.preventDefault(); return jnGo(g.dataset.jgo, g.dataset.jreview === "1"); }
   const p = e.target.closest && e.target.closest("[data-pack]"); if(p){ e.preventDefault(); packOpen(); }
 });
 
@@ -17063,7 +17086,14 @@ function renderTransparency(){
   if(!report && trView !== "page" && typeof gdRender === "function") return gdRender(trSpec());
   if(typeof gdCur !== "undefined") gdCur = null;
   view.innerHTML = (report
-    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, `<button type="button" class="btn sm" data-tr="edit">Edit answers</button><button type="button" class="btn sm" data-tr="save"><svg><use href="#i-save"/></svg><span>${wsSaveLabel("transparency", tr)}</span></button>${DL ? `<button type="button" class="btn sm primary" data-tr="download"><svg><use href="#i-download"/></svg>Download</button>` : ""}<button type="button" class="btn sm" data-tr="copy">${icon("copy")}Copy as text</button><button type="button" class="btn sm" data-tr="sharelink">Copy link</button>`)
+    ? headCompact("Transparency report", `${esc(tr.org || "Your service")} · ${esc(String(tr.year))}`, reportHeaderActions({
+        example:{attrs:'data-tr="example"', label:SEE_EXAMPLE_LABEL},
+        edit:{attrs:'data-tr="edit"', label:EDIT_ANSWERS_LABEL},
+        reset:{attrs:'data-tr="reset"', label:START_OVER_LABEL},
+        save:{attrs:'data-tr="save"', label:wsSaveLabel("transparency", tr), icon:"save"},
+        download:DL ? {attrs:'data-tr="download"', label:DOWNLOAD_LABEL, icon:"download"} : null,
+        extra:[{attrs:'data-tr="copy"', label:"Copy as text", icon:"copy"}, {attrs:'data-tr="sharelink"', label:COPY_LINK_LABEL}]
+      }))
     : head("Transparency report", "The report the EU Digital Services Act asks for: the right sections for your service, what's missing, a readable report.", "Run the program", `${typeof poweredBy === "function" ? poweredBy(ai ? ["claude"] : []) : ""}<button type="button" class="btn sm" data-tr="example">See an example</button>`))
     + (report ? trReportHTML(ai) : trSetupHTML());
 }
@@ -17178,6 +17208,8 @@ function trNum(el){ const raw = String(el.value).replace(/[, ]/g, "").trim(); if
 function trAct(a, arg){
   switch(a){
     case "example": tr = Object.assign(TR_BLANK(), JSON.parse(JSON.stringify(TR_EXAMPLE))); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); return gsay("Example loaded: Pixelry, an online platform, for 2025");
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(tr)), v:trView, g:gdSnap("transparency")}; tr = TR_BLANK(); gdReset("transparency"); trView = null; store.set("ws:cur:transparency", null); trSave(); renderTransparency(); window.scrollTo(0, 0);
+      withUndo("Cleared", snap, s2 => { tr = s2.d; trView = s2.v; gdRestore("transparency", s2.g); trSave(); renderTransparency(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "build": tr.view = "report"; tr.tab = "report"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": trView = null; gdReset("transparency"); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "edit": tr.view = "setup"; trView = "page"; trSave(); renderTransparency(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -17886,6 +17918,9 @@ const typeName = () => { const t = typeof TT_TYPES !== "undefined" && TT_TYPES.f
 let gdCur = null;
 const gdS = {};
 const gdPos = k => gdS[k] || (gdS[k] = {scr:"intro", i:0});
+// A copy of a guided tool's screen position, so Undo after Start over can put the visitor back on the same screen
+const gdSnap = k => gdS[k] ? JSON.parse(JSON.stringify(gdS[k])) : null;
+const gdRestore = (k, snap) => { delete gdS[k]; if(snap) gdS[k] = snap; };
 const gdReset = k => { delete gdS[k]; if(gdCur && gdCur.k === k) gdCur = null; };
 const gdLive = spec => spec.steps.filter(s => !s.skip || !s.skip());
 function gdAnswered(s){
@@ -18864,7 +18899,9 @@ function renderCoppa(){
   view.innerHTML = (report
     ? headCompact("COPPA readiness", `${esc(cp.svc || "Your service")} · ${esc(ap.h)}`,
         reportHeaderActions({
+          example:cp.ex ? null : {attrs:'data-cp="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-cp="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-cp="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-cp="save"', label:wsSaveLabel("coppa", cp), icon:"save"},
           download:{attrs:'data-cp="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-cp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -18914,16 +18951,21 @@ function cpSetupHTML(x, ap, s){
 }
 function cpReportHTML(x, ap, s){
   const tab = ["plan", "map", "drafts", "reqs"].includes(cp.tab) ? cp.tab : "plan", tone = s.crit ? "crit" : s.pct >= 80 ? "good" : "high";
-  const sentence = `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : s.total ? ", no critical gaps" : ""}.`;
-  const actions = s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
-  const bench = cpBenchPct();
+  // Nothing to grade: COPPA likely doesn't apply, or it applies but no children's data is mapped yet. Either way no percentage and no grade.
+  const outside = ap.lvl === "watch", none = !s.total || outside;
+  const record = {t:"Keep a dated record", sub:"Save this result so you can show when you looked and what you answered."};
+  const sentence = outside ? "COPPA doesn't apply to you on these answers." : !s.total ? "COPPA applies to you, but there is nothing to check yet." : `${esc(ap.h)}. ${s.pct}% ready${s.crit ? `, with ${s.crit} critical gap${s.crit === 1 ? "" : "s"}` : ", no critical gaps"}.`;
+  const actions = outside ? [{t:"Know what would change that", sub:"Recheck if you start aiming at children, learn that a user is under 13, or add features children are drawn to."}, record]
+    : !s.total ? [{t:"Map the children's data you collect", sub:"Mark each kind of personal information you collect from children, and the requirements that follow will appear here."}, record]
+    : s.gaps.slice(0, 3).map(r => ({t:r.t, sub:r.fix}));
+  const bench = none ? null : cpBenchPct();
   return `<div class="pol-report cp-report">
     ${cp.shared ? shareBannerHTML('data-cp="unshare"') : ""}
     ${cp.ex ? `<div class="banner"><span><strong>This is an example:</strong> Brightbeam, a learning app for young children, partway to compliance. Start over to check your own service.</span><button type="button" class="btn sm" data-cp="reset">Start over</button></div>` : ""}
-    <div class="card pol-sum tr-sum"><div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>
-      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
+    <div class="card pol-sum tr-sum">${none ? "" : `<div class="tr-ring cp-ring ${tone}"><b>${s.pct}%</b><span>ready</span></div>`}
+      <div><span class="eyebrow">${esc(cpLabel(CP_AUD, cp.aud))}</span><div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${sentence}</h2>${none ? "" : gradeBadge(s.pct, "Share of applicable COPPA requirements in place")}</div><p class="note">${esc(ap.t)}</p>
       ${bench !== null && !cp.ex ? `<p class="bench-line">Typical for a children's product like the built-in example: ${bench}% ready</p>` : ""}
-        <div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>
+        ${none ? "" : `<div class="cp-kpis"><span class="pill ${s.crit ? "crit" : "good"}">${s.crit} critical gap${s.crit === 1 ? "" : "s"}</span><span class="pill">${s.met} of ${s.total} requirements in place</span><span class="pill">${x.rows.length} kind${x.rows.length === 1 ? "" : "s"} of children's data</span>${x.disclose ? `<span class="pill high">Shared with third parties</span>` : ""}</div>`}
         <span class="toast" id="cp-toast" role="status" aria-live="polite"></span></div></div>
     ${actions.length ? `<ol class="pk-list gd-vacts">${actions.map(a => `<li><b>${esc(a.t)}.</b> ${esc(a.sub)}</li>`).join("")}</ol>` : ""}
     ${chapterLinkHTML("coppa")}
@@ -18935,7 +18977,7 @@ function cpReportHTML(x, ap, s){
   </div>`;
 }
 function cpPlanHTML(x, s){
-  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Everything that applies to your answers is in place." : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : "Mark the children's data you collect to see what applies."}</p></div>`;
+  if(!s.gaps.length) return `<div class="card ma-none">${emptyMark(s.total ? "check" : "inbox")}<b>${s.total ? "Everything that applies to your answers is in place." : cp.aud ? (cpApplies(cp).lvl === "watch" ? "Nothing applies to your answers." : "No requirements to check yet.") : "Nothing applies to your answers yet."}</b><p class="note">${s.total ? "Recheck whenever you add a feature, a kind of data or a new partner. The drafts are ready if you need them." : cp.aud ? esc(cpApplies(cp).t) : "Mark the children's data you collect to see what applies."}</p></div>`;
   return `<div class="pol-sec-h"><p class="note">Most urgent first. Each gap names the part of the Rule, who usually owns it and what to do.</p></div>
     <div class="cp-gaps">${s.gaps.map((r, i) => `<article class="cp-gap"><span class="cv-gn mono">${i + 1}</span><div class="cp-gb">
       <span class="eyebrow">${esc((CP_CTRL.find(g => g.k === r.g) || {n:""}).n)}</span><h4>${esc(r.t)} ${pill(CP_SEVN[r.sev][1], CP_SEVN[r.sev][0])}${r.isNew ? `<span class="cp-new">New in 2025</span>` : ""}</h4>
@@ -18977,8 +19019,8 @@ function cpAct(a){
   switch(a){
     case "example": cp = Object.assign(CP_BLANK(), JSON.parse(JSON.stringify(CP_EXAMPLE))); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Example loaded: Brightbeam, a learning app for young children");
     case "frompm": { const src = loopSource(); if(!src) return; cp = Object.assign(CP_BLANK(), cpFromPM(src)); gdReset("coppa"); cpView = "page"; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
-    case "reset": { const snap = JSON.parse(JSON.stringify(cp)); cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cp = s2; cpSave(); renderCoppa(); }); return focusQuiet(document.querySelector("#view h1")); }
-    case "sharelink": return shareCopy("coppa", cp, {svc:cp.svc, aud:cp.aud, pct:s.pct, crit:s.crit}, $("#cp-toast"));
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(cp)), v:cpView, g:gdSnap("coppa")}; cp = CP_BLANK(); gdReset("coppa"); cpView = null; store.set("ws:cur:coppa", null); cpSave(); renderCoppa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cp = s2.d; cpView = s2.v; gdRestore("coppa", s2.g); cpSave(); renderCoppa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": { const s = cpScore(cp, cpCtx(cp), cpApplies(cp)); return shareCopy("coppa", cp, {svc:cp.svc, aud:cp.aud, pct:s.pct, crit:s.crit}, $("#cp-toast")); }
     case "unshare": cp.shared = false; cpSave(); return cpAct("save");
     case "build": cp.view = "report"; cp.tab = "plan"; cpSave(); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": cpView = null; gdReset("coppa"); renderCoppa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -19391,7 +19433,9 @@ function renderDsa(){
   view.innerHTML = (report
     ? headCompact("DSA readiness", `${esc(ds.svc || "Your service")} · ${esc(ap.h)}`,
         reportHeaderActions({
+          example:ds.ex ? null : {attrs:'data-ds="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-ds="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-ds="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-ds="save"', label:wsSaveLabel("dsa", ds), icon:"save"},
           download:{attrs:'data-ds="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-ds="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -19482,8 +19526,8 @@ function dsAct(a){
   switch(a){
     case "example": ds = Object.assign(DS_BLANK(), JSON.parse(JSON.stringify(DS_EXAMPLE))); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, a social video platform with EU users");
     case "fromorg": ds = Object.assign(DS_BLANK(), dsFromOrg()); gdReset("dsa"); dsView = "page"; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); return gsay("Filled in from your profile. Check each answer");
-    case "reset": { const snap = JSON.parse(JSON.stringify(ds)); ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ds = s2; dsSave(); renderDsa(); }); return focusQuiet(document.querySelector("#view h1")); }
-    case "sharelink": return shareCopy("dsa", ds, {svc:ds.svc, tier:ds.tier, pct:s.pct, crit:s.crit}, $("#ds-toast"));
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(ds)), v:dsView, g:gdSnap("dsa")}; ds = DS_BLANK(); gdReset("dsa"); dsView = null; store.set("ws:cur:dsa", null); dsSave(); renderDsa(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { ds = s2.d; dsView = s2.v; gdRestore("dsa", s2.g); dsSave(); renderDsa(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "sharelink": { const s = dsScore(ds, dsCtx(ds)); return shareCopy("dsa", ds, {svc:ds.svc, tier:ds.tier, pct:s.pct, crit:s.crit}, $("#ds-toast")); }
     case "unshare": ds.shared = false; dsSave(); return dsAct("save");
     case "build": ds.view = "report"; ds.tab = "plan"; dsSave(); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
     case "guide": dsView = null; gdReset("dsa"); renderDsa(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -20820,7 +20864,9 @@ function renderGrooming(){
   view.innerHTML = (report
     ? headCompact("Grooming pathway review", `${esc(gp.svc || "Your product")} · ${esc(s.h)}`,
         reportHeaderActions({
+          example:gp.ex ? null : {attrs:'data-gp="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-gp="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-gp="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-gp="save"', label:wsSaveLabel("grooming", gp), icon:"save"},
           download:{attrs:'data-gp="brief"', label:"Product brief", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-gp="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -20959,7 +21005,7 @@ function gpAct(a){
     case "example": gp = Object.assign(GP_BLANK(), JSON.parse(JSON.stringify(GP_EXAMPLE))); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, a photo and short-video app for teens and young adults");
     case "frompm": { const src = loopSource(); if(!src) return; gp = Object.assign(GP_BLANK(), gpFromPM(src)); gdReset("grooming"); gpView = "page"; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
     case "fromorg": { const o = orgGet(); gp = Object.assign(GP_BLANK(), {youth:o.youth, age:o.youth === "adult_verified" ? "verified" : ""}); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); gdGo(gdCur, "start"); return gsay("Audience filled in from your workspace profile"); }
-    case "reset": { const snap = JSON.parse(JSON.stringify(gp)); gp = GP_BLANK(); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { gp = s2; gpSave(); renderGrooming(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(gp)), v:gpView, g:gdSnap("grooming")}; gp = GP_BLANK(); gdReset("grooming"); gpView = null; store.set("ws:cur:grooming", null); gpSave(); renderGrooming(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { gp = s2.d; gpView = s2.v; gdRestore("grooming", s2.g); gpSave(); renderGrooming(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "sharelink": { const s = gpScore(gp, gpCtx(gp)); return shareCopy("grooming", gp, {svc:gp.svc, youth:gp.youth, pct:s.pct, crit:s.crit}, $("#gp-toast")); }
     case "unshare": gp.shared = false; gpSave(); return gpAct("save");
     case "build": gp.view = "report"; gp.tab = "plan"; gp.at = Date.now(); gpSave(); renderGrooming(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -21395,7 +21441,9 @@ function renderReporting(){
   view.innerHTML = (report
     ? headCompact("Child-safety reporting", `${esc(cr.svc || "Your service")} · ${esc(ap.h)}`,
         reportHeaderActions({
+          example:cr.ex ? null : {attrs:'data-cr="example"', label:SEE_EXAMPLE_LABEL},
           edit:{attrs:'data-cr="edit"', label:EDIT_ANSWERS_LABEL},
+          reset:{attrs:'data-cr="reset"', label:START_OVER_LABEL},
           save:{attrs:'data-cr="save"', label:wsSaveLabel("reporting", cr), icon:"save"},
           download:{attrs:'data-cr="memo"', label:"Memo for Legal", icon:"download"},
           tracker:s.gaps.length ? {attrs:'data-cr="tasks"', label:SEND_TRACKER_LABEL, icon:"send"} : null
@@ -21492,7 +21540,7 @@ function crAct(a){
     case "example": cr = Object.assign(CR_BLANK(), JSON.parse(JSON.stringify(CR_EXAMPLE))); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); return gsay("Example loaded: Pixelry, with US, UK and EU users");
     case "frompm": { const src = loopSource(); if(!src) return; cr = Object.assign(CR_BLANK(), crFromPM(src)); gdReset("reporting"); crView = "page"; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); return gsay("Filled in from " + src.name + ". Check each answer"); }
     case "fromorg": cr = Object.assign(CR_BLANK(), crFromOrg()); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); gdGo(gdCur, "start"); return gsay("Markets filled in from your workspace profile");
-    case "reset": { const snap = JSON.parse(JSON.stringify(cr)); cr = CR_BLANK(); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cr = s2; crSave(); renderReporting(); }); return focusQuiet(document.querySelector("#view h1")); }
+    case "reset": { const snap = {d:JSON.parse(JSON.stringify(cr)), v:crView, g:gdSnap("reporting")}; cr = CR_BLANK(); gdReset("reporting"); crView = null; store.set("ws:cur:reporting", null); crSave(); renderReporting(); window.scrollTo(0, 0); withUndo("Cleared", snap, s2 => { cr = s2.d; crView = s2.v; gdRestore("reporting", s2.g); crSave(); renderReporting(); }); return focusQuiet(document.querySelector("#view h1")); }
     case "sharelink": { const s = crScore(cr, crCtx(cr)); return shareCopy("reporting", cr, {svc:cr.svc, regions:cr.regions, pct:s.pct, crit:s.crit}, $("#cr-toast")); }
     case "unshare": cr.shared = false; crSave(); return crAct("save");
     case "build": cr.view = "report"; cr.tab = "plan"; crSave(); renderReporting(); window.scrollTo(0, 0); return focusQuiet(document.querySelector("#view h1"));
@@ -23230,7 +23278,8 @@ function route(){
   if(shareHit && PATHMODE) SHARE_STASH = null;
   if(shareHit && typeof SHARE_APPLY !== "undefined" && SHARE_APPLY[shareHit.route]){
     shareDecode(shareHit.s).catch(() => null).then(data => {
-      if(data) SHARE_APPLY[shareHit.route](data);
+      // Someone opening a shared result wants the result, not the tool's purpose card
+      if(data){ SHARE_APPLY[shareHit.route](data); if(typeof introMark === "function") introMark(shareHit.route); }
       if(!PATHMODE) history.replaceState(null, "", location.pathname + "#" + shareHit.route);
       route();
     });

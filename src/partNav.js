@@ -141,7 +141,7 @@ function shellUpdate(name){
 /* ---------- command palette ---------- */
 function cmdkItems(){
   const out = [];
-  const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", color, tone:TOOL_TONE[route] || "neutral", icon:iconId, run:()=>goRoute(route)});
+  const go = (label, route, color, iconId) => out.push({g:"Go to", label, sub:"", keys:route, color, tone:TOOL_TONE[route] || "neutral", icon:iconId, run:()=>goRoute(route)});
   go("Your assessment","overview","var(--faint)","home"); go("All tools","tools","var(--faint)","layers"); go("Your plan","plan","var(--accent)","send"); go("Quarter by quarter","review","var(--faint)","chart"); go("My workspace","workspace","var(--faint)","user");
   go("Abuse pre-mortem","premortem","var(--t-pm)","radar"); go("Incident tabletop","tabletop","var(--t-tt)","siren"); go("Incident post-mortem","postmortem","var(--t-tt)","doc");
   go("Metrics framework","metrics","var(--t-mx)","gauge"); go("Vendor scorecard","vendors","var(--t-vd)","scale"); go("Program maturity","maturity","var(--t-ma)","steps"); go("Coverage radar","coverage","var(--t-cv)","cover");
@@ -188,7 +188,9 @@ function cmdkHbLoad(){
 let cmdk = {items:[], shown:[], sel:0, prevFocus:null};
 function cmdkDraw(){
   const q = $("#cmdk-q").value.trim().toLowerCase();
-  cmdk.shown = cmdk.items.filter(x => !q || (x.label+" "+x.sub+" "+x.g).toLowerCase().includes(q)).slice(0, 60);
+  // Matches the label, the group, the route name ("premortem") and a copy with hyphens taken out, so "premortem" finds "Abuse pre-mortem"
+  const hay = x => { const s = (x.label+" "+x.sub+" "+x.g+" "+(x.keys || "")).toLowerCase(); return s + " " + s.replace(/-/g, ""); };
+  cmdk.shown = cmdk.items.filter(x => !q || hay(x).includes(q)).slice(0, 60);
   cmdk.sel = Math.min(cmdk.sel, Math.max(0, cmdk.shown.length-1));
   let g = "", h = "";
   cmdk.shown.forEach((x,i) => { if(x.g!==g){ g = x.g; h += `<li class="grp" role="presentation">${esc(g)}</li>`; }
