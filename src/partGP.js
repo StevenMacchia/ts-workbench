@@ -269,7 +269,7 @@ let gp = Object.assign(GP_BLANK(), store.get("gp", null) || {});
 const gpSave = () => store.set("gp", gp);
 const gpTitle = d => "Grooming pathway: " + (d.svc || "Untitled product");
 let gpView = null;
-shareRegister("grooming", d => { gp = Object.assign(GP_BLANK(), d, {shared:true}); gpView = null; gpSave(); });
+shareRegister("grooming", d => { gp = Object.assign(GP_BLANK(), d, {shared:true}); gpView = null; gpSave(); }, GP_BLANK);
 
 /* ---------- working it out ---------- */
 function gpCtx(d){

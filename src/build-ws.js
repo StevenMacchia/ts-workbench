@@ -260,6 +260,29 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
   console.log("v9 assembled");
 }
 
+// Content-Security-Policy for the public pages, as a meta tag (GitHub Pages can't send headers). Scripts run only
+// from this site, the analytics beacon, jsDelivr (the two pinned in-browser AI libraries) and inline scripts whose
+// exact text is hashed here at build time, so markup that ever slips into the page can't run code: no inline
+// handlers (onclick=, onerror=), no javascript: links. Frames are off, which also keeps a srcdoc frame from loading
+// a jsDelivr script. Styles stay 'unsafe-inline' because the app sets style="" attributes. Adding an inline script
+// is automatic (it gets hashed); adding an outside address means adding it here. test-seo.js checks the policy.
+const crypto = require("crypto");
+const cspHashes = html => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  .filter(m => !/\bsrc\s*=/i.test(m[1]) && !/type\s*=\s*["']?application\/(ld\+)?json/i.test(m[1]))
+  .map(m => "'sha256-" + crypto.createHash("sha256").update(m[2], "utf8").digest("base64") + "'");
+const cspMeta = hashes => '<meta http-equiv="Content-Security-Policy" content="' + [
+  "default-src 'self'",
+  "script-src 'self' " + [...new Set(hashes)].join(" ") + " https://static.cloudflareinsights.com https://cdn.jsdelivr.net 'wasm-unsafe-eval'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob:",
+  "media-src 'self' data: blob:",
+  // the handbook's search index, Cloudflare's visit counts, and the AI libraries' own files and the models they download
+  "connect-src 'self' https://stevenmacchia.com https://cloudflareinsights.com https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co https://raw.githubusercontent.com",
+  "worker-src 'self' blob:",
+  "frame-src 'none'", "object-src 'none'", "base-uri 'none'", "form-action 'none'"
+].join("; ") + '">';
+
 // Standalone copy for GitHub Pages: a full document with mobile, preview and icon tags
 {
   const v9 = CORE9;
@@ -271,7 +294,7 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
   // Cookie-free visit counts on the public website only (the Claude version never loads it)
   const cfa = fs.existsSync(path.join(D, "analytics-token.txt")) ? fs.readFileSync(path.join(D, "analytics-token.txt"), "utf8").trim() : "";
   const headTags = [
-    '<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">',
+    '<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">', '__CSP__',
     '<meta name="viewport" content="width=device-width,initial-scale=1">',
     '<title>' + title + '</title>',
     '<meta name="description" content="' + desc + '">',
@@ -293,7 +316,8 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
   // The copy hosted inside Claude keeps the placeholder and stays hash-routed.
   const appBase = site ? new URL(site).pathname.replace(/\/?$/, "/") : "";
   const body = v9.replace(/^<title>[^<]*<\/title>\s*/, "").replace('const APP_BASE = "__APP_BASE__";', () => 'const APP_BASE = "' + appBase + '";');
-  const out = headTags + "\n" + body + "\n</html>\n";
+  const appHashes = cspHashes(body);
+  const out = headTags.replace("__CSP__", () => cspMeta(appHashes)) + "\n" + body + "\n</html>\n";
   const dir = path.join(D, "..", "docs");
   if(!fs.existsSync(dir)) fs.mkdirSync(dir);
   fs.writeFileSync(path.join(dir, "index.html"), out);
@@ -327,13 +351,13 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
       const i = aiSrc.indexOf("AI_TOOLS." + k + " = {"), m = /desc:"([^"]*)"/.exec(aiSrc.slice(i)); return m ? m[1] : ""; };
     const siteDesc = desc.replace(/&amp;/g, "&");
     const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-    const fontTags = out.split("\n").filter(l => /fonts\.(googleapis|gstatic)\.com/.test(l)).join("\n");
+    const fontTags = out.split("\n").filter(l => /^<link\b[^>]*fonts\.(googleapis|gstatic)\.com/.test(l.trim())).join("\n");
     const stale = new Set(fs.readdirSync(dir).filter(n => n.endsWith(".html") && !["index.html", "404.html"].includes(n)));
     let routeBytes = 0, routeFiles = 0;
     Object.keys(labels).filter(k => !skip.includes(k)).forEach(k => {
       const t = labels[k] + " · T&S Workbench", d = rdesc[k] || aiDesc(k) || siteDesc, u = site + "/" + k, ti = esc(t), de = esc(d);
       const page = [
-        '<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">',
+        '<!doctype html>', '<html lang="en">', '<head>', '<meta charset="utf-8">', '__CSP__',
         '<meta name="viewport" content="width=device-width,initial-scale=1">',
         '<title>' + ti + '</title>',
         '<meta name="description" content="' + de + '">',
@@ -353,7 +377,9 @@ fs.writeFileSync(path.join(D, "ts-workbench-v9.html"), css9 + "</style>\n" + bod
         '<noscript><h1>' + esc(labels[k]) + '</h1><p>' + de + '</p><p><a href="./#' + k + '">Open ' + esc(labels[k]) + ' in the T&amp;S Workbench</a></p></noscript>',
         '</body>', '</html>', ''
       ].join("\n");
-      fs.writeFileSync(path.join(dir, k + ".html"), page); stale.delete(k + ".html"); routeFiles++; routeBytes += Buffer.byteLength(page);
+      // the stub's own two scripts plus the app's, so the same policy holds before and after the stub writes the app in
+      const pageOut = page.replace("__CSP__", () => cspMeta(cspHashes(page).concat(appHashes)));
+      fs.writeFileSync(path.join(dir, k + ".html"), pageOut); stale.delete(k + ".html"); routeFiles++; routeBytes += Buffer.byteLength(pageOut);
     });
     stale.forEach(n => fs.unlinkSync(path.join(dir, n)));
     console.log("route pages written: " + routeFiles + " files, " + (routeBytes / 1024).toFixed(0) + " KB");

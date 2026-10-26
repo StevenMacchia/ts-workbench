@@ -369,7 +369,7 @@ function renderAI(key){
     <p class="mxa-q ai-q">${esc(T.q)}</p>
     <div class="mxm-how ai-how"><ol class="mxm-how-s">${T.steps.map((s, j) => `<li><b>${j + 1}</b><span><em>${s[0]}.</em> ${s[1]}</span></li>`).join("")}</ol></div>
     <div class="ai-grid">
-      <form class="card ai-form" id="ai-form" onsubmit="return false">
+      <form class="card ai-form" id="ai-form">
         ${st.r || run.busy ? "" : `<div class="banner cvt-b"><span><strong>Prefer one question at a time?</strong> The guided version asks the same things, one per screen.</span><button type="button" class="btn sm" id="ai-guide">Switch to guided</button></div>`}
         <div class="ai-fields">${T.fields.map(fd => aiField(T, fd, f[fd.k])).join("")}</div>
         ${fill ? `<span class="ai-fill-wrap"><button type="button" class="mx-link ai-fill" id="ai-fill" aria-describedby="ai-fill-prev">Use the numbers from my Metrics scorecard</button><span class="ai-fill-prev" id="ai-fill-prev" role="tooltip">${esc(fillPreview)}</span></span>` : ""}
@@ -405,6 +405,7 @@ function renderAI(key){
   const gb = $("#ai-guide"); if(gb) gb.onclick = () => { persist(); aiView[key] = null; renderAI(key); window.scrollTo(0, 0); };
   view.querySelectorAll("[data-aidepth]").forEach(b => b.onclick = () => { const s = aiGet(key); s.f = aiRead(T); s.depth = b.dataset.aidepth; aiPut(key, s); renderAI(key); });
   const fb = $("#ai-fill"); if(fb) fb.onclick = () => { const el = view.querySelector('[data-fk="data"]'); if(el){ el.value = aiScoreFill(); persist(); el.focus(); } };
+  const af = document.getElementById("ai-form"); if(af) af.onsubmit = e => { e.preventDefault(); return false; };
   const stop = $("#ai-stop"); if(stop) stop.onclick = () => { if(run.ctl) run.ctl.abort(); };
   const rb = $("#ai-run"); if(rb) rb.onclick = () => aiRun(key);
   const tb = $("#ai-tmpl"); if(tb) tb.onclick = () => { if(document.getElementById("ai-form")) persist(); const s = aiGet(key); s.tmplText = T.tmpl(s.f); aiPut(key, s); renderAI(key); setTimeout(() => { const ta = $("#ai-tmpl-ta"); if(ta && ta.scrollIntoView) ta.scrollIntoView({behavior:"smooth", block:"nearest"}); }, 30); };

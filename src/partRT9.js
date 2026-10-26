@@ -9,7 +9,9 @@
    No attack strings here either: the model is a generic in-character assistant, not a scripted target.
    ========================================================= */
 // Loaded only after the learner clicks "Download and start". Pinned so the behaviour doesn't drift under us.
-const RT_SB_LIB = "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm/+esm";
+// Pinned: the version that was current when the sandbox was checked (0.2.85, published 2026-09-08). An unpinned URL
+// would run whatever is published next, on this origin.
+const RT_SB_LIB = "https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.85/+esm";
 // Verified at build time, 2026-10-07, against mlc-ai/web-llm (main, src/config.ts, prebuiltAppConfig):
 // "Llama-3.2-1B-Instruct-q4f16_1-MLC" — about 1B parameters, q4f16 quantization, vram_required_MB 879.04,
 // low_resource_required true. The smallest instruction-tuned Llama build WebLLM ships; chosen over the even

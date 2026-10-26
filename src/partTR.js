@@ -78,7 +78,7 @@ const trSave = () => store.set("tr", tr);
 function trBenchPct(){
   const saved = tr; try{ tr = Object.assign(TR_BLANK(), TR_EXAMPLE); return trProgress().pct; }catch(e){ return null; }finally{ tr = saved; }
 }
-shareRegister("transparency", d => { tr = Object.assign(TR_BLANK(), d, {shared:true}); trView = "page"; trSave(); });
+shareRegister("transparency", d => { if(trRank(d.tier) < 0) delete d.tier; tr = Object.assign(TR_BLANK(), d, {shared:true}); trView = "page"; trSave(); }, TR_BLANK);
 const trSections = () => TR_SECTIONS.filter(s => trRank(s.tier) <= trRank(tr.tier));
 const trHas = f => { const v = tr.v[f[0]]; return f[2] === "chk" ? !!v : f[2] === "txt" ? !!(v && String(v).trim()) : v !== undefined && v !== null && v !== "" && !isNaN(+v); };
 function trProgress(){ const fs = trSections().flatMap(s => s.f); const got = fs.filter(trHas).length; return {got, total:fs.length, pct:fs.length ? Math.round(got / fs.length * 100) : 0, missing:trSections().filter(s => s.f.some(f => !trHas(f)))}; }

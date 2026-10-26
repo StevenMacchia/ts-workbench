@@ -183,7 +183,7 @@ function polReportHTML(ai){
       ${polRing(score, 96)}
       <div><span class="eyebrow">${r ? "Claude's clarity score" : "Instant clarity score"}</span>
         <div class="verdict-row" aria-live="polite"><h2 class="pol-verdict">${r ? esc(r.summary) : h.score>=75 ? "Reasonably clear, with a few gaps" : h.score>=50 ? "Workable, but reviewers will disagree on some cases" : "Too vague to enforce consistently"}</h2>${gradeBadge(score, r ? "Claude's clarity score out of 100" : "Instant heuristic clarity score out of 100")}</div>
-        <p class="note">${h.words} words · instant score ${h.score}/100 on ${h.findings.length} checks${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
+        <p class="note">${+h.words || 0} words · instant score ${+h.score || 0}/100 on ${h.findings.length} checks${r ? ` · Claude ${r.score}/100${pol.depth==="deep"?" · deep review":""}` : ""}</p>
         ${bench ? `<p class="bench-line">Typical range among the built-in example rules: ${bench.min}–${bench.max}</p>` : ""}
         ${r && r.strengths.length ? `<div class="pol-strengths">${r.strengths.map(s=>`<span><svg><use href="#i-check"/></svg>${esc(s)}</span>`).join("")}</div>` : ""}
         <span class="toast" id="pol-toast" role="status" aria-live="polite"></span>
@@ -210,7 +210,7 @@ function polReportHTML(ai){
 }
 function polTabHTML(tab){
   const h = pol.heur, r = pol.result;
-  if(tab === "checks") return `<p class="note pol-find-legend"><span class="pol-find-lg ok">✓ Good</span><span class="pol-find-lg info">i Note</span><span class="pol-find-lg warn">! Issue</span></p><ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${lv}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span><div>${esc(t)}</div></li>`).join("")}</ul>`;
+  if(tab === "checks") return `<p class="note pol-find-legend"><span class="pol-find-lg ok">✓ Good</span><span class="pol-find-lg info">i Note</span><span class="pol-find-lg warn">! Issue</span></p><ul class="pol-find">${h.findings.map(([lv,t])=>`<li class="${esc(lv)}"><span>${lv==="ok"?"✓":lv==="info"?"i":"!"}</span><div>${esc(t)}</div></li>`).join("")}</ul>`;
   if(tab === "cases"){
     const counts = {all:r.edge_cases.length, allow:0, remove:0, escalate:0}; r.edge_cases.forEach(c => counts[c.decision]++);
     const cases = r.edge_cases.filter(c => pol.filter === "all" || c.decision === pol.filter);

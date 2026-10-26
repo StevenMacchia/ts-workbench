@@ -70,7 +70,7 @@ function pmBench(p){
     const who = pr.youth==="teens" ? "teen " : pr.youth==="kids" ? "kids' " : "";
     return {band:assess(Object.assign(blankPM(), JSON.parse(JSON.stringify(pr)))).posture[0], label:`${BENCH_STAGE[pr.scale]} ${who}${BENCH_NOUN[p.type]}`};
   }catch(e){ return null; }
-}shareRegister("premortem", d => { pm = Object.assign(blankPM(), d, {shared:true, stage:"report"}); savePM(); });
+}shareRegister("premortem", d => { ["id", "projectId", "created", "updated"].forEach(k => delete d[k]); pm = Object.assign(blankPM(), d, {shared:true, saved:false, stage:"report"}); savePM(); }, blankPM);
 const savePM = () => { if(pm.saved){ pm.updated = Date.now(); const lib = libLoad(); lib[pm.id] = recordOf(pm); libSave(lib); } store.set("pm3", pm); };
 const visibleQs = () => QS.filter(q => !(q.skip && q.skip(pm)));
 const applySkips = () => QS.forEach(q => { if(q.skip && q.skip(pm)) pm[q.k] = q.skipVal; });

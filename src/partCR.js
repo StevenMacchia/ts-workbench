@@ -208,7 +208,7 @@ let cr = Object.assign(CR_BLANK(), store.get("cr", null) || {});
 const crSave = () => store.set("cr", cr);
 const crTitle = d => "Child-safety reporting: " + (d.svc || "Untitled service");
 let crView = null;
-shareRegister("reporting", d => { cr = Object.assign(CR_BLANK(), d, {shared:true}); crView = null; crSave(); });
+shareRegister("reporting", d => { cr = Object.assign(CR_BLANK(), d, {shared:true}); crView = null; crSave(); }, CR_BLANK);
 
 /* ---------- working it out ---------- */
 function crCtx(d){

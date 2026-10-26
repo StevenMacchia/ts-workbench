@@ -660,7 +660,7 @@ function pxClean(d){
 shareRegister("postmortem", d => {
   if(typeof d === "string"){ px = Object.assign(PX_BLANK(), {name:d.replace(/^Post-mortem: /, "").slice(0, 80), shared:true}); pxSave(); return; }
   px = Object.assign(pxClean(d || {}), {view:"report", shared:true}); pxSave();
-});
+}, PX_BLANK);
 function pxCurStep(){ if(!gdCur || gdCur.k !== "postmortem") return null; const p = gdPos("postmortem"); return gdLive(gdCur)[p.i] || null; }
 // After a typed change inside a custom step: keep Continue and the gaps card honest without redrawing (a redraw would drop the cursor)
 function pxLive(){

@@ -422,9 +422,47 @@ function shareCopy(route, state, summary, toastEl){
     }catch(e){ say("Copy was blocked in this view"); }
   }).catch(() => flashIn(toastEl, "Could not build a link in this view"));
 }
-// Each report tool registers how to apply shared data into its own state.
+// A shared link is written by whoever sent it, so its data is cleaned before a tool sees it: plain JSON values only,
+// no prototype keys, sizes capped, and a top-level field whose type differs from the tool's blank state is dropped
+// (the blank's own value stays). A string (the summary a too-big link falls back to) is capped; anything else is null.
+function shareClean(d, blank){
+  if(typeof d === "string") return d.slice(0, 2000);
+  if(!d || typeof d !== "object" || Array.isArray(d)) return null;
+  let budget = 50000;
+  const kind = v => v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
+  const clean = (v, depth) => {
+    if(--budget < 0 || depth > 12) return null;
+    const t = kind(v);
+    if(t === "null" || t === "boolean") return v;
+    if(t === "number") return isFinite(v) ? v : null;
+    if(t === "string") return v.length > 20000 ? v.slice(0, 20000) : v;
+    if(t === "array") return v.slice(0, 2000).map(x => clean(x, depth + 1));
+    if(t !== "object") return null;
+    const o = {};
+    Object.keys(v).slice(0, 2000).forEach(k => {
+      if(k === "__proto__" || k === "constructor" || k === "prototype" || k.length > 200) return;
+      o[k] = clean(v[k], depth + 1);
+    });
+    return o;
+  };
+  const out = clean(d, 0);
+  delete out.shared;
+  if(blank) Object.keys(out).forEach(k => {
+    const b = blank[k];
+    if(b !== null && b !== undefined && kind(b) !== kind(out[k])) delete out[k];
+  });
+  return out;
+}
+// Each report tool registers how to apply shared data into its own state, and (optionally) its blank state, which
+// shareClean checks the top-level types against.
 const SHARE_APPLY = {};
-function shareRegister(route, apply){ SHARE_APPLY[route] = apply; }
+function shareRegister(route, apply, blank){
+  SHARE_APPLY[route] = d => { const c = shareClean(d, typeof blank === "function" ? blank() : blank); if(c) apply(c); };
+}
+// A shared result stays in memory until the visitor presses "Save a copy": state that still carries shared:true is
+// never written, so opening a link can't replace the visitor's own saved answers. Save a copy sets shared to false
+// and saves as usual.
+{ const set0 = store.set; store.set = function(k, v){ if(v && typeof v === "object" && v.shared === true) return; return set0.call(this, k, v); }; }
 // The "?s=" part of a shared link, read off the hash (or, in path mode, the payload canonNow set aside) so the router can strip it before normal routing.
 function shareParseHash(){
   if(PATHMODE) return SHARE_STASH;
