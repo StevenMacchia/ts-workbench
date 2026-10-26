@@ -14,7 +14,12 @@ const maArea = k => MA_AREAS.find(a => a.k === k);
 const maDate = t => new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric", year:"numeric"});
 // The built-in example's own level, for a benchmark line under the verdict
 function maBenchScore(){ try{ return maScore(MA_EXAMPLE); }catch(e){ return null; } }
-shareRegister("maturity", d => { ma = maInit(Object.assign({stage:"growth", lv:{}, done:{}, ex:false, open:null}, d, {shared:true})); maG = null; maView = "page"; maSave(); });
+const maLevels = o => { const r = {}; MA_AREAS.forEach(a => { const n = Math.round(+(o || {})[a.k]); if(n >= 0 && n <= 5) r[a.k] = n; }); return r; };
+shareRegister("maturity", d => {
+  if(d.lv) d.lv = maLevels(d.lv);
+  if(Array.isArray(d.hist)) d.hist = d.hist.filter(h => h && typeof h === "object" && isFinite(+h.t)).slice(0, 40).map(h => ({t:+h.t, stage:MA_STAGES.some(s => s.k === h.stage) ? h.stage : "growth", lv:maLevels(h.lv)}));
+  ma = maInit(Object.assign({stage:"growth", lv:{}, done:{}, ex:false, open:null}, d, {shared:true})); maG = null; maView = "page"; maSave();
+}, () => ({stage:"growth", lv:{}, done:{}, own:{}, notes:{}, hist:[], ex:false}));
 // The example opens as a plan in progress: a few steps done, owners and last quarter's snapshot
 function maExample(){
   const d = maInit(JSON.parse(JSON.stringify(MA_EXAMPLE))), day = 864e5;
@@ -239,8 +244,8 @@ function maProgressTabHTML(){
       ${last ? `<p class="ma-moved">${moved.length ? `Since ${esc(maDate(last.t))}: ${moved.map(x => `<span class="${x.d > 0 ? "up" : "dn"}">${esc(x.a.s)} ${x.d > 0 ? "+" : ""}${x.d}</span>`).join("")}` : `No change since ${esc(maDate(last.t))}.`}</p>` : ""}</div>
     ${hist.length ? `<div class="card ma-snaps"><h4>Snapshots</h4>${hist.slice().reverse().map(h => { const s = maScore({lv:h.lv, stage:h.stage, done:{}});
       return `<div class="ma-snap"><span class="ma-snap-d">${esc(maDate(h.t))}</span><b class="mono">${s.toFixed(1)}</b>
-        <span class="ma-snap-c" aria-hidden="true">${MA_AREAS.map(a => `<i title="${esc(a.n)}: ${h.lv[a.k] || 0}" style="height:${(h.lv[a.k] || 0) * 20}%"></i>`).join("")}</span>
-        <button type="button" class="btn sm icon" data-masnapdel="${h.t}" aria-label="Delete snapshot from ${esc(maDate(h.t))}" title="Delete"><svg><use href="#i-trash"/></svg></button></div>`; }).join("")}</div>` : ""}
+        <span class="ma-snap-c" aria-hidden="true">${MA_AREAS.map(a => `<i title="${esc(a.n)}: ${+h.lv[a.k] || 0}" style="height:${(h.lv[a.k] || 0) * 20}%"></i>`).join("")}</span>
+        <button type="button" class="btn sm icon" data-masnapdel="${esc(h.t)}" aria-label="Delete snapshot from ${esc(maDate(h.t))}" title="Delete"><svg><use href="#i-trash"/></svg></button></div>`; }).join("")}</div>` : ""}
   </div>`;
 }
 function maPlanHTML(){

@@ -75,6 +75,77 @@ const body = async function(){
     if(bad(h)) throw new Error(route + ": the shared report draws a bad value");
     eq(/You're viewing a shared result/.test(h), true, route + ": the shared report carries the banner");
   }
+  // ---- Hostile links. Anyone can write a ?s= payload by hand, so for every tool this takes the real link's answers and,
+  // one field at a time, swaps the value (string, number, boolean or null) for a piece of markup, or adds a key named
+  // with it. Each version is opened the way a visitor would and drawn on every view the tool can show; the markup
+  // must come out escaped every time. Opening a link must also leave the visitor's own saved answers alone.
+  {
+    const MARK = 'x"\'><i data-xss=1>', hit = h => /<i data-xss/.test(h);
+    const set = (o, p, v) => { let x = o; for(let i = 0; i < p.length - 1; i++) x = x[p[i]]; x[p[p.length - 1]] = v; };
+    const get = (o, p) => p.reduce((x, k) => x[k], o);
+    const views = {
+      coverage:[() => { cvTab = "answers"; }, () => { cvTab = "source"; }],
+      maturity:["roadmap", "areas", "progress"].map(t => () => { maView = null; maG = null; ma.tab = t; }),
+      policy:["checks", "cases", "wording", "rewrite", "team", "laws"].map(t => () => { polView = null; pol.rtab = t; }),
+      dsa:[() => { dsView = null; }], coppa:[() => { cpView = null; }], transparency:[() => { trView = null; }],
+      grooming:[() => { gpView = "page"; }], reporting:[() => { crView = "page"; }], postmortem:[() => { pxView = "page"; }],
+      vendors:[() => { vdView = null; }], eval:[() => { evView = null; }]
+    };
+    const found = [], broke = [];
+    let tried = 0, threw = 0;
+    for(const route of registered){
+      const T = cases[route]; store.set("intro:" + route, true); location.hash = "#" + route;
+      T.set(); T.render(); captured.length = 0; if(T.act) T.act(); else press(view.innerHTML);
+      const base = captured[0].state, paths = [];
+      (function walk(v, p){
+        if(v && typeof v === "object"){ Object.keys(v).forEach(k => walk(v[k], p.concat(k))); if(!Array.isArray(v) && p.length) paths.push({key:p}); }
+        else if(p.length) paths.push({leaf:p});
+      })(base, []);
+      for(const P of paths){
+        const d = clone(base);
+        if(P.leaf) set(d, P.leaf, MARK);
+        else { const o = get(d, P.key), k0 = Object.keys(o)[0]; o[MARK] = k0 === undefined ? MARK : clone(o[k0]); }
+        for(const v of [() => {}].concat(views[route] || [])){
+          tried++;
+          let h = "";
+          const where = route + " " + (P.leaf ? P.leaf : P.key.concat("<key>")).join(".");
+          try{ SHARE_APPLY[route](clone(d)); v(); T.render(); h = view.innerHTML; }catch(e){ threw++; broke.push(where + ": " + e.message); }
+          if(hit(h)) found.push(where);
+        }
+      }
+    }
+    const uniq = [...new Set(found)];
+    if(uniq.length) throw new Error("a shared link puts markup into the page at " + uniq.length + " field(s):\n  " + uniq.join("\n  "));
+    if(broke.length) throw new Error("a malformed shared link breaks the page at " + broke.length + " field(s):\n  " + [...new Set(broke)].join("\n  "));
+    out.push("Hostile links: " + tried + " crafted payloads across " + registered.length + " tools, markup escaped and the page drawn every time");
+  }
+  // ---- Opening a link keeps the shared result in memory only: the visitor's own saved answers stay as they were until
+  // they press Save a copy. The write the tool attempts is caught, which also proves the key below is the tool's own.
+  {
+    const KEY = {premortem:"pm3", coverage:"cv", maturity:"ma", vendors:"vx", policy:"pol", eval:"ev", dsa:"ds", coppa:"cp", grooming:"gp", reporting:"cr", postmortem:"px", transparency:"tr"};
+    const tries = [], s1 = store.set; store.set = function(k, v){ tries.push(k + (v && v.shared === true ? ":shared" : "")); return s1.call(this, k, v); };
+    for(const route of registered){
+      const T = cases[route]; location.hash = "#" + route; T.set(); T.render(); captured.length = 0; if(T.act) T.act(); else press(view.innerHTML);
+      const mine = {mine:route}, items = JSON.stringify(store.get("ws:items", null)), lib = JSON.stringify(store.get("lib", null));
+      s1.call(store, KEY[route], mine); tries.length = 0;
+      SHARE_APPLY[route](Object.assign(clone(captured[0].state), {saved:true, id:"victim"})); T.render();
+      eq(tries.includes(KEY[route] + ":shared"), true, route + ": the tool's save of a shared result goes to " + KEY[route] + " and is held back");
+      eq(JSON.stringify(store.get(KEY[route])), JSON.stringify(mine), route + ": opening a link leaves the visitor's own saved answers alone");
+      eq(JSON.stringify(store.get("ws:items", null)), items, route + ": opening a link leaves the visitor's workspace alone");
+      eq(JSON.stringify(store.get("lib", null)), lib, route + ": opening a link leaves the visitor's saved library alone");
+    }
+    store.set = s1;
+    // Save a copy writes it, as the visitor's own
+    SHARE_APPLY.dsa(clone(DS_EXAMPLE)); dsAct("unshare");
+    eq(store.get("ds").shared, false, "dsa: Save a copy saves the shared result as the visitor's own");
+    eq(store.get("ds").tier, DS_EXAMPLE.tier, "dsa: Save a copy keeps the shared answers");
+    // what the cleaning drops: prototype keys, a field of the wrong type, a non-object
+    const c = shareClean(JSON.parse('{"__proto__":{"x":1},"lv":"oops","stage":"growth","shared":false}'), {lv:{}, stage:"seed"});
+    eq(Object.getPrototypeOf(c), Object.prototype, "shareClean drops a __proto__ key"); eq("lv" in c, false, "shareClean drops a field whose type differs from the blank");
+    eq(c.stage, "growth", "shareClean keeps a field of the right type"); eq("shared" in c, false, "shareClean drops the shared flag");
+    eq(shareClean([1, 2]), null, "shareClean refuses a list"); eq(shareClean(7), null, "shareClean refuses a number");
+    out.push("Opening a link: " + registered.length + " tools hold the shared result in memory and leave saved answers, workspace and library alone; Save a copy saves it");
+  }
   // ---- Start over, then Undo: back on the same screen, report or one-page form
   let undo = null; withUndo = (label, snap, restore) => { undo = () => restore(snap); };
   const guided = {

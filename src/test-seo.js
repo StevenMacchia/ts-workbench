@@ -64,7 +64,7 @@ if(site){
     if(r in ROUTE_DESC && d[1] !== esc(ROUTE_DESC[r])) throw new Error(r + ".html: description differs from ROUTE_DESC");
     if(!h.includes("<noscript><h1>" + esc(ROUTE_LABEL[r]) + "</h1>")) throw new Error(r + ".html: no noscript heading");
     if(!h.includes('fetch("index.html"') || !h.includes("document.write(")) throw new Error(r + ".html: loader script missing");
-    if(h.includes("cloudflareinsights")) throw new Error(r + ".html: the beacon belongs to the app, not the stub (a visit would count twice)");
+    if(/<script[^>]*cloudflareinsights/.test(h)) throw new Error(r + ".html: the beacon belongs to the app, not the stub (a visit would count twice)");
     if(Buffer.byteLength(h) > 6000) throw new Error(r + ".html: stub grew past 6 KB, it should stay small");
   });
   console.log("route pages: " + want2.length + " files, each with its own title, description, canonical and og tags");
@@ -133,3 +133,30 @@ eq(fwd(B + "metrics/some-metric", ""), B + "#metrics/some-metric", "sub-route fo
 eq(fwd(B + "nonsense", ""), null, "unknown path stays a 404"); eq(fwd(B + "nonsense/premortem", ""), null, "unknown first segment stays a 404"); eq(fwd("/other/premortem", ""), null, "other site paths are untouched");
 routes.forEach(r => eq(fwd(B + r, ""), B + "#" + r, r + " forwards"));
 console.log("404 page: forwards all " + routes.length + " tool paths, leaves unknown paths alone");
+
+// Content-Security-Policy: the app and every route page carry one; every inline script on the page has its hash in
+// script-src (a new inline script without one would stop running on the live site); no inline-script escape hatch;
+// frames, plugins and <base> off; no inline event handlers left in the page, since the policy blocks them.
+{
+  const crypto = require("crypto");
+  const check = (name, page) => {
+    const all = [...page.matchAll(/<meta http-equiv="Content-Security-Policy" content="([^"]+)">/g)];
+    if(all.length !== 1) throw new Error(name + ": " + all.length + " Content-Security-Policy meta tags, want exactly one (every policy on a page applies, so a second one can block the first one's scripts)");
+    const m = all[0];
+    if(page.indexOf(m[0]) > page.indexOf("<script")) throw new Error(name + ": the policy must come before the first script");
+    const dir = {}; m[1].split(";").map(s => s.trim().split(/\s+/)).forEach(([k, ...v]) => { dir[k] = v; });
+    const ss = dir["script-src"] || [];
+    eq(ss.includes("'unsafe-inline'") || ss.includes("'unsafe-eval'"), false, name + ": script-src allows inline or eval code");
+    ["frame-src", "object-src", "base-uri", "form-action"].forEach(k => eq((dir[k] || []).join(" "), "'none'", name + ": " + k));
+    [...page.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].filter(x => !/\bsrc\s*=/i.test(x[1])).forEach(x => {
+      const h = "'sha256-" + crypto.createHash("sha256").update(x[2], "utf8").digest("base64") + "'";
+      if(!ss.includes(h)) throw new Error(name + ": an inline script has no hash in script-src: " + x[2].slice(0, 60));
+    });
+    return ss;
+  };
+  const ss = check("index.html", html);
+  eq(/\son(click|submit|error|load|input|change|keydown|mouseover|focus)\s*=\s*["']/i.test(html), false, "index.html: an inline on*= handler, which the policy blocks");
+  const pages = fs.readdirSync(path.join(D, "..", "docs")).filter(n => n.endsWith(".html") && !["index.html", "404.html"].includes(n));
+  pages.forEach(n => { const s2 = check(n, docs(n)); ss.filter(x => x.startsWith("'sha256-")).forEach(h => { if(!s2.includes(h)) throw new Error(n + ": missing the app's script hash, so the app it writes in would not run"); }); });
+  console.log("content security policy: index.html and " + pages.length + " route pages, every inline script hashed, no inline handlers, frames and plugins off");
+}

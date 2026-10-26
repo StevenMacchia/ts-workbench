@@ -154,16 +154,16 @@ function projectCards(items){
   const all = `<button type="button" class="card projcard ${!active?"on":""}" data-wsproj="">
       <span class="projname"><svg><use href="#i-layers"/></svg>All results</span><span class="note">Everything you've saved</span><span class="kcs">${kc(counts(undefined))}</span></button>`;
   const cards = projects.map(p => {
-    if(wsUI.editProject===p.id) return `<div class="card projcard on"><div class="field"><label for="wp-name-${p.id}">Project name</label><input class="input" id="wp-name-${p.id}" value="${esc(p.name)}"></div>
-      <div class="field"><label for="wp-desc-${p.id}">Description</label><input class="input" id="wp-desc-${p.id}" value="${esc(p.desc||"")}"></div>
-      <div class="row"><button type="button" class="btn sm primary" data-ws-projsave="${p.id}">Save</button><button type="button" class="btn sm" data-ws="cancelproj">Cancel</button></div></div>`;
+    if(wsUI.editProject===p.id) return `<div class="card projcard on"><div class="field"><label for="wp-name-${esc(p.id)}">Project name</label><input class="input" id="wp-name-${esc(p.id)}" value="${esc(p.name)}"></div>
+      <div class="field"><label for="wp-desc-${esc(p.id)}">Description</label><input class="input" id="wp-desc-${esc(p.id)}" value="${esc(p.desc||"")}"></div>
+      <div class="row"><button type="button" class="btn sm primary" data-ws-projsave="${esc(p.id)}">Save</button><button type="button" class="btn sm" data-ws="cancelproj">Cancel</button></div></div>`;
     const confirming = wsUI.confirm==="proj:"+p.id;
     return `<div class="card projcard ${active===p.id?"on":""}">
-      <button type="button" class="projhit" data-wsproj="${p.id}" aria-pressed="${active===p.id}"><span class="projname"><svg><use href="#i-folder"/></svg>${esc(p.name)}</span>
+      <button type="button" class="projhit" data-wsproj="${esc(p.id)}" aria-pressed="${active===p.id}"><span class="projname"><svg><use href="#i-folder"/></svg>${esc(p.name)}</span>
         <span class="note">${esc(p.desc||"No description")}</span><span class="kcs">${kc(counts(p.id))}</span></button>
       <div class="projact">${confirming
-        ? `<span class="note">Delete project? Its results move to All results.</span><button type="button" class="btn sm danger" data-ws-projdelok="${p.id}">Delete</button><button type="button" class="btn sm" data-ws="cancelconfirm">Cancel</button>`
-        : `<button type="button" class="btn sm" data-ws-projedit="${p.id}">Rename</button><button type="button" class="btn sm icon" data-ws-projdel="${p.id}" aria-label="Delete project" title="Delete project"><svg><use href="#i-trash"/></svg></button>`}</div>
+        ? `<span class="note">Delete project? Its results move to All results.</span><button type="button" class="btn sm danger" data-ws-projdelok="${esc(p.id)}">Delete</button><button type="button" class="btn sm" data-ws="cancelconfirm">Cancel</button>`
+        : `<button type="button" class="btn sm" data-ws-projedit="${esc(p.id)}">Rename</button><button type="button" class="btn sm icon" data-ws-projdel="${esc(p.id)}" aria-label="Delete project" title="Delete project"><svg><use href="#i-trash"/></svg></button>`}</div>
     </div>`;
   }).join("");
   const form = wsUI.newProject ? `<div class="card projcard on"><div class="field"><label for="wp-new-name">Project name</label><input class="input" id="wp-new-name" placeholder="e.g. Marketplace launch Q3"></div>
@@ -178,20 +178,20 @@ function itemRows(items){
   return `<div class="card wslist">${items.map(it => {
     const s = itemSummary(it), confirming = wsUI.confirm==="item:"+it.id;
     const title = wsUI.rename===it.id
-      ? `<span class="row" style="gap:6px"><input class="input" id="wr-${it.id}" value="${esc(it.title||"")}" style="max-width:280px;padding:6px 9px"><button type="button" class="btn sm primary" data-ws-renameok="${it.id}">Save</button><button type="button" class="btn sm" data-ws="cancelrename">Cancel</button></span>`
+      ? `<span class="row" style="gap:6px"><input class="input" id="wr-${esc(it.id)}" value="${esc(it.title||"")}" style="max-width:280px;padding:6px 9px"><button type="button" class="btn sm primary" data-ws-renameok="${esc(it.id)}">Save</button><button type="button" class="btn sm" data-ws="cancelrename">Cancel</button></span>`
       : `<b>${esc(it.title||"Untitled")}</b>`;
     return `<div class="wsrow">
       ${tileHTML(KINDS[it.kind].icon, TOOL_TONE[it.kind], "md")}
       <div class="libmain">${title}<span class="note">${KINDS[it.kind].n} · Updated ${fmtDate(it.updated)}</span></div>
       <div class="libstat">${s.html}</div>
-      <label class="wsmove"><span class="visually-hidden">Project for ${esc(it.title||"this result")}</span><select class="select" data-ws-move="${it.id}">
-        <option value="">No project</option>${projects.map(p=>`<option value="${p.id}" ${it.projectId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></label>
+      <label class="wsmove"><span class="visually-hidden">Project for ${esc(it.title||"this result")}</span><select class="select" data-ws-move="${esc(it.id)}">
+        <option value="">No project</option>${projects.map(p=>`<option value="${esc(p.id)}" ${it.projectId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></label>
       <div class="libact">${confirming
-        ? `<span class="note">Delete permanently?</span><button type="button" class="btn sm danger" data-ws-delok="${it.id}">Delete</button><button type="button" class="btn sm" data-ws="cancelconfirm">Cancel</button>`
-        : `<button type="button" class="btn sm primary" data-ws-open="${it.id}">Open</button>
-           <button type="button" class="btn sm" data-ws-rename="${it.id}">Rename</button>
-           <button type="button" class="btn sm icon" data-ws-dup="${it.id}" aria-label="Duplicate" title="Duplicate"><svg><use href="#i-copy"/></svg></button>
-           <button type="button" class="btn sm icon" data-ws-del="${it.id}" aria-label="Delete" title="Delete"><svg><use href="#i-trash"/></svg></button>`}</div>
+        ? `<span class="note">Delete permanently?</span><button type="button" class="btn sm danger" data-ws-delok="${esc(it.id)}">Delete</button><button type="button" class="btn sm" data-ws="cancelconfirm">Cancel</button>`
+        : `<button type="button" class="btn sm primary" data-ws-open="${esc(it.id)}">Open</button>
+           <button type="button" class="btn sm" data-ws-rename="${esc(it.id)}">Rename</button>
+           <button type="button" class="btn sm icon" data-ws-dup="${esc(it.id)}" aria-label="Duplicate" title="Duplicate"><svg><use href="#i-copy"/></svg></button>
+           <button type="button" class="btn sm icon" data-ws-del="${esc(it.id)}" aria-label="Delete" title="Delete"><svg><use href="#i-trash"/></svg></button>`}</div>
     </div>`; }).join("")}</div>`;
 }
 function renderWorkspace(){
@@ -305,8 +305,10 @@ function bindWorkspace(){
       reader.onload = () => { try{
           const data = JSON.parse(reader.result); let n = 0;
           if(data && data.kind==="workspace"){
-            const pr = wsProjects(); (data.projects||[]).forEach(p => { if(p && p.id && p.name){ pr[p.id] = p; } }); wsSaveProjects(pr);
-            const m = wsItems(); (data.items||[]).forEach(it => { if(it && it.id && KINDS[it.kind] && it.data){ m[it.id] = it; n++; } }); wsSaveItems(m);
+            // a file can come from anyone: ids are short word characters, names and titles are text, data is an object
+            const okId = x => typeof x === "string" && /^[w-]{1,64}$/.test(x), txt = (x, n) => typeof x === "string" ? x.slice(0, n) : "";
+            const pr = wsProjects(); (Array.isArray(data.projects) ? data.projects : []).forEach(p => { if(p && okId(p.id) && typeof p.name === "string" && p.name){ pr[p.id] = Object.assign({}, p, {name:txt(p.name, 120), desc:txt(p.desc, 400)}); } }); wsSaveProjects(pr);
+            const m = wsItems(); (Array.isArray(data.items) ? data.items : []).forEach(it => { if(it && okId(it.id) && Object.prototype.hasOwnProperty.call(KINDS, it.kind) && it.data && typeof it.data === "object" && (it.projectId == null || okId(it.projectId))){ m[it.id] = Object.assign({}, it, {title:txt(it.title, 200)}); n++; } }); wsSaveItems(m);
             if(data.profile && !wsProfile()) store.set("ws:profile", data.profile);
             re(); return toast(`Imported ${n} result${n===1?"":"s"}`);
           }

@@ -17,7 +17,12 @@ const savePol = () => store.set("pol", pol);
 function polBenchRange(){
   try{ const scores = POL_EXAMPLES.map(([, t]) => polHeuristics(t).score); return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
 }
-shareRegister("policy", d => { pol = Object.assign(POL_BLANK(), d, {shared:true}); polView = "page"; savePol(); });
+const POL_RESULT_LISTS = ["assumptions", "vague_terms", "reviewer_checklist", "open_questions", "gaps", "enforcement_risks", "edge_cases", "strengths", "legal"];
+shareRegister("policy", d => {
+  const r = d.result;
+  if(r && typeof r === "object" && !Array.isArray(r)) POL_RESULT_LISTS.forEach(k => { if(!Array.isArray(r[k])) r[k] = []; else r[k] = r[k].filter(x => x !== null && x !== undefined); });
+  else d.result = null;
+  pol = Object.assign(POL_BLANK(), d, {shared:true}); if(pol.heur) pol.heur = polHeuristics(String(pol.rule || "")); polView = "page"; savePol(); }, POL_BLANK);
 const POL_ENF = [["reports","User reports"],["humans","Human reviewers"],["auto","Automated detection"],["vendor","Outsourced moderation vendor"],["community","Community moderators"]];
 const POL_ACT = [["remove","Remove content"],["label","Warning label or blur"],["limit","Reduce reach"],["warn","Warn the user"],["suspend","Temporary suspension"],["ban","Permanent ban"]];
 const POL_EXAMPLES = [
@@ -258,6 +263,7 @@ function polMarkdown(){
   return L.join("\n");
 }
 function polRing(score, size){
+  score = +score || 0;
   const r = size/2 - 6, C = 2*Math.PI*r, col = score>=75 ? "var(--good)" : score>=50 ? "var(--high)" : "var(--crit)";
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Clarity score ${score} out of 100"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--sunk)" stroke-width="7"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-score/100)).toFixed(1)}" transform="rotate(-90 ${size/2} ${size/2})"/><text x="50%" y="54%" text-anchor="middle" font-size="${size>80?21:15}" font-weight="600" fill="var(--ink)" font-family="var(--mono)">${score}</text></svg>`;
 }

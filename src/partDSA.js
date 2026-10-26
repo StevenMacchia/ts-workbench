@@ -214,7 +214,7 @@ const dsTitle = d => "DSA readiness: " + (d.svc || "Untitled service");
 function dsBenchPct(){
   try{ const d = Object.assign(DS_BLANK(), DS_EXAMPLE), x = dsCtx(d); return dsScore(d, x).pct; }catch(e){ return null; }
 }
-shareRegister("dsa", d => { ds = Object.assign(DS_BLANK(), d, {shared:true}); dsView = "page"; dsSave(); });
+shareRegister("dsa", d => { ds = Object.assign(DS_BLANK(), d, {shared:true}); dsView = "page"; dsSave(); }, DS_BLANK);
 
 /* ---------- working it out ---------- */
 function dsCtx(d){

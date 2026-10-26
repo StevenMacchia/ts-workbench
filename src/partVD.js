@@ -108,7 +108,7 @@ function vdWhy(){
 function vdResultHTML(){
   return `<div class="card vd-why">${vdWhy()}</div>
     <div class="card vd-heat"><table><thead><tr><th>Criterion</th>${vx.vendors.map(v => `<th>${esc(v.name.split(" (")[0])}</th>`).join("")}</tr></thead>
-    <tbody>${CRITERIA.map(c => `<tr><td>${esc(c.n)}${c.deal ? ` <span class="vd-min">min 3</span>` : ""}</td>${vx.vendors.map(v => `<td><span class="vd-cell ${VD_HEAT[v.s[c.k]] || "none"} ${c.deal && v.s[c.k] && v.s[c.k] <= 2 ? "fail" : ""}">${v.s[c.k] || "–"}</span></td>`).join("")}</tr>`).join("")}</tbody></table>
+    <tbody>${CRITERIA.map(c => `<tr><td>${esc(c.n)}${c.deal ? ` <span class="vd-min">min 3</span>` : ""}</td>${vx.vendors.map(v => `<td><span class="vd-cell ${VD_HEAT[v.s[c.k]] || "none"} ${c.deal && v.s[c.k] && v.s[c.k] <= 2 ? "fail" : ""}">${+v.s[c.k] || "–"}</span></td>`).join("")}</tr>`).join("")}</tbody></table>
     <p class="note">Darker green is stronger. A red outline marks a score that fails a minimum.</p></div>`;
 }
 function vdWeightsBar(){
@@ -125,7 +125,11 @@ function vdBenchRange(){
     const scores = DEFAULT_V.vendors.map(v => CRITERIA.reduce((a, c) => a + (+DEFAULT_V.weights[c.k] || 0) * (v.s[c.k] || 0), 0) / tw);
     return {min:Math.min(...scores), max:Math.max(...scores)}; }catch(e){ return null; }
 }
-shareRegister("vendors", d => { vx = Object.assign({weights:{}, vendors:[], open:null}, d, {shared:true}); vdView = "results"; vdSave(); });
+shareRegister("vendors", d => {
+  const w = {}; CRITERIA.forEach(c => { const n = +(d.weights || {})[c.k]; if(isFinite(n)) w[c.k] = n; }); d.weights = w;
+  d.vendors = (d.vendors || []).filter(v => v && typeof v === "object").slice(0, 12).map(v => ({name:String(v.name || "").slice(0, 80), s:Object.fromEntries(CRITERIA.map(c => { const n = Math.round(+(v.s || {})[c.k]); return [c.k, n >= 1 && n <= 5 ? n : null]; }))}));
+  vx = Object.assign({weights:{}, vendors:[], open:null}, d, {shared:true}); vdView = "results"; vdSave();
+}, () => ({weights:{}, vendors:[]}));
 function vdNamesHTML(){ return `<div class="card vd-names"><span class="note">Your shortlist · ${vx.vendors.length} of ${VD_MAX}. Click a name to rename it.</span>${vx.vendors.map((v, i) => `<span class="vd-nm"><input class="input vname" data-i="${i}" value="${esc(v.name)}" placeholder="Vendor name" title="Click to rename" aria-label="Vendor ${i + 1} name" maxlength="40">${vx.vendors.length > VD_MIN ? `<button type="button" class="vd-x" data-vdel="${i}" aria-label="Remove ${esc(v.name)}">${icon("x")}</button>` : ""}</span>`).join("")}
             ${vx.vendors.length < VD_MAX ? `<button type="button" class="btn sm" id="vx-add">${icon("plus")}Add a vendor</button>` : ""}</div>`; }
 function vdCritHTML(c, seen){

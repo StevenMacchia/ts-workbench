@@ -34,7 +34,7 @@ if(!cv.r) cv.r = {};
 const cvSave = () => store.set("cv", cv);
 // The built-in example's own coverage %, for a benchmark line under the verdict
 function cvBenchPct(){ try{ return cvSummary(CV_EXAMPLE).cov; }catch(e){ return null; } }
-shareRegister("coverage", d => { cv = Object.assign({src:null, ex:false, r:{}}, d, {shared:true}); cvG = null; cvView = null; cvTab = "gaps"; cvSave(); });
+shareRegister("coverage", d => { cv = Object.assign({src:null, ex:false, r:{}}, d, {shared:true}); cvG = null; cvView = null; cvTab = "gaps"; cvSave(); }, () => ({src:null, ex:false, r:{}}));
 const cvHarm = a => a.n.replace(" & ", " and ").split(" ").map(w => /^[A-Z]{2,}$/.test(w) ? w : w.toLowerCase()).join(" ");
 const cvRiskWords = x => x.band ? `${BANDS[x.band][0].toLowerCase()} risk (${x.score} of 16)` : "no risk found";
 

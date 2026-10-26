@@ -225,7 +225,7 @@ const cpTitle = d => "COPPA readiness: " + (d.svc || "Untitled service");
 function cpBenchPct(){
   try{ const d = Object.assign(CP_BLANK(), CP_EXAMPLE), x = cpCtx(d), ap = cpApplies(d); return cpScore(d, x, ap).pct; }catch(e){ return null; }
 }
-shareRegister("coppa", d => { cp = Object.assign(CP_BLANK(), d, {shared:true}); cpView = "page"; cpSave(); });
+shareRegister("coppa", d => { cp = Object.assign(CP_BLANK(), d, {shared:true}); cpView = "page"; cpSave(); }, CP_BLANK);
 
 /* ---------- working it out ---------- */
 function cpCtx(d){
